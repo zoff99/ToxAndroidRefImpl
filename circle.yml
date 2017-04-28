@@ -19,6 +19,7 @@ machine:
     # c-toxcore v0.1.2 a096c71db867ac83fc3e01e0fbe98573d20f9286
     # ---------------------------------------------------
 
+    # c-toxcore v0.1.7
     AND_CTOXCORE_VERSION: "48c86e942d487a8856cbd25797b320bfb1879ddc"
 
 dependencies:
@@ -53,7 +54,7 @@ compile:
   - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
   - . ~/pp;curl -s http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
   - . ~/pp;unzip android-ndk-r13b-linux-x86_64.zip
-  - . ~/pp;mv -v /home/ubuntu/c-toxcore/android-ndk-r13b /home/ubuntu/android-ndk
+  - . ~/pp;mv -v /home/ubuntu/ToxAndroidRefImpl/android-ndk-r13b /home/ubuntu/android-ndk
   - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch arm --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
 
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
