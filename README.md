@@ -1,2 +1,1 @@
-# ToxAndroidRefImpl
-Tox Reference implementation on Android
+# Tox Reference implementation on Android
