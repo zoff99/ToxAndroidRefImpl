@@ -1,1 +1,1 @@
-# Tox Reference Implementation for Android
+# Tox Reference Implementation for Android [TRIfA]
