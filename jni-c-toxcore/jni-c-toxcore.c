@@ -60,6 +60,16 @@ const char *savedata_tmp_filename = "savedata.tox.tmp";
 int tox_loop_running = 1;
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 
+// ----- JNI stuff -----
+JNIEnv *jnienv;
+JavaVM *cachedJVM = NULL;
+jobject *android_activity;
+
+char *app_data_dir = NULL;
+jclass MainActivity = NULL;
+jmethodID logger_method = NULL;
+// ----- JNI stuff -----
+
 
 
 typedef struct DHT_node {
@@ -70,6 +80,15 @@ typedef struct DHT_node {
 } DHT_node;
 
 
+
+
+// functions -----------
+// functions -----------
+// functions -----------
+void android_logger(const char* logtext);
+// functions -----------
+// functions -----------
+// functions -----------
 
 
 
@@ -354,14 +373,6 @@ void _main_()
 // ------------- JNI -------------
 
 
-JNIEnv *jnienv;
-JavaVM *cachedJVM = NULL;
-jobject *android_activity;
-
-char *app_data_dir = NULL;
-jclass MainActivity = NULL;
-jmethodID logger_method = NULL;
-
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 {
 	JNIEnv *env_this;
@@ -457,6 +468,8 @@ void android_logger(const char* logtext)
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
 {
+	const char *s = NULL;
+
 	// SET GLOBAL JNIENV here, this is bad!!
 	// SET GLOBAL JNIENV here, this is bad!!
 	// SET GLOBAL JNIENV here, this is bad!!
