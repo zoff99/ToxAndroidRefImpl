@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native methods --------
     void test(int i)
     {
-        // System.out.println("test:" + i);
         Log.i(TAG, "test:" + i);
     }
 
