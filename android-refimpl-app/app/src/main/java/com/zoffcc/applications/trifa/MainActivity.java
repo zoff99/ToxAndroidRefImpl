@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
 
-    void logger(int level, String text)
+    static void logger(int level, String text)
     {
         System.out.println("logger:" + text);
         Log.i(TAG, text);
