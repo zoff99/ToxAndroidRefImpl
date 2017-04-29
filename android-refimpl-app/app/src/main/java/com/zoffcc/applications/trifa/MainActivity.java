@@ -10,6 +10,7 @@ public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
     static TextView mt = null;
+    static boolean native_lib_loaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -19,6 +20,16 @@ public class MainActivity extends AppCompatActivity
 
         mt = (TextView) this.findViewById(R.id.maintext);
         mt.setText("...");
+
+        if (native_lib_loaded)
+        {
+            mt.setText("successfully loaded native library");
+        }
+        else
+        {
+            mt.setText("loadLibrary jni-c-toxcore failed!");
+        }
+
     }
 
     static
@@ -36,18 +47,13 @@ public class MainActivity extends AppCompatActivity
         try
         {
             System.loadLibrary("jni-c-toxcore");
-            if (mt!=null)
-            {
-                mt.setText("successfully loaded native library");
-            }
+            native_lib_loaded = true;
+            Log.i(TAG, "successfully loaded native library");
         }
         catch (java.lang.UnsatisfiedLinkError e)
         {
+            native_lib_loaded = false;
             Log.i(TAG, "loadLibrary jni-c-toxcore failed!");
-            if (mt!=null)
-            {
-                mt.setText("loadLibrary jni-c-toxcore failed!");
-            }
         }
     }
 }
