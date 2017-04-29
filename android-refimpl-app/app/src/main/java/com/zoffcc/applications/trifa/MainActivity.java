@@ -56,7 +56,34 @@ public class MainActivity extends AppCompatActivity
         app_files_directory = getFilesDir().getAbsolutePath();
         init(app_files_directory);
 
-        toxloop();
+        tox_thread_start();
+    }
+
+
+    void tox_thread_start()
+    {
+        Thread thread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                toxloop();
+
+                try
+                {
+                    while (true)
+                    {
+                        sleep(1000);
+                    }
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
     }
 
     static
@@ -83,6 +110,40 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_self_connection_status_method(int a_TOX_CONNECTION)
     {
         Log.i(TAG, "a_TOX_CONNECTION:" + a_TOX_CONNECTION);
+    }
+
+    static void android_tox_callback_friend_name_cb_method(long a, String b, long c)
+    {
+    }
+
+    static void android_tox_callback_friend_status_message_cb_method(long a, String b, long c)
+    {
+    }
+
+    static void android_tox_callback_friend_status_cb_method(long a, int b)
+    {
+    }
+
+    static void android_tox_callback_friend_connection_status_cb(long friend_number, int a_TOX_CONNECTION)
+    {
+        Log.i(TAG, "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION);
+    }
+
+    static void android_tox_callback_friend_typing_cb_method(long a, int b)
+    {
+    }
+
+    static void android_tox_callback_friend_read_receipt_cb_method(long a, long b)
+    {
+    }
+
+    static void android_tox_callback_friend_request_cb_method(String friend_public_key, String friend_request_message, long length)
+    {
+        Log.i(TAG, "_friend_request:friend:" + friend_public_key + " message:" + friend_request_message);
+    }
+
+    static void android_tox_callback_friend_message_cb_method(long a, int b, String c, long d)
+    {
     }
 
     void test(int i)
