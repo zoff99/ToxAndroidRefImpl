@@ -8,6 +8,7 @@ machine:
     AND_PKG_CONFIG_PATH: "$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
     AND_CC: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
     AND_CXX: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang++"
+    AND_READELF: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-readelf"
 # --- Android build ---
 
     # ---------------------------------------------------
@@ -43,7 +44,7 @@ compile:
   override:
 
 # --- Android build ---
-  - echo 'export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS=""' > ~/pp
+  - echo 'export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS=""' > ~/pp
   - chmod u+x ~/pp
   - mkdir -p "$_s_"
 
@@ -129,8 +130,14 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/c-toxcore.zip *
 
 
-  - . ~/pp;cd jni-c-toxcore/;$CC -O2 -fPIC -shared -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so std=gnu99 -lsodium -I/usr/local/include/ -ltoxcore -ltoxav -lvpx -lopus -lm -lc
+  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
+  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
 
+  - . ~/pp;cd jni-c-toxcore/; $CC -O2 -fPIC -shared -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -lsodium -I/usr/local/include/ -ltoxcore -ltoxav -lvpx -lopus -lm -lc
+  - . ~/pp;cd jni-c-toxcore/; ls -al
+  - . ~/pp;cd jni-c-toxcore/; $READELF -a libjni-c-toxcore.so
+  - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
+  - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
 # --- Android build ---
 

@@ -47,11 +47,20 @@
 #define c_sleep(x) usleep(1000*x)
 
 #define CURRENT_LOG_LEVEL 9 // 0 -> error, 1 -> warn, 2 -> info, 9 -> debug
-#deinfe MAX_LOG_LINE_LENGTH 1000
+#define MAX_LOG_LINE_LENGTH 1000
 
 const char *savedata_filename = "savedata.tox";
 const char *savedata_tmp_filename = "savedata.tox.tmp";
+int tox_loop_running = 1;
+TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 
+
+typedef struct DHT_node {
+    const char *ip;
+    uint16_t port;
+    const char key_hex[TOX_PUBLIC_KEY_SIZE*2 + 1];
+    unsigned char key_bin[TOX_PUBLIC_KEY_SIZE];
+} DHT_node;
 
 
 
