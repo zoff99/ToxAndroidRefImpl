@@ -53,11 +53,13 @@
 
 #define CURRENT_LOG_LEVEL 9 // 0 -> error, 1 -> warn, 2 -> info, 9 -> debug
 #define MAX_LOG_LINE_LENGTH 1000
+#define MAX_FULL_PATH_LENGTH 1000
 
 const char *savedata_filename = "savedata.tox";
 const char *savedata_tmp_filename = "savedata.tox.tmp";
 int tox_loop_running = 1;
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
+
 
 
 typedef struct DHT_node {
@@ -127,7 +129,8 @@ void dbg(int level, const char *fmt, ...)
 		va_list ap;
 		va_start(ap, fmt);
 		vsnprintf(log_line_str, (size_t)MAX_LOG_LINE_LENGTH, level_and_format, ap);
-		// *TODO* send "log_line_str" to android
+		// send "log_line_str" to android
+		android_logger(log_line_str);
 		va_end(ap);
 		free(log_line_str);
 	}
@@ -154,7 +157,11 @@ Tox *create_tox()
 	options.hole_punching_enabled = true;
 	options.tcp_port = tcp_port;
 
-    FILE *f = fopen(savedata_filename, "rb");
+	char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
+	snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
+
+
+    FILE *f = fopen(full_path_filename, "rb");
     if (f)
 	{
         fseek(f, 0, SEEK_END);
@@ -186,6 +193,8 @@ Tox *create_tox()
 	bool local_discovery_enabled = tox_options_get_local_discovery_enabled(&options);
 	dbg(9, "local discovery enabled = %d\n", (int)local_discovery_enabled);
 
+	free(full_path_filename);
+
     return tox;
 }
 
@@ -196,12 +205,20 @@ void update_savedata_file(const Tox *tox)
     char *savedata = malloc(size);
     tox_get_savedata(tox, (uint8_t *)savedata);
 
-    FILE *f = fopen(savedata_tmp_filename, "wb");
+	char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
+	snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
+
+	char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
+	snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
+
+    FILE *f = fopen(full_path_filename_tmp, "wb");
     fwrite(savedata, size, 1, f);
     fclose(f);
 
-    rename(savedata_tmp_filename, savedata_filename);
+    rename(full_path_filename_tmp, full_path_filename);
 
+	free(full_path_filename);
+	free(full_path_filename_tmp);
     free(savedata);
 }
 
@@ -332,6 +349,148 @@ void _main_()
 }
 
 
+// ------------- JNI -------------
+// ------------- JNI -------------
+// ------------- JNI -------------
+
+
+JNIEnv *jnienv;
+JavaVM *cachedJVM = NULL;
+jobject *android_activity;
+
+char *app_data_dir = NULL;
+jclass MainActivity = NULL;
+jmethodID logger_method = NULL;
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
+{
+	JNIEnv *env_this;
+	cachedJVM = jvm;
+	if ((*jvm)->GetEnv(jvm, (void**) &env_this, JNI_VERSION_1_6))
+	{
+		// dbg(0,"Could not get JVM\n");
+		return JNI_ERR;
+	}
+
+	// dbg(0,"++ Found JVM ++\n");
+	return JNI_VERSION_1_6;
+}
+
+JNIEnv* jni_getenv()
+{
+	JNIEnv* env_this;
+	(*cachedJVM)->GetEnv(cachedJVM, (void**) &env_this, JNI_VERSION_1_6);
+	return env_this;
+}
+
+
+JNIEnv *AttachJava()
+{
+	JavaVMAttachArgs args = {JNI_VERSION_1_6, 0, 0};
+	JNIEnv *java;
+	(*cachedJVM)->AttachCurrentThread(cachedJVM, &java, &args);
+	return java;
+}
+
+int android_find_class_global(char *name, jclass *ret)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	*ret = (*jnienv2)->FindClass(jnienv2, name);
+	if (!*ret)
+	{
+		return 0;
+	}
+
+	*ret = (*jnienv2)->NewGlobalRef(jnienv2, *ret);
+	return 1;
+}
+
+int android_find_method(jclass class, char *name, char *args, jmethodID *ret)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	*ret = (*jnienv2)->GetMethodID(jnienv2, class, name, args);
+	if (*ret == NULL)
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
+
+int android_find_static_method(jclass class, char *name, char *args, jmethodID *ret)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	*ret = (*jnienv2)->GetStaticMethodID(jnienv2, class, name, args);
+	if (*ret == NULL)
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
+
+void android_logger(const char* logtext)
+{
+	if ((MainActivity) && (logger_method) && (logtext))
+	{
+		if (strlen(logtext) > 0)
+		{
+			JNIEnv *jnienv2;
+			jnienv2 = jni_getenv();
+			jstring js2 = NULL;
+
+			js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
+			(*jnienv2)->CallVoidMethod(jnienv2, MainActivity, logger_method, js2);
+			(*jnienv2)->DeleteLocalRef(jnienv2, js2);
+		}
+	}
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
+{
+	// SET GLOBAL JNIENV here, this is bad!!
+	// SET GLOBAL JNIENV here, this is bad!!
+	// SET GLOBAL JNIENV here, this is bad!!
+	// jnienv = env;
+	// dbg(0,"jnienv=%p\n", env);
+	// SET GLOBAL JNIENV here, this is bad!!
+	// SET GLOBAL JNIENV here, this is bad!!
+	// SET GLOBAL JNIENV here, this is bad!!
+
+	if (MainActivity == NULL)
+	{
+		if (!android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &MainActivity))
+		{
+			MainActivity = NULL;
+		}
+	}
+
+	if (logger_method == NULL)
+	{
+		android_find_method(MainActivity, "logger(String text)", "(Ljava/lang/String;)V", &logger_method);
+	}
+
+	dbg(9, "Logging test ---***---");
+
+	int thread_id = gettid();
+	dbg(9, "THREAD ID=%d\n", thread_id);
+
+	s =  (*env)->GetStringUTFChars(env, datadir, NULL);
+	app_data_dir = strdup(s);
+	(*env)->ReleaseStringUTFChars(env, datadir, s);
+
+}
+
+
 // ------------------------------------------------------------------------------------------------
 // taken from:
 // https://github.com/googlesamples/android-ndk/blob/master/hello-jni/app/src/main/cpp/hello-jni.c
@@ -372,6 +531,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibAPI(JNIEnv* env, job
 #define ABI "unknown"
 #endif
 
-    return (*env)->NewStringUTF(env, "Native Code Compiled with ABI " ABI ".");
+    return (*env)->NewStringUTF(env, "Native Code Compiled with ABI:" ABI "");
 }
+
+
+// ------------- JNI -------------
+// ------------- JNI -------------
+// ------------- JNI -------------
+
 

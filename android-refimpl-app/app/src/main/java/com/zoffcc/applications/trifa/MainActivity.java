@@ -60,6 +60,11 @@ public class MainActivity extends AppCompatActivity
 
     public native String getNativeLibAPI();
 
+    void logger(String text)
+    {
+        Log.i(TAG, text);
+    }
+
     /*
      * this is used to load the native library on
 	 * application startup. The library has already been unpacked at
