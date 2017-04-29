@@ -3,9 +3,11 @@ package com.zoffcc.applications.trifa;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity
 {
+    private static final String TAG = "trifa.MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,6 +28,13 @@ public class MainActivity extends AppCompatActivity
 	 */
     static
     {
-        System.loadLibrary("jni-c-toxcore");
+        try
+        {
+            System.loadLibrary("jni-c-toxcore");
+        }
+        catch (java.lang.UnsatisfiedLinkError e)
+        {
+            Log.i(TAG, "loadLibrary jni-c-toxcore failed!");
+        }
     }
 }
