@@ -85,7 +85,7 @@ typedef struct DHT_node {
 // functions -----------
 // functions -----------
 // functions -----------
-void android_logger(int level, const char* logtext)
+void android_logger(int level, const char* logtext);
 // functions -----------
 // functions -----------
 // functions -----------
