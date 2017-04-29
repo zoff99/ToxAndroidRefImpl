@@ -192,25 +192,27 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
-  - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so android-refimpl-app/app/nativelibs/armeabi/
+  - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi/
 # --- Android build ---
 
 
 # --------- GRADLE -------------
-  - cd jni-c-toxcore/android-refimpl-app/ ; ./gradlew build --max-workers=1 --stacktrace --no-daemon || ./gradlew build --stacktrace --no-daemon # first build may FAIL
+  - cd android-refimpl-app/ ; ./gradlew build --max-workers=1 --stacktrace --no-daemon || ./gradlew build --stacktrace --no-daemon # first build may FAIL
 # --------- GRADLE -------------
 
 
 # --- save lint output ---
-  - cd jni-c-toxcore/android-refimpl-app/ ; find . -name '*lint-report*' -exec ls -al {} \; ; exit 0
-  - cd jni-c-toxcore/android-refimpl-app/ ; cp -av ./app/lint-report.html $CIRCLE_ARTIFACTS/ ; exit 0
-  - cd jni-c-toxcore/android-refimpl-app/ ; cp -av ./app/lint-report.xml $CIRCLE_ARTIFACTS/ ; exit 0
-  - cd jni-c-toxcore/android-refimpl-app/ ; cp -av ./lint-report.txt $CIRCLE_ARTIFACTS/ ; exit 0
+  - cd android-refimpl-app/ ; find . -name '*lint-report*' -exec ls -al {} \; ; exit 0
+  - cd android-refimpl-app/ ; cp -av ./app/lint-report.html $CIRCLE_ARTIFACTS/ ; exit 0
+  - cd android-refimpl-app/ ; cp -av ./app/lint-report.xml $CIRCLE_ARTIFACTS/ ; exit 0
+  - cd android-refimpl-app/ ; cp -av ./lint-report.txt $CIRCLE_ARTIFACTS/ ; exit 0
 # --- save lint output ---
 
 # ----------- show generated apk file -----------
-  - cd jni-c-toxcore/android-refimpl-app/ ; ls -al app/build/outputs/apk/ ; exit 0
-  - cd jni-c-toxcore/android-refimpl-app/ ; find ./ -name '*.apk' ; exit 0
+  - cd android-refimpl-app/ ; ls -al app/build/outputs/apk/ ; exit 0
+  - cd android-refimpl-app/ ; find ./ -name '*.apk' ; exit 0
+  - mkdir -p app/build/outputs/apk/
+  - cd android-refimpl-app/ ; cp -av /app/build/outputs/apk/*.apk ../app/build/outputs/apk/
 # ----------- show generated apk file -----------
 
 
