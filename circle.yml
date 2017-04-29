@@ -197,6 +197,7 @@ compile:
 
 
 # --------- GRADLE -------------
+  - cd android-refimpl-app/ ; chmod a+rx ./gradlew
   - cd android-refimpl-app/ ; ./gradlew build --max-workers=1 --stacktrace --no-daemon || ./gradlew build --stacktrace --no-daemon # first build may FAIL
 # --------- GRADLE -------------
 
