@@ -4,16 +4,21 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
+    static TextView mt = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mt = (TextView) this.findViewById(R.id.maintext);
+        mt.setText("...");
     }
 
     static
@@ -31,10 +36,18 @@ public class MainActivity extends AppCompatActivity
         try
         {
             System.loadLibrary("jni-c-toxcore");
+            if (mt!=null)
+            {
+                mt.setText("successfully loaded native library");
+            }
         }
         catch (java.lang.UnsatisfiedLinkError e)
         {
             Log.i(TAG, "loadLibrary jni-c-toxcore failed!");
+            if (mt!=null)
+            {
+                mt.setText("loadLibrary jni-c-toxcore failed!");
+            }
         }
     }
 }
