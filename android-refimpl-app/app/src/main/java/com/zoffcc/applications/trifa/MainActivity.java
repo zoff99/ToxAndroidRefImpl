@@ -28,7 +28,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
-    static TextView mt = null;
+    TextView mt = null;
     static boolean native_lib_loaded = false;
 
     @Override
