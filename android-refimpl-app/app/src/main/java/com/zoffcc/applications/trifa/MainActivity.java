@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity
 
         String native_api = getNativeLibAPI();
         mt.setText(mt.getText() + "\n" + native_api);
+
+        init("/data/data/");
     }
 
     static
@@ -58,9 +60,16 @@ public class MainActivity extends AppCompatActivity
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
+    // -------- native methods --------
+    // -------- native methods --------
+    // -------- native methods --------
+    public native void init(String data_dir);
     public native String getNativeLibAPI();
+    // -------- native methods --------
+    // -------- native methods --------
+    // -------- native methods --------
 
-    void logger(String text)
+    void logger(int level, String text)
     {
         System.out.println("logger:" + text);
         Log.i(TAG, text);

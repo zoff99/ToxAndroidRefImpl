@@ -85,7 +85,7 @@ typedef struct DHT_node {
 // functions -----------
 // functions -----------
 // functions -----------
-void android_logger(const char* logtext);
+void android_logger(int level, const char* logtext)
 // functions -----------
 // functions -----------
 // functions -----------
@@ -149,7 +149,7 @@ void dbg(int level, const char *fmt, ...)
 		va_start(ap, fmt);
 		vsnprintf(log_line_str, (size_t)MAX_LOG_LINE_LENGTH, level_and_format, ap);
 		// send "log_line_str" to android
-		android_logger(log_line_str);
+		android_logger(level, log_line_str);
 		va_end(ap);
 		free(log_line_str);
 	}
@@ -448,7 +448,7 @@ int android_find_static_method(jclass class, char *name, char *args, jmethodID *
 }
 
 
-void android_logger(const char* logtext)
+void android_logger(int level, const char* logtext)
 {
 	if ((MainActivity) && (logger_method) && (logtext))
 	{
@@ -456,16 +456,15 @@ void android_logger(const char* logtext)
 		{
 			JNIEnv *jnienv2;
 			jnienv2 = jni_getenv();
-			jstring js2 = NULL;
 
-			js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
-			(*jnienv2)->CallVoidMethod(jnienv2, MainActivity, logger_method, js2);
+			jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
+			// (*jnienv2)->CallVoidMethod(jnienv2, MainActivity, logger_method, level, js2);
 			(*jnienv2)->DeleteLocalRef(jnienv2, js2);
 		}
 	}
 }
 
-JNIEXPORT jstring JNICALL
+JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
 {
 	const char *s = NULL;
@@ -479,18 +478,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	// SET GLOBAL JNIENV here, this is bad!!
 	// SET GLOBAL JNIENV here, this is bad!!
 
-	if (MainActivity == NULL)
-	{
-		if (!android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &MainActivity))
-		{
-			MainActivity = NULL;
-		}
-	}
-
-	if (logger_method == NULL)
-	{
-		android_find_method(MainActivity, "logger", "(Ljava/lang/String;)V", &logger_method);
-	}
+	jclass cls_local = (*env)->GetObjectClass(env, thiz);
+	MainActivity = (*env)->NewGlobalRef(env, cls_local);
+	logger_method = (*env)->GetMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
 
 	dbg(9, "Logging test ---***---");
 
