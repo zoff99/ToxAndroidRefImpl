@@ -12,6 +12,7 @@ android {
 
     sourceSets {
         main {
+            jni.srcDirs = []
             jniLibs.srcDirs = ['nativelibs']
         }
     }
@@ -24,6 +25,15 @@ android {
 
     lintOptions {
         abortOnError false
+        absolutePaths false
+        lintConfig file("lint.xml")
+        showAll true
+        textReport true
+        xmlReport true
+        htmlReport true
+        textOutput file("lint-report.txt")
+        htmlOutput file("lint-report.html")
+        xmlOutput file("lint-report.xml")
     }
 
     compileOptions {
@@ -48,6 +58,10 @@ android {
 
     buildTypes {
         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -8,3 +8,4 @@
 /android-refimpl-app/build
 /android-refimpl-app/captures
 /android-refimpl-app.externalNativeBuild
+android-refimpl-app/app/nativelibs/armeabi/libjni-c-toxcore.so

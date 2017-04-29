@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity
         {
             native_lib_loaded = false;
             Log.i(TAG, "loadLibrary jni-c-toxcore failed!");
+            e.printStackTrace();
         }
     }
 }
