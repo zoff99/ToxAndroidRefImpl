@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "trifa.MainActivity";
     TextView mt = null;
     static boolean native_lib_loaded = false;
+    static String app_files_directory = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,7 +53,10 @@ public class MainActivity extends AppCompatActivity
         String native_api = getNativeLibAPI();
         mt.setText(mt.getText() + "\n" + native_api);
 
-        init("/data/data/");
+        app_files_directory = getFilesDir().getAbsolutePath();
+        init(app_files_directory);
+
+        toxloop();
     }
 
     static
@@ -65,6 +69,8 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     public native void init(String data_dir);
 
+    public native void toxloop();
+
     public native String getNativeLibAPI();
     // -------- native methods --------
     // -------- native methods --------
@@ -73,6 +79,12 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native methods --------
     // -------- called by native methods --------
     // -------- called by native methods --------
+
+    static void android_tox_callback_self_connection_status_method(int a_TOX_CONNECTION)
+    {
+        Log.i(TAG, "a_TOX_CONNECTION:" + a_TOX_CONNECTION);
+    }
+
     void test(int i)
     {
         Log.i(TAG, "test:" + i);

@@ -68,6 +68,7 @@ jobject *android_activity;
 char *app_data_dir = NULL;
 jclass MainActivity = NULL;
 jmethodID logger_method = NULL;
+jmethodID android_tox_callback_self_connection_status_method = NULL;
 // ----- JNI stuff -----
 
 
@@ -86,6 +87,7 @@ typedef struct DHT_node {
 // functions -----------
 // functions -----------
 void android_logger(int level, const char* logtext);
+void android_tox_callback_self_connection_status(int a_TOX_CONNECTION);
 // functions -----------
 // functions -----------
 // functions -----------
@@ -308,31 +310,36 @@ void print_tox_id(Tox *tox)
 void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void *user_data)
 {
     switch (connection_status)
-	{
+    {
         case TOX_CONNECTION_NONE:
             dbg(2, "Offline\n");
-			my_connection_status = TOX_CONNECTION_NONE;
+            my_connection_status = TOX_CONNECTION_NONE;
+            android_tox_callback_self_connection_status((int)my_connection_status);
             break;
         case TOX_CONNECTION_TCP:
             dbg(2, "Online, using TCP\n");
-			my_connection_status = TOX_CONNECTION_TCP;
+            my_connection_status = TOX_CONNECTION_TCP;
+            android_tox_callback_self_connection_status((int)my_connection_status);
             break;
         case TOX_CONNECTION_UDP:
             dbg(2, "Online, using UDP\n");
-			my_connection_status = TOX_CONNECTION_UDP;
+            my_connection_status = TOX_CONNECTION_UDP;
+            android_tox_callback_self_connection_status((int)my_connection_status);
             break;
     }
+
 }
 
 void _main_()
 {
 	Tox *tox = create_tox();
 
-    const char *name = "[TRIfA]";
-    tox_self_set_name(tox, (uint8_t *)name, strlen(name), NULL);
+	const char *name = "TRIfA";
+	tox_self_set_name(tox, (uint8_t *)name, strlen(name), NULL);
 
-    const char *status_message = "This is [TRIfA]";
+	const char *status_message = "This is TRIfA";
 	tox_self_set_status_message(tox, (uint8_t *)status_message, strlen(status_message), NULL);
+
 
 	bootstrap(tox);
 	print_tox_id(tox);
@@ -344,23 +351,23 @@ void _main_()
 	uint8_t off = 1;
 	while (1)
 	{
-        tox_iterate(tox, NULL);
-        usleep(tox_iteration_interval(tox) * 1000);
-        if (tox_self_get_connection_status(tox) && off)
+	        tox_iterate(tox, NULL);
+	        usleep(tox_iteration_interval(tox) * 1000);
+	        if (tox_self_get_connection_status(tox) && off)
 		{
-            dbg(2, "Tox online, took %llu seconds\n", time(NULL) - cur_time);
-            off = 0;
+	        	dbg(2, "Tox online, took %llu seconds\n", time(NULL) - cur_time);
+	        	off = 0;
 			break;
-        }
-        c_sleep(20);
+        	}
+        	c_sleep(20);
 	}
 
 	tox_loop_running = 1;
 
-    while (tox_loop_running)
-    {
-        tox_iterate(tox, NULL);
-        usleep(tox_iteration_interval(tox) * 1000);
+    	while (tox_loop_running)
+    	{
+        	tox_iterate(tox, NULL);
+        	usleep(tox_iteration_interval(tox) * 1000);
 	}
 
 	// does not reach here now!
@@ -448,6 +455,15 @@ int android_find_static_method(jclass class, char *name, char *args, jmethodID *
 }
 
 
+void android_tox_callback_self_connection_status(int a_TOX_CONNECTION)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_self_connection_status_method, a_TOX_CONNECTION);
+}
+
+
 void android_logger(int level, const char* logtext)
 {
 	if ((MainActivity) && (logger_method) && (logtext))
@@ -458,7 +474,6 @@ void android_logger(int level, const char* logtext)
 			jnienv2 = jni_getenv();
 
 			jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
-			// (*jnienv2)->CallVoidMethod(jnienv2, MainActivity, logger_method, level, js2);
 			(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, logger_method, level, js2);
 			(*jnienv2)->DeleteLocalRef(jnienv2, js2);
 		}
@@ -481,7 +496,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 
 	jclass cls_local = (*env)->GetObjectClass(env, thiz);
 	MainActivity = (*env)->NewGlobalRef(env, cls_local);
-	// logger_method = (*env)->GetMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
 	logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
 
 	dbg(9, "cls_local=%p\n", cls_local);
@@ -494,6 +508,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 
 	s =  (*env)->GetStringUTFChars(env, datadir, NULL);
 	app_data_dir = strdup(s);
+	dbg(9, "app_data_dir=%s\n", app_data_dir);
 	(*env)->ReleaseStringUTFChars(env, datadir, s);
 
         jclass class2 = NULL;
@@ -507,8 +522,21 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 
 
 	(*env)->CallVoidMethod(env, thiz, test_method, 79);
+
+
+	// -------- callbacks --------
+	android_tox_callback_self_connection_status_method =
+        (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_self_connection_status_method", "(I)V");
+	// -------- callbacks --------
+
 }
 
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxloop(JNIEnv* env, jobject thiz)
+{
+	_main_();
+}
 
 // ------------------------------------------------------------------------------------------------
 // taken from:
@@ -557,5 +585,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibAPI(JNIEnv* env, job
 // ------------- JNI -------------
 // ------------- JNI -------------
 // ------------- JNI -------------
+
 
 
