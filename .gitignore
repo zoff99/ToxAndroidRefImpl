@@ -1,0 +1,10 @@
+*.iml
+/android-refimpl-app/.gradle
+/android-refimpl-app/.idea
+/android-refimpl-app/local.properties
+/android-refimpl-app/.idea/workspace.xml
+/android-refimpl-app/.idea/libraries
+/android-refimpl-app.DS_Store
+/android-refimpl-app/build
+/android-refimpl-app/captures
+/android-refimpl-app.externalNativeBuild
