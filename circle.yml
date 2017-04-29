@@ -320,9 +320,9 @@ test:
 
 # ----- CI artifact cleanup -----
     - mkdir -p $CIRCLE_ARTIFACTS/other/
-    - mv -v $CIRCLE_ARTIFACTS/adb_out.txt $CIRCLE_ARTIFACTS/other/
-    - mv -v $CIRCLE_ARTIFACTS/stderr*.txt $CIRCLE_ARTIFACTS/other/
-    - mv -v $CIRCLE_ARTIFACTS/stdout*.txt $CIRCLE_ARTIFACTS/other/
+    - mv -v $CIRCLE_ARTIFACTS/adb_out.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
+    - mv -v $CIRCLE_ARTIFACTS/stderr*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
+    - mv -v $CIRCLE_ARTIFACTS/stdout*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
 # ----- CI artifact cleanup -----
 
 
