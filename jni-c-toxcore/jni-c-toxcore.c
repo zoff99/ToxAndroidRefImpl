@@ -43,6 +43,11 @@
 #include <vpx/vpx_image.h>
 #include <sys/mman.h>
 
+// ------- Android/JNI stuff -------
+// #include <android/log.h>
+#include <jni.h>
+// ------- Android/JNI stuff -------
+
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define c_sleep(x) usleep(1000*x)
 
@@ -324,5 +329,49 @@ void _main_()
 
 	// does not reach here now!
 	tox_kill(tox);
+}
+
+
+// ------------------------------------------------------------------------------------------------
+// taken from:
+// https://github.com/googlesamples/android-ndk/blob/master/hello-jni/app/src/main/cpp/hello-jni.c
+// ------------------------------------------------------------------------------------------------
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibAPI(JNIEnv* env, jobject thiz)
+{
+#if defined(__arm__)
+    #if defined(__ARM_ARCH_7A__)
+    #if defined(__ARM_NEON__)
+      #if defined(__ARM_PCS_VFP)
+        #define ABI "armeabi-v7a/NEON (hard-float)"
+      #else
+        #define ABI "armeabi-v7a/NEON"
+      #endif
+    #else
+      #if defined(__ARM_PCS_VFP)
+        #define ABI "armeabi-v7a (hard-float)"
+      #else
+        #define ABI "armeabi-v7a"
+      #endif
+    #endif
+  #else
+   #define ABI "armeabi"
+  #endif
+#elif defined(__i386__)
+#define ABI "x86"
+#elif defined(__x86_64__)
+#define ABI "x86_64"
+#elif defined(__mips64)  /* mips64el-* toolchain defines __mips__ too */
+#define ABI "mips64"
+#elif defined(__mips__)
+#define ABI "mips"
+#elif defined(__aarch64__)
+#define ABI "arm64-v8a"
+#else
+#define ABI "unknown"
+#endif
+
+    return (*env)->NewStringUTF(env, "Native Code Compiled with ABI " ABI ".");
 }
 
