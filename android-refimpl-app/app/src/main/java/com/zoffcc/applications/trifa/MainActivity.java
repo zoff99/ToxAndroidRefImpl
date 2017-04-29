@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
 
     void logger(String text)
     {
+        System.out.println("logger:" + text);
         Log.i(TAG, text);
     }
 
