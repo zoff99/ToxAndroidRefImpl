@@ -459,6 +459,7 @@ void android_logger(int level, const char* logtext)
 
 			jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
 			// (*jnienv2)->CallVoidMethod(jnienv2, MainActivity, logger_method, level, js2);
+			(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, logger_method, level, js2);
 			(*jnienv2)->DeleteLocalRef(jnienv2, js2);
 		}
 	}
@@ -480,7 +481,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 
 	jclass cls_local = (*env)->GetObjectClass(env, thiz);
 	MainActivity = (*env)->NewGlobalRef(env, cls_local);
-	logger_method = (*env)->GetMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
+	// logger_method = (*env)->GetMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
+	logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
+
+	dbg(9, "cls_local=%p\n", cls_local);
+	dbg(9, "MainActivity=%p\n", MainActivity);
 
 	dbg(9, "Logging test ---***---");
 
@@ -491,6 +496,17 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	app_data_dir = strdup(s);
 	(*env)->ReleaseStringUTFChars(env, datadir, s);
 
+        jclass class2 = NULL;
+	android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &class2);
+	dbg(9, "class2=%p\n", class2);
+
+	jmethodID test_method = NULL;
+
+	android_find_method(class2, "test", "(I)V", &test_method);
+	dbg(9, "test_method=%p\n", test_method);
+
+
+	(*env)->CallVoidMethod(env, thiz, test_method, 79);
 }
 
 

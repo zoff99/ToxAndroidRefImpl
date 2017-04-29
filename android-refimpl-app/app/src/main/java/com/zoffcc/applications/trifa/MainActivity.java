@@ -64,16 +64,28 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     public native void init(String data_dir);
+
     public native String getNativeLibAPI();
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
 
+    // -------- called by native methods --------
+    // -------- called by native methods --------
+    // -------- called by native methods --------
+    void test(int i)
+    {
+        // System.out.println("test:" + i);
+        Log.i(TAG, "test:" + i);
+    }
+
     static void logger(int level, String text)
     {
-        System.out.println("logger:" + text);
         Log.i(TAG, text);
     }
+    // -------- called by native methods --------
+    // -------- called by native methods --------
+    // -------- called by native methods --------
 
     /*
      * this is used to load the native library on
