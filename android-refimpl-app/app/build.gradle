@@ -3,13 +3,49 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+    compileOptions.encoding = 'UTF-8'
+    // generatedDensities = []
+
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['nativelibs']
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        encoding "UTF-8"
+        // sourceCompatibility JavaVersion.VERSION_1_8
+        // targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dexOptions {
+        javaMaxHeapSize "2.2g"
+    }
+
     defaultConfig {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 10000
         versionName "1.0.0"
+
+        vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -17,6 +53,7 @@ android {
         }
     }
 }
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
