@@ -127,6 +127,11 @@ compile:
   - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
   - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/c-toxcore.zip *
+
+
+  - . ~/pp;cd jni-c-toxcore/;$CC -O2 -fPIC -shared -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so std=gnu99 -lsodium -I/usr/local/include/ -ltoxcore -ltoxav -lvpx -lopus -lm -lc
+
+
 # --- Android build ---
 
 test:
