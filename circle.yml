@@ -223,7 +223,7 @@ compile:
   - cd android-refimpl-app/ ; ls -al app/build/outputs/apk/ ; exit 0
   - cd android-refimpl-app/ ; find ./ -name '*.apk' ; exit 0
   - mkdir -p app/build/outputs/apk/
-  - cd android-refimpl-app/ ; cp -av /app/build/outputs/apk/*.apk ../app/build/outputs/apk/
+  - cd android-refimpl-app/ ; cp -av ./app/build/outputs/apk/app-release-unsigned.apk ../app/build/outputs/apk/
 # ----------- show generated apk file -----------
 
 
