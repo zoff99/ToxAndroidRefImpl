@@ -489,7 +489,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 
 	if (logger_method == NULL)
 	{
-		android_find_method(MainActivity, "logger(String text)", "(Ljava/lang/String;)V", &logger_method);
+		android_find_method(MainActivity, "logger", "(Ljava/lang/String;)V", &logger_method);
 	}
 
 	dbg(9, "Logging test ---***---");
