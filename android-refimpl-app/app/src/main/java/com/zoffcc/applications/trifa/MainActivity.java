@@ -99,6 +99,10 @@ public class MainActivity extends AppCompatActivity
     public native void toxloop();
 
     public native String getNativeLibAPI();
+
+    public native void update_savedata_file();
+
+    public native long tox_friend_add_norequest(String public_key_str);
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
@@ -107,7 +111,7 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native methods --------
     // -------- called by native methods --------
 
-    static void android_tox_callback_self_connection_status_method(int a_TOX_CONNECTION)
+    static void android_tox_callback_self_connection_status_cb_method(int a_TOX_CONNECTION)
     {
         Log.i(TAG, "a_TOX_CONNECTION:" + a_TOX_CONNECTION);
     }

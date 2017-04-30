@@ -320,6 +320,11 @@ void get_my_toxid(Tox *tox, char *toxid_str)
 	snprintf(toxid_str, (size_t)(TOX_ADDRESS_SIZE*2 + 1), "%s", (const char*)tox_id_hex_local);
 }
 
+void toxid_hex_to_bin(const uint8_t *public_key, char *toxid_str)
+{
+	sodium_hex2bin(public_key, TOX_ADDRESS_SIZE, toxid_str, (TOX_ADDRESS_SIZE*2), NULL, NULL, NULL);
+}
+
 void toxid_bin_to_hex(const uint8_t *public_key, char *toxid_str)
 {
 	char tox_id_hex_local[TOX_ADDRESS_SIZE*2 + 1];
@@ -489,6 +494,14 @@ int android_find_static_method(jclass class, char *name, char *args, jmethodID *
 }
 
 // -------- _callbacks_ --------
+void android_tox_callback_self_connection_status_cb(int a_TOX_CONNECTION)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_self_connection_status_cb_method, a_TOX_CONNECTION);
+}
+
 void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void *user_data)
 {
     switch (connection_status)
@@ -511,24 +524,35 @@ void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void 
     }
 }
 
-void android_tox_callback_self_connection_status_cb(int a_TOX_CONNECTION)
+void android_tox_callback_friend_name_cb(uint32_t friend_number, const uint8_t *name, size_t length)
 {
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
-	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-          android_tox_callback_self_connection_status_cb_method, a_TOX_CONNECTION);
-}
 
+	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)name);
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_friend_name_cb_method, (jlong)(unsigned long long)friend_number, js1, (jlong)(unsigned long long)length);
+
+	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
+}
 
 void friend_name_cb(Tox *tox, uint32_t friend_number, const uint8_t *name, size_t length, void *user_data)
 {
 	android_tox_callback_friend_name_cb(friend_number, name, length);
 }
 
-void android_tox_callback_friend_name_cb(uint32_t friend_number, const uint8_t *name, size_t length)
+void android_tox_callback_friend_status_message_cb(uint32_t friend_number, const uint8_t *message, size_t length)
 {
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
+
+	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_friend_status_message_cb_method, (jlong)(unsigned long long)friend_number, js1, (jlong)(unsigned long long)length);
+
+	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
 }
 
 void friend_status_message_cb(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data)
@@ -536,26 +560,18 @@ void friend_status_message_cb(Tox *tox, uint32_t friend_number, const uint8_t *m
 	android_tox_callback_friend_status_message_cb(friend_number, message, length);
 }
 
-void android_tox_callback_friend_status_message_cb(uint32_t friend_number, const uint8_t *message, size_t length)
+void android_tox_callback_friend_status_cb(uint32_t friend_number, TOX_USER_STATUS status)
 {
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_friend_status_cb_method, (jlong)(unsigned long long)friend_number, (int)status);
 }
 
 void friend_status_cb(Tox *tox, uint32_t friend_number, TOX_USER_STATUS status, void *user_data)
 {
 	android_tox_callback_friend_status_cb(friend_number, status);
-}
-
-void android_tox_callback_friend_status_cb(uint32_t friend_number, TOX_USER_STATUS status)
-{
-	JNIEnv *jnienv2;
-	jnienv2 = jni_getenv();
-}
-
-void friend_connection_status_cb(Tox *tox, uint32_t friend_number, TOX_CONNECTION connection_status, void *user_data)
-{
-	android_tox_callback_friend_connection_status_cb(friend_number, connection_status);
 }
 
 void android_tox_callback_friend_connection_status_cb(uint32_t friend_number, TOX_CONNECTION connection_status)
@@ -583,9 +599,9 @@ void android_tox_callback_friend_connection_status_cb(uint32_t friend_number, TO
     }
 }
 
-void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data)
+void friend_connection_status_cb(Tox *tox, uint32_t friend_number, TOX_CONNECTION connection_status, void *user_data)
 {
-	android_tox_callback_friend_typing_cb(friend_number, is_typing);
+	android_tox_callback_friend_connection_status_cb(friend_number, connection_status);
 }
 
 void android_tox_callback_friend_typing_cb(uint32_t friend_number, bool is_typing)
@@ -594,9 +610,9 @@ void android_tox_callback_friend_typing_cb(uint32_t friend_number, bool is_typin
 	jnienv2 = jni_getenv();
 }
 
-void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data)
+void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data)
 {
-	android_tox_callback_friend_read_receipt_cb(friend_number, message_id);
+	android_tox_callback_friend_typing_cb(friend_number, is_typing);
 }
 
 void android_tox_callback_friend_read_receipt_cb(uint32_t friend_number, uint32_t message_id)
@@ -605,15 +621,9 @@ void android_tox_callback_friend_read_receipt_cb(uint32_t friend_number, uint32_
 	jnienv2 = jni_getenv();
 }
 
-void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data)
+void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data)
 {
-	android_tox_callback_friend_request_cb(public_key, message, length);
-
-	// ------------------- auto add any friend -------------------
-    uint32_t friendnum = tox_friend_add_norequest(tox, public_key, NULL);
-    dbg(2, "add friend:friendnum=%d\n", friendnum);
-	update_savedata_file(tox);
-	// ------------------- auto add any friend -------------------
+	android_tox_callback_friend_read_receipt_cb(friend_number, message_id);
 }
 
 void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uint8_t *message, size_t length)
@@ -637,15 +647,33 @@ void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uin
 
 }
 
-void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data)
+void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data)
 {
-	android_tox_callback_friend_message_cb(friend_number, type, message, length);
+	android_tox_callback_friend_request_cb(public_key, message, length);
+
+	// ------------------- auto add any friend -------------------
+    uint32_t friendnum = tox_friend_add_norequest(tox, public_key, NULL);
+    dbg(2, "add friend:friendnum=%d\n", friendnum);
+	update_savedata_file(tox);
+	// ------------------- auto add any friend -------------------
 }
 
 void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length)
 {
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
+
+	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_friend_message_cb_method, (jlong)(unsigned long long)friend_number, (int) type, js1, (jlong)(unsigned long long)length);
+
+	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
+}
+
+void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data)
+{
+	android_tox_callback_friend_message_cb(friend_number, type, message, length);
 }
 // -------- _callbacks_ --------
 
@@ -707,21 +735,72 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	dbg(9, "test_method=%p\n", test_method);
 
 
+	dbg(9, "100");
 	(*env)->CallVoidMethod(env, thiz, test_method, 79);
 
 	// -------- _callbacks_ --------
+	dbg(9, "101");
 	android_tox_callback_self_connection_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_self_connection_status_cb_method", "(I)V");
-    android_tox_callback_friend_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_name_cb_method", "(JLjava/lang/String;J)V");
+	dbg(9, "102");
+	android_tox_callback_friend_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_name_cb_method", "(JLjava/lang/String;J)V");
+	dbg(9, "103");
 	android_tox_callback_friend_status_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_status_message_cb_method", "(JLjava/lang/String;J)V");
+	dbg(9, "104");
 	android_tox_callback_friend_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_status_cb_method", "(JI)V");
+	dbg(9, "105");
 	android_tox_callback_friend_connection_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_connection_status_cb_method", "(JI)V");
+	dbg(9, "106");
 	android_tox_callback_friend_typing_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_typing_cb_method", "(JI)V");
+	dbg(9, "107");
 	android_tox_callback_friend_read_receipt_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_read_receipt_cb_method", "(JJ)V");
+	dbg(9, "108");
 	android_tox_callback_friend_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_request_cb_method", "(Ljava/lang/String;Ljava/lang/String;J)V");
+	dbg(9, "109");
 	android_tox_callback_friend_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
+	dbg(9, "110");
 	// -------- _callbacks_ --------
 
 }
+
+
+
+
+// --------------- _toxfuncs_ ---------------
+// --------------- _toxfuncs_ ---------------
+// --------------- _toxfuncs_ ---------------
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_update_savedata_file(JNIEnv* env, jobject thiz)
+{
+	update_savedata_file(tox);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_friend_add_norequest(JNIEnv* env, jobject thiz, jobject public_key_str)
+{
+	unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
+	char *public_key_str2 = NULL;
+
+	s =  (*env)->GetStringUTFChars(env, public_key_str, NULL);
+	public_key_str2 = strdup(s);
+	dbg(9, "public_key_str2=%s\n", public_key_str2);
+	(*env)->ReleaseStringUTFChars(env, public_key_str, s);
+
+	toxid_hex_to_bin(public_key_bin, public_key_str2);
+    uint32_t friendnum = tox_friend_add_norequest(tox, public_key_bin, NULL);
+
+	if (public_key_str2)
+	{
+		free(public_key_str2);
+	}
+
+    dbg(2, "add friend:friendnum=%d\n", friendnum);
+	return (jlong)(unsigned long long)friendnum;
+}
+// --------------- _toxfuncs_ ---------------
+// --------------- _toxfuncs_ ---------------
+// --------------- _toxfuncs_ ---------------
+
+
 
 
 JNIEXPORT void JNICALL
