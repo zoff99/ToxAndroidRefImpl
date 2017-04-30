@@ -30,7 +30,6 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mt = (TextView) this.findViewById(R.id.maintext);
+        mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
 
         main_handler = new Handler(getMainLooper());
@@ -167,6 +166,13 @@ public class MainActivity extends AppCompatActivity
         main_handler_s.post(myRunnable);
     }
 
+    @Override
+    protected void onDestroy()
+    {
+        nMN.cancel(NOTIFICATION_ID);
+        super.onDestroy();
+    }
+
     static void change_notification(int a_TOXCONNECTION)
     {
 
@@ -184,17 +190,20 @@ public class MainActivity extends AppCompatActivity
                     b.setSmallIcon(R.drawable.circle_red);
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
                 }
-                else if (a_TOXCONNECTION__f == 1)
+                else
                 {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    b.setSmallIcon(R.drawable.circle_green);
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
-                }
-                else // if (a_TOXCONNECTION__f == 2)
-                {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    b.setSmallIcon(R.drawable.circle_green);
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+                    if (a_TOXCONNECTION__f == 1)
+                    {
+                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                        b.setSmallIcon(R.drawable.circle_green);
+                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
+                    }
+                    else // if (a_TOXCONNECTION__f == 2)
+                    {
+                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                        b.setSmallIcon(R.drawable.circle_green);
+                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+                    }
                 }
                 notification_view.setTextViewText(R.id.text, "");
 
