@@ -187,9 +187,12 @@ void dbg(int level, const char *fmt, ...)
 
 Tox *create_tox()
 {
-	Tox *tox;
+	Tox *tox = NULL;
+	TOX_ERR_NEW error;
 	struct Tox_Options options;
+	CLEAR(options);
 
+	dbg(9, "1006");
 	tox_options_default(&options);
 
 	uint16_t tcp_port = 33776; // act as TCP relay
@@ -200,8 +203,11 @@ Tox *create_tox()
 	options.hole_punching_enabled = true;
 	options.tcp_port = tcp_port;
 
+	dbg(9, "1007");
 	char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
+	dbg(9, "1008");
 	snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
+	dbg(9, "1009");
 
 
     FILE *f = fopen(full_path_filename, "rb");
@@ -224,13 +230,25 @@ Tox *create_tox()
         options.savedata_data = savedata;
         options.savedata_length = fsize;
 
-        tox = tox_new(&options, NULL);
+		dbg(9, "1008");
+        tox = tox_new(&options, &error);
+		dbg(9, "1009 tox=%p error=%d", tox, error);
+
+		while (error != 0)
+		{
+			// could not allocate network port, sleep and try again ...
+			c_sleep(150);
+			tox = tox_new(&options, &error);
+			dbg(9, "1009 tox=%p error=%d", tox, error);
+		}
 
         free((void *)savedata);
     }
 	else
 	{
+		dbg(9, "1010");
         tox = tox_new(&options, NULL);
+		dbg(9, "1011 tox=%p", tox);
     }
 
 	bool local_discovery_enabled = tox_options_get_local_discovery_enabled(&options);
@@ -377,6 +395,7 @@ void init_tox_callbacks()
 	// -------- _callbacks_ --------
 }
 
+/*
 void _main_()
 {
 	tox_global = create_tox();
@@ -441,6 +460,7 @@ void _main_()
 	// does not reach here now!
 	tox_kill(tox_global);
 }
+*/
 
 
 // ------------- JNI -------------
@@ -748,7 +768,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	dbg(9, "app_data_dir=%s", app_data_dir);
 	(*env)->ReleaseStringUTFChars(env, datadir, s);
 
-        jclass class2 = NULL;
+	jclass class2 = NULL;
 	android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &class2);
 	dbg(9, "class2=%p", class2);
 
@@ -774,12 +794,18 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 
 	// ----------- create Tox instance -----------
 	tox_global = create_tox();
+	dbg(9, "tox_global=%p", tox_global);
 
+	dbg(9, "1001");
 	const char *name = "TRIfA";
+	dbg(9, "1002");
 	tox_self_set_name(tox_global, (uint8_t *)name, strlen(name), NULL);
+	dbg(9, "1003");
 
 	const char *status_message = "This is TRIfA";
+	dbg(9, "1004");
 	tox_self_set_status_message(tox_global, (uint8_t *)status_message, strlen(status_message), NULL);
+	dbg(9, "1005");
 	// ----------- create Tox instance -----------
 
 }
@@ -873,7 +899,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
 		free(public_key_str2);
 	}
 
-    dbg(2, "add friend:friendnum=%d", friendnum);
+    dbg(9, "------\n");
+    dbg(9, "add friend:friendnum=%d\n", (int)friendnum);
+    dbg(9, "------\n");
 	return (jlong)(unsigned long long)friendnum;
 }
 // --------------- _toxfuncs_ ---------------

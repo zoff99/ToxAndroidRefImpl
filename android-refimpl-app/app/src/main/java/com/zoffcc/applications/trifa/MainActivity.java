@@ -19,11 +19,14 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -31,6 +34,11 @@ public class MainActivity extends AppCompatActivity
     TextView mt = null;
     static boolean native_lib_loaded = false;
     static String app_files_directory = "";
+    static boolean stop_me = false;
+    static Thread ToxServiceThread = null;
+    Handler main_handler = null;
+    static Handler main_handler_s = null;
+    static Context context_s = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -40,6 +48,10 @@ public class MainActivity extends AppCompatActivity
 
         mt = (TextView) this.findViewById(R.id.maintext);
         mt.setText("...");
+
+        main_handler = new Handler(getMainLooper());
+        main_handler_s = main_handler;
+        context_s = this.getBaseContext();
 
         if (native_lib_loaded)
         {
@@ -59,10 +71,9 @@ public class MainActivity extends AppCompatActivity
         tox_thread_start();
     }
 
-
     void tox_thread_start()
     {
-        Thread thread = new Thread()
+        ToxServiceThread = new Thread()
         {
             @Override
             public void run()
@@ -80,7 +91,7 @@ public class MainActivity extends AppCompatActivity
 
                 tox_iterate();
 
-                while (true)
+                while (!stop_me)
                 {
                     try
                     {
@@ -100,7 +111,48 @@ public class MainActivity extends AppCompatActivity
             }
         };
 
-        thread.start();
+        ToxServiceThread.start();
+    }
+
+    static void stop_tox()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Toast.makeText(context_s, "stopping Tox Service", Toast.LENGTH_SHORT).show();
+            }
+        };
+        main_handler_s.post(myRunnable);
+
+        stop_me = true;
+        ToxServiceThread.interrupt();
+        try
+        {
+            ToxServiceThread.join();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Toast.makeText(context_s, "Tox Service stopped", Toast.LENGTH_LONG).show();
+            }
+        };
+        main_handler_s.post(myRunnable);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        stop_tox();
     }
 
     static
@@ -177,14 +229,32 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "friend_request:friend:" + friend_public_key + " friend request message:" + friend_request_message);
 
-        // ---- auto add all friends ----
-        // ---- auto add all friends ----
-        // ---- auto add all friends ----
-        tox_friend_add_norequest(friend_public_key); // add friend
-        update_savedata_file(); // save toxcore datafile (new friend added)
-        // ---- auto add all friends ----
-        // ---- auto add all friends ----
-        // ---- auto add all friends ----
+        final String friend_public_key__final = friend_public_key;
+
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(1000); // wait 1 second
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                // ---- auto add all friends ----
+                // ---- auto add all friends ----
+                // ---- auto add all friends ----
+                tox_friend_add_norequest(friend_public_key__final); // add friend
+                update_savedata_file(); // save toxcore datafile (new friend added)
+                // ---- auto add all friends ----
+                // ---- auto add all friends ----
+                // ---- auto add all friends ----
+            }
+        };
+        t.start();
     }
 
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
