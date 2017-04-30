@@ -37,7 +37,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <!--tools:replace="android:icon,android:label,android:theme,android:name,android:allowBackup"-->
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
