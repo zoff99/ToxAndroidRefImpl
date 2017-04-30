@@ -74,7 +74,7 @@ jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_name_cb_method = NULL;
 jmethodID android_tox_callback_friend_status_message_cb_method = NULL;
 jmethodID android_tox_callback_friend_status_cb_method = NULL;
-jmethodID android_tox_callback_friend_connection_status_cb_method = NULL
+jmethodID android_tox_callback_friend_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_typing_cb_method = NULL;
 jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
@@ -98,8 +98,17 @@ typedef struct DHT_node {
 // functions -----------
 // functions -----------
 // functions -----------
+void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void *user_data);
+void friend_name_cb(Tox *tox, uint32_t friend_number, const uint8_t *name, size_t length, void *user_data);
+void friend_status_message_cb(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data);
+void friend_status_cb(Tox *tox, uint32_t friend_number, TOX_USER_STATUS status, void *user_data);
+void friend_connection_status_cb(Tox *tox, uint32_t friend_number, TOX_CONNECTION connection_status, void *user_data);
+void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data);
+void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data);
+void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data);
+void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
+
 void android_logger(int level, const char* logtext);
-void android_tox_callback_self_connection_status_cb(int a_TOX_CONNECTION);
 // functions -----------
 // functions -----------
 // functions -----------
@@ -705,7 +714,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
     android_tox_callback_friend_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_name_cb_method", "(JLjava/lang/String;J)V");
 	android_tox_callback_friend_status_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_status_message_cb_method", "(JLjava/lang/String;J)V");
 	android_tox_callback_friend_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_status_cb_method", "(JI)V");
-	android_tox_callback_friend_connection_status_cb = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_connection_status_cb", "(JI)V");
+	android_tox_callback_friend_connection_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_connection_status_cb_method", "(JI)V");
 	android_tox_callback_friend_typing_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_typing_cb_method", "(JI)V");
 	android_tox_callback_friend_read_receipt_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_read_receipt_cb_method", "(JJ)V");
 	android_tox_callback_friend_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_request_cb_method", "(Ljava/lang/String;Ljava/lang/String;J)V");

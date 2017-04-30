@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity
     {
     }
 
-    static void android_tox_callback_friend_connection_status_cb(long friend_number, int a_TOX_CONNECTION)
+    static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
     {
         Log.i(TAG, "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION);
     }
