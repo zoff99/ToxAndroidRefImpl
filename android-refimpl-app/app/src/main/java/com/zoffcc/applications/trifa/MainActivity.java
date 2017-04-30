@@ -109,8 +109,20 @@ public class MainActivity extends AppCompatActivity
             {
                 // ------ correct startup order ------
                 bootstrap();
-                String my_ToxId = get_my_toxid();
+                final String my_ToxId = get_my_toxid();
                 Log.i(TAG, "my_ToxId=" + my_ToxId);
+
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        mt.setText(mt.getText() + "\n" + "my_ToxId=" + my_ToxId);
+                    }
+                };
+                main_handler_s.post(myRunnable);
+
+
                 init_tox_callbacks();
                 update_savedata_file();
                 // ------ correct startup order ------
@@ -298,23 +310,51 @@ public class MainActivity extends AppCompatActivity
         change_notification(a_TOX_CONNECTION);
         // -- notification ------------------
         // -- notification ------------------
-
-
     }
 
     static void android_tox_callback_friend_name_cb_method(long friend_number, String friend_name, long length)
     {
         Log.i(TAG, "friend_name:friend:" + friend_number + " name:" + friend_name);
+
+        if (friend_list_fragment != null)
+        {
+            FriendList f = friend_list_fragment.get_friend(friend_number);
+            if (f != null)
+            {
+                f.name = friend_name;
+                friend_list_fragment.modify_friend(f, friend_number);
+            }
+        }
     }
 
     static void android_tox_callback_friend_status_message_cb_method(long friend_number, String status_message, long length)
     {
         Log.i(TAG, "friend_status_message:friend:" + friend_number + " status message:" + status_message);
+
+        if (friend_list_fragment != null)
+        {
+            FriendList f = friend_list_fragment.get_friend(friend_number);
+            if (f != null)
+            {
+                f.status_message = status_message;
+                friend_list_fragment.modify_friend(f, friend_number);
+            }
+        }
     }
 
     static void android_tox_callback_friend_status_cb_method(long friend_number, int a_TOX_USER_STATUS)
     {
         Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
+
+        if (friend_list_fragment != null)
+        {
+            FriendList f = friend_list_fragment.get_friend(friend_number);
+            if (f != null)
+            {
+                f.TOX_USER_STATUS = a_TOX_USER_STATUS;
+                friend_list_fragment.modify_friend(f, friend_number);
+            }
+        }
     }
 
     static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
@@ -325,6 +365,7 @@ public class MainActivity extends AppCompatActivity
             FriendList f = friend_list_fragment.get_friend(friend_number);
             if (f != null)
             {
+                f.TOXCONNECTION = a_TOX_CONNECTION;
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
