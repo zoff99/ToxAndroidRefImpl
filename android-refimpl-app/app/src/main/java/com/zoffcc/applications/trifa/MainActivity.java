@@ -31,6 +31,8 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity
     static RemoteViews notification_view = null;
     static long[] friends = null;
     static FriendListFragment friend_list_fragment = null;
+    static OrmaDatabase orma = null;
+    final static String FriendList_DB_NAME = "friendlist.db";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,6 +78,10 @@ public class MainActivity extends AppCompatActivity
         String native_api = getNativeLibAPI();
         mt.setText(mt.getText() + "\n" + native_api);
 
+        // See OrmaDatabaseBuilderBase for other options.
+        orma = OrmaDatabase.builder(this).name(FriendList_DB_NAME).build();
+        // default: "${applicationId}.orma.db"
+
         app_files_directory = getFilesDir().getAbsolutePath();
         init(app_files_directory);
 
@@ -96,7 +104,6 @@ public class MainActivity extends AppCompatActivity
         // -- notification ------------------
         // -- notification ------------------
 
-
         tox_thread_start();
     }
 
@@ -112,6 +119,15 @@ public class MainActivity extends AppCompatActivity
                 final String my_ToxId = get_my_toxid();
                 Log.i(TAG, "my_ToxId=" + my_ToxId);
 
+
+                // -------------- DEBUG --------------
+                // -------------- DEBUG --------------
+                // -------------- DEBUG --------------
+                // ------ // orma.deleteAll();
+                // -------------- DEBUG --------------
+                // -------------- DEBUG --------------
+                // -------------- DEBUG --------------
+
                 Runnable myRunnable = new Runnable()
                 {
                     @Override
@@ -122,7 +138,6 @@ public class MainActivity extends AppCompatActivity
                 };
                 main_handler_s.post(myRunnable);
 
-
                 init_tox_callbacks();
                 update_savedata_file();
                 // ------ correct startup order ------
@@ -131,17 +146,52 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "number of friends=" + friends.length);
 
                 int fc = 0;
+                boolean exists_in_db = false;
                 for (fc = 0; fc < friends.length; fc++)
                 {
-                    FriendList f = new FriendList();
-                    f.tox_public_key_string = "P-U-B Key";
-                    f.name = "friend #" + friends[fc];
-                    f.tox_friendnum = fc;
-                    f.status_message = "...";
+                    FriendList f;
+                    List<FriendList> fl = orma.selectFromFriendList().tox_friendnumEq(fc).toList();
+                    if (fl.size() > 0)
+                    {
+                        f = fl.get(0);
+                    }
+                    else
+                    {
+                        f = null;
+                    }
+
+                    if (f == null)
+                    {
+                        f = new FriendList();
+                        f.tox_public_key_string = "" + (Math.random() * 100000);
+                        f.tox_friendnum = fc;
+                        f.name = "friend #" + fc;
+                        exists_in_db = false;
+                    }
+                    else
+                    {
+                        Log.i(TAG, "found friend in DB " + f.tox_friendnum + " f=" + f);
+                        exists_in_db = true;
+                    }
+
                     f.TOXCONNECTION = 0;
                     if (friend_list_fragment != null)
                     {
                         friend_list_fragment.add_friends(f);
+                    }
+
+                    // set all to OFFLINE and AVAILABLE
+                    f.TOX_USER_STATUS =0;
+                    f.TOXCONNECTION = 0;
+                    // set all to OFFLINE and AVAILABLE
+
+                    if (exists_in_db == false)
+                    {
+                        orma.insertIntoFriendList(f);
+                    }
+                    else
+                    {
+                        orma.updateFriendList().tox_friendnumEq(f.tox_friendnum).tox_friendnum(f.tox_friendnum).tox_public_key_string(f.tox_public_key_string).name(f.name).status_message(f.status_message).TOXCONNECTION(f.TOXCONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
                     }
                 }
 
@@ -203,6 +253,34 @@ public class MainActivity extends AppCompatActivity
     {
         nMN.cancel(NOTIFICATION_ID);
         super.onDestroy();
+    }
+
+    static FriendList main_get_friend(long friendnum)
+    {
+        FriendList f;
+        List<FriendList> fl = orma.selectFromFriendList().tox_friendnumEq(friendnum).toList();
+        if (fl.size() > 0)
+        {
+            f = fl.get(0);
+        }
+        else
+        {
+            f = null;
+        }
+
+        return f;
+    }
+
+    synchronized static void update_friend_in_db(FriendList f)
+    {
+        orma.updateFriendList().
+                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_string(f.tox_public_key_string).
+                name(f.name).
+                status_message(f.status_message).
+                TOXCONNECTION(f.TOXCONNECTION).
+                TOX_USER_STATUS(f.TOX_USER_STATUS).
+                execute();
     }
 
     static void change_notification(int a_TOXCONNECTION)
@@ -318,10 +396,11 @@ public class MainActivity extends AppCompatActivity
 
         if (friend_list_fragment != null)
         {
-            FriendList f = friend_list_fragment.get_friend(friend_number);
+            FriendList f = main_get_friend(friend_number);
             if (f != null)
             {
                 f.name = friend_name;
+                update_friend_in_db(f);
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
@@ -333,10 +412,11 @@ public class MainActivity extends AppCompatActivity
 
         if (friend_list_fragment != null)
         {
-            FriendList f = friend_list_fragment.get_friend(friend_number);
+            FriendList f = main_get_friend(friend_number);
             if (f != null)
             {
                 f.status_message = status_message;
+                update_friend_in_db(f);
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
@@ -348,10 +428,11 @@ public class MainActivity extends AppCompatActivity
 
         if (friend_list_fragment != null)
         {
-            FriendList f = friend_list_fragment.get_friend(friend_number);
+            FriendList f = main_get_friend(friend_number);
             if (f != null)
             {
                 f.TOX_USER_STATUS = a_TOX_USER_STATUS;
+                update_friend_in_db(f);
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
@@ -362,10 +443,11 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION);
         if (friend_list_fragment != null)
         {
-            FriendList f = friend_list_fragment.get_friend(friend_number);
+            FriendList f = main_get_friend(friend_number);
             if (f != null)
             {
                 f.TOXCONNECTION = a_TOX_CONNECTION;
+                update_friend_in_db(f);
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
@@ -392,7 +474,7 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    Thread.sleep(1000); // wait 1 second
+                    Thread.sleep(20); // wait a bit
                 }
                 catch (Exception e)
                 {
@@ -401,8 +483,16 @@ public class MainActivity extends AppCompatActivity
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
-                tox_friend_add_norequest(friend_public_key__final); // add friend
+                long friendnum = tox_friend_add_norequest(friend_public_key__final); // add friend
                 update_savedata_file(); // save toxcore datafile (new friend added)
+
+                FriendList f = new FriendList();
+                f.tox_public_key_string = friend_public_key__final;
+                f.tox_friendnum = friendnum;
+                f.TOX_USER_STATUS = 0;
+                f.TOXCONNECTION = 0;
+                orma.insertIntoFriendList(f);
+
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
@@ -449,4 +539,5 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
 }

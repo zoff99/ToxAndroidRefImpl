@@ -51,63 +51,67 @@ public class FriendListFragment extends ListFragment
         setListAdapter(a);
     }
 
-    void modify_friend(FriendList f, long friendnum)
+    void modify_friend(final FriendList f, final long friendnum)
     {
-        int size = data_values.size();
-        int i = 0;
-        for (i = 0; i < size; i++)
-        {
-            if (data_values.get(i).tox_friendnum == friendnum)
-            {
-                FriendList n = deep_copy(f);
-                data_values.set(i, n);
-
-                Log.i(TAG, "modify_friend:found friend:" + friendnum);
-
-                Runnable myRunnable = new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        Log.i(TAG, "modify_friend:notifyDataSetChanged");
-                        a.notifyDataSetChanged();
-                    }
-                };
-                main_handler_s.post(myRunnable);
-            }
-        }
-    }
-
-    FriendList get_friend(long friendnum)
-    {
-        int size = data_values.size();
-        int i = 0;
-        for (i = 0; i < size; i++)
-        {
-            if (data_values.get(i).tox_friendnum == friendnum)
-            {
-                Log.i(TAG, "get_friend:found friend:" + friendnum);
-                FriendList n = deep_copy(data_values.get(i));
-                return n;
-            }
-        }
-        return null;
-    }
-
-
-    void add_friends(FriendList f)
-    {
-        FriendList n = deep_copy(f);
-        data_values.add(n);
-
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
+                boolean found_friend = false;
+                int size = data_values.size();
+                int i = 0;
+                for (i = 0; i < size; i++)
+                {
+                    if (data_values.get(i).tox_friendnum == friendnum)
+                    {
+                        found_friend = true;
+                        FriendList n = deep_copy(f);
+                        data_values.set(i, n);
+                        Log.i(TAG, "modify_friend:found friend:" + friendnum);
+                        a.notifyDataSetChanged();
+                    }
+                }
+
+                if (!found_friend)
+                {
+                    add_friends(f);
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
+    }
+
+    //    FriendList get_friend(long friendnum)
+    //    {
+    //        int size = data_values.size();
+    //        int i = 0;
+    //        for (i = 0; i < size; i++)
+    //        {
+    //            if (data_values.get(i).tox_friendnum == friendnum)
+    //            {
+    //                Log.i(TAG, "get_friend:found friend:" + friendnum);
+    //                FriendList n = deep_copy(data_values.get(i));
+    //                return n;
+    //            }
+    //        }
+    //        return null;
+    //    }
+
+
+    void add_friends(final FriendList f)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                FriendList n = deep_copy(f);
+                data_values.add(n);
                 a.notifyDataSetChanged();
             }
         };
+
         main_handler_s.post(myRunnable);
     }
 

@@ -74,7 +74,7 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         {
             if (values.get(position).TOX_USER_STATUS == 1)
             {
-                imageView2.setImageResource(R.drawable.circle_yellow);
+                imageView2.setImageResource(R.drawable.circle_orange);
             }
             else
             {
