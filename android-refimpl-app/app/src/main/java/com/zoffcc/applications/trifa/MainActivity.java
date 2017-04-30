@@ -19,12 +19,16 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +43,10 @@ public class MainActivity extends AppCompatActivity
     Handler main_handler = null;
     static Handler main_handler_s = null;
     static Context context_s = null;
+    static Notification notification = null;
+    static NotificationManager nMN = null;
+    static int NOTIFICATION_ID = 293821038;
+    static RemoteViews notification_view = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,6 +75,26 @@ public class MainActivity extends AppCompatActivity
 
         app_files_directory = getFilesDir().getAbsolutePath();
         init(app_files_directory);
+
+        // -- notification ------------------
+        // -- notification ------------------
+        nMN = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        notification_view = new RemoteViews(getPackageName(), R.layout.custom_notification);
+        Log.i(TAG, "contentView=" + notification_view);
+        notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+        notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
+        notification_view.setTextViewText(R.id.text, "");
+
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+        b.setContent(notification_view);
+        b.setSmallIcon(R.drawable.circle_red);
+        notification = b.build();
+        notification.flags |= Notification.FLAG_NO_CLEAR;
+        nMN.notify(NOTIFICATION_ID, notification);
+        // -- notification ------------------
+        // -- notification ------------------
+
 
         tox_thread_start();
     }
@@ -121,28 +149,60 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                Toast.makeText(context_s, "stopping Tox Service", Toast.LENGTH_SHORT).show();
+                stop_me = true;
+                ToxServiceThread.interrupt();
+                try
+                {
+                    ToxServiceThread.join();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                nMN.cancel(NOTIFICATION_ID);
+                MainActivity.exit();
             }
         };
         main_handler_s.post(myRunnable);
+    }
 
-        stop_me = true;
-        ToxServiceThread.interrupt();
-        try
-        {
-            ToxServiceThread.join();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+    static void change_notification(int a_TOXCONNECTION)
+    {
 
-        myRunnable = new Runnable()
+        final int a_TOXCONNECTION__f = a_TOXCONNECTION;
+        Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                Toast.makeText(context_s, "Tox Service stopped", Toast.LENGTH_LONG).show();
+                NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+
+                if (a_TOXCONNECTION__f == 0)
+                {
+                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+                    b.setSmallIcon(R.drawable.circle_red);
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
+                }
+                else if (a_TOXCONNECTION__f == 1)
+                {
+                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                    b.setSmallIcon(R.drawable.circle_green);
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
+                }
+                else // if (a_TOXCONNECTION__f == 2)
+                {
+                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                    b.setSmallIcon(R.drawable.circle_green);
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+                }
+                notification_view.setTextViewText(R.id.text, "");
+
+                b.setContent(notification_view);
+                notification = b.build();
+                notification.flags |= Notification.FLAG_NO_CLEAR;
+                nMN.notify(NOTIFICATION_ID, notification);
+
             }
         };
         main_handler_s.post(myRunnable);
@@ -183,6 +243,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_kill();
 
+    public static native void exit();
+
     public static native long tox_friend_add_norequest(String public_key_str);
     // -------- native methods --------
     // -------- native methods --------
@@ -195,6 +257,14 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_self_connection_status_cb_method(int a_TOX_CONNECTION)
     {
         Log.i(TAG, "self_connection_status:" + a_TOX_CONNECTION);
+
+        // -- notification ------------------
+        // -- notification ------------------
+        change_notification(a_TOX_CONNECTION);
+        // -- notification ------------------
+        // -- notification ------------------
+
+
     }
 
     static void android_tox_callback_friend_name_cb_method(long friend_number, String friend_name, long length)

@@ -195,13 +195,14 @@ Tox *create_tox()
 	dbg(9, "1006");
 	tox_options_default(&options);
 
-	uint16_t tcp_port = 33776; // act as TCP relay
+	uint16_t tcp_port = 33776;
 
 	options.ipv6_enabled = true;
 	options.udp_enabled = true;
 	options.local_discovery_enabled = true;
 	options.hole_punching_enabled = true;
-	options.tcp_port = tcp_port;
+	// options.tcp_port = tcp_port;
+    options.tcp_port = 0; // TCP relay is disabled !!
 
 	dbg(9, "1007");
 	char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
@@ -234,8 +235,14 @@ Tox *create_tox()
         tox = tox_new(&options, &error);
 		dbg(9, "1009 tox=%p error=%d", tox, error);
 
+		int j = 0;
 		while (error != 0)
 		{
+			j++;
+			if (j > 100)
+			{
+				break;
+			}
 			// could not allocate network port, sleep and try again ...
 			c_sleep(150);
 			tox = tox_new(&options, &error);
@@ -869,6 +876,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv* env, jobject t
 	dbg(9, "tox_kill ... READY");
 }
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv* env, jobject thiz)
+{
+	dbg(9, "Exit Program");
+	exit(0);
+}
+
 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv* env, jobject thiz)
@@ -888,20 +902,23 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
 
 	s =  (*env)->GetStringUTFChars(env, public_key_str, NULL);
 	public_key_str2 = strdup(s);
-	dbg(9, "public_key_str2=%s", public_key_str2);
 	(*env)->ReleaseStringUTFChars(env, public_key_str, s);
 
 	toxid_hex_to_bin(public_key_bin, public_key_str2);
     uint32_t friendnum = tox_friend_add_norequest(tox_global, (uint8_t *)public_key_bin, NULL);
+
+    dbg(9, "------");
+    dbg(9, "add friend:friendnum=%d", (int)friendnum);
+    dbg(9, "------");
 
 	if (public_key_str2)
 	{
 		free(public_key_str2);
 	}
 
-    dbg(9, "------\n");
-    dbg(9, "add friend:friendnum=%d\n", (int)friendnum);
-    dbg(9, "------\n");
+    dbg(9, "------");
+    dbg(9, "add friend:friendnum=%d", (int)friendnum);
+    dbg(9, "------");
 	return (jlong)(unsigned long long)friendnum;
 }
 // --------------- _toxfuncs_ ---------------
