@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity
     static NotificationManager nMN = null;
     static int NOTIFICATION_ID = 293821038;
     static RemoteViews notification_view = null;
+    static long[] friends = null;
+    static FriendListFragment friend_list_fragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -112,6 +114,24 @@ public class MainActivity extends AppCompatActivity
                 init_tox_callbacks();
                 update_savedata_file();
                 // ------ correct startup order ------
+
+                friends = tox_self_get_friend_list();
+                Log.i(TAG, "number of friends=" + friends.length);
+
+                int fc = 0;
+                for (fc = 0; fc < friends.length; fc++)
+                {
+                    FriendList f = new FriendList();
+                    f.tox_public_key_string = "P-U-B Key";
+                    f.name = "friend #" + friends[fc];
+                    f.tox_friendnum = fc;
+                    f.status_message = "...";
+                    f.TOXCONNECTION = 0;
+                    if (friend_list_fragment != null)
+                    {
+                        friend_list_fragment.add_friends(f);
+                    }
+                }
 
                 long tox_iteration_interval_ms = tox_iteration_interval();
                 Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
@@ -255,6 +275,12 @@ public class MainActivity extends AppCompatActivity
     public static native void exit();
 
     public static native long tox_friend_add_norequest(String public_key_str);
+
+    public static native long tox_self_get_friend_list_size();
+
+    public static native long tox_friend_by_public_key(String friend_public_key_string);
+
+    public static native long[] tox_self_get_friend_list();
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
@@ -294,6 +320,14 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
     {
         Log.i(TAG, "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION);
+        if (friend_list_fragment != null)
+        {
+            FriendList f = friend_list_fragment.get_friend(friend_number);
+            if (f != null)
+            {
+                friend_list_fragment.modify_friend(f, friend_number);
+            }
+        }
     }
 
     static void android_tox_callback_friend_typing_cb_method(long friend_number, int b)

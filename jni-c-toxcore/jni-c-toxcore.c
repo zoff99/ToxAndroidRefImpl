@@ -870,6 +870,73 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv* env, jobjec
 	// dbg(9, "tox_iterate ... READY");
 }
 
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list_1size(JNIEnv* env, jobject thiz)
+{
+	size_t numfriends = tox_self_get_friend_list_size(tox_global);
+	return (jlong)(unsigned long long)numfriends;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNIEnv* env, jobject thiz, jobject public_key_str)
+{
+	unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
+	char *public_key_str2 = NULL;
+	const char *s = NULL;
+
+	s =  (*env)->GetStringUTFChars(env, public_key_str, NULL);
+	public_key_str2 = strdup(s);
+	(*env)->ReleaseStringUTFChars(env, public_key_str, s);
+
+	toxid_hex_to_bin(public_key_bin, public_key_str2);
+
+	TOX_ERR_FRIEND_BY_PUBLIC_KEY error;
+	uint32_t friendnum = tox_friend_by_public_key(tox_global, (uint8_t *)public_key_bin, &error);
+
+	if (public_key_str2)
+	{
+		free(public_key_str2);
+	}
+
+	return (jlong)(unsigned long long)friendnum;
+}
+
+JNIEXPORT jlongArray JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNIEnv* env, jobject thiz)
+{
+	size_t numfriends = tox_self_get_friend_list_size(tox_global);
+	size_t memsize = (numfriends * sizeof(uint32_t));
+	uint32_t *friend_list = malloc(memsize);
+	uint32_t *friend_list_iter = friend_list;
+	jlongArray result;
+
+	tox_self_get_friend_list(tox_global, friend_list);
+
+	result = (*env)->NewLongArray(env, numfriends);
+
+	if (result == NULL)
+	{
+		// TODO this would be bad!!
+	}
+
+	jlong buffer[numfriends];
+	int i = 0;
+	for (i=0;i<numfriends;i++)
+	{
+		buffer[i] = (long)friend_list_iter[i];
+	}
+
+	(*env)->SetLongArrayRegion(env, result, 0, numfriends, buffer);
+
+	if (friend_list)
+	{
+		free(friend_list);
+	}
+
+	return result;
+}
+
+
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv* env, jobject thiz)
 {
