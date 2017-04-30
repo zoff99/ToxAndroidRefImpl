@@ -64,6 +64,25 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
             imageView.setImageResource(R.drawable.circle_green);
         }
 
+        ImageView imageView2 = (ImageView) rowView.findViewById(R.id.f_user_status_icon);
+
+        if (values.get(position).TOX_USER_STATUS == 0)
+        {
+            imageView2.setImageResource(R.drawable.circle_green);
+        }
+        else
+        {
+            if (values.get(position).TOX_USER_STATUS == 1)
+            {
+                imageView2.setImageResource(R.drawable.circle_yellow);
+            }
+            else
+            {
+                imageView2.setImageResource(R.drawable.circle_red);
+            }
+        }
+
+
         return rowView;
     }
 }
