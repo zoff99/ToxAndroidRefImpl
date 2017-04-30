@@ -198,7 +198,7 @@ Tox *create_tox()
 	uint16_t tcp_port = 33776;
 
 	options.ipv6_enabled = true;
-	options.udp_enabled = true;
+	options.udp_enabled = false; // set TCP as default mode for android !!
 	options.local_discovery_enabled = true;
 	options.hole_punching_enabled = true;
 	// options.tcp_port = tcp_port;
@@ -312,6 +312,8 @@ void bootstrap_real(Tox *tox)
     DHT_node nodes[] =
     {
         {"178.62.250.138",             33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
+        {"136.243.141.187",             443,  "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39", {0}},
+        {"185.14.30.213",               443,  "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
         {"2a03:b0c0:2:d0::16:1",       33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
         {"tox.zodiaclabs.org",         33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074", {0}},
         {"163.172.136.118",            33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
@@ -324,7 +326,8 @@ void bootstrap_real(Tox *tox)
     for (size_t i = 0; i < sizeof(nodes)/sizeof(DHT_node); i ++) {
         sodium_hex2bin(nodes[i].key_bin, sizeof(nodes[i].key_bin),
                        nodes[i].key_hex, sizeof(nodes[i].key_hex)-1, NULL, NULL, NULL);
-        tox_bootstrap(tox, nodes[i].ip, nodes[i].port, nodes[i].key_bin, NULL);
+			tox_bootstrap(tox, nodes[i].ip, nodes[i].port, nodes[i].key_bin, NULL);
+		tox_add_tcp_relay(tox, nodes[i].ip, nodes[i].port, nodes[i].key_bin, NULL); // also try as TCP relay
     }
 }
 
