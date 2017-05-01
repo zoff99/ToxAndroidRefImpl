@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TRIfA</string>
+    <string name="add_friend_activity_name">add Friend</string>
 </resources>

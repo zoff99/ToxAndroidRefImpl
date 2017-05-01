@@ -22,12 +22,15 @@ package com.zoffcc.applications.trifa;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity
     static FriendListFragment friend_list_fragment = null;
     static OrmaDatabase orma = null;
     final static String FriendList_DB_NAME = "friendlist.db";
+    final static int AddFriendActivity_ID = 10001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -149,6 +153,8 @@ public class MainActivity extends AppCompatActivity
                 boolean exists_in_db = false;
                 for (fc = 0; fc < friends.length; fc++)
                 {
+                    Log.i(TAG, "loading friend  #:" + fc);
+
                     FriendList f;
                     List<FriendList> fl = orma.selectFromFriendList().tox_friendnumEq(fc).toList();
                     if (fl.size() > 0)
@@ -181,7 +187,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     // set all to OFFLINE and AVAILABLE
-                    f.TOX_USER_STATUS =0;
+                    f.TOX_USER_STATUS = 0;
                     f.TOXCONNECTION = 0;
                     // set all to OFFLINE and AVAILABLE
 
@@ -342,7 +348,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(String data_dir);
+    public native void init(@NonNull String data_dir);
 
     // public native void toxloop();
 
@@ -364,11 +370,13 @@ public class MainActivity extends AppCompatActivity
 
     public static native void exit();
 
-    public static native long tox_friend_add_norequest(String public_key_str);
+    public static native long tox_friend_add(@NonNull String toxid_str, @NonNull String message);
+
+    public static native long tox_friend_add_norequest(@NonNull String public_key_str);
 
     public static native long tox_self_get_friend_list_size();
 
-    public static native long tox_friend_by_public_key(String friend_public_key_string);
+    public static native long tox_friend_by_public_key(@NonNull String friend_public_key_string);
 
     public static native long[] tox_self_get_friend_list();
     // -------- native methods --------
@@ -540,4 +548,63 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void show_add_friend(View view)
+    {
+        Intent intent = new Intent(this, AddFriendActivity.class);
+        // intent.putExtra("key", value);
+        startActivityForResult(intent, AddFriendActivity_ID);
+    }
+
+    static void insert_into_friendlist_db(final FriendList f)
+    {
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                orma.insertIntoFriendList(f);
+            }
+        };
+        t.start();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AddFriendActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                String friend_tox_id1 = data.getStringExtra("toxid");
+                String friend_tox_id = "";
+                friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
+
+                Log.i(TAG, "add friend ID:" + friend_tox_id);
+
+                // add friend ---------------
+                long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
+                Log.i(TAG, "add friend  #:" + friendnum);
+                update_savedata_file(); // save toxcore datafile (new friend added)
+
+                // nospam=8 chars, checksum=4 chars
+                String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
+                Log.i(TAG, "add friend PK:" + friend_public_key);
+
+                FriendList f = new FriendList();
+                f.tox_public_key_string = friend_public_key;
+                f.tox_friendnum = friendnum;
+                f.TOX_USER_STATUS = 0;
+                f.TOXCONNECTION = 0;
+
+                insert_into_friendlist_db(f);
+                // add friend ---------------
+            }
+            else
+            {
+                // (resultCode == RESULT_CANCELED)
+            }
+        }
+    }
 }
+

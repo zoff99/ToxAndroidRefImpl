@@ -36,7 +36,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--tools:replace="android:icon,android:label,android:theme,android:name,android:allowBackup"-->
         <activity
             android:name=".MainActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
@@ -45,6 +44,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".AddFriendActivity"
+            android:label="@string/add_friend_activity_name">
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>
     </application>
 

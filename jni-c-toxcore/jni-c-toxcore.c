@@ -963,6 +963,36 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv*
 	return (jlong)(unsigned long long)interval;
 }
 
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv* env, jobject thiz, jobject toxid_str, jobject message)
+{
+	unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
+	char *public_key_str2 = NULL;
+	const char *s = NULL;
+	const char *message_str = NULL;
+
+	s =  (*env)->GetStringUTFChars(env, toxid_str, NULL);
+	public_key_str2 = strdup(s);
+	(*env)->ReleaseStringUTFChars(env, toxid_str, s);
+
+	message_str = (*env)->GetStringUTFChars(env, message, NULL);
+
+	toxid_hex_to_bin(public_key_bin, public_key_str2);
+    uint32_t friendnum = tox_friend_add(tox_global, (uint8_t *)public_key_bin, (uint8_t *)message_str, (size_t)strlen(message_str), NULL);
+
+	(*env)->ReleaseStringUTFChars(env, message, message_str);
+
+	if (public_key_str2)
+	{
+		free(public_key_str2);
+	}
+
+    dbg(9, "add friend");
+	return (jlong)(unsigned long long)friendnum;
+}
+
+
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIEnv* env, jobject thiz, jobject public_key_str)
 {
@@ -977,18 +1007,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
 	toxid_hex_to_bin(public_key_bin, public_key_str2);
     uint32_t friendnum = tox_friend_add_norequest(tox_global, (uint8_t *)public_key_bin, NULL);
 
-    dbg(9, "------");
-    dbg(9, "add friend:friendnum=%d", (int)friendnum);
-    dbg(9, "------");
-
 	if (public_key_str2)
 	{
 		free(public_key_str2);
 	}
 
-    dbg(9, "------");
-    dbg(9, "add friend:friendnum=%d", (int)friendnum);
-    dbg(9, "------");
+    dbg(9, "add friend norequest");
 	return (jlong)(unsigned long long)friendnum;
 }
 // --------------- _toxfuncs_ ---------------
