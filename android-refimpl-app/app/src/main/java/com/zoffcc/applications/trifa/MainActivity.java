@@ -228,6 +228,15 @@ public class MainActivity extends AppCompatActivity
                     tox_iterate();
 
                 }
+
+                try
+                {
+                    tox_kill();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         };
 

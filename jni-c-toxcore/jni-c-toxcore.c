@@ -35,9 +35,12 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include <sodium/utils.h>
 #include <tox/tox.h>
 #include <tox/toxav.h>
+
+#include <sodium/utils.h>
+
+#include <pthread.h>
 
 #include <linux/videodev2.h>
 #include <vpx/vpx_image.h>
@@ -55,11 +58,28 @@
 #define MAX_LOG_LINE_LENGTH 1000
 #define MAX_FULL_PATH_LENGTH 1000
 
+#define DEFAULT_FPS_SLEEP_MS 160 // default video fps (sleep in msecs. !!)
+
+typedef struct {
+    bool incoming;
+    uint32_t state;
+	uint32_t audio_bit_rate;
+	uint32_t video_bit_rate;
+    // pthread_mutex_t arb_mutex[1];
+} CallControl;
+
+
 const char *savedata_filename = "savedata.tox";
 const char *savedata_tmp_filename = "savedata.tox.tmp";
 int tox_loop_running = 1;
+int toxav_thread_stop = 0;
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
+ToxAV *tox_av_global = NULL;
+CallControl mytox_CC;
+int global_video_active = 0;
+pthread_t tid[1];
+
 
 // ----- JNI stuff -----
 JNIEnv *jnienv;
@@ -748,6 +768,69 @@ void android_logger(int level, const char* logtext)
 	}
 }
 
+void yieldcpu(uint32_t ms)
+{
+    usleep(1000 * ms);
+}
+
+void *thread_av(void *data)
+{
+	JavaVMAttachArgs args = {JNI_VERSION_1_6, 0, 0};
+	JNIEnv *env;
+	(*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
+
+	dbg(9, "2001");
+	ToxAV *av = (ToxAV *) data;
+	dbg(9, "2002");
+
+	pthread_t id = pthread_self();
+	dbg(9, "2003");
+	pthread_mutex_t av_thread_lock;
+	dbg(9, "2004");
+
+	if (pthread_mutex_init(&av_thread_lock, NULL) != 0)
+	{
+		dbg(0, "Error creating av_thread_lock");
+	}
+	else
+	{
+		dbg(2, "av_thread_lock created successfully");
+	}
+
+	dbg(2, "AV Thread #%d: starting", (int) id);
+
+	while (toxav_thread_stop != 1)
+	{
+		if (global_video_active == 1)
+		{
+			pthread_mutex_lock(&av_thread_lock);
+
+			pthread_mutex_unlock(&av_thread_lock);
+			// yieldcpu(1000); // 1 frame every 1 seconds!!
+			yieldcpu(DEFAULT_FPS_SLEEP_MS); /* ~6 frames per second */
+
+			continue; /* We're running video, so don't sleep for and extra 100 */
+		}
+		else
+		{
+			pthread_mutex_lock(&av_thread_lock);
+			toxav_iterate(av);
+			// dbg(9, "AV Thread #%d running ...", (int) id);
+			pthread_mutex_unlock(&av_thread_lock);
+
+		}
+
+		usleep(toxav_iteration_interval(av) * 1000);
+		yieldcpu(300);
+	}
+
+	// unreachable code
+	dbg(2, "ToxVideo:Clean thread exit!\n");
+
+	(*cachedJVM)->DetachCurrentThread(cachedJVM);
+	env = NULL;
+}
+
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
 {
@@ -819,6 +902,38 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	dbg(9, "1005");
 	// ----------- create Tox instance -----------
 
+
+	// ----------- create Tox AV instance --------
+    TOXAV_ERR_NEW rc;
+	dbg(2, "new Tox AV");
+    tox_av_global = toxav_new(tox_global, &rc);
+	if (rc != TOXAV_ERR_NEW_OK)
+	{
+		dbg(0, "Error at toxav_new: %d", rc);
+	}
+
+	memset(&mytox_CC, 0, sizeof(CallControl));
+	// ----------- create Tox AV instance --------
+
+    // init AV callbacks -------------------------------
+    // toxav_callback_call(tox_av_global, t_toxav_call_cb, &mytox_CC);
+    // toxav_callback_call_state(tox_av_global, t_toxav_call_state_cb, &mytox_CC);
+    // toxav_callback_bit_rate_status(tox_av_global, t_toxav_bit_rate_status_cb, &mytox_CC);
+    // toxav_callback_video_receive_frame(tox_av_global, t_toxav_receive_video_frame_cb, &mytox_CC);
+    // toxav_callback_audio_receive_frame(tox_av_global, t_toxav_receive_audio_frame_cb, &mytox_CC);
+	// init AV callbacks -------------------------------
+
+	// start toxav thread ------------------------------
+	toxav_thread_stop = 0;
+    if (pthread_create(&(tid[0]), NULL, thread_av, (void *)tox_av_global) != 0)
+	{
+        dbg(0, "AV Thread create failed");
+	}
+	else
+	{
+        dbg(2, "AV Thread successfully created");
+	}
+	// start toxav thread ------------------------------
 }
 
 
@@ -943,6 +1058,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv* env, jobject t
 {
 	dbg(9, "tox_kill ... START");
 	tox_kill(tox_global);
+
+	toxav_thread_stop = 1; // should stop out toxav thread
+	pthread_join(tid[0], NULL); // wait for toxav thread to end
+
+	toxav_kill(tox_av_global);
 	tox_global = NULL;
 	dbg(9, "tox_kill ... READY");
 }
