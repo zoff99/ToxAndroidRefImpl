@@ -26,7 +26,47 @@
         android:id="@+id/ml_fragment"
         android:name="com.zoffcc.applications.trifa.MessageListFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom"
+        android:layout_weight="0"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/ml_new_message"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:cursorVisible="true"
+            android:singleLine="false"
+            android:text=""
+            android:textColor="@android:color/primary_text_light"
+            android:textSize="19sp"/>
+
+        <LinearLayout
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="2dp"
+                android:layout_weight="0"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:onClick="send_message_onclick"
+                android:padding="2dp"
+                android:scaleType="fitCenter"
+                android:src="@android:drawable/ic_menu_send"/>
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
 

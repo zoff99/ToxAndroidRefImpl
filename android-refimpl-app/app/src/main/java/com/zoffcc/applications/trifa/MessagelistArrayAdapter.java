@@ -45,7 +45,17 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
     public View getView(int position, View convertView, ViewGroup parent)
     {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.message_list_entry, parent, false);
+        View rowView = null;
+        if (values.get(position).direction == 0)
+        {
+            // msg to me
+            rowView = inflater.inflate(R.layout.message_list_entry, parent, false);
+        }
+        else
+        {
+            // msg from me
+            rowView = inflater.inflate(R.layout.message_list_self_entry, parent, false);
+        }
 
         TextView textView = (TextView) rowView.findViewById(R.id.m_text);
         textView.setText("#" + values.get(position).id + ":" + values.get(position).text);
