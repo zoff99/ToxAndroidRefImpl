@@ -499,14 +499,20 @@ public class MainActivity extends AppCompatActivity
                 f.tox_friendnum = friendnum;
                 f.TOX_USER_STATUS = 0;
                 f.TOXCONNECTION = 0;
-                orma.insertIntoFriendList(f);
+
+                try
+                {
+                    orma.insertIntoFriendList(f);
+                }
+                catch (android.database.sqlite.SQLiteConstraintException)
+                {
+                }
 
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
             }
-        };
-        t.start();
+        }; t.start();
     }
 
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
@@ -587,17 +593,32 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "add friend  #:" + friendnum);
                 update_savedata_file(); // save toxcore datafile (new friend added)
 
-                // nospam=8 chars, checksum=4 chars
-                String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
-                Log.i(TAG, "add friend PK:" + friend_public_key);
+                if (friendnum > -1)
+                {
+                    // nospam=8 chars, checksum=4 chars
+                    String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
+                    Log.i(TAG, "add friend PK:" + friend_public_key);
 
-                FriendList f = new FriendList();
-                f.tox_public_key_string = friend_public_key;
-                f.tox_friendnum = friendnum;
-                f.TOX_USER_STATUS = 0;
-                f.TOXCONNECTION = 0;
+                    FriendList f = new FriendList();
+                    f.tox_public_key_string = friend_public_key;
+                    f.tox_friendnum = friendnum;
+                    f.TOX_USER_STATUS = 0;
+                    f.TOXCONNECTION = 0;
 
-                insert_into_friendlist_db(f);
+                    try
+                    {
+                        insert_into_friendlist_db(f);
+                    }
+                    catch (android.database.sqlite.SQLiteConstraintException)
+                    {
+                    }
+                }
+
+                if (friendnum == -1)
+                {
+                    Log.i(TAG, "friend already added, or request already sent");
+                }
+
                 // add friend ---------------
             }
             else

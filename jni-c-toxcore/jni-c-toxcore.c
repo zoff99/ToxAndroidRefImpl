@@ -978,8 +978,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv* env, jo
 
 	message_str = (*env)->GetStringUTFChars(env, message, NULL);
 
+	TOX_ERR_FRIEND_ADD error;
+
 	toxid_hex_to_bin(public_key_bin, public_key_str2);
-    uint32_t friendnum = tox_friend_add(tox_global, (uint8_t *)public_key_bin, (uint8_t *)message_str, (size_t)strlen(message_str), NULL);
+    uint32_t friendnum = tox_friend_add(tox_global, (uint8_t *)public_key_bin, (uint8_t *)message_str, (size_t)strlen(message_str), &error);
 
 	(*env)->ReleaseStringUTFChars(env, message, message_str);
 
@@ -988,8 +990,24 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv* env, jo
 		free(public_key_str2);
 	}
 
-    dbg(9, "add friend");
-	return (jlong)(unsigned long long)friendnum;
+	if (error != 0)
+	{
+		if (error == TOX_ERR_FRIEND_ADD_ALREADY_SENT)
+		{
+			dbg(9, "add friend:ERROR:TOX_ERR_FRIEND_ADD_ALREADY_SENT");
+			return (jlong)-1;
+		}
+		else
+		{
+			dbg(9, "add friend:ERROR:%d", (int)error);
+			return (jlong)-2;
+		}
+	}
+	else
+	{
+		dbg(9, "add friend");
+		return (jlong)(unsigned long long)friendnum;
+	}
 }
 
 
