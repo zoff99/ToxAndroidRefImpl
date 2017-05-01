@@ -796,6 +796,8 @@ void toxav_call_cb_(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool 
 {
 	android_toxav_callback_call_cb(friend_number, audio_enabled, video_enabled);
 }
+
+
 // ------------- AV ------------
 // ------------- AV ------------
 
@@ -1312,6 +1314,24 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
     dbg(9, "add friend norequest");
 	return (jlong)(unsigned long long)friendnum;
 }
+
+
+// ------------------- AV -------------------
+// ------------------- AV -------------------
+// ------------------- AV -------------------
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1answer(JNIEnv* env, jobject thiz, jlong friend_number, jlong audio_bit_rate, jlong video_bit_rate)
+{
+	TOXAV_ERR_ANSWER error;
+	bool res = toxav_answer(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate, (uint32_t)video_bit_rate, &error);
+	return (jint)res;
+}
+// ------------------- AV -------------------
+// ------------------- AV -------------------
+// ------------------- AV -------------------
+
+
+
 // --------------- _toxfuncs_ ---------------
 // --------------- _toxfuncs_ ---------------
 // --------------- _toxfuncs_ ---------------

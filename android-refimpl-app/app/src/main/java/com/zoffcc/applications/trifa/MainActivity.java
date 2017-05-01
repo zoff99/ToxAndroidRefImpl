@@ -407,6 +407,15 @@ public class MainActivity extends AppCompatActivity
     public static native long tox_friend_by_public_key(@NonNull String friend_public_key_string);
 
     public static native long[] tox_self_get_friend_list();
+
+    // --------------- AV -------------
+    // --------------- AV -------------
+    // --------------- AV -------------
+    public static native int toxav_answer(long friendnum, long audio_bit_rate, long video_bit_rate);
+    // --------------- AV -------------
+    // --------------- AV -------------
+    // --------------- AV -------------
+
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
@@ -418,6 +427,14 @@ public class MainActivity extends AppCompatActivity
     static void android_toxav_callback_call_cb_method(long friend_number, int audio_enabled, int video_enabled)
     {
         Log.i(TAG, "toxav_call:from=" + friend_number + " audio=" + audio_enabled + " video=" + video_enabled);
+
+        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
+        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
+        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
+        toxav_answer(friend_number, 10, 10);
+        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
+        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
+        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
     }
 
     static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long width, long height)
