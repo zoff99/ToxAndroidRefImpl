@@ -523,8 +523,8 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
 
         Message m = new Message();
-        m.to_tox_friendnum = -1; // -1 -> myself
-        m.from_tox_friendnum = friend_number;
+        m.tox_friendnum = friend_number;
+        m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = friend_message;

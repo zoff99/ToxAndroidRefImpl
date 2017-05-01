@@ -3,39 +3,41 @@ package com.zoffcc.applications.trifa;
 import android.support.annotation.Nullable;
 
 import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.Index;
+import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
 // for CREATE INDEX:
-@Table(indexes = @Index(value = {"from_tox_friendnum", "to_tox_friendnum"} // ,unique = true
-))
+@Table
 public class Message
 {
-    @Column(indexed = true)
-    long from_tox_friendnum = 0L;
+    @PrimaryKey(autoincrement = true, auto = true)
+    long id;
 
     @Column(indexed = true)
-    long to_tox_friendnum = 0L;
+    long tox_friendnum;
+
+    @Column(indexed = true)
+    int direction = 0; // 0 -> msg received, 1 -> msg sent
 
     @Column(indexed = true)
     int TOX_MESSAGE_TYPE = 0; // 0 -> normal, 1 -> action
 
-    @Column
+    @Column(helpers = Column.Helpers.ALL)
     @Nullable
     long sent_timestamp = 0L;
 
-    @Column
+    @Column(indexed = true)
     @Nullable
     long rcvd_timestamp = 0L;
 
-    @Column
+    @Column(indexed = true)
     boolean read = false;
 
     @Column
     @Nullable
     String text = null;
 
-    @Column
+    @Column(helpers = Column.Helpers.ALL)
     @Nullable
     String filename_fullpath = null;
 
@@ -43,8 +45,8 @@ public class Message
     static Message deep_copy(Message in)
     {
         Message out = new Message();
-        out.from_tox_friendnum = in.from_tox_friendnum;
-        out.to_tox_friendnum = in.to_tox_friendnum;
+        out.tox_friendnum = in.tox_friendnum;
+        out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
         out.sent_timestamp = in.sent_timestamp;
         out.rcvd_timestamp = in.rcvd_timestamp;
@@ -58,6 +60,6 @@ public class Message
     @Override
     public String toString()
     {
-        return from_tox_friendnum + ":" + to_tox_friendnum + ":" + TOX_MESSAGE_TYPE + ":" + sent_timestamp + ":" + rcvd_timestamp + ":" + read + ":" + text + ":" + filename_fullpath;
+        return tox_friendnum + ":" + direction + ":" + TOX_MESSAGE_TYPE + ":" + sent_timestamp + ":" + rcvd_timestamp + ":" + read + ":" + text + ":" + filename_fullpath;
     }
 }

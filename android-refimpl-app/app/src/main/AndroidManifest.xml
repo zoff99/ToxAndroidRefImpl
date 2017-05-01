@@ -51,6 +51,11 @@
             android:label="@string/add_friend_activity_name">
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>
+        <activity
+            android:name=".MessageListActivity"
+            android:label="@string/message_list_activity_name">
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
     </application>
 
 </manifest>

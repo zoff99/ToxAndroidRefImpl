@@ -21,7 +21,6 @@ package com.zoffcc.applications.trifa;
 
 import android.app.ListFragment;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,24 +28,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.orma;
 
-public class FriendListFragment extends ListFragment
+public class MessageListFragment extends ListFragment
 {
-    private static final String TAG = "trifa.FriendListFrgnt";
-    static final int MessageListActivity_ID = 2;
-    List<FriendList> data_values = null;
-    FriendlistArrayAdapter a = null;
+    private static final String TAG = "trifa.MsgListFrgnt";
+    List<Message> data_values = null;
+    MessagelistArrayAdapter a = null;
+    long current_friendnum = -1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.friend_list_layout, container, false);
-        MainActivity.friend_list_fragment = this;
+        View view = inflater.inflate(R.layout.message_list_layout, container, false);
         return view;
     }
 
@@ -60,52 +57,49 @@ public class FriendListFragment extends ListFragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
-        data_values = new ArrayList<FriendList>();
-        a = new FriendlistArrayAdapter(context, data_values);
+        MessageListActivity mla = (MessageListActivity) (getActivity());
+        current_friendnum = mla.get_current_friendnum();
+        Log.i(TAG, "current_friendnum=" + current_friendnum);
+        data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
+        a = new MessagelistArrayAdapter(context, data_values);
         setListAdapter(a);
     }
 
-    void modify_friend(final FriendList f, final long friendnum)
+    void update_all_messages()
     {
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                boolean found_friend = false;
-                int size = data_values.size();
-                int i = 0;
-                for (i = 0; i < size; i++)
-                {
-                    if (data_values.get(i).tox_friendnum == friendnum)
-                    {
-                        found_friend = true;
-                        FriendList n = deep_copy(f);
-                        data_values.set(i, n);
-                        Log.i(TAG, "modify_friend:found friend:" + friendnum);
-                        a.notifyDataSetChanged();
-                    }
-                }
-
-                if (!found_friend)
-                {
-                    add_friends(f);
-                }
+                Log.i(TAG, "current_friendnum=" + current_friendnum);
+                data_values.clear();
+                data_values.addAll(orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList());
+                a.notifyDataSetChanged();
             }
         };
         main_handler_s.post(myRunnable);
     }
 
-    void add_friends(final FriendList f)
+    void modify_message(final Message m)
     {
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                FriendList n = deep_copy(f);
-                data_values.add(n);
-                a.notifyDataSetChanged();
+            }
+        };
+        main_handler_s.post(myRunnable);
+    }
+
+    void add_message(final Message m)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
             }
         };
 
@@ -115,10 +109,5 @@ public class FriendListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-        Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_friendnum);
-
-        Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
-        intent.putExtra("friendnum", data_values.get(position).tox_friendnum);
-        startActivityForResult(intent, MessageListActivity_ID);
     }
 }
