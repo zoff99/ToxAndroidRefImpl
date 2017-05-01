@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity
     static RemoteViews notification_view = null;
     static long[] friends = null;
     static FriendListFragment friend_list_fragment = null;
+    static MessageListFragment message_list_fragment = null;
     static OrmaDatabase orma = null;
     final static String MAIN_DB_NAME = "main.db";
     final static int AddFriendActivity_ID = 10001;
@@ -545,7 +546,7 @@ public class MainActivity extends AppCompatActivity
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = friend_message;
 
-        insert_into_message_db(m);
+        insert_into_message_db(m, true);
     }
 
     // void test(int i)
@@ -589,7 +590,7 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent, AddFriendActivity_ID);
     }
 
-    static void insert_into_message_db(final Message m)
+    static void insert_into_message_db(final Message m, final boolean update_message_view_flag)
     {
         Thread t = new Thread()
         {
@@ -597,6 +598,10 @@ public class MainActivity extends AppCompatActivity
             public void run()
             {
                 orma.insertIntoMessage(m);
+                if (update_message_view_flag)
+                {
+                    update_message_view();
+                }
             }
         };
         t.start();
@@ -613,6 +618,28 @@ public class MainActivity extends AppCompatActivity
             }
         };
         t.start();
+    }
+
+    static void update_message_view()
+    {
+        try
+        {
+            Log.i(TAG, "update_message_view:001 " + message_list_fragment);
+            Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " + message_list_fragment.isVisible());
+            // update the message view (if possbile)
+            if ((message_list_fragment.isAdded()) && (message_list_fragment.isVisible()))
+            {
+                Log.i(TAG, "update_message_view:003");
+                MainActivity.message_list_fragment.update_all_messages();
+                Log.i(TAG, "update_message_view:004");
+            }
+        }
+
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update_message_view:EE:" + e.getMessage());
+        }
     }
 
     @Override

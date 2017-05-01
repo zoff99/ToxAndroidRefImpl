@@ -56,23 +56,36 @@ public class MessageListActivity extends AppCompatActivity
 
     public void send_message_onclick(View view)
     {
-        // send typed message to friend
-        String msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
 
-        Message m = new Message();
-        m.tox_friendnum = friendnum;
-        m.direction = 1; // msg sent
-        m.TOX_MESSAGE_TYPE = 0;
-        m.rcvd_timestamp = 0L;
-        m.sent_timestamp = System.currentTimeMillis();
-        m.read = false;
-        m.text = msg;
+        String msg = "";
+        try
+        {
+            // send typed message to friend
+            msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
 
-        insert_into_message_db(m);
-        long res = tox_friend_send_message(friendnum, 0, msg);
+            Message m = new Message();
+            m.tox_friendnum = friendnum;
+            m.direction = 1; // msg sent
+            m.TOX_MESSAGE_TYPE = 0;
+            m.rcvd_timestamp = 0L;
+            m.sent_timestamp = System.currentTimeMillis();
+            m.read = false;
+            m.text = msg;
 
-        ml_new_message.setText("");
+            long res = tox_friend_send_message(friendnum, 0, msg);
 
-        Log.i(TAG, "tox_friend_send_message:result=" + res);
+            if (res > -1)
+            {
+                insert_into_message_db(m, true);
+                ml_new_message.setText("");
+            }
+            Log.i(TAG, "tox_friend_send_message:result=" + res);
+
+        }
+        catch (Exception e)
+        {
+            msg = "";
+            e.printStackTrace();
+        }
     }
 }

@@ -44,6 +44,7 @@ public class MessageListFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
+        MainActivity.message_list_fragment = this;
         return view;
     }
 
@@ -57,12 +58,60 @@ public class MessageListFragment extends ListFragment
     public void onAttach(Context context)
     {
         super.onAttach(context);
+
         MessageListActivity mla = (MessageListActivity) (getActivity());
         current_friendnum = mla.get_current_friendnum();
         Log.i(TAG, "current_friendnum=" + current_friendnum);
         data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
         a = new MessagelistArrayAdapter(context, data_values);
         setListAdapter(a);
+
+        // TODO this is just a bad hack, fix me!! -----------------
+        final Thread t1 = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Log.i(TAG, "scroll to bottom:1");
+                    Thread.sleep(300); // TODO: really back hack!!
+                    // scroll to bottom
+                    Log.i(TAG, "scroll to bottom:2");
+                    scroll_to_bottom();
+                    Log.i(TAG, "scroll to bottom:2");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "scroll to bottom:EE:" + e.getMessage());
+                }
+            }
+        };
+        t1.start();
+        // TODO this is just a bad hack, fix me!! -----------------
+
+    }
+
+    void scroll_to_bottom()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    // scroll to bottom
+                    setSelection(data_values.size());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
     }
 
     void update_all_messages()
@@ -76,6 +125,7 @@ public class MessageListFragment extends ListFragment
                 data_values.clear();
                 data_values.addAll(orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList());
                 a.notifyDataSetChanged();
+                scroll_to_bottom();
             }
         };
         main_handler_s.post(myRunnable);
@@ -109,5 +159,6 @@ public class MessageListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
+        // TODO
     }
 }
