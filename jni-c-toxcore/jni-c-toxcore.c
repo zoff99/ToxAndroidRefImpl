@@ -100,6 +100,10 @@ jmethodID android_tox_callback_friend_typing_cb_method = NULL;
 jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_cb_method = NULL;
+// -------- _AV-callbacks_ -----
+jmethodID android_toxav_callback_call_cb_method = NULL;
+jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
+// -------- _AV-callbacks_ -----
 // -------- _callbacks_ --------
 
 // ----- JNI stuff -----
@@ -128,6 +132,12 @@ void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *us
 void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data);
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data);
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
+
+void toxav_call_cd(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool video_enabled, void *user_data);
+void toxav_video_receive_frame_cd(ToxAV *av, uint32_t friend_number, uint16_t width, uint16_t height,
+     const uint8_t *y, const uint8_t *u, const uint8_t *v, int32_t ystride, int32_t ustride, int32_t vstride, void *user_data);
+
+
 
 void android_logger(int level, const char* logtext);
 // functions -----------
@@ -579,7 +589,7 @@ void android_tox_callback_self_connection_status_cb(int a_TOX_CONNECTION)
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-          android_tox_callback_self_connection_status_cb_method, a_TOX_CONNECTION);
+          android_tox_callback_self_connection_status_cb_method, (jint)a_TOX_CONNECTION);
 }
 
 void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void *user_data)
@@ -646,7 +656,7 @@ void android_tox_callback_friend_status_cb(uint32_t friend_number, TOX_USER_STAT
 	jnienv2 = jni_getenv();
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-          android_tox_callback_friend_status_cb_method, (jlong)(unsigned long long)friend_number, (int)status);
+          android_tox_callback_friend_status_cb_method, (jlong)(unsigned long long)friend_number, (jint)status);
 }
 
 void friend_status_cb(Tox *tox, uint32_t friend_number, TOX_USER_STATUS status, void *user_data)
@@ -664,17 +674,17 @@ void android_tox_callback_friend_connection_status_cb(uint32_t friend_number, TO
         case TOX_CONNECTION_NONE:
             dbg(2, "friend# %d Offline", (int)friend_number);
 			(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-				android_tox_callback_friend_connection_status_cb_method, (jlong)(unsigned long long)friend_number, (int)connection_status);
+				android_tox_callback_friend_connection_status_cb_method, (jlong)(unsigned long long)friend_number, (jint)connection_status);
             break;
         case TOX_CONNECTION_TCP:
             dbg(2, "friend# %d Online, using TCP", (int)friend_number);
 			(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-				android_tox_callback_friend_connection_status_cb_method, (jlong)(unsigned long long)friend_number, (int)connection_status);
+				android_tox_callback_friend_connection_status_cb_method, (jlong)(unsigned long long)friend_number, (jint)connection_status);
             break;
         case TOX_CONNECTION_UDP:
             dbg(2, "friend# %d Online, using UDP", (int)friend_number);
 			(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-				android_tox_callback_friend_connection_status_cb_method, (jlong)(unsigned long long)friend_number, (int)connection_status);
+				android_tox_callback_friend_connection_status_cb_method, (jlong)(unsigned long long)friend_number, (jint)connection_status);
             break;
     }
 }
@@ -688,6 +698,8 @@ void android_tox_callback_friend_typing_cb(uint32_t friend_number, bool is_typin
 {
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
+
+	// TODO
 }
 
 void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data)
@@ -699,6 +711,8 @@ void android_tox_callback_friend_read_receipt_cb(uint32_t friend_number, uint32_
 {
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
+
+	// TODO
 }
 
 void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data)
@@ -740,7 +754,7 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
 	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-          android_tox_callback_friend_message_cb_method, (jlong)(unsigned long long)friend_number, (int) type, js1, (jlong)(unsigned long long)length);
+          android_tox_callback_friend_message_cb_method, (jlong)(unsigned long long)friend_number, (jint) type, js1, (jlong)(unsigned long long)length);
 
 	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
 }
@@ -749,7 +763,47 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 {
 	android_tox_callback_friend_message_cb(friend_number, type, message, length);
 }
+
+
+
+// ------------- AV ------------
+// ------------- AV ------------
+void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_toxav_callback_video_receive_frame_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)width, (jlong)(unsigned long long)height);
+}
+
+void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t width, uint16_t height,
+     const uint8_t *y, const uint8_t *u, const uint8_t *v, int32_t ystride, int32_t ustride, int32_t vstride, void *user_data)
+{
+	android_toxav_callback_video_receive_frame_cb(friend_number, width, height);
+}
+
+void android_toxav_callback_call_cb(uint32_t friend_number, bool audio_enabled, bool video_enabled)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_toxav_callback_call_cb_method, (jlong)(unsigned long long)friend_number, (jint)audio_enabled, (jint)video_enabled);
+}
+
+void toxav_call_cb_(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool video_enabled, void *user_data)
+{
+	android_toxav_callback_call_cb(friend_number, audio_enabled, video_enabled);
+}
+// ------------- AV ------------
+// ------------- AV ------------
+
 // -------- _callbacks_ --------
+
+
+
+
 
 
 void android_logger(int level, const char* logtext)
@@ -916,11 +970,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	// ----------- create Tox AV instance --------
 
     // init AV callbacks -------------------------------
-    // toxav_callback_call(tox_av_global, t_toxav_call_cb, &mytox_CC);
+	dbg(9, "linking AV callbacks ... START");
+	android_toxav_callback_call_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_call_cb_method", "(JII)V");
+    toxav_callback_call(tox_av_global, toxav_call_cb_, &mytox_CC);
+	android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_video_receive_frame_cb_method", "(JJJ)V");
+    toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
     // toxav_callback_call_state(tox_av_global, t_toxav_call_state_cb, &mytox_CC);
     // toxav_callback_bit_rate_status(tox_av_global, t_toxav_bit_rate_status_cb, &mytox_CC);
-    // toxav_callback_video_receive_frame(tox_av_global, t_toxav_receive_video_frame_cb, &mytox_CC);
     // toxav_callback_audio_receive_frame(tox_av_global, t_toxav_receive_audio_frame_cb, &mytox_CC);
+	dbg(9, "linking AV callbacks ... READY");
 	// init AV callbacks -------------------------------
 
 	// start toxav thread ------------------------------

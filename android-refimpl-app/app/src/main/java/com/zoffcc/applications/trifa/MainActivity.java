@@ -411,6 +411,25 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
 
+    // -------- called by AV native methods --------
+    // -------- called by AV native methods --------
+    // -------- called by AV native methods --------
+
+    static void android_toxav_callback_call_cb_method(long friend_number, int audio_enabled, int video_enabled)
+    {
+        Log.i(TAG, "toxav_call:from=" + friend_number + " audio=" + audio_enabled + " video=" + video_enabled);
+    }
+
+    static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long width, long height)
+    {
+        Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + width + " video height=" + height);
+    }
+
+    // -------- called by AV native methods --------
+    // -------- called by AV native methods --------
+    // -------- called by AV native methods --------
+
+
     // -------- called by native methods --------
     // -------- called by native methods --------
     // -------- called by native methods --------
