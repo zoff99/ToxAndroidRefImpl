@@ -1,8 +1,7 @@
 package com.zoffcc.applications.trifa;
 
-import android.annotation.TargetApi;
 import android.app.ListFragment;
-import android.os.Build;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,28 +25,22 @@ public class FriendListFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.friend_list_layout, container, false);
-
         MainActivity.friend_list_fragment = this;
-
         return view;
     }
 
-    // TODO make it work with API less than 23 (M) !!
-    @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+    }
 
+    @Override
+    public void onAttach(Context context)
+    {
+        super.onAttach(context);
         data_values = new ArrayList<FriendList>();
-
-        FriendList tmp = new FriendList();
-        // tmp.name = "name1";
-        // tmp.status_message = "status message 1";
-        // tmp.TOXCONNECTION = 1;
-        // values.add(tmp);
-
-        a = new FriendlistArrayAdapter(FriendListFragment.this.getContext(), data_values);
+        a = new FriendlistArrayAdapter(context, data_values);
         setListAdapter(a);
     }
 
