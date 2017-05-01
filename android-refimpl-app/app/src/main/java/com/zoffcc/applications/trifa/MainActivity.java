@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity
         String native_api = getNativeLibAPI();
         mt.setText(mt.getText() + "\n" + native_api);
 
+        mt.setText(mt.getText() + "\n" + "c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
+
         // See OrmaDatabaseBuilderBase for other options.
         orma = OrmaDatabase.builder(this).name(MAIN_DB_NAME).build();
         // default: "${applicationId}.orma.db"
@@ -372,6 +374,20 @@ public class MainActivity extends AppCompatActivity
 
     public static native void exit();
 
+    public static native long tox_friend_send_message(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message);
+
+    public static native long tox_version_major();
+
+    public static native long tox_version_minor();
+
+    public static native long tox_version_patch();
+
+    public static native long tox_max_filename_length();
+
+    public static native long tox_file_id_length();
+
+    public static native long tox_max_message_length();
+
     public static native long tox_friend_add(@NonNull String toxid_str, @NonNull String message);
 
     public static native long tox_friend_add_norequest(@NonNull String public_key_str);
@@ -637,6 +653,8 @@ public class MainActivity extends AppCompatActivity
                     catch (android.database.sqlite.SQLiteConstraintException e)
                     {
                     }
+
+                    friend_list_fragment.modify_friend(f, friendnum);
                 }
 
                 if (friendnum == -1)

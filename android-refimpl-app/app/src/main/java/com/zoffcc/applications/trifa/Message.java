@@ -13,10 +13,13 @@ public class Message
     @PrimaryKey(autoincrement = true, auto = true)
     long id;
 
-    @Column(indexed = true)
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    long message_id = -1;
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
     long tox_friendnum;
 
-    @Column(indexed = true)
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
     int direction = 0; // 0 -> msg received, 1 -> msg sent
 
     @Column(indexed = true)
@@ -30,10 +33,10 @@ public class Message
     @Nullable
     long rcvd_timestamp = 0L;
 
-    @Column(indexed = true)
+    @Column(helpers = Column.Helpers.ALL)
     boolean read = false;
 
-    @Column
+    @Column(helpers = Column.Helpers.ALL)
     @Nullable
     String text = null;
 

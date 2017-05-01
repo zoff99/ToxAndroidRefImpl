@@ -958,12 +958,112 @@ Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv* env, jobject thiz)
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv* env, jobject thiz)
 {
-	long long interval = (long long)tox_iteration_interval(tox_global);
-	dbg(9, "tox_iteration_interval=%lld", (long long)interval);
-
-	return (jlong)(unsigned long long)interval;
+	long long l = (long long)tox_iteration_interval(tox_global);
+	dbg(9, "tox_iteration_interval=%lld", (long long)l);
+	return (jlong)(unsigned long long)l;
 }
 
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1max_1message_1length(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)tox_max_message_length();
+	return (jlong)(unsigned long long)l;
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1id_1length(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)tox_file_id_length();
+	return (jlong)(unsigned long long)l;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1max_1filename_1length(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)tox_max_filename_length();
+	return (jlong)(unsigned long long)l;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1major(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)tox_version_major();
+	return (jlong)(unsigned long long)l;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1minor(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)tox_version_minor();
+	return (jlong)(unsigned long long)l;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1patch(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)tox_version_patch();
+	return (jlong)(unsigned long long)l;
+}
+
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEnv* env, jobject thiz, jlong friend_number, jint type, jobject message)
+{
+	const char *message_str = NULL;
+	message_str = (*env)->GetStringUTFChars(env, message, NULL);
+
+	TOX_ERR_FRIEND_SEND_MESSAGE error;
+	uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)message_str, (size_t)strlen(message_str), &error);
+
+	(*env)->ReleaseStringUTFChars(env, message, message_str);
+
+	if (error != 0)
+	{
+		if (error == TOX_ERR_FRIEND_SEND_MESSAGE_NULL)
+		{
+			dbg(9, "tox_friend_send_message:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_NULL");
+			return (jlong)-1;
+		}
+		else if (error == TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_FOUND)
+		{
+			dbg(9, "tox_friend_send_message:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_FOUND");
+			return (jlong)-2;
+		}
+		else if (error == TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_CONNECTED)
+		{
+			dbg(9, "tox_friend_send_message:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_CONNECTED");
+			return (jlong)-3;
+		}
+		else if (error == TOX_ERR_FRIEND_SEND_MESSAGE_SENDQ)
+		{
+			dbg(9, "tox_friend_send_message:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_SENDQ");
+			return (jlong)-4;
+		}
+		else if (error == TOX_ERR_FRIEND_SEND_MESSAGE_TOO_LONG)
+		{
+			dbg(9, "tox_friend_send_message:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_TOO_LONG");
+			return (jlong)-5;
+		}
+		else if (error == TOX_ERR_FRIEND_SEND_MESSAGE_EMPTY)
+		{
+			dbg(9, "tox_friend_send_message:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_EMPTY");
+			return (jlong)-6;
+		}
+		else
+		{
+			dbg(9, "tox_friend_send_message:ERROR:%d", (int)error);
+			return (jlong)-99;
+		}
+	}
+	else
+	{
+		dbg(9, "tox_friend_send_message");
+		return (jlong)(unsigned long long)res;
+	}
+}
 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv* env, jobject thiz, jobject toxid_str, jobject message)
