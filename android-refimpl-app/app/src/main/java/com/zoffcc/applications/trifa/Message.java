@@ -18,7 +18,7 @@ public class Message
     long to_tox_friendnum = 0L;
 
     @Column(indexed = true)
-    int type = 0; // 0 -> normal text message, 1 -> file
+    int TOX_MESSAGE_TYPE = 0; // 0 -> normal, 1 -> action
 
     @Column
     @Nullable
@@ -45,7 +45,7 @@ public class Message
         Message out = new Message();
         out.from_tox_friendnum = in.from_tox_friendnum;
         out.to_tox_friendnum = in.to_tox_friendnum;
-        out.type = in.type;
+        out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
         out.sent_timestamp = in.sent_timestamp;
         out.rcvd_timestamp = in.rcvd_timestamp;
         out.read = in.read;
@@ -58,6 +58,6 @@ public class Message
     @Override
     public String toString()
     {
-        return from_tox_friendnum + ":" + to_tox_friendnum + ":" + type + ":" + sent_timestamp + ":" + rcvd_timestamp + ":" + read + ":" + text + ":" + filename_fullpath;
+        return from_tox_friendnum + ":" + to_tox_friendnum + ":" + TOX_MESSAGE_TYPE + ":" + sent_timestamp + ":" + rcvd_timestamp + ":" + read + ":" + text + ":" + filename_fullpath;
     }
 }

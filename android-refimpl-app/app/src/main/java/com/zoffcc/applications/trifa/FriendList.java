@@ -24,7 +24,7 @@ public class FriendList
     String status_message;
 
     @Column
-    int TOXCONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
+    int TOX_CONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
     @Column
     int TOX_USER_STATUS; // 0 --> NONE, 1 --> online AWAY, 2 --> online BUSY
@@ -36,7 +36,7 @@ public class FriendList
         out.tox_friendnum = in.tox_friendnum;
         out.name = in.name;
         out.status_message = in.status_message;
-        out.TOXCONNECTION = in.TOXCONNECTION;
+        out.TOX_CONNECTION = in.TOX_CONNECTION;
         out.TOX_USER_STATUS = in.TOX_USER_STATUS;
 
         return out;
@@ -45,6 +45,6 @@ public class FriendList
     @Override
     public String toString()
     {
-        return tox_friendnum + ":" + tox_public_key_string + ":" + name + ":" + status_message + ":" + TOXCONNECTION + ":" + TOX_USER_STATUS;
+        return tox_friendnum + ":" + tox_public_key_string + ":" + name + ":" + status_message + ":" + TOX_CONNECTION + ":" + TOX_USER_STATUS;
     }
 }

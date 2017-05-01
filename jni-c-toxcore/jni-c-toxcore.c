@@ -169,6 +169,7 @@ void dbg(int level, const char *fmt, ...)
 	if (level <= CURRENT_LOG_LEVEL)
 	{
 		log_line_str = malloc((size_t)MAX_LOG_LINE_LENGTH);
+		// memset(log_line_str, 0, (size_t)MAX_LOG_LINE_LENGTH);
 		va_list ap;
 		va_start(ap, fmt);
 		vsnprintf(log_line_str, (size_t)MAX_LOG_LINE_LENGTH, level_and_format, ap);
@@ -958,7 +959,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv* env, jobject thiz)
 {
 	long long interval = (long long)tox_iteration_interval(tox_global);
-	dbg(9, "tox_iteration_interval=%lld" + (long long)interval);
+	dbg(9, "tox_iteration_interval=%lld", (long long)interval);
 
 	return (jlong)(unsigned long long)interval;
 }

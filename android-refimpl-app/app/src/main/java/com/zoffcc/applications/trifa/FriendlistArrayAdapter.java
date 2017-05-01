@@ -55,7 +55,7 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 
         ImageView imageView = (ImageView) rowView.findViewById(R.id.f_status_icon);
 
-        if (values.get(position).TOXCONNECTION == 0)
+        if (values.get(position).TOX_CONNECTION == 0)
         {
             imageView.setImageResource(R.drawable.circle_red);
         }
