@@ -504,7 +504,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     orma.insertIntoFriendList(f);
                 }
-                catch (android.database.sqlite.SQLiteConstraintException)
+                catch (android.database.sqlite.SQLiteConstraintException e)
                 {
                 }
 
@@ -609,7 +609,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         insert_into_friendlist_db(f);
                     }
-                    catch (android.database.sqlite.SQLiteConstraintException)
+                    catch (android.database.sqlite.SQLiteConstraintException e)
                     {
                     }
                 }
