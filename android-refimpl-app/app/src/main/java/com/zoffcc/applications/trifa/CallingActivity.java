@@ -41,7 +41,7 @@ public class CallingActivity extends AppCompatActivity
         accept_button = (ImageButton) findViewById(R.id.accept_button);
         decline_button = (ImageButton) findViewById(R.id.decline_button);
 
-        top_text_line.setText(Callstate.tox_call_state + ":" + Callstate.friend_name);
+        top_text_line.setText(Callstate.friend_name);
 
         accept_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -51,7 +51,9 @@ public class CallingActivity extends AppCompatActivity
                 try
                 {
                     toxav_answer(Callstate.friend_number, 10, 10);
-                    top_text_line.setText(Callstate.tox_call_state + ":" + Callstate.friend_name);
+                    Callstate.call_start_timestamp = System.currentTimeMillis();
+                    String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
+                    top_text_line.setText(Callstate.friend_name + " : " + a);
                 }
                 catch (Exception e)
                 {
@@ -69,7 +71,6 @@ public class CallingActivity extends AppCompatActivity
                 try
                 {
                     toxav_call_control(Callstate.friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
-                    top_text_line.setText(Callstate.tox_call_state + ":" + Callstate.friend_name);
                     close_calling_activity();
                 }
                 catch (Exception e)
