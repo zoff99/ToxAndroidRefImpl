@@ -175,42 +175,48 @@ public class ToxVars
          * Resume a previously paused call. Only valid if the pause was caused by this
          * client, if not, this control is ignored. Not valid before the call is accepted.
          */
-        TOXAV_CALL_CONTROL_RESUME,
+        TOXAV_CALL_CONTROL_RESUME(0),
 
         /**
          * Put a call on hold. Not valid before the call is accepted.
          */
-        TOXAV_CALL_CONTROL_PAUSE,
+        TOXAV_CALL_CONTROL_PAUSE(1),
 
         /**
          * Reject a call if it was not answered, yet. Cancel a call after it was
          * answered.
          */
-        TOXAV_CALL_CONTROL_CANCEL,
+        TOXAV_CALL_CONTROL_CANCEL(2),
 
         /**
          * Request that the friend stops sending audio. Regardless of the friend's
          * compliance, this will cause the audio_receive_frame event to stop being
          * triggered on receiving an audio frame from the friend.
          */
-        TOXAV_CALL_CONTROL_MUTE_AUDIO,
+        TOXAV_CALL_CONTROL_MUTE_AUDIO(3),
 
         /**
          * Calling this control will notify client to start sending audio again.
          */
-        TOXAV_CALL_CONTROL_UNMUTE_AUDIO,
+        TOXAV_CALL_CONTROL_UNMUTE_AUDIO(4),
 
         /**
          * Request that the friend stops sending video. Regardless of the friend's
          * compliance, this will cause the video_receive_frame event to stop being
          * triggered on receiving a video frame from the friend.
          */
-        TOXAV_CALL_CONTROL_HIDE_VIDEO,
+        TOXAV_CALL_CONTROL_HIDE_VIDEO(5),
 
         /**
          * Calling this control will notify client to start sending video again.
          */
-        TOXAV_CALL_CONTROL_SHOW_VIDEO,
+        TOXAV_CALL_CONTROL_SHOW_VIDEO(6);
+        public int value;
+
+        private TOXAV_CALL_CONTROL(int value)
+        {
+            this.value = value;
+        }
 
     }
 

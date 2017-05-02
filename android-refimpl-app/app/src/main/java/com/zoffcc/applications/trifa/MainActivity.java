@@ -37,6 +37,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
+
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
@@ -505,6 +507,7 @@ public class MainActivity extends AppCompatActivity
 
         if (Callstate.state == 1)
         {
+            int old_value = Callstate.tox_call_state;
             Callstate.tox_call_state = a_TOXAV_FRIEND_CALL_STATE;
 
             if ((a_TOXAV_FRIEND_CALL_STATE & (4 + 8 + 16 + 32)) > 0)
@@ -514,7 +517,13 @@ public class MainActivity extends AppCompatActivity
             }
             else if ((a_TOXAV_FRIEND_CALL_STATE & (2)) > 0)
             {
-                Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending");
+                Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending(1)");
+                close_calling_activity();
+            }
+            else if ((old_value > 0) && (a_TOXAV_FRIEND_CALL_STATE == 0))
+            {
+                Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending(2)");
+                close_calling_activity();
             }
 
         }

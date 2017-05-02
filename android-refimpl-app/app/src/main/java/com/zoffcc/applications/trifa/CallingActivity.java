@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
 public class CallingActivity extends AppCompatActivity
 {
@@ -22,6 +23,7 @@ public class CallingActivity extends AppCompatActivity
     ImageButton accept_button = null;
     ImageButton decline_button = null;
     TextView top_text_line = null;
+    static CallingActivity ca = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,6 +32,8 @@ public class CallingActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_calling);
 
+        ca = this;
+
         mVisible = true;
         mContentView = findViewById(R.id.video_view);
 
@@ -37,7 +41,7 @@ public class CallingActivity extends AppCompatActivity
         accept_button = (ImageButton) findViewById(R.id.accept_button);
         decline_button = (ImageButton) findViewById(R.id.decline_button);
 
-        top_text_line.setText("" + Callstate.friend_name);
+        top_text_line.setText(Callstate.tox_call_state + ":" + Callstate.friend_name);
 
         accept_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -47,6 +51,7 @@ public class CallingActivity extends AppCompatActivity
                 try
                 {
                     toxav_answer(Callstate.friend_number, 10, 10);
+                    top_text_line.setText(Callstate.tox_call_state + ":" + Callstate.friend_name);
                 }
                 catch (Exception e)
                 {
@@ -61,10 +66,28 @@ public class CallingActivity extends AppCompatActivity
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
+                try
+                {
+                    toxav_call_control(Callstate.friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+                    top_text_line.setText(Callstate.tox_call_state + ":" + Callstate.friend_name);
+                    close_calling_activity();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 return true;
             }
         });
 
+    }
+
+    public static void close_calling_activity()
+    {
+        Callstate.reset_values();
+        // close calling activity --------
+        ca.finish();
+        // close calling activity --------
     }
 
     @Override
