@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     final static String MAIN_DB_NAME = "main.db";
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
+    static String temp_string_a = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -465,6 +466,7 @@ public class MainActivity extends AppCompatActivity
                         Log.i(TAG, "CALL:start:show activity");
                         Callstate.state = 1;
                         Callstate.call_first_video_frame_received = -1;
+                        Callstate.call_start_timestamp = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_number = fn;
                         try
@@ -498,6 +500,8 @@ public class MainActivity extends AppCompatActivity
         if (Callstate.call_first_video_frame_received == -1)
         {
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
+            temp_string_a = "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
+            CallingActivity.update_top_text_line(temp_string_a);
         }
     }
 

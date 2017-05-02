@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -22,8 +23,14 @@ public class CallingActivity extends AppCompatActivity
     private View mContentView;
     ImageButton accept_button = null;
     ImageButton decline_button = null;
-    TextView top_text_line = null;
+    static TextView top_text_line = null;
     static CallingActivity ca = null;
+    static String top_text_line_str1 = "";
+    static String top_text_line_str2 = "";
+    static String top_text_line_str3 = "";
+    Handler callactivity_handler = null;
+    static Handler callactivity_handler_s = null;
+    private static final String TAG = "trifa.CallingActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -31,6 +38,9 @@ public class CallingActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_calling);
+
+        callactivity_handler = new Handler(getMainLooper());
+        callactivity_handler_s = callactivity_handler;
 
         ca = this;
 
@@ -41,7 +51,10 @@ public class CallingActivity extends AppCompatActivity
         accept_button = (ImageButton) findViewById(R.id.accept_button);
         decline_button = (ImageButton) findViewById(R.id.decline_button);
 
-        top_text_line.setText(Callstate.friend_name);
+        top_text_line_str1 = Callstate.friend_name;
+        top_text_line_str2 = "";
+        top_text_line_str3 = "";
+        update_top_text_line();
 
         accept_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -53,7 +66,8 @@ public class CallingActivity extends AppCompatActivity
                     toxav_answer(Callstate.friend_number, 10, 10);
                     Callstate.call_start_timestamp = System.currentTimeMillis();
                     String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
-                    top_text_line.setText(Callstate.friend_name + " : " + a);
+                    top_text_line_str2 = a;
+                    update_top_text_line();
                 }
                 catch (Exception e)
                 {
@@ -89,6 +103,56 @@ public class CallingActivity extends AppCompatActivity
         // close calling activity --------
         ca.finish();
         // close calling activity --------
+    }
+
+    synchronized public static void update_top_text_line()
+    {
+        Log.i(TAG, "update_top_text_line(1):top_text_line_str3=" + top_text_line_str3);
+        update_top_text_line(top_text_line_str3);
+    }
+
+    synchronized public static void update_top_text_line(String text2)
+    {
+        Log.i(TAG, "update_top_text_line(2):str=" + text2);
+        Log.i(TAG, "update_top_text_line(2):top_text_line_str1=" + top_text_line_str1);
+        Log.i(TAG, "update_top_text_line(2):top_text_line_str2=" + top_text_line_str2);
+        Log.i(TAG, "update_top_text_line(2):top_text_line_str3=" + top_text_line_str3);
+
+        top_text_line_str3 = text2;
+
+        Log.i(TAG, "update_top_text_line(2b):top_text_line_str3=" + top_text_line_str3);
+
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Log.i(TAG, "update_top_text_line(2c):top_text_line_str3=" + top_text_line_str3);
+
+                    if (top_text_line_str3 != "")
+                    {
+                        top_text_line.setText(top_text_line_str1 + " : " + top_text_line_str2 + " : " + top_text_line_str3);
+                    }
+                    else
+                    {
+                        if (top_text_line_str2 != "")
+                        {
+                            top_text_line.setText(top_text_line_str1 + " : " + top_text_line_str2);
+                        }
+                        else
+                        {
+                            top_text_line.setText(top_text_line_str1);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+        callactivity_handler_s.post(myRunnable);
     }
 
     @Override
