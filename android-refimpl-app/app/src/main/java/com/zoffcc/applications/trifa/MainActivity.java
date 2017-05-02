@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     static OrmaDatabase orma = null;
     final static String MAIN_DB_NAME = "main.db";
     final static int AddFriendActivity_ID = 10001;
+    final static int CallingActivity_ID = 10002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,6 +73,11 @@ public class MainActivity extends AppCompatActivity
         main_handler_s = main_handler;
         context_s = this.getBaseContext();
 
+        // reset calling state
+        Callstate.state = 0;
+        Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value
+        Callstate.call_first_video_frame_received = -1;
+
         if (native_lib_loaded)
         {
             mt.setText("successfully loaded native library");
@@ -84,6 +91,7 @@ public class MainActivity extends AppCompatActivity
         mt.setText(mt.getText() + "\n" + native_api);
 
         mt.setText(mt.getText() + "\n" + "c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
+        mt.setText(mt.getText() + "\n" + "jni-c-toxcore:v" + jnictoxcore_version());
 
         // See OrmaDatabaseBuilderBase for other options.
         orma = OrmaDatabase.builder(this).name(MAIN_DB_NAME).build();
@@ -364,8 +372,6 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     public native void init(@NonNull String data_dir);
 
-    // public native void toxloop();
-
     public native String getNativeLibAPI();
 
     public static native void update_savedata_file();
@@ -392,6 +398,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_version_patch();
 
+    public static native String jnictoxcore_version();
+
     public static native long tox_max_filename_length();
 
     public static native long tox_file_id_length();
@@ -412,6 +420,16 @@ public class MainActivity extends AppCompatActivity
     // --------------- AV -------------
     // --------------- AV -------------
     public static native int toxav_answer(long friendnum, long audio_bit_rate, long video_bit_rate);
+
+    public static native long toxav_iteration_interval();
+
+    public static native int toxav_call(long friendnum, long audio_bit_rate, long video_bit_rate);
+
+    public static native int toxav_bit_rate_set(long friendnum, long audio_bit_rate, long video_bit_rate);
+
+    public static native int toxav_call_control(long friendnum, int a_TOXAV_CALL_CONTROL);
+
+    public static native int toxav_video_send_frame(long friendnum, int frame_width_px, int frame_height_px);
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -427,20 +445,79 @@ public class MainActivity extends AppCompatActivity
     static void android_toxav_callback_call_cb_method(long friend_number, int audio_enabled, int video_enabled)
     {
         Log.i(TAG, "toxav_call:from=" + friend_number + " audio=" + audio_enabled + " video=" + video_enabled);
+        final long fn = friend_number;
+        final int f_audio_enabled = audio_enabled;
+        final int f_video_enabled = video_enabled;
 
-        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
-        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
-        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
-        toxav_answer(friend_number, 10, 10);
-        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
-        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
-        // auto answer any call!! --------------- DANGER !! DANGER !! ------------
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (Callstate.state == 0)
+                    {
+                        Callstate.state = 1;
+                        Callstate.call_first_video_frame_received = -1;
+                        Intent intent = new Intent(context_s, CallingActivity.class);
+                        Callstate.friend_number = fn;
+                        Callstate.other_audio_enabled = f_audio_enabled;
+                        Callstate.other_video_enabled = f_video_enabled;
+                        Callstate.call_init_timestamp = System.currentTimeMillis();
+                        ((Activity) context_s).startActivityForResult(intent, CallingActivity_ID);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
     }
 
-    static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long width, long height)
+    static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px)
     {
-        Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + width + " video height=" + height);
+        Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
+        if (Callstate.call_first_video_frame_received == -1)
+        {
+            Callstate.call_first_video_frame_received = System.currentTimeMillis();
+        }
     }
+
+    static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
+    {
+        Log.i(TAG, "toxav_call_state:from=" + friend_number + " state=" + a_TOXAV_FRIEND_CALL_STATE);
+
+        if (Callstate.state == 1)
+        {
+            Callstate.tox_call_state = a_TOXAV_FRIEND_CALL_STATE;
+
+            if ((a_TOXAV_FRIEND_CALL_STATE & (4 + 8 + 16 + 32)) > 0)
+            {
+                Log.i(TAG, "toxav_call_state:from=" + friend_number + " call starting");
+                Callstate.call_start_timestamp = System.currentTimeMillis();
+            }
+            else if ((a_TOXAV_FRIEND_CALL_STATE & (2)) > 0)
+            {
+                Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending");
+            }
+
+        }
+    }
+
+    static void android_toxav_callback_bit_rate_status_cb_method(long friend_number, long audio_bit_rate, long video_bit_rate)
+    {
+        Log.i(TAG, "toxav_bit_rate_status:from=" + friend_number + " audio_bit_rate=" + audio_bit_rate + " video_bit_rate=" + video_bit_rate);
+
+        if (Callstate.state == 1)
+        {
+            Callstate.audio_bitrate = audio_bit_rate;
+            Callstate.video_bitrate = video_bit_rate;
+        }
+    }
+
 
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------

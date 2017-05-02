@@ -91,10 +91,11 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-
-    annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.4'
     compile 'com.github.gfx.android.orma:orma:4.2.4'
+    compile 'com.android.support:support-v4:25.3.1'
+    annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.4'
 }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="com.zoffcc.applications.trifa"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature
         android:name="android.hardware.location.network"
@@ -45,7 +44,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".AddFriendActivity"
             android:label="@string/add_friend_activity_name">
@@ -55,6 +53,12 @@
             android:name=".MessageListActivity"
             android:label="@string/message_list_activity_name">
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
+            android:name=".CallingActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_calling"
+            android:theme="@style/FullscreenTheme">
         </activity>
     </application>
 

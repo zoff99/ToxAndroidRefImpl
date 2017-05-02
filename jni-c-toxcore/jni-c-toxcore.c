@@ -51,6 +51,18 @@
 #include <jni.h>
 // ------- Android/JNI stuff -------
 
+
+// ----------- version -----------
+// ----------- version -----------
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 99
+#define VERSION_PATCH 3
+static const char global_version_string[] = "0.99.3";
+// ----------- version -----------
+// ----------- version -----------
+
+
+
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define c_sleep(x) usleep(1000*x)
 
@@ -72,13 +84,15 @@ typedef struct {
 const char *savedata_filename = "savedata.tox";
 const char *savedata_tmp_filename = "savedata.tox.tmp";
 int tox_loop_running = 1;
-int toxav_thread_stop = 0;
+int toxav_video_thread_stop = 0;
+int toxav_iterate_thread_stop = 0;
+
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
 ToxAV *tox_av_global = NULL;
 CallControl mytox_CC;
 int global_video_active = 0;
-pthread_t tid[1];
+pthread_t tid[2]; // 0 -> toxav_iterate thread, 1 -> video send thread
 
 
 // ----- JNI stuff -----
@@ -103,6 +117,8 @@ jmethodID android_tox_callback_friend_message_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_call_state_cb_method = NULL;
+jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 // -------- _callbacks_ --------
 
@@ -136,8 +152,6 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 void toxav_call_cd(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool video_enabled, void *user_data);
 void toxav_video_receive_frame_cd(ToxAV *av, uint32_t friend_number, uint16_t width, uint16_t height,
      const uint8_t *y, const uint8_t *u, const uint8_t *v, int32_t ystride, int32_t ustride, int32_t vstride, void *user_data);
-
-
 
 void android_logger(int level, const char* logtext);
 // functions -----------
@@ -436,78 +450,12 @@ void init_tox_callbacks()
 	// -------- _callbacks_ --------
 }
 
-/*
-void _main_()
-{
-	tox_global = create_tox();
 
-	const char *name = "TRIfA";
-	tox_self_set_name(tox_global, (uint8_t *)name, strlen(name), NULL);
-
-	const char *status_message = "This is TRIfA";
-	tox_self_set_status_message(tox_global, (uint8_t *)status_message, strlen(status_message), NULL);
-
-
-	bootstrap();
-	print_tox_id(tox_global);
-
-	// -------- _callbacks_ --------
-	tox_callback_self_connection_status(tox_global, self_connection_status_cb);
-	tox_callback_friend_name(tox_global, friend_name_cb);
-	tox_callback_friend_status_message(tox_global, friend_status_message_cb);
-	tox_callback_friend_status(tox_global, friend_status_cb);
-	tox_callback_friend_connection_status(tox_global, friend_connection_status_cb);
-	tox_callback_friend_typing(tox_global, friend_typing_cb);
-	tox_callback_friend_read_receipt(tox_global, friend_read_receipt_cb);
-	tox_callback_friend_request(tox_global, friend_request_cb);
-	tox_callback_friend_message(tox_global, friend_message_cb);
-// tox_callback_file_recv_control(tox_global, tox_file_recv_control_cb *callback);
-// tox_callback_file_chunk_request(tox_global, tox_file_chunk_request_cb *callback);
-// tox_callback_file_recv(tox_global, tox_file_recv_cb *callback);
-// tox_callback_file_recv_chunk(tox_global, tox_file_recv_chunk_cb *callback);
-// tox_callback_conference_invite(tox_global, tox_conference_invite_cb *callback);
-// tox_callback_conference_message(tox_global, tox_conference_message_cb *callback);
-// tox_callback_conference_title(tox_global, tox_conference_title_cb *callback);
-// tox_callback_conference_namelist_change(tox_global, tox_conference_namelist_change_cb *callback);
-// tox_callback_friend_lossy_packet(tox_global, tox_friend_lossy_packet_cb *callback);
-// tox_callback_friend_lossless_packet(tox_global, tox_friend_lossless_packet_cb *callback);
-	// -------- _callbacks_ --------
-
-	update_savedata_file(tox_global);
-
-	long long unsigned int cur_time = time(NULL);
-	uint8_t off = 1;
-	while (1)
-	{
-	        tox_iterate(tox_global, NULL);
-	        usleep(tox_iteration_interval(tox_global) * 1000);
-	        if (tox_self_get_connection_status(tox_global) && off)
-			{
-	        	dbg(2, "Tox online, took %llu seconds", time(NULL) - cur_time);
-	        	off = 0;
-				break;
-        	}
-        	c_sleep(20);
-	}
-
-	tox_loop_running = 1;
-
-    	while (tox_loop_running)
-    	{
-        	tox_iterate(tox_global, NULL);
-        	usleep(tox_iteration_interval(tox_global) * 1000);
-	}
-
-	// does not reach here now!
-	tox_kill(tox_global);
-}
-*/
 
 
 // ------------- JNI -------------
 // ------------- JNI -------------
 // ------------- JNI -------------
-
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 {
@@ -768,6 +716,34 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 
 // ------------- AV ------------
 // ------------- AV ------------
+void android_toxav_callback_call_state_cb(uint32_t friend_number, uint32_t state)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_toxav_callback_call_state_cb_method, (jlong)(unsigned long long)friend_number, (jint)state);
+
+}
+void toxav_call_state_cb_(ToxAV *av, uint32_t friend_number, uint32_t state, void *user_data)
+{
+	android_toxav_callback_call_state_cb(friend_number, state);
+}
+
+void android_toxav_callback_bit_rate_status_cb(uint32_t friend_number, uint32_t audio_bit_rate, uint32_t video_bit_rate)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_toxav_callback_bit_rate_status_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)audio_bit_rate, (jlong)(unsigned long long)video_bit_rate);
+
+}
+void toxav_bit_rate_status_cb_(ToxAV *av, uint32_t friend_number, uint32_t audio_bit_rate, uint32_t video_bit_rate, void *user_data)
+{
+	android_toxav_callback_bit_rate_status_cb(friend_number, audio_bit_rate, video_bit_rate);
+}
+
 void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height)
 {
 	JNIEnv *jnienv2;
@@ -796,8 +772,6 @@ void toxav_call_cb_(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool 
 {
 	android_toxav_callback_call_cb(friend_number, audio_enabled, video_enabled);
 }
-
-
 // ------------- AV ------------
 // ------------- AV ------------
 
@@ -855,29 +829,24 @@ void *thread_av(void *data)
 
 	dbg(2, "AV Thread #%d: starting", (int) id);
 
-	while (toxav_thread_stop != 1)
+	while (toxav_iterate_thread_stop != 1)
 	{
 		if (global_video_active == 1)
 		{
 			pthread_mutex_lock(&av_thread_lock);
 
 			pthread_mutex_unlock(&av_thread_lock);
-			// yieldcpu(1000); // 1 frame every 1 seconds!!
-			yieldcpu(DEFAULT_FPS_SLEEP_MS); /* ~6 frames per second */
+			yieldcpu(1000); // 1 frame every 1 seconds!!
+			// yieldcpu(DEFAULT_FPS_SLEEP_MS); /* ~6 frames per second */
 
 			continue; /* We're running video, so don't sleep for and extra 100 */
 		}
 		else
 		{
-			pthread_mutex_lock(&av_thread_lock);
-			toxav_iterate(av);
-			// dbg(9, "AV Thread #%d running ...", (int) id);
-			pthread_mutex_unlock(&av_thread_lock);
-
 		}
 
 		usleep(toxav_iteration_interval(av) * 1000);
-		yieldcpu(300);
+		// yieldcpu(10);
 	}
 
 	// unreachable code
@@ -886,6 +855,51 @@ void *thread_av(void *data)
 	(*cachedJVM)->DetachCurrentThread(cachedJVM);
 	env = NULL;
 }
+
+
+void *thread_video_av(void *data)
+{
+	JavaVMAttachArgs args = {JNI_VERSION_1_6, 0, 0};
+	JNIEnv *env;
+	(*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
+
+	dbg(9, "2001");
+	ToxAV *av = (ToxAV *) data;
+	dbg(9, "2002");
+
+	pthread_t id = pthread_self();
+	dbg(9, "2003");
+	pthread_mutex_t av_thread_lock;
+	dbg(9, "2004");
+
+	if (pthread_mutex_init(&av_thread_lock, NULL) != 0)
+	{
+		dbg(0, "Error creating video av_thread_lock");
+	}
+	else
+	{
+		dbg(2, "av_thread_lock video created successfully");
+	}
+
+	dbg(2, "AV video Thread #%d: starting", (int) id);
+
+	while (toxav_video_thread_stop != 1)
+	{
+		pthread_mutex_lock(&av_thread_lock);
+		toxav_iterate(av);
+		// dbg(9, "AV video Thread #%d running ...", (int) id);
+		pthread_mutex_unlock(&av_thread_lock);
+
+		usleep(toxav_iteration_interval(av) * 1000);
+	}
+
+	// unreachable code
+	dbg(2, "ToxVideo:Clean video thread exit!\n");
+
+	(*cachedJVM)->DetachCurrentThread(cachedJVM);
+	env = NULL;
+}
+
 
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
@@ -977,21 +991,33 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
     toxav_callback_call(tox_av_global, toxav_call_cb_, &mytox_CC);
 	android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_video_receive_frame_cb_method", "(JJJ)V");
     toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
-    // toxav_callback_call_state(tox_av_global, t_toxav_call_state_cb, &mytox_CC);
-    // toxav_callback_bit_rate_status(tox_av_global, t_toxav_bit_rate_status_cb, &mytox_CC);
+	android_toxav_callback_call_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_call_state_cb_method", "(JI)V");
+    toxav_callback_call_state(tox_av_global, toxav_call_state_cb_, &mytox_CC);
+	android_toxav_callback_bit_rate_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_bit_rate_status_cb_method", "(JJJ)V");
+    toxav_callback_bit_rate_status(tox_av_global, toxav_bit_rate_status_cb_, &mytox_CC);
     // toxav_callback_audio_receive_frame(tox_av_global, t_toxav_receive_audio_frame_cb, &mytox_CC);
 	dbg(9, "linking AV callbacks ... READY");
 	// init AV callbacks -------------------------------
 
 	// start toxav thread ------------------------------
-	toxav_thread_stop = 0;
+	toxav_iterate_thread_stop = 0;
     if (pthread_create(&(tid[0]), NULL, thread_av, (void *)tox_av_global) != 0)
 	{
-        dbg(0, "AV Thread create failed");
+        dbg(0, "AV iterate Thread create failed");
 	}
 	else
 	{
-        dbg(2, "AV Thread successfully created");
+        dbg(2, "AV iterate Thread successfully created");
+	}
+
+	toxav_video_thread_stop = 0;
+    if (pthread_create(&(tid[1]), NULL, thread_video_av, (void *)tox_av_global) != 0)
+	{
+        dbg(0, "AV video Thread create failed");
+	}
+	else
+	{
+        dbg(2, "AV video Thread successfully created");
 	}
 	// start toxav thread ------------------------------
 }
@@ -1119,8 +1145,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv* env, jobject t
 	dbg(9, "tox_kill ... START");
 	tox_kill(tox_global);
 
-	toxav_thread_stop = 1; // should stop out toxav thread
-	pthread_join(tid[0], NULL); // wait for toxav thread to end
+	toxav_iterate_thread_stop = 1;
+	pthread_join(tid[0], NULL); // wait for toxav iterate thread to end
+
+	toxav_video_thread_stop = 1;
+	pthread_join(tid[1], NULL); // wait for toxav video thread to end
 
 	toxav_kill(tox_av_global);
 	tox_global = NULL;
@@ -1187,6 +1216,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1patch(JNIEnv* env,
 	return (jlong)(unsigned long long)l;
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_jnictoxcore_1version(JNIEnv* env, jobject thiz)
+{
+	return (*env)->NewStringUTF(env, global_version_string);
+}
 
 
 JNIEXPORT jlong JNICALL
@@ -1324,6 +1358,71 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1answer(JNIEnv* env, jobje
 {
 	TOXAV_ERR_ANSWER error;
 	bool res = toxav_answer(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate, (uint32_t)video_bit_rate, &error);
+	return (jint)res;
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1iteration_1interval(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)toxav_iteration_interval(tox_av_global);
+	dbg(9, "toxav_iteration_interval=%lld", (long long)l);
+	return (jlong)(unsigned long long)l;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call(JNIEnv* env, jobject thiz, jlong friend_number, jlong audio_bit_rate, jlong video_bit_rate)
+{
+	TOXAV_ERR_CALL error;
+	bool res = toxav_call(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate, (uint32_t)video_bit_rate, &error);
+	return (jint)res;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1bit_1rate_1set(JNIEnv* env, jobject thiz, jlong friend_number, jlong audio_bit_rate, jlong video_bit_rate)
+{
+	TOXAV_ERR_BIT_RATE_SET error;
+	bool res = toxav_bit_rate_set(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate, (uint32_t)video_bit_rate, &error);
+	return (jint)res;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv* env, jobject thiz, jlong friend_number, jint control)
+{
+	TOXAV_ERR_CALL_CONTROL error;
+	bool res = toxav_call_control(tox_av_global, (uint32_t)friend_number, (TOXAV_CALL_CONTROL)control, &error);
+	return (jint)res;
+}
+
+/**
+ * Send a video frame to a friend.
+ *
+ * Y - plane should be of size: height * width
+ * U - plane should be of size: (height/2) * (width/2)
+ * V - plane should be of size: (height/2) * (width/2)
+ *
+ * @param friend_number The friend number of the friend to which to send a video
+ * frame.
+ * @param width Width of the frame in pixels.
+ * @param height Height of the frame in pixels.
+ * @param y Y (Luminance) plane data.
+ * @param u U (Chroma) plane data.
+ * @param v V (Chroma) plane data.
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv* env, jobject thiz, jlong friend_number, jint width, jint height)
+{
+	TOXAV_ERR_SEND_FRAME error;
+
+	// TODO have a buffer and send actual YUV420 frame
+	const uint8_t *y = NULL;
+	const uint8_t *u = NULL;
+	const uint8_t *v = NULL;
+	// bool res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)width, (uint16_t)height, y, u, v, &error);
+	bool res = 1;
 	return (jint)res;
 }
 // ------------------- AV -------------------

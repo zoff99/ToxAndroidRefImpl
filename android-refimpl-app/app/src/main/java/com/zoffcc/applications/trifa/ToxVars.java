@@ -1,0 +1,972 @@
+package com.zoffcc.applications.trifa;
+
+
+public class ToxVars
+{
+
+    // --------- TOXAV ------------
+    // --------- TOXAV ------------
+    // --------- TOXAV ------------
+
+    public static enum TOXAV_ERR_NEW
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOXAV_ERR_NEW_OK,
+
+        /**
+         * One of the arguments to the function was NULL when it was not expected.
+         */
+        TOXAV_ERR_NEW_NULL,
+
+        /**
+         * Memory allocation failure while trying to allocate structures required for
+         * the A/V session.
+         */
+        TOXAV_ERR_NEW_MALLOC,
+
+        /**
+         * Attempted to create a second session for the same Tox instance.
+         */
+        TOXAV_ERR_NEW_MULTIPLE,
+
+    }
+
+
+    public static enum TOXAV_ERR_CALL
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOXAV_ERR_CALL_OK,
+
+        /**
+         * A resource allocation error occurred while trying to create the structures
+         * required for the call.
+         */
+        TOXAV_ERR_CALL_MALLOC,
+
+        /**
+         * Synchronization error occurred.
+         */
+        TOXAV_ERR_CALL_SYNC,
+
+        /**
+         * The friend number did not designate a valid friend.
+         */
+        TOXAV_ERR_CALL_FRIEND_NOT_FOUND,
+
+        /**
+         * The friend was valid, but not currently connected.
+         */
+        TOXAV_ERR_CALL_FRIEND_NOT_CONNECTED,
+
+        /**
+         * Attempted to call a friend while already in an audio or video call with
+         * them.
+         */
+        TOXAV_ERR_CALL_FRIEND_ALREADY_IN_CALL,
+
+        /**
+         * Audio or video bit rate is invalid.
+         */
+        TOXAV_ERR_CALL_INVALID_BIT_RATE,
+
+    }
+
+    public static enum TOXAV_ERR_ANSWER
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOXAV_ERR_ANSWER_OK,
+
+        /**
+         * Synchronization error occurred.
+         */
+        TOXAV_ERR_ANSWER_SYNC,
+
+        /**
+         * Failed to initialize codecs for call session. Note that codec initiation
+         * will fail if there is no receive callback registered for either audio or
+         * video.
+         */
+        TOXAV_ERR_ANSWER_CODEC_INITIALIZATION,
+
+        /**
+         * The friend number did not designate a valid friend.
+         */
+        TOXAV_ERR_ANSWER_FRIEND_NOT_FOUND,
+
+        /**
+         * The friend was valid, but they are not currently trying to initiate a call.
+         * This is also returned if this client is already in a call with the friend.
+         */
+        TOXAV_ERR_ANSWER_FRIEND_NOT_CALLING,
+
+        /**
+         * Audio or video bit rate is invalid.
+         */
+        TOXAV_ERR_ANSWER_INVALID_BIT_RATE,
+
+    }
+
+
+    public static enum TOXAV_FRIEND_CALL_STATE
+    {
+
+        /**
+         * The empty bit mask. None of the bits specified below are set.
+         */
+        TOXAV_FRIEND_CALL_STATE_NONE(0),
+
+        /**
+         * Set by the AV core if an error occurred on the remote end or if friend
+         * timed out. This is the final state after which no more state
+         * transitions can occur for the call. This call state will never be triggered
+         * in combination with other call states.
+         */
+        TOXAV_FRIEND_CALL_STATE_ERROR(1),
+
+        /**
+         * The call has finished. This is the final state after which no more state
+         * transitions can occur for the call. This call state will never be
+         * triggered in combination with other call states.
+         */
+        TOXAV_FRIEND_CALL_STATE_FINISHED(2),
+
+        /**
+         * The flag that marks that friend is sending audio.
+         */
+        TOXAV_FRIEND_CALL_STATE_SENDING_A(4),
+
+        /**
+         * The flag that marks that friend is sending video.
+         */
+        TOXAV_FRIEND_CALL_STATE_SENDING_V(8),
+
+        /**
+         * The flag that marks that friend is receiving audio.
+         */
+        TOXAV_FRIEND_CALL_STATE_ACCEPTING_A(16),
+
+        /**
+         * The flag that marks that friend is receiving video.
+         */
+        TOXAV_FRIEND_CALL_STATE_ACCEPTING_V(32);
+
+        public int value;
+
+        private TOXAV_FRIEND_CALL_STATE(int value)
+        {
+            this.value = value;
+        }
+    }
+
+
+    public static enum TOXAV_CALL_CONTROL
+    {
+
+        /**
+         * Resume a previously paused call. Only valid if the pause was caused by this
+         * client, if not, this control is ignored. Not valid before the call is accepted.
+         */
+        TOXAV_CALL_CONTROL_RESUME,
+
+        /**
+         * Put a call on hold. Not valid before the call is accepted.
+         */
+        TOXAV_CALL_CONTROL_PAUSE,
+
+        /**
+         * Reject a call if it was not answered, yet. Cancel a call after it was
+         * answered.
+         */
+        TOXAV_CALL_CONTROL_CANCEL,
+
+        /**
+         * Request that the friend stops sending audio. Regardless of the friend's
+         * compliance, this will cause the audio_receive_frame event to stop being
+         * triggered on receiving an audio frame from the friend.
+         */
+        TOXAV_CALL_CONTROL_MUTE_AUDIO,
+
+        /**
+         * Calling this control will notify client to start sending audio again.
+         */
+        TOXAV_CALL_CONTROL_UNMUTE_AUDIO,
+
+        /**
+         * Request that the friend stops sending video. Regardless of the friend's
+         * compliance, this will cause the video_receive_frame event to stop being
+         * triggered on receiving a video frame from the friend.
+         */
+        TOXAV_CALL_CONTROL_HIDE_VIDEO,
+
+        /**
+         * Calling this control will notify client to start sending video again.
+         */
+        TOXAV_CALL_CONTROL_SHOW_VIDEO,
+
+    }
+
+
+    public static enum TOXAV_ERR_CALL_CONTROL
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOXAV_ERR_CALL_CONTROL_OK,
+
+        /**
+         * Synchronization error occurred.
+         */
+        TOXAV_ERR_CALL_CONTROL_SYNC,
+
+        /**
+         * The friend_number passed did not designate a valid friend.
+         */
+        TOXAV_ERR_CALL_CONTROL_FRIEND_NOT_FOUND,
+
+        /**
+         * This client is currently not in a call with the friend. Before the call is
+         * answered, only CANCEL is a valid control.
+         */
+        TOXAV_ERR_CALL_CONTROL_FRIEND_NOT_IN_CALL,
+
+        /**
+         * Happens if user tried to pause an already paused call or if trying to
+         * resume a call that is not paused.
+         */
+        TOXAV_ERR_CALL_CONTROL_INVALID_TRANSITION,
+
+    }
+
+
+    public static enum TOXAV_ERR_BIT_RATE_SET
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOXAV_ERR_BIT_RATE_SET_OK,
+
+        /**
+         * Synchronization error occurred.
+         */
+        TOXAV_ERR_BIT_RATE_SET_SYNC,
+
+        /**
+         * The audio bit rate passed was not one of the supported values.
+         */
+        TOXAV_ERR_BIT_RATE_SET_INVALID_AUDIO_BIT_RATE,
+
+        /**
+         * The video bit rate passed was not one of the supported values.
+         */
+        TOXAV_ERR_BIT_RATE_SET_INVALID_VIDEO_BIT_RATE,
+
+        /**
+         * The friend_number passed did not designate a valid friend.
+         */
+        TOXAV_ERR_BIT_RATE_SET_FRIEND_NOT_FOUND,
+
+        /**
+         * This client is currently not in a call with the friend.
+         */
+        TOXAV_ERR_BIT_RATE_SET_FRIEND_NOT_IN_CALL,
+
+    }
+
+
+    public static enum TOXAV_ERR_SEND_FRAME
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOXAV_ERR_SEND_FRAME_OK,
+
+        /**
+         * In case of video, one of Y, U, or V was NULL. In case of audio, the samples
+         * data pointer was NULL.
+         */
+        TOXAV_ERR_SEND_FRAME_NULL,
+
+        /**
+         * The friend_number passed did not designate a valid friend.
+         */
+        TOXAV_ERR_SEND_FRAME_FRIEND_NOT_FOUND,
+
+        /**
+         * This client is currently not in a call with the friend.
+         */
+        TOXAV_ERR_SEND_FRAME_FRIEND_NOT_IN_CALL,
+
+        /**
+         * Synchronization error occurred.
+         */
+        TOXAV_ERR_SEND_FRAME_SYNC,
+
+        /**
+         * One of the frame parameters was invalid. E.g. the resolution may be too
+         * small or too large, or the audio sampling rate may be unsupported.
+         */
+        TOXAV_ERR_SEND_FRAME_INVALID,
+
+        /**
+         * Either friend turned off audio or video receiving or we turned off sending
+         * for the said payload.
+         */
+        TOXAV_ERR_SEND_FRAME_PAYLOAD_TYPE_DISABLED,
+
+        /**
+         * Failed to push frame through rtp interface.
+         */
+        TOXAV_ERR_SEND_FRAME_RTP_FAILED,
+
+    }
+
+    // --------- TOXAV ------------
+    // --------- TOXAV ------------
+    // --------- TOXAV ------------
+
+
+    // ---------- TOX -------------
+    // ---------- TOX -------------
+    // ---------- TOX -------------
+
+    public static enum TOX_USER_STATUS
+    {
+
+        /**
+         * User is online and available.
+         */
+        TOX_USER_STATUS_NONE,
+
+        /**
+         * User is away. Clients can set this e.g. after a user defined
+         * inactivity time.
+         */
+        TOX_USER_STATUS_AWAY,
+
+        /**
+         * User is busy. Signals to other clients that this client does not
+         * currently wish to communicate.
+         */
+        TOX_USER_STATUS_BUSY,
+
+    }
+
+    public static enum TOX_MESSAGE_TYPE
+    {
+
+        /**
+         * Normal text message. Similar to PRIVMSG on IRC.
+         */
+        TOX_MESSAGE_TYPE_NORMAL,
+
+        /**
+         * A message describing an user action. This is similar to /me (CTCP ACTION)
+         * on IRC.
+         */
+        TOX_MESSAGE_TYPE_ACTION,
+
+    }
+
+
+    public static enum TOX_PROXY_TYPE
+    {
+
+        /**
+         * Don't use a proxy.
+         */
+        TOX_PROXY_TYPE_NONE,
+
+        /**
+         * HTTP proxy using CONNECT.
+         */
+        TOX_PROXY_TYPE_HTTP,
+
+        /**
+         * SOCKS proxy for simple socket pipes.
+         */
+        TOX_PROXY_TYPE_SOCKS5,
+
+    }
+
+
+    public static enum TOX_SAVEDATA_TYPE
+    {
+
+        /**
+         * No savedata.
+         */
+        TOX_SAVEDATA_TYPE_NONE,
+
+        /**
+         * Savedata is one that was obtained from tox_get_savedata.
+         */
+        TOX_SAVEDATA_TYPE_TOX_SAVE,
+
+        /**
+         * Savedata is a secret key of length TOX_SECRET_KEY_SIZE.
+         */
+        TOX_SAVEDATA_TYPE_SECRET_KEY,
+
+    }
+
+
+    public static enum TOX_LOG_LEVEL
+    {
+
+        /**
+         * Very detailed traces including all network activity.
+         */
+        TOX_LOG_LEVEL_TRACE,
+
+        /**
+         * Debug messages such as which port we bind to.
+         */
+        TOX_LOG_LEVEL_DEBUG,
+
+        /**
+         * Informational log messages such as video call status changes.
+         */
+        TOX_LOG_LEVEL_INFO,
+
+        /**
+         * Warnings about internal inconsistency or logic errors.
+         */
+        TOX_LOG_LEVEL_WARNING,
+
+        /**
+         * Severe unexpected errors caused by external or internal inconsistency.
+         */
+        TOX_LOG_LEVEL_ERROR,
+
+    }
+
+
+    public static enum TOX_ERR_OPTIONS_NEW
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_OPTIONS_NEW_OK,
+
+        /**
+         * The function failed to allocate enough memory for the options struct.
+         */
+        TOX_ERR_OPTIONS_NEW_MALLOC,
+
+    }
+
+
+    public static enum TOX_ERR_NEW
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_NEW_OK,
+
+        /**
+         * One of the arguments to the function was NULL when it was not expected.
+         */
+        TOX_ERR_NEW_NULL,
+
+        /**
+         * The function was unable to allocate enough memory to store the internal
+         * structures for the Tox object.
+         */
+        TOX_ERR_NEW_MALLOC,
+
+        /**
+         * The function was unable to bind to a port. This may mean that all ports
+         * have already been bound, e.g. by other Tox instances, or it may mean
+         * a permission error. You may be able to gather more information from errno.
+         */
+        TOX_ERR_NEW_PORT_ALLOC,
+
+        /**
+         * proxy_type was invalid.
+         */
+        TOX_ERR_NEW_PROXY_BAD_TYPE,
+
+        /**
+         * proxy_type was valid but the proxy_host passed had an invalid format
+         * or was NULL.
+         */
+        TOX_ERR_NEW_PROXY_BAD_HOST,
+
+        /**
+         * proxy_type was valid, but the proxy_port was invalid.
+         */
+        TOX_ERR_NEW_PROXY_BAD_PORT,
+
+        /**
+         * The proxy address passed could not be resolved.
+         */
+        TOX_ERR_NEW_PROXY_NOT_FOUND,
+
+        /**
+         * The byte array to be loaded contained an encrypted save.
+         */
+        TOX_ERR_NEW_LOAD_ENCRYPTED,
+
+        /**
+         * The data format was invalid. This can happen when loading data that was
+         * saved by an older version of Tox, or when the data has been corrupted.
+         * When loading from badly formatted data, some data may have been loaded,
+         * and the rest is discarded. Passing an invalid length parameter also
+         * causes this error.
+         */
+        TOX_ERR_NEW_LOAD_BAD_FORMAT,
+
+    }
+
+    public static enum TOX_ERR_BOOTSTRAP
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_BOOTSTRAP_OK,
+
+        /**
+         * One of the arguments to the function was NULL when it was not expected.
+         */
+        TOX_ERR_BOOTSTRAP_NULL,
+
+        /**
+         * The address could not be resolved to an IP address, or the IP address
+         * passed was invalid.
+         */
+        TOX_ERR_BOOTSTRAP_BAD_HOST,
+
+        /**
+         * The port passed was invalid. The valid port range is (1, 65535).
+         */
+        TOX_ERR_BOOTSTRAP_BAD_PORT,
+
+    }
+
+
+    public static enum TOX_CONNECTION
+    {
+
+        /**
+         * There is no connection. This instance, or the friend the state change is
+         * about, is now offline.
+         */
+        TOX_CONNECTION_NONE,
+
+        /**
+         * A TCP connection has been established. For the own instance, this means it
+         * is connected through a TCP relay, only. For a friend, this means that the
+         * connection to that particular friend goes through a TCP relay.
+         */
+        TOX_CONNECTION_TCP,
+
+        /**
+         * A UDP connection has been established. For the own instance, this means it
+         * is able to send UDP packets to DHT nodes, but may still be connected to
+         * a TCP relay. For a friend, this means that the connection to that
+         * particular friend was built using direct UDP packets.
+         */
+        TOX_CONNECTION_UDP,
+
+    }
+
+    public static enum TOX_ERR_SET_INFO
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_SET_INFO_OK,
+
+        /**
+         * One of the arguments to the function was NULL when it was not expected.
+         */
+        TOX_ERR_SET_INFO_NULL,
+
+        /**
+         * Information length exceeded maximum permissible size.
+         */
+        TOX_ERR_SET_INFO_TOO_LONG,
+
+    }
+
+
+    public static enum TOX_ERR_FRIEND_ADD
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_FRIEND_ADD_OK,
+
+        /**
+         * One of the arguments to the function was NULL when it was not expected.
+         */
+        TOX_ERR_FRIEND_ADD_NULL,
+
+        /**
+         * The length of the friend request message exceeded
+         * TOX_MAX_FRIEND_REQUEST_LENGTH.
+         */
+        TOX_ERR_FRIEND_ADD_TOO_LONG,
+
+        /**
+         * The friend request message was empty. This, and the TOO_LONG code will
+         * never be returned from tox_friend_add_norequest.
+         */
+        TOX_ERR_FRIEND_ADD_NO_MESSAGE,
+
+        /**
+         * The friend address belongs to the sending client.
+         */
+        TOX_ERR_FRIEND_ADD_OWN_KEY,
+
+        /**
+         * A friend request has already been sent, or the address belongs to a friend
+         * that is already on the friend list.
+         */
+        TOX_ERR_FRIEND_ADD_ALREADY_SENT,
+
+        /**
+         * The friend address checksum failed.
+         */
+        TOX_ERR_FRIEND_ADD_BAD_CHECKSUM,
+
+        /**
+         * The friend was already there, but the nospam value was different.
+         */
+        TOX_ERR_FRIEND_ADD_SET_NEW_NOSPAM,
+
+        /**
+         * A memory allocation failed when trying to increase the friend list size.
+         */
+        TOX_ERR_FRIEND_ADD_MALLOC,
+
+    }
+
+
+    public static enum TOX_ERR_FRIEND_SEND_MESSAGE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_FRIEND_SEND_MESSAGE_OK,
+
+        /**
+         * One of the arguments to the function was NULL when it was not expected.
+         */
+        TOX_ERR_FRIEND_SEND_MESSAGE_NULL,
+
+        /**
+         * The friend number did not designate a valid friend.
+         */
+        TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_FOUND,
+
+        /**
+         * This client is currently not connected to the friend.
+         */
+        TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_CONNECTED,
+
+        /**
+         * An allocation error occurred while increasing the send queue size.
+         */
+        TOX_ERR_FRIEND_SEND_MESSAGE_SENDQ,
+
+        /**
+         * Message length exceeded TOX_MAX_MESSAGE_LENGTH.
+         */
+        TOX_ERR_FRIEND_SEND_MESSAGE_TOO_LONG,
+
+        /**
+         * Attempted to send a zero-length message.
+         */
+        TOX_ERR_FRIEND_SEND_MESSAGE_EMPTY,
+
+    }
+
+
+    public static enum TOX_FILE_KIND
+    {
+
+        /**
+         * Arbitrary file data. Clients can choose to handle it based on the file name
+         * or magic or any other way they choose.
+         */
+        TOX_FILE_KIND_DATA,
+
+        /**
+         * Avatar file_id. This consists of tox_hash(image).
+         * Avatar data. This consists of the image data.
+         * <p>
+         * Avatars can be sent at any time the client wishes. Generally, a client will
+         * send the avatar to a friend when that friend comes online, and to all
+         * friends when the avatar changed. A client can save some traffic by
+         * remembering which friend received the updated avatar already and only send
+         * it if the friend has an out of date avatar.
+         * <p>
+         * Clients who receive avatar send requests can reject it (by sending
+         * TOX_FILE_CONTROL_CANCEL before any other controls), or accept it (by
+         * sending TOX_FILE_CONTROL_RESUME). The file_id of length TOX_HASH_LENGTH bytes
+         * (same length as TOX_FILE_ID_LENGTH) will contain the hash. A client can compare
+         * this hash with a saved hash and send TOX_FILE_CONTROL_CANCEL to terminate the avatar
+         * transfer if it matches.
+         * <p>
+         * When file_size is set to 0 in the transfer request it means that the client
+         * has no avatar.
+         */
+        TOX_FILE_KIND_AVATAR,
+
+    }
+
+    public static enum TOX_FILE_CONTROL
+    {
+
+        /**
+         * Sent by the receiving side to accept a file send request. Also sent after a
+         * TOX_FILE_CONTROL_PAUSE command to continue sending or receiving.
+         */
+        TOX_FILE_CONTROL_RESUME,
+
+        /**
+         * Sent by clients to pause the file transfer. The initial state of a file
+         * transfer is always paused on the receiving side and running on the sending
+         * side. If both the sending and receiving side pause the transfer, then both
+         * need to send TOX_FILE_CONTROL_RESUME for the transfer to resume.
+         */
+        TOX_FILE_CONTROL_PAUSE,
+
+        /**
+         * Sent by the receiving side to reject a file send request before any other
+         * commands are sent. Also sent by either side to terminate a file transfer.
+         */
+        TOX_FILE_CONTROL_CANCEL,
+
+    }
+
+
+    public static enum TOX_ERR_FILE_CONTROL
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_FILE_CONTROL_OK,
+
+        /**
+         * The friend_number passed did not designate a valid friend.
+         */
+        TOX_ERR_FILE_CONTROL_FRIEND_NOT_FOUND,
+
+        /**
+         * This client is currently not connected to the friend.
+         */
+        TOX_ERR_FILE_CONTROL_FRIEND_NOT_CONNECTED,
+
+        /**
+         * No file transfer with the given file number was found for the given friend.
+         */
+        TOX_ERR_FILE_CONTROL_NOT_FOUND,
+
+        /**
+         * A RESUME control was sent, but the file transfer is running normally.
+         */
+        TOX_ERR_FILE_CONTROL_NOT_PAUSED,
+
+        /**
+         * A RESUME control was sent, but the file transfer was paused by the other
+         * party. Only the party that paused the transfer can resume it.
+         */
+        TOX_ERR_FILE_CONTROL_DENIED,
+
+        /**
+         * A PAUSE control was sent, but the file transfer was already paused.
+         */
+        TOX_ERR_FILE_CONTROL_ALREADY_PAUSED,
+
+        /**
+         * Packet queue is full.
+         */
+        TOX_ERR_FILE_CONTROL_SENDQ,
+
+    }
+
+
+    public static enum TOX_ERR_FILE_SEEK
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_FILE_SEEK_OK,
+
+        /**
+         * The friend_number passed did not designate a valid friend.
+         */
+        TOX_ERR_FILE_SEEK_FRIEND_NOT_FOUND,
+
+        /**
+         * This client is currently not connected to the friend.
+         */
+        TOX_ERR_FILE_SEEK_FRIEND_NOT_CONNECTED,
+
+        /**
+         * No file transfer with the given file number was found for the given friend.
+         */
+        TOX_ERR_FILE_SEEK_NOT_FOUND,
+
+        /**
+         * File was not in a state where it could be seeked.
+         */
+        TOX_ERR_FILE_SEEK_DENIED,
+
+        /**
+         * Seek position was invalid
+         */
+        TOX_ERR_FILE_SEEK_INVALID_POSITION,
+
+        /**
+         * Packet queue is full.
+         */
+        TOX_ERR_FILE_SEEK_SENDQ,
+
+    }
+
+
+    public static enum TOX_ERR_FILE_GET
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_FILE_GET_OK,
+
+        /**
+         * One of the arguments to the function was NULL when it was not expected.
+         */
+        TOX_ERR_FILE_GET_NULL,
+
+        /**
+         * The friend_number passed did not designate a valid friend.
+         */
+        TOX_ERR_FILE_GET_FRIEND_NOT_FOUND,
+
+        /**
+         * No file transfer with the given file number was found for the given friend.
+         */
+        TOX_ERR_FILE_GET_NOT_FOUND,
+
+    }
+
+
+    public static enum TOX_ERR_FILE_SEND
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_FILE_SEND_OK,
+
+        /**
+         * One of the arguments to the function was NULL when it was not expected.
+         */
+        TOX_ERR_FILE_SEND_NULL,
+
+        /**
+         * The friend_number passed did not designate a valid friend.
+         */
+        TOX_ERR_FILE_SEND_FRIEND_NOT_FOUND,
+
+        /**
+         * This client is currently not connected to the friend.
+         */
+        TOX_ERR_FILE_SEND_FRIEND_NOT_CONNECTED,
+
+        /**
+         * Filename length exceeded TOX_MAX_FILENAME_LENGTH bytes.
+         */
+        TOX_ERR_FILE_SEND_NAME_TOO_LONG,
+
+        /**
+         * Too many ongoing transfers. The maximum number of concurrent file transfers
+         * is 256 per friend per direction (sending and receiving).
+         */
+        TOX_ERR_FILE_SEND_TOO_MANY,
+
+    }
+
+
+    public static enum TOX_ERR_FILE_SEND_CHUNK
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_FILE_SEND_CHUNK_OK,
+
+        /**
+         * The length parameter was non-zero, but data was NULL.
+         */
+        TOX_ERR_FILE_SEND_CHUNK_NULL,
+
+        /**
+         * The friend_number passed did not designate a valid friend.
+         */
+        TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_FOUND,
+
+        /**
+         * This client is currently not connected to the friend.
+         */
+        TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_CONNECTED,
+
+        /**
+         * No file transfer with the given file number was found for the given friend.
+         */
+        TOX_ERR_FILE_SEND_CHUNK_NOT_FOUND,
+
+        /**
+         * File transfer was found but isn't in a transferring state: (paused, done,
+         * broken, etc...) (happens only when not called from the request chunk callback).
+         */
+        TOX_ERR_FILE_SEND_CHUNK_NOT_TRANSFERRING,
+
+        /**
+         * Attempted to send more or less data than requested. The requested data size is
+         * adjusted according to maximum transmission unit and the expected end of
+         * the file. Trying to send less or more than requested will return this error.
+         */
+        TOX_ERR_FILE_SEND_CHUNK_INVALID_LENGTH,
+
+        /**
+         * Packet queue is full.
+         */
+        TOX_ERR_FILE_SEND_CHUNK_SENDQ,
+
+        /**
+         * Position parameter was wrong.
+         */
+        TOX_ERR_FILE_SEND_CHUNK_WRONG_POSITION,
+
+    }
+
+    // ---------- TOX -------------
+    // ---------- TOX -------------
+    // ---------- TOX -------------
+
+
+}
