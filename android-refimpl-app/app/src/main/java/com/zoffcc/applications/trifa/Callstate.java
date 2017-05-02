@@ -16,4 +16,20 @@ public class Callstate
     static long call_init_timestamp = -1L; // when it starts ringing (someone calls us)
     static long call_start_timestamp = -1L; // when we actually start the call (someone calls us)
     static long call_first_video_frame_received = -1L; // when we receive the first video frame (someone calls us)
+
+    static void reset_values()
+    {
+        Callstate.state = 0;
+        Callstate.call_first_video_frame_received = -1;
+        Callstate.call_start_timestamp = -1;
+        Callstate.call_init_timestamp = -1;
+        Callstate.friend_number = -1;
+        Callstate.friend_name = "";
+        Callstate.other_audio_enabled = 0;
+        Callstate.other_video_enabled = 0;
+        Callstate.my_audio_enabled = 0;
+        Callstate.my_video_enabled = 0;
+        Callstate.audio_bitrate = 0;
+        Callstate.video_bitrate = 0;
+    }
 }
