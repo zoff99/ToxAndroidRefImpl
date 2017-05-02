@@ -187,7 +187,7 @@ compile:
   - mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
 
   - find / -name 'cpu-features*' 2>/dev/null
- - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null
+  - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null
 
   - . ~/pp;cd jni-c-toxcore/; $GCC -O2 -shared -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a -lm ../ndk_suppliment/cpu-features.c
   - . ~/pp;cd jni-c-toxcore/; ls -al
