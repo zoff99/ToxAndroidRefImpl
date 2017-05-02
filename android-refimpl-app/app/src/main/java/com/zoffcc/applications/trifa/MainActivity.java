@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     Handler main_handler = null;
     static Handler main_handler_s = null;
     static Context context_s = null;
+    static Activity main_activity_s = null;
     static Notification notification = null;
     static NotificationManager nMN = null;
     static int NOTIFICATION_ID = 293821038;
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity
         main_handler = new Handler(getMainLooper());
         main_handler_s = main_handler;
         context_s = this.getBaseContext();
+        main_activity_s = this;
 
         // reset calling state
         Callstate.state = 0;
@@ -458,19 +460,30 @@ public class MainActivity extends AppCompatActivity
                 {
                     if (Callstate.state == 0)
                     {
+                        Log.i(TAG, "CALL:start:show activity");
                         Callstate.state = 1;
                         Callstate.call_first_video_frame_received = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_number = fn;
+                        try
+                        {
+                            Callstate.friend_name = orma.selectFromFriendList().tox_friendnumEq(Callstate.friend_number).toList().get(0).name;
+                        }
+                        catch (Exception e)
+                        {
+                            Callstate.friend_name = "Unknown";
+                            e.printStackTrace();
+                        }
                         Callstate.other_audio_enabled = f_audio_enabled;
                         Callstate.other_video_enabled = f_video_enabled;
                         Callstate.call_init_timestamp = System.currentTimeMillis();
-                        ((Activity) context_s).startActivityForResult(intent, CallingActivity_ID);
+                        main_activity_s.startActivityForResult(intent, CallingActivity_ID);
                     }
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                    Log.i(TAG, "CALL:start:EE:" + e.getMessage());
                 }
             }
         };

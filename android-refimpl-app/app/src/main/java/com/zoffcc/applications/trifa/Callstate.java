@@ -6,6 +6,7 @@ public class Callstate
     static int state = 0; // 0 -> not in a call, 1 -> ringing/calling
     static int tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
     static long friend_number = -1;
+    static String friend_name = "";
     static int other_audio_enabled = 0;
     static int other_video_enabled = 0;
     static int my_audio_enabled = 0;

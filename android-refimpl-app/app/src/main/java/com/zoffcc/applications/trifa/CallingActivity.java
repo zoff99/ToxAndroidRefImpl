@@ -7,55 +7,93 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 
 public class CallingActivity extends AppCompatActivity
 {
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
     private static final boolean AUTO_HIDE = true;
-
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
     private static final int AUTO_HIDE_DELAY_MILLIS = 1000;
-
-    /**
-     * Some older devices needs a small delay between UI widget updates
-     * and a change of the status and navigation bar.
-     */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
+    ImageButton accept_button = null;
+    ImageButton decline_button = null;
+    TextView top_text_line = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_calling);
+
+        mVisible = true;
+        mContentView = findViewById(R.id.video_view);
+
+        top_text_line = (TextView) findViewById(R.id.top_text_line);
+        accept_button = (ImageButton) findViewById(R.id.accept_button);
+        decline_button = (ImageButton) findViewById(R.id.decline_button);
+
+        top_text_line.setText("" + Callstate.friend_name);
+
+        accept_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                try
+                {
+                    toxav_answer(Callstate.friend_number, 10, 10);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+        });
+
+        decline_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                return true;
+            }
+        });
+
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        // dont let the user use the back button to close the activity
+    }
+
+
     private final Runnable mHidePart2Runnable = new Runnable()
     {
         @SuppressLint("InlinedApi")
         @Override
         public void run()
         {
-            // Delayed removal of status and navigation bar
-
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
             mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
-    private View mControlsView;
+
     private final Runnable mShowPart2Runnable = new Runnable()
     {
         @Override
         public void run()
         {
-            // Delayed display of UI elements
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null)
             {
                 actionBar.show();
             }
-            mControlsView.setVisibility(View.VISIBLE);
         }
     };
     private boolean mVisible;
@@ -67,55 +105,23 @@ public class CallingActivity extends AppCompatActivity
             hide();
         }
     };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener()
-    {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent)
-        {
-            if (AUTO_HIDE)
-            {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_calling);
-
-        mVisible = true;
-        // mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.fullscreen_content);
-
-
-        // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                toggle();
-            }
-        });
-    }
+    //    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener()
+    //    {
+    //        @Override
+    //        public boolean onTouch(View view, MotionEvent motionEvent)
+    //        {
+    //            if (AUTO_HIDE)
+    //            {
+    //                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+    //            }
+    //            return false;
+    //        }
+    //    };
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
         super.onPostCreate(savedInstanceState);
-
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
         delayedHide(100);
     }
 
@@ -139,7 +145,6 @@ public class CallingActivity extends AppCompatActivity
         {
             actionBar.hide();
         }
-        mControlsView.setVisibility(View.GONE);
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay
@@ -159,10 +164,6 @@ public class CallingActivity extends AppCompatActivity
         mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
     }
 
-    /**
-     * Schedules a call to hide() in [delay] milliseconds, canceling any
-     * previously scheduled calls.
-     */
     private void delayedHide(int delayMillis)
     {
         mHideHandler.removeCallbacks(mHideRunnable);

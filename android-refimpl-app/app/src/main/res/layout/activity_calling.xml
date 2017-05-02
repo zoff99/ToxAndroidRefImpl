@@ -1,20 +1,99 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="#0099cc"
              tools:context="com.zoffcc.applications.trifa.CallingActivity">
 
-    <TextView
-        android:id="@+id/fullscreen_content"
+    <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="xxxxxxxx"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/top_text_line"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_span="5"
+            android:text="xxxxxxxx"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="20sp"/>
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_span="5"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/video_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/black"/>
+        </LinearLayout>
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+
+        <ImageButton
+            android:id="@+id/accept_button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@android:color/transparent"
+            android:keepScreenOn="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_green"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1.7"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+
+        <ImageButton
+            android:id="@+id/decline_button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@android:color/transparent"
+            android:keepScreenOn="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_red"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+    </TableRow>
 
 
-</FrameLayout>
+</TableLayout>
