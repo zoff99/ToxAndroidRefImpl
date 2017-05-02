@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity
 
         // reset calling state
         Callstate.state = 0;
-        Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value
+        Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
         Callstate.call_first_video_frame_received = -1;
 
         if (native_lib_loaded)

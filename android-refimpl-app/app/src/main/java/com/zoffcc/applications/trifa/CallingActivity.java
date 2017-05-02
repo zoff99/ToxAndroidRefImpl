@@ -93,7 +93,7 @@ public class CallingActivity extends AppCompatActivity
         setContentView(R.layout.activity_calling);
 
         mVisible = true;
-        mControlsView = findViewById(R.id.fullscreen_content_controls);
+        // mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
 
