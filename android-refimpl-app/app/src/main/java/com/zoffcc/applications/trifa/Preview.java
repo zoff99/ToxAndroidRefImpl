@@ -31,9 +31,11 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
 
     public Preview(Context context, AttributeSet attrs)
     {
+        // !!this one is actually used!!
         super(context, attrs);
         mSurfaceView = CallingActivity.camera_preview_surface_view;
         Log.i(TAG, "init:001");
+        // !!this one is actually used!!
     }
 
 
