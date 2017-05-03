@@ -64,7 +64,7 @@ public class CallingActivity extends AppCompatActivity
             {
                 try
                 {
-                    toxav_answer(Callstate.friend_number, 1, 100);
+                    toxav_answer(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
                     accept_button.setVisibility(View.GONE);
 
                     Callstate.call_start_timestamp = System.currentTimeMillis();

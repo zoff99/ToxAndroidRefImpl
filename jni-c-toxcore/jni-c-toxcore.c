@@ -106,9 +106,9 @@ char *app_data_dir = NULL;
 jclass MainActivity = NULL;
 jmethodID logger_method = NULL;
 
-volatile uint8_t *video_buffer_1 = NULL;
-volatile uint8_t *video_buffer_1_u = NULL;
-volatile uint8_t *video_buffer_1_v = NULL;
+uint8_t *video_buffer_1 = NULL;
+uint8_t *video_buffer_1_u = NULL;
+uint8_t *video_buffer_1_v = NULL;
 long video_buffer_1_size = 0;
 int video_buffer_1_width = 0;
 int video_buffer_1_height = 0;
@@ -818,15 +818,15 @@ void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t w
 		if ((y) && (u) && (v))
 		{
 			// copy the Y layer into the buffer
-			dbg(9, "[V1]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
-			memcpy(video_buffer_1, v, (size_t)(video_buffer_1_y_size));
+			// dbg(9, "[V1]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+			memcpy(video_buffer_1, y, (size_t)(video_buffer_1_y_size));
 			// copy the U layer into the buffer
-			dbg(9, "[V2]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+			// dbg(9, "[V2]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
 			memcpy(video_buffer_1_u, u, (size_t)(video_buffer_1_u_size));
 			// copy the V layer into the buffer
-			dbg(9, "[V3]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+			// dbg(9, "[V3]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
 			memcpy(video_buffer_1_v, v, (size_t)(video_buffer_1_v_size));
-			dbg(9, "[V4]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+			// dbg(9, "[V4]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
 		}
 	}
 

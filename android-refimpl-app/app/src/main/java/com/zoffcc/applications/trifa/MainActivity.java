@@ -525,14 +525,28 @@ public class MainActivity extends AppCompatActivity
             //            yuvType.setY(frame_height_px);
             // yuvType.setYuvFormat(android.graphics.ImageFormat.YV12);
 
-            // Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(buffer_size_in_bytes);
+            // --------- 002  not working     ---------
+            // --------- 002       ---------
+            // --------- 002       ---------
+//            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(buffer_size_in_bytes);
+//            alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
+//            Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
+//            alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
+            // --------- 002       ---------
+            // --------- 002       ---------
+            // --------- 002       ---------
+
+            // --------- works !!!!! ---------
+            // --------- works !!!!! ---------
+            // --------- works !!!!! ---------
             Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px).setY(frame_height_px);
             yuvType.setYuvFormat(android.graphics.ImageFormat.YV12);
-
             alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
-
             Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
             alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
+            // --------- works !!!!! ---------
+            // --------- works !!!!! ---------
+            // --------- works !!!!! ---------
         }
 
         video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
@@ -587,7 +601,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
     {
-        Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
+        // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
         if (Callstate.call_first_video_frame_received == -1)
         {
             Callstate.call_first_video_frame_received = System.currentTimeMillis();

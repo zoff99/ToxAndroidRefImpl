@@ -2,7 +2,7 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#2090cc"
+              android:background="#0277bd"
               android:orientation="vertical"
               tools:context="com.zoffcc.applications.trifa.CallingActivity">
 
@@ -10,8 +10,9 @@
     <TextView
         android:id="@+id/top_text_line"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="35dp"
         android:text="xxxxxxxx"
+        android:gravity="center_vertical"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="20sp"/>
