@@ -286,7 +286,7 @@ public class CallingActivity extends AppCompatActivity
             try
             {
                 Log.i(TAG, "Camera:001");
-                camera = Camera.open(0);
+                camera = Camera.open(numCams - 1);
                 Log.i(TAG, "Camera:002");
                 camera.startPreview();
                 Log.i(TAG, "Camera:003");
