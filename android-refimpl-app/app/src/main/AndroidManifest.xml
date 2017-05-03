@@ -60,6 +60,11 @@
             android:label="@string/title_activity_calling"
             android:theme="@style/FullscreenTheme">
         </activity>
+        <activity android:name=".ProfileActivity"
+                  android:label="@string/title_activity_profile"
+                  android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            >
+        </activity>
     </application>
 
 </manifest>

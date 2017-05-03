@@ -25,6 +25,8 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.ImageFormat;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,10 +39,24 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.app.NotificationCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -70,6 +86,7 @@ public class MainActivity extends AppCompatActivity
     final static String MAIN_DB_NAME = "main.db";
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
+    final static int ProfileActivity_ID = 10003;
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
 
@@ -81,11 +98,19 @@ public class MainActivity extends AppCompatActivity
     static int buffer_size_in_bytes = 0;
     // YUV conversion -------
 
+    // main drawer ----------
+    Drawer main_drawer = null;
+    AccountHeader main_drawer_header = null;
+    // main drawer ----------
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
@@ -94,6 +119,58 @@ public class MainActivity extends AppCompatActivity
         main_handler_s = main_handler;
         context_s = this.getBaseContext();
         main_activity_s = this;
+
+        // -------- drawer ------------
+        // -------- drawer ------------
+        // -------- drawer ------------
+        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("Profile").withIcon(GoogleMaterial.Icon.gmd_face);
+        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName("Settings").withIcon(GoogleMaterial.Icon.gmd_settings);
+        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Logout").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
+
+        Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+
+        // Create the AccountHeader
+        main_drawer_header = new AccountHeaderBuilder().withActivity(this).addProfiles(new ProfileDrawerItem().withName("me").withIcon(d1)).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
+        {
+            @Override
+            public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+            {
+                return false;
+            }
+        }).build();
+
+
+        // create the drawer and remember the `Drawer` result object
+        main_drawer = new DrawerBuilder().withActivity(this).addDrawerItems(item1, new DividerDrawerItem(), item2, item3).withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+        {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+            {
+                Log.i(TAG, "drawer:item=" + position);
+                if (position == 1)
+                {
+                    // profile
+                    try
+                    {
+                        if (Callstate.state == 0)
+                        {
+                            Log.i(TAG, "start profile activity");
+                            Intent intent = new Intent(context_s, ProfileActivity.class);
+                            main_activity_s.startActivityForResult(intent, ProfileActivity_ID);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                return true;
+            }
+        }).build();
+        // -------- drawer ------------
+        // -------- drawer ------------
+        // -------- drawer ------------
 
         // reset calling state
         Callstate.state = 0;
@@ -480,16 +557,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         /*
+        * YUV420 frame with width * height
+        *
         * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
         * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
         * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
         */
-
-        // YUV420 frame with w x h size
-        //        int y_layer_size = frame_width_px * frame_height_px;
-        //        int u_layer_size = (y_layer_size / 4);
-        //        int v_layer_size = (y_layer_size / 4);
-
         int y_layer_size = (int) Math.max(frame_width_px1, Math.abs(ystride)) * frame_height_px1;
         int u_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(ustride)) * (frame_height_px1 / 2);
         int v_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(vstride)) * (frame_height_px1 / 2);
@@ -502,45 +575,26 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "YUV420 frame w1=" + frame_width_px1 + " h1=" + frame_height_px1 + " bytes=" + buffer_size_in_bytes);
         Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
         Log.i(TAG, "YUV420 frame ystride=" + ystride + " ustride=" + ustride + " vstride=" + vstride);
-        video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes * 3);
+        video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
         int written = set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
         //if (written > 0)
         //{
         //    buffer.limit(written);
         //}
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        // only works with Android 4.3 and up !! --------------------------------
+        // only works with Android 4.3 and up !! --------------------------------
+        // only works with Android 4.3 and up !! --------------------------------
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
             RenderScript rs = RenderScript.create(context_s);
             yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
-
-            //            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs))
-            //                    .setX(frame_width_px)
-            //                    .setY(frame_height_px)
-            //                    .setYuvFormat(android.graphics.ImageFormat.YV12);
-
-            //            Type.Builder yuvType = new Type.Builder(rs, Element.createPixel(rs,
-            //                    Element.DataType.UNSIGNED_8, Element.DataKind.PIXEL_YUV));
-            //            yuvType.setX(frame_width_px);
-            //            yuvType.setY(frame_height_px);
-            // yuvType.setYuvFormat(android.graphics.ImageFormat.YV12);
-
-            // --------- 002  not working     ---------
-            // --------- 002       ---------
-            // --------- 002       ---------
-//            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(buffer_size_in_bytes);
-//            alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
-//            Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
-//            alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
-            // --------- 002       ---------
-            // --------- 002       ---------
-            // --------- 002       ---------
 
             // --------- works !!!!! ---------
             // --------- works !!!!! ---------
             // --------- works !!!!! ---------
             Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px).setY(frame_height_px);
-            yuvType.setYuvFormat(android.graphics.ImageFormat.YV12);
+            yuvType.setYuvFormat(ImageFormat.YV12);
             alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
             Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
             alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
@@ -548,6 +602,9 @@ public class MainActivity extends AppCompatActivity
             // --------- works !!!!! ---------
             // --------- works !!!!! ---------
         }
+        // only works with Android 4.3 and up !! --------------------------------
+        // only works with Android 4.3 and up !! --------------------------------
+        // only works with Android 4.3 and up !! --------------------------------
 
         video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
     }

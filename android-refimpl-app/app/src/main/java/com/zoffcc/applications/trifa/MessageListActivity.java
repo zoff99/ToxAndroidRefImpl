@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -45,6 +46,9 @@ public class MessageListActivity extends AppCompatActivity
         friendnum = intent.getLongExtra("friendnum", -1);
 
         setContentView(R.layout.activity_message_list);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         ml_new_message = (EditText) findViewById(R.id.ml_new_message);
     }

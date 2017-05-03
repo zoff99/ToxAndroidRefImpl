@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.zoffcc.applications.trifa.ProfileActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"/>
+
+    <ImageView
+        android:id="@+id/profile_icon"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:src="@mipmap/ic_launcher_round"/>
+
+    <TextView
+        android:id="@+id/mytoxid_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp"
+        android:gravity="center_horizontal"
+        android:paddingBottom="15dp"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:text="TOXID94583458340958309458093850934805830583085389053095DUMMY"/>
+
+    <ImageView
+        android:id="@+id/mytoxid_imageview"
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:src="@mipmap/ic_launcher_round"/>
+
+</LinearLayout>
