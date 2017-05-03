@@ -35,6 +35,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
     static String temp_string_a = "";
+    static ByteBuffer video_buffer_1 = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -435,6 +437,8 @@ public class MainActivity extends AppCompatActivity
     public static native int toxav_call_control(long friendnum, int a_TOXAV_CALL_CONTROL);
 
     public static native int toxav_video_send_frame(long friendnum, int frame_width_px, int frame_height_px);
+
+    public static native int set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -446,6 +450,27 @@ public class MainActivity extends AppCompatActivity
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
+
+    static void allocate_video_buffer_1(int frame_width_px, int frame_height_px)
+    {
+        if (video_buffer_1 != null)
+        {
+            // video_buffer_1.clear();
+            video_buffer_1 = null;
+        }
+        // YUV420 frame with w x h size
+        int y_layer_size = frame_width_px * frame_height_px;
+        int u_layer_size = (y_layer_size / 4);
+        int v_layer_size = (y_layer_size / 4);
+        int buffer_size_in_bytes = y_layer_size + v_layer_size + u_layer_size;
+        Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
+        video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
+        int written = set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
+        //if (written > 0)
+        //{
+        //    buffer.limit(written);
+        //}
+    }
 
     static void android_toxav_callback_call_cb_method(long friend_number, int audio_enabled, int video_enabled)
     {
@@ -499,6 +524,9 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
         if (Callstate.call_first_video_frame_received == -1)
         {
+            // allocate new video buffer on 1 frame
+            allocate_video_buffer_1((int) frame_width_px, (int) frame_height_px);
+
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
             temp_string_a = "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a);

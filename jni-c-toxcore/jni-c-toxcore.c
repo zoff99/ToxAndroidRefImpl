@@ -104,6 +104,18 @@ char *app_data_dir = NULL;
 jclass MainActivity = NULL;
 jmethodID logger_method = NULL;
 
+uint8_t *video_buffer_1 = NULL;
+uint8_t *video_buffer_1_u = NULL;
+uint8_t *video_buffer_1_v = NULL;
+long video_buffer_1_size = 0;
+int video_buffer_1_width = 0;
+int video_buffer_1_height = 0;
+int video_buffer_1_y_size = 0;
+int video_buffer_1_u_size = 0;
+int video_buffer_1_v_size = 0;
+
+
+
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_name_cb_method = NULL;
@@ -753,9 +765,52 @@ void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint1
           android_toxav_callback_video_receive_frame_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)width, (jlong)(unsigned long long)height);
 }
 
+// ----- get video buffer from Java -----
+// ----- get video buffer from Java -----
+// ----- get video buffer from Java -----
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer(JNIEnv* env, jobject thiz, jobject buffer, jint frame_width_px, jint frame_height_px)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+    // jclass cls = (*jnienv2)->GetObjectClass(jnienv2, buffer);
+    // jmethodID mid = (*jnienv2)->GetMethodID(jnienv2, cls, "limit", "(I)Ljava/nio/Buffer;");
+
+    video_buffer_1 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, buffer);
+    jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer);
+	video_buffer_1_size = (long)capacity;
+
+	video_buffer_1_width = (int)frame_width_px;
+	video_buffer_1_height = (int)frame_height_px;
+	video_buffer_1_y_size = (int)(frame_width_px * frame_height_px);
+	video_buffer_1_u_size = (int)(video_buffer_1_y_size / 4);
+	video_buffer_1_v_size = (int)(video_buffer_1_y_size / 4);
+	video_buffer_1_u = (uint8_t*)(video_buffer_1 + video_buffer_1_y_size);
+	video_buffer_1_v = (uint8_t*)(video_buffer_1 + video_buffer_1_y_size + video_buffer_1_u_size);
+
+    int written = 0;
+
+    // (*jnienv2)->CallObjectMethod(jnienv2, buffer, mid, written);
+    return written;
+}
+// ----- get video buffer from Java -----
+// ----- get video buffer from Java -----
+// ----- get video buffer from Java -----
+
 void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t width, uint16_t height,
      const uint8_t *y, const uint8_t *u, const uint8_t *v, int32_t ystride, int32_t ustride, int32_t vstride, void *user_data)
 {
+	if (video_buffer_1 != NULL)
+	{
+		// copy the Y layer into the buffer
+		memcpy(video_buffer_1, v, (size_t)(video_buffer_1_y_size));
+		// copy the U layer into the buffer
+		memcpy(video_buffer_1_u, u, (size_t)(video_buffer_1_u_size));
+		// copy the V layer into the buffer
+		memcpy(video_buffer_1_v, v, (size_t)(video_buffer_1_u_size));
+	}
+
 	android_toxav_callback_video_receive_frame_cb(friend_number, width, height);
 }
 
