@@ -1,17 +1,21 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
@@ -32,6 +36,9 @@ public class CallingActivity extends AppCompatActivity
     Handler callactivity_handler = null;
     static Handler callactivity_handler_s = null;
     private static final String TAG = "trifa.CallingActivity";
+    Preview preview = null;
+    Camera camera = null;
+    static SurfaceView camera_preview_surface_view = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,6 +58,20 @@ public class CallingActivity extends AppCompatActivity
         top_text_line = (TextView) findViewById(R.id.top_text_line);
         accept_button = (ImageButton) findViewById(R.id.accept_button);
         decline_button = (ImageButton) findViewById(R.id.decline_button);
+
+        camera_preview_surface_view = (SurfaceView) this.findViewById(R.id.video_my_preview_surfaceview);
+
+        // ----- camera preview -----
+        // ----- camera preview -----
+        // ----- camera preview -----
+        //preview = new Preview(this, (SurfaceView)findViewById(R.id.video_my_preview));
+        preview = (com.zoffcc.applications.trifa.Preview) findViewById(R.id.video_my_preview);
+        // preview.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        // ((FrameLayout) findViewById(R.id.layout)).addView(preview);
+        preview.setKeepScreenOn(true);
+        // ----- camera preview -----
+        // ----- camera preview -----
+        // ----- camera preview -----
 
         top_text_line_str1 = Callstate.friend_name;
         top_text_line_str2 = "";
@@ -196,18 +217,6 @@ public class CallingActivity extends AppCompatActivity
             hide();
         }
     };
-    //    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener()
-    //    {
-    //        @Override
-    //        public boolean onTouch(View view, MotionEvent motionEvent)
-    //        {
-    //            if (AUTO_HIDE)
-    //            {
-    //                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-    //            }
-    //            return false;
-    //        }
-    //    };
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
@@ -260,4 +269,58 @@ public class CallingActivity extends AppCompatActivity
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
+
+
+    // ----- camera preview -----
+    // ----- camera preview -----
+    // ----- camera preview -----
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        int numCams = Camera.getNumberOfCameras();
+        Toast.makeText(context_s, "Cameras=" + numCams, Toast.LENGTH_LONG).show();
+        Log.i(TAG, "Cameras=" + numCams);
+        if (numCams > 0)
+        {
+            try
+            {
+                Log.i(TAG, "Camera:001");
+                camera = Camera.open(0);
+                Log.i(TAG, "Camera:002");
+                camera.startPreview();
+                Log.i(TAG, "Camera:003");
+                preview.setCamera(camera);
+                Log.i(TAG, "Camera:004");
+            }
+            catch (RuntimeException ex)
+            {
+                Log.i(TAG, "Camera:099:EE:" + ex.getMessage());
+                Toast.makeText(context_s, "Camera not found", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        if (camera != null)
+        {
+            camera.stopPreview();
+            preview.setCamera(null);
+            camera.release();
+            camera = null;
+        }
+        super.onPause();
+    }
+
+    private void resetCam()
+    {
+        camera.startPreview();
+        preview.setCamera(camera);
+    }
+    // ----- camera preview -----
+    // ----- camera preview -----
+    // ----- camera preview -----
+
 }

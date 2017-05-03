@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
+    final static int SettingsActivity_ID = 10004;
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
 
@@ -164,7 +165,23 @@ public class MainActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
-
+                else if (position == 3)
+                {
+                    // settings
+                    try
+                    {
+                        if (Callstate.state == 0)
+                        {
+                            Log.i(TAG, "start settings activity");
+                            Intent intent = new Intent(context_s, SettingsActivity.class);
+                            main_activity_s.startActivityForResult(intent, SettingsActivity_ID);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
                 return true;
             }
         }).build();

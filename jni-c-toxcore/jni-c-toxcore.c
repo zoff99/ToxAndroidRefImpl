@@ -1221,7 +1221,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
 
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv* env, jobject thiz)
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "tox_kill ... START");
 	tox_kill(tox_global);
@@ -1238,11 +1238,27 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv* env, jobject t
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv* env, jobject thiz)
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv* env, jobject thiz)
+{
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(env, thiz));
+}
+
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_exit__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "Exit Program");
 	exit(0);
 }
+
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv* env, jobject thiz)
+{
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_exit__real(env, thiz));
+}
+
+
 
 
 JNIEXPORT jlong JNICALL

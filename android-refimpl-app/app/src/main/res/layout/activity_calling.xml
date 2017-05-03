@@ -11,8 +11,8 @@
         android:id="@+id/top_text_line"
         android:layout_width="match_parent"
         android:layout_height="35dp"
-        android:text="xxxxxxxx"
         android:gravity="center_vertical"
+        android:text="xxxxxxxx"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="20sp"/>
@@ -25,11 +25,35 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/video_view"
-            android:layout_width="400dp"
-            android:layout_height="match_parent"
-            android:background="@android:color/black"/>
+
+        <FrameLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/video_view"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/black"/>
+
+            <com.zoffcc.applications.trifa.Preview
+                android:id="@+id/video_my_preview"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_gravity="bottom|right"
+                android:background="@android:color/holo_green_light"
+                android:gravity="center">
+
+                <SurfaceView
+                    android:id="@+id/video_my_preview_surfaceview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                </SurfaceView>
+            </com.zoffcc.applications.trifa.Preview>
+
+        </FrameLayout>
+
     </LinearLayout>
 
     <LinearLayout
