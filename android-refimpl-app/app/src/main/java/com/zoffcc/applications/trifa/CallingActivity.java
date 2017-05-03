@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
@@ -20,7 +21,7 @@ public class CallingActivity extends AppCompatActivity
     private static final int AUTO_HIDE_DELAY_MILLIS = 1000;
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private View mContentView;
+    static ImageView mContentView;
     ImageButton accept_button = null;
     ImageButton decline_button = null;
     static TextView top_text_line = null;
@@ -45,7 +46,7 @@ public class CallingActivity extends AppCompatActivity
         ca = this;
 
         mVisible = true;
-        mContentView = findViewById(R.id.video_view);
+        mContentView = (ImageView) findViewById(R.id.video_view);
 
         top_text_line = (TextView) findViewById(R.id.top_text_line);
         accept_button = (ImageButton) findViewById(R.id.accept_button);
@@ -133,13 +134,13 @@ public class CallingActivity extends AppCompatActivity
 
                     if (top_text_line_str3 != "")
                     {
-                        top_text_line.setText(top_text_line_str1 + " : " + top_text_line_str2 + " : " + top_text_line_str3);
+                        top_text_line.setText(top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3);
                     }
                     else
                     {
                         if (top_text_line_str2 != "")
                         {
-                            top_text_line.setText(top_text_line_str1 + " : " + top_text_line_str2);
+                            top_text_line.setText(top_text_line_str1 + ":" + top_text_line_str2);
                         }
                         else
                         {

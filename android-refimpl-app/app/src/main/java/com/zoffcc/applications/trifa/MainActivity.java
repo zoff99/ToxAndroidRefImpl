@@ -24,8 +24,15 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
+import android.renderscript.Type;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -65,6 +72,14 @@ public class MainActivity extends AppCompatActivity
     final static int CallingActivity_ID = 10002;
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
+
+    // YUV conversion -------
+    static ScriptIntrinsicYuvToRGB yuvToRgb = null;
+    static Allocation alloc_in = null;
+    static Allocation alloc_out = null;
+    static Bitmap video_frame_image = null;
+    static int buffer_size_in_bytes = 0;
+    // YUV conversion -------
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -458,11 +473,17 @@ public class MainActivity extends AppCompatActivity
             // video_buffer_1.clear();
             video_buffer_1 = null;
         }
+        if (video_frame_image != null)
+        {
+            video_frame_image.recycle();
+            video_frame_image = null;
+        }
+
         // YUV420 frame with w x h size
         int y_layer_size = frame_width_px * frame_height_px;
         int u_layer_size = (y_layer_size / 4);
         int v_layer_size = (y_layer_size / 4);
-        int buffer_size_in_bytes = y_layer_size + v_layer_size + u_layer_size;
+        buffer_size_in_bytes = y_layer_size + v_layer_size + u_layer_size;
         Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
         video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
         int written = set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
@@ -470,6 +491,20 @@ public class MainActivity extends AppCompatActivity
         //{
         //    buffer.limit(written);
         //}
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        {
+            RenderScript rs = RenderScript.create(context_s);
+            yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
+
+            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px);
+            alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
+
+            Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
+            alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
+        }
+
+        video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
     }
 
     static void android_toxav_callback_call_cb_method(long friend_number, int audio_enabled, int video_enabled)
@@ -530,6 +565,38 @@ public class MainActivity extends AppCompatActivity
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
             temp_string_a = "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            try
+            {
+                alloc_in.copyFrom(video_buffer_1.array());
+                yuvToRgb.setInput(alloc_in);
+                yuvToRgb.forEach(alloc_out);
+                alloc_out.copyTo(video_frame_image);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        CallingActivity.mContentView.setImageBitmap(video_frame_image);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            main_handler_s.post(myRunnable);
         }
     }
 

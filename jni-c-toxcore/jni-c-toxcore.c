@@ -49,6 +49,8 @@
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
 #include <jni.h>
+#include "coffeecatch.h"
+#include "coffeejni.h"
 // ------- Android/JNI stuff -------
 
 
@@ -756,6 +758,7 @@ void toxav_bit_rate_status_cb_(ToxAV *av, uint32_t friend_number, uint32_t audio
 	android_toxav_callback_bit_rate_status_cb(friend_number, audio_bit_rate, video_bit_rate);
 }
 
+
 void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height)
 {
 	JNIEnv *jnienv2;
@@ -804,11 +807,13 @@ void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t w
 	if (video_buffer_1 != NULL)
 	{
 		// copy the Y layer into the buffer
-		memcpy(video_buffer_1, v, (size_t)(video_buffer_1_y_size));
+		// memcpy(video_buffer_1, v, (size_t)(video_buffer_1_y_size));
 		// copy the U layer into the buffer
-		memcpy(video_buffer_1_u, u, (size_t)(video_buffer_1_u_size));
+		// memcpy(video_buffer_1_u, u, (size_t)(video_buffer_1_u_size));
 		// copy the V layer into the buffer
-		memcpy(video_buffer_1_v, v, (size_t)(video_buffer_1_u_size));
+		// memcpy(video_buffer_1_v, v, (size_t)(video_buffer_1_u_size));
+
+		memcpy(video_buffer_1, v, (size_t)(video_buffer_1_size));
 	}
 
 	android_toxav_callback_video_receive_frame_cb(friend_number, width, height);
@@ -957,7 +962,7 @@ void *thread_video_av(void *data)
 
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
+Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir)
 {
 	const char *s = NULL;
 
@@ -1077,6 +1082,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	// start toxav thread ------------------------------
 }
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
+{
+	dbg(99, "app_crash_C:001");
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir));
+	dbg(99, "app_crash_C:002");
+}
 
 
 

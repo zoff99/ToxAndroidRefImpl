@@ -2,8 +2,57 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:background="#0099cc"
+             android:background="#2090cc"
              tools:context="com.zoffcc.applications.trifa.CallingActivity">
+
+    <TableRow
+        android:id="@+id/first_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+
+        <ImageButton
+            android:layout_width="70dp"
+            android:layout_height="1dp"
+            android:background="@android:color/transparent"
+            android:keepScreenOn="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_green"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1.7"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+
+        <ImageButton
+            android:layout_width="70dp"
+            android:layout_height="1dp"
+            android:background="@android:color/transparent"
+            android:keepScreenOn="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_red"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+    </TableRow>
+
 
     <TableRow
         android:layout_width="match_parent"
@@ -39,7 +88,7 @@
 
             <ImageView
                 android:id="@+id/video_view"
-                android:layout_width="match_parent"
+                android:layout_width="400dp"
                 android:layout_height="match_parent"
                 android:background="@android:color/black"/>
         </LinearLayout>
