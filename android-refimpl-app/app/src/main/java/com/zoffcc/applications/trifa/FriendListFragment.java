@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
@@ -39,12 +40,13 @@ public class FriendListFragment extends ListFragment
 {
     private static final String TAG = "trifa.FriendListFrgnt";
     static final int MessageListActivity_ID = 2;
-    List<FriendList> data_values = null;
+    List<FriendList> data_values = new ArrayList<FriendList>();
     FriendlistArrayAdapter a = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.friend_list_layout, container, false);
         MainActivity.friend_list_fragment = this;
         return view;
@@ -53,43 +55,63 @@ public class FriendListFragment extends ListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
+        Log.i(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onAttach(Context context)
     {
+        Log.i(TAG, "onAttach(Context)");
         super.onAttach(context);
-        data_values = new ArrayList<FriendList>();
+        data_values.clear();
         a = new FriendlistArrayAdapter(context, data_values);
+        setListAdapter(a);
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        Log.i(TAG, "onAttach()");
+        super.onAttach(activity);
+        data_values.clear();
+        a = new FriendlistArrayAdapter(activity, data_values);
         setListAdapter(a);
     }
 
     void modify_friend(final FriendList f, final long friendnum)
     {
+        Log.i(TAG, "modify_friend");
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                boolean found_friend = false;
-                int size = data_values.size();
-                int i = 0;
-                for (i = 0; i < size; i++)
+                try
                 {
-                    if (data_values.get(i).tox_friendnum == friendnum)
+                    boolean found_friend = false;
+                    int size = data_values.size();
+                    int i = 0;
+                    for (i = 0; i < size; i++)
                     {
-                        found_friend = true;
-                        FriendList n = deep_copy(f);
-                        data_values.set(i, n);
-                        Log.i(TAG, "modify_friend:found friend:" + friendnum);
-                        a.notifyDataSetChanged();
+                        if (data_values.get(i).tox_friendnum == friendnum)
+                        {
+                            found_friend = true;
+                            FriendList n = deep_copy(f);
+                            data_values.set(i, n);
+                            Log.i(TAG, "modify_friend:found friend:" + friendnum);
+                            a.notifyDataSetChanged();
+                        }
+                    }
+
+                    if (!found_friend)
+                    {
+                        add_friends(f);
                     }
                 }
-
-                if (!found_friend)
+                catch (Exception e)
                 {
-                    add_friends(f);
+                    e.printStackTrace();
                 }
             }
         };
@@ -98,14 +120,22 @@ public class FriendListFragment extends ListFragment
 
     void add_friends(final FriendList f)
     {
+        Log.i(TAG, "add_friends");
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                FriendList n = deep_copy(f);
-                data_values.add(n);
-                a.notifyDataSetChanged();
+                try
+                {
+                    FriendList n = deep_copy(f);
+                    data_values.add(n);
+                    a.notifyDataSetChanged();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         };
 

@@ -1059,6 +1059,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     catch (android.database.sqlite.SQLiteConstraintException e)
                     {
+                        e.printStackTrace();
                     }
 
                     friend_list_fragment.modify_friend(f, friendnum);

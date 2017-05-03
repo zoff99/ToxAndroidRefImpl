@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -57,6 +58,7 @@ public class MessageListFragment extends ListFragment
     @Override
     public void onAttach(Context context)
     {
+        Log.i(TAG, "onAttach(Context)");
         super.onAttach(context);
 
         MessageListActivity mla = (MessageListActivity) (getActivity());
@@ -92,6 +94,47 @@ public class MessageListFragment extends ListFragment
         // TODO this is just a bad hack, fix me!! -----------------
 
     }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        Log.i(TAG, "onAttach(Activity)");
+        super.onAttach(activity);
+
+        MessageListActivity mla = (MessageListActivity) (getActivity());
+        current_friendnum = mla.get_current_friendnum();
+        Log.i(TAG, "current_friendnum=" + current_friendnum);
+        data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
+        a = new MessagelistArrayAdapter(activity, data_values);
+        setListAdapter(a);
+
+        // TODO this is just a bad hack, fix me!! -----------------
+        final Thread t1 = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Log.i(TAG, "scroll to bottom:1");
+                    Thread.sleep(300); // TODO: really back hack!!
+                    // scroll to bottom
+                    Log.i(TAG, "scroll to bottom:2");
+                    scroll_to_bottom();
+                    Log.i(TAG, "scroll to bottom:2");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "scroll to bottom:EE:" + e.getMessage());
+                }
+            }
+        };
+        t1.start();
+        // TODO this is just a bad hack, fix me!! -----------------
+
+    }
+
 
     void scroll_to_bottom()
     {
