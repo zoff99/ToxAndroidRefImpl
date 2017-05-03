@@ -466,7 +466,7 @@ public class MainActivity extends AppCompatActivity
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
 
-    static void allocate_video_buffer_1(int frame_width_px, int frame_height_px)
+    static void allocate_video_buffer_1(int frame_width_px1, int frame_height_px1, long ystride, long ustride, long vstride)
     {
         if (video_buffer_1 != null)
         {
@@ -479,13 +479,30 @@ public class MainActivity extends AppCompatActivity
             video_frame_image = null;
         }
 
+        /*
+        * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
+        * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
+        * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
+        */
+
         // YUV420 frame with w x h size
-        int y_layer_size = frame_width_px * frame_height_px;
-        int u_layer_size = (y_layer_size / 4);
-        int v_layer_size = (y_layer_size / 4);
+        //        int y_layer_size = frame_width_px * frame_height_px;
+        //        int u_layer_size = (y_layer_size / 4);
+        //        int v_layer_size = (y_layer_size / 4);
+
+        int y_layer_size = (int) Math.max(frame_width_px1, Math.abs(ystride)) * frame_height_px1;
+        int u_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(ustride)) * (frame_height_px1 / 2);
+        int v_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(vstride)) * (frame_height_px1 / 2);
+
+        int frame_width_px = (int) Math.max(frame_width_px1, Math.abs(ystride));
+        int frame_height_px = (int) frame_height_px1;
+
         buffer_size_in_bytes = y_layer_size + v_layer_size + u_layer_size;
+
+        Log.i(TAG, "YUV420 frame w1=" + frame_width_px1 + " h1=" + frame_height_px1 + " bytes=" + buffer_size_in_bytes);
         Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
-        video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
+        Log.i(TAG, "YUV420 frame ystride=" + ystride + " ustride=" + ustride + " vstride=" + vstride);
+        video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes * 3);
         int written = set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
         //if (written > 0)
         //{
@@ -497,7 +514,21 @@ public class MainActivity extends AppCompatActivity
             RenderScript rs = RenderScript.create(context_s);
             yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
 
-            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px);
+            //            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs))
+            //                    .setX(frame_width_px)
+            //                    .setY(frame_height_px)
+            //                    .setYuvFormat(android.graphics.ImageFormat.YV12);
+
+            //            Type.Builder yuvType = new Type.Builder(rs, Element.createPixel(rs,
+            //                    Element.DataType.UNSIGNED_8, Element.DataKind.PIXEL_YUV));
+            //            yuvType.setX(frame_width_px);
+            //            yuvType.setY(frame_height_px);
+            // yuvType.setYuvFormat(android.graphics.ImageFormat.YV12);
+
+            // Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(buffer_size_in_bytes);
+            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px).setY(frame_height_px);
+            yuvType.setYuvFormat(android.graphics.ImageFormat.YV12);
+
             alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
 
             Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
@@ -554,15 +585,16 @@ public class MainActivity extends AppCompatActivity
         main_handler_s.post(myRunnable);
     }
 
-    static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px)
+    synchronized static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
     {
         Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
         if (Callstate.call_first_video_frame_received == -1)
         {
-            // allocate new video buffer on 1 frame
-            allocate_video_buffer_1((int) frame_width_px, (int) frame_height_px);
-
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
+
+            // allocate new video buffer on 1 frame
+            allocate_video_buffer_1((int) frame_width_px, (int) frame_height_px, ystride, ustride, vstride);
+
             temp_string_a = "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a);
         }
@@ -613,6 +645,23 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call starting");
                 Callstate.call_start_timestamp = System.currentTimeMillis();
+
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            CallingActivity.accept_button.setVisibility(View.GONE);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                CallingActivity.callactivity_handler_s.post(myRunnable);
             }
             else if ((a_TOXAV_FRIEND_CALL_STATE & (2)) > 0)
             {

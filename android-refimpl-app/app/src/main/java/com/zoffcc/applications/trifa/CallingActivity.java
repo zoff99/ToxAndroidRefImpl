@@ -22,7 +22,7 @@ public class CallingActivity extends AppCompatActivity
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     static ImageView mContentView;
-    ImageButton accept_button = null;
+    static ImageButton accept_button = null;
     ImageButton decline_button = null;
     static TextView top_text_line = null;
     static CallingActivity ca = null;
@@ -64,7 +64,9 @@ public class CallingActivity extends AppCompatActivity
             {
                 try
                 {
-                    toxav_answer(Callstate.friend_number, 10, 10);
+                    toxav_answer(Callstate.friend_number, 1, 100);
+                    accept_button.setVisibility(View.GONE);
+
                     Callstate.call_start_timestamp = System.currentTimeMillis();
                     String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
                     top_text_line_str2 = a;

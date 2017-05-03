@@ -106,9 +106,9 @@ char *app_data_dir = NULL;
 jclass MainActivity = NULL;
 jmethodID logger_method = NULL;
 
-uint8_t *video_buffer_1 = NULL;
-uint8_t *video_buffer_1_u = NULL;
-uint8_t *video_buffer_1_v = NULL;
+volatile uint8_t *video_buffer_1 = NULL;
+volatile uint8_t *video_buffer_1_u = NULL;
+volatile uint8_t *video_buffer_1_v = NULL;
 long video_buffer_1_size = 0;
 int video_buffer_1_width = 0;
 int video_buffer_1_height = 0;
@@ -759,13 +759,17 @@ void toxav_bit_rate_status_cb_(ToxAV *av, uint32_t friend_number, uint32_t audio
 }
 
 
-void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height)
+void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height, int32_t ystride, int32_t ustride, int32_t vstride)
 {
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-          android_toxav_callback_video_receive_frame_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)width, (jlong)(unsigned long long)height);
+          android_toxav_callback_video_receive_frame_cb_method, (jlong)(unsigned long long)friend_number,
+		(jlong)(unsigned long long)width, (jlong)(unsigned long long)height,
+		(jlong)(unsigned long long)ystride,
+		(jlong)(unsigned long long)ustride, (jlong)(unsigned long long)vstride
+		);
 }
 
 // ----- get video buffer from Java -----
@@ -801,22 +805,32 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer(JNIEnv* 
 // ----- get video buffer from Java -----
 // ----- get video buffer from Java -----
 
+/*
+ * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
+ * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
+ * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
+ */
 void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t width, uint16_t height,
      const uint8_t *y, const uint8_t *u, const uint8_t *v, int32_t ystride, int32_t ustride, int32_t vstride, void *user_data)
 {
 	if (video_buffer_1 != NULL)
 	{
-		// copy the Y layer into the buffer
-		// memcpy(video_buffer_1, v, (size_t)(video_buffer_1_y_size));
-		// copy the U layer into the buffer
-		// memcpy(video_buffer_1_u, u, (size_t)(video_buffer_1_u_size));
-		// copy the V layer into the buffer
-		// memcpy(video_buffer_1_v, v, (size_t)(video_buffer_1_u_size));
-
-		memcpy(video_buffer_1, v, (size_t)(video_buffer_1_size));
+		if ((y) && (u) && (v))
+		{
+			// copy the Y layer into the buffer
+			dbg(9, "[V1]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+			memcpy(video_buffer_1, v, (size_t)(video_buffer_1_y_size));
+			// copy the U layer into the buffer
+			dbg(9, "[V2]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+			memcpy(video_buffer_1_u, u, (size_t)(video_buffer_1_u_size));
+			// copy the V layer into the buffer
+			dbg(9, "[V3]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+			memcpy(video_buffer_1_v, v, (size_t)(video_buffer_1_v_size));
+			dbg(9, "[V4]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+		}
 	}
 
-	android_toxav_callback_video_receive_frame_cb(friend_number, width, height);
+	android_toxav_callback_video_receive_frame_cb(friend_number, width, height, ystride, ustride, vstride);
 }
 
 void android_toxav_callback_call_cb(uint32_t friend_number, bool audio_enabled, bool video_enabled)
@@ -1049,7 +1063,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject 
 	dbg(9, "linking AV callbacks ... START");
 	android_toxav_callback_call_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_call_cb_method", "(JII)V");
     toxav_callback_call(tox_av_global, toxav_call_cb_, &mytox_CC);
-	android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_video_receive_frame_cb_method", "(JJJ)V");
+	android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_video_receive_frame_cb_method", "(JJJJJJ)V");
     toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
 	android_toxav_callback_call_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_call_state_cb_method", "(JI)V");
     toxav_callback_call_state(tox_av_global, toxav_call_state_cb_, &mytox_CC);
