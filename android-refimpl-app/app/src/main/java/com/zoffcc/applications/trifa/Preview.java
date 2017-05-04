@@ -60,7 +60,7 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
     {
         Log.i(TAG, "setCamera:camera=" + camera);
 
-        if (first_called)
+        // if (first_called)
         {
             first_called = false;
             mSurfaceView = CallingActivity.camera_preview_surface_view;

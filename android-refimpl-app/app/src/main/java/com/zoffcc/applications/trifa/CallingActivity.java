@@ -1,6 +1,27 @@
+/**
+ * [TRIfA], Java part of Tox Reference Implementation for Android
+ * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * <p>
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ */
+
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +36,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
+
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
@@ -28,6 +53,8 @@ public class CallingActivity extends AppCompatActivity
     static ImageView mContentView;
     static ImageButton accept_button = null;
     ImageButton decline_button = null;
+    static ImageButton camera_toggle_button = null;
+    static ImageButton mute_button = null;
     static TextView top_text_line = null;
     static CallingActivity ca = null;
     static String top_text_line_str1 = "";
@@ -39,6 +66,9 @@ public class CallingActivity extends AppCompatActivity
     Preview preview = null;
     Camera camera = null;
     static SurfaceView camera_preview_surface_view = null;
+    static int front_camera_id = -1;
+    static int back_camera_id = -1;
+    static int active_camera_id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -58,6 +88,44 @@ public class CallingActivity extends AppCompatActivity
         top_text_line = (TextView) findViewById(R.id.top_text_line);
         accept_button = (ImageButton) findViewById(R.id.accept_button);
         decline_button = (ImageButton) findViewById(R.id.decline_button);
+        camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
+        mute_button = (ImageButton) findViewById(R.id.mute_button);
+
+        Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic_off)
+                .backgroundColor(Color.TRANSPARENT)
+                .color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+        mute_button.setImageDrawable(d1);
+
+        Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_camera)
+                .backgroundColor(Color.TRANSPARENT)
+                .color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+        camera_toggle_button.setImageDrawable(d2);
+
+        Drawable d3 = new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_highlight_off)
+                .backgroundColor(Color.TRANSPARENT)
+                .color(Color.parseColor("#D0FF0000")).sizeDp(12);
+        decline_button.setImageDrawable(d3);
+        // #AARRGGBB
+
+        Drawable d4 = new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_check_circle)
+                .backgroundColor(Color.TRANSPARENT)
+                .color(Color.parseColor("#D0088A29")).sizeDp(12);
+        accept_button.setImageDrawable(d4);
+
+        camera_toggle_button.setVisibility(View.GONE);
+        mute_button.setVisibility(View.GONE);
+
+        camera_toggle_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                toggle_camera();
+                return true;
+            }
+        });
 
         camera_preview_surface_view = (SurfaceView) this.findViewById(R.id.video_my_preview_surfaceview);
 
@@ -87,6 +155,8 @@ public class CallingActivity extends AppCompatActivity
                 {
                     toxav_answer(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
                     accept_button.setVisibility(View.GONE);
+                    camera_toggle_button.setVisibility(View.VISIBLE);
+                    mute_button.setVisibility(View.VISIBLE);
 
                     Callstate.call_start_timestamp = System.currentTimeMillis();
                     String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
@@ -285,13 +355,32 @@ public class CallingActivity extends AppCompatActivity
         {
             try
             {
-                Log.i(TAG, "Camera:001");
-                camera = Camera.open(numCams - 1);
-                Log.i(TAG, "Camera:002");
+                for (int camNo = 0; camNo < numCams; camNo++)
+                {
+                    Camera.CameraInfo camInfo = new Camera.CameraInfo();
+                    Camera.getCameraInfo(camNo, camInfo);
+                    if (camInfo.facing == (Camera.CameraInfo.CAMERA_FACING_FRONT))
+                    {
+                        front_camera_id = camNo;
+                    }
+                    else if (camInfo.facing == (Camera.CameraInfo.CAMERA_FACING_BACK))
+                    {
+                        back_camera_id = camNo;
+                    }
+                }
+
+                if (front_camera_id != -1)
+                {
+                    camera = Camera.open(front_camera_id);
+                    active_camera_id = front_camera_id;
+                }
+                else
+                {
+                    camera = Camera.open(back_camera_id);
+                    active_camera_id = back_camera_id;
+                }
                 camera.startPreview();
-                Log.i(TAG, "Camera:003");
                 preview.setCamera(camera);
-                Log.i(TAG, "Camera:004");
             }
             catch (RuntimeException ex)
             {
@@ -299,6 +388,46 @@ public class CallingActivity extends AppCompatActivity
                 Toast.makeText(context_s, "Camera not found", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    void toggle_camera()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (camera != null)
+                    {
+                        camera.stopPreview();
+                        preview.setCamera(null);
+                        camera.release();
+                        camera = null;
+                    }
+
+                    if (active_camera_id == back_camera_id)
+                    {
+                        camera = Camera.open(front_camera_id);
+                        active_camera_id = front_camera_id;
+                    }
+                    else
+                    {
+                        camera = Camera.open(back_camera_id);
+                        active_camera_id = back_camera_id;
+                    }
+
+                    camera.startPreview();
+                    preview.setCamera(camera);
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+        callactivity_handler_s.post(myRunnable);
+
     }
 
     @Override

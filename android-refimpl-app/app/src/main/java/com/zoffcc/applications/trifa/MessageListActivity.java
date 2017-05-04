@@ -20,22 +20,35 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 
 public class MessageListActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MsgListActivity";
     long friendnum = -1;
     EditText ml_new_message = null;
+    TextView ml_maintext = null;
+    ImageView ml_icon = null;
+    ImageButton ml_phone_icon = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,6 +64,35 @@ public class MessageListActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         ml_new_message = (EditText) findViewById(R.id.ml_new_message);
+        ml_maintext = (TextView) findViewById(R.id.ml_maintext);
+        ml_icon = (ImageView) findViewById(R.id.ml_icon);
+        ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
+
+        ml_icon.setImageResource(R.drawable.circle_red);
+
+        Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
+        ml_phone_icon.setImageDrawable(d1);
+
+        final long fn = friendnum;
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                final String f_name = MainActivity.get_friend_name_from_num(fn);
+
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        ml_maintext.setText(f_name);
+                    }
+                };
+                main_handler_s.post(myRunnable);
+            }
+        };
+        t.start();
     }
 
     long get_current_friendnum()
@@ -60,7 +102,6 @@ public class MessageListActivity extends AppCompatActivity
 
     public void send_message_onclick(View view)
     {
-
         String msg = "";
         try
         {
@@ -91,5 +132,11 @@ public class MessageListActivity extends AppCompatActivity
             msg = "";
             e.printStackTrace();
         }
+    }
+
+    public void start_call_to_friend(View view)
+    {
+        Log.i(TAG,"start_call_to_friend");
+        MainActivity.toxav_call(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
     }
 }

@@ -1078,5 +1078,22 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
+
+    static String get_friend_name_from_num(long friendnum)
+    {
+        String result = "Unknown";
+        try
+        {
+            result = orma.selectFromFriendList().tox_friendnumEq(friendnum).toList().get(0).name;
+        }
+        catch (Exception e)
+        {
+            result = "Unknown";
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 }
 

@@ -84,7 +84,43 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="70dp"
-            android:layout_weight="1.7"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+
+        <ImageButton
+            android:id="@+id/camera_toggle_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@android:color/transparent"
+            android:keepScreenOn="true"
+            android:layout_gravity="center_vertical"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_blue"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+
+        <ImageButton
+            android:id="@+id/mute_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/transparent"
+            android:keepScreenOn="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_orange"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text="">
         </TextView>
