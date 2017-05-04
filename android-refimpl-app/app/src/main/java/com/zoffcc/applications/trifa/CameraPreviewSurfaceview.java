@@ -32,7 +32,7 @@ public class CameraPreviewSurfaceview extends SurfaceView implements Camera.Prev
     // !!this one is actually used!!
 
     @Override
-    public void onPreviewFrame(byte[] data, Camera camera)
+    public void onPreviewFrame(byte[] data, Camera camera2)
     {
         if (data == null)
         {
@@ -41,7 +41,7 @@ public class CameraPreviewSurfaceview extends SurfaceView implements Camera.Prev
         {
             if (camera_preview_size_ == null)
             {
-                Camera.Parameters p = camera.getParameters();
+                Camera.Parameters p = camera2.getParameters();
                 camera_preview_size_ = p.getPreviewSize();
                 Log.i(TAG, "onPreviewFrame:w=" + camera_preview_size_.width + " h=" + camera_preview_size_.height);
 
@@ -69,13 +69,18 @@ public class CameraPreviewSurfaceview extends SurfaceView implements Camera.Prev
 
                 Log.i(TAG, "YUV420 frame w1=" + camera_preview_size_.width + " h1=" + camera_preview_size_.height + " bytes=" + buffer_size_in_bytes2);
                 Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes2);
-                video_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes2 * 5);
+                video_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes2 + 1);
                 set_JNI_video_buffer2(video_buffer_2, camera_preview_size_.width, camera_preview_size_.height);
             }
 
             try
             {
                 video_buffer_2.rewind();
+                Camera.Parameters p = camera2.getParameters();
+                camera_preview_size_ = p.getPreviewSize();
+                Log.i(TAG, "onPreviewFrame:w=" + camera_preview_size_.width + " h=" + camera_preview_size_.height);
+                Log.i(TAG, "YUV420 data bytes=" + data.length);
+
                 video_buffer_2.put(data);
                 toxav_video_send_frame(Callstate.friend_number, camera_preview_size_.width, camera_preview_size_.height);
             }

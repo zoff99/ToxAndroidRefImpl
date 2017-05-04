@@ -92,7 +92,11 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
 
             // ------------------- YUV420 -------------------
             // ------------------- YUV420 -------------------
+            Log.i(TAG, "setCamera:setPreviewFormat(1)a:" + params.getPreviewFormat());
+            Log.i(TAG, "setCamera:setPreviewFormat(1)a:" + params.getSupportedPreviewFormats());
             params.setPreviewFormat(ImageFormat.YV12);
+            // params.setPreviewFormat(ImageFormat.NV21);
+            Log.i(TAG, "setCamera:setPreviewFormat(2)a:" + params.getPreviewFormat());
             // ------------------- YUV420 -------------------
             // ------------------- YUV420 -------------------
 
@@ -105,6 +109,7 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
 
                 // set the focus mode
                 params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+
                 // set Camera parameters
                 mCamera.setParameters(params);
 
@@ -309,9 +314,26 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
 
             Log.i(TAG, "surfaceChanged:w=" + w + " h=" + h);
 
+            // ------------------- YUV420 -------------------
+            // ------------------- YUV420 -------------------
+            Log.i(TAG, "setCamera:setPreviewFormat(1)b:" + parameters.getPreviewFormat());
+            Log.i(TAG, "setCamera:setPreviewFormat(1)b:" + parameters.getSupportedPreviewFormats());
+            // parameters.setPreviewFormat(ImageFormat.YV12);
+            Log.i(TAG, "setCamera:setPreviewFormat(2)b:" + parameters.getPreviewFormat());
+            // ------------------- YUV420 -------------------
+            // ------------------- YUV420 -------------------
+
+
             mCamera.setParameters(parameters);
             mCamera.setPreviewCallback(CallingActivity.camera_preview_surface_view);
-            mCamera.startPreview();
+            try
+            {
+                mCamera.startPreview();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
