@@ -11,13 +11,18 @@ import android.hardware.Camera.Size;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import java.io.IOException;
 import java.util.List;
+
+import static android.content.Context.WINDOW_SERVICE;
 
 class Preview extends ViewGroup implements SurfaceHolder.Callback
 {
@@ -97,6 +102,48 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
 
                 Log.i(TAG, "setCamera:006");
             }
+
+
+            // ----- fix rotated camera preview -----
+            // ----- fix rotated camera preview -----
+            // ----- fix rotated camera preview -----
+            try
+            {
+
+                Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+
+                Log.i(TAG, "display.getRotation=" + display.getRotation());
+
+                if (display.getRotation() == Surface.ROTATION_0)
+                {
+                    // params.setPreviewSize(mPreviewSize.height, mPreviewSize.width);
+                    mCamera.setDisplayOrientation(90);
+                }
+                else if (display.getRotation() == Surface.ROTATION_90)
+                {
+                    // params.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+                }
+                else if (display.getRotation() == Surface.ROTATION_180)
+                {
+                    // params.setPreviewSize(mPreviewSize.height, mPreviewSize.width);
+                }
+                else if (display.getRotation() == Surface.ROTATION_270)
+                {
+                    // params.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+                    mCamera.setDisplayOrientation(180);
+                }
+
+                // mCamera.setParameters(params);
+
+                // setCameraDisplayOrientation(??activitiy??, active_camera_id, camera);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            // ----- fix rotated camera preview -----
+            // ----- fix rotated camera preview -----
+            // ----- fix rotated camera preview -----
         }
     }
 
@@ -235,16 +282,7 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
         }
 
         Log.i(TAG, "getOptimalPreviewSize:w=" + optimalSize.width + " h=" + optimalSize.height);
-
-        // -------- DEBUG --------
-        // -------- DEBUG --------
-        // -------- DEBUG --------
-        // optimalSize.width = 120;
-        // optimalSize.height = 120;
-        // -------- DEBUG --------
-        // -------- DEBUG --------
-        // -------- DEBUG --------
-
+        
         return optimalSize;
     }
 
@@ -252,6 +290,11 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
     {
         if (mCamera != null)
         {
+            // ----------------------------
+            // ----------------------------
+            mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, w, h);
+            // ----------------------------
+            // ----------------------------
             Camera.Parameters parameters = mCamera.getParameters();
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
             requestLayout();

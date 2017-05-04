@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
@@ -29,6 +30,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
@@ -395,42 +397,35 @@ public class CallingActivity extends AppCompatActivity
 
     void toggle_camera()
     {
-        Runnable myRunnable = new Runnable()
+        try
         {
-            @Override
-            public void run()
+            camera.stopPreview();
+            camera.release();
+
+            if (active_camera_id == back_camera_id)
             {
-                try
-                {
-                    if (camera != null)
-                    {
-                        camera.stopPreview();
-                        preview.setCamera(null);
-                        camera.release();
-                        camera = null;
-                    }
-
-                    if (active_camera_id == back_camera_id)
-                    {
-                        camera = Camera.open(front_camera_id);
-                        active_camera_id = front_camera_id;
-                    }
-                    else
-                    {
-                        camera = Camera.open(back_camera_id);
-                        active_camera_id = back_camera_id;
-                    }
-
-                    camera.startPreview();
-                    preview.setCamera(camera);
-                }
-                catch (Exception e)
-                {
-                }
+                camera = Camera.open(front_camera_id);
+                active_camera_id = front_camera_id;
             }
-        };
-        callactivity_handler_s.post(myRunnable);
+            else
+            {
+                camera = Camera.open(back_camera_id);
+                active_camera_id = back_camera_id;
+            }
 
+            setCameraDisplayOrientation(this, active_camera_id, camera);
+
+            camera.setPreviewDisplay(CallingActivity.camera_preview_surface_view.getHolder());
+            camera.startPreview();
+            // ----------------------------
+            // ----------------------------
+            preview.setCamera(camera);
+            // ----------------------------
+            // ----------------------------
+        }
+        catch (Exception e)
+        {
+        }
     }
 
     @Override
@@ -455,4 +450,46 @@ public class CallingActivity extends AppCompatActivity
     // ----- camera preview -----
     // ----- camera preview -----
 
+
+    public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera)
+    {
+        try
+        {
+            android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+            android.hardware.Camera.getCameraInfo(cameraId, info);
+            int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+            int degrees = 0;
+            switch (rotation)
+            {
+                case Surface.ROTATION_0:
+                    degrees = 0;
+                    break;
+                case Surface.ROTATION_90:
+                    degrees = 90;
+                    break;
+                case Surface.ROTATION_180:
+                    degrees = 180;
+                    break;
+                case Surface.ROTATION_270:
+                    degrees = 270;
+                    break;
+            }
+
+            int result;
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
+            {
+                result = (info.orientation + degrees) % 360;
+                result = (360 - result) % 360;  // compensate the mirror
+            }
+            else
+            {  // back-facing
+                result = (info.orientation - degrees + 360) % 360;
+            }
+            camera.setDisplayOrientation(result);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
