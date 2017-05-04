@@ -67,7 +67,7 @@ public class CallingActivity extends AppCompatActivity
     private static final String TAG = "trifa.CallingActivity";
     Preview preview = null;
     Camera camera = null;
-    static SurfaceView camera_preview_surface_view = null;
+    static CameraPreviewSurfaceview camera_preview_surface_view = null;
     static int front_camera_id = -1;
     static int back_camera_id = -1;
     static int active_camera_id = 0;
@@ -130,7 +130,7 @@ public class CallingActivity extends AppCompatActivity
             }
         });
 
-        camera_preview_surface_view = (SurfaceView) this.findViewById(R.id.video_my_preview_surfaceview);
+        camera_preview_surface_view = (CameraPreviewSurfaceview) this.findViewById(R.id.video_my_preview_surfaceview);
 
         // ----- camera preview -----
         // ----- camera preview -----
@@ -400,6 +400,8 @@ public class CallingActivity extends AppCompatActivity
         try
         {
             camera.stopPreview();
+            camera.setPreviewCallback(null);
+            CameraPreviewSurfaceview.camera_preview_size_=null;
             camera.release();
 
             if (active_camera_id == back_camera_id)
@@ -416,6 +418,7 @@ public class CallingActivity extends AppCompatActivity
             setCameraDisplayOrientation(this, active_camera_id, camera);
 
             camera.setPreviewDisplay(CallingActivity.camera_preview_surface_view.getHolder());
+            camera.setPreviewCallback(CallingActivity.camera_preview_surface_view);
             camera.startPreview();
             // ----------------------------
             // ----------------------------
@@ -435,6 +438,8 @@ public class CallingActivity extends AppCompatActivity
         {
             camera.stopPreview();
             preview.setCamera(null);
+            camera.setPreviewCallback(null);
+            CameraPreviewSurfaceview.camera_preview_size_=null;
             camera.release();
             camera = null;
         }

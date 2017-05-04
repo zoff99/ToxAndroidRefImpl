@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity
     final static int SettingsActivity_ID = 10004;
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
+    static ByteBuffer video_buffer_2 = null;
 
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -547,7 +548,9 @@ public class MainActivity extends AppCompatActivity
 
     public static native int toxav_video_send_frame(long friendnum, int frame_width_px, int frame_height_px);
 
-    public static native int set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
+    public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
+
+    public static native void set_JNI_video_buffer2(ByteBuffer buffer, int frame_width_px, int frame_height_px);
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -567,6 +570,7 @@ public class MainActivity extends AppCompatActivity
             // video_buffer_1.clear();
             video_buffer_1 = null;
         }
+
         if (video_frame_image != null)
         {
             video_frame_image.recycle();
@@ -593,7 +597,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
         Log.i(TAG, "YUV420 frame ystride=" + ystride + " ustride=" + ustride + " vstride=" + vstride);
         video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
-        int written = set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
+        long written = set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
         //if (written > 0)
         //{
         //    buffer.limit(written);

@@ -6,6 +6,7 @@ package com.zoffcc.applications.trifa;
  */
 
 import android.content.Context;
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.support.annotation.Nullable;
@@ -77,6 +78,7 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
         }
 
         mCamera = camera;
+
         if (mCamera != null)
         {
             Log.i(TAG, "setCamera:001");
@@ -87,6 +89,12 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
             // get Camera parameters
             Camera.Parameters params = mCamera.getParameters();
             Log.i(TAG, "setCamera:003");
+
+            // ------------------- YUV420 -------------------
+            // ------------------- YUV420 -------------------
+            params.setPreviewFormat(ImageFormat.YV12);
+            // ------------------- YUV420 -------------------
+            // ------------------- YUV420 -------------------
 
             List<String> focusModes = params.getSupportedFocusModes();
             Log.i(TAG, "setCamera:004");
@@ -282,7 +290,7 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
         }
 
         Log.i(TAG, "getOptimalPreviewSize:w=" + optimalSize.width + " h=" + optimalSize.height);
-        
+
         return optimalSize;
     }
 
@@ -302,8 +310,10 @@ class Preview extends ViewGroup implements SurfaceHolder.Callback
             Log.i(TAG, "surfaceChanged:w=" + w + " h=" + h);
 
             mCamera.setParameters(parameters);
+            mCamera.setPreviewCallback(CallingActivity.camera_preview_surface_view);
             mCamera.startPreview();
         }
     }
 
 }
+

@@ -116,6 +116,14 @@ int video_buffer_1_y_size = 0;
 int video_buffer_1_u_size = 0;
 int video_buffer_1_v_size = 0;
 
+uint8_t *video_buffer_2 = NULL;
+uint8_t *video_buffer_2_u = NULL;
+uint8_t *video_buffer_2_v = NULL;
+long video_buffer_2_size = 0;
+int video_buffer_2_y_size = 0;
+int video_buffer_2_u_size = 0;
+int video_buffer_2_v_size = 0;
+
 
 
 // -------- _callbacks_ --------
@@ -804,6 +812,34 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer(JNIEnv* 
 // ----- get video buffer from Java -----
 // ----- get video buffer from Java -----
 // ----- get video buffer from Java -----
+
+
+
+
+
+// ----- get video buffer 2 from Java -----
+// ----- get video buffer 2 from Java -----
+// ----- get video buffer 2 from Java -----
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer2(JNIEnv* env, jobject thiz, jobject buffer2, jint frame_width_px, jint frame_height_px)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+    video_buffer_2 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, buffer2);
+
+	dbg(9, "video_buffer_2=(call)%p buffer2=%p", video_buffer_2, buffer2);
+
+    jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer2);
+	video_buffer_2_size = (long)capacity;
+}
+// ----- get video buffer 2 from Java -----
+// ----- get video buffer 2 from Java -----
+// ----- get video buffer 2 from Java -----
+
+
+
+
 
 /*
  * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
@@ -1510,17 +1546,24 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv* env
  * @param v V (Chroma) plane data.
  */
 JNIEXPORT jint JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv* env, jobject thiz, jlong friend_number, jint width, jint height)
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv* env, jobject thiz, jlong friend_number, jint frame_width_px, jint frame_height_px)
 {
 	TOXAV_ERR_SEND_FRAME error;
 
-	// TODO have a buffer and send actual YUV420 frame
-	const uint8_t *y = NULL;
-	const uint8_t *u = NULL;
-	const uint8_t *v = NULL;
-	// bool res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)width, (uint16_t)height, y, u, v, &error);
-	bool res = 1;
-	return (jint)res;
+	video_buffer_2_y_size = (int)(frame_width_px * frame_height_px);
+	video_buffer_2_u_size = (int)(video_buffer_2_y_size / 4);
+	video_buffer_2_v_size = (int)(video_buffer_2_y_size / 4);
+	video_buffer_2_u = (uint8_t*)(video_buffer_2 + video_buffer_2_y_size);
+	video_buffer_2_v = (uint8_t*)(video_buffer_2 + video_buffer_2_y_size + video_buffer_2_u_size);
+
+	// dbg(9, "toxav_video_send_frame:fn=%d,video_buffer_2=%p,w=%d,h=%d", (int)friend_number, video_buffer_2, (int)frame_width_px, (int)frame_height_px);
+
+	bool res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px, (uint16_t)frame_height_px,
+		(uint8_t*)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error);
+
+	// dbg(9, "toxav_video_send_frame:res=%d,error=%d", (int)res, (int)error);
+
+	return (jint)error;
 }
 // ------------------- AV -------------------
 // ------------------- AV -------------------

@@ -45,12 +45,12 @@
                 android:background="@android:color/transparent"
                 android:gravity="center">
 
-                <SurfaceView
+                <com.zoffcc.applications.trifa.CameraPreviewSurfaceview
                     android:id="@+id/video_my_preview_surfaceview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent">
-                </SurfaceView>
+                </com.zoffcc.applications.trifa.CameraPreviewSurfaceview>
             </com.zoffcc.applications.trifa.Preview>
 
         </FrameLayout>
