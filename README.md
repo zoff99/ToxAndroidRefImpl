@@ -5,7 +5,6 @@ This is not a Reference Client, it's c-toxcore for Android.
 Build Status
 =
 **CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/master.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl)
-**Travis:** [![Build Status](https://travis-ci.org/zoff99/ToxAndroidRefImpl.png?branch=master)](https://travis-ci.org/zoff99/ToxAndroidRefImpl)
 
 
 Development Snapshot Version (Android)
