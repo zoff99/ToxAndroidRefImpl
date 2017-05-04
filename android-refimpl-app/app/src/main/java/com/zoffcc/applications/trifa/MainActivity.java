@@ -644,6 +644,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         Log.i(TAG, "CALL:start:show activity");
                         Callstate.state = 1;
+                        Callstate.accepted_call = 0;
                         Callstate.call_first_video_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);

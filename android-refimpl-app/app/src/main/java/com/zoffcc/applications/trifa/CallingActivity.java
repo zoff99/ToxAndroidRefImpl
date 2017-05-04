@@ -91,31 +91,32 @@ public class CallingActivity extends AppCompatActivity
         camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
         mute_button = (ImageButton) findViewById(R.id.mute_button);
 
-        Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic_off)
-                .backgroundColor(Color.TRANSPARENT)
-                .color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+        Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
         mute_button.setImageDrawable(d1);
 
-        Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_camera)
-                .backgroundColor(Color.TRANSPARENT)
-                .color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+        Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
         camera_toggle_button.setImageDrawable(d2);
 
-        Drawable d3 = new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_highlight_off)
-                .backgroundColor(Color.TRANSPARENT)
-                .color(Color.parseColor("#D0FF0000")).sizeDp(12);
+        Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(12);
         decline_button.setImageDrawable(d3);
         // #AARRGGBB
 
-        Drawable d4 = new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_check_circle)
-                .backgroundColor(Color.TRANSPARENT)
-                .color(Color.parseColor("#D0088A29")).sizeDp(12);
+        Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(12);
         accept_button.setImageDrawable(d4);
 
-        camera_toggle_button.setVisibility(View.GONE);
-        mute_button.setVisibility(View.GONE);
+        if (Callstate.accepted_call == 1)
+        {
+            accept_button.setVisibility(View.GONE);
+            camera_toggle_button.setVisibility(View.VISIBLE);
+            mute_button.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            accept_button.setVisibility(View.VISIBLE);
+            camera_toggle_button.setVisibility(View.GONE);
+            mute_button.setVisibility(View.GONE);
+        }
+
 
         camera_toggle_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -153,6 +154,8 @@ public class CallingActivity extends AppCompatActivity
             {
                 try
                 {
+                    Callstate.accepted_call = 1;
+
                     toxav_answer(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
                     accept_button.setVisibility(View.GONE);
                     camera_toggle_button.setVisibility(View.VISIBLE);

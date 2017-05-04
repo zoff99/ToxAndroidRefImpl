@@ -35,8 +35,12 @@ import android.widget.TextView;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
+import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.orma;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
@@ -137,6 +141,53 @@ public class MessageListActivity extends AppCompatActivity
     public void start_call_to_friend(View view)
     {
         Log.i(TAG,"start_call_to_friend");
-        MainActivity.toxav_call(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
+
+        final long fn = friendnum;
+
+        // these 2 bitrate values are very strange!! sometimes no video!!
+        final int f_audio_enabled = 10;
+        final int f_video_enabled = 10;
+
+        MainActivity.toxav_call(friendnum, f_audio_enabled, f_video_enabled);
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (Callstate.state == 0)
+                    {
+                        Log.i(TAG, "CALL:start:(2):show activity");
+                        Callstate.state = 1;
+                        Callstate.accepted_call = 1; // we started the call, so it's already accepted on our side
+                        Callstate.call_first_video_frame_received = -1;
+                        Callstate.call_start_timestamp = -1;
+                        Intent intent = new Intent(context_s, CallingActivity.class);
+                        Callstate.friend_number = fn;
+                        try
+                        {
+                            Callstate.friend_name = orma.selectFromFriendList().tox_friendnumEq(Callstate.friend_number).toList().get(0).name;
+                        }
+                        catch (Exception e)
+                        {
+                            Callstate.friend_name = "Unknown";
+                            e.printStackTrace();
+                        }
+                        Callstate.other_audio_enabled = f_audio_enabled;
+                        Callstate.other_video_enabled = f_video_enabled;
+                        Callstate.call_init_timestamp = System.currentTimeMillis();
+                        main_activity_s.startActivityForResult(intent, CallingActivity_ID);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "CALL:start:(2):EE:" + e.getMessage());
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
+
     }
 }
