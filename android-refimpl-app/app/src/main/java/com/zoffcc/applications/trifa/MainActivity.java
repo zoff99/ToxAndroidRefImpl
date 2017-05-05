@@ -30,16 +30,16 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
-import android.renderscript.Type;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
+import android.support.v8.renderscript.Allocation;
+import android.support.v8.renderscript.Element;
+import android.support.v8.renderscript.RenderScript;
+import android.support.v8.renderscript.ScriptIntrinsicYuvToRGB;
+import android.support.v8.renderscript.Type;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -547,6 +547,7 @@ public class MainActivity extends AppCompatActivity
     public static native int toxav_call_control(long friendnum, int a_TOXAV_CALL_CONTROL);
 
     public static native int toxav_video_send_frame_uv_reversed(long friendnum, int frame_width_px, int frame_height_px);
+
     public static native int toxav_video_send_frame(long friendnum, int frame_width_px, int frame_height_px);
 
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
@@ -563,7 +564,6 @@ public class MainActivity extends AppCompatActivity
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
-
     static void allocate_video_buffer_1(int frame_width_px1, int frame_height_px1, long ystride, long ustride, long vstride)
     {
         if (video_buffer_1 != null)
@@ -604,29 +604,20 @@ public class MainActivity extends AppCompatActivity
         //    buffer.limit(written);
         //}
 
-        // only works with Android 4.3 and up !! --------------------------------
-        // only works with Android 4.3 and up !! --------------------------------
-        // only works with Android 4.3 and up !! --------------------------------
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-        {
-            RenderScript rs = RenderScript.create(context_s);
-            yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
+        RenderScript rs = RenderScript.create(context_s);
+        yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
 
-            // --------- works !!!!! ---------
-            // --------- works !!!!! ---------
-            // --------- works !!!!! ---------
-            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px).setY(frame_height_px);
-            yuvType.setYuvFormat(ImageFormat.YV12);
-            alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
-            Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
-            alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
-            // --------- works !!!!! ---------
-            // --------- works !!!!! ---------
-            // --------- works !!!!! ---------
-        }
-        // only works with Android 4.3 and up !! --------------------------------
-        // only works with Android 4.3 and up !! --------------------------------
-        // only works with Android 4.3 and up !! --------------------------------
+        // --------- works !!!!! ---------
+        // --------- works !!!!! ---------
+        // --------- works !!!!! ---------
+        Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px).setY(frame_height_px);
+        yuvType.setYuvFormat(ImageFormat.YV12);
+        alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
+        Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
+        alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
+        // --------- works !!!!! ---------
+        // --------- works !!!!! ---------
+        // --------- works !!!!! ---------
 
         video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
     }

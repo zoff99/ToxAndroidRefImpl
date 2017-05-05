@@ -70,19 +70,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     Handler callactivity_handler = null;
     static Handler callactivity_handler_s = null;
     private static final String TAG = "trifa.CallingActivity";
-    Preview preview = null;
     Camera camera = null;
-    static CameraPreviewSurfaceview camera_preview_surface_view = null;
     static CameraSurfacePreview cameraSurfacePreview = null;
     static float mPreviewRate = -1f;
     static int front_camera_id = -1;
     static int back_camera_id = -1;
     static int active_camera_id = 0;
-    public static final String FRAGMENT_TAG = "camera_preview_fragment_";
-
-    //
-    private static final boolean USE_CAM_001 = false;
-    //
+    // public static final String FRAGMENT_TAG = "camera_preview_fragment_";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -142,26 +136,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-        if (USE_CAM_001)
-        {
-            // camera_preview_surface_view = (CameraPreviewSurfaceview) this.findViewById(R.id.video_my_preview_surfaceview);
-        }
-
 
         initUI();
         initViewParams();
-
-        // ----- camera preview -----
-        // ----- camera preview -----
-        // ----- camera preview -----
-        if (USE_CAM_001)
-        {
-            // preview = (com.zoffcc.applications.trifa.Preview) findViewById(R.id.video_my_preview);
-            preview.setKeepScreenOn(true);
-        }
-        // ----- camera preview -----
-        // ----- camera preview -----
-        // ----- camera preview -----
 
         top_text_line_str1 = Callstate.friend_name;
         top_text_line_str2 = "";
@@ -365,58 +342,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     }
 
 
-    // ----- camera preview -----
-    // ----- camera preview -----
-    // ----- camera preview -----
     @Override
     protected void onResume()
     {
         super.onResume();
-
-        if (USE_CAM_001)
-        {
-
-            int numCams = Camera.getNumberOfCameras();
-            Toast.makeText(context_s, "Cameras=" + numCams, Toast.LENGTH_LONG).show();
-            Log.i(TAG, "Cameras=" + numCams);
-            if (numCams > 0)
-            {
-                try
-                {
-                    for (int camNo = 0; camNo < numCams; camNo++)
-                    {
-                        Camera.CameraInfo camInfo = new Camera.CameraInfo();
-                        Camera.getCameraInfo(camNo, camInfo);
-                        if (camInfo.facing == (Camera.CameraInfo.CAMERA_FACING_FRONT))
-                        {
-                            front_camera_id = camNo;
-                        }
-                        else if (camInfo.facing == (Camera.CameraInfo.CAMERA_FACING_BACK))
-                        {
-                            back_camera_id = camNo;
-                        }
-                    }
-
-                    if (front_camera_id != -1)
-                    {
-                        camera = Camera.open(front_camera_id);
-                        active_camera_id = front_camera_id;
-                    }
-                    else
-                    {
-                        camera = Camera.open(back_camera_id);
-                        active_camera_id = back_camera_id;
-                    }
-                    camera.startPreview();
-                    preview.setCamera(camera);
-                }
-                catch (RuntimeException ex)
-                {
-                    Log.i(TAG, "Camera:099:EE:" + ex.getMessage());
-                    Toast.makeText(context_s, "Camera not found", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
     }
 
     void toggle_camera()
@@ -475,33 +404,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     protected void onPause()
     {
-        if (USE_CAM_001)
-        {
-            if (camera != null)
-            {
-                camera.stopPreview();
-                preview.setCamera(null);
-                camera.setPreviewCallback(null);
-                CameraPreviewSurfaceview.camera_preview_size_ = null;
-                camera.release();
-                camera = null;
-            }
-        }
         super.onPause();
     }
-
-    private void resetCam()
-    {
-        if (USE_CAM_001)
-        {
-            camera.startPreview();
-            preview.setCamera(camera);
-        }
-    }
-    // ----- camera preview -----
-    // ----- camera preview -----
-    // ----- camera preview -----
-
 
     public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera)
     {

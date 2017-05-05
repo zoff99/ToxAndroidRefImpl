@@ -41,6 +41,19 @@ android {
         exclude 'LICENSE.txt'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/rxjava.properties'
+//
+        exclude 'lib/armeabi/libRSSupport.so'
+        exclude 'lib/armeabi/librsjni.so'
+        exclude 'lib/arm64-v8a/libRSSupport.so'
+        exclude 'lib/arm64-v8a/librsjni.so'
+        exclude 'lib/mips64/libRSSupport.so'
+        exclude 'lib/mips64/librsjni.so'
+        exclude 'lib/mips/libRSSupport.so'
+        exclude 'lib/mips/librsjni.so'
+        exclude 'lib/x86/libRSSupport.so'
+        exclude 'lib/x86/librsjni.so'
+        exclude 'lib/x86_64/libRSSupport.so'
+        exclude 'lib/x86_64/librsjni.so'
     }
 
     lintOptions {
@@ -68,10 +81,13 @@ android {
 
     defaultConfig {
         applicationId "com.zoffcc.applications.trifa"
-        minSdkVersion 18
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 10000
         versionName "1.0.0"
+
+        renderscriptTargetApi 16
+        renderscriptSupportModeEnabled true
 
         vectorDrawables.useSupportLibrary = true
     }
