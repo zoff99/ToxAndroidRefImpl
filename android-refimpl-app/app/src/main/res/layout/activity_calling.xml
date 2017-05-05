@@ -37,21 +37,29 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/black"/>
 
-            <com.zoffcc.applications.trifa.Preview
-                android:id="@+id/video_my_preview"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="bottom|right"
-                android:background="@android:color/transparent"
-                android:gravity="center">
+            <com.zoffcc.applications.trifa.CameraSurfacePreview
+                android:id="@+id/camera_surfaceview"
+                android:layout_width="120dip"
+                android:layout_height="120dip"
+                android:layout_gravity="bottom|right">
 
-                <com.zoffcc.applications.trifa.CameraPreviewSurfaceview
-                    android:id="@+id/video_my_preview_surfaceview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent">
-                </com.zoffcc.applications.trifa.CameraPreviewSurfaceview>
-            </com.zoffcc.applications.trifa.Preview>
+            </com.zoffcc.applications.trifa.CameraSurfacePreview>
+
+            <!--<com.zoffcc.applications.trifa.Preview-->
+            <!--android:id="@+id/video_my_preview"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="100dp"-->
+            <!--android:layout_gravity="bottom|right"-->
+            <!--android:background="@android:color/transparent"-->
+            <!--android:gravity="center">-->
+
+            <!--<com.zoffcc.applications.trifa.CameraPreviewSurfaceview-->
+            <!--android:id="@+id/video_my_preview_surfaceview"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="@android:color/transparent">-->
+            <!--</com.zoffcc.applications.trifa.CameraPreviewSurfaceview>-->
+            <!--</com.zoffcc.applications.trifa.Preview>-->
 
         </FrameLayout>
 
@@ -93,9 +101,9 @@
             android:id="@+id/camera_toggle_button"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:keepScreenOn="true"
-            android:layout_gravity="center_vertical"
             android:scaleType="fitXY"
             android:src="@drawable/circle_blue"/>
 

@@ -92,7 +92,8 @@ public class CameraPreviewSurfaceview extends SurfaceView implements Camera.Prev
             {
                 e.printStackTrace();
             }
-            // camera.addCallbackBuffer(data);
+
+            camera2.addCallbackBuffer(data);
         }
     }
 }
