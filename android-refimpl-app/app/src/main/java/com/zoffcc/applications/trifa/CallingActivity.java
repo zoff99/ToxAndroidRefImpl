@@ -20,7 +20,6 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
@@ -31,20 +30,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
@@ -407,49 +403,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onPause();
     }
 
-    public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera)
-    {
-        try
-        {
-            android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-            android.hardware.Camera.getCameraInfo(cameraId, info);
-            int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-            int degrees = 0;
-            switch (rotation)
-            {
-                case Surface.ROTATION_0:
-                    degrees = 0;
-                    break;
-                case Surface.ROTATION_90:
-                    degrees = 90;
-                    break;
-                case Surface.ROTATION_180:
-                    degrees = 180;
-                    break;
-                case Surface.ROTATION_270:
-                    degrees = 270;
-                    break;
-            }
-
-            int result;
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
-            {
-                result = (info.orientation + degrees) % 360;
-                result = (360 - result) % 360;  // compensate the mirror
-            }
-            else
-            {  // back-facing
-                result = (info.orientation - degrees + 360) % 360;
-            }
-            camera.setDisplayOrientation(result);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-
     // ---------------
     @Override
     protected void onStart()
@@ -493,4 +446,5 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         SurfaceHolder holder = this.cameraSurfacePreview.getSurfaceHolder();
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
+
 }

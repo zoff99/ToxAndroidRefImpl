@@ -42,10 +42,13 @@ public class CameraWrapper
     private Camera.Parameters mCameraParamters;
     static Camera.CameraInfo cameraInfo = null;
     private static CameraWrapper mCameraWrapper;
+    static int camera_video_rotate_angle = 0;
     private boolean mIsPreviewing = false;
     private float mPreviewRate = -1.0f;
     public static final int IMAGE_HEIGHT = 720;
     public static final int IMAGE_WIDTH = 1280;
+    static byte[] data_new = null;
+    static byte[] data_new2 = null;
     private CameraPreviewCallback mCameraPreviewCallback;
     private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
@@ -159,6 +162,7 @@ public class CameraWrapper
 
     private int getRotation()
     {
+        Log.i(TAG, "[sum]================");
         Display display = CallingActivity.ca.getWindowManager().getDefaultDisplay();
         int rotation = display.getRotation();
         int degrees = 0;
@@ -183,15 +187,18 @@ public class CameraWrapper
         if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
         {
             result = (cameraInfo.orientation + degrees) % 360;
-            result = (360 - result) % 360;    // compensate the mirror
+            Log.i(TAG, "[FRONT CAMERA] tmp=" + (cameraInfo.orientation + degrees) + " result=" + result);
+            // result = (360 - result) % 360;    // compensate the mirror
         }
         else
         {
             result = (cameraInfo.orientation - degrees + 360) % 360;
         }
 
-        Log.i(TAG, "cameraInfo.orientation=" + cameraInfo.orientation);
-        Log.i(TAG, "result=" + result);
+        Log.i(TAG, "[camera]cameraInfo.orientation=" + cameraInfo.orientation);
+        Log.i(TAG, "[display]degrees=" + degrees);
+        Log.i(TAG, "[sum]result=" + result);
+        Log.i(TAG, "[sum]================");
 
         return result;
     }
@@ -201,16 +208,14 @@ public class CameraWrapper
     {
         if (this.mCamera != null)
         {
-            getRotation();
+            this.camera_video_rotate_angle = getRotation();
 
             this.mCameraParamters = this.mCamera.getParameters();
-            // this.mCameraParamters.setPreviewFormat(ImageFormat.NV21);
             this.mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
             this.mCameraParamters.setFlashMode("off");
             this.mCameraParamters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
             this.mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
             this.mCameraParamters.setPreviewSize(IMAGE_WIDTH, IMAGE_HEIGHT);
-            this.mCamera.setDisplayOrientation(90);
             mCameraPreviewCallback = new CameraPreviewCallback();
             mCamera.addCallbackBuffer(mImageCallbackBuffer);
             mCamera.setPreviewCallbackWithBuffer(mCameraPreviewCallback);
@@ -293,14 +298,62 @@ public class CameraWrapper
 
                 try
                 {
-                    video_buffer_2.rewind();
                     // Log.i(TAG, "YUV420 data bytes=" + data.length);
-                    video_buffer_2.put(data);
-                    // -------------------------------------------------
-                    // android has the order YVU (instead of YUV) !!
-                    // so we need to call ..._uv_reversed here
-                    // -------------------------------------------------
-                    toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+
+                    if (CameraWrapper.camera_video_rotate_angle == 90)
+                    {
+                        data_new = rotateYUV420Degree90(data, camera_preview_size2.width, camera_preview_size2.height);
+                        video_buffer_2.rewind();
+                        video_buffer_2.put(data_new);
+
+                        // -------------------------------------------------
+                        // android has the order YVU (instead of YUV) !!
+                        // so we need to call ..._uv_reversed here
+                        // -------------------------------------------------
+                        toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                        camera.addCallbackBuffer(data_new);
+                    }
+                    else if (CameraWrapper.camera_video_rotate_angle == 270)
+                    {
+                        data_new = rotateYUV420Degree90(data, camera_preview_size2.width, camera_preview_size2.height);
+                        data_new2 = rotateYUV420Degree90(data_new, camera_preview_size2.height, camera_preview_size2.width);
+                        data_new = rotateYUV420Degree90(data_new2, camera_preview_size2.width, camera_preview_size2.height);
+                        video_buffer_2.rewind();
+                        video_buffer_2.put(data_new);
+
+                        // -------------------------------------------------
+                        // android has the order YVU (instead of YUV) !!
+                        // so we need to call ..._uv_reversed here
+                        // -------------------------------------------------
+                        toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                        camera.addCallbackBuffer(data_new);
+                    }
+                    else if (CameraWrapper.camera_video_rotate_angle == 180)
+                    {
+                        data_new = rotateYUV420Degree90(data, camera_preview_size2.width, camera_preview_size2.height);
+                        data_new2 = rotateYUV420Degree90(data_new, camera_preview_size2.height, camera_preview_size2.width);
+                        video_buffer_2.rewind();
+                        video_buffer_2.put(data_new2);
+
+                        // -------------------------------------------------
+                        // android has the order YVU (instead of YUV) !!
+                        // so we need to call ..._uv_reversed here
+                        // -------------------------------------------------
+                        toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                        camera.addCallbackBuffer(data_new2);
+                    }
+                    else
+                    {
+                        video_buffer_2.rewind();
+                        video_buffer_2.put(data);
+
+                        // -------------------------------------------------
+                        // android has the order YVU (instead of YUV) !!
+                        // so we need to call ..._uv_reversed here
+                        // -------------------------------------------------
+                        toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                        camera.addCallbackBuffer(data);
+                    }
                 }
                 catch (java.nio.BufferOverflowException e)
                 {
@@ -310,9 +363,37 @@ public class CameraWrapper
                 {
                     e.printStackTrace();
                 }
-
-                camera.addCallbackBuffer(data);
             }
         }
     }
+
+
+    private byte[] rotateYUV420Degree90(byte[] data, int imageWidth, int imageHeight)
+    {
+        byte[] yuv = new byte[imageWidth * imageHeight * 3 / 2];
+        // Rotate the Y luma
+        int i = 0;
+        for (int x = 0; x < imageWidth; x++)
+        {
+            for (int y = imageHeight - 1; y >= 0; y--)
+            {
+                yuv[i] = data[y * imageWidth + x];
+                i++;
+            }
+        }
+        // Rotate the U and V color components
+        i = imageWidth * imageHeight * 3 / 2 - 1;
+        for (int x = imageWidth - 1; x > 0; x = x - 2)
+        {
+            for (int y = 0; y < imageHeight / 2; y++)
+            {
+                yuv[i] = data[(imageWidth * imageHeight) + (y * imageWidth) + x];
+                i--;
+                yuv[i] = data[(imageWidth * imageHeight) + (y * imageWidth) + (x - 1)];
+                i--;
+            }
+        }
+        return yuv;
+    }
+
 }

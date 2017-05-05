@@ -564,6 +564,8 @@ public class MainActivity extends AppCompatActivity
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
+    // -- this is for incoming video --
+    // -- this is for incoming video --
     static void allocate_video_buffer_1(int frame_width_px1, int frame_height_px1, long ystride, long ustride, long vstride)
     {
         if (video_buffer_1 != null)
@@ -598,11 +600,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
         Log.i(TAG, "YUV420 frame ystride=" + ystride + " ustride=" + ustride + " vstride=" + vstride);
         video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
-        long written = set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
-        //if (written > 0)
-        //{
-        //    buffer.limit(written);
-        //}
+        set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
 
         RenderScript rs = RenderScript.create(context_s);
         yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
