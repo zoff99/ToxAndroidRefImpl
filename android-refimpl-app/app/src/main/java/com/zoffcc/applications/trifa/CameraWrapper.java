@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_video_buffer2;
-import static com.zoffcc.applications.trifa.MainActivity.toxav_video_send_frame;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_video_send_frame_uv_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.video_buffer_2;
 
 public class CameraWrapper
@@ -145,7 +145,7 @@ public class CameraWrapper
         {
             this.mCameraParamters = this.mCamera.getParameters();
             // this.mCameraParamters.setPreviewFormat(ImageFormat.NV21);
-            this.mCameraParamters.setPreviewFormat(ImageFormat.YV12);
+            this.mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
             this.mCameraParamters.setFlashMode("off");
             this.mCameraParamters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
             this.mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
@@ -242,7 +242,7 @@ public class CameraWrapper
                     Log.i(TAG, "YUV420 data bytes=" + data.length);
 
                     video_buffer_2.put(data);
-                    toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                    toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
                 }
                 catch (java.nio.BufferOverflowException e)
                 {
