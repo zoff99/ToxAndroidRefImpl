@@ -546,6 +546,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native int toxav_call_control(long friendnum, int a_TOXAV_CALL_CONTROL);
 
+    public static native int toxav_video_send_frame_uv_reversed(long friendnum, int frame_width_px, int frame_height_px);
     public static native int toxav_video_send_frame(long friendnum, int frame_width_px, int frame_height_px);
 
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
