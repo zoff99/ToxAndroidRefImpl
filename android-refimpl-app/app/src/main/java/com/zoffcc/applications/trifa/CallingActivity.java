@@ -53,6 +53,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static final boolean AUTO_HIDE = true;
     private static final int AUTO_HIDE_DELAY_MILLIS = 1000;
     private static final int UI_ANIMATION_DELAY = 300;
+    private static final int FRONT_CAMERA_USED = 1;
+    private static final int BACK_CAMERA_USED = 2;
+    static int active_camera_type = FRONT_CAMERA_USED;
     private final Handler mHideHandler = new Handler();
     static ImageView mContentView;
     static ImageButton accept_button = null;
@@ -420,32 +423,49 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         try
         {
-            camera.stopPreview();
-            camera.setPreviewCallback(null);
-            CameraPreviewSurfaceview.camera_preview_size_ = null;
-            camera.release();
+            CameraWrapper.getInstance().doStopCamera();
 
-            if (active_camera_id == back_camera_id)
+            if (active_camera_type == FRONT_CAMERA_USED)
             {
-                camera = Camera.open(front_camera_id);
-                active_camera_id = front_camera_id;
+                CameraWrapper.camera_preview_size2 = null;
+                active_camera_type = BACK_CAMERA_USED;
+                CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, false);
             }
             else
             {
-                camera = Camera.open(back_camera_id);
-                active_camera_id = back_camera_id;
+                CameraWrapper.camera_preview_size2 = null;
+                active_camera_type = FRONT_CAMERA_USED;
+                CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
             }
 
-            setCameraDisplayOrientation(this, active_camera_id, camera);
+            // -----------------------
 
-            camera.setPreviewDisplay(CallingActivity.camera_preview_surface_view.getHolder());
-            camera.setPreviewCallback(CallingActivity.camera_preview_surface_view);
-            camera.startPreview();
-            // ----------------------------
-            // ----------------------------
-            preview.setCamera(camera);
-            // ----------------------------
-            // ----------------------------
+            //            camera.stopPreview();
+            //            camera.setPreviewCallback(null);
+            //            CameraPreviewSurfaceview.camera_preview_size_ = null;
+            //            camera.release();
+            //
+            //            if (active_camera_id == back_camera_id)
+            //            {
+            //                camera = Camera.open(front_camera_id);
+            //                active_camera_id = front_camera_id;
+            //            }
+            //            else
+            //            {
+            //                camera = Camera.open(back_camera_id);
+            //                active_camera_id = back_camera_id;
+            //            }
+            //
+            //            setCameraDisplayOrientation(this, active_camera_id, camera);
+            //
+            //            camera.setPreviewDisplay(CallingActivity.camera_preview_surface_view.getHolder());
+            //            camera.setPreviewCallback(CallingActivity.camera_preview_surface_view);
+            //            camera.startPreview();
+            //            // ----------------------------
+            //            // ----------------------------
+            //            preview.setCamera(camera);
+            //            // ----------------------------
+            //            // ----------------------------
         }
         catch (Exception e)
         {
@@ -538,7 +558,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             @Override
             public void run()
             {
-                CameraWrapper.getInstance().doOpenCamera(CallingActivity.this);
+                active_camera_type = FRONT_CAMERA_USED;
+                CameraWrapper.camera_preview_size2 = null;
+                CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
             }
         };
         openThread.start();
