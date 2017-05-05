@@ -23,6 +23,8 @@ import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.util.Log;
+import android.view.Display;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import java.io.IOException;
@@ -38,17 +40,14 @@ public class CameraWrapper
     private static final String TAG = "CameraWrapper";
     private Camera mCamera;
     private Camera.Parameters mCameraParamters;
+    static Camera.CameraInfo cameraInfo = null;
     private static CameraWrapper mCameraWrapper;
     private boolean mIsPreviewing = false;
     private float mPreviewRate = -1.0f;
     public static final int IMAGE_HEIGHT = 720;
     public static final int IMAGE_WIDTH = 1280;
     private CameraPreviewCallback mCameraPreviewCallback;
-    // private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT * 3 / 2) ];
-    private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT )
-            + ((CameraWrapper.IMAGE_WIDTH/2) * (CameraWrapper.IMAGE_HEIGHT/2))
-            + ((CameraWrapper.IMAGE_WIDTH/2) * (CameraWrapper.IMAGE_HEIGHT/2))
-            ];
+    private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
 
     public interface CamOpenOverCallback
@@ -80,11 +79,11 @@ public class CameraWrapper
             camera_type = Camera.CameraInfo.CAMERA_FACING_BACK;
         }
 
-        Camera.CameraInfo info = new Camera.CameraInfo();
+        cameraInfo = new Camera.CameraInfo();
         for (int i = 0; i < numCameras; i++)
         {
-            Camera.getCameraInfo(i, info);
-            if (info.facing == camera_type)
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing == camera_type)
             {
                 mCamera = Camera.open(i);
                 break;
@@ -158,10 +157,52 @@ public class CameraWrapper
         }
     }
 
+    private int getRotation()
+    {
+        Display display = CallingActivity.ca.getWindowManager().getDefaultDisplay();
+        int rotation = display.getRotation();
+        int degrees = 0;
+        int result = 0;
+
+        switch (rotation)
+        {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+
+        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
+        {
+            result = (cameraInfo.orientation + degrees) % 360;
+            result = (360 - result) % 360;    // compensate the mirror
+        }
+        else
+        {
+            result = (cameraInfo.orientation - degrees + 360) % 360;
+        }
+
+        Log.i(TAG, "cameraInfo.orientation=" + cameraInfo.orientation);
+        Log.i(TAG, "result=" + result);
+
+        return result;
+    }
+
+
     private void initCamera()
     {
         if (this.mCamera != null)
         {
+            getRotation();
+
             this.mCameraParamters = this.mCamera.getParameters();
             // this.mCameraParamters.setPreviewFormat(ImageFormat.NV21);
             this.mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
@@ -210,11 +251,6 @@ public class CameraWrapper
         @Override
         public void onPreviewFrame(byte[] data, Camera camera)
         {
-            // Log.i(TAG, "onPreviewFrame");
-            // videoEncoder.encodeFrame(data/*, encodeData*/);
-            // camera.addCallbackBuffer(data);
-
-
             // ----------------------------
             if (data == null)
             {
@@ -258,9 +294,12 @@ public class CameraWrapper
                 try
                 {
                     video_buffer_2.rewind();
-                    Log.i(TAG, "YUV420 data bytes=" + data.length);
-
+                    // Log.i(TAG, "YUV420 data bytes=" + data.length);
                     video_buffer_2.put(data);
+                    // -------------------------------------------------
+                    // android has the order YVU (instead of YUV) !!
+                    // so we need to call ..._uv_reversed here
+                    // -------------------------------------------------
                     toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
                 }
                 catch (java.nio.BufferOverflowException e)
