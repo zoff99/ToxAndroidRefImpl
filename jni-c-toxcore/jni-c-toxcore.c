@@ -1530,6 +1530,30 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv* env
 	return (jint)res;
 }
 
+
+// reverse the order of the U and V planes ---------------
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1uv_1reversed(JNIEnv* env, jobject thiz, jlong friend_number, jint frame_width_px, jint frame_height_px)
+{
+	TOXAV_ERR_SEND_FRAME error;
+
+	video_buffer_2_y_size = (int)(frame_width_px * frame_height_px);
+	video_buffer_2_u_size = (int)(video_buffer_2_y_size / 4);
+	video_buffer_2_v_size = (int)(video_buffer_2_y_size / 4);
+	// reversed -----------
+	// reversed -----------
+	video_buffer_2_v = (uint8_t*)(video_buffer_2 + video_buffer_2_y_size);
+	video_buffer_2_u = (uint8_t*)(video_buffer_2 + video_buffer_2_y_size + video_buffer_2_u_size);
+	// reversed -----------
+	// reversed -----------
+	bool res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px, (uint16_t)frame_height_px,
+		(uint8_t*)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error);
+
+	return (jint)error;
+}
+// reverse the order of the U and V planes ---------------
+
+
 /**
  * Send a video frame to a friend.
  *
