@@ -31,14 +31,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.MainActivity.set_JNI_video_buffer2;
-import static com.zoffcc.applications.trifa.MainActivity.toxav_video_send_frame_uv_reversed;
-import static com.zoffcc.applications.trifa.MainActivity.video_buffer_2;
-
 public class CameraWrapper
 {
     private static final String TAG = "CameraWrapper";
-    static  Camera mCamera;
+    static Camera mCamera;
     private Camera.Parameters mCameraParamters;
     static Camera.CameraInfo cameraInfo = null;
     private static CameraWrapper mCameraWrapper;
@@ -50,7 +46,7 @@ public class CameraWrapper
     static byte[] data_new = null;
     static byte[] data_new2 = null;
     private CameraPreviewCallback mCameraPreviewCallback;
-    private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
+    // private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
 
     public interface CamOpenOverCallback
@@ -222,8 +218,9 @@ public class CameraWrapper
             this.mCamera.setDisplayOrientation(90); // always 90 ??
             Log.i(TAG, "preview size after 2=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
             mCameraPreviewCallback = new CameraPreviewCallback();
-            mCamera.addCallbackBuffer(mImageCallbackBuffer);
-            mCamera.setPreviewCallbackWithBuffer(mCameraPreviewCallback);
+            // mCamera.addCallbackBuffer(mImageCallbackBuffer);
+            mCamera.setPreviewCallback(mCameraPreviewCallback);
+            // mCamera.setPreviewCallbackWithBuffer(mCameraPreviewCallback);
             List<String> focusModes = this.mCameraParamters.getSupportedFocusModes();
             if (focusModes.contains("continuous-video"))
             {
@@ -239,18 +236,17 @@ public class CameraWrapper
     class CameraPreviewCallback implements Camera.PreviewCallback
     {
         private static final String TAG = "CameraPreviewCallback";
-        private VideoEncoderFromBuffer videoEncoder = null;
 
         private CameraPreviewCallback()
         {
-            videoEncoder = new VideoEncoderFromBuffer(CameraWrapper.IMAGE_WIDTH, CameraWrapper.IMAGE_HEIGHT);
+            // videoEncoder = new VideoEncoderFromBuffer(CameraWrapper.IMAGE_WIDTH, CameraWrapper.IMAGE_HEIGHT);
         }
 
         void close()
         {
             try
             {
-                videoEncoder.close();
+                // videoEncoder.close();
             }
             catch (Exception e) // java.lang.IllegalStateException
             {
@@ -273,10 +269,10 @@ public class CameraWrapper
                     camera_preview_size2 = p.getPreviewSize();
                     Log.i(TAG, "onPreviewFrame:w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height);
 
-                    if (video_buffer_2 != null)
+                    if (MainActivity.video_buffer_2 != null)
                     {
                         // video_buffer_2.clear();
-                        video_buffer_2 = null;
+                        MainActivity.video_buffer_2 = null;
                     }
 
                 /*
@@ -297,8 +293,8 @@ public class CameraWrapper
 
                     Log.i(TAG, "YUV420 frame w1=" + camera_preview_size2.width + " h1=" + camera_preview_size2.height + " bytes=" + buffer_size_in_bytes2);
                     Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes2);
-                    video_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes2 + 1);
-                    set_JNI_video_buffer2(video_buffer_2, camera_preview_size2.width, camera_preview_size2.height);
+                    MainActivity.video_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes2 + 1);
+                    MainActivity.set_JNI_video_buffer2(MainActivity.video_buffer_2, camera_preview_size2.width, camera_preview_size2.height);
                 }
 
                 try
@@ -308,14 +304,14 @@ public class CameraWrapper
                     if (CameraWrapper.camera_video_rotate_angle == 90)
                     {
                         data_new = rotateYUV420Degree90(data, camera_preview_size2.width, camera_preview_size2.height);
-                        video_buffer_2.rewind();
-                        video_buffer_2.put(data_new);
+                        MainActivity.video_buffer_2.rewind();
+                        MainActivity.video_buffer_2.put(data_new);
 
                         // -------------------------------------------------
                         // android has the order YVU (instead of YUV) !!
                         // so we need to call ..._uv_reversed here
                         // -------------------------------------------------
-                        toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                        MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
                         camera.addCallbackBuffer(data_new);
                     }
                     else if (CameraWrapper.camera_video_rotate_angle == 270)
@@ -323,41 +319,41 @@ public class CameraWrapper
                         data_new = rotateYUV420Degree90(data, camera_preview_size2.width, camera_preview_size2.height);
                         data_new2 = rotateYUV420Degree90(data_new, camera_preview_size2.height, camera_preview_size2.width);
                         data_new = rotateYUV420Degree90(data_new2, camera_preview_size2.width, camera_preview_size2.height);
-                        video_buffer_2.rewind();
-                        video_buffer_2.put(data_new);
+                        MainActivity.video_buffer_2.rewind();
+                        MainActivity.video_buffer_2.put(data_new);
 
                         // -------------------------------------------------
                         // android has the order YVU (instead of YUV) !!
                         // so we need to call ..._uv_reversed here
                         // -------------------------------------------------
-                        toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                        MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
                         camera.addCallbackBuffer(data_new);
                     }
                     else if (CameraWrapper.camera_video_rotate_angle == 180)
                     {
                         data_new = rotateYUV420Degree90(data, camera_preview_size2.width, camera_preview_size2.height);
                         data_new2 = rotateYUV420Degree90(data_new, camera_preview_size2.height, camera_preview_size2.width);
-                        video_buffer_2.rewind();
-                        video_buffer_2.put(data_new2);
+                        MainActivity.video_buffer_2.rewind();
+                        MainActivity.video_buffer_2.put(data_new2);
 
                         // -------------------------------------------------
                         // android has the order YVU (instead of YUV) !!
                         // so we need to call ..._uv_reversed here
                         // -------------------------------------------------
-                        toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                        MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
                         camera.addCallbackBuffer(data_new2);
                     }
                     else
                     {
-                        video_buffer_2.rewind();
-                        video_buffer_2.put(data);
+                        MainActivity.video_buffer_2.rewind();
+                        MainActivity.video_buffer_2.put(data);
 
                         // -------------------------------------------------
                         // android has the order YVU (instead of YUV) !!
                         // so we need to call ..._uv_reversed here
                         // -------------------------------------------------
-                        toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
-                        camera.addCallbackBuffer(data);
+                        MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                        // camera.addCallbackBuffer(data);
                     }
                 }
                 catch (java.nio.BufferOverflowException e)
