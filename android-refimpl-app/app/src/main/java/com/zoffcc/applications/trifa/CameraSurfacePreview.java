@@ -21,10 +21,13 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.util.List;
 
 public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.Callback
 {
@@ -32,6 +35,9 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     public static final String TAG = "CameraSurfacePreview";
     SurfaceHolder mSurfaceHolder;
     Context mContext;
+    static List<Camera.Size> mSupportedPreviewSizes = null;
+    static Camera.Size mPreviewSize = null;
+
     CameraWrapper mCameraWrapper;
 
     @SuppressWarnings("deprecation")
@@ -43,6 +49,66 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         this.mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         this.mSurfaceHolder.addCallback(this);
+    }
+
+    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h)
+    {
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio = (double) h / w;
+
+        if (sizes == null)
+        {
+            return null;
+        }
+
+        Camera.Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
+        for (Camera.Size size : sizes)
+        {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
+            {
+                continue;
+            }
+            if (Math.abs(size.height - targetHeight) < minDiff)
+            {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+
+        if (optimalSize == null)
+        {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes)
+            {
+                if (Math.abs(size.height - targetHeight) < minDiff)
+                {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
+    }
+
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+    {
+        Log.i(TAG, "onMeasure");
+        final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+        final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+        setMeasuredDimension(width, height);
+
+        if (mSupportedPreviewSizes != null)
+        {
+            mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+            Log.i(TAG, "mPreviewSize=" + mPreviewSize.width+","+mPreviewSize.height);
+        }
     }
 
     @Override

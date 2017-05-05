@@ -45,8 +45,8 @@ public class CameraWrapper
     static int camera_video_rotate_angle = 0;
     private boolean mIsPreviewing = false;
     private float mPreviewRate = -1.0f;
-    public static final int IMAGE_HEIGHT = 720;
-    public static final int IMAGE_WIDTH = 1280;
+    public static final int IMAGE_WIDTH = 640; // 1280
+    public static final int IMAGE_HEIGHT = 480; // 720
     static byte[] data_new = null;
     static byte[] data_new2 = null;
     private CameraPreviewCallback mCameraPreviewCallback;
@@ -209,13 +209,18 @@ public class CameraWrapper
         if (this.mCamera != null)
         {
             this.camera_video_rotate_angle = getRotation();
+            CameraSurfacePreview.mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
 
             this.mCameraParamters = this.mCamera.getParameters();
             this.mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
             this.mCameraParamters.setFlashMode("off");
             this.mCameraParamters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
             this.mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
+            Log.i(TAG, "preview size before=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
             this.mCameraParamters.setPreviewSize(IMAGE_WIDTH, IMAGE_HEIGHT);
+            Log.i(TAG, "preview size after 1=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
+            this.mCamera.setDisplayOrientation(90); // always 90 ??
+            Log.i(TAG, "preview size after 2=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
             mCameraPreviewCallback = new CameraPreviewCallback();
             mCamera.addCallbackBuffer(mImageCallbackBuffer);
             mCamera.setPreviewCallbackWithBuffer(mCameraPreviewCallback);
@@ -395,5 +400,6 @@ public class CameraWrapper
         }
         return yuv;
     }
+
 
 }
