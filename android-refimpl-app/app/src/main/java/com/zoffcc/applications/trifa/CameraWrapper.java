@@ -218,9 +218,7 @@ public class CameraWrapper
             this.mCamera.setDisplayOrientation(90); // always 90 ??
             Log.i(TAG, "preview size after 2=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
             mCameraPreviewCallback = new CameraPreviewCallback();
-            // mCamera.addCallbackBuffer(mImageCallbackBuffer);
             mCamera.setPreviewCallback(mCameraPreviewCallback);
-            // mCamera.setPreviewCallbackWithBuffer(mCameraPreviewCallback);
             List<String> focusModes = this.mCameraParamters.getSupportedFocusModes();
             if (focusModes.contains("continuous-video"))
             {
@@ -312,7 +310,7 @@ public class CameraWrapper
                         // so we need to call ..._uv_reversed here
                         // -------------------------------------------------
                         MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
-                        camera.addCallbackBuffer(data_new);
+                        // camera.addCallbackBuffer(data_new);
                     }
                     else if (CameraWrapper.camera_video_rotate_angle == 270)
                     {
@@ -327,7 +325,7 @@ public class CameraWrapper
                         // so we need to call ..._uv_reversed here
                         // -------------------------------------------------
                         MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
-                        camera.addCallbackBuffer(data_new);
+                        // camera.addCallbackBuffer(data_new);
                     }
                     else if (CameraWrapper.camera_video_rotate_angle == 180)
                     {
@@ -341,7 +339,7 @@ public class CameraWrapper
                         // so we need to call ..._uv_reversed here
                         // -------------------------------------------------
                         MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
-                        camera.addCallbackBuffer(data_new2);
+                        // camera.addCallbackBuffer(data_new2);
                     }
                     else
                     {
