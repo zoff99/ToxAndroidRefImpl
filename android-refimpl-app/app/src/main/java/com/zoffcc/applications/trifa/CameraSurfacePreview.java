@@ -24,6 +24,7 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -51,7 +52,53 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         this.mSurfaceHolder.addCallback(this);
     }
 
-    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h)
+    private Camera.Size getOptimalPreviewSize_2(List<Camera.Size> sizes, int w, int h)
+    {
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio = (double) h / w;
+
+        if (sizes == null)
+        {
+            return null;
+        }
+
+        Camera.Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
+        for (Camera.Size size : sizes)
+        {
+            double ratio = (double) size.height / size.width;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
+            {
+                continue;
+            }
+
+            if (Math.abs(size.height - targetHeight) < minDiff)
+            {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+
+        if (optimalSize == null)
+        {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes)
+            {
+                if (Math.abs(size.height - targetHeight) < minDiff)
+                {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+
+        return optimalSize;
+    }
+
+    private Camera.Size getOptimalPreviewSize_1(List<Camera.Size> sizes, int w, int h)
     {
         final double ASPECT_TOLERANCE = 0.1;
         double targetRatio = (double) h / w;
@@ -96,18 +143,58 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     }
 
 
+    public static int convertDpToPixels(float dp, Context context)
+    {
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
+        return px;
+    }
+
+    public static int convertSpToPixels(float sp, Context context)
+    {
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+        return px;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
         Log.i(TAG, "onMeasure");
-        final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-        final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-        setMeasuredDimension(width, height);
+        int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+        int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+        // setMeasuredDimension(width, height);
+        width = convertDpToPixels(120, getContext());
+        height = convertDpToPixels(120, getContext());
+
 
         if (mSupportedPreviewSizes != null)
         {
-            mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
-            Log.i(TAG, "mPreviewSize=" + mPreviewSize.width+","+mPreviewSize.height);
+            mPreviewSize = getOptimalPreviewSize_1(mSupportedPreviewSizes, width, height);
+            Log.i(TAG, "mOptimalPreviewSize(1)=" + mPreviewSize.width + "," + mPreviewSize.height);
+            mPreviewSize = getOptimalPreviewSize_2(mSupportedPreviewSizes, width, height);
+            Log.i(TAG, "mOptimalPreviewSize(2)=" + mPreviewSize.width + "," + mPreviewSize.height);
+        }
+
+        if (mPreviewSize != null)
+        {
+            float ratio;
+            if (mPreviewSize.height >= mPreviewSize.width)
+            {
+                ratio = (float) mPreviewSize.height / (float) mPreviewSize.width;
+            }
+            else
+            {
+                ratio = (float) mPreviewSize.width / (float) mPreviewSize.height;
+            }
+
+            Log.i(TAG, "raio=" + ratio + " w=" + width + " h=" + height + " wmin=" + widthMeasureSpec + " hmin=" + heightMeasureSpec);
+
+            // One of these methods should be used, second method squishes preview slightly
+            setMeasuredDimension(width, (int) (width * ratio));
+            //  setMeasuredDimension((int) (width * ratio), height);
+        }
+        else
+        {
+            setMeasuredDimension(width, height);
         }
     }
 
@@ -121,6 +208,18 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
         Log.i(TAG, "surfaceChanged...");
+        try
+        {
+            Camera.Parameters parameters = CameraWrapper.mCamera.getParameters();
+            parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+            CameraWrapper.mCamera.setParameters(parameters);
+            CameraWrapper.mCamera.startPreview();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "surfaceChanged:EE:" + e.getMessage());
+        }
     }
 
     @Override

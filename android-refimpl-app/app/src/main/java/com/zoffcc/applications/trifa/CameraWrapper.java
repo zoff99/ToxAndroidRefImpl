@@ -38,7 +38,7 @@ import static com.zoffcc.applications.trifa.MainActivity.video_buffer_2;
 public class CameraWrapper
 {
     private static final String TAG = "CameraWrapper";
-    private Camera mCamera;
+    static  Camera mCamera;
     private Camera.Parameters mCameraParamters;
     static Camera.CameraInfo cameraInfo = null;
     private static CameraWrapper mCameraWrapper;
