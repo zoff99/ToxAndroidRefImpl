@@ -19,13 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -253,89 +251,90 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     }
 
 
-    private final Runnable mHidePart2Runnable = new Runnable()
-    {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run()
-        {
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
+    //    private final Runnable mHidePart2Runnable = new Runnable()
+    //    {
+    //        @SuppressLint("InlinedApi")
+    //        @Override
+    //        public void run()
+    //        {
+    //            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    //        }
+    //    };
 
-    private final Runnable mShowPart2Runnable = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null)
-            {
-                actionBar.show();
-            }
-        }
-    };
+    //    private final Runnable mShowPart2Runnable = new Runnable()
+    //    {
+    //        @Override
+    //        public void run()
+    //        {
+    //            ActionBar actionBar = getSupportActionBar();
+    //            if (actionBar != null)
+    //            {
+    //                actionBar.show();
+    //            }
+    //        }
+    //    };
+
     private boolean mVisible;
-    private final Runnable mHideRunnable = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            hide();
-        }
-    };
+    //    private final Runnable mHideRunnable = new Runnable()
+    //    {
+    //        @Override
+    //        public void run()
+    //        {
+    //            hide();
+    //        }
+    //    };
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
         super.onPostCreate(savedInstanceState);
-        delayedHide(100);
+        // delayedHide(100);
     }
 
-    private void toggle()
-    {
-        if (mVisible)
-        {
-            hide();
-        }
-        else
-        {
-            show();
-        }
-    }
+    //    private void toggle()
+    //    {
+    //        if (mVisible)
+    //        {
+    //            hide();
+    //        }
+    //        else
+    //        {
+    //            show();
+    //        }
+    //    }
 
-    private void hide()
-    {
-        // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-        {
-            actionBar.hide();
-        }
-        mVisible = false;
+    //    private void hide()
+    //    {
+    //        // Hide UI first
+    //        ActionBar actionBar = getSupportActionBar();
+    //        if (actionBar != null)
+    //        {
+    //            actionBar.hide();
+    //        }
+    //        mVisible = false;
+    //
+    //        // Schedule a runnable to remove the status and navigation bar after a delay
+    //        mHideHandler.removeCallbacks(mShowPart2Runnable);
+    //        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
+    //    }
 
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
-    }
+    //    @SuppressLint("InlinedApi")
+    //    private void show()
+    //    {
+    //        // Show the system bar
+    //        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+    //        mVisible = true;
+    //
+    //        // Schedule a runnable to display UI elements after a delay
+    //        mHideHandler.removeCallbacks(mHidePart2Runnable);
+    //        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
+    //    }
 
-    @SuppressLint("InlinedApi")
-    private void show()
-    {
-        // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    private void delayedHide(int delayMillis)
-    {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
-    }
+    //    private void delayedHide(int delayMillis)
+    //    {
+    //        mHideHandler.removeCallbacks(mHideRunnable);
+    //        mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    //    }
 
 
     @Override
@@ -362,40 +361,33 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 active_camera_type = FRONT_CAMERA_USED;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
             }
-
-            // -----------------------
-
-            //            camera.stopPreview();
-            //            camera.setPreviewCallback(null);
-            //            CameraPreviewSurfaceview.camera_preview_size_ = null;
-            //            camera.release();
-            //
-            //            if (active_camera_id == back_camera_id)
-            //            {
-            //                camera = Camera.open(front_camera_id);
-            //                active_camera_id = front_camera_id;
-            //            }
-            //            else
-            //            {
-            //                camera = Camera.open(back_camera_id);
-            //                active_camera_id = back_camera_id;
-            //            }
-            //
-            //            setCameraDisplayOrientation(this, active_camera_id, camera);
-            //
-            //            camera.setPreviewDisplay(CallingActivity.camera_preview_surface_view.getHolder());
-            //            camera.setPreviewCallback(CallingActivity.camera_preview_surface_view);
-            //            camera.startPreview();
-            //            // ----------------------------
-            //            // ----------------------------
-            //            preview.setCamera(camera);
-            //            // ----------------------------
-            //            // ----------------------------
         }
         catch (Exception e)
         {
         }
     }
+
+    // -------------------------------------------------------
+    // TODO
+    // this is a bad workaround to really show the cam preview
+    // -------------------------------------------------------
+    static void reinit_camera(CallingActivity c)
+    {
+        try
+        {
+            Log.i(TAG,"active_camera_type(1)="+active_camera_type);
+            CameraWrapper.getInstance().doStopCamera();
+            Log.i(TAG,"active_camera_type(2)="+active_camera_type);
+            CameraWrapper.camera_preview_size2 = null;
+            Log.i(TAG,"active_camera_type(3)="+active_camera_type);
+            CameraWrapper.getInstance().doOpenCamera(c, true);
+            Log.i(TAG,"active_camera_type(4)="+active_camera_type);
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
 
     @Override
     protected void onPause()
@@ -415,6 +407,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             @Override
             public void run()
             {
+                try
+                {
+                    // Thread.sleep(5000);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 active_camera_type = FRONT_CAMERA_USED;
                 CameraWrapper.camera_preview_size2 = null;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);

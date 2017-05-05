@@ -33,7 +33,7 @@ import java.util.List;
 public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.Callback
 {
 
-    public static final String TAG = "CameraSurfacePreview";
+    public static final String TAG = "trifa.CameraSurfacePrv";
     SurfaceHolder mSurfaceHolder;
     Context mContext;
     static List<Camera.Size> mSupportedPreviewSizes = null;
@@ -168,8 +168,8 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
 
         if (mSupportedPreviewSizes != null)
         {
-            mPreviewSize = getOptimalPreviewSize_1(mSupportedPreviewSizes, width, height);
-            Log.i(TAG, "mOptimalPreviewSize(1)=" + mPreviewSize.width + "," + mPreviewSize.height);
+            // mPreviewSize = getOptimalPreviewSize_1(mSupportedPreviewSizes, width, height);
+            // Log.i(TAG, "mOptimalPreviewSize(1)=" + mPreviewSize.width + "," + mPreviewSize.height);
             mPreviewSize = getOptimalPreviewSize_2(mSupportedPreviewSizes, width, height);
             Log.i(TAG, "mOptimalPreviewSize(2)=" + mPreviewSize.width + "," + mPreviewSize.height);
         }
@@ -202,6 +202,19 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     public void surfaceCreated(SurfaceHolder holder)
     {
         Log.i(TAG, "surfaceCreated...");
+
+        try
+        {
+            Log.i(TAG, "surfaceCreated:re init camera:START");
+            CallingActivity.reinit_camera(CallingActivity.ca);
+            Log.i(TAG, "surfaceCreated:re init camera:READY");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "surfaceCreated:EE1:" + e.getMessage());
+        }
+
     }
 
     @Override
@@ -210,16 +223,24 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         Log.i(TAG, "surfaceChanged...");
         try
         {
-            Camera.Parameters parameters = CameraWrapper.mCamera.getParameters();
-            parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-            CameraWrapper.mCamera.setParameters(parameters);
             CameraWrapper.mCamera.startPreview();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "surfaceChanged:EE:" + e.getMessage());
+            Log.i(TAG, "surfaceChanged:EE1:" + e.getMessage());
         }
+
+        try
+        {
+            CameraWrapper.mCamera.startPreview();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "surfaceChanged:EE2:" + e.getMessage());
+        }
+
     }
 
     @Override

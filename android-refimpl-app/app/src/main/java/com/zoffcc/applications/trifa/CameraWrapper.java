@@ -106,18 +106,22 @@ public class CameraWrapper
         Log.i(TAG, "doStartPreview...");
         if (mIsPreviewing)
         {
+            Log.i(TAG, "doStartPreview:stopPreview");
             this.mCamera.stopPreview();
             return;
         }
 
         try
         {
+            Log.i(TAG, "doStartPreview:setPreviewDisplay");
             this.mCamera.setPreviewDisplay(holder);
         }
         catch (IOException e)
         {
+            Log.i(TAG, "doStartPreview:EE:"+e.getMessage());
             e.printStackTrace();
         }
+        Log.i(TAG, "doStartPreview:initCamera");
         initCamera();
     }
 
@@ -225,6 +229,7 @@ public class CameraWrapper
                 this.mCameraParamters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             }
             this.mCamera.setParameters(this.mCameraParamters);
+
             this.mCamera.startPreview();
 
             this.mIsPreviewing = true;
