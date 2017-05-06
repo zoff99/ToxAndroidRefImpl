@@ -374,6 +374,20 @@ public class MainActivity extends AppCompatActivity
         return f;
     }
 
+    static int is_friend_online(long friendnum)
+    {
+        try
+        {
+            return (TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList().get(0).TOX_CONNECTION);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return 0;
+        }
+
+    }
+
     synchronized static void set_all_friends_offline()
     {
 

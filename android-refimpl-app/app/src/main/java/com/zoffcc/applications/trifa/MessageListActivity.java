@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -38,12 +37,13 @@ import com.mikepenz.iconics.IconicsDrawable;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
+import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
-import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
+import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListActivity extends AppCompatActivity
 {
@@ -140,7 +140,19 @@ public class MessageListActivity extends AppCompatActivity
 
     public void start_call_to_friend(View view)
     {
-        Log.i(TAG,"start_call_to_friend");
+        Log.i(TAG, "start_call_to_friend");
+
+        if (!is_tox_started)
+        {
+            Log.i(TAG, "TOX:offline");
+            return;
+        }
+
+        if (is_friend_online(friendnum) == 0)
+        {
+            Log.i(TAG, "TOX:friend offline");
+            return;
+        }
 
         final long fn = friendnum;
 
