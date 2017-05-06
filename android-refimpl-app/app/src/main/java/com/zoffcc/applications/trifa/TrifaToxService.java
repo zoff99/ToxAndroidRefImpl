@@ -107,14 +107,72 @@ public class TrifaToxService extends Service
     }
 
 
-    void stop_me()
+    void stop_me(boolean exit_app)
     {
         Log.i(TAG, "stop_me");
         stopSelf();
+        if (exit_app)
+        {
+            try
+            {
+                Log.i(TAG, "stop_me:001");
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Log.i(TAG, "stop_me:002");
+                        long i = 0;
+                        while (is_tox_started)
+                        {
+                            i++;
+                            if (i > 2000)
+                            {
+                                break;
+                            }
+
+                            Log.i(TAG, "stop_me:003");
+
+                            try
+                            {
+                                Thread.sleep(300);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        Log.i(TAG, "stop_me:004");
+
+                        try
+                        {
+                            Thread.sleep(2000);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        Log.i(TAG, "stop_me:005");
+
+                        MainActivity.exit();
+
+                        Log.i(TAG, "stop_me:099");
+                    }
+                };
+                t.start();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     void stop_tox_fg()
     {
+        Log.i(TAG, "stop_tox_fg");
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -145,6 +203,8 @@ public class TrifaToxService extends Service
 
     void tox_thread_start_fg()
     {
+        Log.i(TAG, "tox_thread_start_fg");
+
         ToxServiceThread = new Thread()
         {
             @Override

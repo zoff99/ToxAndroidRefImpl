@@ -669,7 +669,8 @@ void android_tox_callback_friend_typing_cb(uint32_t friend_number, bool is_typin
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	// TODO
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+		android_tox_callback_friend_typing_cb_method, (jlong)(unsigned long long)friend_number, (jlong)is_typing);
 }
 
 void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data)
@@ -682,7 +683,8 @@ void android_tox_callback_friend_read_receipt_cb(uint32_t friend_number, uint32_
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	// TODO
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+		android_tox_callback_friend_read_receipt_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)message_id);
 }
 
 void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data)
@@ -1478,6 +1480,33 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
     dbg(9, "add friend norequest");
 	return (jlong)(unsigned long long)friendnum;
 }
+
+
+// -----------------------
+// TODO
+// -----------------------
+/*
+void tox_self_get_public_key(const Tox *tox, uint8_t *public_key);
+void tox_self_get_secret_key(const Tox *tox, uint8_t *secret_key);
+uint32_t tox_self_get_nospam(const Tox *tox);
+bool tox_friend_exists(const Tox *tox, uint32_t friend_number);
+bool tox_friend_get_public_key(const Tox *tox, uint32_t friend_number, uint8_t *public_key,
+TOX_ERR_FRIEND_GET_PUBLIC_KEY *error);
+uint64_t tox_friend_get_last_online(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_GET_LAST_ONLINE *error);
+TOX_USER_STATUS tox_friend_get_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
+TOX_CONNECTION tox_friend_get_connection_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
+bool tox_friend_get_typing(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
+bool tox_hash(uint8_t *hash, const uint8_t *data, size_t length);
+
+void tox_self_set_nospam(Tox *tox, uint32_t nospam);
+bool tox_self_set_name(Tox *tox, const uint8_t *name, size_t length, TOX_ERR_SET_INFO *error);
+bool tox_self_set_status_message(Tox *tox, const uint8_t *status_message, size_t length, TOX_ERR_SET_INFO *error);
+void tox_self_set_status(Tox *tox, TOX_USER_STATUS status);
+bool tox_self_set_typing(Tox *tox, uint32_t friend_number, bool typing, TOX_ERR_SET_TYPING *error);
+*/
+// -----------------------
+// TODO
+// -----------------------
 
 
 // ------------------- AV -------------------

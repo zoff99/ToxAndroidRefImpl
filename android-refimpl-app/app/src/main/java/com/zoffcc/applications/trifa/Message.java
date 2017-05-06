@@ -44,7 +44,6 @@ public class Message
     @Nullable
     String filename_fullpath = null;
 
-
     static Message deep_copy(Message in)
     {
         Message out = new Message();
@@ -56,6 +55,7 @@ public class Message
         out.read = in.read;
         out.text = in.text;
         out.filename_fullpath = in.filename_fullpath;
+        out.message_id = in.message_id;
 
         return out;
     }
@@ -63,6 +63,6 @@ public class Message
     @Override
     public String toString()
     {
-        return tox_friendnum + ":" + direction + ":" + TOX_MESSAGE_TYPE + ":" + sent_timestamp + ":" + rcvd_timestamp + ":" + read + ":" + text + ":" + filename_fullpath;
+        return tox_friendnum + ":" + direction + ":" + TOX_MESSAGE_TYPE + ":" + sent_timestamp + ":" + rcvd_timestamp + ":" + read + ":" + text + ":" + filename_fullpath + ":" + message_id;
     }
 }

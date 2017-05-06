@@ -127,7 +127,8 @@ public class MainActivity extends AppCompatActivity
         // -------- drawer ------------
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("Profile").withIcon(GoogleMaterial.Icon.gmd_face);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName("Settings").withIcon(GoogleMaterial.Icon.gmd_settings);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Logout").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
+        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Logout/Login").withIcon(GoogleMaterial.Icon.gmd_refresh);
+        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
         Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
 
@@ -143,69 +144,91 @@ public class MainActivity extends AppCompatActivity
 
 
         // create the drawer and remember the `Drawer` result object
-        main_drawer = new DrawerBuilder().withActivity(this).addDrawerItems(item1, new DividerDrawerItem(), item2, item3).withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-        {
-            @Override
-            public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
-            {
-                Log.i(TAG, "drawer:item=" + position);
-                if (position == 1)
+        main_drawer = new DrawerBuilder().
+                withActivity(this).
+                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4).
+                withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).
+                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                 {
-                    // profile
-                    try
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
                     {
-                        if (Callstate.state == 0)
+                        Log.i(TAG, "drawer:item=" + position);
+                        if (position == 1)
                         {
-                            Log.i(TAG, "start profile activity");
-                            Intent intent = new Intent(context_s, ProfileActivity.class);
-                            main_activity_s.startActivityForResult(intent, ProfileActivity_ID);
+                            // profile
+                            try
+                            {
+                                if (Callstate.state == 0)
+                                {
+                                    Log.i(TAG, "start profile activity");
+                                    Intent intent = new Intent(context_s, ProfileActivity.class);
+                                    main_activity_s.startActivityForResult(intent, ProfileActivity_ID);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-                else if (position == 3)
-                {
-                    // settings
-                    try
-                    {
-                        if (Callstate.state == 0)
+                        else if (position == 3)
                         {
-                            Log.i(TAG, "start settings activity");
-                            Intent intent = new Intent(context_s, SettingsActivity.class);
-                            main_activity_s.startActivityForResult(intent, SettingsActivity_ID);
+                            // settings
+                            try
+                            {
+                                if (Callstate.state == 0)
+                                {
+                                    Log.i(TAG, "start settings activity");
+                                    Intent intent = new Intent(context_s, SettingsActivity.class);
+                                    main_activity_s.startActivityForResult(intent, SettingsActivity_ID);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-                else if (position == 4)
-                {
-                    // logout/login
-                    try
-                    {
-                        if (is_tox_started)
+                        else if (position == 4)
                         {
-                            tox_service_fg.stop_tox_fg();
+                            // logout/login
+                            try
+                            {
+                                if (is_tox_started)
+                                {
+                                    tox_service_fg.stop_tox_fg();
+                                }
+                                else
+                                {
+                                    init(app_files_directory);
+                                    tox_service_fg.tox_thread_start_fg();
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
-                        else
+                        else if (position == 5)
                         {
-                            init(app_files_directory);
-                            tox_service_fg.tox_thread_start_fg();
+                            // Exit
+                            try
+                            {
+                                if (is_tox_started)
+                                {
+                                    tox_service_fg.stop_tox_fg();
+                                    tox_service_fg.stop_me(true);
+                                }
+
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
+                        return true;
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-                return true;
-            }
-        }).build();
+                }).build();
+
         // -------- drawer ------------
         // -------- drawer ------------
         // -------- drawer ------------
@@ -415,6 +438,18 @@ public class MainActivity extends AppCompatActivity
                 status_message(f.status_message).
                 TOX_CONNECTION(f.TOX_CONNECTION).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
+                execute();
+    }
+
+    synchronized static void update_message_id_db(Message m)
+    {
+        TrifaToxService.orma.updateMessage().
+                idEq(m.id).
+                read(m.read).
+                text(m.text).
+                sent_timestamp(m.sent_timestamp).
+                rcvd_timestamp(m.rcvd_timestamp).
+                filename_fullpath(m.filename_fullpath).
                 execute();
     }
 
@@ -863,8 +898,31 @@ public class MainActivity extends AppCompatActivity
     {
     }
 
-    static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long b)
+    static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
     {
+        Log.i(TAG, "friend_read_receipt:friend:" + friend_number + " message_id:" + message_id);
+
+        try
+        {
+            // FriendList f = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friend_number).toList().get(0);
+            Message m = TrifaToxService.orma.selectFromMessage().
+                    message_idEq(message_id).
+                    tox_friendnumEq(friend_number).
+                    directionEq(1).
+                    toList().get(0);
+
+            if (m != null)
+            {
+                update_message_id_db(m);
+                // TODO this updates all messages. should be done nicer and faster!
+                update_message_view();
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "friend_read_receipt:EE:" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     static void android_tox_callback_friend_request_cb_method(String friend_public_key, String friend_request_message, long length)

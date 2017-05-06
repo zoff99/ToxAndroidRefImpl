@@ -156,6 +156,7 @@ public class MessageListActivity extends AppCompatActivity
 
             if (res > -1)
             {
+                m.message_id = res;
                 insert_into_message_db(m, true);
                 ml_new_message.setText("");
             }
