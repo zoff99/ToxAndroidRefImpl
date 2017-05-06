@@ -1012,13 +1012,6 @@ void *thread_video_av(void *data)
 
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
-{
-	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir));
-}
-
-
-JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir)
 {
 	const char *s = NULL;
@@ -1137,6 +1130,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject 
         dbg(2, "AV video Thread successfully created");
 	}
 	// start toxav thread ------------------------------
+}
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
+{
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir));
 }
 
 

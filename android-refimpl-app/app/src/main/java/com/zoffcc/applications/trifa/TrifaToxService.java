@@ -152,7 +152,6 @@ public class TrifaToxService extends Service
                 is_tox_started = true;
                 if (!old_is_tox_started)
                 {
-                    MainActivity.init(getFilesDir().getAbsolutePath());
                     MainActivity.bootstrap();
                 }
                 final String my_ToxId = MainActivity.get_my_toxid();

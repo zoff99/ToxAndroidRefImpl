@@ -204,7 +204,6 @@ public class MainActivity extends AppCompatActivity
 
         String native_api = getNativeLibAPI();
         mt.setText(mt.getText() + "\n" + native_api);
-
         mt.setText(mt.getText() + "\n" + "c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
         mt.setText(mt.getText() + "\n" + "jni-c-toxcore:v" + jnictoxcore_version());
 
@@ -222,6 +221,8 @@ public class MainActivity extends AppCompatActivity
         // default: "${applicationId}.orma.db"
 
         app_files_directory = getFilesDir().getAbsolutePath();
+        init(app_files_directory);
+
         tox_thread_start();
     }
 
@@ -426,9 +427,9 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public static native void init(@NonNull String data_dir);
+    public native void init(@NonNull String data_dir);
 
-    public static native String getNativeLibAPI();
+    public native String getNativeLibAPI();
 
     public static native void update_savedata_file();
 
