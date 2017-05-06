@@ -564,6 +564,14 @@ public class MainActivity extends AppCompatActivity
 
     public static native long[] tox_self_get_friend_list();
 
+    public static native int tox_self_set_name(@NonNull String name);
+
+    public static native int tox_self_set_status_message(@NonNull String status_message);
+
+    public static native void tox_self_set_status(int a_TOX_USER_STATUS);
+
+    public static native int tox_self_set_typing(long friend_number, int typing);
+
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -1111,6 +1119,15 @@ public class MainActivity extends AppCompatActivity
                     FriendList f = new FriendList();
                     f.tox_public_key_string = friend_public_key;
                     f.tox_friendnum = friendnum;
+                    try
+                    {
+                        f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        f.name = "Unknown";
+                    }
                     f.TOX_USER_STATUS = 0;
                     f.TOX_CONNECTION = 0;
 
