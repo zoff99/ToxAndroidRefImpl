@@ -47,7 +47,7 @@ public class TrifaToxService extends Service
     static boolean stop_me = false;
     static OrmaDatabase orma = null;
     static boolean is_tox_started = false;
-    static boolean global_toxid_text_set=false;
+    static boolean global_toxid_text_set = false;
 
 
     @Override
@@ -152,9 +152,9 @@ public class TrifaToxService extends Service
             {
                 // ------ correct startup order ------
                 boolean old_is_tox_started = is_tox_started;
-                Log.i(TAG,"is_tox_started:==============================");
-                Log.i(TAG,"is_tox_started="+is_tox_started);
-                Log.i(TAG,"is_tox_started:==============================");
+                Log.i(TAG, "is_tox_started:==============================");
+                Log.i(TAG, "is_tox_started=" + is_tox_started);
+                Log.i(TAG, "is_tox_started:==============================");
 
                 is_tox_started = true;
                 if (!old_is_tox_started)
@@ -222,7 +222,7 @@ public class TrifaToxService extends Service
 
                     if (MainActivity.friend_list_fragment != null)
                     {
-                         MainActivity.friend_list_fragment.add_friends(f);
+                        MainActivity.friend_list_fragment.add_friends(f);
                     }
 
                     if (exists_in_db == false)

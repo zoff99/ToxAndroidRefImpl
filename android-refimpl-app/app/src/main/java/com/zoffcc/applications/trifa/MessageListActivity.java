@@ -64,6 +64,8 @@ public class MessageListActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_message_list);
 
+        MainActivity.message_list_activity = this;
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -73,6 +75,7 @@ public class MessageListActivity extends AppCompatActivity
         ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
 
         ml_icon.setImageResource(R.drawable.circle_red);
+        set_friend_status_icon();
 
         Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
         ml_phone_icon.setImageDrawable(d1);
@@ -102,6 +105,34 @@ public class MessageListActivity extends AppCompatActivity
     long get_current_friendnum()
     {
         return friendnum;
+    }
+
+    public void set_friend_status_icon()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (is_friend_online(friendnum) == 0)
+                    {
+                        ml_icon.setImageResource(R.drawable.circle_red);
+                    }
+                    else
+                    {
+                        ml_icon.setImageResource(R.drawable.circle_green);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "CALL:start:(2):EE:" + e.getMessage());
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
     }
 
     public void send_message_onclick(View view)

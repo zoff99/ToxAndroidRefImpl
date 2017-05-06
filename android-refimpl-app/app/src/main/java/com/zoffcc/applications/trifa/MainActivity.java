@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
     static long[] friends = null;
     static FriendListFragment friend_list_fragment = null;
     static MessageListFragment message_list_fragment = null;
+    static MessageListActivity message_list_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
@@ -830,6 +831,14 @@ public class MainActivity extends AppCompatActivity
             {
                 f.TOX_USER_STATUS = a_TOX_USER_STATUS;
                 update_friend_in_db(f);
+                try
+                {
+                    message_list_activity.set_friend_status_icon();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
