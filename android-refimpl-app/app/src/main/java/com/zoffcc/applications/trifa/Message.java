@@ -47,6 +47,7 @@ public class Message
     static Message deep_copy(Message in)
     {
         Message out = new Message();
+        out.id = in.id;
         out.tox_friendnum = in.tox_friendnum;
         out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
@@ -63,6 +64,6 @@ public class Message
     @Override
     public String toString()
     {
-        return tox_friendnum + ":" + direction + ":" + TOX_MESSAGE_TYPE + ":" + sent_timestamp + ":" + rcvd_timestamp + ":" + read + ":" + text + ":" + filename_fullpath + ":" + message_id;
+        return "id=" + id + ", message_id=" + message_id + ", tox_friendnum=" + tox_friendnum + ", direction=" + direction + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", filename_fullpath=" + filename_fullpath;
     }
 }

@@ -441,7 +441,7 @@ public class MainActivity extends AppCompatActivity
                 execute();
     }
 
-    synchronized static void update_message_id_db(Message m)
+    synchronized static void update_message_in_db(Message m)
     {
         TrifaToxService.orma.updateMessage().
                 idEq(m.id).
@@ -452,6 +452,16 @@ public class MainActivity extends AppCompatActivity
                 filename_fullpath(m.filename_fullpath).
                 execute();
     }
+
+    static void update_message_in_db_read_rcvd_timestamp(Message m)
+    {
+        TrifaToxService.orma.updateMessage().
+                idEq(m.id).
+                read(m.read).
+                rcvd_timestamp(m.rcvd_timestamp).
+                execute();
+    }
+
 
     static void change_notification(int a_TOXCONNECTION)
     {
@@ -572,6 +582,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_self_set_typing(long friend_number, int typing);
 
+    public static native int tox_friend_get_connection_status(long friend_number);
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -912,20 +923,23 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            // FriendList f = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friend_number).toList().get(0);
+            // there can be older messages with same message_id for this friend! so always take the latest one! -------
             Message m = TrifaToxService.orma.selectFromMessage().
                     message_idEq(message_id).
                     tox_friendnumEq(friend_number).
                     directionEq(1).
+                    orderByIdDesc().
                     toList().get(0);
+            // there can be older messages with same message_id for this friend! so always take the latest one! -------
 
-            Log.i(TAG, "friend_read_receipt:m=" + m.toString());
+            // Log.i(TAG, "friend_read_receipt:m=" + m);
+            Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendnum=" + m.tox_friendnum + " read=" + m.read + " direction=" + m.direction);
 
             if (m != null)
             {
                 m.rcvd_timestamp = System.currentTimeMillis();
                 m.read = true;
-                update_message_id_db(m);
+                update_message_in_db_read_rcvd_timestamp(m);
                 // TODO this updates all messages. should be done nicer and faster!
                 update_message_view();
             }

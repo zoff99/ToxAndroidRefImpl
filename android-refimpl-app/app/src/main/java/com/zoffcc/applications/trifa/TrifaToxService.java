@@ -36,6 +36,7 @@ import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 
@@ -245,8 +246,10 @@ public class TrifaToxService extends Service
                 }
                 // ------ correct startup order ------
 
-                tox_self_set_name("abcd");
-                tox_self_set_status_message("status message");
+                // TODO --------
+                tox_self_set_name("TRIfA");
+                tox_self_set_status_message("this is TRIfA");
+                // TODO --------
 
                 MainActivity.friends = MainActivity.tox_self_get_friend_list();
                 Log.i(TAG, "number of friends=" + MainActivity.friends.length);
@@ -283,6 +286,17 @@ public class TrifaToxService extends Service
                     {
                         Log.i(TAG, "found friend in DB " + f.tox_friendnum + " f=" + f);
                         exists_in_db = true;
+                    }
+
+                    try
+                    {
+                        // get the real "live" connection status of this friend
+                        // the value in the database may be old (and wrong)
+                        f.TOX_CONNECTION = tox_friend_get_connection_status(f.tox_friendnum);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
                     }
 
                     if (MainActivity.friend_list_fragment != null)

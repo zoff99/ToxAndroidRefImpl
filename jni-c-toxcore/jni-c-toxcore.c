@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 4
-static const char global_version_string[] = "0.99.4";
+#define VERSION_PATCH 5
+static const char global_version_string[] = "0.99.5";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -1520,6 +1520,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1typing(JNIEnv* e
 	return (jint)res;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1connection_1status(JNIEnv* env, jobject thiz, jlong friend_number)
+{
+	TOX_ERR_FRIEND_QUERY error;
+	TOX_CONNECTION res = tox_friend_get_connection_status(tox_global, (uint32_t)friend_number, &error);
+	return (jint)res;
+}
+
+
 
 // -----------------------
 // TODO
@@ -1533,7 +1542,6 @@ bool tox_friend_get_public_key(const Tox *tox, uint32_t friend_number, uint8_t *
 TOX_ERR_FRIEND_GET_PUBLIC_KEY *error);
 uint64_t tox_friend_get_last_online(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_GET_LAST_ONLINE *error);
 TOX_USER_STATUS tox_friend_get_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
-TOX_CONNECTION tox_friend_get_connection_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
 bool tox_friend_get_typing(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
 bool tox_hash(uint8_t *hash, const uint8_t *data, size_t length);
 

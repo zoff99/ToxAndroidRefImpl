@@ -79,9 +79,7 @@ public class MessageListFragment extends ListFragment
                     Log.i(TAG, "scroll to bottom:1");
                     Thread.sleep(300); // TODO: really back hack!!
                     // scroll to bottom
-                    Log.i(TAG, "scroll to bottom:2");
                     scroll_to_bottom();
-                    Log.i(TAG, "scroll to bottom:2");
                 }
                 catch (Exception e)
                 {

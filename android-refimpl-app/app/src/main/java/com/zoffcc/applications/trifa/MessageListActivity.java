@@ -24,6 +24,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -42,6 +44,7 @@ import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -53,6 +56,9 @@ public class MessageListActivity extends AppCompatActivity
     TextView ml_maintext = null;
     ImageView ml_icon = null;
     ImageButton ml_phone_icon = null;
+    int global_typing = 0;
+    Thread typing_flag_thread = null;
+    final static int TYPING_FLAG_DEACTIVATE_DELAY_IN_MILLIS = 1000; // 1 second
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -76,6 +82,73 @@ public class MessageListActivity extends AppCompatActivity
 
         ml_icon.setImageResource(R.drawable.circle_red);
         set_friend_status_icon();
+
+
+        ml_new_message.addTextChangedListener(new TextWatcher()
+        {
+
+            public void afterTextChanged(Editable s)
+            {
+                // TODO bad hack!
+                Log.i(TAG, "TextWatcher:afterTextChanged");
+                if (global_typing == 0)
+                {
+                    global_typing = 1;  // typing = 1
+                    tox_self_set_typing(friendnum, global_typing);
+                    Log.i(TAG, "typing:fn#" + friendnum + ":activated");
+                }
+
+                try
+                {
+                    typing_flag_thread.interrupt();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                typing_flag_thread = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        boolean skip_flag_update = false;
+                        try
+                        {
+                            Thread.sleep(TYPING_FLAG_DEACTIVATE_DELAY_IN_MILLIS); // sleep for n seconds
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            // ok, dont update typing flag
+                            skip_flag_update = true;
+                        }
+
+                        if (global_typing == 1)
+                        {
+                            if (skip_flag_update == false)
+                            {
+                                global_typing = 0;  // typing = 0
+                                tox_self_set_typing(friendnum, global_typing);
+                                Log.i(TAG, "typing:fn#" + friendnum + ":DEactivated");
+                            }
+                        }
+                    }
+                };
+                typing_flag_thread.start();
+                // TODO bad hack! sends way too many "typing" messages --------
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+                // Log.i(TAG,"TextWatcher:beforeTextChanged");
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                // Log.i(TAG,"TextWatcher:onTextChanged");
+            }
+        });
 
         Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
         ml_phone_icon.setImageDrawable(d1);
@@ -153,6 +226,7 @@ public class MessageListActivity extends AppCompatActivity
             m.text = msg;
 
             long res = tox_friend_send_message(friendnum, 0, msg);
+            Log.i(TAG, "tox_friend_send_message:result=" + res);
 
             if (res > -1)
             {
@@ -160,7 +234,6 @@ public class MessageListActivity extends AppCompatActivity
                 insert_into_message_db(m, true);
                 ml_new_message.setText("");
             }
-            Log.i(TAG, "tox_friend_send_message:result=" + res);
 
         }
         catch (Exception e)
