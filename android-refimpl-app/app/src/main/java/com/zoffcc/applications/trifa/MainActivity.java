@@ -21,7 +21,6 @@ package com.zoffcc.applications.trifa;
 
 import android.app.Activity;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,7 +32,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.support.v8.renderscript.Allocation;
 import android.support.v8.renderscript.Element;
@@ -66,17 +64,17 @@ import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activi
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
-    TextView mt = null;
+    static TextView mt = null;
     static boolean native_lib_loaded = false;
     static String app_files_directory = "";
-    static boolean stop_me = false;
-    static Thread ToxServiceThread = null;
+    // static boolean stop_me = false;
+    // static Thread ToxServiceThread = null;
     Handler main_handler = null;
     static Handler main_handler_s = null;
     static Context context_s = null;
     static Activity main_activity_s = null;
     static Notification notification = null;
-    static NotificationManager nMN = null;
+    // static NotificationManager nMN = null;
     static int NOTIFICATION_ID = 293821038;
     static RemoteViews notification_view = null;
     static long[] friends = null;
@@ -91,6 +89,7 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
+    static TrifaToxService tox_service_fg = null;
 
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -217,187 +216,127 @@ public class MainActivity extends AppCompatActivity
         app_files_directory = getFilesDir().getAbsolutePath();
         init(app_files_directory);
 
-        // -- notification ------------------
-        // -- notification ------------------
-        nMN = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        notification_view = new RemoteViews(getPackageName(), R.layout.custom_notification);
-        Log.i(TAG, "contentView=" + notification_view);
-        notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-        notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
-        notification_view.setTextViewText(R.id.text, "");
+        // --- forground service ---
+        // --- forground service ---
+        // --- forground service ---
+        Intent i = new Intent(this, TrifaToxService.class);
+        startService(i);
+        // --- forground service ---
+        // --- forground service ---
+        // --- forground service ---
 
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
-        b.setContent(notification_view);
-        b.setSmallIcon(R.drawable.circle_red);
-        notification = b.build();
-        notification.flags |= Notification.FLAG_NO_CLEAR;
-        nMN.notify(NOTIFICATION_ID, notification);
-        // -- notification ------------------
-        // -- notification ------------------
 
         tox_thread_start();
     }
 
     void tox_thread_start()
     {
-        ToxServiceThread = new Thread()
+        try
         {
-            @Override
-            public void run()
+            Thread t = new Thread()
             {
-                // ------ correct startup order ------
-                bootstrap();
-                final String my_ToxId = get_my_toxid();
-                Log.i(TAG, "my_ToxId=" + my_ToxId);
-
-
-                // -------------- DEBUG --------------
-                // -------------- DEBUG --------------
-                // -------------- DEBUG --------------
-                // ------ // orma.deleteAll();
-                // -------------- DEBUG --------------
-                // -------------- DEBUG --------------
-                // -------------- DEBUG --------------
-
-                Runnable myRunnable = new Runnable()
+                @Override
+                public void run()
                 {
-                    @Override
-                    public void run()
+                    long counter = 0;
+                    while (tox_service_fg == null)
                     {
-                        mt.setText(mt.getText() + "\n" + "my_ToxId=" + my_ToxId);
-                    }
-                };
-                main_handler_s.post(myRunnable);
+                        counter++;
+                        if (counter > 100)
+                        {
+                            break;
+                        }
 
-                init_tox_callbacks();
-                update_savedata_file();
-                // ------ correct startup order ------
-
-                friends = tox_self_get_friend_list();
-                Log.i(TAG, "number of friends=" + friends.length);
-
-                int fc = 0;
-                boolean exists_in_db = false;
-                for (fc = 0; fc < friends.length; fc++)
-                {
-                    Log.i(TAG, "loading friend  #:" + fc);
-
-                    FriendList f;
-                    List<FriendList> fl = orma.selectFromFriendList().tox_friendnumEq(fc).toList();
-                    if (fl.size() > 0)
-                    {
-                        f = fl.get(0);
-                    }
-                    else
-                    {
-                        f = null;
+                        try
+                        {
+                            Thread.sleep(100);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
 
-                    if (f == null)
-                    {
-                        Log.i(TAG, "fc is null");
-
-                        f = new FriendList();
-                        f.tox_public_key_string = "" + (Math.random() * 100000);
-                        f.tox_friendnum = fc;
-                        f.name = "friend #" + fc;
-                        exists_in_db = false;
-                    }
-                    else
-                    {
-                        Log.i(TAG, "found friend in DB " + f.tox_friendnum + " f=" + f);
-                        exists_in_db = true;
-                    }
-
-                    f.TOX_CONNECTION = 0;
-                    if (friend_list_fragment != null)
-                    {
-                        friend_list_fragment.add_friends(f);
-                    }
-
-                    // set all to OFFLINE and AVAILABLE
-                    f.TOX_USER_STATUS = 0;
-                    f.TOX_CONNECTION = 0;
-                    // set all to OFFLINE and AVAILABLE
-
-                    if (exists_in_db == false)
-                    {
-                        orma.insertIntoFriendList(f);
-                    }
-                    else
-                    {
-                        orma.updateFriendList().tox_friendnumEq(f.tox_friendnum).tox_friendnum(f.tox_friendnum).tox_public_key_string(f.tox_public_key_string).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
-                    }
-                }
-
-                long tox_iteration_interval_ms = tox_iteration_interval();
-                Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
-
-                tox_iterate();
-
-                while (!stop_me)
-                {
                     try
                     {
-                        sleep(tox_iteration_interval_ms);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
+
+                        tox_service_fg.tox_thread_start_fg();
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
-                    tox_iterate();
-
                 }
-
-                try
-                {
-                    tox_kill();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        ToxServiceThread.start();
+            };
+            t.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG,"tox_thread_start:EE:"+e.getMessage());
+        }
     }
 
     static void stop_tox()
     {
-        Runnable myRunnable = new Runnable()
+        try
         {
-            @Override
-            public void run()
+            Thread t = new Thread()
             {
-                stop_me = true;
-                ToxServiceThread.interrupt();
-                try
+                @Override
+                public void run()
                 {
-                    ToxServiceThread.join();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                    long counter = 0;
+                    while (tox_service_fg == null)
+                    {
+                        counter++;
+                        if (counter > 100)
+                        {
+                            break;
+                        }
 
-                nMN.cancel(NOTIFICATION_ID);
-                MainActivity.exit();
-            }
-        };
-        main_handler_s.post(myRunnable);
+                        try
+                        {
+                            Thread.sleep(100);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    try
+                    {
+
+                        tox_service_fg.stop_tox_fg();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG,"stop_tox:EE:"+e.getMessage());
+        }
     }
 
     @Override
     protected void onDestroy()
     {
-        nMN.cancel(NOTIFICATION_ID);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onNewIntent(Intent i)
+    {
+        Log.i(TAG, "onNewIntent:i=" + i);
+        super.onNewIntent(i);
     }
 
     static FriendList main_get_friend(long friendnum)
@@ -430,53 +369,59 @@ public class MainActivity extends AppCompatActivity
 
     static void change_notification(int a_TOXCONNECTION)
     {
-
-        final int a_TOXCONNECTION__f = a_TOXCONNECTION;
-        Runnable myRunnable = new Runnable()
+        Log.i(TAG, "change_notification");
+        final int a_TOXCONNECTION_f = a_TOXCONNECTION;
+        try
         {
-            @Override
-            public void run()
+            Thread t = new Thread()
             {
-                NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
-
-                if (a_TOXCONNECTION__f == 0)
+                @Override
+                public void run()
                 {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-                    b.setSmallIcon(R.drawable.circle_red);
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
-                }
-                else
-                {
-                    if (a_TOXCONNECTION__f == 1)
+                    long counter = 0;
+                    while (tox_service_fg == null)
                     {
-                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                        b.setSmallIcon(R.drawable.circle_green);
-                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
+                        counter++;
+                        if (counter > 10)
+                        {
+                            break;
+                        }
+                        // Log.i(TAG, "change_notification:sleep");
+
+                        try
+                        {
+                            Thread.sleep(100);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
-                    else // if (a_TOXCONNECTION__f == 2)
+                    Log.i(TAG, "change_notification:change");
+                    try
                     {
-                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                        b.setSmallIcon(R.drawable.circle_green);
-                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+
+                        tox_service_fg.change_notification_fg(a_TOXCONNECTION_f);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
                     }
                 }
-                notification_view.setTextViewText(R.id.text, "");
-
-                b.setContent(notification_view);
-                notification = b.build();
-                notification.flags |= Notification.FLAG_NO_CLEAR;
-                nMN.notify(NOTIFICATION_ID, notification);
-
-            }
-        };
-        main_handler_s.post(myRunnable);
+            };
+            t.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onBackPressed()
     {
         super.onBackPressed();
-        stop_tox();
+        // ******** // stop_tox();
     }
 
     static
@@ -1090,5 +1035,6 @@ public class MainActivity extends AppCompatActivity
 
         return result;
     }
+
 }
 
