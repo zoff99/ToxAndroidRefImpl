@@ -182,6 +182,26 @@ public class MainActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
+                else if (position == 4)
+                {
+                    // logout/login
+                    try
+                    {
+                        if (is_tox_started)
+                        {
+                            tox_service_fg.stop_tox_fg();
+                        }
+                        else
+                        {
+                            init(app_files_directory);
+                            tox_service_fg.tox_thread_start_fg();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
                 return true;
             }
         }).build();
@@ -267,7 +287,8 @@ public class MainActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
-            }; t.start();
+            };
+            t.start();
         }
         catch (Exception e)
         {
@@ -351,6 +372,23 @@ public class MainActivity extends AppCompatActivity
         }
 
         return f;
+    }
+
+    synchronized static void set_all_friends_offline()
+    {
+
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                TrifaToxService.orma.updateFriendList().
+                        TOX_CONNECTION(0).
+                        execute();
+                friend_list_fragment.set_all_friends_to_offline();
+            }
+        };
+        t.start();
     }
 
     synchronized static void update_friend_in_db(FriendList f)

@@ -32,7 +32,9 @@ import android.widget.RemoteViews;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
+import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 
 public class TrifaToxService extends Service
 {
@@ -44,6 +46,7 @@ public class TrifaToxService extends Service
     static boolean stop_me = false;
     static OrmaDatabase orma = null;
     static boolean is_tox_started = false;
+    static boolean global_toxid_text_set=false;
 
 
     @Override
@@ -127,9 +130,12 @@ public class TrifaToxService extends Service
                     e.printStackTrace();
                 }
 
+                stop_me = false; // reset flag again!
+                change_notification(0); // set to offline
+                set_all_friends_offline();
                 is_tox_started = false;
 
-                nmn2.cancel(ONGOING_NOTIFICATION_ID);
+                // nmn2.cancel(ONGOING_NOTIFICATION_ID); // -> cant remove notification because of foreground service
                 // ** // MainActivity.exit();
             }
         };
@@ -154,15 +160,17 @@ public class TrifaToxService extends Service
                 {
                     MainActivity.bootstrap();
                 }
-                final String my_ToxId = MainActivity.get_my_toxid();
-                Log.i(TAG, "my_ToxId=" + my_ToxId);
 
                 Runnable myRunnable = new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + my_ToxId);
+                        if (!global_toxid_text_set)
+                        {
+                            global_toxid_text_set = true;
+                            MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + my_ToxId);
+                        }
                     }
                 };
                 MainActivity.main_handler_s.post(myRunnable);
@@ -179,6 +187,7 @@ public class TrifaToxService extends Service
 
                 int fc = 0;
                 boolean exists_in_db = false;
+                MainActivity.friend_list_fragment.clear_friends();
                 for (fc = 0; fc < MainActivity.friends.length; fc++)
                 {
                     Log.i(TAG, "loading friend  #:" + fc);
@@ -212,7 +221,7 @@ public class TrifaToxService extends Service
 
                     if (MainActivity.friend_list_fragment != null)
                     {
-                        MainActivity.friend_list_fragment.add_friends(f);
+                         MainActivity.friend_list_fragment.add_friends(f);
                     }
 
                     if (exists_in_db == false)
