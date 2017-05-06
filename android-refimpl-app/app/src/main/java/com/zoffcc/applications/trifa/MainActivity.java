@@ -60,6 +60,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
+import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -221,8 +222,6 @@ public class MainActivity extends AppCompatActivity
         // default: "${applicationId}.orma.db"
 
         app_files_directory = getFilesDir().getAbsolutePath();
-        init(app_files_directory);
-
         tox_thread_start();
     }
 
@@ -256,6 +255,11 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
+                        if (!is_tox_started)
+                        {
+                            init(app_files_directory);
+                        }
+
                         tox_service_fg.tox_thread_start_fg();
                     }
                     catch (Exception e)
@@ -263,8 +267,7 @@ public class MainActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
                 }
-            };
-            t.start();
+            }; t.start();
         }
         catch (Exception e)
         {
