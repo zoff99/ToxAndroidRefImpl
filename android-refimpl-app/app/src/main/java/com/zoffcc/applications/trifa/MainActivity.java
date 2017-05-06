@@ -29,6 +29,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.sax.TextElementListener;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -40,6 +41,7 @@ import android.support.v8.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.v8.renderscript.Type;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
@@ -267,6 +269,17 @@ public class MainActivity extends AppCompatActivity
 
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
+
+
+        // ----- Java Crash -----
+        // ----- Java Crash -----
+        // ----- Java Crash -----
+        // EditText et=null;
+        // et.setText("aaa");
+        // ----- Java Crash -----
+        // ----- Java Crash -----
+        // ----- Java Crash -----
+
     }
 
     void tox_thread_start()
