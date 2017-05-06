@@ -247,7 +247,8 @@ public class TrifaToxService extends Service
                 // ------ correct startup order ------
 
                 // TODO --------
-                tox_self_set_name("TRIfA");
+                String my_tox_id_local = get_my_toxid();
+                tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5, my_tox_id_local.length()));
                 tox_self_set_status_message("this is TRIfA");
                 // TODO --------
 

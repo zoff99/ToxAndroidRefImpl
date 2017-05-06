@@ -54,7 +54,9 @@ public class MessageListActivity extends AppCompatActivity
     long friendnum = -1;
     EditText ml_new_message = null;
     TextView ml_maintext = null;
+    static TextView ml_friend_typing = null;
     ImageView ml_icon = null;
+    ImageView ml_status_icon = null;
     ImageButton ml_phone_icon = null;
     int global_typing = 0;
     Thread typing_flag_thread = null;
@@ -76,13 +78,18 @@ public class MessageListActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         ml_new_message = (EditText) findViewById(R.id.ml_new_message);
+        ml_friend_typing = (TextView) findViewById(R.id.ml_friend_typing);
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
+        ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
         ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
 
         ml_icon.setImageResource(R.drawable.circle_red);
+        set_friend_connection_status_icon();
+        ml_status_icon.setImageResource(R.drawable.circle_green);
         set_friend_status_icon();
 
+        ml_friend_typing.setText("");
 
         ml_new_message.addTextChangedListener(new TextWatcher()
         {
@@ -181,6 +188,42 @@ public class MessageListActivity extends AppCompatActivity
     }
 
     public void set_friend_status_icon()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    int tox_user_status_friend = TrifaToxService.orma.selectFromFriendList().
+                            tox_friendnumEq(friendnum).
+                            toList().get(0).TOX_USER_STATUS;
+
+                    if (tox_user_status_friend == 0)
+                    {
+                        ml_status_icon.setImageResource(R.drawable.circle_green);
+                    }
+                    else if (tox_user_status_friend == 1)
+                    {
+                        ml_status_icon.setImageResource(R.drawable.circle_orange);
+                    }
+                    else
+                    {
+                        ml_status_icon.setImageResource(R.drawable.circle_red);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "CALL:start:(2):EE:" + e.getMessage());
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
+    }
+
+    public void set_friend_connection_status_icon()
     {
         Runnable myRunnable = new Runnable()
         {

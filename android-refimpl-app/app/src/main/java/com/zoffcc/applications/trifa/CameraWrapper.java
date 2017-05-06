@@ -45,6 +45,7 @@ public class CameraWrapper
     public static final int IMAGE_HEIGHT = 480; // 720
     static byte[] data_new = null;
     static byte[] data_new2 = null;
+    static boolean mirror_cam_image = true; // mirror the camera image (correct video, but uses more CPU !!)
     private CameraPreviewCallback mCameraPreviewCallback;
     // private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
@@ -311,30 +312,40 @@ public class CameraWrapper
                         if (CameraWrapper.camera_video_rotate_angle == 90)
                         {
                             data_new = rotateYUV420Degree90(data, camera_preview_size2.width, camera_preview_size2.height);
-                            MainActivity.video_buffer_2.rewind();
-                            MainActivity.video_buffer_2.put(data_new);
 
-                            // -------------------------------------------------
-                            // android has the order YVU (instead of YUV) !!
-                            // so we need to call ..._uv_reversed here
-                            // -------------------------------------------------
-                            MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
-                            // camera.addCallbackBuffer(data_new);
+                            if (mirror_cam_image)
+                            {
+                                data_new2 = flipYUV420Horizontal(data_new, camera_preview_size2.height, camera_preview_size2.width);
+                                MainActivity.video_buffer_2.rewind();
+                                MainActivity.video_buffer_2.put(data_new2);
+                                MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                            }
+                            else
+                            {
+                                MainActivity.video_buffer_2.rewind();
+                                MainActivity.video_buffer_2.put(data_new);
+                                MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                            }
                         }
                         else if (CameraWrapper.camera_video_rotate_angle == 270)
                         {
                             data_new = rotateYUV420Degree90(data, camera_preview_size2.width, camera_preview_size2.height);
                             data_new2 = rotateYUV420Degree90(data_new, camera_preview_size2.height, camera_preview_size2.width);
                             data_new = rotateYUV420Degree90(data_new2, camera_preview_size2.width, camera_preview_size2.height);
-                            MainActivity.video_buffer_2.rewind();
-                            MainActivity.video_buffer_2.put(data_new);
 
-                            // -------------------------------------------------
-                            // android has the order YVU (instead of YUV) !!
-                            // so we need to call ..._uv_reversed here
-                            // -------------------------------------------------
-                            MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
-                            // camera.addCallbackBuffer(data_new);
+                            if (mirror_cam_image)
+                            {
+                                data_new2 = flipYUV420Horizontal(data_new, camera_preview_size2.height, camera_preview_size2.width);
+                                MainActivity.video_buffer_2.rewind();
+                                MainActivity.video_buffer_2.put(data_new2);
+                                MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                            }
+                            else
+                            {
+                                MainActivity.video_buffer_2.rewind();
+                                MainActivity.video_buffer_2.put(data_new);
+                                MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                            }
                         }
                         else if (CameraWrapper.camera_video_rotate_angle == 180)
                         {
@@ -377,11 +388,47 @@ public class CameraWrapper
     }
 
 
+    private byte[] flipYUV420Horizontal(byte[] data, int imageWidth, int imageHeight)
+    {
+        byte[] yuv = new byte[imageWidth * imageHeight * 3 / 2];
+
+        // flip the Y plane
+        int i = 0; // start of Y plane
+        for (int y = 0; y < imageHeight; y++)
+        {
+            for (int x = imageWidth - 1; x >= 0; x--)
+            {
+                yuv[i] = data[y * imageWidth + x];
+                i++;
+            }
+        }
+
+        // flip the U+V plane at the same time
+        int w = (imageWidth / 2);
+        int h = (imageHeight / 2);
+        i = (imageWidth * imageHeight); // start of U plane
+        int i_2 = (imageWidth * imageHeight) + (w * h); // start of V plane
+        int offset = i;
+        int offset_2 = i_2;
+        for (int y = 0; y < imageHeight; y++)
+        {
+            for (int x = imageWidth - 1; x >= 0; x--)
+            {
+                yuv[i] = data[offset + (y * w + x)];
+                i++;
+                yuv[i_2] = data[offset_2 + (y * w + x)];
+                i_2++;
+            }
+        }
+
+        return yuv;
+    }
+
     private byte[] rotateYUV420Degree90(byte[] data, int imageWidth, int imageHeight)
     {
         byte[] yuv = new byte[imageWidth * imageHeight * 3 / 2];
         // Rotate the Y luma
-        int i = 0;
+        int i = 0; // start of Y plane
         for (int x = 0; x < imageWidth; x++)
         {
             for (int y = imageHeight - 1; y >= 0; y--)
@@ -390,18 +437,38 @@ public class CameraWrapper
                 i++;
             }
         }
-        // Rotate the U and V color components
-        i = imageWidth * imageHeight * 3 / 2 - 1;
-        for (int x = imageWidth - 1; x > 0; x = x - 2)
+
+        //        // Rotate the U and V color components (interleaved)
+        //        i = imageWidth * imageHeight * 3 / 2 - 1;
+        //        for (int x = imageWidth - 1; x > 0; x = x - 2)
+        //        {
+        //            for (int y = 0; y < imageHeight / 2; y++)
+        //            {
+        //                yuv[i] = data[(imageWidth * imageHeight) + (y * imageWidth) + x];
+        //                i--;
+        //                yuv[i] = data[(imageWidth * imageHeight) + (y * imageWidth) + (x - 1)];
+        //                i--;
+        //            }
+        //        }
+
+        // Rotate the U+V plane at the same time
+        int w = (imageWidth / 2);
+        int h = (imageHeight / 2);
+        i = (imageWidth * imageHeight); // start of U plane
+        int i_2 = (imageWidth * imageHeight) + (w * h); // start of V plane
+        int offset = i;
+        int offset_2 = i_2;
+        for (int x = 0; x < w; x++)
         {
-            for (int y = 0; y < imageHeight / 2; y++)
+            for (int y = h - 1; y >= 0; y--)
             {
-                yuv[i] = data[(imageWidth * imageHeight) + (y * imageWidth) + x];
-                i--;
-                yuv[i] = data[(imageWidth * imageHeight) + (y * imageWidth) + (x - 1)];
-                i--;
+                yuv[i] = data[offset + (y * w + x)];
+                i++;
+                yuv[i_2] = data[offset_2 + (y * w + x)];
+                i_2++;
             }
         }
+
         return yuv;
     }
 

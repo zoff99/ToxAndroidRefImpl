@@ -1528,7 +1528,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1connection_1st
 	return (jint)res;
 }
 
-
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1delete(JNIEnv* env, jobject thiz, jlong friend_number)
+{
+	TOX_ERR_FRIEND_DELETE error;
+	bool res = tox_friend_delete(tox_global, (uint32_t)friend_number, &error);
+	return (jint)res;
+}
 
 // -----------------------
 // TODO

@@ -29,7 +29,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.sax.TextElementListener;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -41,7 +40,6 @@ import android.support.v8.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.v8.renderscript.Type;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
@@ -62,6 +60,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
+import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 
 public class MainActivity extends AppCompatActivity
@@ -596,6 +595,9 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_self_set_typing(long friend_number, int typing);
 
     public static native int tox_friend_get_connection_status(long friend_number);
+
+    public static native int tox_friend_delete(long friend_number);
+
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -891,22 +893,28 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
 
-        if (friend_list_fragment != null)
+        FriendList f = main_get_friend(friend_number);
+        if (f != null)
         {
-            FriendList f = main_get_friend(friend_number);
-            if (f != null)
+            f.TOX_USER_STATUS = a_TOX_USER_STATUS;
+            update_friend_in_db(f);
+
+            try
             {
-                f.TOX_USER_STATUS = a_TOX_USER_STATUS;
-                update_friend_in_db(f);
-                try
-                {
-                    message_list_activity.set_friend_status_icon();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                message_list_activity.set_friend_status_icon();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
                 friend_list_fragment.modify_friend(f, friend_number);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
     }
@@ -921,13 +929,54 @@ public class MainActivity extends AppCompatActivity
             {
                 f.TOX_CONNECTION = a_TOX_CONNECTION;
                 update_friend_in_db(f);
-                friend_list_fragment.modify_friend(f, friend_number);
+
+                try
+                {
+                    message_list_activity.set_friend_connection_status_icon();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    friend_list_fragment.modify_friend(f, friend_number);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    static void android_tox_callback_friend_typing_cb_method(long friend_number, int b)
+    static void android_tox_callback_friend_typing_cb_method(long friend_number, final int typing)
     {
+        Log.i(TAG, "friend_typing_cb:fn=" + friend_number + " typing=" + typing);
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (typing == 1)
+                    {
+                        ml_friend_typing.setText("friend is typing ...");
+                    }
+                    else
+                    {
+                        ml_friend_typing.setText("");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
     }
 
     static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
@@ -1148,6 +1197,7 @@ public class MainActivity extends AppCompatActivity
                     f.tox_friendnum = friendnum;
                     try
                     {
+                        // set name as the last 5 char of TOXID (until we get a name sent from friend)
                         f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
                     }
                     catch (Exception e)

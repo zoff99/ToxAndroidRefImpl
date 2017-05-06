@@ -28,7 +28,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +69,17 @@ public class FriendListFragment extends ListFragment
         data_values.clear();
         a = new FriendlistArrayAdapter(context, data_values);
         setListAdapter(a);
+
+//        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+//        {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
+//            {
+//                Toast.makeText(getActivity(), "On long click listener", Toast.LENGTH_LONG).show();
+//                // tox_friend_delete
+//                return true;
+//            }
+//        });
     }
 
     @Override
@@ -154,6 +167,7 @@ public class FriendListFragment extends ListFragment
 
         main_handler_s.post(myRunnable);
     }
+
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
