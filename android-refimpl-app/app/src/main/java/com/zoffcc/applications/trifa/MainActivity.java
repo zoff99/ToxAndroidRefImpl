@@ -911,8 +911,12 @@ public class MainActivity extends AppCompatActivity
                     directionEq(1).
                     toList().get(0);
 
+            Log.i(TAG, "friend_read_receipt:m=" + m.toString());
+
             if (m != null)
             {
+                m.rcvd_timestamp = System.currentTimeMillis();
+                m.read = true;
                 update_message_id_db(m);
                 // TODO this updates all messages. should be done nicer and faster!
                 update_message_view();
