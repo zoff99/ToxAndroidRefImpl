@@ -210,16 +210,10 @@ public class TrifaToxService extends Service
                         exists_in_db = true;
                     }
 
-                    f.TOX_CONNECTION = 0;
                     if (MainActivity.friend_list_fragment != null)
                     {
                         MainActivity.friend_list_fragment.add_friends(f);
                     }
-
-                    // set all to OFFLINE and AVAILABLE
-                    f.TOX_USER_STATUS = 0;
-                    f.TOX_CONNECTION = 0;
-                    // set all to OFFLINE and AVAILABLE
 
                     if (exists_in_db == false)
                     {
