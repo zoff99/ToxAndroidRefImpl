@@ -42,6 +42,8 @@ public class TrifaToxService extends Service
     NotificationManager nmn2 = null;
     static Thread ToxServiceThread = null;
     static boolean stop_me = false;
+    static OrmaDatabase orma = null;
+    static boolean is_tox_started = false;
 
 
     @Override
@@ -125,6 +127,8 @@ public class TrifaToxService extends Service
                     e.printStackTrace();
                 }
 
+                is_tox_started = false;
+
                 nmn2.cancel(ONGOING_NOTIFICATION_ID);
                 // ** // MainActivity.exit();
             }
@@ -140,18 +144,19 @@ public class TrifaToxService extends Service
             public void run()
             {
                 // ------ correct startup order ------
-                MainActivity.bootstrap();
+                boolean old_is_tox_started = is_tox_started;
+                Log.i(TAG,"is_tox_started:==============================");
+                Log.i(TAG,"is_tox_started="+is_tox_started);
+                Log.i(TAG,"is_tox_started:==============================");
+
+                is_tox_started = true;
+                if (!old_is_tox_started)
+                {
+                    MainActivity.init(getFilesDir().getAbsolutePath());
+                    MainActivity.bootstrap();
+                }
                 final String my_ToxId = MainActivity.get_my_toxid();
                 Log.i(TAG, "my_ToxId=" + my_ToxId);
-
-
-                // -------------- DEBUG --------------
-                // -------------- DEBUG --------------
-                // -------------- DEBUG --------------
-                // ------ // orma.deleteAll();
-                // -------------- DEBUG --------------
-                // -------------- DEBUG --------------
-                // -------------- DEBUG --------------
 
                 Runnable myRunnable = new Runnable()
                 {
@@ -163,8 +168,11 @@ public class TrifaToxService extends Service
                 };
                 MainActivity.main_handler_s.post(myRunnable);
 
-                MainActivity.init_tox_callbacks();
-                MainActivity.update_savedata_file();
+                if (!old_is_tox_started)
+                {
+                    MainActivity.init_tox_callbacks();
+                    MainActivity.update_savedata_file();
+                }
                 // ------ correct startup order ------
 
                 MainActivity.friends = MainActivity.tox_self_get_friend_list();
@@ -177,7 +185,7 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "loading friend  #:" + fc);
 
                     FriendList f;
-                    List<FriendList> fl = MainActivity.orma.selectFromFriendList().tox_friendnumEq(fc).toList();
+                    List<FriendList> fl = orma.selectFromFriendList().tox_friendnumEq(fc).toList();
                     if (fl.size() > 0)
                     {
                         f = fl.get(0);
@@ -216,11 +224,11 @@ public class TrifaToxService extends Service
 
                     if (exists_in_db == false)
                     {
-                        MainActivity.orma.insertIntoFriendList(f);
+                        orma.insertIntoFriendList(f);
                     }
                     else
                     {
-                        MainActivity.orma.updateFriendList().tox_friendnumEq(f.tox_friendnum).tox_friendnum(f.tox_friendnum).tox_public_key_string(f.tox_public_key_string).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
+                        orma.updateFriendList().tox_friendnumEq(f.tox_friendnum).tox_friendnum(f.tox_friendnum).tox_public_key_string(f.tox_public_key_string).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
                     }
                 }
 

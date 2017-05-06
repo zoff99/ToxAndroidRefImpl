@@ -1012,6 +1012,13 @@ void *thread_video_av(void *data)
 
 
 JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
+{
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir));
+}
+
+
+JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir)
 {
 	const char *s = NULL;
@@ -1131,15 +1138,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject 
 	}
 	// start toxav thread ------------------------------
 }
-
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
-{
-	dbg(99, "app_crash_C:001");
-	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir));
-	dbg(99, "app_crash_C:002");
-}
-
 
 
 // --------------- _toxfuncs_ ---------------

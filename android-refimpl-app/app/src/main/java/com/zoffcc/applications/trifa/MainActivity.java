@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity
     static long[] friends = null;
     static FriendListFragment friend_list_fragment = null;
     static MessageListFragment message_list_fragment = null;
-    static OrmaDatabase orma = null;
     final static String MAIN_DB_NAME = "main.db";
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
@@ -209,14 +208,6 @@ public class MainActivity extends AppCompatActivity
         mt.setText(mt.getText() + "\n" + "c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
         mt.setText(mt.getText() + "\n" + "jni-c-toxcore:v" + jnictoxcore_version());
 
-        // See OrmaDatabaseBuilderBase for other options.
-        orma = OrmaDatabase.builder(this).name(MAIN_DB_NAME).build();
-        // default: "${applicationId}.orma.db"
-
-        app_files_directory = getFilesDir().getAbsolutePath();
-        init(app_files_directory);
-
-
         // --- forground service ---
         // --- forground service ---
         // --- forground service ---
@@ -226,7 +217,11 @@ public class MainActivity extends AppCompatActivity
         // --- forground service ---
         // --- forground service ---
 
+        // See OrmaDatabaseBuilderBase for other options.
+        TrifaToxService.orma = OrmaDatabase.builder(this).name(MAIN_DB_NAME).build();
+        // default: "${applicationId}.orma.db"
 
+        app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
     }
 
@@ -260,7 +255,6 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
-
                         tox_service_fg.tox_thread_start_fg();
                     }
                     catch (Exception e)
@@ -274,7 +268,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG,"tox_thread_start:EE:"+e.getMessage());
+            Log.i(TAG, "tox_thread_start:EE:" + e.getMessage());
         }
     }
 
@@ -322,7 +316,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG,"stop_tox:EE:"+e.getMessage());
+            Log.i(TAG, "stop_tox:EE:" + e.getMessage());
         }
     }
 
@@ -342,7 +336,7 @@ public class MainActivity extends AppCompatActivity
     static FriendList main_get_friend(long friendnum)
     {
         FriendList f;
-        List<FriendList> fl = orma.selectFromFriendList().tox_friendnumEq(friendnum).toList();
+        List<FriendList> fl = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList();
         if (fl.size() > 0)
         {
             f = fl.get(0);
@@ -357,7 +351,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db(FriendList f)
     {
-        orma.updateFriendList().
+        TrifaToxService.orma.updateFriendList().
                 tox_friendnumEq(f.tox_friendnum).
                 tox_public_key_string(f.tox_public_key_string).
                 name(f.name).
@@ -432,9 +426,9 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir);
+    public static native void init(@NonNull String data_dir);
 
-    public native String getNativeLibAPI();
+    public static native String getNativeLibAPI();
 
     public static native void update_savedata_file();
 
@@ -590,7 +584,7 @@ public class MainActivity extends AppCompatActivity
                         Callstate.friend_number = fn;
                         try
                         {
-                            Callstate.friend_name = orma.selectFromFriendList().tox_friendnumEq(Callstate.friend_number).toList().get(0).name;
+                            Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(Callstate.friend_number).toList().get(0).name;
                         }
                         catch (Exception e)
                         {
@@ -841,7 +835,7 @@ public class MainActivity extends AppCompatActivity
 
                 try
                 {
-                    orma.insertIntoFriendList(f);
+                    TrifaToxService.orma.insertIntoFriendList(f);
                 }
                 catch (android.database.sqlite.SQLiteConstraintException e)
                 {
@@ -917,7 +911,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                orma.insertIntoMessage(m);
+                TrifaToxService.orma.insertIntoMessage(m);
                 if (update_message_view_flag)
                 {
                     update_message_view();
@@ -934,7 +928,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                orma.insertIntoFriendList(f);
+                TrifaToxService.orma.insertIntoFriendList(f);
             }
         };
         t.start();
@@ -1025,7 +1019,7 @@ public class MainActivity extends AppCompatActivity
         String result = "Unknown";
         try
         {
-            result = orma.selectFromFriendList().tox_friendnumEq(friendnum).toList().get(0).name;
+            result = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList().get(0).name;
         }
         catch (Exception e)
         {

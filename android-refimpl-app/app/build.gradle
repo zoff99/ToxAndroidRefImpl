@@ -116,10 +116,10 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.github.gfx.android.orma:orma:4.2.4'
     compile 'com.mikepenz:google-material-typeface:3.0.1.0.original@aar'
     compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
     compile 'com.google.zxing:core:3.3.0'
     compile 'com.android.support:support-vector-drawable:25.3.1'
+    compile 'com.github.gfx.android.orma:orma:4.2.4'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.4'
 }

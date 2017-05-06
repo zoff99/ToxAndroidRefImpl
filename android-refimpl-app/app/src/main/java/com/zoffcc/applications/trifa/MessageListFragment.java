@@ -32,7 +32,7 @@ import android.widget.ListView;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListFragment extends ListFragment
 {
