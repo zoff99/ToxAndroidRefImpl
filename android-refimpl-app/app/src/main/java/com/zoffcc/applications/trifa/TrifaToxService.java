@@ -33,6 +33,7 @@ import android.widget.RemoteViews;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
+import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 
@@ -169,7 +170,7 @@ public class TrifaToxService extends Service
                         if (!global_toxid_text_set)
                         {
                             global_toxid_text_set = true;
-                            MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + my_ToxId);
+                            MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + get_my_toxid());
                         }
                     }
                 };
