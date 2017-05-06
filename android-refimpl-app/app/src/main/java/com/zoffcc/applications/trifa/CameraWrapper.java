@@ -45,7 +45,7 @@ public class CameraWrapper
     public static final int IMAGE_HEIGHT = 480; // 720
     static byte[] data_new = null;
     static byte[] data_new2 = null;
-    static boolean mirror_cam_image = true; // mirror the camera image (correct video, but uses more CPU !!)
+    static boolean mirror_cam_image = false; // mirror the camera image (correct video, but uses more CPU !!)
     private CameraPreviewCallback mCameraPreviewCallback;
     // private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
@@ -410,9 +410,9 @@ public class CameraWrapper
         int i_2 = (imageWidth * imageHeight) + (w * h); // start of V plane
         int offset = i;
         int offset_2 = i_2;
-        for (int y = 0; y < imageHeight; y++)
+        for (int y = 0; y < h; y++)
         {
-            for (int x = imageWidth - 1; x >= 0; x--)
+            for (int x = w - 1; x >= 0; x--)
             {
                 yuv[i] = data[offset + (y * w + x)];
                 i++;
