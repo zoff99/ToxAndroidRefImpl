@@ -383,7 +383,6 @@ public class TrifaToxService extends Service
     public boolean onUnbind(Intent intent)
     {
         Log.i(TAG, "onUnbind");
-        MainActivity.tox_service_fg = null;
         return super.onUnbind(intent);
     }
 
@@ -391,7 +390,6 @@ public class TrifaToxService extends Service
     public void unbindService(ServiceConnection conn)
     {
         Log.i(TAG, "unbindService");
-        MainActivity.tox_service_fg = null;
         super.unbindService(conn);
     }
 
@@ -406,7 +404,6 @@ public class TrifaToxService extends Service
     public IBinder onBind(Intent intent)
     {
         Log.i(TAG, "onBind");
-        MainActivity.tox_service_fg = this;
         return null;
     }
 
