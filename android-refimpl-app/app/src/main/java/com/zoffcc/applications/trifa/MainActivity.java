@@ -268,17 +268,6 @@ public class MainActivity extends AppCompatActivity
 
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
-
-
-        // ----- Java Crash -----
-        // ----- Java Crash -----
-        // ----- Java Crash -----
-        // EditText et=null;
-        // et.setText("aaa");
-        // ----- Java Crash -----
-        // ----- Java Crash -----
-        // ----- Java Crash -----
-
     }
 
     void tox_thread_start()
@@ -333,53 +322,53 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-//    static void stop_tox()
-//    {
-//        try
-//        {
-//            Thread t = new Thread()
-//            {
-//                @Override
-//                public void run()
-//                {
-//                    long counter = 0;
-//                    while (tox_service_fg == null)
-//                    {
-//                        counter++;
-//                        if (counter > 100)
-//                        {
-//                            break;
-//                        }
-//
-//                        try
-//                        {
-//                            Thread.sleep(100);
-//                        }
-//                        catch (Exception e)
-//                        {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//
-//                    try
-//                    {
-//
-//                        tox_service_fg.stop_tox_fg();
-//                    }
-//                    catch (Exception e)
-//                    {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            };
-//            t.start();
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//            Log.i(TAG, "stop_tox:EE:" + e.getMessage());
-//        }
-//    }
+    //    static void stop_tox()
+    //    {
+    //        try
+    //        {
+    //            Thread t = new Thread()
+    //            {
+    //                @Override
+    //                public void run()
+    //                {
+    //                    long counter = 0;
+    //                    while (tox_service_fg == null)
+    //                    {
+    //                        counter++;
+    //                        if (counter > 100)
+    //                        {
+    //                            break;
+    //                        }
+    //
+    //                        try
+    //                        {
+    //                            Thread.sleep(100);
+    //                        }
+    //                        catch (Exception e)
+    //                        {
+    //                            e.printStackTrace();
+    //                        }
+    //                    }
+    //
+    //                    try
+    //                    {
+    //
+    //                        tox_service_fg.stop_tox_fg();
+    //                    }
+    //                    catch (Exception e)
+    //                    {
+    //                        e.printStackTrace();
+    //                    }
+    //                }
+    //            };
+    //            t.start();
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            e.printStackTrace();
+    //            Log.i(TAG, "stop_tox:EE:" + e.getMessage());
+    //        }
+    //    }
 
     @Override
     protected void onDestroy()
@@ -474,9 +463,21 @@ public class MainActivity extends AppCompatActivity
                 execute();
     }
 
-
     static void change_notification(int a_TOXCONNECTION)
     {
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash_app_java(1);
+        // crash_app_C();
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+
         Log.i(TAG, "change_notification");
         final int a_TOXCONNECTION_f = a_TOXCONNECTION;
         try
@@ -529,7 +530,6 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed()
     {
         super.onBackPressed();
-        // ******** // stop_tox();
     }
 
     static
@@ -629,6 +629,7 @@ public class MainActivity extends AppCompatActivity
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
+
     // -- this is for incoming video --
     // -- this is for incoming video --
     static void allocate_video_buffer_1(int frame_width_px1, int frame_height_px1, long ystride, long ustride, long vstride)
@@ -1277,6 +1278,69 @@ public class MainActivity extends AppCompatActivity
 
         return result;
     }
+
+
+    // --------- make app crash ---------
+    // --------- make app crash ---------
+    // --------- make app crash ---------
+    public static void crash_app_java(int type)
+    {
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======================+++++");
+        System.out.println("+++++======= TYPE:J =======+++++");
+        System.out.println("+++++======================+++++");
+        if (type == 1)
+        {
+            Java_Crash_001();
+        }
+        else if (type == 2)
+        {
+            Java_Crash_002();
+        }
+        else
+        {
+            stackOverflow();
+        }
+    }
+
+    public static void Java_Crash_001()
+    {
+        Integer i = null;
+        i.byteValue();
+    }
+
+    public static void Java_Crash_002()
+    {
+        View v = null;
+        v.bringToFront();
+    }
+
+    public static void stackOverflow()
+    {
+        stackOverflow();
+    }
+
+    public static void crash_app_C()
+    {
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======= CRASH  =======+++++");
+        System.out.println("+++++======================+++++");
+        System.out.println("+++++======= TYPE:C =======+++++");
+        System.out.println("+++++======================+++++");
+        AppCrashC();
+    }
+
+    public static native void AppCrashC();
+    // --------- make app crash ---------
+    // --------- make app crash ---------
+    // --------- make app crash ---------
 
 }
 

@@ -1739,4 +1739,42 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibAPI(JNIEnv* env, job
 // ------------- JNI -------------
 
 
+// ----------- produce a Crash to test Crash Detector -----------
+// ----------- produce a Crash to test Crash Detector -----------
+// ----------- produce a Crash to test Crash Detector -----------
+// void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv* env, jobject thiz) __attribute__((optimize("-O0")));
+// void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv* env, jobject thiz) __attribute__((optimize("O0")));
+void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv* env, jobject thiz)
+{
+        int i = 3;
+        i = (1 / 0);
+
+        char* name = NULL;
+        name = (char*)0;
+        name = "ekrpowekrp";
+
+        int *pi;
+        int c;
+        pi = NULL;
+        c = *pi;
+
+        int *x = NULL;
+        int y = *x;
+        y = y + 1;
+
+        *(long*)0 = 0xDEADBEEF;
+}
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC(JNIEnv* env, jobject thiz)
+{
+        COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(env, thiz));
+}
+// ----------- produce a Crash to test Crash Detector -----------
+// ----------- produce a Crash to test Crash Detector -----------
+// ----------- produce a Crash to test Crash Detector -----------
+
+
+
+
 
