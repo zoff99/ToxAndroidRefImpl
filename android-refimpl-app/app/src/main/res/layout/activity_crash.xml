@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:paddingTop="10dp"
-        android:text="Antox crashed"
+        android:text="TRIfA crashed"
         android:textColor="#ff101010"
         android:textSize="30sp"/>
 

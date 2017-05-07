@@ -1013,8 +1013,7 @@ void *thread_video_av(void *data)
 }
 
 
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir)
+void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir)
 {
 	const char *s = NULL;
 
@@ -1144,12 +1143,18 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 // --------------- _toxfuncs_ ---------------
 // --------------- _toxfuncs_ ---------------
 // --------------- _toxfuncs_ ---------------
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv* env, jobject thiz)
+void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "update_savedata_file");
 	update_savedata_file(tox_global);
 }
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv* env, jobject thiz)
+{
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz));
+}
+
 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv* env, jobject thiz)
@@ -1166,27 +1171,49 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv* env, jobj
 }
 
 
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_bootstrap(JNIEnv* env, jobject thiz)
+void Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "bootstrap");
 	bootstrap();
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks(JNIEnv* env, jobject thiz)
+Java_com_zoffcc_applications_trifa_MainActivity_bootstrap(JNIEnv* env, jobject thiz)
+{
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(env, thiz));
+}
+
+
+void Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "init_tox_callbacks");
 	init_tox_callbacks();
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv* env, jobject thiz)
+Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks(JNIEnv* env, jobject thiz)
+{
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks__real(env, thiz));
+}
+
+
+
+void Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(JNIEnv* env, jobject thiz)
 {
 	// dbg(9, "tox_iterate ... START");
 	tox_iterate(tox_global, NULL);
 	// dbg(9, "tox_iterate ... READY");
 }
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv* env, jobject thiz)
+{
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(env, thiz));
+}
+
+
+
+
 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list_1size(JNIEnv* env, jobject thiz)
@@ -1216,7 +1243,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNI
 		free(public_key_str2);
 	}
 
-	return (jlong)(unsigned long long)friendnum;
+	if (error != TOX_ERR_FRIEND_BY_PUBLIC_KEY_OK)
+	{
+		return (jlong)(unsigned long long)-1;
+	}
+	else
+	{
+		return (jlong)(unsigned long long)friendnum;
+	}
 }
 
 JNIEXPORT jlongArray JNICALL
@@ -1255,8 +1289,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
 }
 
 
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv* env, jobject thiz)
+void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "tox_kill ... START");
 	tox_kill(tox_global);
@@ -1279,8 +1312,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv* env, jobject t
 }
 
 
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_exit__real(JNIEnv* env, jobject thiz)
+void Java_com_zoffcc_applications_trifa_MainActivity_exit__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "Exit Program");
 	exit(0);
@@ -1730,6 +1762,44 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibAPI(JNIEnv* env, job
 // ------------- JNI -------------
 // ------------- JNI -------------
 // ------------- JNI -------------
+
+
+// ----------- produce a Crash to test Crash Detector -----------
+// ----------- produce a Crash to test Crash Detector -----------
+// ----------- produce a Crash to test Crash Detector -----------
+// void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv* env, jobject thiz) __attribute__((optimize("-O0")));
+// void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv* env, jobject thiz) __attribute__((optimize("O0")));
+void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv* env, jobject thiz)
+{
+        // int i = 3;
+        // i = (1 / 0);
+
+        char* name = NULL;
+        name = (char*)0;
+        name = "ekrpowekrp";
+
+        int *pi;
+        int c;
+        pi = NULL;
+        c = *pi;
+
+        int *x = NULL;
+        int y = *x;
+        y = y + 1;
+
+        *(long*)0 = 0xDEADBEEF;
+}
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC(JNIEnv* env, jobject thiz)
+{
+        COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(env, thiz));
+}
+// ----------- produce a Crash to test Crash Detector -----------
+// ----------- produce a Crash to test Crash Detector -----------
+// ----------- produce a Crash to test Crash Detector -----------
+
+
 
 
 

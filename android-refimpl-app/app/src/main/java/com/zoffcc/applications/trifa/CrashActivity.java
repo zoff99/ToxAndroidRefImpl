@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,11 +17,12 @@ public class CrashActivity extends AppCompatActivity
 {
     ImageView bug_button = null;
     View CrashView = null;
+    static final String TAG = "trifa.CrashActy";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        System.out.println("CrashActivity:onCreate");
+        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crash);
 
@@ -99,9 +101,9 @@ public class CrashActivity extends AppCompatActivity
 
     public void restart_app()
     {
-        PendingIntent intent = PendingIntent.getActivity(getBaseContext(), 0, new Intent(getApplicationContext(), com.zoffcc.applications.trifa.MainActivity.class), Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent intent = PendingIntent.getActivity(getBaseContext(), 0, new Intent(getApplicationContext(), com.zoffcc.applications.trifa.MainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 300, intent); // restart app after 1 second delay
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 300, intent); // restart app after n seconds delay
     }
 
 }

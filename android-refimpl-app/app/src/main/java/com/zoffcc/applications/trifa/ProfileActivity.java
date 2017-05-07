@@ -63,7 +63,7 @@ public class ProfileActivity extends AppCompatActivity
 
         try
         {
-            mytoxid_imageview.setImageBitmap(encodeAsBitmap(MainActivity.get_my_toxid()));
+            mytoxid_imageview.setImageBitmap(encodeAsBitmap("tox:" + MainActivity.get_my_toxid()));
             mytoxid_textview.setText(MainActivity.get_my_toxid());
         }
         catch (WriterException e)
@@ -72,7 +72,7 @@ public class ProfileActivity extends AppCompatActivity
 
             try
             {
-                mytoxid_imageview.setImageBitmap(encodeAsBitmap("unknown"));
+                mytoxid_imageview.setImageBitmap(encodeAsBitmap("123")); // in case something goes wrong
                 mytoxid_textview.setText(MainActivity.get_my_toxid());
             }
             catch (WriterException e2)

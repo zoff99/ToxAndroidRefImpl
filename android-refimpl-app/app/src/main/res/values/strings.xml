@@ -6,6 +6,7 @@
     <string name="title_activity_calling">Call</string>
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_crash">Crash</string>
 
     <!-- Strings related to Settings -->
 
