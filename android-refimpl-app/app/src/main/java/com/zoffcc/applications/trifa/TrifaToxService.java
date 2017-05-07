@@ -1,264 +1,414 @@
+/**
+ * [TRIfA], Java part of Tox Reference Implementation for Android
+ * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * <p>
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ */
+
 package com.zoffcc.applications.trifa;
 
-import android.app.ActivityManager;
-import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationManager;
-import android.content.ComponentName;
-import android.content.Context;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Intent;
-import android.os.Build;
-import android.os.Environment;
-import android.preference.PreferenceManager;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
-import static com.zoffcc.applications.trifa.TrifaToxService.ONGOING_NOTIFICATION_ID;
-import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
+import static com.zoffcc.applications.trifa.MainActivity.change_notification;
+import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
+import static com.zoffcc.applications.trifa.MainActivity.notification_view;
+import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 
-public class MainApplication extends Application
+public class TrifaToxService extends Service
 {
-    String last_stack_trace_as_string = "";
-    int i = 0;
-    int crashes = 0;
-    long last_crash_time = 0L;
-    long prevlast_crash_time = 0L;
-    int randnum = -1;
-    static final String TAG = "trifa.MainApplication";
+    static int ONGOING_NOTIFICATION_ID = 1030;
+    static final String TAG = "trifa.ToxService";
+    Notification notification2 = null;
+    NotificationManager nmn2 = null;
+    static Thread ToxServiceThread = null;
+    static boolean stop_me = false;
+    static OrmaDatabase orma = null;
+    static boolean is_tox_started = false;
+    static boolean global_toxid_text_set = false;
 
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
+        Log.i(TAG, "onStartCommand");
+        // this gets called all the time!
+        MainActivity.tox_service_fg = this;
+        return START_STICKY;
+    }
 
     @Override
     public void onCreate()
     {
-        randnum = (int) (Math.random() * 1000d);
-
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "onCreate");
+        Log.i(TAG, "onCreate");
+        // serivce is created ---
+        start_me();
         super.onCreate();
-
-        crashes = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getInt("crashes", 0);
-
-        if (crashes > 10000)
-        {
-            crashes = 0;
-            PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes", crashes).commit();
-        }
-
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "crashes[load]=" + crashes);
-        last_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong("last_crash_time", 0);
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "last_crash_time[load]=" + last_crash_time);
-        prevlast_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong("prevlast_crash_time", 0);
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "prevlast_crash_time[load]=" + prevlast_crash_time);
-
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
-        {
-            @Override
-            public void uncaughtException(Thread thread, Throwable e)
-            {
-                handleUncaughtException(thread, e);
-            }
-        });
-
     }
 
-    @Override
-    protected void attachBaseContext(Context base)
+    void change_notification_fg(int a_TOXCONNECTION)
     {
-        super.attachBaseContext(base);
-    }
+        Log.i(TAG, "change_notification_fg");
 
-    private String grabLogcat()
-    {
-        try
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        if (a_TOXCONNECTION == 0)
         {
-            // grep -r 'Log\.' *|sed -e 's#^.*Log..("##'|grep -v TAG|sed -e 's#",.*$##'|sort |uniq
-
-            final Process process = Runtime.getRuntime().exec("logcat -d -v threadtime");
-
-            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            final StringBuilder log = new StringBuilder();
-            final String separator = System.getProperty("line.separator");
-
-            String line;
-            while ((line = bufferedReader.readLine()) != null)
+            notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+            b.setSmallIcon(R.drawable.circle_red);
+            notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
+        }
+        else
+        {
+            if (a_TOXCONNECTION == 1)
             {
-                log.append(line);
-                log.append(separator);
+                notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                b.setSmallIcon(R.drawable.circle_green);
+                notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
             }
-
-            if ((log.length() < 100) || (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT))
+            else // if (a_TOXCONNECTION__f == 2)
             {
-                // some problems with the params?
-                final Process process2 = Runtime.getRuntime().exec("logcat -d");
-                final BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
-                final StringBuilder log2 = new StringBuilder();
-
-                String line2;
-                while ((line2 = bufferedReader2.readLine()) != null)
-                {
-                    log2.append(line2);
-                    log2.append(separator);
-                }
-
-                return log2.toString();
-            }
-            else
-            {
-                return log.toString();
+                notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                b.setSmallIcon(R.drawable.circle_green);
+                notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
             }
         }
-        catch (IOException ioe)
-        {
-            Log.i(TAG, "MainApplication:" + randnum + ":" + "IOException when trying to read logcat.");
-            return null;
-        }
-        catch (Exception e)
-        {
-            Log.i(TAG, "MainApplication:" + randnum + ":" + "Exception when trying to read logcat.");
-            return null;
-        }
+        notification_view.setTextViewText(R.id.text, "");
+
+        b.setContentIntent(pendingIntent);
+        b.setContent(notification_view);
+        notification2 = b.build();
+        nmn2.notify(ONGOING_NOTIFICATION_ID, notification2);
     }
 
 
-    void save_error_msg() throws IOException
+    void stop_me(boolean exit_app)
     {
-
-        String log_detailed = grabLogcat();
-
-        try
-        {
-            // also save to crash file ----
-            Calendar c = Calendar.getInstance();
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
-            String formattedDate = df.format(c.getTime());
-            File myDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes");
-            myDir.mkdirs();
-            File myFile = new File(myDir.getAbsolutePath() + "/crash_" + formattedDate + ".txt");
-            Log.i(TAG, "MainApplication:" + randnum + ":" + "crash file=" + myFile.getAbsolutePath());
-            myFile.createNewFile();
-            FileOutputStream fOut = new FileOutputStream(myFile);
-            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append("Errormesage:\n" + last_stack_trace_as_string + "\n\n===================================\n\n" + log_detailed);
-            myOutWriter.close();
-            fOut.close();
-            // also save to crash file ----
-        }
-        catch (Exception e)
-        {
-        }
-    }
-
-    private void handleUncaughtException(Thread thread, Throwable e)
-    {
-        last_stack_trace_as_string = e.getMessage();
-        boolean stack_trace_ok = false;
-
-        try
-        {
-            Writer writer = new StringWriter();
-            PrintWriter printWriter = new PrintWriter(writer);
-            e.printStackTrace(printWriter);
-            last_stack_trace_as_string = writer.toString();
-
-            Log.i(TAG, "MainApplication:" + randnum + ":" + "stack trace ok");
-            stack_trace_ok = true;
-        }
-        catch (Exception ee)
-        {
-        }
-        catch (OutOfMemoryError ex2)
-        {
-            Log.i(TAG, "MainApplication:" + randnum + ":" + "stack trace *error*");
-        }
-
-        if (!stack_trace_ok)
+        Log.i(TAG, "stop_me");
+        stopSelf();
+        if (exit_app)
         {
             try
             {
-                last_stack_trace_as_string = Log.getStackTraceString(e);
-                Log.i(TAG, "MainApplication:" + randnum + ":" + "stack trace ok (addon 1)");
-                stack_trace_ok = true;
+                Log.i(TAG, "stop_me:001");
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Log.i(TAG, "stop_me:002");
+                        long i = 0;
+                        while (is_tox_started)
+                        {
+                            i++;
+                            if (i > 2000)
+                            {
+                                break;
+                            }
+
+                            Log.i(TAG, "stop_me:003");
+
+                            try
+                            {
+                                Thread.sleep(300);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        Log.i(TAG, "stop_me:004");
+
+                        try
+                        {
+                            Thread.sleep(3000);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        Log.i(TAG, "stop_me:005");
+
+                        nmn2.cancel(ONGOING_NOTIFICATION_ID);
+                        MainActivity.exit();
+
+                        Log.i(TAG, "stop_me:099");
+                    }
+                };
+                t.start();
             }
-            catch (Exception ee)
+            catch (Exception e)
             {
-            }
-            catch (OutOfMemoryError ex2)
-            {
-                Log.i(TAG, "MainApplication:" + randnum + ":" + "stack trace *error* (addon 1)");
+                e.printStackTrace();
             }
         }
-
-        crashes++;
-        PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes", crashes).commit();
-
-        try
-        {
-            save_error_msg();
-        }
-        catch (Exception ee)
-        {
-        }
-        catch (OutOfMemoryError ex2)
-        {
-        }
-
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "crashes[set]=" + crashes);
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" + (prevlast_crash_time + (60 * 1000)) + " < " + System.currentTimeMillis());
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" + (System.currentTimeMillis() - (prevlast_crash_time + (60 * 1000))));
-
-
-        try
-        {
-            // try to shutdown service (but don't exit the app yet!)
-            if (is_tox_started)
-            {
-                tox_service_fg.stop_tox_fg();
-                tox_service_fg.stop_me(false);
-            }
-        }
-        catch (Exception e2)
-        {
-            Log.i(TAG, "MainApplication:EE1:" + e2.getMessage());
-            e2.printStackTrace();
-        }
-
-        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-        ComponentName componentInfo = taskInfo.get(0).topActivity;
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "componentInfo=" + componentInfo + " class=" + componentInfo.getClassName());
-
-        try
-        {
-            // remove the notofication
-            NotificationManager nmn2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            nmn2.cancel(ONGOING_NOTIFICATION_ID);
-        }
-        catch (Exception e3)
-        {
-            e3.printStackTrace();
-        }
-
-        Intent intent = new Intent(this, com.zoffcc.applications.trifa.CrashActivity.class);
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "xx1 intent(1)=" + intent);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "xx1 intent(2)=" + intent);
-        startActivity(intent); // show CrashActivity
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "xx2");
-        android.os.Process.killProcess(android.os.Process.myPid());
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "xx3");
-        System.exit(2);
-        System.out.println("MainApplication:" + randnum + ":" + "xx4");
-
     }
+
+    void stop_tox_fg()
+    {
+        Log.i(TAG, "stop_tox_fg");
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                stop_me = true;
+                ToxServiceThread.interrupt();
+                try
+                {
+                    ToxServiceThread.join();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                stop_me = false; // reset flag again!
+                change_notification(0); // set to offline
+                set_all_friends_offline();
+                is_tox_started = false;
+
+                // nmn2.cancel(ONGOING_NOTIFICATION_ID); // -> cant remove notification because of foreground service
+                // ** // MainActivity.exit();
+            }
+        };
+        MainActivity.main_handler_s.post(myRunnable);
+    }
+
+    void tox_thread_start_fg()
+    {
+        Log.i(TAG, "tox_thread_start_fg");
+
+        ToxServiceThread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                // ------ correct startup order ------
+                boolean old_is_tox_started = is_tox_started;
+                Log.i(TAG, "is_tox_started:==============================");
+                Log.i(TAG, "is_tox_started=" + is_tox_started);
+                Log.i(TAG, "is_tox_started:==============================");
+
+                is_tox_started = true;
+                if (!old_is_tox_started)
+                {
+                    MainActivity.bootstrap();
+                }
+
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (!global_toxid_text_set)
+                        {
+                            global_toxid_text_set = true;
+                            MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + get_my_toxid());
+                        }
+                    }
+                };
+                MainActivity.main_handler_s.post(myRunnable);
+
+                if (!old_is_tox_started)
+                {
+                    MainActivity.init_tox_callbacks();
+                    MainActivity.update_savedata_file();
+                }
+                // ------ correct startup order ------
+
+                // TODO --------
+                String my_tox_id_local = get_my_toxid();
+                tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5, my_tox_id_local.length()));
+                tox_self_set_status_message("this is TRIfA");
+                // TODO --------
+
+                MainActivity.friends = MainActivity.tox_self_get_friend_list();
+                Log.i(TAG, "number of friends=" + MainActivity.friends.length);
+
+                int fc = 0;
+                boolean exists_in_db = false;
+                MainActivity.friend_list_fragment.clear_friends();
+                for (fc = 0; fc < MainActivity.friends.length; fc++)
+                {
+                    Log.i(TAG, "loading friend  #:" + fc);
+
+                    FriendList f;
+                    List<FriendList> fl = orma.selectFromFriendList().tox_friendnumEq(fc).toList();
+                    if (fl.size() > 0)
+                    {
+                        f = fl.get(0);
+                    }
+                    else
+                    {
+                        f = null;
+                    }
+
+                    if (f == null)
+                    {
+                        Log.i(TAG, "fc is null");
+
+                        f = new FriendList();
+                        f.tox_public_key_string = "" + (Math.random() * 100000);
+                        f.tox_friendnum = fc;
+                        f.name = "friend #" + fc;
+                        exists_in_db = false;
+                    }
+                    else
+                    {
+                        Log.i(TAG, "found friend in DB " + f.tox_friendnum + " f=" + f);
+                        exists_in_db = true;
+                    }
+
+                    try
+                    {
+                        // get the real "live" connection status of this friend
+                        // the value in the database may be old (and wrong)
+                        f.TOX_CONNECTION = tox_friend_get_connection_status(f.tox_friendnum);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    if (MainActivity.friend_list_fragment != null)
+                    {
+                        MainActivity.friend_list_fragment.add_friends(f);
+                    }
+
+                    if (exists_in_db == false)
+                    {
+                        orma.insertIntoFriendList(f);
+                    }
+                    else
+                    {
+                        orma.updateFriendList().tox_friendnumEq(f.tox_friendnum).tox_friendnum(f.tox_friendnum).tox_public_key_string(f.tox_public_key_string).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
+                    }
+                }
+
+                long tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
+                Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
+
+                MainActivity.tox_iterate();
+
+                while (!stop_me)
+                {
+                    try
+                    {
+                        sleep(tox_iteration_interval_ms);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    MainActivity.tox_iterate();
+
+                }
+
+                try
+                {
+                    MainActivity.tox_kill();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        ToxServiceThread.start();
+    }
+
+    void start_me()
+    {
+        Log.i(TAG, "start_me");
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        // -- notification ------------------
+        // -- notification ------------------
+        nmn2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        notification_view = new RemoteViews(getPackageName(), R.layout.custom_notification);
+        Log.i(TAG, "contentView=" + notification_view);
+        notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+        notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
+        notification_view.setTextViewText(R.id.text, "");
+
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+        b.setContent(notification_view);
+        b.setContentIntent(pendingIntent);
+        b.setSmallIcon(R.drawable.circle_red);
+        notification2 = b.build();
+        // -- notification ------------------
+        // -- notification ------------------
+
+        startForeground(ONGOING_NOTIFICATION_ID, notification2);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent)
+    {
+        Log.i(TAG, "onUnbind");
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void unbindService(ServiceConnection conn)
+    {
+        Log.i(TAG, "unbindService");
+        super.unbindService(conn);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        Log.i(TAG, "onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent)
+    {
+        Log.i(TAG, "onBind");
+        return null;
+    }
+
+    // ------------------------------
+
 }
