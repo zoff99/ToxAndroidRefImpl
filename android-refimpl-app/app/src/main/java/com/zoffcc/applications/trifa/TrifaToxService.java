@@ -37,8 +37,15 @@ import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name_size;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 
 public class TrifaToxService extends Service
 {
@@ -129,7 +136,7 @@ public class TrifaToxService extends Service
                         while (is_tox_started)
                         {
                             i++;
-                            if (i > 2000)
+                            if (i > 20)
                             {
                                 break;
                             }
@@ -150,7 +157,7 @@ public class TrifaToxService extends Service
 
                         try
                         {
-                            Thread.sleep(3000);
+                            Thread.sleep(1500);
                         }
                         catch (Exception e)
                         {
@@ -249,8 +256,32 @@ public class TrifaToxService extends Service
 
                 // TODO --------
                 String my_tox_id_local = get_my_toxid();
-                tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5, my_tox_id_local.length()));
-                tox_self_set_status_message("this is TRIfA");
+                global_my_toxid = my_tox_id_local;
+                if (tox_self_get_name_size() > 0)
+                {
+                    global_my_name = tox_self_get_name().substring(0, (int) tox_self_get_name_size());
+                    Log.i(TAG, "AAA:003:" + global_my_name);
+                }
+                else
+                {
+                    tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5, my_tox_id_local.length()));
+                    Log.i(TAG, "AAA:005");
+                }
+
+                if (tox_self_get_status_message_size() > 0)
+                {
+                    global_my_status_message = tox_self_get_status_message().substring(0, (int) tox_self_get_status_message_size());
+                    Log.i(TAG, "AAA:008:" + global_my_status_message);
+                }
+                else
+                {
+                    tox_self_set_status_message("this is TRIfA");
+                    Log.i(TAG, "AAA:010");
+                }
+                Log.i(TAG, "AAA:011");
+
+                MainActivity.update_savedata_file();
+
                 // TODO --------
 
                 MainActivity.friends = MainActivity.tox_self_get_friend_list();
@@ -325,7 +356,7 @@ public class TrifaToxService extends Service
                 {
                     try
                     {
-                        sleep(tox_iteration_interval_ms);
+                        Thread.sleep(tox_iteration_interval_ms);
                     }
                     catch (InterruptedException e)
                     {
@@ -341,12 +372,31 @@ public class TrifaToxService extends Service
 
                 try
                 {
+                    Thread.sleep(200); // wait a bit, for "something" to finish up in the native code
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
                     MainActivity.tox_kill();
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
+
+                try
+                {
+                    Thread.sleep(200); // wait a bit, for "something" to finish up in the native code
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
             }
         };
 

@@ -598,6 +598,14 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_friend_delete(long friend_number);
 
+    public static native String tox_self_get_name();
+
+    public static native long tox_self_get_name_size();
+
+    public static native long tox_self_get_status_message_size();
+
+    public static native String tox_self_get_status_message();
+
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------

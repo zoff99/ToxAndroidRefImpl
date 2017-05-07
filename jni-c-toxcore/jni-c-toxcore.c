@@ -93,7 +93,6 @@ TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
 ToxAV *tox_av_global = NULL;
 CallControl mytox_CC;
-int global_video_active = 0;
 pthread_t tid[2]; // 0 -> toxav_iterate thread, 1 -> video send thread
 
 
@@ -943,25 +942,10 @@ void *thread_av(void *data)
 
 	while (toxav_iterate_thread_stop != 1)
 	{
-		if (global_video_active == 1)
-		{
-			pthread_mutex_lock(&av_thread_lock);
-
-			pthread_mutex_unlock(&av_thread_lock);
-			yieldcpu(1000); // 1 frame every 1 seconds!!
-			// yieldcpu(DEFAULT_FPS_SLEEP_MS); /* ~6 frames per second */
-
-			continue; /* We're running video, so don't sleep for and extra 100 */
-		}
-		else
-		{
-		}
-
 		usleep(toxav_iteration_interval(av) * 1000);
 		// yieldcpu(10);
 	}
 
-	// unreachable code
 	dbg(2, "ToxVideo:Clean thread exit!\n");
 
 	(*cachedJVM)->DetachCurrentThread(cachedJVM);
@@ -1005,7 +989,6 @@ void *thread_video_av(void *data)
 		usleep(toxav_iteration_interval(av) * 1000);
 	}
 
-	// unreachable code
 	dbg(2, "ToxVideo:Clean video thread exit!\n");
 
 	(*cachedJVM)->DetachCurrentThread(cachedJVM);
@@ -1070,18 +1053,17 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	// ----------- create Tox instance -----------
 	tox_global = create_tox();
 	dbg(9, "tox_global=%p", tox_global);
-
-	dbg(9, "1001");
-	const char *name = "TRIfA";
-	dbg(9, "1002");
-	tox_self_set_name(tox_global, (uint8_t *)name, strlen(name), NULL);
-	dbg(9, "1003");
-
-	const char *status_message = "This is TRIfA";
-	dbg(9, "1004");
-	tox_self_set_status_message(tox_global, (uint8_t *)status_message, strlen(status_message), NULL);
-	dbg(9, "1005");
 	// ----------- create Tox instance -----------
+
+	// dbg(9, "1001");
+	// const char *name = "TRIfA";
+	// dbg(9, "1002");
+	// tox_self_set_name(tox_global, (uint8_t *)name, strlen(name), NULL);
+	// dbg(9, "1003");
+	// const char *status_message = "This is TRIfA";
+	// dbg(9, "1004");
+	// tox_self_set_status_message(tox_global, (uint8_t *)status_message, strlen(status_message), NULL);
+	// dbg(9, "1005");
 
 
 	// ----------- create Tox AV instance --------
@@ -1292,8 +1274,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
 void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "tox_kill ... START");
-	tox_kill(tox_global);
-
 	toxav_iterate_thread_stop = 1;
 	pthread_join(tid[0], NULL); // wait for toxav iterate thread to end
 
@@ -1301,6 +1281,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv* env
 	pthread_join(tid[1], NULL); // wait for toxav video thread to end
 
 	toxav_kill(tox_av_global);
+	tox_kill(tox_global);
+	tox_av_global = NULL;
 	tox_global = NULL;
 	dbg(9, "tox_kill ... READY");
 }
@@ -1566,6 +1548,42 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1delete(JNIEnv* env,
 	TOX_ERR_FRIEND_DELETE error;
 	bool res = tox_friend_delete(tox_global, (uint32_t)friend_number, &error);
 	return (jint)res;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv* env, jobject thiz)
+{
+	size_t length = tox_self_get_name_size(tox_global);
+    char name[length + 1];
+	CLEAR(name);
+	// dbg(9, "name len=%d", (int)length);
+	tox_self_get_name(tox_global, name);
+	// dbg(9, "name=%s", (char *)name);
+	return (*env)->NewStringUTF(env, (uint8_t *)name);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name_1size(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)tox_self_get_name_size(tox_global);
+	return (jlong)(unsigned long long)l;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message_1size(JNIEnv* env, jobject thiz)
+{
+	long long l = (long long)tox_self_get_status_message_size(tox_global);
+	return (jlong)(unsigned long long)l;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(JNIEnv* env, jobject thiz)
+{
+	size_t length = tox_self_get_status_message_size(tox_global);
+    char message[length + 1];
+	CLEAR(message);
+	tox_self_get_status_message(tox_global, message);
+	return (*env)->NewStringUTF(env, (uint8_t *)message);
 }
 
 // -----------------------
