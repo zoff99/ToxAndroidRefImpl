@@ -49,12 +49,26 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
         if (values.get(position).direction == 0)
         {
             // msg to me
-            rowView = inflater.inflate(R.layout.message_list_entry, parent, false);
+            if (values.get(position).read)
+            {
+                rowView = inflater.inflate(R.layout.message_list_entry_read, parent, false);
+            }
+            else
+            {
+                rowView = inflater.inflate(R.layout.message_list_entry, parent, false);
+            }
         }
         else
         {
             // msg from me
-            rowView = inflater.inflate(R.layout.message_list_self_entry, parent, false);
+            if (values.get(position).read)
+            {
+                rowView = inflater.inflate(R.layout.message_list_self_entry_read, parent, false);
+            }
+            else
+            {
+                rowView = inflater.inflate(R.layout.message_list_self_entry, parent, false);
+            }
         }
 
         TextView textView = (TextView) rowView.findViewById(R.id.m_text);
@@ -62,14 +76,14 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 
         ImageView imageView = (ImageView) rowView.findViewById(R.id.m_icon);
 
-        if (values.get(position).direction == 0)
+        if (!values.get(position).read)
         {
-            // msg to me
+            // not yet read
             imageView.setImageResource(R.drawable.circle_red);
         }
         else
         {
-            // msg from me
+            // msg read by other party
             imageView.setImageResource(R.drawable.circle_green);
         }
 

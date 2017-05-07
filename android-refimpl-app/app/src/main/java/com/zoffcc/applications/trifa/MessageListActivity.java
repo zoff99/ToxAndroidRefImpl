@@ -24,8 +24,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -38,12 +39,14 @@ import com.mikepenz.iconics.IconicsDrawable;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
+import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.orma;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
-import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListActivity extends AppCompatActivity
 {
@@ -51,8 +54,13 @@ public class MessageListActivity extends AppCompatActivity
     long friendnum = -1;
     EditText ml_new_message = null;
     TextView ml_maintext = null;
+    static TextView ml_friend_typing = null;
     ImageView ml_icon = null;
+    ImageView ml_status_icon = null;
     ImageButton ml_phone_icon = null;
+    int global_typing = 0;
+    Thread typing_flag_thread = null;
+    final static int TYPING_FLAG_DEACTIVATE_DELAY_IN_MILLIS = 1000; // 1 second
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -64,15 +72,90 @@ public class MessageListActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_message_list);
 
+        MainActivity.message_list_activity = this;
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ml_new_message = (EditText) findViewById(R.id.ml_new_message);
+        ml_friend_typing = (TextView) findViewById(R.id.ml_friend_typing);
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
+        ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
         ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
 
         ml_icon.setImageResource(R.drawable.circle_red);
+        set_friend_connection_status_icon();
+        ml_status_icon.setImageResource(R.drawable.circle_green);
+        set_friend_status_icon();
+
+        ml_friend_typing.setText("");
+
+        ml_new_message.addTextChangedListener(new TextWatcher()
+        {
+
+            public void afterTextChanged(Editable s)
+            {
+                // TODO bad hack!
+                Log.i(TAG, "TextWatcher:afterTextChanged");
+                if (global_typing == 0)
+                {
+                    global_typing = 1;  // typing = 1
+                    tox_self_set_typing(friendnum, global_typing);
+                    Log.i(TAG, "typing:fn#" + friendnum + ":activated");
+                }
+
+                try
+                {
+                    typing_flag_thread.interrupt();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                typing_flag_thread = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        boolean skip_flag_update = false;
+                        try
+                        {
+                            Thread.sleep(TYPING_FLAG_DEACTIVATE_DELAY_IN_MILLIS); // sleep for n seconds
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            // ok, dont update typing flag
+                            skip_flag_update = true;
+                        }
+
+                        if (global_typing == 1)
+                        {
+                            if (skip_flag_update == false)
+                            {
+                                global_typing = 0;  // typing = 0
+                                tox_self_set_typing(friendnum, global_typing);
+                                Log.i(TAG, "typing:fn#" + friendnum + ":DEactivated");
+                            }
+                        }
+                    }
+                };
+                typing_flag_thread.start();
+                // TODO bad hack! sends way too many "typing" messages --------
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+                // Log.i(TAG,"TextWatcher:beforeTextChanged");
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                // Log.i(TAG,"TextWatcher:onTextChanged");
+            }
+        });
 
         Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
         ml_phone_icon.setImageDrawable(d1);
@@ -104,6 +187,70 @@ public class MessageListActivity extends AppCompatActivity
         return friendnum;
     }
 
+    public void set_friend_status_icon()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    int tox_user_status_friend = TrifaToxService.orma.selectFromFriendList().
+                            tox_friendnumEq(friendnum).
+                            toList().get(0).TOX_USER_STATUS;
+
+                    if (tox_user_status_friend == 0)
+                    {
+                        ml_status_icon.setImageResource(R.drawable.circle_green);
+                    }
+                    else if (tox_user_status_friend == 1)
+                    {
+                        ml_status_icon.setImageResource(R.drawable.circle_orange);
+                    }
+                    else
+                    {
+                        ml_status_icon.setImageResource(R.drawable.circle_red);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "CALL:start:(2):EE:" + e.getMessage());
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
+    }
+
+    public void set_friend_connection_status_icon()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (is_friend_online(friendnum) == 0)
+                    {
+                        ml_icon.setImageResource(R.drawable.circle_red);
+                    }
+                    else
+                    {
+                        ml_icon.setImageResource(R.drawable.circle_green);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "CALL:start:(2):EE:" + e.getMessage());
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
+    }
+
     public void send_message_onclick(View view)
     {
         String msg = "";
@@ -122,13 +269,14 @@ public class MessageListActivity extends AppCompatActivity
             m.text = msg;
 
             long res = tox_friend_send_message(friendnum, 0, msg);
+            Log.i(TAG, "tox_friend_send_message:result=" + res);
 
             if (res > -1)
             {
+                m.message_id = res;
                 insert_into_message_db(m, true);
                 ml_new_message.setText("");
             }
-            Log.i(TAG, "tox_friend_send_message:result=" + res);
 
         }
         catch (Exception e)
@@ -140,7 +288,19 @@ public class MessageListActivity extends AppCompatActivity
 
     public void start_call_to_friend(View view)
     {
-        Log.i(TAG,"start_call_to_friend");
+        Log.i(TAG, "start_call_to_friend");
+
+        if (!is_tox_started)
+        {
+            Log.i(TAG, "TOX:offline");
+            return;
+        }
+
+        if (is_friend_online(friendnum) == 0)
+        {
+            Log.i(TAG, "TOX:friend offline");
+            return;
+        }
 
         final long fn = friendnum;
 

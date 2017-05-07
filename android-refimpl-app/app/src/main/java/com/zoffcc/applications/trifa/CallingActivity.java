@@ -19,32 +19,26 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
@@ -70,19 +64,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     Handler callactivity_handler = null;
     static Handler callactivity_handler_s = null;
     private static final String TAG = "trifa.CallingActivity";
-    Preview preview = null;
     Camera camera = null;
-    static CameraPreviewSurfaceview camera_preview_surface_view = null;
     static CameraSurfacePreview cameraSurfacePreview = null;
     static float mPreviewRate = -1f;
     static int front_camera_id = -1;
     static int back_camera_id = -1;
     static int active_camera_id = 0;
-    public static final String FRAGMENT_TAG = "camera_preview_fragment_";
-
-    //
-    private static final boolean USE_CAM_001 = false;
-    //
+    // public static final String FRAGMENT_TAG = "camera_preview_fragment_";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -142,26 +130,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-        if (USE_CAM_001)
-        {
-            // camera_preview_surface_view = (CameraPreviewSurfaceview) this.findViewById(R.id.video_my_preview_surfaceview);
-        }
-
 
         initUI();
         initViewParams();
-
-        // ----- camera preview -----
-        // ----- camera preview -----
-        // ----- camera preview -----
-        if (USE_CAM_001)
-        {
-            // preview = (com.zoffcc.applications.trifa.Preview) findViewById(R.id.video_my_preview);
-            preview.setKeepScreenOn(true);
-        }
-        // ----- camera preview -----
-        // ----- camera preview -----
-        // ----- camera preview -----
 
         top_text_line_str1 = Callstate.friend_name;
         top_text_line_str2 = "";
@@ -280,143 +251,96 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     }
 
 
-    private final Runnable mHidePart2Runnable = new Runnable()
-    {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run()
-        {
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
+    //    private final Runnable mHidePart2Runnable = new Runnable()
+    //    {
+    //        @SuppressLint("InlinedApi")
+    //        @Override
+    //        public void run()
+    //        {
+    //            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    //        }
+    //    };
 
-    private final Runnable mShowPart2Runnable = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null)
-            {
-                actionBar.show();
-            }
-        }
-    };
+    //    private final Runnable mShowPart2Runnable = new Runnable()
+    //    {
+    //        @Override
+    //        public void run()
+    //        {
+    //            ActionBar actionBar = getSupportActionBar();
+    //            if (actionBar != null)
+    //            {
+    //                actionBar.show();
+    //            }
+    //        }
+    //    };
+
     private boolean mVisible;
-    private final Runnable mHideRunnable = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            hide();
-        }
-    };
+    //    private final Runnable mHideRunnable = new Runnable()
+    //    {
+    //        @Override
+    //        public void run()
+    //        {
+    //            hide();
+    //        }
+    //    };
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
         super.onPostCreate(savedInstanceState);
-        delayedHide(100);
+        // delayedHide(100);
     }
 
-    private void toggle()
-    {
-        if (mVisible)
-        {
-            hide();
-        }
-        else
-        {
-            show();
-        }
-    }
+    //    private void toggle()
+    //    {
+    //        if (mVisible)
+    //        {
+    //            hide();
+    //        }
+    //        else
+    //        {
+    //            show();
+    //        }
+    //    }
 
-    private void hide()
-    {
-        // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-        {
-            actionBar.hide();
-        }
-        mVisible = false;
+    //    private void hide()
+    //    {
+    //        // Hide UI first
+    //        ActionBar actionBar = getSupportActionBar();
+    //        if (actionBar != null)
+    //        {
+    //            actionBar.hide();
+    //        }
+    //        mVisible = false;
+    //
+    //        // Schedule a runnable to remove the status and navigation bar after a delay
+    //        mHideHandler.removeCallbacks(mShowPart2Runnable);
+    //        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
+    //    }
 
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
-    }
+    //    @SuppressLint("InlinedApi")
+    //    private void show()
+    //    {
+    //        // Show the system bar
+    //        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+    //        mVisible = true;
+    //
+    //        // Schedule a runnable to display UI elements after a delay
+    //        mHideHandler.removeCallbacks(mHidePart2Runnable);
+    //        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
+    //    }
 
-    @SuppressLint("InlinedApi")
-    private void show()
-    {
-        // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    private void delayedHide(int delayMillis)
-    {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
-    }
+    //    private void delayedHide(int delayMillis)
+    //    {
+    //        mHideHandler.removeCallbacks(mHideRunnable);
+    //        mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    //    }
 
 
-    // ----- camera preview -----
-    // ----- camera preview -----
-    // ----- camera preview -----
     @Override
     protected void onResume()
     {
         super.onResume();
-
-        if (USE_CAM_001)
-        {
-
-            int numCams = Camera.getNumberOfCameras();
-            Toast.makeText(context_s, "Cameras=" + numCams, Toast.LENGTH_LONG).show();
-            Log.i(TAG, "Cameras=" + numCams);
-            if (numCams > 0)
-            {
-                try
-                {
-                    for (int camNo = 0; camNo < numCams; camNo++)
-                    {
-                        Camera.CameraInfo camInfo = new Camera.CameraInfo();
-                        Camera.getCameraInfo(camNo, camInfo);
-                        if (camInfo.facing == (Camera.CameraInfo.CAMERA_FACING_FRONT))
-                        {
-                            front_camera_id = camNo;
-                        }
-                        else if (camInfo.facing == (Camera.CameraInfo.CAMERA_FACING_BACK))
-                        {
-                            back_camera_id = camNo;
-                        }
-                    }
-
-                    if (front_camera_id != -1)
-                    {
-                        camera = Camera.open(front_camera_id);
-                        active_camera_id = front_camera_id;
-                    }
-                    else
-                    {
-                        camera = Camera.open(back_camera_id);
-                        active_camera_id = back_camera_id;
-                    }
-                    camera.startPreview();
-                    preview.setCamera(camera);
-                }
-                catch (RuntimeException ex)
-                {
-                    Log.i(TAG, "Camera:099:EE:" + ex.getMessage());
-                    Toast.makeText(context_s, "Camera not found", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
     }
 
     void toggle_camera()
@@ -437,114 +361,39 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 active_camera_type = FRONT_CAMERA_USED;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
             }
-
-            // -----------------------
-
-            //            camera.stopPreview();
-            //            camera.setPreviewCallback(null);
-            //            CameraPreviewSurfaceview.camera_preview_size_ = null;
-            //            camera.release();
-            //
-            //            if (active_camera_id == back_camera_id)
-            //            {
-            //                camera = Camera.open(front_camera_id);
-            //                active_camera_id = front_camera_id;
-            //            }
-            //            else
-            //            {
-            //                camera = Camera.open(back_camera_id);
-            //                active_camera_id = back_camera_id;
-            //            }
-            //
-            //            setCameraDisplayOrientation(this, active_camera_id, camera);
-            //
-            //            camera.setPreviewDisplay(CallingActivity.camera_preview_surface_view.getHolder());
-            //            camera.setPreviewCallback(CallingActivity.camera_preview_surface_view);
-            //            camera.startPreview();
-            //            // ----------------------------
-            //            // ----------------------------
-            //            preview.setCamera(camera);
-            //            // ----------------------------
-            //            // ----------------------------
         }
         catch (Exception e)
         {
         }
     }
+
+    // -------------------------------------------------------
+    // TODO
+    // this is a bad workaround to really show the cam preview
+    // -------------------------------------------------------
+    static void reinit_camera(CallingActivity c)
+    {
+        try
+        {
+            Log.i(TAG,"active_camera_type(1)="+active_camera_type);
+            CameraWrapper.getInstance().doStopCamera();
+            Log.i(TAG,"active_camera_type(2)="+active_camera_type);
+            CameraWrapper.camera_preview_size2 = null;
+            Log.i(TAG,"active_camera_type(3)="+active_camera_type);
+            CameraWrapper.getInstance().doOpenCamera(c, true);
+            Log.i(TAG,"active_camera_type(4)="+active_camera_type);
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
 
     @Override
     protected void onPause()
     {
-        if (USE_CAM_001)
-        {
-            if (camera != null)
-            {
-                camera.stopPreview();
-                preview.setCamera(null);
-                camera.setPreviewCallback(null);
-                CameraPreviewSurfaceview.camera_preview_size_ = null;
-                camera.release();
-                camera = null;
-            }
-        }
         super.onPause();
     }
-
-    private void resetCam()
-    {
-        if (USE_CAM_001)
-        {
-            camera.startPreview();
-            preview.setCamera(camera);
-        }
-    }
-    // ----- camera preview -----
-    // ----- camera preview -----
-    // ----- camera preview -----
-
-
-    public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera)
-    {
-        try
-        {
-            android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-            android.hardware.Camera.getCameraInfo(cameraId, info);
-            int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-            int degrees = 0;
-            switch (rotation)
-            {
-                case Surface.ROTATION_0:
-                    degrees = 0;
-                    break;
-                case Surface.ROTATION_90:
-                    degrees = 90;
-                    break;
-                case Surface.ROTATION_180:
-                    degrees = 180;
-                    break;
-                case Surface.ROTATION_270:
-                    degrees = 270;
-                    break;
-            }
-
-            int result;
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
-            {
-                result = (info.orientation + degrees) % 360;
-                result = (360 - result) % 360;  // compensate the mirror
-            }
-            else
-            {  // back-facing
-                result = (info.orientation - degrees + 360) % 360;
-            }
-            camera.setDisplayOrientation(result);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
 
     // ---------------
     @Override
@@ -558,6 +407,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             @Override
             public void run()
             {
+                try
+                {
+                    // Thread.sleep(5000);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 active_camera_type = FRONT_CAMERA_USED;
                 CameraWrapper.camera_preview_size2 = null;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
@@ -589,4 +446,5 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         SurfaceHolder holder = this.cameraSurfacePreview.getSurfaceHolder();
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
+
 }

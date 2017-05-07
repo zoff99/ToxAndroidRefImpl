@@ -41,6 +41,19 @@ android {
         exclude 'LICENSE.txt'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/rxjava.properties'
+//
+        exclude 'lib/armeabi/libRSSupport.so'
+        exclude 'lib/armeabi/librsjni.so'
+        exclude 'lib/arm64-v8a/libRSSupport.so'
+        exclude 'lib/arm64-v8a/librsjni.so'
+        exclude 'lib/mips64/libRSSupport.so'
+        exclude 'lib/mips64/librsjni.so'
+        exclude 'lib/mips/libRSSupport.so'
+        exclude 'lib/mips/librsjni.so'
+        exclude 'lib/x86/libRSSupport.so'
+        exclude 'lib/x86/librsjni.so'
+        exclude 'lib/x86_64/libRSSupport.so'
+        exclude 'lib/x86_64/librsjni.so'
     }
 
     lintOptions {
@@ -68,10 +81,13 @@ android {
 
     defaultConfig {
         applicationId "com.zoffcc.applications.trifa"
-        minSdkVersion 18
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 10000
         versionName "1.0.0"
+
+        renderscriptTargetApi 16
+        renderscriptSupportModeEnabled true
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -93,20 +109,17 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
 
-
-    compile('com.mikepenz:materialdrawer:5.9.0@aar') {
+    compile('com.mikepenz:materialdrawer:5.9.1@aar') {
         transitive = true
     }
-    //Google Material Icons
-    //FontAwesome
-    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.github.gfx.android.orma:orma:4.2.4'
     compile 'com.mikepenz:google-material-typeface:3.0.1.0.original@aar'
     compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
     compile 'com.google.zxing:core:3.3.0'
     compile 'com.android.support:support-vector-drawable:25.3.1'
+    compile 'com.github.gfx.android.orma:orma:4.2.4'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.4'
 }

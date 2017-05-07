@@ -70,18 +70,14 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         {
             imageView2.setImageResource(R.drawable.circle_green);
         }
+        else if (values.get(position).TOX_USER_STATUS == 1)
+        {
+            imageView2.setImageResource(R.drawable.circle_orange);
+        }
         else
         {
-            if (values.get(position).TOX_USER_STATUS == 1)
-            {
-                imageView2.setImageResource(R.drawable.circle_orange);
-            }
-            else
-            {
-                imageView2.setImageResource(R.drawable.circle_red);
-            }
+            imageView2.setImageResource(R.drawable.circle_red);
         }
-
 
         return rowView;
     }

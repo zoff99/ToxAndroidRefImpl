@@ -32,7 +32,7 @@ import android.widget.ListView;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListFragment extends ListFragment
 {
@@ -79,9 +79,7 @@ public class MessageListFragment extends ListFragment
                     Log.i(TAG, "scroll to bottom:1");
                     Thread.sleep(300); // TODO: really back hack!!
                     // scroll to bottom
-                    Log.i(TAG, "scroll to bottom:2");
                     scroll_to_bottom();
-                    Log.i(TAG, "scroll to bottom:2");
                 }
                 catch (Exception e)
                 {
@@ -104,7 +102,14 @@ public class MessageListFragment extends ListFragment
         MessageListActivity mla = (MessageListActivity) (getActivity());
         current_friendnum = mla.get_current_friendnum();
         Log.i(TAG, "current_friendnum=" + current_friendnum);
-        data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
+        try
+        {
+            data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         a = new MessagelistArrayAdapter(activity, data_values);
         setListAdapter(a);
 

@@ -28,7 +28,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +69,17 @@ public class FriendListFragment extends ListFragment
         data_values.clear();
         a = new FriendlistArrayAdapter(context, data_values);
         setListAdapter(a);
+
+//        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+//        {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
+//            {
+//                Toast.makeText(getActivity(), "On long click listener", Toast.LENGTH_LONG).show();
+//                // tox_friend_delete
+//                return true;
+//            }
+//        });
     }
 
     @Override
@@ -118,6 +131,19 @@ public class FriendListFragment extends ListFragment
         main_handler_s.post(myRunnable);
     }
 
+    void clear_friends()
+    {
+        Log.i(TAG, "clear_friends");
+        data_values.clear();
+    }
+
+    void add_friends_clear(final FriendList f)
+    {
+        Log.i(TAG, "add_friends_clear");
+        data_values.clear();
+        add_friends(f);
+    }
+
     void add_friends(final FriendList f)
     {
         Log.i(TAG, "add_friends");
@@ -142,6 +168,7 @@ public class FriendListFragment extends ListFragment
         main_handler_s.post(myRunnable);
     }
 
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
@@ -150,5 +177,32 @@ public class FriendListFragment extends ListFragment
         Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
         intent.putExtra("friendnum", data_values.get(position).tox_friendnum);
         startActivityForResult(intent, MessageListActivity_ID);
+    }
+
+    public void set_all_friends_to_offline()
+    {
+        Log.i(TAG, "add_friends");
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    int i = 0;
+                    for (i = 0; i < data_values.size(); i++)
+                    {
+                        data_values.get(i).TOX_CONNECTION = 0;
+                    }
+                    a.notifyDataSetChanged();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        main_handler_s.post(myRunnable);
     }
 }

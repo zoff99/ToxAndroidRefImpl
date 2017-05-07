@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 3
-static const char global_version_string[] = "0.99.3";
+#define VERSION_PATCH 5
+static const char global_version_string[] = "0.99.5";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -669,7 +669,8 @@ void android_tox_callback_friend_typing_cb(uint32_t friend_number, bool is_typin
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	// TODO
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+		android_tox_callback_friend_typing_cb_method, (jlong)(unsigned long long)friend_number, (jlong)is_typing);
 }
 
 void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data)
@@ -682,7 +683,8 @@ void android_tox_callback_friend_read_receipt_cb(uint32_t friend_number, uint32_
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	// TODO
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+		android_tox_callback_friend_read_receipt_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)message_id);
 }
 
 void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data)
@@ -1135,11 +1137,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject 
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
 {
-	dbg(99, "app_crash_C:001");
 	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir));
-	dbg(99, "app_crash_C:002");
 }
-
 
 
 // --------------- _toxfuncs_ ---------------
@@ -1481,6 +1480,82 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
     dbg(9, "add friend norequest");
 	return (jlong)(unsigned long long)friendnum;
 }
+
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv* env, jobject thiz, jobject name)
+{
+	const char *s = NULL;
+	s =  (*env)->GetStringUTFChars(env, name, NULL);
+	TOX_ERR_SET_INFO error;
+	bool res = tox_self_set_name(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
+	(*env)->ReleaseStringUTFChars(env, name, s);
+	return (jint)res;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(JNIEnv* env, jobject thiz, jobject status_message)
+{
+	const char *s = NULL;
+	s =  (*env)->GetStringUTFChars(env, status_message, NULL);
+	TOX_ERR_SET_INFO error;
+	bool res = tox_self_set_status_message(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
+	(*env)->ReleaseStringUTFChars(env, status_message, s);
+	return (jint)res;
+}
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status(JNIEnv* env, jobject thiz, jint status)
+{
+	tox_self_set_status(tox_global, (TOX_USER_STATUS)status);
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1typing(JNIEnv* env, jobject thiz, jlong friend_number, jint typing)
+{
+	TOX_ERR_SET_TYPING error;
+	bool res = tox_self_set_typing(tox_global, (uint32_t)friend_number, (bool)typing, &error);
+	return (jint)res;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1connection_1status(JNIEnv* env, jobject thiz, jlong friend_number)
+{
+	TOX_ERR_FRIEND_QUERY error;
+	TOX_CONNECTION res = tox_friend_get_connection_status(tox_global, (uint32_t)friend_number, &error);
+	return (jint)res;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1delete(JNIEnv* env, jobject thiz, jlong friend_number)
+{
+	TOX_ERR_FRIEND_DELETE error;
+	bool res = tox_friend_delete(tox_global, (uint32_t)friend_number, &error);
+	return (jint)res;
+}
+
+// -----------------------
+// TODO
+// -----------------------
+/*
+void tox_self_get_public_key(const Tox *tox, uint8_t *public_key);
+void tox_self_get_secret_key(const Tox *tox, uint8_t *secret_key);
+uint32_t tox_self_get_nospam(const Tox *tox);
+bool tox_friend_exists(const Tox *tox, uint32_t friend_number);
+bool tox_friend_get_public_key(const Tox *tox, uint32_t friend_number, uint8_t *public_key,
+TOX_ERR_FRIEND_GET_PUBLIC_KEY *error);
+uint64_t tox_friend_get_last_online(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_GET_LAST_ONLINE *error);
+TOX_USER_STATUS tox_friend_get_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
+bool tox_friend_get_typing(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
+bool tox_hash(uint8_t *hash, const uint8_t *data, size_t length);
+
+void tox_self_set_nospam(Tox *tox, uint32_t nospam);
+*/
+// -----------------------
+// TODO
+// -----------------------
 
 
 // ------------------- AV -------------------

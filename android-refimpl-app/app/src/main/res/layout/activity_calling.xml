@@ -37,18 +37,19 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/black"/>
 
-            <LinearLayout
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:background="@android:color/holo_orange_dark"
+            <FrameLayout
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_gravity="bottom|right">
 
                 <com.zoffcc.applications.trifa.CameraSurfacePreview
                     android:id="@+id/camera_surfaceview"
+                    android:gravity="center"
                     android:layout_width="0dip"
                     android:layout_height="0dip"
-                    android:layout_gravity="bottom|right"/>
-            </LinearLayout>
+                    android:layout_gravity="bottom|right"
+                    android:elevation="2dp"/>
+            </FrameLayout>
             <!--<com.zoffcc.applications.trifa.Preview-->
             <!--android:id="@+id/video_my_preview"-->
             <!--android:layout_width="100dp"-->
