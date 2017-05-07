@@ -1216,7 +1216,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNI
 		free(public_key_str2);
 	}
 
-	return (jlong)(unsigned long long)friendnum;
+	if (error != TOX_ERR_FRIEND_BY_PUBLIC_KEY_OK)
+	{
+		return (jlong)(unsigned long long)-1;
+	}
+	else
+	{
+		return (jlong)(unsigned long long)friendnum;
+	}
 }
 
 JNIEXPORT jlongArray JNICALL

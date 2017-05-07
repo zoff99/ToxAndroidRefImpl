@@ -215,6 +215,30 @@ public class CameraWrapper
             this.mCameraParamters = this.mCamera.getParameters();
             this.mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
             this.mCameraParamters.setFlashMode("off");
+
+            try
+            {
+                List<Integer> preview_framerates = this.mCameraParamters.getSupportedPreviewFrameRates();
+                Log.i(TAG, "preview_framerates=" + preview_framerates);
+                List<int[]> preview_framerates2 = this.mCameraParamters.getSupportedPreviewFpsRange();
+                int i;
+                int j;
+                for (i = 0; i < preview_framerates2.size(); i++)
+                {
+                    Log.i(TAG, "preview_framerates2[" + i + "]=" + preview_framerates2.get(i).length);
+                    for (j = 0; j < preview_framerates2.get(i).length; j++)
+                    {
+                        Log.i(TAG, "preview_framerates2[" + i + "," + j + "]=" + preview_framerates2.get(i)[j]);
+                    }
+                }
+
+                this.mCameraParamters.setPreviewFpsRange(15000, 15000);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
             this.mCameraParamters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
             this.mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
             Log.i(TAG, "preview size before=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);

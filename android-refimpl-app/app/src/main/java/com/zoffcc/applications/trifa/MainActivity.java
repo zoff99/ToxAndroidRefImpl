@@ -333,53 +333,53 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void stop_tox()
-    {
-        try
-        {
-            Thread t = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    long counter = 0;
-                    while (tox_service_fg == null)
-                    {
-                        counter++;
-                        if (counter > 100)
-                        {
-                            break;
-                        }
-
-                        try
-                        {
-                            Thread.sleep(100);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    try
-                    {
-
-                        tox_service_fg.stop_tox_fg();
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            t.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "stop_tox:EE:" + e.getMessage());
-        }
-    }
+//    static void stop_tox()
+//    {
+//        try
+//        {
+//            Thread t = new Thread()
+//            {
+//                @Override
+//                public void run()
+//                {
+//                    long counter = 0;
+//                    while (tox_service_fg == null)
+//                    {
+//                        counter++;
+//                        if (counter > 100)
+//                        {
+//                            break;
+//                        }
+//
+//                        try
+//                        {
+//                            Thread.sleep(100);
+//                        }
+//                        catch (Exception e)
+//                        {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//
+//                    try
+//                    {
+//
+//                        tox_service_fg.stop_tox_fg();
+//                    }
+//                    catch (Exception e)
+//                    {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            };
+//            t.start();
+//        }
+//        catch (Exception e)
+//        {
+//            e.printStackTrace();
+//            Log.i(TAG, "stop_tox:EE:" + e.getMessage());
+//        }
+//    }
 
     @Override
     protected void onDestroy()
@@ -1140,6 +1140,33 @@ public class MainActivity extends AppCompatActivity
             public void run()
             {
                 TrifaToxService.orma.insertIntoFriendList(f);
+            }
+        };
+        t.start();
+    }
+
+    static void delete_friend_all_messages(final long friendnum)
+    {
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                TrifaToxService.orma.deleteFromMessage().tox_friendnumEq(friendnum).execute();
+            }
+        };
+        t.start();
+    }
+
+
+    static void delete_friend(final long friendnum)
+    {
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                TrifaToxService.orma.deleteFromFriendList().tox_friendnumEq(friendnum).execute();
             }
         };
         t.start();

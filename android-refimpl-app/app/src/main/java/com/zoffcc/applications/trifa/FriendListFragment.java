@@ -24,19 +24,26 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
+import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
+import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
+import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendListFragment extends ListFragment
 {
@@ -59,6 +66,96 @@ public class FriendListFragment extends ListFragment
     {
         Log.i(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
+
+        try
+        {
+            ListView lv = getListView();
+            lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+            {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id)
+                {
+                    final int position_ = position;
+                    PopupMenu menu = new PopupMenu(v.getContext(), v);
+                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                    {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item)
+                        {
+                            int id = item.getItemId();
+                            switch (id)
+                            {
+                                case R.id.item_delete:
+
+                                    Runnable myRunnable = new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            try
+                                            {
+                                                long friend_num_temp = data_values.get(position_).tox_friendnum;
+                                                long friend_num_temp_safety = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
+
+                                                Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
+
+                                                // delete friend -------
+                                                Log.i(TAG, "onMenuItemClick:3");
+                                                delete_friend(friend_num_temp);
+                                                // delete friend -------
+
+                                                // delete friends messages -------
+                                                Log.i(TAG, "onMenuItemClick:2");
+                                                delete_friend_all_messages(friend_num_temp);
+                                                // delete friend  messages -------
+
+                                                // delete friend - tox ----
+                                                Log.i(TAG, "onMenuItemClick:4");
+                                                if (friend_num_temp_safety > -1)
+                                                {
+                                                    int res = tox_friend_delete(friend_num_temp_safety);
+                                                    update_savedata_file(); // save toxcore datafile (friend removed)
+                                                    Log.i(TAG, "onMenuItemClick:5:res=" + res);
+                                                }
+                                                // delete friend - tox ----
+
+                                                // load all friends into data list ---
+                                                Log.i(TAG, "onMenuItemClick:6");
+                                                add_all_friends_clear();
+                                                Log.i(TAG, "onMenuItemClick:7");
+                                                // load all friends into data list ---
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    };
+                                    main_handler_s.post(myRunnable);
+
+                                    break;
+                            }
+                            return true;
+                        }
+                    });
+                    menu.inflate(R.menu.menu_friendlist_item);
+                    menu.show();
+
+                    return true;
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onCreateView:2:EE:" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -70,16 +167,16 @@ public class FriendListFragment extends ListFragment
         a = new FriendlistArrayAdapter(context, data_values);
         setListAdapter(a);
 
-//        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
-//        {
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
-//            {
-//                Toast.makeText(getActivity(), "On long click listener", Toast.LENGTH_LONG).show();
-//                // tox_friend_delete
-//                return true;
-//            }
-//        });
+        //        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        //        {
+        //            @Override
+        //            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
+        //            {
+        //                Toast.makeText(getActivity(), "On long click listener", Toast.LENGTH_LONG).show();
+        //                // tox_friend_delete
+        //                return true;
+        //            }
+        //        });
     }
 
     @Override
@@ -144,6 +241,43 @@ public class FriendListFragment extends ListFragment
         add_friends(f);
     }
 
+    void add_all_friends_clear()
+    {
+        Log.i(TAG, "add_all_friends_clear");
+        data_values.clear();
+
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    List<FriendList> fl = orma.selectFromFriendList().toList();
+                    if (fl != null)
+                    {
+                        if (fl.size() > 0)
+                        {
+                            int i = 0;
+                            for (i = 0; i < fl.size(); i++)
+                            {
+                                FriendList n = deep_copy(fl.get(i));
+                                data_values.add(n);
+                            }
+                        }
+                    }
+                    a.notifyDataSetChanged();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        main_handler_s.post(myRunnable);
+    }
+
     void add_friends(final FriendList f)
     {
         Log.i(TAG, "add_friends");
@@ -166,17 +300,6 @@ public class FriendListFragment extends ListFragment
         };
 
         main_handler_s.post(myRunnable);
-    }
-
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id)
-    {
-        Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_friendnum);
-
-        Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
-        intent.putExtra("friendnum", data_values.get(position).tox_friendnum);
-        startActivityForResult(intent, MessageListActivity_ID);
     }
 
     public void set_all_friends_to_offline()
@@ -205,4 +328,15 @@ public class FriendListFragment extends ListFragment
 
         main_handler_s.post(myRunnable);
     }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id)
+    {
+        Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_friendnum);
+
+        Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
+        intent.putExtra("friendnum", data_values.get(position).tox_friendnum);
+        startActivityForResult(intent, MessageListActivity_ID);
+    }
+
 }

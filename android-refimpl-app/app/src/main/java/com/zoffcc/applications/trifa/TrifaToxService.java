@@ -150,7 +150,7 @@ public class TrifaToxService extends Service
 
                         try
                         {
-                            Thread.sleep(2000);
+                            Thread.sleep(3000);
                         }
                         catch (Exception e)
                         {
@@ -159,6 +159,7 @@ public class TrifaToxService extends Service
 
                         Log.i(TAG, "stop_me:005");
 
+                        nmn2.cancel(ONGOING_NOTIFICATION_ID);
                         MainActivity.exit();
 
                         Log.i(TAG, "stop_me:099");
