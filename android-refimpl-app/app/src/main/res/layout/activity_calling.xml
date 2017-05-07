@@ -38,33 +38,27 @@
                 android:background="@android:color/black"/>
 
             <FrameLayout
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="125dp"
+                android:layout_height="125dp"
                 android:layout_gravity="bottom|right">
 
-                <com.zoffcc.applications.trifa.CameraSurfacePreview
-                    android:id="@+id/camera_surfaceview"
-                    android:gravity="center"
-                    android:layout_width="0dip"
-                    android:layout_height="0dip"
+                <FrameLayout
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_gravity="bottom|right"
-                    android:elevation="2dp"/>
-            </FrameLayout>
-            <!--<com.zoffcc.applications.trifa.Preview-->
-            <!--android:id="@+id/video_my_preview"-->
-            <!--android:layout_width="100dp"-->
-            <!--android:layout_height="100dp"-->
-            <!--android:layout_gravity="bottom|right"-->
-            <!--android:background="@android:color/transparent"-->
-            <!--android:gravity="center">-->
+                    android:background="@drawable/border_001"
+                    android:padding="5dp">
 
-            <!--<com.zoffcc.applications.trifa.CameraPreviewSurfaceview-->
-            <!--android:id="@+id/video_my_preview_surfaceview"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:background="@android:color/transparent">-->
-            <!--</com.zoffcc.applications.trifa.CameraPreviewSurfaceview>-->
-            <!--</com.zoffcc.applications.trifa.Preview>-->
+                    <com.zoffcc.applications.trifa.CameraSurfacePreview
+                        android:id="@+id/camera_surfaceview"
+                        android:layout_width="0dip"
+
+                        android:layout_height="0dip"
+                        android:layout_gravity="bottom|right"
+                        android:elevation="2dp"
+                        android:gravity="center"/>
+                </FrameLayout>
+            </FrameLayout>
 
         </FrameLayout>
 
