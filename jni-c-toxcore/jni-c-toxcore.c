@@ -93,7 +93,6 @@ TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
 ToxAV *tox_av_global = NULL;
 CallControl mytox_CC;
-int global_video_active = 0;
 pthread_t tid[2]; // 0 -> toxav_iterate thread, 1 -> video send thread
 
 
@@ -943,25 +942,10 @@ void *thread_av(void *data)
 
 	while (toxav_iterate_thread_stop != 1)
 	{
-		if (global_video_active == 1)
-		{
-			pthread_mutex_lock(&av_thread_lock);
-
-			pthread_mutex_unlock(&av_thread_lock);
-			yieldcpu(1000); // 1 frame every 1 seconds!!
-			// yieldcpu(DEFAULT_FPS_SLEEP_MS); /* ~6 frames per second */
-
-			continue; /* We're running video, so don't sleep for and extra 100 */
-		}
-		else
-		{
-		}
-
 		usleep(toxav_iteration_interval(av) * 1000);
 		// yieldcpu(10);
 	}
 
-	// unreachable code
 	dbg(2, "ToxVideo:Clean thread exit!\n");
 
 	(*cachedJVM)->DetachCurrentThread(cachedJVM);
@@ -1005,7 +989,6 @@ void *thread_video_av(void *data)
 		usleep(toxav_iteration_interval(av) * 1000);
 	}
 
-	// unreachable code
 	dbg(2, "ToxVideo:Clean video thread exit!\n");
 
 	(*cachedJVM)->DetachCurrentThread(cachedJVM);
@@ -1292,8 +1275,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
 void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv* env, jobject thiz)
 {
 	dbg(9, "tox_kill ... START");
-	tox_kill(tox_global);
-
 	toxav_iterate_thread_stop = 1;
 	pthread_join(tid[0], NULL); // wait for toxav iterate thread to end
 
@@ -1301,6 +1282,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv* env
 	pthread_join(tid[1], NULL); // wait for toxav video thread to end
 
 	toxav_kill(tox_av_global);
+	tox_kill(tox_global);
+	tox_av_global = NULL;
 	tox_global = NULL;
 	dbg(9, "tox_kill ... READY");
 }

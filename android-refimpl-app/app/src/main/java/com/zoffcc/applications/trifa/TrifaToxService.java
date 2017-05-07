@@ -129,7 +129,7 @@ public class TrifaToxService extends Service
                         while (is_tox_started)
                         {
                             i++;
-                            if (i > 2000)
+                            if (i > 20)
                             {
                                 break;
                             }
@@ -150,7 +150,7 @@ public class TrifaToxService extends Service
 
                         try
                         {
-                            Thread.sleep(3000);
+                            Thread.sleep(1500);
                         }
                         catch (Exception e)
                         {
@@ -325,7 +325,7 @@ public class TrifaToxService extends Service
                 {
                     try
                     {
-                        sleep(tox_iteration_interval_ms);
+                        Thread.sleep(tox_iteration_interval_ms);
                     }
                     catch (InterruptedException e)
                     {
@@ -341,12 +341,31 @@ public class TrifaToxService extends Service
 
                 try
                 {
+                    Thread.sleep(200); // wait a bit, for "something" to finish up in the native code
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
                     MainActivity.tox_kill();
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
+
+                try
+                {
+                    Thread.sleep(200); // wait a bit, for "something" to finish up in the native code
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
             }
         };
 
