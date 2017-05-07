@@ -52,7 +52,6 @@
                     <com.zoffcc.applications.trifa.CameraSurfacePreview
                         android:id="@+id/camera_surfaceview"
                         android:layout_width="0dip"
-
                         android:layout_height="0dip"
                         android:layout_gravity="bottom|right"
                         android:elevation="2dp"
@@ -102,6 +101,7 @@
             android:layout_height="32dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
+            android:clickable="true"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
             android:src="@drawable/circle_blue"/>
@@ -120,6 +120,7 @@
             android:layout_height="32dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
+            android:clickable="true"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
             android:src="@drawable/circle_orange"/>
