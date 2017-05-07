@@ -45,7 +45,7 @@ public class CameraWrapper
     public static final int IMAGE_HEIGHT = 480; // 720
     static byte[] data_new = null;
     static byte[] data_new2 = null;
-    static boolean mirror_cam_image = false; // mirror the camera image (correct video, but uses more CPU !!)
+    static boolean mirror_cam_image = false; // mirror the camera image
     private CameraPreviewCallback mCameraPreviewCallback;
     // private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
