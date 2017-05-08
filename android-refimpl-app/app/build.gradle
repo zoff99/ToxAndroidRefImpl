@@ -122,4 +122,7 @@ dependencies {
     compile 'com.android.support:support-vector-drawable:25.3.1'
     compile 'com.github.gfx.android.orma:orma:4.2.4'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.4'
+    
+    compile 'com.github.hotchemi:permissionsdispatcher:2.4.0'
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
 }
