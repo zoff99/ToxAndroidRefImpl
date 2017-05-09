@@ -123,7 +123,8 @@ int video_buffer_2_y_size = 0;
 int video_buffer_2_u_size = 0;
 int video_buffer_2_v_size = 0;
 
-
+uint8_t *audio_buffer_pcm_1 = NULL;
+long audio_buffer_pcm_1_size = 0;
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -838,6 +839,27 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer2(JNIEnv*
 // ----- get video buffer 2 from Java -----
 // ----- get video buffer 2 from Java -----
 
+
+
+// ----- get audio buffer from Java -----
+// ----- get audio buffer from Java -----
+// ----- get audio buffer from Java -----
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer(JNIEnv* env, jobject thiz, jobject audio_buffer)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+    audio_buffer_pcm_1 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, audio_buffer);
+
+	dbg(9, "video_buffer_2=(call)%p audio_buffer=%p", audio_buffer_pcm_1, audio_buffer);
+
+    jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, audio_buffer);
+	audio_buffer_pcm_1_size = (long)capacity;
+}
+// ----- get audio buffer from Java -----
+// ----- get audio buffer from Java -----
+// ----- get audio buffer from Java -----
 
 
 
@@ -1714,6 +1736,61 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv
 
 	return (jint)error;
 }
+
+
+/**
+ * Send an audio frame to a friend.
+ *
+ * The expected format of the PCM data is: [s1c1][s1c2][...][s2c1][s2c2][...]...
+ * Meaning: sample 1 for channel 1, sample 1 for channel 2, ...
+ * For mono audio, this has no meaning, every sample is subsequent. For stereo,
+ * this means the expected format is LRLRLR... with samples for left and right
+ * alternating.
+ *
+ * @param friend_number The friend number of the friend to which to send an
+ * audio frame.
+ * @param pcm An array of audio samples. The size of this array must be
+ * sample_count * channels.
+ * @param sample_count Number of samples in this frame. Valid numbers here are
+ * ((sample rate) * (audio length) / 1000), where audio length can be
+ * 2.5, 5, 10, 20, 40 or 60 millseconds.
+ * @param channels Number of audio channels. Supported values are 1 and 2.
+ * @param sampling_rate Audio sampling rate used in this frame. Valid sampling
+ * rates are 8000, 12000, 16000, 24000, or 48000.
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv* env, jobject thiz, jlong friend_number, jlong sample_count, jint channels, jlong sampling_rate)
+{
+	TOXAV_ERR_SEND_FRAME error;
+
+	if (audio_buffer_pcm_1)
+	{
+		uint16_t *pcm = (uint16_t *)audio_buffer_pcm_1;
+
+		bool res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
+			(uint8_t)channels, (uint32_t)sampling_rate, &error);
+	}
+
+	return (jint)error;
+}
+
+
+/**
+ * The function type for the audio_receive_frame callback. The callback can be
+ * called multiple times per single iteration depending on the amount of queued
+ * frames in the buffer. The received format is the same as in send function.
+ *
+ * @param friend_number The friend number of the friend who sent an audio frame.
+ * @param pcm An array of audio samples (sample_count * channels elements).
+ * @param sample_count The number of audio samples per channel in the PCM array.
+ * @param channels Number of audio channels.
+ * @param sampling_rate Sampling rate used in this frame.
+ *
+ */
+// typedef void toxav_audio_receive_frame_cb(ToxAV *av, uint32_t friend_number, const int16_t *pcm, size_t sample_count,
+//        uint8_t channels, uint32_t sampling_rate, void *user_data);
+
+
 // ------------------- AV -------------------
 // ------------------- AV -------------------
 // ------------------- AV -------------------

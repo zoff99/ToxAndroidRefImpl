@@ -19,13 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.Manifest;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -40,9 +38,6 @@ import android.widget.TextView;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
-
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.RuntimePermissions;
 
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
@@ -76,6 +71,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static int back_camera_id = -1;
     static int active_camera_id = 0;
     // public static final String FRAGMENT_TAG = "camera_preview_fragment_";
+    static AudioRecording audio_thread = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -234,7 +230,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 return true;
             }
         });
-
     }
 
     public static void close_calling_activity()
@@ -392,6 +387,19 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     protected void onResume()
     {
         super.onResume();
+
+        try
+        {
+            if (audio_thread.stopped)
+            {
+                audio_thread = new AudioRecording();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     void toggle_camera()
@@ -452,6 +460,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     protected void onPause()
     {
         super.onPause();
+
+        try
+        {
+            if (!audio_thread.stopped)
+            {
+                audio_thread.close();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     // ---------------

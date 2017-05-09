@@ -688,6 +688,28 @@ public class MainActivity extends AppCompatActivity
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
     public static native void set_JNI_video_buffer2(ByteBuffer buffer, int frame_width_px, int frame_height_px);
+
+    public static native void set_JNI_audio_buffer(ByteBuffer audio_buffer);
+
+    /**
+     * Send an audio frame to a friend.
+     * <p>
+     * The expected format of the PCM data is: [s1c1][s1c2][...][s2c1][s2c2][...]...
+     * Meaning: sample 1 for channel 1, sample 1 for channel 2, ...
+     * For mono audio, this has no meaning, every sample is subsequent. For stereo,
+     * this means the expected format is LRLRLR... with samples for left and right
+     * alternating.
+     *
+     * @param friend_number The friend number of the friend to which to send an
+     *                      audio frame.
+     * @param sample_count  Number of samples in this frame. Valid numbers here are
+     *                      ((sample rate) * (audio length) / 1000), where audio length can be
+     *                      2.5, 5, 10, 20, 40 or 60 millseconds.
+     * @param channels      Number of audio channels. Supported values are 1 and 2.
+     * @param sampling_rate Audio sampling rate used in this frame. Valid sampling
+     *                      rates are 8000, 12000, 16000, 24000, or 48000.
+     */
+    public static native int toxav_audio_send_frame(long friend_number, long sample_count, int channels, long sampling_rate);
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -907,7 +929,6 @@ public class MainActivity extends AppCompatActivity
             Callstate.video_bitrate = video_bit_rate;
         }
     }
-
 
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
