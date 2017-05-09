@@ -19,7 +19,7 @@ public class AudioRecording extends Thread
     // the audio recording options
     static final int RECORDING_RATE = 48000; // 16000; // 44100;
     static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-    static final int FORMAT = AudioFormat.ENCODING_PCM_8BIT;
+    static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
 
@@ -78,17 +78,17 @@ public class AudioRecording extends Thread
                 if (!((Callstate.tox_call_state == 0) || (Callstate.tox_call_state == 1) || (Callstate.tox_call_state == 2)))
                 {
                     read_bytes = recorder.read(buffer, 0, buffer.length);
-                    Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
+                    // Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
 
                     audio_buffer.rewind();
                     audio_buffer.put(buffer);
 
-                    Log.i(TAG, "audio length=" + ((float) read_bytes * (float) 1000 / (float) SMAPLINGRATE_TOX));
-                    Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000));
-                    Log.i(TAG, "audio xxxxxx=" + (((float) SMAPLINGRATE_TOX) * (float) (60) / (float) 1000));
+                    // Log.i(TAG, "audio length=" + ((float) read_bytes * (float) 1000 / (float) SMAPLINGRATE_TOX));
+                    // Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000))
+                    // Log.i(TAG, "audio xxxxxx=" + (((float) SMAPLINGRATE_TOX) * (float) (60) / (float) 1000));
 
                     res = toxav_audio_send_frame(Callstate.friend_number, (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                    Log.i(TAG, "audio:res=" + res);
+                    // Log.i(TAG, "audio:res=" + res);
                 }
             }
             catch (Exception e)
