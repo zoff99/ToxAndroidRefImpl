@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/item_info"
+        android:title="Info"
+        android:visible="true"
+        app:showAsAction="ifRoom|withText"/>
+    <item
         android:id="@+id/item_delete"
         android:title="Delete"
         android:visible="true"
