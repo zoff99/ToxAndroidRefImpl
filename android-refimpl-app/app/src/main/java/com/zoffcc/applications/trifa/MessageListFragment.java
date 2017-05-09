@@ -64,7 +64,15 @@ public class MessageListFragment extends ListFragment
         MessageListActivity mla = (MessageListActivity) (getActivity());
         current_friendnum = mla.get_current_friendnum();
         Log.i(TAG, "current_friendnum=" + current_friendnum);
-        data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
+        try
+        {
+            data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            data_values.clear();
+        }
         a = new MessagelistArrayAdapter(context, data_values);
         setListAdapter(a);
 

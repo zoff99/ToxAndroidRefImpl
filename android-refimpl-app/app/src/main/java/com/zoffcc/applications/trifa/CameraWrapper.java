@@ -85,19 +85,55 @@ public class CameraWrapper
             Camera.getCameraInfo(i, cameraInfo);
             if (cameraInfo.facing == camera_type)
             {
-                mCamera = Camera.open(i);
+                try
+                {
+                    mCamera = Camera.open(i);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    try
+                    {
+                        Thread.sleep(200);
+                    }
+                    catch (InterruptedException e1)
+                    {
+                        e1.printStackTrace();
+                    }
+
+                    try
+                    {
+                        mCamera = Camera.open(i);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                        mCamera = null;
+                    }
+                }
                 break;
             }
         }
+
         if (mCamera == null)
         {
-            Log.d(TAG, "this camera (" + front_camera + ") type found; opening default");
-            mCamera = Camera.open();    // opens first back-facing camera
+            try
+            {
+                Log.d(TAG, "this camera (" + front_camera + ") type found; opening default");
+                mCamera = Camera.open();    // opens first back-facing camera
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                mCamera = null;
+            }
         }
+
         if (mCamera == null)
         {
             throw new RuntimeException("Unable to open camera");
         }
+
         Log.i(TAG, "Camera open over....");
         callback.cameraHasOpened();
     }
@@ -210,7 +246,10 @@ public class CameraWrapper
         if (this.mCamera != null)
         {
             this.camera_video_rotate_angle = getRotation();
+
+            // TODO: it crashes on Nougat 7.x here -------------------
             CameraSurfacePreview.mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
+            // TODO: it crashes on Nougat 7.x here -------------------
 
             this.mCameraParamters = this.mCamera.getParameters();
             this.mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!

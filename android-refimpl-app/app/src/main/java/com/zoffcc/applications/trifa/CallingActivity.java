@@ -19,11 +19,13 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.Manifest;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -39,9 +41,13 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
+
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
+@RuntimePermissions
 public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback
 {
     private static final boolean AUTO_HIDE = true;
@@ -78,6 +84,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_calling);
+
+        // get permission ----------
+        CallingActivityPermissionsDispatcher.dummyForPermissions002WithCheck(this);
+        // get permission ----------
 
         callactivity_handler = new Handler(getMainLooper());
         callactivity_handler_s = callactivity_handler;
@@ -497,8 +507,31 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     public void cameraHasOpened()
     {
+        Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
+        Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
+        Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         SurfaceHolder holder = this.cameraSurfacePreview.getSurfaceHolder();
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
+
+    // ------- for runtime permissions -------
+    // ------- for runtime permissions -------
+    // ------- for runtime permissions -------
+    @NeedsPermission({Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO})
+    void dummyForPermissions002()
+    {
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        CallingActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+    // ------- for runtime permissions -------
+    // ------- for runtime permissions -------
+    // ------- for runtime permissions -------
 
 }
