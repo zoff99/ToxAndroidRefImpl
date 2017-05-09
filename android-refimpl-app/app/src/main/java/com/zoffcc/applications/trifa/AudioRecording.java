@@ -17,11 +17,11 @@ public class AudioRecording extends Thread
     static boolean finished = true;
 
     // the audio recording options
-    static final int RECORDING_RATE = 44100; // 16000; // 44100;
+    static final int RECORDING_RATE = 48000; // 16000; // 44100;
     static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-    static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+    static final int FORMAT = AudioFormat.ENCODING_PCM_8BIT;
     static final int CHANNELS_TOX = 1;
-    static final long SMAPLINGRATE_TOX = 44100; // 16000;
+    static final long SMAPLINGRATE_TOX = 48000; // 16000;
 
     ByteBuffer audio_buffer = null;
     static int buffer_size = 0;
@@ -55,7 +55,7 @@ public class AudioRecording extends Thread
             audio_buffer = ByteBuffer.allocateDirect(buffer_size);
             set_JNI_audio_buffer(audio_buffer);
 
-            recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDING_RATE, CHANNEL, FORMAT, buffer_size);
+            recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, buffer_size);
             recorder.startRecording();
         }
         catch (Exception e)
@@ -73,16 +73,23 @@ public class AudioRecording extends Thread
         {
             try
             {
-                read_bytes = recorder.read(buffer, 0, buffer.length);
-                Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
+                // only send audio frame if call has started
+                // Log.i(TAG, "Callstate.tox_call_state=" + Callstate.tox_call_state);
+                if (!((Callstate.tox_call_state == 0) || (Callstate.tox_call_state == 1) || (Callstate.tox_call_state == 2)))
+                {
+                    read_bytes = recorder.read(buffer, 0, buffer.length);
+                    Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
 
-                audio_buffer.rewind();
-                audio_buffer.put(buffer);
+                    audio_buffer.rewind();
+                    audio_buffer.put(buffer);
 
-                Log.i(TAG, "audio length=" + ((float) read_bytes * (float) 1000 / (float) SMAPLINGRATE_TOX));
-                Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000));
+                    Log.i(TAG, "audio length=" + ((float) read_bytes * (float) 1000 / (float) SMAPLINGRATE_TOX));
+                    Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000));
+                    Log.i(TAG, "audio xxxxxx=" + (((float) SMAPLINGRATE_TOX) * (float) (60) / (float) 1000));
 
-                res = toxav_audio_send_frame(Callstate.friend_number, (long) read_bytes, CHANNELS_TOX, SMAPLINGRATE_TOX);
+                    res = toxav_audio_send_frame(Callstate.friend_number, (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                    Log.i(TAG, "audio:res=" + res);
+                }
             }
             catch (Exception e)
             {

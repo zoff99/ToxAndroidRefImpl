@@ -19,11 +19,9 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.Manifest;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -32,9 +30,6 @@ import android.view.SurfaceHolder;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
-
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.RuntimePermissions;
 
 public class CameraWrapper
 {
@@ -378,8 +373,10 @@ public class CameraWrapper
                 try
                 {
 
+                    // Log.i(TAG, "Callstate.tox_call_state=" + Callstate.tox_call_state);
+
                     // only send video frame if call has started
-                    if (!((Callstate.tox_call_state == 0) && (Callstate.tox_call_state == 1) && (Callstate.tox_call_state == 2)))
+                    if (!((Callstate.tox_call_state == 0) || (Callstate.tox_call_state == 1) || (Callstate.tox_call_state == 2)))
                     {
                         // Log.i(TAG, "YUV420 data bytes=" + data.length);
 
