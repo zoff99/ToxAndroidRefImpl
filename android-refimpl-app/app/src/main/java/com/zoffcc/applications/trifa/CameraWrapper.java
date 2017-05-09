@@ -19,9 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.Manifest;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -30,6 +32,9 @@ import android.view.SurfaceHolder;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
 public class CameraWrapper
 {
@@ -68,7 +73,13 @@ public class CameraWrapper
         return mCameraWrapper;
     }
 
+
     public void doOpenCamera(CamOpenOverCallback callback, boolean front_camera)
+    {
+        doOpenCamera_wrapper(callback, front_camera);
+    }
+
+    public void doOpenCamera_wrapper(CamOpenOverCallback callback, boolean front_camera)
     {
         Log.i(TAG, "Camera open....");
         int numCameras = Camera.getNumberOfCameras();

@@ -19,9 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -35,6 +37,9 @@ import android.widget.TextView;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
+
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
@@ -288,7 +293,7 @@ public class MessageListActivity extends AppCompatActivity
 
     public void start_call_to_friend(View view)
     {
-        Log.i(TAG, "start_call_to_friend");
+        Log.i(TAG, "start_call_to_friend_real");
 
         if (!is_tox_started)
         {

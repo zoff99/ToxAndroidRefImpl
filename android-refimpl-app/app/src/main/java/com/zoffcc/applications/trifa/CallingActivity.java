@@ -47,7 +47,6 @@ import permissions.dispatcher.RuntimePermissions;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
-@RuntimePermissions
 public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback
 {
     private static final boolean AUTO_HIDE = true;
@@ -84,10 +83,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_calling);
-
-        // get permission ----------
-        CallingActivityPermissionsDispatcher.dummyForPermissions002WithCheck(this);
-        // get permission ----------
 
         callactivity_handler = new Handler(getMainLooper());
         callactivity_handler_s = callactivity_handler;
@@ -513,25 +508,4 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         SurfaceHolder holder = this.cameraSurfacePreview.getSurfaceHolder();
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
-
-    // ------- for runtime permissions -------
-    // ------- for runtime permissions -------
-    // ------- for runtime permissions -------
-    @NeedsPermission({Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO})
-    void dummyForPermissions002()
-    {
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // NOTE: delegate the permission handling to generated method
-        CallingActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
-    }
-    // ------- for runtime permissions -------
-    // ------- for runtime permissions -------
-    // ------- for runtime permissions -------
-
 }
