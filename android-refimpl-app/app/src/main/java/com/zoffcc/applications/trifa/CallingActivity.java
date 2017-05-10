@@ -71,6 +71,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static int back_camera_id = -1;
     static int active_camera_id = 0;
     // public static final String FRAGMENT_TAG = "camera_preview_fragment_";
+    static AudioRecording audio_thread = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -229,7 +230,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 return true;
             }
         });
-
     }
 
     public static void close_calling_activity()
@@ -387,6 +387,19 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     protected void onResume()
     {
         super.onResume();
+
+        try
+        {
+            if (audio_thread.stopped)
+            {
+                audio_thread = new AudioRecording();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     void toggle_camera()
@@ -447,6 +460,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     protected void onPause()
     {
         super.onPause();
+
+        try
+        {
+            if (!audio_thread.stopped)
+            {
+                audio_thread.close();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     // ---------------
@@ -497,8 +522,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     public void cameraHasOpened()
     {
+        Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
+        Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
+        Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         SurfaceHolder holder = this.cameraSurfacePreview.getSurfaceHolder();
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
-
 }

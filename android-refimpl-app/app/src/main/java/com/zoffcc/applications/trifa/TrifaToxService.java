@@ -32,6 +32,7 @@ import android.widget.RemoteViews;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
@@ -43,6 +44,9 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
@@ -352,6 +356,66 @@ public class TrifaToxService extends Service
 
                 MainActivity.tox_iterate();
 
+                if (ADD_BOTS_ON_STARTUP)
+                {
+                    boolean need_add_bots = true;
+                    List<TRIFADatabaseGlobals> dbg = null;
+                    try
+                    {
+                        dbg = orma.selectFromTRIFADatabaseGlobals().keyEq("ADD_BOTS_ON_STARTUP_done").toList();
+                    }
+                    catch (Exception e)
+                    {
+                        dbg = null;
+                    }
+
+                    if (dbg != null)
+                    {
+                        if (dbg.size() > 0)
+                        {
+                            if (dbg.get(0).value.equals("true"))
+                            {
+                                need_add_bots = false;
+                                Log.i(TAG, "need_add_bots=false");
+                            }
+                        }
+                    }
+
+                    if (need_add_bots)
+                    {
+                        Log.i(TAG, "need_add_bots:start");
+                        add_friend_real(ECHOBOT_TOXID);
+                        add_friend_real(GROUPBOT_TOXID);
+                        try
+                        {
+                            TRIFADatabaseGlobals g_opts = new TRIFADatabaseGlobals();
+                            g_opts.key = "ADD_BOTS_ON_STARTUP_done";
+                            g_opts.value = "true";
+                            orma.insertIntoTRIFADatabaseGlobals(g_opts);
+                            Log.i(TAG, "need_add_bots=true (INSERT)");
+                        }
+                        catch (android.database.sqlite.SQLiteConstraintException e)
+                        {
+                            e.printStackTrace();
+                            try
+                            {
+                                orma.updateTRIFADatabaseGlobals().keyEq("ADD_BOTS_ON_STARTUP_done").value("true").execute();
+                                Log.i(TAG, "need_add_bots=true (UPDATE)");
+                            }
+                            catch (Exception e2)
+                            {
+                                e2.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
+
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 while (!stop_me)
                 {
                     try
@@ -369,6 +433,12 @@ public class TrifaToxService extends Service
                     MainActivity.tox_iterate();
 
                 }
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                // ------- MAIN TOX LOOP ---------------------------------------------------------------
+
 
                 try
                 {

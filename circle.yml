@@ -334,6 +334,7 @@ test:
     - adb shell am start -n $CLASS_P/$START_INTENT_P
     - sleep 60
     - sleep 120 # wait to be sure the app has started fully
+    - sleep 120 # wait a bit more
 
     - died_count=`cat $CIRCLE_ARTIFACTS/adb_out.txt|grep 'Process. '"$CLASS_P"', PID.'|wc -l|tr -d ' '` ; if [ $died_count -gt 0 ]; then echo "app crashed"; exit 1; fi
 

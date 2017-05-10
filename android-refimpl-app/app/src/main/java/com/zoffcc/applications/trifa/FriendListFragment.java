@@ -39,6 +39,7 @@ import java.util.List;
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
+import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
@@ -49,6 +50,7 @@ public class FriendListFragment extends ListFragment
 {
     private static final String TAG = "trifa.FriendListFrgnt";
     static final int MessageListActivity_ID = 2;
+    static final int FriendInfoActivity_ID = 3;
     List<FriendList> data_values = new ArrayList<FriendList>();
     FriendlistArrayAdapter a = null;
 
@@ -85,6 +87,18 @@ public class FriendListFragment extends ListFragment
                             int id = item.getItemId();
                             switch (id)
                             {
+                                case R.id.item_info:
+                                    // show friend info page -----------------
+                                    long friend_num_temp = data_values.get(position_).tox_friendnum;
+                                    long friend_num_temp_safety = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
+
+                                    Log.i(TAG, "onMenuItemClick:info:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
+
+                                    Intent intent = new Intent(main_activity_s, FriendInfoActivity.class);
+                                    intent.putExtra("friendnum", friend_num_temp_safety);
+                                    startActivityForResult(intent, FriendInfoActivity_ID);
+                                    break;
+                                // show friend info page -----------------
                                 case R.id.item_delete:
 
                                     Runnable myRunnable = new Runnable()

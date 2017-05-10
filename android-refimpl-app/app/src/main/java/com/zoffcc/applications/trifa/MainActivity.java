@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Notification;
 import android.content.Context;
@@ -59,10 +60,14 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
+
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 
+@RuntimePermissions
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
@@ -115,6 +120,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
+
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
 
@@ -122,6 +128,10 @@ public class MainActivity extends AppCompatActivity
         main_handler_s = main_handler;
         context_s = this.getBaseContext();
         main_activity_s = this;
+
+        // get permission ----------
+        MainActivityPermissionsDispatcher.dummyForPermissions001WithCheck(this);
+        // get permission ----------
 
         // -------- drawer ------------
         // -------- drawer ------------
@@ -269,6 +279,26 @@ public class MainActivity extends AppCompatActivity
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
     }
+
+    // ------- for runtime permissions -------
+    // ------- for runtime permissions -------
+    // ------- for runtime permissions -------
+    @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA})
+    void dummyForPermissions001()
+    {
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+    // ------- for runtime permissions -------
+    // ------- for runtime permissions -------
+    // ------- for runtime permissions -------
 
     void tox_thread_start()
     {
@@ -439,6 +469,38 @@ public class MainActivity extends AppCompatActivity
                 status_message(f.status_message).
                 TOX_CONNECTION(f.TOX_CONNECTION).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
+                execute();
+    }
+
+    synchronized static void update_friend_in_db_status_message(FriendList f)
+    {
+        TrifaToxService.orma.updateFriendList().
+                tox_friendnumEq(f.tox_friendnum).
+                status_message(f.status_message).
+                execute();
+    }
+
+    synchronized static void update_friend_in_db_status(FriendList f)
+    {
+        TrifaToxService.orma.updateFriendList().
+                tox_friendnumEq(f.tox_friendnum).
+                TOX_USER_STATUS(f.TOX_USER_STATUS).
+                execute();
+    }
+
+    synchronized static void update_friend_in_db_connection_status(FriendList f)
+    {
+        TrifaToxService.orma.updateFriendList().
+                tox_friendnumEq(f.tox_friendnum).
+                TOX_CONNECTION(f.TOX_CONNECTION).
+                execute();
+    }
+
+    synchronized static void update_friend_in_db_name(FriendList f)
+    {
+        TrifaToxService.orma.updateFriendList().
+                tox_friendnumEq(f.tox_friendnum).
+                status_message(f.name).
                 execute();
     }
 
@@ -626,6 +688,28 @@ public class MainActivity extends AppCompatActivity
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
     public static native void set_JNI_video_buffer2(ByteBuffer buffer, int frame_width_px, int frame_height_px);
+
+    public static native void set_JNI_audio_buffer(ByteBuffer audio_buffer);
+
+    /**
+     * Send an audio frame to a friend.
+     * <p>
+     * The expected format of the PCM data is: [s1c1][s1c2][...][s2c1][s2c2][...]...
+     * Meaning: sample 1 for channel 1, sample 1 for channel 2, ...
+     * For mono audio, this has no meaning, every sample is subsequent. For stereo,
+     * this means the expected format is LRLRLR... with samples for left and right
+     * alternating.
+     *
+     * @param friend_number The friend number of the friend to which to send an
+     *                      audio frame.
+     * @param sample_count  Number of samples in this frame. Valid numbers here are
+     *                      ((sample rate) * (audio length) / 1000), where audio length can be
+     *                      2.5, 5, 10, 20, 40 or 60 millseconds.
+     * @param channels      Number of audio channels. Supported values are 1 and 2.
+     * @param sampling_rate Audio sampling rate used in this frame. Valid sampling
+     *                      rates are 8000, 12000, 16000, 24000, or 48000.
+     */
+    public static native int toxav_audio_send_frame(long friend_number, long sample_count, int channels, long sampling_rate);
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -742,6 +826,7 @@ public class MainActivity extends AppCompatActivity
         main_handler_s.post(myRunnable);
     }
 
+
     synchronized static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
     {
         // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
@@ -792,6 +877,7 @@ public class MainActivity extends AppCompatActivity
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
     {
         Log.i(TAG, "toxav_call_state:from=" + friend_number + " state=" + a_TOXAV_FRIEND_CALL_STATE);
+        Log.i(TAG, "Callstate.tox_call_state=" + a_TOXAV_FRIEND_CALL_STATE + " old=" + Callstate.tox_call_state);
 
         if (Callstate.state == 1)
         {
@@ -845,7 +931,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
@@ -876,7 +961,7 @@ public class MainActivity extends AppCompatActivity
             if (f != null)
             {
                 f.name = friend_name;
-                update_friend_in_db(f);
+                update_friend_in_db_name(f);
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
@@ -892,7 +977,7 @@ public class MainActivity extends AppCompatActivity
             if (f != null)
             {
                 f.status_message = status_message;
-                update_friend_in_db(f);
+                update_friend_in_db_status_message(f);
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
@@ -906,7 +991,7 @@ public class MainActivity extends AppCompatActivity
         if (f != null)
         {
             f.TOX_USER_STATUS = a_TOX_USER_STATUS;
-            update_friend_in_db(f);
+            update_friend_in_db_status(f);
 
             try
             {
@@ -937,7 +1022,7 @@ public class MainActivity extends AppCompatActivity
             if (f != null)
             {
                 f.TOX_CONNECTION = a_TOX_CONNECTION;
-                update_friend_in_db(f);
+                update_friend_in_db_connection_status(f);
 
                 try
                 {
@@ -1067,6 +1152,14 @@ public class MainActivity extends AppCompatActivity
             }
         };
         t.start();
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        // just in case, update own activity pointer!
+        main_activity_s = this;
     }
 
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
@@ -1215,53 +1308,7 @@ public class MainActivity extends AppCompatActivity
                 String friend_tox_id = "";
                 friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
 
-                Log.i(TAG, "add friend ID:" + friend_tox_id);
-
-                // add friend ---------------
-                long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
-                Log.i(TAG, "add friend  #:" + friendnum);
-                update_savedata_file(); // save toxcore datafile (new friend added)
-
-                if (friendnum > -1)
-                {
-                    // nospam=8 chars, checksum=4 chars
-                    String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
-                    Log.i(TAG, "add friend PK:" + friend_public_key);
-
-                    FriendList f = new FriendList();
-                    f.tox_public_key_string = friend_public_key;
-                    f.tox_friendnum = friendnum;
-                    try
-                    {
-                        // set name as the last 5 char of TOXID (until we get a name sent from friend)
-                        f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        f.name = "Unknown";
-                    }
-                    f.TOX_USER_STATUS = 0;
-                    f.TOX_CONNECTION = 0;
-
-                    try
-                    {
-                        insert_into_friendlist_db(f);
-                    }
-                    catch (android.database.sqlite.SQLiteConstraintException e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    friend_list_fragment.modify_friend(f, friendnum);
-                }
-
-                if (friendnum == -1)
-                {
-                    Log.i(TAG, "friend already added, or request already sent");
-                }
-
-                // add friend ---------------
+                add_friend_real(friend_tox_id);
             }
             else
             {
@@ -1270,6 +1317,55 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static void add_friend_real(String friend_tox_id)
+    {
+        Log.i(TAG, "add friend ID:" + friend_tox_id);
+
+        // add friend ---------------
+        long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
+        Log.i(TAG, "add friend  #:" + friendnum);
+        update_savedata_file(); // save toxcore datafile (new friend added)
+
+        if (friendnum > -1)
+        {
+            // nospam=8 chars, checksum=4 chars
+            String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
+            Log.i(TAG, "add friend PK:" + friend_public_key);
+
+            FriendList f = new FriendList();
+            f.tox_public_key_string = friend_public_key;
+            f.tox_friendnum = friendnum;
+            try
+            {
+                // set name as the last 5 char of TOXID (until we get a name sent from friend)
+                f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                f.name = "Unknown";
+            }
+            f.TOX_USER_STATUS = 0;
+            f.TOX_CONNECTION = 0;
+
+            try
+            {
+                insert_into_friendlist_db(f);
+            }
+            catch (android.database.sqlite.SQLiteConstraintException e)
+            {
+                e.printStackTrace();
+            }
+
+            friend_list_fragment.modify_friend(f, friendnum);
+        }
+
+        if (friendnum == -1)
+        {
+            Log.i(TAG, "friend already added, or request already sent");
+        }
+        // add friend ---------------
+    }
 
     static String get_friend_name_from_num(long friendnum)
     {
