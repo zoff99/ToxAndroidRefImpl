@@ -19,9 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -72,6 +74,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static int active_camera_id = 0;
     // public static final String FRAGMENT_TAG = "camera_preview_fragment_";
     static AudioRecording audio_thread = null;
+    static AudioReceiver audio_receiver_thread = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -84,6 +87,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         callactivity_handler_s = callactivity_handler;
 
         ca = this;
+
+        // set volume control -------------
+        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        manager.setMode(AudioManager.MODE_NORMAL);
+        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        // set volume control -------------
 
         mVisible = true;
         mContentView = (ImageView) findViewById(R.id.video_view);
@@ -400,6 +409,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e.printStackTrace();
         }
 
+
+        try
+        {
+            if (audio_receiver_thread.stopped)
+            {
+                audio_receiver_thread = new AudioReceiver();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     void toggle_camera()
@@ -472,6 +493,19 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+
+        try
+        {
+            if (!audio_receiver_thread.stopped)
+            {
+                audio_receiver_thread.close();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     // ---------------

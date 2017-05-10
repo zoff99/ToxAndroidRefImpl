@@ -96,6 +96,8 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
+    static ByteBuffer audio_buffer_2 = null;
+    static int audio_buffer_2_read_length = 0;
     static TrifaToxService tox_service_fg = null;
 
     // YUV conversion -------
@@ -248,6 +250,7 @@ public class MainActivity extends AppCompatActivity
         Callstate.state = 0;
         Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
         Callstate.call_first_video_frame_received = -1;
+        Callstate.call_first_audio_frame_received = -1;
 
         if (native_lib_loaded)
         {
@@ -500,7 +503,7 @@ public class MainActivity extends AppCompatActivity
     {
         TrifaToxService.orma.updateFriendList().
                 tox_friendnumEq(f.tox_friendnum).
-                status_message(f.name).
+                name(f.name).
                 execute();
     }
 
@@ -687,9 +690,12 @@ public class MainActivity extends AppCompatActivity
 
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
-    public static native void set_JNI_video_buffer2(ByteBuffer buffer, int frame_width_px, int frame_height_px);
+    public static native void set_JNI_video_buffer2(ByteBuffer buffer2, int frame_width_px, int frame_height_px);
 
     public static native void set_JNI_audio_buffer(ByteBuffer audio_buffer);
+
+    // buffer2 is for incoming audio
+    public static native void set_JNI_audio_buffer2(ByteBuffer audio_buffer2);
 
     /**
      * Send an audio frame to a friend.
@@ -798,6 +804,7 @@ public class MainActivity extends AppCompatActivity
                         Callstate.state = 1;
                         Callstate.accepted_call = 0;
                         Callstate.call_first_video_frame_received = -1;
+                        Callstate.call_first_audio_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_number = fn;
@@ -929,6 +936,20 @@ public class MainActivity extends AppCompatActivity
             Callstate.audio_bitrate = audio_bit_rate;
             Callstate.video_bitrate = video_bit_rate;
         }
+    }
+
+    static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
+    {
+        if (Callstate.call_first_audio_frame_received == -1)
+        {
+            Callstate.call_first_audio_frame_received = System.currentTimeMillis();
+
+            audio_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
+            set_JNI_audio_buffer2(audio_buffer_2);
+        }
+
+        // TODO: dirty hack, "make good"
+        audio_buffer_2_read_length = (int) sample_count;
     }
 
     // -------- called by AV native methods --------
@@ -1154,14 +1175,6 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        // just in case, update own activity pointer!
-        main_activity_s = this;
-    }
-
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
     {
         Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
@@ -1209,6 +1222,15 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        // just in case, update own activity pointer!
+        main_activity_s = this;
+    }
+
 
     public void show_add_friend(View view)
     {

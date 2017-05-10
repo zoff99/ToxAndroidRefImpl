@@ -164,6 +164,11 @@ public class CameraWrapper
             Log.i(TAG, "doStartPreview:EE:" + e.getMessage());
             e.printStackTrace();
         }
+        catch (Exception e)
+        {
+            Log.i(TAG, "doStartPreview:EE2:" + e.getMessage());
+            e.printStackTrace();
+        }
         Log.i(TAG, "doStartPreview:initCamera");
         initCamera();
     }
