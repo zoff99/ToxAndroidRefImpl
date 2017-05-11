@@ -409,7 +409,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e.printStackTrace();
         }
 
-
         try
         {
             if (audio_receiver_thread.stopped)

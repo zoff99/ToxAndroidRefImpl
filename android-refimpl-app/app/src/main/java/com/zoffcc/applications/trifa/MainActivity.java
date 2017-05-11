@@ -1181,6 +1181,14 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        // just in case, update own activity pointer!
+        main_activity_s = this;
+    }
+
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
     {
         Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
