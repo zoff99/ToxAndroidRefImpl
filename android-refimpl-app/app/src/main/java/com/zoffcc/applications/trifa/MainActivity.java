@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -44,6 +43,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import com.github.gfx.android.orma.AccessThreadConstraint;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -96,6 +96,8 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
+    static ByteBuffer audio_buffer_2 = null;
+    static int audio_buffer_2_read_length = 0;
     static TrifaToxService tox_service_fg = null;
 
     // YUV conversion -------
@@ -248,6 +250,7 @@ public class MainActivity extends AppCompatActivity
         Callstate.state = 0;
         Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
         Callstate.call_first_video_frame_received = -1;
+        Callstate.call_first_audio_frame_received = -1;
 
         if (native_lib_loaded)
         {
@@ -273,7 +276,12 @@ public class MainActivity extends AppCompatActivity
         // --- forground service ---
 
         // See OrmaDatabaseBuilderBase for other options.
-        TrifaToxService.orma = OrmaDatabase.builder(this).name(MAIN_DB_NAME).build();
+        OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+        // builder = builder.provider(new EncryptedDatabase.Provider("password"));
+        TrifaToxService.orma = builder.name(MAIN_DB_NAME).
+                readOnMainThread(AccessThreadConstraint.WARNING).
+                writeOnMainThread(AccessThreadConstraint.WARNING).
+                build();
         // default: "${applicationId}.orma.db"
 
         app_files_directory = getFilesDir().getAbsolutePath();
@@ -500,7 +508,7 @@ public class MainActivity extends AppCompatActivity
     {
         TrifaToxService.orma.updateFriendList().
                 tox_friendnumEq(f.tox_friendnum).
-                status_message(f.name).
+                name(f.name).
                 execute();
     }
 
@@ -593,6 +601,66 @@ public class MainActivity extends AppCompatActivity
     {
         super.onBackPressed();
     }
+
+
+    // -- this is for incoming video --
+    // -- this is for incoming video --
+    static void allocate_video_buffer_1(int frame_width_px1, int frame_height_px1, long ystride, long ustride, long vstride)
+    {
+        if (video_buffer_1 != null)
+        {
+            // video_buffer_1.clear();
+            video_buffer_1 = null;
+        }
+
+        if (video_frame_image != null)
+        {
+            video_frame_image.recycle();
+            video_frame_image = null;
+        }
+
+        /*
+        * YUV420 frame with width * height
+        *
+        * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
+        * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
+        * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
+        */
+        int y_layer_size = (int) Math.max(frame_width_px1, Math.abs(ystride)) * frame_height_px1;
+        int u_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(ustride)) * (frame_height_px1 / 2);
+        int v_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(vstride)) * (frame_height_px1 / 2);
+
+        int frame_width_px = (int) Math.max(frame_width_px1, Math.abs(ystride));
+        int frame_height_px = (int) frame_height_px1;
+
+        buffer_size_in_bytes = y_layer_size + v_layer_size + u_layer_size;
+
+        Log.i(TAG, "YUV420 frame w1=" + frame_width_px1 + " h1=" + frame_height_px1 + " bytes=" + buffer_size_in_bytes);
+        Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
+        Log.i(TAG, "YUV420 frame ystride=" + ystride + " ustride=" + ustride + " vstride=" + vstride);
+        video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
+        set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
+
+        RenderScript rs = RenderScript.create(context_s);
+        yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
+
+        // --------- works !!!!! ---------
+        // --------- works !!!!! ---------
+        // --------- works !!!!! ---------
+        Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px).setY(frame_height_px);
+        yuvType.setYuvFormat(ImageFormat.YV12);
+        alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
+        Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
+        alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
+        // --------- works !!!!! ---------
+        // --------- works !!!!! ---------
+        // --------- works !!!!! ---------
+
+        video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
+    }
+    // -- this is for incoming video --
+    // -- this is for incoming video --
+
 
     static
     {
@@ -687,9 +755,12 @@ public class MainActivity extends AppCompatActivity
 
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
-    public static native void set_JNI_video_buffer2(ByteBuffer buffer, int frame_width_px, int frame_height_px);
+    public static native void set_JNI_video_buffer2(ByteBuffer buffer2, int frame_width_px, int frame_height_px);
 
     public static native void set_JNI_audio_buffer(ByteBuffer audio_buffer);
+
+    // buffer2 is for incoming audio
+    public static native void set_JNI_audio_buffer2(ByteBuffer audio_buffer2);
 
     /**
      * Send an audio frame to a friend.
@@ -722,62 +793,6 @@ public class MainActivity extends AppCompatActivity
     // -------- called by AV native methods --------
     // -------- called by AV native methods --------
 
-    // -- this is for incoming video --
-    // -- this is for incoming video --
-    static void allocate_video_buffer_1(int frame_width_px1, int frame_height_px1, long ystride, long ustride, long vstride)
-    {
-        if (video_buffer_1 != null)
-        {
-            // video_buffer_1.clear();
-            video_buffer_1 = null;
-        }
-
-        if (video_frame_image != null)
-        {
-            video_frame_image.recycle();
-            video_frame_image = null;
-        }
-
-        /*
-        * YUV420 frame with width * height
-        *
-        * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
-        * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
-        * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
-        */
-        int y_layer_size = (int) Math.max(frame_width_px1, Math.abs(ystride)) * frame_height_px1;
-        int u_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(ustride)) * (frame_height_px1 / 2);
-        int v_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(vstride)) * (frame_height_px1 / 2);
-
-        int frame_width_px = (int) Math.max(frame_width_px1, Math.abs(ystride));
-        int frame_height_px = (int) frame_height_px1;
-
-        buffer_size_in_bytes = y_layer_size + v_layer_size + u_layer_size;
-
-        Log.i(TAG, "YUV420 frame w1=" + frame_width_px1 + " h1=" + frame_height_px1 + " bytes=" + buffer_size_in_bytes);
-        Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
-        Log.i(TAG, "YUV420 frame ystride=" + ystride + " ustride=" + ustride + " vstride=" + vstride);
-        video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
-        set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
-
-        RenderScript rs = RenderScript.create(context_s);
-        yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
-
-        // --------- works !!!!! ---------
-        // --------- works !!!!! ---------
-        // --------- works !!!!! ---------
-        Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px).setY(frame_height_px);
-        yuvType.setYuvFormat(ImageFormat.YV12);
-        alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
-        Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
-        alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
-        // --------- works !!!!! ---------
-        // --------- works !!!!! ---------
-        // --------- works !!!!! ---------
-
-        video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
-    }
-
     static void android_toxav_callback_call_cb_method(long friend_number, int audio_enabled, int video_enabled)
     {
         Log.i(TAG, "toxav_call:from=" + friend_number + " audio=" + audio_enabled + " video=" + video_enabled);
@@ -798,6 +813,7 @@ public class MainActivity extends AppCompatActivity
                         Callstate.state = 1;
                         Callstate.accepted_call = 0;
                         Callstate.call_first_video_frame_received = -1;
+                        Callstate.call_first_audio_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_number = fn;
@@ -841,37 +857,34 @@ public class MainActivity extends AppCompatActivity
             CallingActivity.update_top_text_line(temp_string_a);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        try
         {
-            try
-            {
-                alloc_in.copyFrom(video_buffer_1.array());
-                yuvToRgb.setInput(alloc_in);
-                yuvToRgb.forEach(alloc_out);
-                alloc_out.copyTo(video_frame_image);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            Runnable myRunnable = new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        CallingActivity.mContentView.setImageBitmap(video_frame_image);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            main_handler_s.post(myRunnable);
+            alloc_in.copyFrom(video_buffer_1.array());
+            yuvToRgb.setInput(alloc_in);
+            yuvToRgb.forEach(alloc_out);
+            alloc_out.copyTo(video_frame_image);
         }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    CallingActivity.mContentView.setImageBitmap(video_frame_image);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
     }
 
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
@@ -929,6 +942,20 @@ public class MainActivity extends AppCompatActivity
             Callstate.audio_bitrate = audio_bit_rate;
             Callstate.video_bitrate = video_bit_rate;
         }
+    }
+
+    static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
+    {
+        if (Callstate.call_first_audio_frame_received == -1)
+        {
+            Callstate.call_first_audio_frame_received = System.currentTimeMillis();
+
+            audio_buffer_2 = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+            set_JNI_audio_buffer2(audio_buffer_2);
+        }
+
+        // TODO: dirty hack, "make good"
+        audio_buffer_2_read_length = (int) sample_count;
     }
 
     // -------- called by AV native methods --------
@@ -1209,6 +1236,15 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        // just in case, update own activity pointer!
+        main_activity_s = this;
+    }
+
 
     public void show_add_friend(View view)
     {

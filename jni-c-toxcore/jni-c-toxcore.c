@@ -1,4 +1,4 @@
-﻿/**
+/**
  * [TRIfA], JNI part of Tox Reference Implementation for Android
  * Copyright (C) 2017 Zoff <zoff@zoff.cc>
  *
@@ -126,6 +126,9 @@ int video_buffer_2_v_size = 0;
 uint8_t *audio_buffer_pcm_1 = NULL;
 long audio_buffer_pcm_1_size = 0;
 
+uint8_t *audio_buffer_pcm_2 = NULL;
+long audio_buffer_pcm_2_size = 0;
+
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_name_cb_method = NULL;
@@ -141,6 +144,7 @@ jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
 jmethodID android_toxav_callback_call_state_cb_method = NULL;
 jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
+jmethodID android_toxav_callback_audio_receive_frame_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 // -------- _callbacks_ --------
 
@@ -170,10 +174,6 @@ void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *us
 void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data);
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data);
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
-
-void toxav_call_cd(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool video_enabled, void *user_data);
-void toxav_video_receive_frame_cd(ToxAV *av, uint32_t friend_number, uint16_t width, uint16_t height,
-     const uint8_t *y, const uint8_t *u, const uint8_t *v, int32_t ystride, int32_t ustride, int32_t vstride, void *user_data);
 
 void android_logger(int level, const char* logtext);
 // functions -----------
@@ -763,11 +763,45 @@ void android_toxav_callback_bit_rate_status_cb(uint32_t friend_number, uint32_t 
           android_toxav_callback_bit_rate_status_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)audio_bit_rate, (jlong)(unsigned long long)video_bit_rate);
 
 }
+
 void toxav_bit_rate_status_cb_(ToxAV *av, uint32_t friend_number, uint32_t audio_bit_rate, uint32_t video_bit_rate, void *user_data)
 {
 	android_toxav_callback_bit_rate_status_cb(friend_number, audio_bit_rate, video_bit_rate);
 }
 
+void android_toxav_callback_audio_receive_frame_cb(uint32_t friend_number, size_t sample_count, uint8_t channels, uint32_t sampling_rate)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_toxav_callback_audio_receive_frame_cb_method, (jlong)(unsigned long long)friend_number,
+		(jlong)(unsigned long long)sample_count, (jint)channels,
+		(jlong)(unsigned long long)sampling_rate
+		);
+}
+
+/**
+ * The function type for the audio_receive_frame callback. The callback can be
+ * called multiple times per single iteration depending on the amount of queued
+ * frames in the buffer. The received format is the same as in send function.
+ *
+ * @param friend_number The friend number of the friend who sent an audio frame.
+ * @param pcm An array of audio samples (sample_count * channels elements).
+ * @param sample_count The number of audio samples per channel in the PCM array.
+ * @param channels Number of audio channels.
+ * @param sampling_rate Sampling rate used in this frame.
+ *
+ */
+void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, void *user_data)
+{
+	if ((audio_buffer_pcm_2 != NULL) && (pcm != NULL))
+	{
+		memcpy(audio_buffer_pcm_2, pcm, sample_count);
+	}
+
+	android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
+}
 
 void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height, int32_t ystride, int32_t ustride, int32_t vstride)
 {
@@ -829,11 +863,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer2(JNIEnv*
 	jnienv2 = jni_getenv();
 
     video_buffer_2 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, buffer2);
-
-	dbg(9, "video_buffer_2=(call)%p buffer2=%p", video_buffer_2, buffer2);
-
+	dbg(9, "video_buffer_2=(call.a)%p buffer2=%p", video_buffer_2, buffer2);
     jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer2);
+	dbg(9, "video_buffer_2=(call.b)capacity");
 	video_buffer_2_size = (long)capacity;
+	dbg(9, "video_buffer_2=(call.b)capacity=%d", (int)video_buffer_2_size);
 }
 // ----- get video buffer 2 from Java -----
 // ----- get video buffer 2 from Java -----
@@ -852,11 +886,26 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer(JNIEnv* 
 
     audio_buffer_pcm_1 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, audio_buffer);
 
-	dbg(9, "video_buffer_2=(call)%p audio_buffer=%p", audio_buffer_pcm_1, audio_buffer);
+	dbg(9, "audio_buffer_1=(call)%p audio_buffer=%p", audio_buffer_pcm_1, audio_buffer);
 
     jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, audio_buffer);
 	audio_buffer_pcm_1_size = (long)capacity;
 }
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer2(JNIEnv* env, jobject thiz, jobject audio_buffer2)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+    audio_buffer_pcm_2 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, audio_buffer2);
+
+	dbg(9, "audio_buffer_2=(call)%p audio_buffer2=%p", audio_buffer_pcm_2, audio_buffer2);
+
+    jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, audio_buffer2);
+	audio_buffer_pcm_2_size = (long)capacity;
+}
+
 // ----- get audio buffer from Java -----
 // ----- get audio buffer from Java -----
 // ----- get audio buffer from Java -----
@@ -1110,7 +1159,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
     toxav_callback_call_state(tox_av_global, toxav_call_state_cb_, &mytox_CC);
 	android_toxav_callback_bit_rate_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_bit_rate_status_cb_method", "(JJJ)V");
     toxav_callback_bit_rate_status(tox_av_global, toxav_bit_rate_status_cb_, &mytox_CC);
-    // toxav_callback_audio_receive_frame(tox_av_global, t_toxav_receive_audio_frame_cb, &mytox_CC);
+	android_toxav_callback_audio_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_toxav_callback_audio_receive_frame_cb_method", "(JJIJ)V");
+    toxav_callback_audio_receive_frame(tox_av_global, toxav_audio_receive_frame_cb_, &mytox_CC);
 	dbg(9, "linking AV callbacks ... READY");
 	// init AV callbacks -------------------------------
 
@@ -1773,24 +1823,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
 	return (jint)error;
 }
-
-
-/**
- * The function type for the audio_receive_frame callback. The callback can be
- * called multiple times per single iteration depending on the amount of queued
- * frames in the buffer. The received format is the same as in send function.
- *
- * @param friend_number The friend number of the friend who sent an audio frame.
- * @param pcm An array of audio samples (sample_count * channels elements).
- * @param sample_count The number of audio samples per channel in the PCM array.
- * @param channels Number of audio channels.
- * @param sampling_rate Sampling rate used in this frame.
- *
- */
-// typedef void toxav_audio_receive_frame_cb(ToxAV *av, uint32_t friend_number, const int16_t *pcm, size_t sample_count,
-//        uint8_t channels, uint32_t sampling_rate, void *user_data);
-
-
 // ------------------- AV -------------------
 // ------------------- AV -------------------
 // ------------------- AV -------------------

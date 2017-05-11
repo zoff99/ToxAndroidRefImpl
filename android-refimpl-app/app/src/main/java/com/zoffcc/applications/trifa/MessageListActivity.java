@@ -313,7 +313,6 @@ public class MessageListActivity extends AppCompatActivity
         final int f_audio_enabled = 10;
         final int f_video_enabled = 10;
 
-        MainActivity.toxav_call(friendnum, f_audio_enabled, f_video_enabled);
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -328,6 +327,7 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.accepted_call = 1; // we started the call, so it's already accepted on our side
                         Callstate.call_first_video_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
+                        Callstate.camera_opened = false;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_number = fn;
                         try
@@ -339,6 +339,59 @@ public class MessageListActivity extends AppCompatActivity
                             Callstate.friend_name = "Unknown";
                             e.printStackTrace();
                         }
+
+                        Thread t = new Thread()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                Log.i(TAG, "wating for camera open");
+
+                                try
+                                {
+                                    Thread.sleep(20);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+
+                                boolean waiting = true;
+                                int i = 0;
+                                while (waiting)
+                                {
+                                    i++;
+                                    if (Callstate.camera_opened)
+                                    {
+                                        Log.i(TAG, "Callstate.camera_opened" + Callstate.camera_opened);
+                                        waiting = false;
+                                    }
+
+                                    if (i > 80)
+                                    {
+                                        waiting = false;
+                                    }
+
+                                    try
+                                    {
+                                        Thread.sleep(200); // wait a bit
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                try
+                                {
+                                    MainActivity.toxav_call(friendnum, f_audio_enabled, f_video_enabled);
+                                }
+                                catch (android.database.sqlite.SQLiteConstraintException e)
+                                {
+                                }
+                            }
+                        };
+                        t.start();
+
                         Callstate.other_audio_enabled = f_audio_enabled;
                         Callstate.other_video_enabled = f_video_enabled;
                         Callstate.call_init_timestamp = System.currentTimeMillis();

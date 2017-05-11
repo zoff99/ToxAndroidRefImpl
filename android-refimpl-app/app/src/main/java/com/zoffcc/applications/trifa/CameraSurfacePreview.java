@@ -206,7 +206,7 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         try
         {
             Log.i(TAG, "surfaceCreated:re init camera:START");
-            CallingActivity.reinit_camera(CallingActivity.ca);
+            // CallingActivity.reinit_camera(CallingActivity.ca);
             Log.i(TAG, "surfaceCreated:re init camera:READY");
         }
         catch (Exception e)
@@ -221,26 +221,25 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
         Log.i(TAG, "surfaceChanged...");
-        try
-        {
-            CameraWrapper.mCamera.startPreview();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "surfaceChanged:EE1:" + e.getMessage());
-        }
-
-        try
-        {
-            CameraWrapper.mCamera.startPreview();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "surfaceChanged:EE2:" + e.getMessage());
-        }
-
+//        try
+//        {
+//            CameraWrapper.mCamera.startPreview();
+//        }
+//        catch (Exception e)
+//        {
+//            e.printStackTrace();
+//            Log.i(TAG, "surfaceChanged:EE1:" + e.getMessage());
+//        }
+//
+//        try
+//        {
+//            CameraWrapper.mCamera.startPreview();
+//        }
+//        catch (Exception e)
+//        {
+//            e.printStackTrace();
+//            Log.i(TAG, "surfaceChanged:EE2:" + e.getMessage());
+//        }
     }
 
     @Override

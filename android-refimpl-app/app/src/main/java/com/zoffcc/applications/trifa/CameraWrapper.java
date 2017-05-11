@@ -164,6 +164,11 @@ public class CameraWrapper
             Log.i(TAG, "doStartPreview:EE:" + e.getMessage());
             e.printStackTrace();
         }
+        catch (Exception e)
+        {
+            Log.i(TAG, "doStartPreview:EE2:" + e.getMessage());
+            e.printStackTrace();
+        }
         Log.i(TAG, "doStartPreview:initCamera");
         initCamera();
     }
@@ -430,7 +435,6 @@ public class CameraWrapper
                             // so we need to call ..._uv_reversed here
                             // -------------------------------------------------
                             MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
-                            // camera.addCallbackBuffer(data_new2);
                         }
                         else
                         {
@@ -442,7 +446,6 @@ public class CameraWrapper
                             // so we need to call ..._uv_reversed here
                             // -------------------------------------------------
                             MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
-                            // camera.addCallbackBuffer(data);
                         }
                     }
                 }
