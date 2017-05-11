@@ -863,11 +863,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer2(JNIEnv*
 	jnienv2 = jni_getenv();
 
     video_buffer_2 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, buffer2);
-
-	dbg(9, "video_buffer_2=(call)%p buffer2=%p", video_buffer_2, buffer2);
-
+	dbg(9, "video_buffer_2=(call.a)%p buffer2=%p", video_buffer_2, buffer2);
     jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer2);
+	dbg(9, "video_buffer_2=(call.b)capacity");
 	video_buffer_2_size = (long)capacity;
+	dbg(9, "video_buffer_2=(call.b)capacity=%d", (int)video_buffer_2_size);
 }
 // ----- get video buffer 2 from Java -----
 // ----- get video buffer 2 from Java -----
@@ -886,7 +886,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer(JNIEnv* 
 
     audio_buffer_pcm_1 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, audio_buffer);
 
-	dbg(9, "video_buffer_2=(call)%p audio_buffer=%p", audio_buffer_pcm_1, audio_buffer);
+	dbg(9, "audio_buffer_1=(call)%p audio_buffer=%p", audio_buffer_pcm_1, audio_buffer);
 
     jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, audio_buffer);
 	audio_buffer_pcm_1_size = (long)capacity;
@@ -900,7 +900,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer2(JNIEnv*
 
     audio_buffer_pcm_2 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, audio_buffer2);
 
-	dbg(9, "video_buffer_2=(call)%p audio_buffer2=%p", audio_buffer_pcm_2, audio_buffer2);
+	dbg(9, "audio_buffer_2=(call)%p audio_buffer2=%p", audio_buffer_pcm_2, audio_buffer2);
 
     jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, audio_buffer2);
 	audio_buffer_pcm_2_size = (long)capacity;

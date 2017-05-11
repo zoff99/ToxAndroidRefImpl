@@ -21,7 +21,7 @@ public class AudioReceiver extends Thread
     static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
 
-    int buffer_size = 0;
+    static int buffer_size = 50000; // TODO: bad!!!!
     AudioTrack track = null;
 
 
