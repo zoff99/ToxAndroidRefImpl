@@ -63,9 +63,16 @@ public class AddFriendActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-            Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-            startActivity(marketIntent);
+            try
+            {
+                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+                Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
+                startActivity(marketIntent);
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+            }
         }
     }
 

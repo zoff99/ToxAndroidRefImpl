@@ -206,7 +206,7 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         try
         {
             Log.i(TAG, "surfaceCreated:re init camera:START");
-            CallingActivity.reinit_camera(CallingActivity.ca);
+            // CallingActivity.reinit_camera(CallingActivity.ca);
             Log.i(TAG, "surfaceCreated:re init camera:READY");
         }
         catch (Exception e)
