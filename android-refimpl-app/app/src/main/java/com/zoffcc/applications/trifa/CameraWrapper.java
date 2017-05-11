@@ -335,6 +335,16 @@ public class CameraWrapper
         @Override
         public void onPreviewFrame(byte[] data, Camera camera)
         {
+            // -------- DISABLE --------
+            // -------- DISABLE --------
+            if (2 == (1 + 1))
+            {
+                return;
+            }
+            // -------- DISABLE --------
+            // -------- DISABLE --------
+
+
             // ----------------------------
             if (data == null)
             {
@@ -435,7 +445,6 @@ public class CameraWrapper
                             // so we need to call ..._uv_reversed here
                             // -------------------------------------------------
                             MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
-                            // camera.addCallbackBuffer(data_new2);
                         }
                         else
                         {
@@ -447,7 +456,6 @@ public class CameraWrapper
                             // so we need to call ..._uv_reversed here
                             // -------------------------------------------------
                             MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
-                            // camera.addCallbackBuffer(data);
                         }
                     }
                 }

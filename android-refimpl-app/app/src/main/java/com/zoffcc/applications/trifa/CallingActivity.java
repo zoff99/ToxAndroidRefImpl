@@ -559,6 +559,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
+        Callstate.camera_opened = true;
         SurfaceHolder holder = this.cameraSurfacePreview.getSurfaceHolder();
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
