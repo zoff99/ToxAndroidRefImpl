@@ -335,16 +335,6 @@ public class CameraWrapper
         @Override
         public void onPreviewFrame(byte[] data, Camera camera)
         {
-            // -------- DISABLE --------
-            // -------- DISABLE --------
-            if (2 == (1 + 1))
-            {
-                return;
-            }
-            // -------- DISABLE --------
-            // -------- DISABLE --------
-
-
             // ----------------------------
             if (data == null)
             {
