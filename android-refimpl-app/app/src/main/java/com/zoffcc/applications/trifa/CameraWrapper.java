@@ -402,7 +402,7 @@ public class CameraWrapper
                                 }
                                 else
                                 {
-                                    MainActivity.toxav_video_send_frame_normal(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
                                 }
                             }
                             else
@@ -415,7 +415,7 @@ public class CameraWrapper
                                 }
                                 else
                                 {
-                                    MainActivity.toxav_video_send_frame_normal(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
                                 }
                             }
                         }
@@ -436,7 +436,7 @@ public class CameraWrapper
                                 }
                                 else
                                 {
-                                    MainActivity.toxav_video_send_frame_normal(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
                                 }
                             }
                             else
@@ -449,7 +449,7 @@ public class CameraWrapper
                                 }
                                 else
                                 {
-                                    MainActivity.toxav_video_send_frame_normal(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
                                 }
                             }
                         }
@@ -470,7 +470,7 @@ public class CameraWrapper
                             }
                             else
                             {
-                                MainActivity.toxav_video_send_frame_normal(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                                MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
                             }
                         }
                         else
@@ -488,7 +488,7 @@ public class CameraWrapper
                             }
                             else
                             {
-                                MainActivity.toxav_video_send_frame_normal(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                                MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
                             }
                         }
                     }

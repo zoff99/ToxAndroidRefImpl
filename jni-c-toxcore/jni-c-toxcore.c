@@ -1767,7 +1767,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1uv_1r
  * @param v V (Chroma) plane data.
  */
 JNIEXPORT jint JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1normal(JNIEnv* env, jobject thiz, jlong friend_number, jint frame_width_px, jint frame_height_px)
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv* env, jobject thiz, jlong friend_number, jint frame_width_px, jint frame_height_px)
 {
 	TOXAV_ERR_SEND_FRAME error;
 
