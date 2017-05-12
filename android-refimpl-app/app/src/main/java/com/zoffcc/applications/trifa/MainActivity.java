@@ -24,11 +24,13 @@ import android.app.Activity;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity
     static TrifaToxService tox_service_fg = null;
     //
     static boolean UV_reversed = true; // TODO: on older phone this needs to be "false"
-
+    //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
     static Allocation alloc_in = null;
@@ -123,6 +125,12 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+
+        // prefs ----------
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        UV_reversed = settings.getBoolean("video_uv_reversed", true);
+        Log.i(TAG, "UV_reversed:2=" + UV_reversed);
+        // prefs ----------
 
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
@@ -414,6 +422,17 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        // prefs ----------
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        UV_reversed = settings.getBoolean("video_uv_reversed", true);
+        Log.i(TAG, "UV_reversed:2=" + UV_reversed);
+        // prefs ----------
     }
 
     @Override
