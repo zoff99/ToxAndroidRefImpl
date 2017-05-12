@@ -63,6 +63,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static String top_text_line_str1 = "";
     static String top_text_line_str2 = "";
     static String top_text_line_str3 = "";
+    static String top_text_line_str4 = "";
     Handler callactivity_handler = null;
     static Handler callactivity_handler_s = null;
     private static final String TAG = "trifa.CallingActivity";
@@ -193,6 +194,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         top_text_line_str1 = Callstate.friend_name;
         top_text_line_str2 = "";
         top_text_line_str3 = "";
+        top_text_line_str4 = "";
         update_top_text_line();
 
         accept_button.setOnTouchListener(new View.OnTouchListener()
@@ -252,17 +254,25 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     synchronized public static void update_top_text_line()
     {
         Log.i(TAG, "update_top_text_line(1):top_text_line_str3=" + top_text_line_str3);
-        update_top_text_line(top_text_line_str3);
+        update_top_text_line(top_text_line_str3, 3);
     }
 
-    synchronized public static void update_top_text_line(String text2)
+    synchronized public static void update_top_text_line(String text2, int linenum)
     {
         Log.i(TAG, "update_top_text_line(2):str=" + text2);
         Log.i(TAG, "update_top_text_line(2):top_text_line_str1=" + top_text_line_str1);
         Log.i(TAG, "update_top_text_line(2):top_text_line_str2=" + top_text_line_str2);
         Log.i(TAG, "update_top_text_line(2):top_text_line_str3=" + top_text_line_str3);
+        Log.i(TAG, "update_top_text_line(2):top_text_line_str4=" + top_text_line_str4);
 
-        top_text_line_str3 = text2;
+        if (linenum == 3)
+        {
+            top_text_line_str3 = text2;
+        }
+        else if (linenum == 4)
+        {
+            top_text_line_str4 = text2;
+        }
 
         Log.i(TAG, "update_top_text_line(2b):top_text_line_str3=" + top_text_line_str3);
 
@@ -275,9 +285,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     Log.i(TAG, "update_top_text_line(2c):top_text_line_str3=" + top_text_line_str3);
 
-                    if (top_text_line_str3 != "")
+                    if ((top_text_line_str3 != "") || (top_text_line_str4 != ""))
                     {
-                        top_text_line.setText(top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3);
+                        top_text_line.setText(top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" + top_text_line_str4);
                     }
                     else
                     {
