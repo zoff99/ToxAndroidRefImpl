@@ -19,11 +19,9 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.Manifest;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -38,9 +36,7 @@ import android.widget.TextView;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.RuntimePermissions;
-
+import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
@@ -383,6 +379,8 @@ public class MessageListActivity extends AppCompatActivity
                                 }
                                 try
                                 {
+                                    CallingActivity.top_text_line_str2 = "0s";
+                                    update_top_text_line();
                                     MainActivity.toxav_call(friendnum, f_audio_enabled, f_video_enabled);
                                 }
                                 catch (android.database.sqlite.SQLiteConstraintException e)

@@ -854,7 +854,7 @@ public class MainActivity extends AppCompatActivity
             allocate_video_buffer_1((int) frame_width_px, (int) frame_height_px, ystride, ustride, vstride);
 
             temp_string_a = "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
-            CallingActivity.update_top_text_line(temp_string_a);
+            CallingActivity.update_top_text_line(temp_string_a, 3);
         }
 
         try
@@ -949,6 +949,9 @@ public class MainActivity extends AppCompatActivity
         if (Callstate.call_first_audio_frame_received == -1)
         {
             Callstate.call_first_audio_frame_received = System.currentTimeMillis();
+
+            temp_string_a = "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
+            CallingActivity.update_top_text_line(temp_string_a, 4);
 
             audio_buffer_2 = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
             set_JNI_audio_buffer2(audio_buffer_2);
@@ -1179,14 +1182,6 @@ public class MainActivity extends AppCompatActivity
             }
         };
         t.start();
-    }
-
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        // just in case, update own activity pointer!
-        main_activity_s = this;
     }
 
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
