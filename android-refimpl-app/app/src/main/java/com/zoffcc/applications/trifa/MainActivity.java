@@ -952,7 +952,6 @@ public class MainActivity extends AppCompatActivity
 
             temp_string_a = "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a, 4);
-
             audio_buffer_2 = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
             set_JNI_audio_buffer2(audio_buffer_2);
         }
