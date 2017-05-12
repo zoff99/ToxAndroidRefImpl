@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity
     static ByteBuffer audio_buffer_2 = null;
     static int audio_buffer_2_read_length = 0;
     static TrifaToxService tox_service_fg = null;
+    static boolean UV_reversed = true; // TODO: on older phone this needs to be "false"
 
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -751,7 +752,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native int toxav_video_send_frame_uv_reversed(long friendnum, int frame_width_px, int frame_height_px);
 
-    public static native int toxav_video_send_frame(long friendnum, int frame_width_px, int frame_height_px);
+    public static native int toxav_video_send_frame_normal(long friendnum, int frame_width_px, int frame_height_px);
 
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
