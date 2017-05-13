@@ -200,7 +200,7 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
+  - . ~/pp;cd ~/build/;export CFLAGS="-g"; ~/c-toxcore/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
