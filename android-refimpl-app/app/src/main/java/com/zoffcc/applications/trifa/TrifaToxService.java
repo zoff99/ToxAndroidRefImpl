@@ -451,7 +451,7 @@ public class TrifaToxService extends Service
 
                 try
                 {
-                    Thread.sleep(200); // wait a bit, for "something" to finish up in the native code
+                    Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
                 {
@@ -469,7 +469,7 @@ public class TrifaToxService extends Service
 
                 try
                 {
-                    Thread.sleep(200); // wait a bit, for "something" to finish up in the native code
+                    Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
                 {
