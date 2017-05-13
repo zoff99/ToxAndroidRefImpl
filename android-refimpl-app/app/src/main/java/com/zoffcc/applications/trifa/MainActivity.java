@@ -1223,6 +1223,11 @@ public class MainActivity extends AppCompatActivity
     //    Log.i(TAG, "test:" + i);
     // }
 
+    static void android_tox_log_cb_method(int a_TOX_LOG_LEVEL, String file, long line, String function, String message)
+    {
+        Log.i(TAG, "C-TOXCORE:" + ToxVars.TOX_LOG_LEVEL.value_str(a_TOX_LOG_LEVEL) + ":file=" + file + ":linenum=" + line + ":func=" + function + ":msg=" + message);
+    }
+
     static void logger(int level, String text)
     {
         Log.i(TAG, text);

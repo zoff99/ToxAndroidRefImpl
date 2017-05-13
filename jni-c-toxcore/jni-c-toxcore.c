@@ -139,6 +139,7 @@ jmethodID android_tox_callback_friend_typing_cb_method = NULL;
 jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_cb_method = NULL;
+jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
@@ -174,6 +175,8 @@ void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *us
 void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data);
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data);
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
+
+void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message, void *user_data);
 
 void android_logger(int level, const char* logtext);
 // functions -----------
@@ -270,6 +273,10 @@ Tox *create_tox()
 	options.hole_punching_enabled = true;
 	// options.tcp_port = tcp_port;
     options.tcp_port = 0; // TCP relay is disabled !!
+	// ------------------------------------------------------------
+	// set our own handler for c-toxcore logging messages!!
+	options.log_callback = tox_log_cb__custom;
+	// ------------------------------------------------------------
 
 	dbg(9, "1007");
 	char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
@@ -736,6 +743,26 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 	android_tox_callback_friend_message_cb(friend_number, type, message, length);
 }
 
+void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
+	jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, func);
+	jstring js3 = (*jnienv2)->NewStringUTF(jnienv2, message);
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, android_tox_log_cb_method, (int)level, js1, (jlong)(unsigned long long)line, js2, js3);
+
+	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
+	(*jnienv2)->DeleteLocalRef(jnienv2, js2);
+	(*jnienv2)->DeleteLocalRef(jnienv2, js3);
+}
+
+void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message, void *user_data)
+{
+	android_tox_log_cb(level, file, line, func, message);
+}
 
 
 // ------------- AV ------------
@@ -1117,6 +1144,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	android_tox_callback_friend_read_receipt_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_read_receipt_cb_method", "(JJ)V");
 	android_tox_callback_friend_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_request_cb_method", "(Ljava/lang/String;Ljava/lang/String;J)V");
 	android_tox_callback_friend_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
+	android_tox_log_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_log_cb_method", "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
 	dbg(9, "linking callbacks ... READY");
 	// -------- _callbacks_ --------
 
