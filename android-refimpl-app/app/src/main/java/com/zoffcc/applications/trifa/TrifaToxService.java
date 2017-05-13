@@ -420,7 +420,16 @@ public class TrifaToxService extends Service
                 {
                     try
                     {
-                        Thread.sleep(tox_iteration_interval_ms);
+                        if (tox_iteration_interval_ms < 10)
+                        {
+                            Log.i(TAG, "(tox_iteration_interval_ms < 10ms!!):" + tox_iteration_interval_ms + "ms");
+                            Thread.sleep(10);
+                        }
+                        else
+                        {
+                            // Log.i(TAG, "(tox_iteration_interval_ms):" + tox_iteration_interval_ms + "ms");
+                            Thread.sleep(tox_iteration_interval_ms);
+                        }
                     }
                     catch (InterruptedException e)
                     {
