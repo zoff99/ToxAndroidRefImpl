@@ -200,7 +200,7 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O0 -g" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O0 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -215,7 +215,7 @@ compile:
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
-  - . ~/pp;cd jni-c-toxcore/; $GCC -O0 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -shared -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+  - . ~/pp;cd jni-c-toxcore/; $GCC -O0 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
   - . ~/pp;cd jni-c-toxcore/; ls -al
   #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
