@@ -71,7 +71,7 @@ public class MessageListFragment extends ListFragment
         catch (Exception e)
         {
             e.printStackTrace();
-            data_values.clear();
+            // data_values is NULL here!!
         }
         a = new MessagelistArrayAdapter(context, data_values);
         setListAdapter(a);
@@ -117,6 +117,7 @@ public class MessageListFragment extends ListFragment
         catch (Exception e)
         {
             e.printStackTrace();
+            // data_values is NULL here!!
         }
         a = new MessagelistArrayAdapter(activity, data_values);
         setListAdapter(a);
@@ -178,8 +179,15 @@ public class MessageListFragment extends ListFragment
             public void run()
             {
                 Log.i(TAG, "current_friendnum=" + current_friendnum);
-                data_values.clear();
-                data_values.addAll(orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList());
+                try
+                {
+                    data_values.clear();
+                    data_values.addAll(orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 a.notifyDataSetChanged();
                 scroll_to_bottom();
             }
