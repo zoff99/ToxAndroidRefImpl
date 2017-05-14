@@ -22,18 +22,24 @@ package com.zoffcc.applications.trifa;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.support.v8.renderscript.Allocation;
 import android.support.v8.renderscript.Element;
@@ -95,6 +101,7 @@ public class MainActivity extends AppCompatActivity
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
     final static int SettingsActivity_ID = 10004;
+    final static int Notification_new_message_ID = 10023;
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
@@ -1233,16 +1240,52 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        // start "new" notification
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Intent notificationIntent = new Intent(context_s, MainActivity.class);
+                    notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
+
+                    // -- notification ------------------
+                    // -- notification ------------------
+                    NotificationManager nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
+
+                    NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                    b.setContentIntent(pendingIntent);
+                    b.setSmallIcon(R.drawable.circle_orange);
+                    b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                    Uri default_notification_sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    b.setSound(default_notification_sound);
+                    b.setContentTitle("TRIfA");
+                    b.setAutoCancel(true);
+                    b.setContentText("new Message");
+
+                    Notification notification3 = b.build();
+                    nmn3.notify(Notification_new_message_ID, notification3);
+                    // -- notification ------------------
+                    // -- notification ------------------
+
+
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
         try
         {
-            // start "new" notification
-            FriendList f = TrifaToxService.orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+            main_handler_s.post(myRunnable);
         }
         catch (Exception e)
         {
-            e.printStackTrace();
         }
-
     }
 
     // void test(int i)
