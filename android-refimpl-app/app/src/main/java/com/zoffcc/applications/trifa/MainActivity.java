@@ -1270,8 +1270,6 @@ public class MainActivity extends AppCompatActivity
                     nmn3.notify(Notification_new_message_ID, notification3);
                     // -- notification ------------------
                     // -- notification ------------------
-
-
                 }
                 catch (Exception e)
                 {
