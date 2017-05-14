@@ -45,18 +45,17 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         this.values = values;
     }
 
-    @Override
-    public void setNotifyOnChange(boolean notifyOnChange)
-    {
-        super.setNotifyOnChange(notifyOnChange);
-
-        Log.i(TAG, "setNotifyOnChange");
-    }
+//    @Override
+//    public void setNotifyOnChange(boolean notifyOnChange)
+//    {
+//        super.setNotifyOnChange(notifyOnChange);
+//        Log.i(TAG, "setNotifyOnChange");
+//    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
+        // Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.friend_list_entry, parent, false);
@@ -68,7 +67,7 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         statusText.setText(values.get(position).status_message);
 
         TextView unread_count = (TextView) rowView.findViewById(R.id.f_unread_count);
-        Log.i(TAG, "unread_count view=" + unread_count);
+        // Log.i(TAG, "unread_count view=" + unread_count);
 
         try
         {

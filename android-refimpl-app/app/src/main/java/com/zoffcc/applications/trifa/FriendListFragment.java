@@ -205,12 +205,13 @@ public class FriendListFragment extends ListFragment
 
     void modify_friend(final FriendList f, final long friendnum)
     {
-        Log.i(TAG, "modify_friend");
+        Log.i(TAG, "modify_friend:start");
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
+                Log.i(TAG, "modify_friend:run---");
                 try
                 {
                     boolean found_friend = false;
@@ -237,9 +238,19 @@ public class FriendListFragment extends ListFragment
                 {
                     e.printStackTrace();
                 }
+                Log.i(TAG, "modify_friend:end---");
             }
         };
-        main_handler_s.post(myRunnable);
+        try
+        {
+            main_handler_s.post(myRunnable);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
+        }
+        Log.i(TAG, "modify_friend:finished");
     }
 
     @Override
