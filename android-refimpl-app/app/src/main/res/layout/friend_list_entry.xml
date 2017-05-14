@@ -69,7 +69,7 @@
             android:paddingTop="0dp">
 
             <TextView
-                android:id="@+id/unread_count"
+                android:id="@+id/f_unread_count"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"

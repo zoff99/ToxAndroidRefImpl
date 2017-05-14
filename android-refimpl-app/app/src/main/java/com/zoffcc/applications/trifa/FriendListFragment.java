@@ -242,6 +242,22 @@ public class FriendListFragment extends ListFragment
         main_handler_s.post(myRunnable);
     }
 
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        try
+        {
+            // update "new" status on friendlist fragment
+            a.notifyDataSetChanged();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     void clear_friends()
     {
         Log.i(TAG, "clear_friends");

@@ -65,6 +65,18 @@ public class MessageListFragment extends ListFragment
         MessageListActivity mla = (MessageListActivity) (getActivity());
         current_friendnum = mla.get_current_friendnum();
         Log.i(TAG, "current_friendnum=" + current_friendnum);
+
+        try
+        {
+            // reset "new" flags for messages -------
+            orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            // reset "new" flags for messages -------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         try
         {
             Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
@@ -114,6 +126,18 @@ public class MessageListFragment extends ListFragment
         MessageListActivity mla = (MessageListActivity) (getActivity());
         current_friendnum = mla.get_current_friendnum();
         Log.i(TAG, "current_friendnum=" + current_friendnum);
+
+        try
+        {
+            // reset "new" flags for messages -------
+            orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            // reset "new" flags for messages -------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         try
         {
             data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
@@ -177,12 +201,26 @@ public class MessageListFragment extends ListFragment
 
     void update_all_messages()
     {
+        Log.i(TAG, "update_all_messages");
+
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
                 Log.i(TAG, "current_friendnum=" + current_friendnum);
+
+                try
+                {
+                    // reset "new" flags for messages -------
+                    orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                    // reset "new" flags for messages -------
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 try
                 {
                     data_values.clear();
@@ -206,6 +244,7 @@ public class MessageListFragment extends ListFragment
             @Override
             public void run()
             {
+                // TODO
             }
         };
         main_handler_s.post(myRunnable);
@@ -218,6 +257,7 @@ public class MessageListFragment extends ListFragment
             @Override
             public void run()
             {
+                // TODO
             }
         };
 

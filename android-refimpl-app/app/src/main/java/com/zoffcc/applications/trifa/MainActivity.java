@@ -1221,6 +1221,28 @@ public class MainActivity extends AppCompatActivity
         m.text = friend_message;
 
         insert_into_message_db(m, true);
+
+        try
+        {
+            // update "new" status on friendlist fragment
+            FriendList f = TrifaToxService.orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+            friend_list_fragment.modify_friend(f, friend_number);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            // start "new" notification
+            FriendList f = TrifaToxService.orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     // void test(int i)
