@@ -38,6 +38,7 @@ import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message;
@@ -299,7 +300,7 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "loading friend  #:" + fc);
 
                     FriendList f;
-                    List<FriendList> fl = orma.selectFromFriendList().tox_friendnumEq(fc).toList();
+                    List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
                     if (fl.size() > 0)
                     {
                         f = fl.get(0);
@@ -315,13 +316,13 @@ public class TrifaToxService extends Service
 
                         f = new FriendList();
                         f.tox_public_key_string = "" + (Math.random() * 100000);
-                        f.tox_friendnum = fc;
+                        // f.tox_friendnum = fc;
                         f.name = "friend #" + fc;
                         exists_in_db = false;
                     }
                     else
                     {
-                        Log.i(TAG, "found friend in DB " + f.tox_friendnum + " f=" + f);
+                        Log.i(TAG, "found friend in DB " + f.tox_public_key_string + " f=" + f);
                         exists_in_db = true;
                     }
 
@@ -329,7 +330,7 @@ public class TrifaToxService extends Service
                     {
                         // get the real "live" connection status of this friend
                         // the value in the database may be old (and wrong)
-                        f.TOX_CONNECTION = tox_friend_get_connection_status(f.tox_friendnum);
+                        f.TOX_CONNECTION = tox_friend_get_connection_status(MainActivity.friends[fc]);
                     }
                     catch (Exception e)
                     {
@@ -347,7 +348,7 @@ public class TrifaToxService extends Service
                     }
                     else
                     {
-                        orma.updateFriendList().tox_friendnumEq(f.tox_friendnum).tox_friendnum(f.tox_friendnum).tox_public_key_string(f.tox_public_key_string).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
+                        orma.updateFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
                     }
                 }
 

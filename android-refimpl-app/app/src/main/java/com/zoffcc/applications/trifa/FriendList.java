@@ -12,8 +12,8 @@ public class FriendList
     @PrimaryKey
     String tox_public_key_string = "";
 
-    @Column(indexed = true, unique = true)
-    long tox_friendnum = 0L;
+    /// @Column(indexed = true, unique = true)
+    // long tox_friendnum = 0L;
 
     @Column
     @Nullable
@@ -33,7 +33,7 @@ public class FriendList
     {
         FriendList out = new FriendList();
         out.tox_public_key_string = in.tox_public_key_string;
-        out.tox_friendnum = in.tox_friendnum;
+        // out.tox_friendnum = in.tox_friendnum;
         out.name = in.name;
         out.status_message = in.status_message;
         out.TOX_CONNECTION = in.TOX_CONNECTION;
@@ -45,6 +45,6 @@ public class FriendList
     @Override
     public String toString()
     {
-        return tox_friendnum + ":" + tox_public_key_string + ":" + name + ":" + status_message + ":" + TOX_CONNECTION + ":" + TOX_USER_STATUS;
+        return tox_public_key_string + ":" + name + ":" + status_message + ":" + TOX_CONNECTION + ":" + TOX_USER_STATUS;
     }
 }

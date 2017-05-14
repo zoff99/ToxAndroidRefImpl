@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
+import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
+import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
@@ -89,7 +91,7 @@ public class FriendListFragment extends ListFragment
                             {
                                 case R.id.item_info:
                                     // show friend info page -----------------
-                                    long friend_num_temp = data_values.get(position_).tox_friendnum;
+                                    long friend_num_temp = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
                                     long friend_num_temp_safety = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
 
                                     Log.i(TAG, "onMenuItemClick:info:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
@@ -108,7 +110,7 @@ public class FriendListFragment extends ListFragment
                                         {
                                             try
                                             {
-                                                long friend_num_temp = data_values.get(position_).tox_friendnum;
+                                                long friend_num_temp = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
                                                 long friend_num_temp_safety = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
 
                                                 Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
@@ -128,6 +130,8 @@ public class FriendListFragment extends ListFragment
                                                 if (friend_num_temp_safety > -1)
                                                 {
                                                     int res = tox_friend_delete(friend_num_temp_safety);
+                                                    cache_pubkey_fnum.clear();
+                                                    cache_fnum_pubkey.clear();
                                                     update_savedata_file(); // save toxcore datafile (friend removed)
                                                     Log.i(TAG, "onMenuItemClick:5:res=" + res);
                                                 }
@@ -219,7 +223,7 @@ public class FriendListFragment extends ListFragment
                     int i = 0;
                     for (i = 0; i < size; i++)
                     {
-                        if (data_values.get(i).tox_friendnum == friendnum)
+                        if (tox_friend_by_public_key(data_values.get(i).tox_public_key_string) == friendnum)
                         {
                             found_friend = true;
                             FriendList n = deep_copy(f);
@@ -373,10 +377,10 @@ public class FriendListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-        Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_friendnum);
+        Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_public_key_string);
 
         Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
-        intent.putExtra("friendnum", data_values.get(position).tox_friendnum);
+        intent.putExtra("friendnum", tox_friend_by_public_key(data_values.get(position).tox_public_key_string));
         startActivityForResult(intent, MessageListActivity_ID);
     }
 

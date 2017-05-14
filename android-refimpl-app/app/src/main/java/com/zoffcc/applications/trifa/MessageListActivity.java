@@ -43,7 +43,6 @@ import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -200,7 +199,7 @@ public class MessageListActivity extends AppCompatActivity
                 try
                 {
                     int tox_user_status_friend = TrifaToxService.orma.selectFromFriendList().
-                            tox_friendnumEq(friendnum).
+                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                             toList().get(0).TOX_USER_STATUS;
 
                     if (tox_user_status_friend == 0)
@@ -254,8 +253,10 @@ public class MessageListActivity extends AppCompatActivity
         main_handler_s.post(myRunnable);
     }
 
-    public void send_message_onclick(View view)
+    synchronized public void send_message_onclick(View view)
     {
+        // Log.i(TAG,"send_message_onclick:---start");
+
         String msg = "";
         try
         {
@@ -271,22 +272,26 @@ public class MessageListActivity extends AppCompatActivity
             m.read = false;
             m.text = msg;
 
-            long res = tox_friend_send_message(friendnum, 0, msg);
-            Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
-
-            if (res > -1)
+            if ((msg != null) && (!msg.equalsIgnoreCase("")))
             {
-                m.message_id = res;
-                insert_into_message_db(m, true);
-                ml_new_message.setText("");
-            }
+                long res = tox_friend_send_message(friendnum, 0, msg);
+                Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
 
+                if (res > -1)
+                {
+                    m.message_id = res;
+                    insert_into_message_db(m, true);
+                    ml_new_message.setText("");
+                }
+            }
         }
         catch (Exception e)
         {
             msg = "";
             e.printStackTrace();
         }
+
+        // Log.i(TAG,"send_message_onclick:---end");
     }
 
     public void start_call_to_friend(View view)
@@ -331,7 +336,9 @@ public class MessageListActivity extends AppCompatActivity
                         // Callstate.friend_number = fn;
                         try
                         {
-                            Callstate.friend_name = orma.selectFromFriendList().tox_friendnumEq(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)).toList().get(0).name;
+                            Callstate.friend_name = orma.selectFromFriendList().
+                                    tox_public_key_stringEq(Callstate.friend_pubkey).
+                                    toList().get(0).name;
                         }
                         catch (Exception e)
                         {

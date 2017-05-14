@@ -13,6 +13,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendInfoActivity extends AppCompatActivity
@@ -56,7 +57,7 @@ public class FriendInfoActivity extends AppCompatActivity
                 @Override
                 public void run()
                 {
-                    final FriendList f = orma.selectFromFriendList().tox_friendnumEq(friendnum_).toList().get(0);
+                    final FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum_)).toList().get(0);
 
                     Runnable myRunnable = new Runnable()
                     {

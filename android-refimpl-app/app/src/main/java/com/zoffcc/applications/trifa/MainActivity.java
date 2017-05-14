@@ -66,7 +66,9 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -118,6 +120,11 @@ public class MainActivity extends AppCompatActivity
     static Bitmap video_frame_image = null;
     static int buffer_size_in_bytes = 0;
     // YUV conversion -------
+
+    // ---- lookup cache ----
+    static Map<String, Long> cache_pubkey_fnum = new HashMap<String, Long>();
+    static Map<Long, String> cache_fnum_pubkey = new HashMap<Long, String>();
+    // ---- lookup cache ----
 
     // main drawer ----------
     Drawer main_drawer = null;
@@ -453,7 +460,9 @@ public class MainActivity extends AppCompatActivity
     static FriendList main_get_friend(long friendnum)
     {
         FriendList f;
-        List<FriendList> fl = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList();
+        List<FriendList> fl = TrifaToxService.orma.selectFromFriendList().
+                tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                toList();
         if (fl.size() > 0)
         {
             f = fl.get(0);
@@ -470,7 +479,9 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            return (TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList().get(0).TOX_CONNECTION);
+            return (TrifaToxService.orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0).TOX_CONNECTION);
         }
         catch (Exception e)
         {
@@ -500,7 +511,6 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
                 tox_public_key_string(f.tox_public_key_string).
                 name(f.name).
                 status_message(f.status_message).
@@ -512,7 +522,7 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db_status_message(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_stringEq(f.tox_public_key_string).
                 status_message(f.status_message).
                 execute();
     }
@@ -520,7 +530,7 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db_status(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
                 execute();
     }
@@ -528,7 +538,7 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db_connection_status(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_CONNECTION(f.TOX_CONNECTION).
                 execute();
     }
@@ -536,7 +546,7 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db_name(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_stringEq(f.tox_public_key_string).
                 name(f.name).
                 execute();
     }
@@ -851,7 +861,9 @@ public class MainActivity extends AppCompatActivity
                         // Callstate.friend_number = fn;
                         try
                         {
-                            Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)).toList().get(0).name;
+                            Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().
+                                    tox_public_key_stringEq(Callstate.friend_pubkey).
+                                    toList().get(0).name;
                         }
                         catch (Exception e)
                         {
@@ -1141,7 +1153,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
-            Message m = TrifaToxService.orma.selectFromMessage().
+            final Message m = TrifaToxService.orma.selectFromMessage().
                     message_idEq(message_id).
                     tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
                     directionEq(1).
@@ -1154,11 +1166,26 @@ public class MainActivity extends AppCompatActivity
 
             if (m != null)
             {
-                m.rcvd_timestamp = System.currentTimeMillis();
-                m.read = true;
-                update_message_in_db_read_rcvd_timestamp(m);
-                // TODO this updates all messages. should be done nicer and faster!
-                update_message_view();
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            m.rcvd_timestamp = System.currentTimeMillis();
+                            m.read = true;
+                            update_message_in_db_read_rcvd_timestamp(m);
+                            // TODO this updates all messages. should be done nicer and faster!
+                            update_message_view();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                main_handler_s.post(myRunnable);
             }
         }
         catch (Exception e)
@@ -1195,7 +1222,6 @@ public class MainActivity extends AppCompatActivity
 
                 FriendList f = new FriendList();
                 f.tox_public_key_string = friend_public_key__final;
-                f.tox_friendnum = friendnum;
                 f.TOX_USER_STATUS = 0;
                 f.TOX_CONNECTION = 0;
 
@@ -1238,6 +1264,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
         }
 
         // start "new" notification
@@ -1336,13 +1363,43 @@ public class MainActivity extends AppCompatActivity
     public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
     {
         // TODO: cache me (friend number only changes when a friend in the middle of the list is deleted!!)
-        return tox_friend_by_public_key(friend_public_key_string);
+        if (cache_pubkey_fnum.containsKey(friend_public_key_string))
+        {
+            Log.i(TAG, "cache hit:1");
+            return cache_pubkey_fnum.get(friend_public_key_string);
+        }
+        else
+        {
+            if (cache_pubkey_fnum.size() >= 20)
+            {
+                // TODO: bad!
+                cache_pubkey_fnum.clear();
+            }
+            long result = tox_friend_by_public_key(friend_public_key_string);
+            cache_pubkey_fnum.put(friend_public_key_string, result);
+            return result;
+        }
     }
 
     public static String tox_friend_get_public_key__wrapper(long friend_number)
     {
         // TODO: cache me (friend number only changes when a friend in the middle of the list is deleted!!)
-        return tox_friend_get_public_key(friend_number);
+        if (cache_fnum_pubkey.containsKey(friend_number))
+        {
+            Log.i(TAG, "cache hit:2");
+            return cache_fnum_pubkey.get(friend_number);
+        }
+        else
+        {
+            if (cache_fnum_pubkey.size() >= 20)
+            {
+                // TODO: bad!
+                cache_fnum_pubkey.clear();
+            }
+            String result = tox_friend_get_public_key(friend_number);
+            cache_fnum_pubkey.put(friend_number, result);
+            return result;
+        }
     }
 
     public void show_add_friend(View view)
@@ -1404,7 +1461,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                TrifaToxService.orma.deleteFromFriendList().tox_friendnumEq(friendnum).execute();
+                TrifaToxService.orma.deleteFromFriendList().
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        execute();
             }
         };
         t.start();
@@ -1470,7 +1529,6 @@ public class MainActivity extends AppCompatActivity
 
             FriendList f = new FriendList();
             f.tox_public_key_string = friend_public_key;
-            f.tox_friendnum = friendnum;
             try
             {
                 // set name as the last 5 char of TOXID (until we get a name sent from friend)
@@ -1508,7 +1566,9 @@ public class MainActivity extends AppCompatActivity
         String result = "Unknown";
         try
         {
-            result = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList().get(0).name;
+            result = TrifaToxService.orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0).name;
         }
         catch (Exception e)
         {
