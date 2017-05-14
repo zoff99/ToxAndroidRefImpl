@@ -15,8 +15,11 @@ public class Message
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     long message_id = -1;
 
+    // @Column(indexed = true, helpers = Column.Helpers.ALL)
+    // long tox_friendnum;
+
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    long tox_friendnum;
+    String tox_friendpubkey;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     int direction = 0; // 0 -> msg received, 1 -> msg sent
@@ -35,6 +38,9 @@ public class Message
     @Column(helpers = Column.Helpers.ALL)
     boolean read = false;
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    boolean is_new = true;
+
     @Column(helpers = Column.Helpers.ALL)
     @Nullable
     String text = null;
@@ -47,15 +53,17 @@ public class Message
     {
         Message out = new Message();
         out.id = in.id;
-        out.tox_friendnum = in.tox_friendnum;
+        // out.tox_friendnum = in.tox_friendnum;
         out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
         out.sent_timestamp = in.sent_timestamp;
         out.rcvd_timestamp = in.rcvd_timestamp;
         out.read = in.read;
         out.text = in.text;
+        out.tox_friendpubkey = in.tox_friendpubkey;
         out.filename_fullpath = in.filename_fullpath;
         out.message_id = in.message_id;
+        out.is_new = in.is_new;
 
         return out;
     }
@@ -63,6 +71,6 @@ public class Message
     @Override
     public String toString()
     {
-        return "id=" + id + ", message_id=" + message_id + ", tox_friendnum=" + tox_friendnum + ", direction=" + direction + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", filename_fullpath=" + filename_fullpath;
+        return "id=" + id + ", message_id=" + message_id + ", tox_friendpubkey=" + tox_friendpubkey + ", direction=" + direction + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new;
     }
 }

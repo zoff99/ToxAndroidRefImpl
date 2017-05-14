@@ -43,6 +43,7 @@ import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
@@ -261,7 +262,7 @@ public class MessageListActivity extends AppCompatActivity
             msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
 
             Message m = new Message();
-            m.tox_friendnum = friendnum;
+            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
             m.direction = 1; // msg sent
             m.TOX_MESSAGE_TYPE = 0;
             m.rcvd_timestamp = 0L;
@@ -270,7 +271,7 @@ public class MessageListActivity extends AppCompatActivity
             m.text = msg;
 
             long res = tox_friend_send_message(friendnum, 0, msg);
-            Log.i(TAG, "tox_friend_send_message:result=" + res);
+            Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
 
             if (res > -1)
             {

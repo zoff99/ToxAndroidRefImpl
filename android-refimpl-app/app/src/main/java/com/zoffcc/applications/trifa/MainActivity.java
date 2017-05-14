@@ -735,6 +735,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_friend_by_public_key(@NonNull String friend_public_key_string);
 
+    public static native String tox_friend_get_public_key(long friend_number);
+
     public static native long[] tox_self_get_friend_list();
 
     public static native int tox_self_set_name(@NonNull String name);
@@ -1132,14 +1134,14 @@ public class MainActivity extends AppCompatActivity
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
             Message m = TrifaToxService.orma.selectFromMessage().
                     message_idEq(message_id).
-                    tox_friendnumEq(friend_number).
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
                     directionEq(1).
                     orderByIdDesc().
                     toList().get(0);
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
 
             // Log.i(TAG, "friend_read_receipt:m=" + m);
-            Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendnum=" + m.tox_friendnum + " read=" + m.read + " direction=" + m.direction);
+            Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendpubkey=" + m.tox_friendpubkey + " read=" + m.read + " direction=" + m.direction);
 
             if (m != null)
             {
@@ -1209,7 +1211,8 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
 
         Message m = new Message();
-        m.tox_friendnum = friend_number;
+        // m.tox_friendnum = friend_number;
+        m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.rcvd_timestamp = System.currentTimeMillis();
@@ -1265,6 +1268,11 @@ public class MainActivity extends AppCompatActivity
         main_activity_s = this;
     }
 
+    public static String tox_friend_get_public_key__wrapper(long friend_number)
+    {
+        // TODO: cache me (friend number only changes when a friend in the middle of the list is deleted!!)
+        return tox_friend_get_public_key(friend_number);
+    }
 
     public void show_add_friend(View view)
     {
@@ -1280,6 +1288,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
+                Log.i(TAG, "insert_into_message_db:m=" + m);
                 TrifaToxService.orma.insertIntoMessage(m);
                 if (update_message_view_flag)
                 {
@@ -1310,7 +1319,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                TrifaToxService.orma.deleteFromMessage().tox_friendnumEq(friendnum).execute();
+                TrifaToxService.orma.deleteFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
             }
         };
         t.start();

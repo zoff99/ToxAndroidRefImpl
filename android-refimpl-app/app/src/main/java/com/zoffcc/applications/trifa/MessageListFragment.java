@@ -32,6 +32,7 @@ import android.widget.ListView;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListFragment extends ListFragment
@@ -66,7 +67,10 @@ public class MessageListFragment extends ListFragment
         Log.i(TAG, "current_friendnum=" + current_friendnum);
         try
         {
-            data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
+            Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+            data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+            Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+            Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
         }
         catch (Exception e)
         {
@@ -112,7 +116,7 @@ public class MessageListFragment extends ListFragment
         Log.i(TAG, "current_friendnum=" + current_friendnum);
         try
         {
-            data_values = orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList();
+            data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
         }
         catch (Exception e)
         {
@@ -182,7 +186,7 @@ public class MessageListFragment extends ListFragment
                 try
                 {
                     data_values.clear();
-                    data_values.addAll(orma.selectFromMessage().tox_friendnumEq(current_friendnum).toList());
+                    data_values.addAll(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
                 }
                 catch (Exception e)
                 {

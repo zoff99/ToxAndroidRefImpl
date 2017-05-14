@@ -1329,15 +1329,36 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv* env, jobjec
 	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(env, thiz));
 }
 
-
-
-
-
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list_1size(JNIEnv* env, jobject thiz)
 {
 	size_t numfriends = tox_self_get_friend_list_size(tox_global);
 	return (jlong)(unsigned long long)numfriends;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1public_1key(JNIEnv* env, jobject thiz, jlong friend_number)
+{
+	jstring result;
+
+	uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
+	TOX_ERR_FRIEND_GET_PUBLIC_KEY error;
+    bool res = tox_friend_get_public_key(tox_global, (uint32_t)friend_number, public_key, &error);
+
+	if (res == false)
+	{
+		result = (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+	}
+	else
+	{
+		char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1]; // need this wrong size for next call
+		CLEAR(tox_id_hex);
+		toxid_bin_to_hex(public_key, tox_id_hex);
+		tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+		result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
+	}
+
+	return result;
 }
 
 JNIEXPORT jlong JNICALL
