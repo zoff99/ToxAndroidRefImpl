@@ -261,6 +261,7 @@ public class MainActivity extends AppCompatActivity
         Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
         Callstate.call_first_video_frame_received = -1;
         Callstate.call_first_audio_frame_received = -1;
+        Callstate.friend_pubkey = "-1";
 
         if (native_lib_loaded)
         {
@@ -839,7 +840,7 @@ public class MainActivity extends AppCompatActivity
                         Callstate.call_first_audio_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
-                        Callstate.friend_pubkey = "-1";
+                        Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         // Callstate.friend_number = fn;
                         try
                         {

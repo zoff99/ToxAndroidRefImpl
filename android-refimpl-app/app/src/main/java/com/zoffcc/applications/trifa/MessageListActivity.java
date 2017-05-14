@@ -325,7 +325,7 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.accepted_call = 1; // we started the call, so it's already accepted on our side
                         Callstate.call_first_video_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
-                        Callstate.friend_pubkey = "-1";
+                        Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         Callstate.camera_opened = false;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         // Callstate.friend_number = fn;
