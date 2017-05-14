@@ -69,8 +69,8 @@ public class MessageListFragment extends ListFragment
         {
             Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
             data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
-            Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
-            Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+            // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
         }
         catch (Exception e)
         {

@@ -1288,7 +1288,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                Log.i(TAG, "insert_into_message_db:m=" + m);
+                // Log.i(TAG, "insert_into_message_db:m=" + m);
                 TrifaToxService.orma.insertIntoMessage(m);
                 if (update_message_view_flag)
                 {
