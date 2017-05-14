@@ -5,7 +5,8 @@ public class Callstate
 {
     static int state = 0; // 0 -> not in a call, 1 -> ringing/calling
     static int tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
-    static long friend_number = -1;
+    // static long friend_number = -1;
+    static String friend_pubkey = "-1";
     static String friend_name = "";
     static int other_audio_enabled = 0;
     static int other_video_enabled = 0;
@@ -26,7 +27,8 @@ public class Callstate
         Callstate.call_first_video_frame_received = -1;
         Callstate.call_start_timestamp = -1;
         Callstate.call_init_timestamp = -1;
-        Callstate.friend_number = -1;
+        // Callstate.friend_number = -1;
+        Callstate.friend_pubkey = "-1";
         Callstate.friend_name = "";
         Callstate.other_audio_enabled = 0;
         Callstate.other_video_enabled = 0;

@@ -839,10 +839,11 @@ public class MainActivity extends AppCompatActivity
                         Callstate.call_first_audio_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
-                        Callstate.friend_number = fn;
+                        Callstate.friend_pubkey = "-1";
+                        // Callstate.friend_number = fn;
                         try
                         {
-                            Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(Callstate.friend_number).toList().get(0).name;
+                            Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)).toList().get(0).name;
                         }
                         catch (Exception e)
                         {
@@ -1266,6 +1267,12 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
         // just in case, update own activity pointer!
         main_activity_s = this;
+    }
+
+    public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
+    {
+        // TODO: cache me (friend number only changes when a friend in the middle of the list is deleted!!)
+        return tox_friend_by_public_key(friend_public_key_string);
     }
 
     public static String tox_friend_get_public_key__wrapper(long friend_number)

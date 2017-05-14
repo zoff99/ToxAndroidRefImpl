@@ -8,6 +8,7 @@ import android.util.Log;
 import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_audio_send_frame;
 
 public class AudioRecording extends Thread
@@ -87,7 +88,7 @@ public class AudioRecording extends Thread
                     // Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000))
                     // Log.i(TAG, "audio xxxxxx=" + (((float) SMAPLINGRATE_TOX) * (float) (60) / (float) 1000));
 
-                    res = toxav_audio_send_frame(Callstate.friend_number, (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                    res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
                     // Log.i(TAG, "audio:res=" + res);
                 }
             }

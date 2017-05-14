@@ -32,6 +32,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.UV_reversed;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 
 public class CameraWrapper
 {
@@ -400,11 +401,11 @@ public class CameraWrapper
                                 MainActivity.video_buffer_2.put(data_new2);
                                 if (UV_reversed)
                                 {
-                                    MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
                                 else
                                 {
-                                    MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
                             }
                             else
@@ -413,11 +414,11 @@ public class CameraWrapper
                                 MainActivity.video_buffer_2.put(data_new);
                                 if (UV_reversed)
                                 {
-                                    MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
                                 else
                                 {
-                                    MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
                             }
                         }
@@ -434,11 +435,11 @@ public class CameraWrapper
                                 MainActivity.video_buffer_2.put(data_new2);
                                 if (UV_reversed)
                                 {
-                                    MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
                                 else
                                 {
-                                    MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
                             }
                             else
@@ -447,11 +448,11 @@ public class CameraWrapper
                                 MainActivity.video_buffer_2.put(data_new);
                                 if (UV_reversed)
                                 {
-                                    MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
                                 else
                                 {
-                                    MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.height, camera_preview_size2.width);
+                                    MainActivity.toxav_video_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
                             }
                         }
@@ -468,11 +469,11 @@ public class CameraWrapper
                             // -------------------------------------------------
                             if (UV_reversed)
                             {
-                                MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                                MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.width, camera_preview_size2.height);
                             }
                             else
                             {
-                                MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                                MainActivity.toxav_video_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.width, camera_preview_size2.height);
                             }
                         }
                         else
@@ -486,11 +487,11 @@ public class CameraWrapper
                             // -------------------------------------------------
                             if (UV_reversed)
                             {
-                                MainActivity.toxav_video_send_frame_uv_reversed(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                                MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.width, camera_preview_size2.height);
                             }
                             else
                             {
-                                MainActivity.toxav_video_send_frame(Callstate.friend_number, camera_preview_size2.width, camera_preview_size2.height);
+                                MainActivity.toxav_video_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.width, camera_preview_size2.height);
                             }
                         }
                     }

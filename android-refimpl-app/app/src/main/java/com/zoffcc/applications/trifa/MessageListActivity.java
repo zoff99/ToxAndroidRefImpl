@@ -43,6 +43,7 @@ import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -324,12 +325,13 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.accepted_call = 1; // we started the call, so it's already accepted on our side
                         Callstate.call_first_video_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
+                        Callstate.friend_pubkey = "-1";
                         Callstate.camera_opened = false;
                         Intent intent = new Intent(context_s, CallingActivity.class);
-                        Callstate.friend_number = fn;
+                        // Callstate.friend_number = fn;
                         try
                         {
-                            Callstate.friend_name = orma.selectFromFriendList().tox_friendnumEq(Callstate.friend_number).toList().get(0).name;
+                            Callstate.friend_name = orma.selectFromFriendList().tox_friendnumEq(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)).toList().get(0).name;
                         }
                         catch (Exception e)
                         {
