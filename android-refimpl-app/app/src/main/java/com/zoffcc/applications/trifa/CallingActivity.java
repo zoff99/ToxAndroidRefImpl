@@ -204,17 +204,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
-                    Callstate.accepted_call = 1;
+                    if (event.getAction() != MotionEvent.ACTION_UP)
+                    {
+                    }
+                    else
+                    {
+                        if (Callstate.accepted_call != 1)
+                        {
+                            Callstate.accepted_call = 1;
 
-                    toxav_answer(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
-                    accept_button.setVisibility(View.GONE);
-                    camera_toggle_button.setVisibility(View.VISIBLE);
-                    mute_button.setVisibility(View.VISIBLE);
+                            Log.i(TAG, "answer button pressed");
+                            toxav_answer(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
+                            accept_button.setVisibility(View.GONE);
+                            camera_toggle_button.setVisibility(View.VISIBLE);
+                            mute_button.setVisibility(View.VISIBLE);
 
-                    Callstate.call_start_timestamp = System.currentTimeMillis();
-                    String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
-                    top_text_line_str2 = a;
-                    update_top_text_line();
+                            Callstate.call_start_timestamp = System.currentTimeMillis();
+                            String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
+                            top_text_line_str2 = a;
+                            update_top_text_line();
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -231,8 +241,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
-                    toxav_call_control(Callstate.friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
-                    close_calling_activity();
+                    if (event.getAction() != MotionEvent.ACTION_UP)
+                    {
+                    }
+                    else
+                    {
+                        Log.i(TAG, "decline button pressed");
+                        toxav_call_control(Callstate.friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+                        close_calling_activity();
+                    }
                 }
                 catch (Exception e)
                 {
