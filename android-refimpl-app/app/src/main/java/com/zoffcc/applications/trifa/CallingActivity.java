@@ -215,6 +215,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                             Log.i(TAG, "answer button pressed");
                             toxav_answer(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
+                            // need to set our state manually here, no callback from toxcore :-(
+                            Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
+                            // need to set our state manually here, no callback from toxcore :-(
                             accept_button.setVisibility(View.GONE);
                             camera_toggle_button.setVisibility(View.VISIBLE);
                             mute_button.setVisibility(View.VISIBLE);

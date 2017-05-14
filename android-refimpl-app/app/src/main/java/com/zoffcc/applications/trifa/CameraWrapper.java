@@ -319,6 +319,7 @@ public class CameraWrapper
 
         private CameraPreviewCallback()
         {
+            Log.i(TAG, "CameraPreviewCallback");
             // videoEncoder = new VideoEncoderFromBuffer(CameraWrapper.IMAGE_WIDTH, CameraWrapper.IMAGE_HEIGHT);
         }
 
@@ -340,6 +341,7 @@ public class CameraWrapper
             // ----------------------------
             if (data == null)
             {
+                Log.i(TAG, "onPreviewFrame:data=null");
             }
             else
             {
@@ -347,7 +349,7 @@ public class CameraWrapper
                 {
                     Camera.Parameters p = camera.getParameters();
                     camera_preview_size2 = p.getPreviewSize();
-                    Log.i(TAG, "onPreviewFrame:w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height);
+                    Log.i(TAG, "onPreviewFrame:w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " camera_video_rotate_angle=" + CameraWrapper.camera_video_rotate_angle);
 
                     if (MainActivity.video_buffer_2 != null)
                     {
@@ -371,8 +373,8 @@ public class CameraWrapper
 
                     int buffer_size_in_bytes2 = y_layer_size + v_layer_size + u_layer_size;
 
-                    Log.i(TAG, "YUV420 frame w1=" + camera_preview_size2.width + " h1=" + camera_preview_size2.height + " bytes=" + buffer_size_in_bytes2);
-                    Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes2);
+                    Log.i(TAG, "onPreviewFrame:YUV420 frame w1=" + camera_preview_size2.width + " h1=" + camera_preview_size2.height + " bytes=" + buffer_size_in_bytes2);
+                    Log.i(TAG, "onPreviewFrame:YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes2);
                     MainActivity.video_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes2 + 1);
                     MainActivity.set_JNI_video_buffer2(MainActivity.video_buffer_2, camera_preview_size2.width, camera_preview_size2.height);
                 }
@@ -385,7 +387,7 @@ public class CameraWrapper
                     // only send video frame if call has started
                     if (!((Callstate.tox_call_state == 0) || (Callstate.tox_call_state == 1) || (Callstate.tox_call_state == 2)))
                     {
-                        // Log.i(TAG, "YUV420 data bytes=" + data.length);
+                        // Log.i(TAG, "onPreviewFrame:sending video:YUV420 data bytes=" + data.length + " rotation=" + CameraWrapper.camera_video_rotate_angle);
 
                         if (CameraWrapper.camera_video_rotate_angle == 90)
                         {
@@ -492,14 +494,20 @@ public class CameraWrapper
                             }
                         }
                     }
+                    else
+                    {
+                        // Log.i(TAG, "onPreviewFrame:not sending video:Callstate.tox_call_state=" + Callstate.tox_call_state);
+                    }
                 }
                 catch (java.nio.BufferOverflowException e)
                 {
                     e.printStackTrace();
+                    Log.i(TAG, "onPreviewFrame:EE1:" + e.getMessage());
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                    Log.i(TAG, "onPreviewFrame:EE2:" + e.getMessage());
                 }
             }
         }
