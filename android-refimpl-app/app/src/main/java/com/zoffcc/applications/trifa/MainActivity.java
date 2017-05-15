@@ -52,7 +52,6 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.github.gfx.android.orma.AccessThreadConstraint;
-import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -105,6 +104,8 @@ public class MainActivity extends AppCompatActivity
     final static int ProfileActivity_ID = 10003;
     final static int SettingsActivity_ID = 10004;
     final static int Notification_new_message_ID = 10023;
+    static long Notification_new_message_last_shown_timestamp = -1;
+    final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
@@ -1277,28 +1278,34 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    Intent notificationIntent = new Intent(context_s, MainActivity.class);
-                    notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
+                    // allow notification every n seconds
+                    if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) < System.currentTimeMillis())
+                    {
+                        Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
 
-                    // -- notification ------------------
-                    // -- notification ------------------
-                    NotificationManager nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
+                        Intent notificationIntent = new Intent(context_s, MainActivity.class);
+                        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
 
-                    NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
-                    b.setContentIntent(pendingIntent);
-                    b.setSmallIcon(R.drawable.circle_orange);
-                    b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                    Uri default_notification_sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                    b.setSound(default_notification_sound);
-                    b.setContentTitle("TRIfA");
-                    b.setAutoCancel(true);
-                    b.setContentText("new Message");
+                        // -- notification ------------------
+                        // -- notification ------------------
+                        NotificationManager nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
 
-                    Notification notification3 = b.build();
-                    nmn3.notify(Notification_new_message_ID, notification3);
-                    // -- notification ------------------
-                    // -- notification ------------------
+                        NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                        b.setContentIntent(pendingIntent);
+                        b.setSmallIcon(R.drawable.circle_orange);
+                        b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                        Uri default_notification_sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        b.setSound(default_notification_sound);
+                        b.setContentTitle("TRIfA");
+                        b.setAutoCancel(true);
+                        b.setContentText("new Message");
+
+                        Notification notification3 = b.build();
+                        nmn3.notify(Notification_new_message_ID, notification3);
+                        // -- notification ------------------
+                        // -- notification ------------------
+                    }
                 }
                 catch (Exception e)
                 {
