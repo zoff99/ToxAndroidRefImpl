@@ -52,6 +52,7 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.github.gfx.android.orma.AccessThreadConstraint;
+import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -303,13 +304,40 @@ public class MainActivity extends AppCompatActivity
         // --- forground service ---
 
         // See OrmaDatabaseBuilderBase for other options.
-        OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-        // OrmaDatabase.Builder builder = OrmaDatabase.builder(this).provider(new EncryptedDatabase.Provider("password"));
-        // builder = builder.provider(new EncryptedDatabase.Provider("password"));
-        TrifaToxService.orma = builder.name(MAIN_DB_NAME).
-                readOnMainThread(AccessThreadConstraint.WARNING).
-                writeOnMainThread(AccessThreadConstraint.WARNING).
-                build();
+        try
+        {
+            Log.i(TAG, "db:path=" + getDatabasePath(MAIN_DB_NAME));
+            OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+            // OrmaDatabase.Builder builder = OrmaDatabase.builder(this).provider(new EncryptedDatabase.Provider("password"));
+            builder = builder.provider(new EncryptedDatabase.Provider("password"));
+            TrifaToxService.orma = builder.name(MAIN_DB_NAME).
+                    readOnMainThread(AccessThreadConstraint.WARNING).
+                    writeOnMainThread(AccessThreadConstraint.WARNING).
+                    build();
+            Log.i(TAG, "db:open=OK:path=" + getDatabasePath(MAIN_DB_NAME));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "db:EE1:" + e.getMessage());
+
+            Log.i(TAG, "db:deleting database:" + getDatabasePath(MAIN_DB_NAME));
+            deleteDatabase(MAIN_DB_NAME);
+
+            Log.i(TAG, "db:path(2)=" + getDatabasePath(MAIN_DB_NAME));
+            OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+            // OrmaDatabase.Builder builder = OrmaDatabase.builder(this).provider(new EncryptedDatabase.Provider("password"));
+            builder = builder.provider(new EncryptedDatabase.Provider("password"));
+            TrifaToxService.orma = builder.name(MAIN_DB_NAME).
+                    readOnMainThread(AccessThreadConstraint.WARNING).
+                    writeOnMainThread(AccessThreadConstraint.WARNING).
+                    build();
+            Log.i(TAG, "db:open(2)=OK:path=" + getDatabasePath(MAIN_DB_NAME));
+        }
+
+        Log.i(TAG, "db:migrate");
+        TrifaToxService.orma.migrate();
+        Log.i(TAG, "db:migrate=OK:path=" + getDatabasePath(MAIN_DB_NAME));
         // default: "${applicationId}.orma.db"
 
         app_files_directory = getFilesDir().getAbsolutePath();
