@@ -52,6 +52,7 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.github.gfx.android.orma.AccessThreadConstraint;
+import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -302,7 +303,7 @@ public class MainActivity extends AppCompatActivity
 
         // See OrmaDatabaseBuilderBase for other options.
         OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-        // builder = builder.provider(new EncryptedDatabase.Provider("password"));
+        builder = builder.provider(new EncryptedDatabase.Provider("password"));
         TrifaToxService.orma = builder.name(MAIN_DB_NAME).
                 readOnMainThread(AccessThreadConstraint.WARNING).
                 writeOnMainThread(AccessThreadConstraint.WARNING).

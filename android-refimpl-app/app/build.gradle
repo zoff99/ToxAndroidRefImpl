@@ -128,10 +128,11 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    compile ('com.github.gfx.android.orma:orma:4.2.4'){
+    compile ('com.github.gfx.android.orma:orma:5.0.0-rc1') {
         exclude group: 'com.android.support'
     }
-    annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.4'
+    compile 'com.github.gfx.android.orma:orma-encryption:5.0.0-rc1'
+    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc1'
     //
     compile ('com.github.hotchemi:permissionsdispatcher:2.4.0'){
         exclude group: 'com.android.support'
