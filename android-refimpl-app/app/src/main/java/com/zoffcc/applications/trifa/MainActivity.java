@@ -70,6 +70,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -114,7 +115,11 @@ public class MainActivity extends AppCompatActivity
     static int audio_buffer_2_read_length = 0;
     static TrifaToxService tox_service_fg = null;
     //
-    static boolean UV_reversed = true; // TODO: on older phone this needs to be "false"
+    static boolean PREF__UV_reversed = true; // TODO: on older phone this needs to be "false"
+    static boolean PREF__notification_sound = true;
+    static boolean PREF__notification_vibrate = true;
+    static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
+    private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&/()=?,.;:-_+*";
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -145,10 +150,32 @@ public class MainActivity extends AppCompatActivity
 
         // prefs ----------
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        UV_reversed = settings.getBoolean("video_uv_reversed", true);
-        Log.i(TAG, "UV_reversed:2=" + UV_reversed);
+        PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
+        Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
+        PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
+        Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
+        PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
+        Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
         // prefs ----------
 
+        PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
+        if (PREF__DB_secrect_key.isEmpty())
+        {
+            // TODO: bad, make better
+            // create new key -------------
+            PREF__DB_secrect_key = getRandomString(60);
+            settings.edit().putString("DB_secrect_key", PREF__DB_secrect_key).commit();
+            // create new key -------------
+        }
+
+        // TODO: don't print this!!
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // *** // Log.i(TAG, "PREF__DB_secrect_key=" + PREF__DB_secrect_key);
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ------ don't print this ------
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
@@ -303,13 +330,13 @@ public class MainActivity extends AppCompatActivity
         // --- forground service ---
         // --- forground service ---
 
-        // See OrmaDatabaseBuilderBase for other options.
         try
         {
             Log.i(TAG, "db:path=" + getDatabasePath(MAIN_DB_NAME));
+            // See OrmaDatabaseBuilderBase for other options.
+            // default db name = "${applicationId}.orma.db"
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-            // OrmaDatabase.Builder builder = OrmaDatabase.builder(this).provider(new EncryptedDatabase.Provider("password"));
-            builder = builder.provider(new EncryptedDatabase.Provider("password"));
+            builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
             TrifaToxService.orma = builder.name(MAIN_DB_NAME).
                     readOnMainThread(AccessThreadConstraint.WARNING).
                     writeOnMainThread(AccessThreadConstraint.WARNING).
@@ -326,7 +353,6 @@ public class MainActivity extends AppCompatActivity
 
             Log.i(TAG, "db:path(2)=" + getDatabasePath(MAIN_DB_NAME));
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-            // OrmaDatabase.Builder builder = OrmaDatabase.builder(this).provider(new EncryptedDatabase.Provider("password"));
             builder = builder.provider(new EncryptedDatabase.Provider("password"));
             TrifaToxService.orma = builder.name(MAIN_DB_NAME).
                     readOnMainThread(AccessThreadConstraint.WARNING).
@@ -338,7 +364,6 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "db:migrate");
         TrifaToxService.orma.migrate();
         Log.i(TAG, "db:migrate=OK:path=" + getDatabasePath(MAIN_DB_NAME));
-        // default: "${applicationId}.orma.db"
 
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
@@ -363,6 +388,18 @@ public class MainActivity extends AppCompatActivity
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
+
+
+    private static String getRandomString(final int sizeOfRandomString)
+    {
+        final Random random = new Random();
+        final StringBuilder sb = new StringBuilder(sizeOfRandomString);
+        for (int i = 0; i < sizeOfRandomString; ++i)
+        {
+            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
+        }
+        return sb.toString();
+    }
 
     void tox_thread_start()
     {
@@ -476,8 +513,10 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         // prefs ----------
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        UV_reversed = settings.getBoolean("video_uv_reversed", true);
-        Log.i(TAG, "UV_reversed:2=" + UV_reversed);
+        PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
+        PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
+        PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
+        Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         // prefs ----------
     }
 
@@ -1399,7 +1438,6 @@ public class MainActivity extends AppCompatActivity
 
     public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
     {
-        // TODO: cache me (friend number only changes when a friend in the middle of the list is deleted!!)
         if (cache_pubkey_fnum.containsKey(friend_public_key_string))
         {
             Log.i(TAG, "cache hit:1");
@@ -1420,7 +1458,6 @@ public class MainActivity extends AppCompatActivity
 
     public static String tox_friend_get_public_key__wrapper(long friend_number)
     {
-        // TODO: cache me (friend number only changes when a friend in the middle of the list is deleted!!)
         if (cache_fnum_pubkey.containsKey(friend_number))
         {
             Log.i(TAG, "cache hit:2");
@@ -1491,7 +1528,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    static void delete_friend(final long friendnum)
+    static void delete_friend(final String friend_pubkey)
     {
         Thread t = new Thread()
         {
@@ -1499,7 +1536,7 @@ public class MainActivity extends AppCompatActivity
             public void run()
             {
                 TrifaToxService.orma.deleteFromFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        tox_public_key_stringEq(friend_pubkey).
                         execute();
             }
         };

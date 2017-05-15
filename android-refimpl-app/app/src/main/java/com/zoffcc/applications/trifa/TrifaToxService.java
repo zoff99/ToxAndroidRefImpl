@@ -33,6 +33,8 @@ import android.widget.RemoteViews;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
+import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
@@ -233,10 +235,6 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "is_tox_started:==============================");
 
                 is_tox_started = true;
-                if (!old_is_tox_started)
-                {
-                    MainActivity.bootstrap();
-                }
 
                 Runnable myRunnable = new Runnable()
                 {
@@ -258,6 +256,9 @@ public class TrifaToxService extends Service
                     MainActivity.update_savedata_file();
                 }
                 // ------ correct startup order ------
+
+                cache_pubkey_fnum.clear();
+                cache_fnum_pubkey.clear();
 
                 // TODO --------
                 String my_tox_id_local = get_my_toxid();
@@ -290,20 +291,25 @@ public class TrifaToxService extends Service
                 // TODO --------
 
                 MainActivity.friends = MainActivity.tox_self_get_friend_list();
-                Log.i(TAG, "number of friends=" + MainActivity.friends.length);
+                Log.i(TAG, "loading_friend:number_of_friends=" + MainActivity.friends.length);
 
                 int fc = 0;
                 boolean exists_in_db = false;
                 MainActivity.friend_list_fragment.clear_friends();
                 for (fc = 0; fc < MainActivity.friends.length; fc++)
                 {
-                    Log.i(TAG, "loading friend  #:" + fc);
+                    Log.i(TAG, "loading_friend:" + fc + " friendnum=" + MainActivity.friends[fc]);
+                    Log.i(TAG, "loading_friend:" + fc + " pubkey=" + tox_friend_get_public_key__wrapper(MainActivity.friends[fc]));
 
                     FriendList f;
                     List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+
+                    Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
+
                     if (fl.size() > 0)
                     {
                         f = fl.get(0);
+                        Log.i(TAG, "loading_friend:" + fc + " db entry=" + f);
                     }
                     else
                     {
@@ -312,17 +318,25 @@ public class TrifaToxService extends Service
 
                     if (f == null)
                     {
-                        Log.i(TAG, "fc is null");
+                        Log.i(TAG, "loading_friend:c is null");
 
                         f = new FriendList();
-                        f.tox_public_key_string = "" + (Math.random() * 100000);
-                        // f.tox_friendnum = fc;
+                        f.tox_public_key_string = "" + (long) ((Math.random() * 10000000d));
+                        try
+                        {
+                            f.tox_public_key_string = tox_friend_get_public_key__wrapper(MainActivity.friends[fc]);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                         f.name = "friend #" + fc;
                         exists_in_db = false;
+                        Log.i(TAG, "loading_friend:c is null fnew=" + f);
                     }
                     else
                     {
-                        Log.i(TAG, "found friend in DB " + f.tox_public_key_string + " f=" + f);
+                        Log.i(TAG, "loading_friend:found friend in DB " + f.tox_public_key_string + " f=" + f);
                         exists_in_db = true;
                     }
 
@@ -344,13 +358,42 @@ public class TrifaToxService extends Service
 
                     if (exists_in_db == false)
                     {
+                        Log.i(TAG, "loading_friend:1:insertIntoFriendList:" + " f=" + f);
                         orma.insertIntoFriendList(f);
+                        Log.i(TAG, "loading_friend:2:insertIntoFriendList:" + " f=" + f);
                     }
                     else
                     {
+                        Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
                         orma.updateFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
+                        Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
                     }
+
+                    FriendList f_check;
+                    List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+                    Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
+                    try
+                    {
+                        Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "loading_friend:check:EE:" + e.getMessage());
+                    }
+
                 }
+
+                // --------------- bootstrap ---------------
+                // --------------- bootstrap ---------------
+                // --------------- bootstrap ---------------
+                if (!old_is_tox_started)
+                {
+                    MainActivity.bootstrap();
+                }
+                // --------------- bootstrap ---------------
+                // --------------- bootstrap ---------------
+                // --------------- bootstrap ---------------
 
                 long tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
                 Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);

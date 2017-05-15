@@ -17,7 +17,12 @@
         android:ringtoneType="notification"
         android:title="@string/pref_title_ringtone"/>
 
-    <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
+    <SwitchPreference
+        android:defaultValue="true"
+        android:dependency="notifications_new_message"
+        android:key="notifications_new_message_sound"
+        android:title="@string/pref_title_sound"/>
+
     <SwitchPreference
         android:defaultValue="true"
         android:dependency="notifications_new_message"

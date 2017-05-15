@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.MainActivity.UV_reversed;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 
 public class CameraWrapper
@@ -399,7 +399,7 @@ public class CameraWrapper
                                 data_new2 = flipYUV420Horizontal(data_new, camera_preview_size2.height, camera_preview_size2.width);
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new2);
-                                if (UV_reversed)
+                                if (PREF__UV_reversed)
                                 {
                                     MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
@@ -412,7 +412,7 @@ public class CameraWrapper
                             {
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new);
-                                if (UV_reversed)
+                                if (PREF__UV_reversed)
                                 {
                                     MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
@@ -433,7 +433,7 @@ public class CameraWrapper
                                 data_new2 = flipYUV420Horizontal(data_new, camera_preview_size2.height, camera_preview_size2.width);
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new2);
-                                if (UV_reversed)
+                                if (PREF__UV_reversed)
                                 {
                                     MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
@@ -446,7 +446,7 @@ public class CameraWrapper
                             {
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new);
-                                if (UV_reversed)
+                                if (PREF__UV_reversed)
                                 {
                                     MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.height, camera_preview_size2.width);
                                 }
@@ -467,7 +467,7 @@ public class CameraWrapper
                             // android has the order YVU (instead of YUV) !!
                             // so we need to call ..._uv_reversed here
                             // -------------------------------------------------
-                            if (UV_reversed)
+                            if (PREF__UV_reversed)
                             {
                                 MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.width, camera_preview_size2.height);
                             }
@@ -485,7 +485,7 @@ public class CameraWrapper
                             // android has the order YVU (instead of YUV) !!
                             // so we need to call ..._uv_reversed here
                             // -------------------------------------------------
-                            if (UV_reversed)
+                            if (PREF__UV_reversed)
                             {
                                 MainActivity.toxav_video_send_frame_uv_reversed(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.width, camera_preview_size2.height);
                             }

@@ -99,10 +99,10 @@ public class FriendListFragment extends ListFragment
                                     Intent intent = new Intent(main_activity_s, FriendInfoActivity.class);
                                     intent.putExtra("friendnum", friend_num_temp_safety);
                                     startActivityForResult(intent, FriendInfoActivity_ID);
+                                    // show friend info page -----------------
                                     break;
-                                // show friend info page -----------------
                                 case R.id.item_delete:
-
+                                    // delete friend -----------------
                                     Runnable myRunnable = new Runnable()
                                     {
                                         @Override
@@ -111,25 +111,24 @@ public class FriendListFragment extends ListFragment
                                             try
                                             {
                                                 long friend_num_temp = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
-                                                long friend_num_temp_safety = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
 
-                                                Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
+                                                Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
 
                                                 // delete friend -------
-                                                Log.i(TAG, "onMenuItemClick:3");
-                                                delete_friend(friend_num_temp);
+                                                Log.i(TAG, "onMenuItemClick:3:pubkey=" + data_values.get(position_).tox_public_key_string);
+                                                delete_friend(data_values.get(position_).tox_public_key_string);
                                                 // delete friend -------
 
                                                 // delete friends messages -------
-                                                Log.i(TAG, "onMenuItemClick:2");
+                                                Log.i(TAG, "onMenuItemClick:2:fnum=" + friend_num_temp);
                                                 delete_friend_all_messages(friend_num_temp);
                                                 // delete friend  messages -------
 
                                                 // delete friend - tox ----
                                                 Log.i(TAG, "onMenuItemClick:4");
-                                                if (friend_num_temp_safety > -1)
+                                                if (friend_num_temp > -1)
                                                 {
-                                                    int res = tox_friend_delete(friend_num_temp_safety);
+                                                    int res = tox_friend_delete(friend_num_temp);
                                                     cache_pubkey_fnum.clear();
                                                     cache_fnum_pubkey.clear();
                                                     update_savedata_file(); // save toxcore datafile (friend removed)
@@ -139,18 +138,19 @@ public class FriendListFragment extends ListFragment
 
                                                 // load all friends into data list ---
                                                 Log.i(TAG, "onMenuItemClick:6");
-                                                add_all_friends_clear();
+                                                add_all_friends_clear(200);
                                                 Log.i(TAG, "onMenuItemClick:7");
                                                 // load all friends into data list ---
                                             }
                                             catch (Exception e)
                                             {
                                                 e.printStackTrace();
+                                                Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
                                             }
                                         }
                                     };
                                     main_handler_s.post(myRunnable);
-
+                                    // delete friend -----------------
                                     break;
                             }
                             return true;
@@ -286,7 +286,7 @@ public class FriendListFragment extends ListFragment
         add_friends(f);
     }
 
-    void add_all_friends_clear()
+    void add_all_friends_clear(final int delay)
     {
         Log.i(TAG, "add_all_friends_clear");
         data_values.clear();
@@ -298,9 +298,12 @@ public class FriendListFragment extends ListFragment
             {
                 try
                 {
+                    Thread.sleep(delay);
+
                     List<FriendList> fl = orma.selectFromFriendList().toList();
                     if (fl != null)
                     {
+                        Log.i(TAG, "add_all_friends_clear:fl.size=" + fl.size());
                         if (fl.size() > 0)
                         {
                             int i = 0;
@@ -308,6 +311,7 @@ public class FriendListFragment extends ListFragment
                             {
                                 FriendList n = deep_copy(fl.get(i));
                                 data_values.add(n);
+                                Log.i(TAG, "add_all_friends_clear:add:" + n);
                             }
                         }
                     }
@@ -315,12 +319,14 @@ public class FriendListFragment extends ListFragment
                 }
                 catch (Exception e)
                 {
+                    Log.i(TAG, "add_all_friends_clear:EE:" + e.getMessage());
                     e.printStackTrace();
                 }
             }
         };
-
+        Log.i(TAG, "add_all_friends_clear:A:");
         main_handler_s.post(myRunnable);
+        Log.i(TAG, "add_all_friends_clear:B:");
     }
 
     void add_friends(final FriendList f)
