@@ -66,6 +66,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__notification_vibrate = false;
     static boolean PREF__notification = true;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
-    private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&/()=?,.;:-_+*";
+    private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         {
             // TODO: bad, make better
             // create new key -------------
-            PREF__DB_secrect_key = getRandomString(60);
+            PREF__DB_secrect_key = getRandomString(20);
             settings.edit().putString("DB_secrect_key", PREF__DB_secrect_key).commit();
             // create new key -------------
         }
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity
         // ------ don't print this ------
         // ------ don't print this ------
         // ------ don't print this ------
-        // *** // Log.i(TAG, "PREF__DB_secrect_key=" + PREF__DB_secrect_key);
+        // ** // Log.i(TAG, "PREF__DB_secrect_key=" + PREF__DB_secrect_key);
         // ------ don't print this ------
         // ------ don't print this ------
         // ------ don't print this ------
@@ -337,6 +338,10 @@ public class MainActivity extends AppCompatActivity
         try
         {
             Log.i(TAG, "db:path=" + getDatabasePath(MAIN_DB_NAME));
+
+            File database_dir = new File(getDatabasePath(MAIN_DB_NAME).getParent());
+            database_dir.mkdirs();
+
             // See OrmaDatabaseBuilderBase for other options.
             // default db name = "${applicationId}.orma.db"
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
@@ -352,8 +357,16 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             Log.i(TAG, "db:EE1:" + e.getMessage());
 
-            Log.i(TAG, "db:deleting database:" + getDatabasePath(MAIN_DB_NAME));
-            deleteDatabase(MAIN_DB_NAME);
+            try
+            {
+                Log.i(TAG, "db:deleting database:" + getDatabasePath(MAIN_DB_NAME));
+                deleteDatabase(MAIN_DB_NAME);
+            }
+            catch (Exception e3)
+            {
+                e3.printStackTrace();
+                Log.i(TAG, "db:EE3:" + e3.getMessage());
+            }
 
             Log.i(TAG, "db:path(2)=" + getDatabasePath(MAIN_DB_NAME));
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
