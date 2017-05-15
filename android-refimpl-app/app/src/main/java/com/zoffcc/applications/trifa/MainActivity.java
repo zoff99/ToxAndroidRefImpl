@@ -303,7 +303,8 @@ public class MainActivity extends AppCompatActivity
 
         // See OrmaDatabaseBuilderBase for other options.
         OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-        builder = builder.provider(new EncryptedDatabase.Provider("password"));
+        // OrmaDatabase.Builder builder = OrmaDatabase.builder(this).provider(new EncryptedDatabase.Provider("password"));
+        // builder = builder.provider(new EncryptedDatabase.Provider("password"));
         TrifaToxService.orma = builder.name(MAIN_DB_NAME).
                 readOnMainThread(AccessThreadConstraint.WARNING).
                 writeOnMainThread(AccessThreadConstraint.WARNING).
