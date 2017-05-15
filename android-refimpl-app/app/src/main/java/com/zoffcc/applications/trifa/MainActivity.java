@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
     static Context context_s = null;
     static Activity main_activity_s = null;
     static Notification notification = null;
-    // static NotificationManager nMN = null;
+    static NotificationManager nmn3 = null;
     static int NOTIFICATION_ID = 293821038;
     static RemoteViews notification_view = null;
     static long[] friends = null;
@@ -117,7 +117,8 @@ public class MainActivity extends AppCompatActivity
     //
     static boolean PREF__UV_reversed = true; // TODO: on older phone this needs to be "false"
     static boolean PREF__notification_sound = true;
-    static boolean PREF__notification_vibrate = true;
+    static boolean PREF__notification_vibrate = false;
+    static boolean PREF__notification = true;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&/()=?,.;:-_+*";
     //
@@ -154,8 +155,9 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
         Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
-        PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
+        PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
+        PREF__notification = settings.getBoolean("notifications_new_message", true);
         // prefs ----------
 
         PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
@@ -184,6 +186,8 @@ public class MainActivity extends AppCompatActivity
         main_handler_s = main_handler;
         context_s = this.getBaseContext();
         main_activity_s = this;
+
+        nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
 
         // get permission ----------
         MainActivityPermissionsDispatcher.dummyForPermissions001WithCheck(this);
@@ -1348,30 +1352,44 @@ public class MainActivity extends AppCompatActivity
                     // allow notification every n seconds
                     if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) < System.currentTimeMillis())
                     {
-                        Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
 
-                        Intent notificationIntent = new Intent(context_s, MainActivity.class);
-                        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
+                        if (PREF__notification)
+                        {
+                            Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
 
-                        // -- notification ------------------
-                        // -- notification ------------------
-                        NotificationManager nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
+                            Intent notificationIntent = new Intent(context_s, MainActivity.class);
+                            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
 
-                        NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
-                        b.setContentIntent(pendingIntent);
-                        b.setSmallIcon(R.drawable.circle_orange);
-                        b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                        Uri default_notification_sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                        b.setSound(default_notification_sound);
-                        b.setContentTitle("TRIfA");
-                        b.setAutoCancel(true);
-                        b.setContentText("new Message");
+                            // -- notification ------------------
+                            // -- notification ------------------
 
-                        Notification notification3 = b.build();
-                        nmn3.notify(Notification_new_message_ID, notification3);
-                        // -- notification ------------------
-                        // -- notification ------------------
+                            NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                            b.setContentIntent(pendingIntent);
+                            b.setSmallIcon(R.drawable.circle_orange);
+                            b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                            Uri default_notification_sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                            if (PREF__notification_sound)
+                            {
+                                b.setSound(default_notification_sound);
+                            }
+
+                            if (PREF__notification_vibrate)
+                            {
+                                long[] vibrate_pattern = {100, 300};
+                                b.setVibrate(vibrate_pattern);
+                            }
+
+                            b.setContentTitle("TRIfA");
+                            b.setAutoCancel(true);
+                            b.setContentText("new Message");
+
+                            Notification notification3 = b.build();
+                            nmn3.notify(Notification_new_message_ID, notification3);
+                            // -- notification ------------------
+                            // -- notification ------------------
+                        }
                     }
                 }
                 catch (Exception e)
