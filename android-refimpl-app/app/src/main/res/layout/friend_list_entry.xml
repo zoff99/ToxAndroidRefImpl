@@ -59,14 +59,15 @@
 
 
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
-            android:paddingBottom="0dp"
-            android:paddingLeft="0dp"
-            android:paddingRight="0dp"
-            android:paddingTop="0dp">
+            android:paddingBottom="2dp"
+            android:paddingLeft="2dp"
+            android:clipToPadding="false"
+            android:paddingRight="2dp"
+            android:paddingTop="2dp">
 
             <TextView
                 android:id="@+id/f_unread_count"
@@ -77,13 +78,14 @@
                 android:paddingBottom="0.5dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:paddingTop="8dp"
+                android:paddingTop="9dp"
                 android:textStyle="bold"
                 android:text="120"
                 android:textAlignment="center"
+                android:elevation="4dp"
                 android:textColor="#ffffff"
                 android:textSize="10dp"
-                android:visibility="invisible">
+                android:visibility="visible">
             </TextView>
 
         </FrameLayout>
