@@ -44,16 +44,22 @@ android {
 //
         exclude 'lib/armeabi/libRSSupport.so'
         exclude 'lib/armeabi/librsjni.so'
+        exclude 'lib/armeabi/libsqlcipher.so'
         exclude 'lib/arm64-v8a/libRSSupport.so'
         exclude 'lib/arm64-v8a/librsjni.so'
+        exclude 'lib/arm64-v8a/libsqlcipher.so'
         exclude 'lib/mips64/libRSSupport.so'
         exclude 'lib/mips64/librsjni.so'
+        exclude 'lib/mips64/libsqlcipher.so'
         exclude 'lib/mips/libRSSupport.so'
         exclude 'lib/mips/librsjni.so'
+        exclude 'lib/mips/libsqlcipher.so'
         exclude 'lib/x86/libRSSupport.so'
         exclude 'lib/x86/librsjni.so'
+        exclude 'lib/x86/libsqlcipher.so'
         exclude 'lib/x86_64/libRSSupport.so'
         exclude 'lib/x86_64/librsjni.so'
+        exclude 'lib/x86_64/libsqlcipher.so'
     }
 
     lintOptions {
@@ -76,7 +82,7 @@ android {
     }
 
     dexOptions {
-        javaMaxHeapSize "2.2g"
+        javaMaxHeapSize "2g"
     }
 
     defaultConfig {
@@ -109,21 +115,33 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //
     //
-    compile('com.mikepenz:materialdrawer:5.9.1@aar') {
+    compile('com.mikepenz:materialdrawer:5.9.1@aar'){
         transitive = true
     }
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.mikepenz:google-material-typeface:3.0.1.0.original@aar'
-    compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
-    compile 'com.google.zxing:core:3.3.0'
     compile 'com.android.support:support-vector-drawable:25.3.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     //
-    compile 'com.github.gfx.android.orma:orma:4.2.4'
-    annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.4'
+    compile ('com.mikepenz:google-material-typeface:3.0.1.0.original@aar'){
+        exclude group: 'com.android.support'
+    }
+    compile ('com.mikepenz:fontawesome-typeface:4.7.0.0@aar'){
+        exclude group: 'com.android.support'
+    }
+    compile ('com.google.zxing:core:3.3.0'){
+        exclude group: 'com.android.support'
+    }
     //
-    compile 'com.github.hotchemi:permissionsdispatcher:2.4.0'
+    compile ('com.github.gfx.android.orma:orma:5.0.0-rc1') {
+        exclude group: 'com.android.support'
+    }
+    compile 'com.github.gfx.android.orma:orma-encryption:5.0.0-rc1'
+    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc1'
+    //
+    compile ('com.github.hotchemi:permissionsdispatcher:2.4.0'){
+        exclude group: 'com.android.support'
+    }
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
 }

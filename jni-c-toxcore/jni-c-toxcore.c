@@ -139,6 +139,7 @@ jmethodID android_tox_callback_friend_typing_cb_method = NULL;
 jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_cb_method = NULL;
+jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
@@ -174,6 +175,8 @@ void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *us
 void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data);
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data);
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
+
+void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message, void *user_data);
 
 void android_logger(int level, const char* logtext);
 // functions -----------
@@ -270,6 +273,10 @@ Tox *create_tox()
 	options.hole_punching_enabled = true;
 	// options.tcp_port = tcp_port;
     options.tcp_port = 0; // TCP relay is disabled !!
+	// ------------------------------------------------------------
+	// set our own handler for c-toxcore logging messages!!
+	options.log_callback = tox_log_cb__custom;
+	// ------------------------------------------------------------
 
 	dbg(9, "1007");
 	char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
@@ -381,13 +388,49 @@ void bootstrap_real(Tox *tox)
         {"178.62.250.138",             33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
         {"136.243.141.187",             443,  "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39", {0}},
         {"185.14.30.213",               443,  "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
-        {"2a03:b0c0:2:d0::16:1",       33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
-        {"tox.zodiaclabs.org",         33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074", {0}},
-        {"163.172.136.118",            33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
-        {"2001:bc8:4400:2100::1c:50f", 33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
-        {"128.199.199.197",            33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09", {0}},
-        {"2400:6180:0:d0::17a:a001",   33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09", {0}},
-        {"biribiri.org",               33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67", {0}}
+		{"biribiri.org",33445,"F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67", {0}},
+		{"nodes.tox.chat",33445,"6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E", {0}},
+		{"130.133.110.14",33445,"461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F", {0}},
+		{"205.185.116.116",33445,"A179B09749AC826FF01F37A9613F6B57118AE014D4196A0E1105A98F93A54702", {0}},
+		{"198.98.51.198",33445,"1D5A5F2F5D6233058BF0259B09622FB40B482E4FA0931EB8FD3AB8E7BF7DAF6F", {0}},
+		{"108.61.165.198",33445,"8E7D0B859922EF569298B4D261A8CCB5FEA14FB91ED412A7603A585A25698832", {0}},
+		{"194.249.212.109",33445,"3CEE1F054081E7A011234883BC4FC39F661A55B73637A5AC293DDF1251D9432B", {0}},
+		{"185.25.116.107",33445,"DA4E4ED4B697F2E9B000EEFE3A34B554ACD3F45F5C96EAEA2516DD7FF9AF7B43", {0}},
+		{"5.189.176.217",5190,"2B2137E094F743AC8BD44652C55F41DFACC502F125E99E4FE24D40537489E32F", {0}},
+		{"217.182.143.254",2306,"7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147", {0}},
+		{"104.223.122.15",33445,"0FB96EEBFB1650DDB52E70CF773DDFCABE25A95CC3BB50FC251082E4B63EF82A", {0}},
+		{"tox.verdict.gg",33445,"1C5293AEF2114717547B39DA8EA6F1E331E5E358B35F9B6B5F19317911C5F976", {0}},
+		{"d4rk4.ru",1813,"53737F6D47FA6BD2808F378E339AF45BF86F39B64E79D6D491C53A1D522E7039", {0}},
+		{"104.233.104.126",33445,"EDEE8F2E839A57820DE3DA4156D88350E53D4161447068A3457EE8F59F362414", {0}},
+		{"51.254.84.212",33445,"AEC204B9A4501412D5F0BB67D9C81B5DB3EE6ADA64122D32A3E9B093D544327D", {0}},
+		{"88.99.133.52",33445,"2D320F971EF2CA18004416C2AAE7BA52BF7949DB34EA8E2E21AF67BD367BE211", {0}},
+		{"185.58.206.164",33445,"24156472041E5F220D1FA11D9DF32F7AD697D59845701CDD7BE7D1785EB9DB39", {0}},
+		{"92.54.84.70",33445,"5625A62618CB4FCA70E147A71B29695F38CC65FF0CBD68AD46254585BE564802", {0}},
+		{"195.93.190.6",33445,"FB4CE0DDEFEED45F26917053E5D24BDDA0FA0A3D83A672A9DA2375928B37023D", {0}},
+		{"tox.uplinklabs.net",33445,"1A56EA3EDF5DF4C0AEABBF3C2E4E603890F87E983CAC8A0D532A335F2C6E3E1F", {0}},
+		{"toxnode.nek0.net",33445,"20965721D32CE50C3E837DD75B33908B33037E6225110BFF209277AEAF3F9639", {0}},
+		{"95.215.44.78",33445,"672DBE27B4ADB9D5FB105A6BB648B2F8FDB89B3323486A7A21968316E012023C", {0}},
+		{"163.172.136.118",33445,"2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
+		{"sorunome.de",33445,"02807CF4F8BB8FB390CC3794BDF1E8449E9A8392C5D3F2200019DA9F1E812E46", {0}},
+		{"37.97.185.116",33445,"E59A0E71ADA20D35BD1B0957059D7EF7E7792B3D680AE25C6F4DBBA09114D165", {0}},
+		{"193.124.186.205",5228,"9906D65F2A4751068A59D30505C5FC8AE1A95E0843AE9372EAFA3BAB6AC16C2C", {0}},
+		{"80.87.193.193",33445,"B38255EE4B054924F6D79A5E6E5889EC94B6ADF6FE9906F97A3D01E3D083223A", {0}},
+		{"initramfs.io",33445,"3F0A45A268367C1BEA652F258C85F4A66DA76BCAA667A49E770BCC4917AB6A25", {0}},
+		{"hibiki.eve.moe",33445,"D3EB45181B343C2C222A5BCF72B760638E15ED87904625AAD351C594EEFAE03E", {0}},
+		{"tox.deadteam.org",33445,"C7D284129E83877D63591F14B3F658D77FF9BA9BA7293AEB2BDFBFE1A803AF47", {0}},
+		{"46.229.52.198",33445,"813C8F4187833EF0655B10F7752141A352248462A567529A38B6BBF73E979307", {0}},
+		{"node.tox.ngc.network",33445,"A856243058D1DE633379508ADCAFCF944E40E1672FF402750EF712E30C42012A", {0}},
+		{"144.217.86.39",33445,"7E5668E0EE09E19F320AD47902419331FFEE147BB3606769CFBE921A2A2FD34C", {0}},
+		{"185.14.30.213",443,"2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
+		{"77.37.160.178",33440,"CE678DEAFA29182EFD1B0C5B9BC6999E5A20B50A1A6EC18B91C8EBB591712416", {0}},
+		{"85.21.144.224",33445,"8F738BBC8FA9394670BCAB146C67A507B9907C8E564E28C2B59BEBB2FF68711B", {0}},
+		{"tox.natalenko.name",33445,"1CB6EBFD9D85448FA70D3CAE1220B76BF6FCE911B46ACDCF88054C190589650B", {0}},
+		{"37.187.122.30",33445,"BEB71F97ED9C99C04B8489BB75579EB4DC6AB6F441B603D63533122F1858B51D", {0}},
+		{"completelyunoriginal.moe",33445,"FBC7DED0B0B662D81094D91CC312D6CDF12A7B16C7FFB93817143116B510C13E", {0}},
+		{"136.243.141.187",443,"6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39", {0}},
+		{"tox.abilinski.com",33445,"0E9D7FEE2AA4B42A4C18FE81C038E32FFD8D907AAA7896F05AA76C8D31A20065", {0}},
+		{"95.215.46.114",33445,"5823FB947FF24CF83DDFAC3F3BAA18F96EA2018B16CC08429CB97FA502F40C23", {0}},
+		{"51.15.54.207",33445,"1E64DBA45EC810C0BF3A96327DC8A9D441AB262C14E57FCE11ECBCE355305239", {0}}
     };
 
     for (size_t i = 0; i < sizeof(nodes)/sizeof(DHT_node); i ++) {
@@ -736,6 +779,26 @@ void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, 
 	android_tox_callback_friend_message_cb(friend_number, type, message, length);
 }
 
+void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
+	jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, func);
+	jstring js3 = (*jnienv2)->NewStringUTF(jnienv2, message);
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, android_tox_log_cb_method, (int)level, js1, (jlong)(unsigned long long)line, js2, js3);
+
+	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
+	(*jnienv2)->DeleteLocalRef(jnienv2, js2);
+	(*jnienv2)->DeleteLocalRef(jnienv2, js3);
+}
+
+void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message, void *user_data)
+{
+	android_tox_log_cb(level, file, line, func, message);
+}
 
 
 // ------------- AV ------------
@@ -1117,6 +1180,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	android_tox_callback_friend_read_receipt_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_read_receipt_cb_method", "(JJ)V");
 	android_tox_callback_friend_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_request_cb_method", "(Ljava/lang/String;Ljava/lang/String;J)V");
 	android_tox_callback_friend_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
+	android_tox_log_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_log_cb_method", "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
 	dbg(9, "linking callbacks ... READY");
 	// -------- _callbacks_ --------
 
@@ -1265,15 +1329,36 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv* env, jobjec
 	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(env, thiz));
 }
 
-
-
-
-
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list_1size(JNIEnv* env, jobject thiz)
 {
 	size_t numfriends = tox_self_get_friend_list_size(tox_global);
 	return (jlong)(unsigned long long)numfriends;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1public_1key(JNIEnv* env, jobject thiz, jlong friend_number)
+{
+	jstring result;
+
+	uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
+	TOX_ERR_FRIEND_GET_PUBLIC_KEY error;
+    bool res = tox_friend_get_public_key(tox_global, (uint32_t)friend_number, public_key, &error);
+
+	if (res == false)
+	{
+		result = (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+	}
+	else
+	{
+		char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1]; // need this wrong size for next call
+		CLEAR(tox_id_hex);
+		toxid_bin_to_hex(public_key, tox_id_hex);
+		tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+		result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
+	}
+
+	return result;
 }
 
 JNIEXPORT jlong JNICALL
@@ -1500,28 +1585,39 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEn
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv* env, jobject thiz, jobject toxid_str, jobject message)
 {
-	unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
+	unsigned char public_key_bin[TOX_ADDRESS_SIZE];
 	char *public_key_str2 = NULL;
 	const char *s = NULL;
 	const char *message_str = NULL;
 
 	s =  (*env)->GetStringUTFChars(env, toxid_str, NULL);
+	dbg(9, "add friend:s=%p", s);
 	public_key_str2 = strdup(s);
-	(*env)->ReleaseStringUTFChars(env, toxid_str, s);
+	dbg(9, "add friend:public_key_str2=%p", public_key_str2);
+	dbg(9, "add friend:TOX_PUBLIC_KEY_SIZE len=%d", (int)TOX_ADDRESS_SIZE);
+	dbg(9, "add friend:public_key_str2 len=%d", strlen(public_key_str2));
 
 	message_str = (*env)->GetStringUTFChars(env, message, NULL);
 
 	TOX_ERR_FRIEND_ADD error;
 
 	toxid_hex_to_bin(public_key_bin, public_key_str2);
+
+	dbg(9, "add friend:public_key_bin=%p", public_key_bin);
+	dbg(9, "add friend:public_key_bin len=%d", strlen(public_key_bin));
+
+	dbg(9, "add friend:message_str=%p", message_str);
+
     uint32_t friendnum = tox_friend_add(tox_global, (uint8_t *)public_key_bin, (uint8_t *)message_str, (size_t)strlen(message_str), &error);
 
-	(*env)->ReleaseStringUTFChars(env, message, message_str);
 
 	if (public_key_str2)
 	{
 		free(public_key_str2);
 	}
+
+	(*env)->ReleaseStringUTFChars(env, message, message_str);
+	(*env)->ReleaseStringUTFChars(env, toxid_str, s);
 
 	if (error != 0)
 	{

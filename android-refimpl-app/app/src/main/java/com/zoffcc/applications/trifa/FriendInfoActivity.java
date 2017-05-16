@@ -13,6 +13,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendInfoActivity extends AppCompatActivity
@@ -41,9 +42,9 @@ public class FriendInfoActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mytoxid.setText("");
-        mynick.setText("");
-        mystatus_message.setText("");
+        mytoxid.setText("*error*");
+        mynick.setText("*error*");
+        mystatus_message.setText("*error*");
 
         Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
         profile_icon.setImageDrawable(d1);
@@ -56,27 +57,34 @@ public class FriendInfoActivity extends AppCompatActivity
                 @Override
                 public void run()
                 {
-                    final FriendList f = orma.selectFromFriendList().tox_friendnumEq(friendnum_).toList().get(0);
-
-                    Runnable myRunnable = new Runnable()
+                    try
                     {
-                        @Override
-                        public void run()
+                        final FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum_)).toList().get(0);
+
+                        Runnable myRunnable = new Runnable()
                         {
-                            try
+                            @Override
+                            public void run()
                             {
-                                mytoxid.setText(f.tox_public_key_string);
-                                mynick.setText(f.name);
-                                mystatus_message.setText(f.status_message);
+                                try
+                                {
+                                    mytoxid.setText(f.tox_public_key_string);
+                                    mynick.setText(f.name);
+                                    mystatus_message.setText(f.status_message);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    Log.i(TAG, "CALL:start:EE:" + e.getMessage());
+                                }
                             }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "CALL:start:EE:" + e.getMessage());
-                            }
-                        }
-                    };
-                    main_handler_s.post(myRunnable);
+                        };
+                        main_handler_s.post(myRunnable);
+                    }
+                    catch(Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
                 }
             };
             t.start();

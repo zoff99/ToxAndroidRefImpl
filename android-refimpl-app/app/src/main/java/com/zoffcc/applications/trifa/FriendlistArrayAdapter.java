@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +30,11 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+
 public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 {
+    private static final String TAG = "trifa.FriendListAA";
     private final Context context;
     private final List<FriendList> values;
 
@@ -41,9 +45,18 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         this.values = values;
     }
 
+//    @Override
+//    public void setNotifyOnChange(boolean notifyOnChange)
+//    {
+//        super.setNotifyOnChange(notifyOnChange);
+//        Log.i(TAG, "setNotifyOnChange");
+//    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
+        // Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
+
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.friend_list_entry, parent, false);
 
@@ -52,6 +65,38 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 
         TextView statusText = (TextView) rowView.findViewById(R.id.f_status_message);
         statusText.setText(values.get(position).status_message);
+
+        TextView unread_count = (TextView) rowView.findViewById(R.id.f_unread_count);
+        // Log.i(TAG, "unread_count view=" + unread_count);
+
+        try
+        {
+            int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(values.get(position).tox_public_key_string).and().is_newEq(true).count();
+            if (new_messages_count > 0)
+            {
+                if (new_messages_count > 300)
+                {
+                    unread_count.setText("+");
+                }
+                else
+                {
+                    unread_count.setText("" + new_messages_count);
+                }
+                unread_count.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                unread_count.setText("");
+                unread_count.setVisibility(View.INVISIBLE);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+
+            unread_count.setText("");
+            unread_count.setVisibility(View.INVISIBLE);
+        }
 
         ImageView imageView = (ImageView) rowView.findViewById(R.id.f_status_icon);
 

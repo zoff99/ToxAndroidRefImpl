@@ -22,16 +22,24 @@ package com.zoffcc.applications.trifa;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.support.v8.renderscript.Allocation;
 import android.support.v8.renderscript.Element;
@@ -44,6 +52,7 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.github.gfx.android.orma.AccessThreadConstraint;
+import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -57,8 +66,12 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
+import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -81,7 +94,7 @@ public class MainActivity extends AppCompatActivity
     static Context context_s = null;
     static Activity main_activity_s = null;
     static Notification notification = null;
-    // static NotificationManager nMN = null;
+    static NotificationManager nmn3 = null;
     static int NOTIFICATION_ID = 293821038;
     static RemoteViews notification_view = null;
     static long[] friends = null;
@@ -93,13 +106,23 @@ public class MainActivity extends AppCompatActivity
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
     final static int SettingsActivity_ID = 10004;
+    final static int Notification_new_message_ID = 10023;
+    static long Notification_new_message_last_shown_timestamp = -1;
+    final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
     static ByteBuffer audio_buffer_2 = null;
     static int audio_buffer_2_read_length = 0;
     static TrifaToxService tox_service_fg = null;
-
+    //
+    static boolean PREF__UV_reversed = true; // TODO: on older phone this needs to be "false"
+    static boolean PREF__notification_sound = true;
+    static boolean PREF__notification_vibrate = false;
+    static boolean PREF__notification = true;
+    static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
+    private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
+    //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
     static Allocation alloc_in = null;
@@ -107,6 +130,11 @@ public class MainActivity extends AppCompatActivity
     static Bitmap video_frame_image = null;
     static int buffer_size_in_bytes = 0;
     // YUV conversion -------
+
+    // ---- lookup cache ----
+    static Map<String, Long> cache_pubkey_fnum = new HashMap<String, Long>();
+    static Map<Long, String> cache_fnum_pubkey = new HashMap<Long, String>();
+    // ---- lookup cache ----
 
     // main drawer ----------
     Drawer main_drawer = null;
@@ -122,6 +150,35 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
 
+        // prefs ----------
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
+        Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
+        PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
+        Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
+        PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
+        Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
+        PREF__notification = settings.getBoolean("notifications_new_message", true);
+        // prefs ----------
+
+        PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
+        if (PREF__DB_secrect_key.isEmpty())
+        {
+            // TODO: bad, make better
+            // create new key -------------
+            PREF__DB_secrect_key = getRandomString(20);
+            settings.edit().putString("DB_secrect_key", PREF__DB_secrect_key).commit();
+            // create new key -------------
+        }
+
+        // TODO: don't print this!!
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ** // Log.i(TAG, "PREF__DB_secrect_key=" + PREF__DB_secrect_key);
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ------ don't print this ------
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
@@ -130,6 +187,8 @@ public class MainActivity extends AppCompatActivity
         main_handler_s = main_handler;
         context_s = this.getBaseContext();
         main_activity_s = this;
+
+        nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
 
         // get permission ----------
         MainActivityPermissionsDispatcher.dummyForPermissions001WithCheck(this);
@@ -251,6 +310,7 @@ public class MainActivity extends AppCompatActivity
         Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
         Callstate.call_first_video_frame_received = -1;
         Callstate.call_first_audio_frame_received = -1;
+        Callstate.friend_pubkey = "-1";
 
         if (native_lib_loaded)
         {
@@ -275,14 +335,52 @@ public class MainActivity extends AppCompatActivity
         // --- forground service ---
         // --- forground service ---
 
-        // See OrmaDatabaseBuilderBase for other options.
-        OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-        // builder = builder.provider(new EncryptedDatabase.Provider("password"));
-        TrifaToxService.orma = builder.name(MAIN_DB_NAME).
-                readOnMainThread(AccessThreadConstraint.WARNING).
-                writeOnMainThread(AccessThreadConstraint.WARNING).
-                build();
-        // default: "${applicationId}.orma.db"
+        try
+        {
+            Log.i(TAG, "db:path=" + getDatabasePath(MAIN_DB_NAME));
+
+            File database_dir = new File(getDatabasePath(MAIN_DB_NAME).getParent());
+            database_dir.mkdirs();
+
+            // See OrmaDatabaseBuilderBase for other options.
+            // default db name = "${applicationId}.orma.db"
+            OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+            builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+            TrifaToxService.orma = builder.name(MAIN_DB_NAME).
+                    readOnMainThread(AccessThreadConstraint.WARNING).
+                    writeOnMainThread(AccessThreadConstraint.WARNING).
+                    build();
+            Log.i(TAG, "db:open=OK:path=" + getDatabasePath(MAIN_DB_NAME));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "db:EE1:" + e.getMessage());
+
+            try
+            {
+                Log.i(TAG, "db:deleting database:" + getDatabasePath(MAIN_DB_NAME));
+                deleteDatabase(MAIN_DB_NAME);
+            }
+            catch (Exception e3)
+            {
+                e3.printStackTrace();
+                Log.i(TAG, "db:EE3:" + e3.getMessage());
+            }
+
+            Log.i(TAG, "db:path(2)=" + getDatabasePath(MAIN_DB_NAME));
+            OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+            builder = builder.provider(new EncryptedDatabase.Provider("password"));
+            TrifaToxService.orma = builder.name(MAIN_DB_NAME).
+                    readOnMainThread(AccessThreadConstraint.WARNING).
+                    writeOnMainThread(AccessThreadConstraint.WARNING).
+                    build();
+            Log.i(TAG, "db:open(2)=OK:path=" + getDatabasePath(MAIN_DB_NAME));
+        }
+
+        Log.i(TAG, "db:migrate");
+        TrifaToxService.orma.migrate();
+        Log.i(TAG, "db:migrate=OK:path=" + getDatabasePath(MAIN_DB_NAME));
 
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
@@ -307,6 +405,18 @@ public class MainActivity extends AppCompatActivity
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
+
+
+    private static String getRandomString(final int sizeOfRandomString)
+    {
+        final Random random = new Random();
+        final StringBuilder sb = new StringBuilder(sizeOfRandomString);
+        for (int i = 0; i < sizeOfRandomString; ++i)
+        {
+            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
+        }
+        return sb.toString();
+    }
 
     void tox_thread_start()
     {
@@ -415,6 +525,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume()
+    {
+        super.onResume();
+        // prefs ----------
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
+        PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
+        PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
+        Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
+        // prefs ----------
+    }
+
+    @Override
     protected void onNewIntent(Intent i)
     {
         Log.i(TAG, "onNewIntent:i=" + i);
@@ -424,7 +547,9 @@ public class MainActivity extends AppCompatActivity
     static FriendList main_get_friend(long friendnum)
     {
         FriendList f;
-        List<FriendList> fl = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList();
+        List<FriendList> fl = TrifaToxService.orma.selectFromFriendList().
+                tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                toList();
         if (fl.size() > 0)
         {
             f = fl.get(0);
@@ -441,7 +566,9 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            return (TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList().get(0).TOX_CONNECTION);
+            return (TrifaToxService.orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0).TOX_CONNECTION);
         }
         catch (Exception e)
         {
@@ -471,7 +598,6 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
                 tox_public_key_string(f.tox_public_key_string).
                 name(f.name).
                 status_message(f.status_message).
@@ -483,7 +609,7 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db_status_message(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_stringEq(f.tox_public_key_string).
                 status_message(f.status_message).
                 execute();
     }
@@ -491,7 +617,7 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db_status(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
                 execute();
     }
@@ -499,7 +625,7 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db_connection_status(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_CONNECTION(f.TOX_CONNECTION).
                 execute();
     }
@@ -507,7 +633,7 @@ public class MainActivity extends AppCompatActivity
     synchronized static void update_friend_in_db_name(FriendList f)
     {
         TrifaToxService.orma.updateFriendList().
-                tox_friendnumEq(f.tox_friendnum).
+                tox_public_key_stringEq(f.tox_public_key_string).
                 name(f.name).
                 execute();
     }
@@ -714,6 +840,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_friend_by_public_key(@NonNull String friend_public_key_string);
 
+    public static native String tox_friend_get_public_key(long friend_number);
+
     public static native long[] tox_self_get_friend_list();
 
     public static native int tox_self_set_name(@NonNull String name);
@@ -816,10 +944,13 @@ public class MainActivity extends AppCompatActivity
                         Callstate.call_first_audio_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
-                        Callstate.friend_number = fn;
+                        Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
+                        // Callstate.friend_number = fn;
                         try
                         {
-                            Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(Callstate.friend_number).toList().get(0).name;
+                            Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().
+                                    tox_public_key_stringEq(Callstate.friend_pubkey).
+                                    toList().get(0).name;
                         }
                         catch (Exception e)
                         {
@@ -1109,24 +1240,39 @@ public class MainActivity extends AppCompatActivity
         try
         {
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
-            Message m = TrifaToxService.orma.selectFromMessage().
+            final Message m = TrifaToxService.orma.selectFromMessage().
                     message_idEq(message_id).
-                    tox_friendnumEq(friend_number).
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
                     directionEq(1).
                     orderByIdDesc().
                     toList().get(0);
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
 
             // Log.i(TAG, "friend_read_receipt:m=" + m);
-            Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendnum=" + m.tox_friendnum + " read=" + m.read + " direction=" + m.direction);
+            Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendpubkey=" + m.tox_friendpubkey + " read=" + m.read + " direction=" + m.direction);
 
             if (m != null)
             {
-                m.rcvd_timestamp = System.currentTimeMillis();
-                m.read = true;
-                update_message_in_db_read_rcvd_timestamp(m);
-                // TODO this updates all messages. should be done nicer and faster!
-                update_message_view();
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            m.rcvd_timestamp = System.currentTimeMillis();
+                            m.read = true;
+                            update_message_in_db_read_rcvd_timestamp(m);
+                            // TODO this updates all messages. should be done nicer and faster!
+                            update_message_view();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                main_handler_s.post(myRunnable);
             }
         }
         catch (Exception e)
@@ -1163,7 +1309,6 @@ public class MainActivity extends AppCompatActivity
 
                 FriendList f = new FriendList();
                 f.tox_public_key_string = friend_public_key__final;
-                f.tox_friendnum = friendnum;
                 f.TOX_USER_STATUS = 0;
                 f.TOX_CONNECTION = 0;
 
@@ -1188,19 +1333,102 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
 
         Message m = new Message();
-        m.tox_friendnum = friend_number;
+        // m.tox_friendnum = friend_number;
+        m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = friend_message;
 
         insert_into_message_db(m, true);
+
+        try
+        {
+            // update "new" status on friendlist fragment
+            FriendList f = TrifaToxService.orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+            friend_list_fragment.modify_friend(f, friend_number);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
+        }
+
+        // start "new" notification
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    // allow notification every n seconds
+                    if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) < System.currentTimeMillis())
+                    {
+
+                        if (PREF__notification)
+                        {
+                            Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
+
+                            Intent notificationIntent = new Intent(context_s, MainActivity.class);
+                            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
+
+                            // -- notification ------------------
+                            // -- notification ------------------
+
+                            NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                            b.setContentIntent(pendingIntent);
+                            b.setSmallIcon(R.drawable.circle_orange);
+                            b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                            Uri default_notification_sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                            if (PREF__notification_sound)
+                            {
+                                b.setSound(default_notification_sound);
+                            }
+
+                            if (PREF__notification_vibrate)
+                            {
+                                long[] vibrate_pattern = {100, 300};
+                                b.setVibrate(vibrate_pattern);
+                            }
+
+                            b.setContentTitle("TRIfA");
+                            b.setAutoCancel(true);
+                            b.setContentText("new Message");
+
+                            Notification notification3 = b.build();
+                            nmn3.notify(Notification_new_message_ID, notification3);
+                            // -- notification ------------------
+                            // -- notification ------------------
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        try
+        {
+            main_handler_s.post(myRunnable);
+        }
+        catch (Exception e)
+        {
+        }
     }
 
     // void test(int i)
     // {
     //    Log.i(TAG, "test:" + i);
     // }
+
+    static void android_tox_log_cb_method(int a_TOX_LOG_LEVEL, String file, long line, String function, String message)
+    {
+        Log.i(TAG, "C-TOXCORE:" + ToxVars.TOX_LOG_LEVEL.value_str(a_TOX_LOG_LEVEL) + ":file=" + file + ":linenum=" + line + ":func=" + function + ":msg=" + message);
+    }
 
     static void logger(int level, String text)
     {
@@ -1239,6 +1467,45 @@ public class MainActivity extends AppCompatActivity
         main_activity_s = this;
     }
 
+    public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
+    {
+        if (cache_pubkey_fnum.containsKey(friend_public_key_string))
+        {
+            Log.i(TAG, "cache hit:1");
+            return cache_pubkey_fnum.get(friend_public_key_string);
+        }
+        else
+        {
+            if (cache_pubkey_fnum.size() >= 20)
+            {
+                // TODO: bad!
+                cache_pubkey_fnum.clear();
+            }
+            long result = tox_friend_by_public_key(friend_public_key_string);
+            cache_pubkey_fnum.put(friend_public_key_string, result);
+            return result;
+        }
+    }
+
+    public static String tox_friend_get_public_key__wrapper(long friend_number)
+    {
+        if (cache_fnum_pubkey.containsKey(friend_number))
+        {
+            Log.i(TAG, "cache hit:2");
+            return cache_fnum_pubkey.get(friend_number);
+        }
+        else
+        {
+            if (cache_fnum_pubkey.size() >= 20)
+            {
+                // TODO: bad!
+                cache_fnum_pubkey.clear();
+            }
+            String result = tox_friend_get_public_key(friend_number);
+            cache_fnum_pubkey.put(friend_number, result);
+            return result;
+        }
+    }
 
     public void show_add_friend(View view)
     {
@@ -1254,6 +1521,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
+                // Log.i(TAG, "insert_into_message_db:m=" + m);
                 TrifaToxService.orma.insertIntoMessage(m);
                 if (update_message_view_flag)
                 {
@@ -1284,21 +1552,23 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                TrifaToxService.orma.deleteFromMessage().tox_friendnumEq(friendnum).execute();
+                TrifaToxService.orma.deleteFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
             }
         };
         t.start();
     }
 
 
-    static void delete_friend(final long friendnum)
+    static void delete_friend(final String friend_pubkey)
     {
         Thread t = new Thread()
         {
             @Override
             public void run()
             {
-                TrifaToxService.orma.deleteFromFriendList().tox_friendnumEq(friendnum).execute();
+                TrifaToxService.orma.deleteFromFriendList().
+                        tox_public_key_stringEq(friend_pubkey).
+                        execute();
             }
         };
         t.start();
@@ -1364,7 +1634,6 @@ public class MainActivity extends AppCompatActivity
 
             FriendList f = new FriendList();
             f.tox_public_key_string = friend_public_key;
-            f.tox_friendnum = friendnum;
             try
             {
                 // set name as the last 5 char of TOXID (until we get a name sent from friend)
@@ -1402,7 +1671,9 @@ public class MainActivity extends AppCompatActivity
         String result = "Unknown";
         try
         {
-            result = TrifaToxService.orma.selectFromFriendList().tox_friendnumEq(friendnum).toList().get(0).name;
+            result = TrifaToxService.orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0).name;
         }
         catch (Exception e)
         {

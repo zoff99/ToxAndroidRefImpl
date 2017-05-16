@@ -41,6 +41,7 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
@@ -204,17 +205,30 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
-                    Callstate.accepted_call = 1;
+                    if (event.getAction() != MotionEvent.ACTION_UP)
+                    {
+                    }
+                    else
+                    {
+                        if (Callstate.accepted_call != 1)
+                        {
+                            Callstate.accepted_call = 1;
 
-                    toxav_answer(Callstate.friend_number, 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
-                    accept_button.setVisibility(View.GONE);
-                    camera_toggle_button.setVisibility(View.VISIBLE);
-                    mute_button.setVisibility(View.VISIBLE);
+                            Log.i(TAG, "answer button pressed");
+                            toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
+                            // need to set our state manually here, no callback from toxcore :-(
+                            Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
+                            // need to set our state manually here, no callback from toxcore :-(
+                            accept_button.setVisibility(View.GONE);
+                            camera_toggle_button.setVisibility(View.VISIBLE);
+                            mute_button.setVisibility(View.VISIBLE);
 
-                    Callstate.call_start_timestamp = System.currentTimeMillis();
-                    String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
-                    top_text_line_str2 = a;
-                    update_top_text_line();
+                            Callstate.call_start_timestamp = System.currentTimeMillis();
+                            String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
+                            top_text_line_str2 = a;
+                            update_top_text_line();
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -231,8 +245,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
-                    toxav_call_control(Callstate.friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
-                    close_calling_activity();
+                    if (event.getAction() != MotionEvent.ACTION_UP)
+                    {
+                    }
+                    else
+                    {
+                        Log.i(TAG, "decline button pressed");
+                        toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+                        close_calling_activity();
+                    }
                 }
                 catch (Exception e)
                 {
