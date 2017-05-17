@@ -1,4 +1,4 @@
-/**
+﻿/**
  * [TRIfA], JNI part of Tox Reference Implementation for Android
  * Copyright (C) 2017 Zoff <zoff@zoff.cc>
  *
@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 5
-static const char global_version_string[] = "0.99.5";
+#define VERSION_PATCH 6
+static const char global_version_string[] = "0.99.6";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -860,7 +860,7 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
 {
 	if ((audio_buffer_pcm_2 != NULL) && (pcm != NULL))
 	{
-		memcpy(audio_buffer_pcm_2, pcm, sample_count);
+		memcpy((void*)audio_buffer_pcm_2, (void*)pcm, (size_t)(sample_count * channels * 2));
 	}
 
 	android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
@@ -963,10 +963,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer2(JNIEnv*
 
     audio_buffer_pcm_2 = (uint8_t*)(*jnienv2)->GetDirectBufferAddress(jnienv2, audio_buffer2);
 
-	dbg(9, "audio_buffer_2=(call)%p audio_buffer2=%p", audio_buffer_pcm_2, audio_buffer2);
-
     jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, audio_buffer2);
 	audio_buffer_pcm_2_size = (long)capacity;
+
+	dbg(9, "audio_buffer_2_=================================");
+	dbg(9, "audio_buffer_2_=================================");
+	dbg(9, "audio_buffer_2_=(call)%p audio_buffer2=%p size in bytes=%d", audio_buffer_pcm_2, audio_buffer2, (int)audio_buffer_pcm_2_size);
+	dbg(9, "audio_buffer_2_=================================");
+	dbg(9, "audio_buffer_2_=================================");
 }
 
 // ----- get audio buffer from Java -----

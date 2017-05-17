@@ -76,6 +76,7 @@ import java.util.Random;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
+import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
@@ -112,8 +113,12 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    static ByteBuffer audio_buffer_2 = null;
-    static int audio_buffer_2_read_length = 0;
+    final static int audio_in_buffer_max_count = 5;
+    static int audio_in_buffer_element_count = 0;
+    static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
+    static ByteBuffer audio_buffer_play = null;
+    static int audio_buffer_play_length = 0;
+    static int[] audio_buffer_2_read_length = new int[audio_in_buffer_max_count];
     static TrifaToxService tox_service_fg = null;
     //
     static boolean PREF__UV_reversed = true; // TODO: on older phone this needs to be "false"
@@ -638,25 +643,55 @@ public class MainActivity extends AppCompatActivity
                 execute();
     }
 
-    synchronized static void update_message_in_db(Message m)
+    synchronized static void update_message_in_db(final Message m)
     {
-        TrifaToxService.orma.updateMessage().
-                idEq(m.id).
-                read(m.read).
-                text(m.text).
-                sent_timestamp(m.sent_timestamp).
-                rcvd_timestamp(m.rcvd_timestamp).
-                filename_fullpath(m.filename_fullpath).
-                execute();
+        final Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    TrifaToxService.orma.updateMessage().
+                            idEq(m.id).
+                            read(m.read).
+                            text(m.text).
+                            sent_timestamp(m.sent_timestamp).
+                            rcvd_timestamp(m.rcvd_timestamp).
+                            filename_fullpath(m.filename_fullpath).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        t.start();
     }
 
-    static void update_message_in_db_read_rcvd_timestamp(Message m)
+    static void update_message_in_db_read_rcvd_timestamp(final Message m)
     {
-        TrifaToxService.orma.updateMessage().
-                idEq(m.id).
-                read(m.read).
-                rcvd_timestamp(m.rcvd_timestamp).
-                execute();
+        final Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    TrifaToxService.orma.updateMessage().
+                            idEq(m.id).
+                            read(m.read).
+                            rcvd_timestamp(m.rcvd_timestamp).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        t.start();
     }
 
     static void change_notification(int a_TOXCONNECTION)
@@ -1081,14 +1116,64 @@ public class MainActivity extends AppCompatActivity
         {
             Callstate.call_first_audio_frame_received = System.currentTimeMillis();
 
+            Log.i(TAG, "audio_play:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" + sampling_rate);
+
+
             temp_string_a = "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a, 4);
-            audio_buffer_2 = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
-            set_JNI_audio_buffer2(audio_buffer_2);
+
+            // AudioReceiver.buffer_size = AudioTrack.getMinBufferSize((int) sampling_rate, channels, AudioFormat.ENCODING_PCM_16BIT);
+            // Log.i(TAG, "audio_play:read:init min buffer size(calc)=" + AudioReceiver.buffer_size);
+
+            // HINT: PCM_16 needs 2 bytes per sample per channel
+            AudioReceiver.buffer_size = (int) ((sample_count * channels) * 2); // TODO: this is really bad
+
+            // reset audio in buffers
+            int i = 0;
+            for (i = 0; i < audio_in_buffer_max_count; i++)
+            {
+                try
+                {
+                    audio_buffer_2[i].clear();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    audio_buffer_2[i] = null;
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                audio_buffer_2[i] = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+                audio_buffer_2_read_length[i] = 0;
+                Log.i(TAG, "audio_play:audio_buffer_2[" + i + "] size=" + AudioReceiver.buffer_size);
+            }
+
+            audio_in_buffer_element_count = 0;
+            audio_buffer_play = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+
+            // always write to buffer[0] in the pipeline !! -----------
+            set_JNI_audio_buffer2(audio_buffer_2[0]);
+            // always write to buffer[0] in the pipeline !! -----------
+
+            Log.i(TAG, "audio_play:audio_buffer_play size=" + AudioReceiver.buffer_size);
         }
 
         // TODO: dirty hack, "make good"
-        audio_buffer_2_read_length = (int) sample_count;
+        try
+        {
+            audio_buffer_read_write(sample_count, channels, sampling_rate, true);
+            audio_thread.interrupt();
+        }
+        catch (Exception e)
+        {
+        }
     }
 
     // -------- called by AV native methods --------
@@ -1263,6 +1348,7 @@ public class MainActivity extends AppCompatActivity
                             m.rcvd_timestamp = System.currentTimeMillis();
                             m.read = true;
                             update_message_in_db_read_rcvd_timestamp(m);
+
                             // TODO this updates all messages. should be done nicer and faster!
                             update_message_view();
                         }
@@ -1471,7 +1557,7 @@ public class MainActivity extends AppCompatActivity
     {
         if (cache_pubkey_fnum.containsKey(friend_public_key_string))
         {
-            Log.i(TAG, "cache hit:1");
+            // Log.i(TAG, "cache hit:1");
             return cache_pubkey_fnum.get(friend_public_key_string);
         }
         else
@@ -1491,7 +1577,7 @@ public class MainActivity extends AppCompatActivity
     {
         if (cache_fnum_pubkey.containsKey(friend_number))
         {
-            Log.i(TAG, "cache hit:2");
+            // Log.i(TAG, "cache hit:2");
             return cache_fnum_pubkey.get(friend_number);
         }
         else
@@ -1682,6 +1768,68 @@ public class MainActivity extends AppCompatActivity
         }
 
         return result;
+    }
+
+    synchronized static boolean audio_buffer_read_write(long sample_count, int channels, long sampling_rate, boolean write)
+    {
+        if (write)
+        {
+            // Log.i(TAG, "audio_buffer_read_write:write:START");
+
+            int j = 0;
+            if (audio_in_buffer_element_count < audio_in_buffer_max_count)
+            {
+                if (audio_in_buffer_element_count > 0)
+                {
+                    for (j = 0; j < audio_in_buffer_element_count; j++)
+                    {
+                        audio_buffer_2[audio_in_buffer_element_count - 1 - j].rewind();
+                        audio_buffer_2[audio_in_buffer_element_count - j].rewind();
+                        // Log.i(TAG, "audio_play:write:buffer size src=" + audio_buffer_2[audio_in_buffer_element_count - 1 - j].limit());
+                        // Log.i(TAG, "audio_play:write:buffer pos src=" + audio_buffer_2[audio_in_buffer_element_count - 1 - j].position());
+                        // Log.i(TAG, "audio_play:write:buffer size dst=" + audio_buffer_2[audio_in_buffer_element_count - j].limit());
+                        // Log.i(TAG, "audio_play:write:buffer pos dst=" + audio_buffer_2[audio_in_buffer_element_count - j].position());
+                        // audio_buffer_2[audio_in_buffer_element_count - j].put(audio_buffer_2[audio_in_buffer_element_count - 1 - j].array());
+                        audio_buffer_2[audio_in_buffer_element_count - j].put(audio_buffer_2[audio_in_buffer_element_count - 1 - j].array(), 0, AudioReceiver.buffer_size);
+                        audio_buffer_2[audio_in_buffer_element_count - j].rewind();
+                        audio_buffer_2_read_length[audio_in_buffer_element_count - j] = audio_buffer_2_read_length[audio_in_buffer_element_count - 1 - j];
+                        // Log.i(TAG, "audio_play:write:mv " + (audio_in_buffer_element_count - 1 - j + " -> " + (audio_in_buffer_element_count - j)));
+                    }
+                }
+                // Log.i(TAG, "audio_play:write:set buffer 0:len=" + sample_count);
+                audio_buffer_2_read_length[0] = (int) (sample_count * channels * 2);
+                audio_in_buffer_element_count++;
+                // Log.i(TAG, "audio_play:write:element count new=" + audio_in_buffer_element_count);
+                // Log.i(TAG, "audio_play:write:element count new=" + audio_in_buffer_element_count);
+            }
+
+            // Log.i(TAG, "audio_buffer_read_write:write:END");
+
+            return true;
+        }
+        else // read
+        {
+            // Log.i(TAG, "audio_buffer_read_write:READ:START");
+
+            if (audio_in_buffer_element_count > 0)
+            {
+                // Log.i(TAG, "audio_play:read:load buffer " + (audio_in_buffer_element_count - 1) + ":len=" + audio_buffer_2_read_length[audio_in_buffer_element_count - 1]);
+
+                audio_buffer_play.rewind();
+                audio_buffer_play.put(audio_buffer_2[audio_in_buffer_element_count - 1].array(), 0, AudioReceiver.buffer_size);
+                audio_buffer_play_length = audio_buffer_2_read_length[audio_in_buffer_element_count - 1];
+                audio_in_buffer_element_count--;
+                // Log.i(TAG, "audio_play:read:element count new=" + audio_in_buffer_element_count);
+
+                // Log.i(TAG, "audio_buffer_read_write:READ:END01");
+
+                return true;
+            }
+
+            // Log.i(TAG, "audio_buffer_read_write:READ:END02");
+
+            return false;
+        }
     }
 
 

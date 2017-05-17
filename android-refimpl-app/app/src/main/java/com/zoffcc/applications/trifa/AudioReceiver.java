@@ -3,10 +3,12 @@ package com.zoffcc.applications.trifa;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Process;
 import android.util.Log;
 
-import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
-import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_read_length;
+import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play;
+import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play_length;
+import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_read_write;
 
 public class AudioReceiver extends Thread
 {
@@ -21,13 +23,13 @@ public class AudioReceiver extends Thread
     static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
 
-    static int buffer_size = 50000; // TODO: bad!!!!
+    static int buffer_size = 1920 * 5; // TODO: hardcoded is bad!!!!
     AudioTrack track = null;
 
 
     public AudioReceiver()
     {
-        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
         stopped = false;
         finished = false;
         start();
@@ -35,8 +37,12 @@ public class AudioReceiver extends Thread
 
     public AudioTrack findAudioTrack()
     {
-        buffer_size = AudioTrack.getMinBufferSize((int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT);
+        int buffer_size22 = AudioTrack.getMinBufferSize((int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT);
+        Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
+        Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
+
         track = new AudioTrack(AudioManager.STREAM_MUSIC, (int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT, buffer_size, AudioTrack.MODE_STREAM);
+        // track = new AudioTrack(AudioManager.STREAM_MUSIC, (int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT, buffer_size, AudioTrack.MODE_STATIC);
         return track;
     }
 
@@ -62,16 +68,22 @@ public class AudioReceiver extends Thread
         {
             try
             {
-                Thread.sleep(20);
-                if ((audio_buffer_2 != null) && (audio_buffer_2_read_length > 0))
+                // puts data into "audio_buffer_play"
+                if ((audio_buffer_read_write(0, 0, 0, false)) && (audio_buffer_play_length > 0))
                 {
-                    track.write(audio_buffer_2.array(), 0, audio_buffer_2_read_length);
+                    // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
+                    track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
+                    // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
+                }
+                else
+                {
+                    Thread.sleep(20);
                 }
             }
             catch (Exception e)
             {
-                e.printStackTrace();
-                Log.i(TAG, "audio:EE:" + e.getMessage());
+                // e.printStackTrace();
+                // Log.i(TAG, "audio_play:EE:" + e.getMessage());
             }
         }
 
