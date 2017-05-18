@@ -23,6 +23,7 @@ public class AudioReceiver extends Thread
     static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
 
+    static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
     static int buffer_size = 1920 * 5; // TODO: hardcoded is bad!!!!
     AudioTrack track = null;
 
@@ -64,6 +65,7 @@ public class AudioReceiver extends Thread
 
         int res = 0;
         int read_bytes = 0;
+        int played_bytes = 0;
         while (!stopped)
         {
             try
@@ -72,17 +74,17 @@ public class AudioReceiver extends Thread
                 // if ((audio_buffer_read_write(0, 0, 0, false)) && (audio_buffer_play_length > 0))
                 if (audio_buffer_read_write(0, 0, 0, false))
                 {
-                    // Log.i(TAG, "audio_play:recthr:play");
                     // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
-                    track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
+                    played_bytes = track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
                     // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
+                    // Log.i(TAG, "audio_play:recthr:play:bytes=" + played_bytes + " len=" + audio_buffer_play_length);
                 }
                 else
                 {
                     try
                     {
                         // Log.i(TAG, "audio_play:recthr:no data");
-                        Thread.sleep(30);
+                        Thread.sleep(sleep_millis);
                     }
                     catch (InterruptedException esleep)
                     {

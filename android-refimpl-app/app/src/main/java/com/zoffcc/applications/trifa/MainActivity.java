@@ -1127,6 +1127,9 @@ public class MainActivity extends AppCompatActivity
 
             // HINT: PCM_16 needs 2 bytes per sample per channel
             AudioReceiver.buffer_size = (int) ((sample_count * channels) * 2); // TODO: this is really bad
+            AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f * 0.9f); // TODO: this is bad also
+            Log.i(TAG, "audio_play:read:init buffer_size=" + AudioReceiver.buffer_size);
+            Log.i(TAG, "audio_play:read:init sleep_millis=" + AudioReceiver.sleep_millis);
 
             // reset audio in buffers
             int i = 0;
