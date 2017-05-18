@@ -56,7 +56,7 @@ public class AudioRecording extends Thread
             audio_buffer = ByteBuffer.allocateDirect(buffer_size);
             set_JNI_audio_buffer(audio_buffer);
 
-            recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, buffer_size);
+            recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, buffer_size * 5);
             recorder.startRecording();
         }
         catch (Exception e)

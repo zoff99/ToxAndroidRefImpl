@@ -5,7 +5,6 @@ public class Callstate
 {
     static int state = 0; // 0 -> not in a call, 1 -> ringing/calling
     static int tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
-    // static long friend_number = -1;
     static String friend_pubkey = "-1";
     static String friend_name = "";
     static int other_audio_enabled = 0;
@@ -20,6 +19,7 @@ public class Callstate
     static long call_first_video_frame_received = -1L; // when we receive the first video frame (someone calls us)
     static long call_first_audio_frame_received = -1L; // when we receive the first audio frame (someone calls us)
     static boolean camera_opened = false;
+    static boolean audio_speaker = true; // true -> loudspeaker, false -> for your ear-speaker
 
     static void reset_values()
     {
@@ -37,5 +37,6 @@ public class Callstate
         Callstate.audio_bitrate = 0;
         Callstate.video_bitrate = 0;
         Callstate.accepted_call = 0;
+        Callstate.audio_speaker = true;
     }
 }

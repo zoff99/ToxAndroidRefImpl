@@ -19,13 +19,18 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -41,19 +46,20 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
-public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback
+public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback, SensorEventListener
 {
-    private static final boolean AUTO_HIDE = true;
-    private static final int AUTO_HIDE_DELAY_MILLIS = 1000;
-    private static final int UI_ANIMATION_DELAY = 300;
+    // private static final boolean AUTO_HIDE = true;
+    // private static final int AUTO_HIDE_DELAY_MILLIS = 1000;
+    // private static final int UI_ANIMATION_DELAY = 300;
     private static final int FRONT_CAMERA_USED = 1;
     private static final int BACK_CAMERA_USED = 2;
     static int active_camera_type = FRONT_CAMERA_USED;
-    private final Handler mHideHandler = new Handler();
+    // private final Handler mHideHandler = new Handler();
     static ImageView mContentView;
     static ImageButton accept_button = null;
     ImageButton decline_button = null;
@@ -68,15 +74,20 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     Handler callactivity_handler = null;
     static Handler callactivity_handler_s = null;
     private static final String TAG = "trifa.CallingActivity";
-    Camera camera = null;
+    // Camera camera = null;
     static CameraSurfacePreview cameraSurfacePreview = null;
     static float mPreviewRate = -1f;
-    static int front_camera_id = -1;
-    static int back_camera_id = -1;
-    static int active_camera_id = 0;
-    // public static final String FRAGMENT_TAG = "camera_preview_fragment_";
+    // static int front_camera_id = -1;
+    // static int back_camera_id = -1;
+    // static int active_camera_id = 0;
     static AudioRecording audio_thread = null;
     static AudioReceiver audio_receiver_thread = null;
+    private SensorManager sensor_manager = null;
+    private Sensor proximity_sensor = null;
+    PowerManager pm = null;
+    PowerManager.WakeLock wl1 = null;
+    PowerManager.WakeLock wl2 = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -84,6 +95,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_calling);
+
+        sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        proximity_sensor = sensor_manager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
         callactivity_handler = new Handler(getMainLooper());
         callactivity_handler_s = callactivity_handler;
@@ -105,7 +120,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
         mute_button = (ImageButton) findViewById(R.id.mute_button);
 
-        Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+        Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
         mute_button.setImageDrawable(d1);
         mute_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -114,12 +129,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (event.getAction() != MotionEvent.ACTION_UP)
                 {
-                    Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                    Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
                     mute_button.setImageDrawable(d1a);
                 }
                 else
                 {
-                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
                     mute_button.setImageDrawable(d2a);
                 }
                 return true;
@@ -428,6 +443,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         super.onResume();
 
+        sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
         try
         {
             if (audio_thread.stopped)
@@ -512,6 +529,25 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         super.onPause();
 
+        sensor_manager.unregisterListener(this);
+
+        try
+        {
+            wl1.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            wl2.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         try
         {
             if (!audio_thread.stopped)
@@ -592,5 +628,120 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Callstate.camera_opened = true;
         SurfaceHolder holder = this.cameraSurfacePreview.getSurfaceHolder();
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
+    }
+
+    public void turnOnScreen()
+    {
+        // turn on screen
+        try
+        {
+            wl1.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            wl2.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "trifa_screen_on");
+        wl1.acquire();
+    }
+
+    @TargetApi(21)
+    public void turnOffScreen()
+    {
+        try
+        {
+            wl1.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            wl2.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        // turn off screen
+        wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "trifa_screen_OFF");
+        wl2.acquire();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event)
+    {
+        if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
+        {
+            // Log.i(TAG, "onSensorChanged:value=" + event.values[0] + " max=" + proximity_sensor.getMaximumRange());
+
+            if (event.values[0] >= -proximity_sensor.getMaximumRange() && event.values[0] <= proximity_sensor.getMaximumRange())
+            {
+                // close to ear
+                if (Callstate.audio_speaker == true)
+                {
+                    Callstate.audio_speaker = false;
+                    try
+                    {
+                        audio_manager_s.setSpeakerphoneOn(false);
+                        try
+                        {
+                            turnOffScreen();
+                        }
+                        catch (Exception e2)
+                        {
+                            e2.printStackTrace();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Callstate.audio_speaker = true;
+                    }
+                }
+            }
+            else
+            {
+                // away from ear
+                if (Callstate.audio_speaker == false)
+                {
+                    Callstate.audio_speaker = true;
+                    try
+                    {
+                        audio_manager_s.setSpeakerphoneOn(true);
+                        try
+                        {
+                            turnOnScreen();
+                        }
+                        catch (Exception e2)
+                        {
+                            e2.printStackTrace();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Callstate.audio_speaker = false;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
+
     }
 }

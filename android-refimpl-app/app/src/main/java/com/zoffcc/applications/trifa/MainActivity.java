@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 5;
+    final static int audio_in_buffer_max_count = 6;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -323,6 +323,7 @@ public class MainActivity extends AppCompatActivity
         Callstate.call_first_video_frame_received = -1;
         Callstate.call_first_audio_frame_received = -1;
         Callstate.friend_pubkey = "-1";
+        Callstate.audio_speaker = true;
 
         if (native_lib_loaded)
         {
@@ -985,6 +986,7 @@ public class MainActivity extends AppCompatActivity
                         Callstate.call_first_video_frame_received = -1;
                         Callstate.call_first_audio_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
+                        Callstate.audio_speaker = true;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         // Callstate.friend_number = fn;

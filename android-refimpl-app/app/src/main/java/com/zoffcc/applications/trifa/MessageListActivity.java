@@ -332,8 +332,9 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.call_start_timestamp = -1;
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         Callstate.camera_opened = false;
+                        Callstate.audio_speaker = true;
+
                         Intent intent = new Intent(context_s, CallingActivity.class);
-                        // Callstate.friend_number = fn;
                         try
                         {
                             Callstate.friend_name = orma.selectFromFriendList().

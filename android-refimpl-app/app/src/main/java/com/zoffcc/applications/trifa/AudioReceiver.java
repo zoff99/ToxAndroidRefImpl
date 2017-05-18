@@ -19,7 +19,7 @@ public class AudioReceiver extends Thread
 
     // the audio recording options
     static final int RECORDING_RATE = 48000; // 16000; // 44100;
-    static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
+    static final int CHANNEL = AudioFormat.CHANNEL_OUT_MONO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
@@ -39,11 +39,11 @@ public class AudioReceiver extends Thread
 
     public AudioTrack findAudioTrack()
     {
-        int buffer_size22 = AudioTrack.getMinBufferSize((int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT);
+        int buffer_size22 = AudioTrack.getMinBufferSize((int) SMAPLINGRATE_TOX, CHANNEL, FORMAT);
         Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
 
-        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT, buffer_size, AudioTrack.MODE_STREAM);
+        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) SMAPLINGRATE_TOX, CHANNEL, FORMAT, buffer_size22 * 5, AudioTrack.MODE_STREAM);
 
         try
         {
@@ -51,8 +51,16 @@ public class AudioReceiver extends Thread
             MainActivity.RingerMode_old = audio_manager_s.getRingerMode();
             MainActivity.isSpeakerPhoneOn_old = audio_manager_s.isSpeakerphoneOn();
 
-            audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            audio_manager_s.setSpeakerphoneOn(true);
+            if (Callstate.audio_speaker)
+            {
+                audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                audio_manager_s.setSpeakerphoneOn(true);
+            }
+            else
+            {
+                audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                audio_manager_s.setSpeakerphoneOn(false);
+            }
         }
         catch (Exception e)
         {
