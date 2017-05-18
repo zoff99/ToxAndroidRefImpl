@@ -41,7 +41,7 @@ public class AudioReceiver extends Thread
         Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
 
-        track = new AudioTrack(AudioManager.STREAM_MUSIC, (int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT, buffer_size, AudioTrack.MODE_STREAM);
+        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT, buffer_size, AudioTrack.MODE_STREAM);
         // track = new AudioTrack(AudioManager.STREAM_MUSIC, (int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT, buffer_size, AudioTrack.MODE_STATIC);
         return track;
     }
@@ -69,21 +69,31 @@ public class AudioReceiver extends Thread
             try
             {
                 // puts data into "audio_buffer_play"
-                if ((audio_buffer_read_write(0, 0, 0, false)) && (audio_buffer_play_length > 0))
+                // if ((audio_buffer_read_write(0, 0, 0, false)) && (audio_buffer_play_length > 0))
+                if (audio_buffer_read_write(0, 0, 0, false))
                 {
+                    // Log.i(TAG, "audio_play:recthr:play");
                     // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
                     track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
                     // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
                 }
                 else
                 {
-                    Thread.sleep(20);
+                    try
+                    {
+                        // Log.i(TAG, "audio_play:recthr:no data");
+                        Thread.sleep(30);
+                    }
+                    catch (InterruptedException esleep)
+                    {
+                        // Log.i(TAG, "audio_play:recthr:wake up:" + esleep.getMessage());
+                    }
                 }
             }
             catch (Exception e)
             {
                 // e.printStackTrace();
-                // Log.i(TAG, "audio_play:EE:" + e.getMessage());
+                Log.i(TAG, "audio_play:recthr:EE:" + e.getMessage());
             }
         }
 

@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 5;
+    final static int audio_in_buffer_max_count = 3;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -1169,7 +1169,6 @@ public class MainActivity extends AppCompatActivity
         try
         {
             audio_buffer_read_write(sample_count, channels, sampling_rate, true);
-            audio_thread.interrupt();
         }
         catch (Exception e)
         {
@@ -1801,6 +1800,16 @@ public class MainActivity extends AppCompatActivity
                 audio_in_buffer_element_count++;
                 // Log.i(TAG, "audio_play:write:element count new=" + audio_in_buffer_element_count);
                 // Log.i(TAG, "audio_play:write:element count new=" + audio_in_buffer_element_count);
+
+                // wake up audio thread -----------
+                try
+                {
+                    audio_thread.interrupt();
+                }
+                catch (Exception e)
+                {
+                }
+                // wake up audio thread -----------
             }
 
             // Log.i(TAG, "audio_buffer_read_write:write:END");
