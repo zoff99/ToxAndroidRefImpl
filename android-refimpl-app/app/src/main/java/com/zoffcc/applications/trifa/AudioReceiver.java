@@ -9,6 +9,7 @@ import android.util.Log;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play_length;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_read_write;
+import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 
 public class AudioReceiver extends Thread
 {
@@ -43,7 +44,21 @@ public class AudioReceiver extends Thread
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
 
         track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT, buffer_size, AudioTrack.MODE_STREAM);
-        // track = new AudioTrack(AudioManager.STREAM_MUSIC, (int) SMAPLINGRATE_TOX, CHANNELS_TOX, FORMAT, buffer_size, AudioTrack.MODE_STATIC);
+
+        try
+        {
+            MainActivity.AudioMode_old = audio_manager_s.getMode();
+            MainActivity.RingerMode_old = audio_manager_s.getRingerMode();
+            MainActivity.isSpeakerPhoneOn_old = audio_manager_s.isSpeakerphoneOn();
+
+            audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            audio_manager_s.setSpeakerphoneOn(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         return track;
     }
 
@@ -101,6 +116,17 @@ public class AudioReceiver extends Thread
 
         track.stop();
         track.release();
+
+        try
+        {
+            audio_manager_s.setSpeakerphoneOn(MainActivity.isSpeakerPhoneOn_old);
+            audio_manager_s.setMode(MainActivity.AudioMode_old);
+            audio_manager_s.setRingerMode(MainActivity.RingerMode_old);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         finished = true;
     }

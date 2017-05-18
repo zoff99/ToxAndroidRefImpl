@@ -31,6 +31,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -94,6 +95,10 @@ public class MainActivity extends AppCompatActivity
     static Handler main_handler_s = null;
     static Context context_s = null;
     static Activity main_activity_s = null;
+    static AudioManager audio_manager_s = null;
+    static int AudioMode_old;
+    static int RingerMode_old;
+    static boolean isSpeakerPhoneOn_old;
     static Notification notification = null;
     static NotificationManager nmn3 = null;
     static int NOTIFICATION_ID = 293821038;
@@ -113,7 +118,7 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 3;
+    final static int audio_in_buffer_max_count = 5;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -154,6 +159,8 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+
+        audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         // prefs ----------
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -1175,6 +1182,8 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
+            e.printStackTrace();
+            Log.i(TAG, "audio_play:EE3:" + e.getMessage());
         }
     }
 
@@ -1777,7 +1786,6 @@ public class MainActivity extends AppCompatActivity
         if (write)
         {
             // Log.i(TAG, "audio_buffer_read_write:write:START");
-
             int j = 0;
             if (audio_in_buffer_element_count < audio_in_buffer_max_count)
             {
@@ -1811,8 +1819,13 @@ public class MainActivity extends AppCompatActivity
                 }
                 catch (Exception e)
                 {
+                    Log.i(TAG, "audio_buffer_read_write:write:wake up audio thread:EE:" + e.getMessage());
                 }
                 // wake up audio thread -----------
+            }
+            else
+            {
+                Log.i(TAG, "audio_buffer_read_write:write:* buffer FULL *");
             }
 
             // Log.i(TAG, "audio_buffer_read_write:write:END");
