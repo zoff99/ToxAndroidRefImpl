@@ -348,36 +348,45 @@ public class CameraWrapper
             {
                 if (camera_preview_size2 == null)
                 {
-                    Camera.Parameters p = camera.getParameters();
-                    camera_preview_size2 = p.getPreviewSize();
-                    Log.i(TAG, "onPreviewFrame:w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " camera_video_rotate_angle=" + CameraWrapper.camera_video_rotate_angle);
-
-                    if (MainActivity.video_buffer_2 != null)
+                    try
                     {
-                        // video_buffer_2.clear();
-                        MainActivity.video_buffer_2 = null;
+                        Camera.Parameters p = camera.getParameters();
+                        camera_preview_size2 = p.getPreviewSize();
+                        Log.i(TAG, "onPreviewFrame:w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " camera_video_rotate_angle=" + CameraWrapper.camera_video_rotate_angle);
+
+                        if (MainActivity.video_buffer_2 != null)
+                        {
+                            // video_buffer_2.clear();
+                            MainActivity.video_buffer_2 = null;
+                        }
+
+                        /*
+                        * YUV420 frame with width * height
+                        *
+                        * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
+                        * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
+                        * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
+                        */
+                        int y_layer_size = (int) camera_preview_size2.width * camera_preview_size2.height;
+                        int u_layer_size = (int) (camera_preview_size2.width / 2) * (camera_preview_size2.height / 2);
+                        int v_layer_size = (int) (camera_preview_size2.width / 2) * (camera_preview_size2.height / 2);
+
+                        int frame_width_px = (int) camera_preview_size2.width;
+                        int frame_height_px = (int) camera_preview_size2.height;
+
+                        int buffer_size_in_bytes2 = y_layer_size + v_layer_size + u_layer_size;
+
+                        Log.i(TAG, "onPreviewFrame:YUV420 frame w1=" + camera_preview_size2.width + " h1=" + camera_preview_size2.height + " bytes=" + buffer_size_in_bytes2);
+                        Log.i(TAG, "onPreviewFrame:YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes2);
+                        MainActivity.video_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes2 + 1);
+                        MainActivity.set_JNI_video_buffer2(MainActivity.video_buffer_2, camera_preview_size2.width, camera_preview_size2.height);
                     }
-
-                /*
-                * YUV420 frame with width * height
-                *
-                * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
-                * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
-                * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
-                */
-                    int y_layer_size = (int) camera_preview_size2.width * camera_preview_size2.height;
-                    int u_layer_size = (int) (camera_preview_size2.width / 2) * (camera_preview_size2.height / 2);
-                    int v_layer_size = (int) (camera_preview_size2.width / 2) * (camera_preview_size2.height / 2);
-
-                    int frame_width_px = (int) camera_preview_size2.width;
-                    int frame_height_px = (int) camera_preview_size2.height;
-
-                    int buffer_size_in_bytes2 = y_layer_size + v_layer_size + u_layer_size;
-
-                    Log.i(TAG, "onPreviewFrame:YUV420 frame w1=" + camera_preview_size2.width + " h1=" + camera_preview_size2.height + " bytes=" + buffer_size_in_bytes2);
-                    Log.i(TAG, "onPreviewFrame:YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes2);
-                    MainActivity.video_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes2 + 1);
-                    MainActivity.set_JNI_video_buffer2(MainActivity.video_buffer_2, camera_preview_size2.width, camera_preview_size2.height);
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                        camera_preview_size2 = null;
+                        Log.i(TAG, "onPreviewFrame:EE1:" + e2.getMessage());
+                    }
                 }
 
                 try

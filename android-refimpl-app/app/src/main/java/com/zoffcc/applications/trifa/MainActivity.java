@@ -77,6 +77,8 @@ import java.util.Random;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
+import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
+import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
@@ -1124,6 +1126,9 @@ public class MainActivity extends AppCompatActivity
         if (Callstate.call_first_audio_frame_received == -1)
         {
             Callstate.call_first_audio_frame_received = System.currentTimeMillis();
+
+            sampling_rate_ = sampling_rate;
+            channels_ = channels;
 
             Log.i(TAG, "audio_play:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" + sampling_rate);
 

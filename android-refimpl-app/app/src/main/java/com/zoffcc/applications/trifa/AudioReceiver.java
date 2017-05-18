@@ -18,11 +18,14 @@ public class AudioReceiver extends Thread
     static boolean finished = true;
 
     // the audio recording options
-    static final int RECORDING_RATE = 48000; // 16000; // 44100;
-    static final int CHANNEL = AudioFormat.CHANNEL_OUT_MONO;
+    // static final int RECORDING_RATE = 48000; // 16000; // 44100;
+    static final int CHANNEL_1 = AudioFormat.CHANNEL_OUT_MONO;
+    static final int CHANNEL_2 = AudioFormat.CHANNEL_OUT_STEREO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-    static final int CHANNELS_TOX = 1;
+    // static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
+    static long sampling_rate_ = SMAPLINGRATE_TOX;
+    static int channels_ = 1;
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
     static int buffer_size = 1920 * 5; // TODO: hardcoded is bad!!!!
@@ -39,11 +42,23 @@ public class AudioReceiver extends Thread
 
     public AudioTrack findAudioTrack()
     {
-        int buffer_size22 = AudioTrack.getMinBufferSize((int) SMAPLINGRATE_TOX, CHANNEL, FORMAT);
+        int CHANNEL;
+
+        if (channels_ == 1)
+        {
+            CHANNEL = CHANNEL_1;
+        }
+        else
+        {
+            CHANNEL = CHANNEL_2;
+        }
+
+        int buffer_size22 = AudioTrack.getMinBufferSize((int) sampling_rate_, CHANNEL, FORMAT);
         Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
 
-        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) SMAPLINGRATE_TOX, CHANNEL, FORMAT, buffer_size22 * 5, AudioTrack.MODE_STREAM);
+        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size22 * 3, AudioTrack.MODE_STREAM);
+        // track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size * 3, AudioTrack.MODE_STREAM);
 
         try
         {
