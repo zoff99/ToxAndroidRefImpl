@@ -92,7 +92,7 @@ android {
         versionCode 10000
         versionName "1.0.0"
 
-        renderscriptTargetApi 18
+        renderscriptTargetApi 16
         renderscriptSupportModeEnabled true
 
         vectorDrawables.useSupportLibrary = true
