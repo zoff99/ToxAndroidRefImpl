@@ -1,3 +1,22 @@
+/**
+ * [TRIfA], Java part of Tox Reference Implementation for Android
+ * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * <p>
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ */
+
 package com.zoffcc.applications.trifa;
 
 import android.media.AudioFormat;
@@ -29,6 +48,7 @@ public class AudioReceiver extends Thread
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
     static int buffer_size = 1920 * 5; // TODO: hardcoded is bad!!!!
+    final static int buffer_multiplier = 20;
     AudioTrack track = null;
 
 
@@ -57,8 +77,7 @@ public class AudioReceiver extends Thread
         Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
 
-        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size22 * 3, AudioTrack.MODE_STREAM);
-        // track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size * 3, AudioTrack.MODE_STREAM);
+        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size22 * buffer_multiplier, AudioTrack.MODE_STREAM);
 
         try
         {

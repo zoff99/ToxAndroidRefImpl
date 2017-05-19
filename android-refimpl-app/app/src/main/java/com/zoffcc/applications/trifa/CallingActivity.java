@@ -202,7 +202,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 return true;
             }
         });
-        
+
         initUI();
         initViewParams();
 

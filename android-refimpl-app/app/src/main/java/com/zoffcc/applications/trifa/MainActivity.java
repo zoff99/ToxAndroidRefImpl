@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 6;
+    final static int audio_in_buffer_max_count = 10;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -1091,7 +1091,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
     {
-        if (cache_pubkey_fnum.get(Callstate.friend_pubkey)!= friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)!= friend_number)
         {
             // not the friend we are in call with now
             return;
