@@ -43,6 +43,7 @@ public class AudioReceiver extends Thread
     static final int CHANNEL_1 = AudioFormat.CHANNEL_OUT_MONO;
     static final int CHANNEL_2 = AudioFormat.CHANNEL_OUT_STEREO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+    static final int AUDIO_GAIN_VALUE = 1000;
     // static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
     static long sampling_rate_ = SMAPLINGRATE_TOX;
@@ -125,31 +126,10 @@ public class AudioReceiver extends Thread
             {
                 lec = new LoudnessEnhancer(track.getAudioSessionId());
 
-                //                try
-                //                {
-                //                    NoiseSuppressor.create(track.getAudioSessionId()).setEnabled(true);
-                //                }
-                //                catch (Exception ee2)
-                //                {
-                //                    ee2.printStackTrace();
-                //                    Log.i(TAG, "Audio Thread [IN]:EE4:" + ee2.getMessage());
-                //                }
-                //
-                //                try
-                //                {
-                //                    AcousticEchoCanceler.create(track.getAudioSessionId()).setEnabled(true);
-                //                }
-                //                catch (Exception ee3)
-                //                {
-                //                    ee3.printStackTrace();
-                //                    Log.i(TAG, "Audio Thread [IN]:EE5:" + ee3.getMessage());
-                //                }
-
-
                 float target_gain = lec.getTargetGain();
                 Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
 
-                lec.setTargetGain(1000);
+                lec.setTargetGain(AUDIO_GAIN_VALUE);
 
                 target_gain = lec.getTargetGain();
                 Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
