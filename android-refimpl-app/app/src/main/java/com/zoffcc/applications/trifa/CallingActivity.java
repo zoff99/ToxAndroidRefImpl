@@ -28,6 +28,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -38,6 +39,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -92,6 +94,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_calling);
@@ -342,6 +346,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         };
         callactivity_handler_s.post(myRunnable);
+    }
+
+    private void initializeScreenshotSecurity()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        }
+        else
+        {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        }
     }
 
     @Override

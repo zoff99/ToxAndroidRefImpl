@@ -368,6 +368,7 @@ public class MainActivity extends AppCompatActivity
             TrifaToxService.orma = builder.name(MAIN_DB_NAME).
                     readOnMainThread(AccessThreadConstraint.WARNING).
                     writeOnMainThread(AccessThreadConstraint.WARNING).
+                    trace(false).
                     build();
             Log.i(TAG, "db:open=OK:path=" + getDatabasePath(MAIN_DB_NAME));
         }

@@ -19,10 +19,12 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.os.Process;
+import android.media.audiofx.LoudnessEnhancer;
+import android.os.Build;
 import android.util.Log;
 
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play;
@@ -54,7 +56,7 @@ public class AudioReceiver extends Thread
 
     public AudioReceiver()
     {
-        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
         stopped = false;
         finished = false;
         start();
@@ -104,6 +106,7 @@ public class AudioReceiver extends Thread
         return track;
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void run()
     {
@@ -113,6 +116,18 @@ public class AudioReceiver extends Thread
         try
         {
             track = findAudioTrack();
+
+            LoudnessEnhancer lec = null;
+            try
+            {
+                lec = new LoudnessEnhancer(track.getAudioSessionId());
+                lec.setEnabled(true);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
             track.play();
         }
         catch (Exception e)

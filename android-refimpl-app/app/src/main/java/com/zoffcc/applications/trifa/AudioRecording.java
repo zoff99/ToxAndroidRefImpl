@@ -20,12 +20,16 @@
 package com.zoffcc.applications.trifa;
 
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.media.audiofx.AutomaticGainControl;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
 
+import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_audio_send_frame;
@@ -45,15 +49,25 @@ public class AudioRecording extends Thread
 
     ByteBuffer audio_buffer = null;
     static int buffer_size = 0;
+    static int audio_session_id = -1;
 
     /**
      * Give the thread high priority so that it's not canceled unexpectedly, and start it
      */
     public AudioRecording()
     {
+
+        // AcousticEchoCanceler
+        // AutomaticGainControl
+        // LoudnessEnhancer
+
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
         stopped = false;
         finished = false;
+
+        audio_manager_s.setMicrophoneMute(false);
+        audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
+        audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
         start();
     }
 
@@ -76,6 +90,30 @@ public class AudioRecording extends Thread
             set_JNI_audio_buffer(audio_buffer);
 
             recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, buffer_size * 5);
+            audio_session_id = recorder.getAudioSessionId();
+
+            AutomaticGainControl agc = null;
+            try
+            {
+                agc = AutomaticGainControl.create(audio_session_id);
+                agc.setEnabled(true);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            AcousticEchoCanceler aec = null;
+            try
+            {
+                aec = AcousticEchoCanceler.create(audio_session_id);
+                aec.setEnabled(true);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
             recorder.startRecording();
         }
         catch (Exception e)
