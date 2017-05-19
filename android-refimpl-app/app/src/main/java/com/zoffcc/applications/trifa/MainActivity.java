@@ -326,6 +326,10 @@ public class MainActivity extends AppCompatActivity
         Callstate.call_first_audio_frame_received = -1;
         Callstate.friend_pubkey = "-1";
         Callstate.audio_speaker = true;
+        Callstate.other_audio_enabled = 1;
+        Callstate.other_video_enabled = 1;
+        Callstate.my_audio_enabled = 1;
+        Callstate.my_video_enabled = 1;
 
         if (native_lib_loaded)
         {
@@ -968,6 +972,13 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_cb_method(long friend_number, int audio_enabled, int video_enabled)
     {
+        if (Callstate.state!=0)
+        {
+            // don't accept a new call if we already are in a call
+            return;
+        }
+
+
         Log.i(TAG, "toxav_call:from=" + friend_number + " audio=" + audio_enabled + " video=" + video_enabled);
         final long fn = friend_number;
         final int f_audio_enabled = audio_enabled;
@@ -989,6 +1000,10 @@ public class MainActivity extends AppCompatActivity
                         Callstate.call_first_audio_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
                         Callstate.audio_speaker = true;
+                        Callstate.other_audio_enabled = 1;
+                        Callstate.other_video_enabled = 1;
+                        Callstate.my_audio_enabled = 1;
+                        Callstate.my_video_enabled = 1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         // Callstate.friend_number = fn;
@@ -1019,9 +1034,19 @@ public class MainActivity extends AppCompatActivity
         main_handler_s.post(myRunnable);
     }
 
-
     synchronized static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
     {
+        if (Callstate.other_video_enabled == 0)
+        {
+            return;
+        }
+
+        if (cache_pubkey_fnum.get(Callstate.friend_pubkey)!= friend_number)
+        {
+            // not the friend we are in call with now
+            return;
+        }
+
         // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
         if (Callstate.call_first_video_frame_received == -1)
         {
@@ -1066,6 +1091,12 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
     {
+        if (cache_pubkey_fnum.get(Callstate.friend_pubkey)!= friend_number)
+        {
+            // not the friend we are in call with now
+            return;
+        }
+
         Log.i(TAG, "toxav_call_state:from=" + friend_number + " state=" + a_TOXAV_FRIEND_CALL_STATE);
         Log.i(TAG, "Callstate.tox_call_state=" + a_TOXAV_FRIEND_CALL_STATE + " old=" + Callstate.tox_call_state);
 
@@ -1112,6 +1143,12 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_bit_rate_status_cb_method(long friend_number, long audio_bit_rate, long video_bit_rate)
     {
+        if (cache_pubkey_fnum.get(Callstate.friend_pubkey)!= friend_number)
+        {
+            // not the friend we are in call with now
+            return;
+        }
+
         Log.i(TAG, "toxav_bit_rate_status:from=" + friend_number + " audio_bit_rate=" + audio_bit_rate + " video_bit_rate=" + video_bit_rate);
 
         if (Callstate.state == 1)
@@ -1123,6 +1160,17 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
     {
+        if (Callstate.other_audio_enabled == 0)
+        {
+            return;
+        }
+
+        if (cache_pubkey_fnum.get(Callstate.friend_pubkey)!= friend_number)
+        {
+            // not the friend we are in call with now
+            return;
+        }
+
         if (Callstate.call_first_audio_frame_received == -1)
         {
             Callstate.call_first_audio_frame_received = System.currentTimeMillis();

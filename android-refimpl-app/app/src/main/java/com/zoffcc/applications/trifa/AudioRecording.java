@@ -78,18 +78,21 @@ public class AudioRecording extends Thread
                 // Log.i(TAG, "Callstate.tox_call_state=" + Callstate.tox_call_state);
                 if (!((Callstate.tox_call_state == 0) || (Callstate.tox_call_state == 1) || (Callstate.tox_call_state == 2)))
                 {
-                    read_bytes = recorder.read(buffer, 0, buffer.length);
-                    // Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
+                    if (Callstate.my_audio_enabled == 1)
+                    {
+                        read_bytes = recorder.read(buffer, 0, buffer.length);
+                        // Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
 
-                    audio_buffer.rewind();
-                    audio_buffer.put(buffer);
+                        audio_buffer.rewind();
+                        audio_buffer.put(buffer);
 
-                    // Log.i(TAG, "audio length=" + ((float) read_bytes * (float) 1000 / (float) SMAPLINGRATE_TOX));
-                    // Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000))
-                    // Log.i(TAG, "audio xxxxxx=" + (((float) SMAPLINGRATE_TOX) * (float) (60) / (float) 1000));
+                        // Log.i(TAG, "audio length=" + ((float) read_bytes * (float) 1000 / (float) SMAPLINGRATE_TOX));
+                        // Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000))
+                        // Log.i(TAG, "audio xxxxxx=" + (((float) SMAPLINGRATE_TOX) * (float) (60) / (float) 1000));
 
-                    res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                    // Log.i(TAG, "audio:res=" + res);
+                        res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                        // Log.i(TAG, "audio:res=" + res);
+                    }
                 }
             }
             catch (Exception e)

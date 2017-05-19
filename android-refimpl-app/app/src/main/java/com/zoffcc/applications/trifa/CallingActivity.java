@@ -202,8 +202,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 return true;
             }
         });
-
-
+        
         initUI();
         initViewParams();
 
@@ -650,6 +649,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e.printStackTrace();
         }
 
+        Callstate.other_video_enabled = 1;
+        Callstate.my_video_enabled = 1;
+
         wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "trifa_screen_on");
         wl1.acquire();
     }
@@ -673,6 +675,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+
+        Callstate.other_video_enabled = 0;
+        Callstate.my_video_enabled = 0;
 
         // turn off screen
         wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "trifa_screen_OFF");

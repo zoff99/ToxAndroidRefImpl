@@ -333,6 +333,10 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         Callstate.camera_opened = false;
                         Callstate.audio_speaker = true;
+                        Callstate.other_audio_enabled = 1;
+                        Callstate.other_video_enabled = 1;
+                        Callstate.my_audio_enabled = 1;
+                        Callstate.my_video_enabled = 1;
 
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         try
