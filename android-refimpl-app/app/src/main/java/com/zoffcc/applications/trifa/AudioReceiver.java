@@ -19,7 +19,6 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -109,7 +108,6 @@ public class AudioReceiver extends Thread
         return track;
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void run()
     {
@@ -120,29 +118,32 @@ public class AudioReceiver extends Thread
         {
             track = findAudioTrack();
 
-            Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
-            lec = null;
-            try
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             {
-                lec = new LoudnessEnhancer(track.getAudioSessionId());
+                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
+                lec = null;
+                try
+                {
+                    lec = new LoudnessEnhancer(track.getAudioSessionId());
 
-                float target_gain = lec.getTargetGain();
-                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
+                    float target_gain = lec.getTargetGain();
+                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
 
-                lec.setTargetGain(AUDIO_GAIN_VALUE);
+                    lec.setTargetGain(AUDIO_GAIN_VALUE);
 
-                target_gain = lec.getTargetGain();
-                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
+                    target_gain = lec.getTargetGain();
+                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
 
-                int res = lec.setEnabled(true);
-                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res);
+                    int res = lec.setEnabled(true);
+                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res);
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "Audio Thread [IN]:EE1:" + e.getMessage());
+                    e.printStackTrace();
+                }
+                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
             }
-            catch (Exception e)
-            {
-                Log.i(TAG, "Audio Thread [IN]:EE1:" + e.getMessage());
-                e.printStackTrace();
-            }
-            Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
 
             track.setPlaybackRate((int) sampling_rate_);
 
@@ -199,14 +200,17 @@ public class AudioReceiver extends Thread
             }
         }
 
-        try
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
         {
-            lec.release();
-        }
-        catch (Exception e)
-        {
-            Log.i(TAG, "Audio Thread [IN]:EE3:" + e.getMessage());
-            e.printStackTrace();
+            try
+            {
+                lec.release();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "Audio Thread [IN]:EE3:" + e.getMessage());
+                e.printStackTrace();
+            }
         }
 
 
