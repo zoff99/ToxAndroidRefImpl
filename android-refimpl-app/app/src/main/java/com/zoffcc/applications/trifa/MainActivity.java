@@ -88,6 +88,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
+    final static boolean CTOXCORE_NATIVE_LOGGING = false;
     static TextView mt = null;
     static boolean native_lib_loaded = false;
     static String app_files_directory = "";
@@ -366,8 +367,8 @@ public class MainActivity extends AppCompatActivity
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
             builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
             TrifaToxService.orma = builder.name(MAIN_DB_NAME).
-                    readOnMainThread(AccessThreadConstraint.WARNING).
-                    writeOnMainThread(AccessThreadConstraint.WARNING).
+                    readOnMainThread(AccessThreadConstraint.NONE).
+                    writeOnMainThread(AccessThreadConstraint.NONE).
                     trace(false).
                     build();
             Log.i(TAG, "db:open=OK:path=" + getDatabasePath(MAIN_DB_NAME));
@@ -973,7 +974,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_cb_method(long friend_number, int audio_enabled, int video_enabled)
     {
-        if (Callstate.state!=0)
+        if (Callstate.state != 0)
         {
             // don't accept a new call if we already are in a call
             return;
@@ -1042,7 +1043,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)!= friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -1092,7 +1093,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
     {
-        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)!= friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -1144,7 +1145,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_bit_rate_status_cb_method(long friend_number, long audio_bit_rate, long video_bit_rate)
     {
-        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)!= friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -1166,7 +1167,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)!= friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -1580,7 +1581,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_log_cb_method(int a_TOX_LOG_LEVEL, String file, long line, String function, String message)
     {
-        Log.i(TAG, "C-TOXCORE:" + ToxVars.TOX_LOG_LEVEL.value_str(a_TOX_LOG_LEVEL) + ":file=" + file + ":linenum=" + line + ":func=" + function + ":msg=" + message);
+        if (CTOXCORE_NATIVE_LOGGING)
+        {
+            Log.i(TAG, "C-TOXCORE:" + ToxVars.TOX_LOG_LEVEL.value_str(a_TOX_LOG_LEVEL) + ":file=" + file + ":linenum=" + line + ":func=" + function + ":msg=" + message);
+        }
     }
 
     static void logger(int level, String text)

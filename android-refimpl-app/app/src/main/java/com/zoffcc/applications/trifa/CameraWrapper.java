@@ -391,7 +391,7 @@ public class CameraWrapper
 
                 try
                 {
-                    Log.i(TAG, "Callstate.tox_call_state=" + Callstate.tox_call_state + " my_video_enabled=" + Callstate.my_video_enabled);
+                    // Log.i(TAG, "Callstate.tox_call_state=" + Callstate.tox_call_state + " my_video_enabled=" + Callstate.my_video_enabled);
                     if (Callstate.my_video_enabled == 1)
                     {
                         // only send video frame if call has started

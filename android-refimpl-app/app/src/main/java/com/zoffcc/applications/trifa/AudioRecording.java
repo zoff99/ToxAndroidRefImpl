@@ -50,6 +50,8 @@ public class AudioRecording extends Thread
     ByteBuffer audio_buffer = null;
     static int buffer_size = 0;
     static int audio_session_id = -1;
+    AutomaticGainControl agc = null;
+    AcousticEchoCanceler aec = null;
 
     /**
      * Give the thread high priority so that it's not canceled unexpectedly, and start it
@@ -74,7 +76,7 @@ public class AudioRecording extends Thread
     @Override
     public void run()
     {
-        Log.i(TAG, "Running Audio Thread");
+        Log.i(TAG, "Running Audio Thread [OUT]");
         AudioRecord recorder = null;
         byte[] buffer = null;
 
@@ -89,30 +91,41 @@ public class AudioRecording extends Thread
             audio_buffer = ByteBuffer.allocateDirect(buffer_size);
             set_JNI_audio_buffer(audio_buffer);
 
-            recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, buffer_size * 5);
+            // recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, buffer_size * 5);
+            recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDING_RATE, CHANNEL, FORMAT, buffer_size * 5);
             audio_session_id = recorder.getAudioSessionId();
 
-            AutomaticGainControl agc = null;
+            Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:===============================");
+            agc = null;
             try
             {
+                Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:isAvailable:" + AutomaticGainControl.isAvailable());
                 agc = AutomaticGainControl.create(audio_session_id);
-                agc.setEnabled(true);
+                int res = agc.setEnabled(true);
+                Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:setEnabled:" + res + " audio_session_id=" + audio_session_id);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
+                Log.i(TAG, "Audio Thread [OUT]:EE1:" + e.getMessage());
             }
+            Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:===============================");
 
-            AcousticEchoCanceler aec = null;
+            Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:===============================");
+            aec = null;
             try
             {
+                Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:isAvailable:" + AcousticEchoCanceler.isAvailable());
                 aec = AcousticEchoCanceler.create(audio_session_id);
-                aec.setEnabled(true);
+                int res = aec.setEnabled(true);
+                Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:setEnabled:" + res + " audio_session_id=" + audio_session_id);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
+                Log.i(TAG, "Audio Thread [OUT]:EE2:" + e.getMessage());
             }
+            Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:===============================");
 
             recorder.startRecording();
         }
@@ -155,14 +168,35 @@ public class AudioRecording extends Thread
             catch (Exception e)
             {
                 e.printStackTrace();
-                Log.i(TAG, "audio:EE:" + e.getMessage());
+                Log.i(TAG, "Audio Thread [OUT]:EE3:" + e.getMessage());
             }
+        }
+
+        try
+        {
+            agc.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Audio Thread [OUT]:EE4:" + e.getMessage());
+        }
+
+        try
+        {
+            aec.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Audio Thread [OUT]:EE5:" + e.getMessage());
         }
 
         recorder.stop();
         recorder.release();
 
         finished = true;
+        Log.i(TAG, "Audio Thread [OUT]:finished");
     }
 
     public static void close()

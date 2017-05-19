@@ -52,6 +52,7 @@ public class AudioReceiver extends Thread
     static int buffer_size = 1920 * 5; // TODO: hardcoded is bad!!!!
     final static int buffer_multiplier = 3;
     AudioTrack track = null;
+    LoudnessEnhancer lec = null;
 
 
     public AudioReceiver()
@@ -80,6 +81,7 @@ public class AudioReceiver extends Thread
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
 
         track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size22 * buffer_multiplier, AudioTrack.MODE_STREAM);
+        // track = new AudioTrack(AudioManager.ROUTE_HEADSET, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size22 * buffer_multiplier, AudioTrack.MODE_STREAM);
 
         try
         {
@@ -110,23 +112,59 @@ public class AudioReceiver extends Thread
     @Override
     public void run()
     {
-        Log.i(TAG, "Running Audio Thread");
+        Log.i(TAG, "Running Audio Thread [IN]");
         track = null;
 
         try
         {
             track = findAudioTrack();
 
-            LoudnessEnhancer lec = null;
+            Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
+            lec = null;
             try
             {
                 lec = new LoudnessEnhancer(track.getAudioSessionId());
-                lec.setEnabled(true);
+
+                //                try
+                //                {
+                //                    NoiseSuppressor.create(track.getAudioSessionId()).setEnabled(true);
+                //                }
+                //                catch (Exception ee2)
+                //                {
+                //                    ee2.printStackTrace();
+                //                    Log.i(TAG, "Audio Thread [IN]:EE4:" + ee2.getMessage());
+                //                }
+                //
+                //                try
+                //                {
+                //                    AcousticEchoCanceler.create(track.getAudioSessionId()).setEnabled(true);
+                //                }
+                //                catch (Exception ee3)
+                //                {
+                //                    ee3.printStackTrace();
+                //                    Log.i(TAG, "Audio Thread [IN]:EE5:" + ee3.getMessage());
+                //                }
+
+
+                float target_gain = lec.getTargetGain();
+                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
+
+                lec.setTargetGain(1000);
+
+                target_gain = lec.getTargetGain();
+                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
+
+                int res = lec.setEnabled(true);
+                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res);
             }
             catch (Exception e)
             {
+                Log.i(TAG, "Audio Thread [IN]:EE1:" + e.getMessage());
                 e.printStackTrace();
             }
+            Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
+
+            track.setPlaybackRate((int) sampling_rate_);
 
             track.play();
         }
@@ -147,7 +185,17 @@ public class AudioReceiver extends Thread
                 if (audio_buffer_read_write(0, 0, 0, false))
                 {
                     // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
+
+                    // ------- HINT: this will block !! -------
+                    // ------- HINT: this will block !! -------
+                    // ------- HINT: this will block !! -------
                     played_bytes = track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
+                    // ------- HINT: this will block !! -------
+                    // ------- HINT: this will block !! -------
+                    // ------- HINT: this will block !! -------
+
+                    Thread.sleep(sleep_millis);
+
                     // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
                     // Log.i(TAG, "audio_play:recthr:play:bytes=" + played_bytes + " len=" + audio_buffer_play_length);
                 }
@@ -167,9 +215,20 @@ public class AudioReceiver extends Thread
             catch (Exception e)
             {
                 // e.printStackTrace();
-                Log.i(TAG, "audio_play:recthr:EE:" + e.getMessage());
+                Log.i(TAG, "audio_play:recthr:EE2:" + e.getMessage());
             }
         }
+
+        try
+        {
+            lec.release();
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "Audio Thread [IN]:EE3:" + e.getMessage());
+            e.printStackTrace();
+        }
+
 
         track.stop();
         track.release();
@@ -186,6 +245,7 @@ public class AudioReceiver extends Thread
         }
 
         finished = true;
+        Log.i(TAG, "Audio Thread [IN]:finished");
     }
 
     public static void close()
