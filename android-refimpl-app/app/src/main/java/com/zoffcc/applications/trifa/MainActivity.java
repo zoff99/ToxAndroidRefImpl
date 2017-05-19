@@ -1178,6 +1178,7 @@ public class MainActivity extends AppCompatActivity
             Callstate.call_first_audio_frame_received = System.currentTimeMillis();
 
             sampling_rate_ = sampling_rate;
+            Log.i(TAG, "audio_play:read:incoming sampling_rate=" + sampling_rate + " kHz");
             channels_ = channels;
 
             Log.i(TAG, "audio_play:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" + sampling_rate);

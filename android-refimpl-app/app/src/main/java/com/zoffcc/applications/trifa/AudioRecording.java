@@ -41,11 +41,11 @@ public class AudioRecording extends Thread
     static boolean finished = true;
 
     // the audio recording options
-    static final int RECORDING_RATE = 48000; // 16000; // 44100;
+    static int RECORDING_RATE = 48000; // 16000; // 44100;
     static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     static final int CHANNELS_TOX = 1;
-    static final long SMAPLINGRATE_TOX = 48000; // 16000;
+    static long SMAPLINGRATE_TOX = 48000; // 16000;
 
     ByteBuffer audio_buffer = null;
     static int buffer_size = 0;
@@ -82,6 +82,23 @@ public class AudioRecording extends Thread
 
         try
         {
+            // try more than 8kHz at first
+            int min_sampling_rate = getMinSupportedSampleRate(false);
+            Log.i(TAG, "Running Audio Thread [OUT]:try sampling rate:1:" + min_sampling_rate);
+            if (min_sampling_rate == -1)
+            {
+                // ok, now try also with 8kHz
+                min_sampling_rate = getMinSupportedSampleRate(true);
+                Log.i(TAG, "Running Audio Thread [OUT]:try sampling rate:2:" + min_sampling_rate);
+            }
+
+            if (min_sampling_rate != -1)
+            {
+                RECORDING_RATE = min_sampling_rate;
+            }
+            SMAPLINGRATE_TOX = RECORDING_RATE;
+            Log.i(TAG, "Running Audio Thread [OUT]:using sampling rate:" + RECORDING_RATE + " kHz (min=" + min_sampling_rate + ")");
+
             /*
              * Initialize buffer to hold continuously recorded audio data, start recording
              */
@@ -204,4 +221,52 @@ public class AudioRecording extends Thread
         stopped = true;
     }
 
+
+    /*
+     * thanks to: http://stackoverflow.com/questions/8043387/android-audiorecord-supported-sampling-rates
+     */
+    int getMinSupportedSampleRate(boolean use_8_khz)
+    {
+    /*
+     * Valid Audio Sample rates
+     *
+     * @see <a
+     * href="http://en.wikipedia.org/wiki/Sampling_%28signal_processing%29"
+     * >Wikipedia</a>
+     */
+        int validSampleRates[];
+        if (use_8_khz)
+        {
+            validSampleRates = new int[]{8000, 16000, 22050,
+                    //
+                    32000, 37800, 44056, 44100, 47250, 48000, 50000, 50400,
+                    //
+                    88200, 96000, 176400, 192000, 352800, 2822400, 5644800};
+        }
+        else
+        {
+            validSampleRates = new int[]{16000, 22050,
+                    //
+                    32000, 37800, 44056, 44100, 47250, 48000, 50000, 50400,
+                    //
+                    88200, 96000, 176400, 192000, 352800, 2822400, 5644800};
+        }
+    /*
+     * Selecting default audio input source for recording since
+     * AudioFormat.CHANNEL_CONFIGURATION_DEFAULT is deprecated and selecting
+     * default encoding format.
+     */
+        for (int i = 0; i < validSampleRates.length; i++)
+        {
+            int result = AudioRecord.getMinBufferSize(validSampleRates[i], CHANNEL, FORMAT);
+            if (result != AudioRecord.ERROR && result != AudioRecord.ERROR_BAD_VALUE && result > 0)
+            {
+                // return the mininum supported audio sample rate
+                return validSampleRates[i];
+            }
+        }
+        // If none of the sample rates are supported return -1 handle it in
+        // calling method
+        return -1;
+    }
 }
