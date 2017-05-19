@@ -48,7 +48,7 @@ public class AudioReceiver extends Thread
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
     static int buffer_size = 1920 * 5; // TODO: hardcoded is bad!!!!
-    final static int buffer_multiplier = 20;
+    final static int buffer_multiplier = 3;
     AudioTrack track = null;
 
 

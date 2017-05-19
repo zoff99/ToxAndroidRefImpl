@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 10;
+    final static int audio_in_buffer_max_count = 4;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -1041,7 +1041,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if (cache_pubkey_fnum.get(Callstate.friend_pubkey)!= friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)!= friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -1143,7 +1143,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_bit_rate_status_cb_method(long friend_number, long audio_bit_rate, long video_bit_rate)
     {
-        if (cache_pubkey_fnum.get(Callstate.friend_pubkey)!= friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)!= friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -1165,7 +1165,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if (cache_pubkey_fnum.get(Callstate.friend_pubkey)!= friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)!= friend_number)
         {
             // not the friend we are in call with now
             return;
