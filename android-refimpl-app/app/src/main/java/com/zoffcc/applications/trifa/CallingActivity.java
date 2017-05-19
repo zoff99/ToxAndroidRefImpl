@@ -649,6 +649,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e.printStackTrace();
         }
 
+        Log.i(TAG, "turn*ON*Screen");
         Callstate.other_video_enabled = 1;
         Callstate.my_video_enabled = 1;
 
@@ -676,6 +677,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e.printStackTrace();
         }
 
+        Log.i(TAG, "turnOffScreen");
         Callstate.other_video_enabled = 0;
         Callstate.my_video_enabled = 0;
 
@@ -691,7 +693,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             // Log.i(TAG, "onSensorChanged:value=" + event.values[0] + " max=" + proximity_sensor.getMaximumRange());
 
-            if (event.values[0] >= -proximity_sensor.getMaximumRange() && event.values[0] <= proximity_sensor.getMaximumRange())
+            if (event.values[0] < proximity_sensor.getMaximumRange())
             {
                 // close to ear
                 if (Callstate.audio_speaker == true)
