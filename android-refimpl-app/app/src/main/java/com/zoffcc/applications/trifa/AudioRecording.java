@@ -82,8 +82,9 @@ public class AudioRecording extends Thread
 
         try
         {
+            int min_sampling_rate = -1;
             // try more than 8kHz at first
-            int min_sampling_rate = getMinSupportedSampleRate(false);
+            // ** // int min_sampling_rate = getMinSupportedSampleRate(false);
             Log.i(TAG, "Running Audio Thread [OUT]:try sampling rate:1:" + min_sampling_rate);
             if (min_sampling_rate == -1)
             {
