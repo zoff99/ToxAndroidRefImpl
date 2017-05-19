@@ -88,6 +88,7 @@ dependencies:
   - echo y | android update sdk --no-ui --all --filter build-tools-24.0.2
   - echo y | android update sdk --no-ui --all --filter build-tools-24.0.3
   - echo y | android update sdk --no-ui --all --filter build-tools-25.0.2
+  - echo y | android update sdk --no-ui --all --filter build-tools-25.0.3
   - echo y | android update sdk --no-ui --all --filter android-16 ; exit 0
   - echo y | android update sdk --no-ui --all --filter android-21
   - echo y | android update sdk --no-ui --all --filter android-23
