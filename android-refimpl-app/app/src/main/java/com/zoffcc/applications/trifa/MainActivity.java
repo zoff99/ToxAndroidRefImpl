@@ -74,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import info.guardianproject.iocipher.VirtualFileSystem;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
@@ -83,6 +84,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
+import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity
@@ -111,6 +113,7 @@ public class MainActivity extends AppCompatActivity
     static MessageListFragment message_list_fragment = null;
     static MessageListActivity message_list_activity = null;
     final static String MAIN_DB_NAME = "main.db";
+    final static String MAIN_VFS_NAME = "files.db";
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
@@ -357,31 +360,32 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            Log.i(TAG, "db:path=" + getDatabasePath(MAIN_DB_NAME));
+            String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+            Log.i(TAG, "db:path=" + dbs_path);
 
-            File database_dir = new File(getDatabasePath(MAIN_DB_NAME).getParent());
+            File database_dir = new File(new File(dbs_path).getParent());
             database_dir.mkdirs();
 
-            // See OrmaDatabaseBuilderBase for other options.
-            // default db name = "${applicationId}.orma.db"
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
             builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-            TrifaToxService.orma = builder.name(MAIN_DB_NAME).
+            TrifaToxService.orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.NONE).
                     writeOnMainThread(AccessThreadConstraint.NONE).
                     trace(false).
                     build();
-            Log.i(TAG, "db:open=OK:path=" + getDatabasePath(MAIN_DB_NAME));
+            Log.i(TAG, "db:open=OK:path=" + dbs_path);
         }
         catch (Exception e)
         {
             e.printStackTrace();
             Log.i(TAG, "db:EE1:" + e.getMessage());
 
+            String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+
             try
             {
-                Log.i(TAG, "db:deleting database:" + getDatabasePath(MAIN_DB_NAME));
-                deleteDatabase(MAIN_DB_NAME);
+                Log.i(TAG, "db:deleting database:" + dbs_path);
+                new File(dbs_path).delete();
             }
             catch (Exception e3)
             {
@@ -389,19 +393,101 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "db:EE3:" + e3.getMessage());
             }
 
-            Log.i(TAG, "db:path(2)=" + getDatabasePath(MAIN_DB_NAME));
+            Log.i(TAG, "db:path(2)=" + dbs_path);
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-            builder = builder.provider(new EncryptedDatabase.Provider("password"));
-            TrifaToxService.orma = builder.name(MAIN_DB_NAME).
+            builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+            TrifaToxService.orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.WARNING).
                     writeOnMainThread(AccessThreadConstraint.WARNING).
                     build();
-            Log.i(TAG, "db:open(2)=OK:path=" + getDatabasePath(MAIN_DB_NAME));
+            Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
         }
 
         Log.i(TAG, "db:migrate");
         TrifaToxService.orma.migrate();
-        Log.i(TAG, "db:migrate=OK:path=" + getDatabasePath(MAIN_DB_NAME));
+        Log.i(TAG, "db:migrate=OK");
+
+        try
+        {
+            String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+
+            File database_dir = new File(new File(dbFile).getParent());
+            database_dir.mkdirs();
+
+            Log.i(TAG, "vfs:path=" + dbFile);
+            vfs = VirtualFileSystem.get();
+            vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
+            vfs.mount(PREF__DB_secrect_key);
+            Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "vfs:EE:" + e.getMessage());
+
+            String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+
+            try
+            {
+                Log.i(TAG, "vfs:deleting database:" + dbFile);
+                new File(dbFile).delete();
+            }
+            catch (Exception e3)
+            {
+                e3.printStackTrace();
+                Log.i(TAG, "vfs:EE3:" + e3.getMessage());
+            }
+
+            try
+            {
+                Log.i(TAG, "vfs:path=" + dbFile);
+                vfs = VirtualFileSystem.get();
+                vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
+                vfs.mount(PREF__DB_secrect_key);
+                Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+                Log.i(TAG, "vfs:EE2:" + e.getMessage());
+            }
+        }
+
+
+        // ---------- DEBUG, just a test ----------
+        // ---------- DEBUG, just a test ----------
+        // ---------- DEBUG, just a test ----------
+        if (vfs.isMounted())
+        {
+            //            try
+            //            {
+            //                BufferedWriter out = new BufferedWriter(new info.guardianproject.iocipher.FileWriter("test.txt"));
+            //                out.write("aString\nthis is a\nttest");
+            //                out.close();
+            //                Log.i(TAG, "vfs:write:OK");
+            //            }
+            //            catch (Exception e)
+            //            {
+            //                e.printStackTrace();
+            //                Log.i(TAG, "vfs:EE:write:EE1:" + e.getMessage());
+            //            }
+
+            //            try
+            //            {
+            //                BufferedReader reader = new BufferedReader(new info.guardianproject.iocipher.FileReader("test.txt"));
+            //                String txt = reader.readLine();
+            //                Log.i(TAG, "vfs:read:res=" + txt);
+            //            }
+            //            catch (Exception e)
+            //            {
+            //                e.printStackTrace();
+            //                Log.i(TAG, "vfs:EE:read:EE1:" + e.getMessage());
+            //            }
+
+        }
+        // ---------- DEBUG, just a test ----------
+        // ---------- DEBUG, just a test ----------
+        // ---------- DEBUG, just a test ----------
 
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();

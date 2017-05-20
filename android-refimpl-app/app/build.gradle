@@ -45,21 +45,27 @@ android {
         exclude 'lib/armeabi/libRSSupport.so'
         exclude 'lib/armeabi/librsjni.so'
         exclude 'lib/armeabi/libsqlcipher.so'
+        exclude 'lib/armeabi/libiocipher.so'
         exclude 'lib/arm64-v8a/libRSSupport.so'
         exclude 'lib/arm64-v8a/librsjni.so'
         exclude 'lib/arm64-v8a/libsqlcipher.so'
+        exclude 'lib/arm64-v8a/libiocipher.so'
         exclude 'lib/mips64/libRSSupport.so'
         exclude 'lib/mips64/librsjni.so'
         exclude 'lib/mips64/libsqlcipher.so'
+        exclude 'lib/mips64/libiocipher.so'
         exclude 'lib/mips/libRSSupport.so'
         exclude 'lib/mips/librsjni.so'
         exclude 'lib/mips/libsqlcipher.so'
+        exclude 'lib/mips/libiocipher.so'
         exclude 'lib/x86/libRSSupport.so'
         exclude 'lib/x86/librsjni.so'
         exclude 'lib/x86/libsqlcipher.so'
+        exclude 'lib/x86/libiocipher.so'
         exclude 'lib/x86_64/libRSSupport.so'
         exclude 'lib/x86_64/librsjni.so'
         exclude 'lib/x86_64/libsqlcipher.so'
+        exclude 'lib/x86_64/libiocipher.so'
     }
 
     lintOptions {
@@ -150,4 +156,6 @@ dependencies {
     compile ('com.github.angads25:filepicker:1.1.0') {
         exclude group: 'com.android.support'
     }
+    //
+    compile 'info.guardianproject.iocipher:IOCipher:0.4'
 }

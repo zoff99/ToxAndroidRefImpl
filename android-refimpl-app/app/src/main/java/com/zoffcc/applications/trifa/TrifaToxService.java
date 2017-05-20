@@ -32,6 +32,8 @@ import android.widget.RemoteViews;
 
 import java.util.List;
 
+import info.guardianproject.iocipher.VirtualFileSystem;
+
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
@@ -63,6 +65,7 @@ public class TrifaToxService extends Service
     static Thread ToxServiceThread = null;
     static boolean stop_me = false;
     static OrmaDatabase orma = null;
+    static VirtualFileSystem vfs = null;
     static boolean is_tox_started = false;
     static boolean global_toxid_text_set = false;
 
@@ -143,7 +146,7 @@ public class TrifaToxService extends Service
                         while (is_tox_started)
                         {
                             i++;
-                            if (i > 20)
+                            if (i > 40)
                             {
                                 break;
                             }
@@ -152,7 +155,7 @@ public class TrifaToxService extends Service
 
                             try
                             {
-                                Thread.sleep(300);
+                                Thread.sleep(150);
                             }
                             catch (Exception e)
                             {
@@ -160,11 +163,32 @@ public class TrifaToxService extends Service
                             }
                         }
 
+                        try
+                        {
+                            // orma.unmount();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        try
+                        {
+                            if (vfs.isMounted())
+                            {
+                                vfs.unmount();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
                         Log.i(TAG, "stop_me:004");
 
                         try
                         {
-                            Thread.sleep(1500);
+                            Thread.sleep(500);
                         }
                         catch (Exception e)
                         {
@@ -266,22 +290,24 @@ public class TrifaToxService extends Service
                 if (tox_self_get_name_size() > 0)
                 {
                     global_my_name = tox_self_get_name().substring(0, (int) tox_self_get_name_size());
-                    Log.i(TAG, "AAA:003:" + global_my_name);
+                    Log.i(TAG, "AAA:003:" + global_my_name + " size=" + tox_self_get_name_size());
                 }
                 else
                 {
                     tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5, my_tox_id_local.length()));
+                    global_my_name = ("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5, my_tox_id_local.length()));
                     Log.i(TAG, "AAA:005");
                 }
 
                 if (tox_self_get_status_message_size() > 0)
                 {
                     global_my_status_message = tox_self_get_status_message().substring(0, (int) tox_self_get_status_message_size());
-                    Log.i(TAG, "AAA:008:" + global_my_status_message);
+                    Log.i(TAG, "AAA:008:" + global_my_status_message + " size=" + tox_self_get_status_message_size());
                 }
                 else
                 {
                     tox_self_set_status_message("this is TRIfA");
+                    global_my_status_message = "this is TRIfA";
                     Log.i(TAG, "AAA:010");
                 }
                 Log.i(TAG, "AAA:011");
