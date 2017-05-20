@@ -165,15 +165,6 @@ public class TrifaToxService extends Service
 
                         try
                         {
-                            // orma.unmount();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-
-                        try
-                        {
                             if (vfs.isMounted())
                             {
                                 vfs.unmount();
