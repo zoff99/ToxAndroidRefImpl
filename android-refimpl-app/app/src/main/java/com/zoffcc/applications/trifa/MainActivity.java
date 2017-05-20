@@ -90,7 +90,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
-    final static boolean CTOXCORE_NATIVE_LOGGING = false;
+    final static boolean CTOXCORE_NATIVE_LOGGING = true;
     static TextView mt = null;
     static boolean native_lib_loaded = false;
     static String app_files_directory = "";
@@ -1094,7 +1094,6 @@ public class MainActivity extends AppCompatActivity
                         Callstate.my_video_enabled = 1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
-                        // Callstate.friend_number = fn;
                         try
                         {
                             Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().
