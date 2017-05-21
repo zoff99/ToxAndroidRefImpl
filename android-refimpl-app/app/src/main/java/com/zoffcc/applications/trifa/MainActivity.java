@@ -943,6 +943,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native void bootstrap();
 
+    public static native int add_tcp_relay_single(String ip, String key_hex, long port);
+
+    public static native int bootstrap_single(String ip, String key_hex, long port);
+
     public static native void init_tox_callbacks();
 
     public static native long tox_iteration_interval();
@@ -2003,6 +2007,15 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static int add_tcp_relay_single_wrapper(String ip, long port, String key_hex)
+    {
+        return add_tcp_relay_single(ip, key_hex, port);
+    }
+
+    static int bootstrap_single_wrapper(String ip, long port, String key_hex)
+    {
+        return bootstrap_single(ip, key_hex, port);
+    }
 
     // --------- make app crash ---------
     // --------- make app crash ---------

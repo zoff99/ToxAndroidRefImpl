@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 6
-static const char global_version_string[] = "0.99.6";
+#define VERSION_PATCH 7
+static const char global_version_string[] = "0.99.7";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -390,12 +390,14 @@ void bootstrap_real(Tox *tox)
     DHT_node nodes[] =
     {
         {"178.62.250.138",             33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
-        {"2a03:b0c0:2:d0::16:1",       33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
+        {"nodes.tox.chat",             33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E", {0}},
+        {"130.133.110.14",             33445, "461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F", {0}},
         {"tox.zodiaclabs.org",         33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074", {0}},
         {"163.172.136.118",            33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
-        {"2001:bc8:4400:2100::1c:50f", 33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
+        {"217.182.143.254",             443, "7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147", {0}},
+        {"185.14.30.213",               443,  "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
+        {"136.243.141.187",             443,  "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39", {0}},
         {"128.199.199.197",            33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09", {0}},
-        {"2400:6180:0:d0::17a:a001",   33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09", {0}},
         // {"192.168.0.20",   33447, "578E5F044C98290D0368F425E0E957056B30FB995F53DEB21C3E23D7A3B4E679", {0}} ,
         // {"192.168.0.22",   33447, "578E5F044C98290D0368F425E0E957056B30FB995F53DEB21C3E23D7A3B4E679", {0}} ,
         {"biribiri.org",               33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67", {0}}
@@ -457,13 +459,15 @@ void bootstrap_real(Tox *tox)
 #endif
 
 
-    for (size_t i = 0; i < sizeof(nodes)/sizeof(DHT_node); i ++) {
+    for (size_t i = 0; i < sizeof(nodes)/sizeof(DHT_node); i ++)
+	{
         sodium_hex2bin(nodes[i].key_bin, sizeof(nodes[i].key_bin),
                        nodes[i].key_hex, sizeof(nodes[i].key_hex)-1, NULL, NULL, NULL);
 			tox_bootstrap(tox, nodes[i].ip, nodes[i].port, nodes[i].key_bin, NULL);
 		tox_add_tcp_relay(tox, nodes[i].ip, nodes[i].port, nodes[i].key_bin, NULL); // also try as TCP relay
     }
 }
+
 
 // fill string with toxid in upper case hex.
 // size of toxid_str needs to be: [TOX_ADDRESS_SIZE*2 + 1] !!
@@ -1300,6 +1304,145 @@ Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv* e
 {
 	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz));
 }
+
+
+
+
+// -----------------
+// -----------------
+// -----------------
+int add_tcp_relay_single(Tox *tox, const char *ip, uint16_t port, const char *key_hex)
+{
+    unsigned char key_bin[TOX_PUBLIC_KEY_SIZE];
+	toxid_hex_to_bin(key_bin, key_hex);
+	int res1 = sodium_hex2bin(key_bin, sizeof(key_bin), key_hex, sizeof(key_hex)-1, NULL, NULL, NULL);
+	dbg(9, "sodium_hex2bin:res=%d", res1);
+	TOX_ERR_BOOTSTRAP error;
+	bool res = tox_add_tcp_relay(tox, ip, port, key_bin, &error); // also try as TCP relay
+
+	if (res != true)
+	{
+		if (error == TOX_ERR_BOOTSTRAP_OK)
+		{
+			return 0;
+		}
+		else if (error == TOX_ERR_BOOTSTRAP_NULL)
+		{
+			return 1;
+		}
+		else if (error == TOX_ERR_BOOTSTRAP_BAD_HOST)
+		{
+			return 2;
+		}
+		else if (error == TOX_ERR_BOOTSTRAP_BAD_PORT)
+		{
+			return 3;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+int Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single__real(JNIEnv* env, jobject thiz, jobject ip, jobject key_hex, long port)
+{
+	dbg(9, "add_tcp_relay_single1");
+
+	const char *key_hex_str = NULL;
+	const char *ip_str = NULL;
+
+	key_hex_str =  (*env)->GetStringUTFChars(env, key_hex, NULL);
+	char *key_hex_str2 = strdup(key_hex_str);
+
+	ip_str =  (*env)->GetStringUTFChars(env, ip, NULL);
+	char *ip_str2 = strdup(ip_str);
+
+	int res = add_tcp_relay_single(tox_global, ip_str2, (uint16_t)port, key_hex_str2);
+
+	(*env)->ReleaseStringUTFChars(env, ip, ip_str);
+	(*env)->ReleaseStringUTFChars(env, key_hex, key_hex_str);
+
+	if (ip_str2)
+	{
+		free(ip_str2);
+	}
+
+	if (key_hex_str2)
+	{
+		free(key_hex_str2);
+	}
+
+	return res;
+}
+
+JNIEXPORT int JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single(JNIEnv* env, jobject thiz, jstring ip, jstring key_hex, long port)
+{
+	jint retcode = 0;
+	COFFEE_TRY_JNI(env, retcode = Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single__real(env, thiz, ip, key_hex, port));
+	return retcode;
+}
+
+int bootstrap_single(Tox *tox, const char *ip, uint16_t port, const char *key_hex)
+{
+    unsigned char key_bin[TOX_PUBLIC_KEY_SIZE];
+	toxid_hex_to_bin(key_bin, key_hex);
+	int res1 = sodium_hex2bin(key_bin, sizeof(key_bin), key_hex, sizeof(key_hex)-1, NULL, NULL, NULL);
+	dbg(9, "sodium_hex2bin:res=%d", res1);
+	TOX_ERR_BOOTSTRAP error;
+	bool res = tox_bootstrap(tox, ip, port, key_bin, &error);
+	if (res != true)
+	{
+		if (error == TOX_ERR_BOOTSTRAP_OK)
+		{
+			return 0;
+		}
+		else if (error == TOX_ERR_BOOTSTRAP_NULL)
+		{
+			return 1;
+		}
+		else if (error == TOX_ERR_BOOTSTRAP_BAD_HOST)
+		{
+			return 2;
+		}
+		else if (error == TOX_ERR_BOOTSTRAP_BAD_PORT)
+		{
+			return 3;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+int Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single__real(JNIEnv* env, jobject thiz, jobject ip, jobject key_hex, long port)
+{
+	dbg(9, "bootstrap_single");
+	const char *ip_str =  (*env)->GetStringUTFChars(env, ip, NULL);
+	const char *key_hex_str =  (*env)->GetStringUTFChars(env, key_hex, NULL);
+	int res = bootstrap_single(tox_global, ip_str, (uint16_t)port, key_hex_str);
+	(*env)->ReleaseStringUTFChars(env, key_hex, key_hex_str);
+	(*env)->ReleaseStringUTFChars(env, ip, ip_str);
+
+	return res;
+}
+
+JNIEXPORT int JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single(JNIEnv* env, jobject thiz, jobject ip, jobject key_hex, long port)
+{
+	jint retcode = 0;
+	COFFEE_TRY_JNI(env, retcode = Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single__real(env, thiz, ip, key_hex, port));
+	return retcode;
+}
+// -----------------
+// -----------------
+// -----------------
+
+
+
+
 
 
 JNIEXPORT jstring JNICALL

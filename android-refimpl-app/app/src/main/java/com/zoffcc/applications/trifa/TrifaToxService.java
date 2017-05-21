@@ -406,8 +406,33 @@ public class TrifaToxService extends Service
                 // --------------- bootstrap ---------------
                 if (!old_is_tox_started)
                 {
-                    MainActivity.bootstrap();
+                    // ----- UDP ------
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("178.62.250.138", 33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("nodes.tox.chat", 33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("130.133.110.14", 33445, "461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("tox.zodiaclabs.org", 33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("163.172.136.118", 33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("217.182.143.254", 443, "7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("185.14.30.213", 443, "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("136.243.141.187", 443, "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("128.199.199.197", 33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09"));
+                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("biribiri.org", 33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67"));
+                    // ----- UDP ------
+                    //
+                    // ----- TCP ------
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("178.62.250.138", 33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("nodes.tox.chat", 33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("130.133.110.14", 33445, "461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("tox.zodiaclabs.org", 33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("163.172.136.118", 33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("217.182.143.254", 443, "7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("185.14.30.213", 443, "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("136.243.141.187", 443, "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("128.199.199.197", 33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09"));
+                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("biribiri.org", 33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67"));
+                    // ----- TCP ------
                 }
+
                 // --------------- bootstrap ---------------
                 // --------------- bootstrap ---------------
                 // --------------- bootstrap ---------------
@@ -418,6 +443,7 @@ public class TrifaToxService extends Service
                 MainActivity.tox_iterate();
 
                 if (ADD_BOTS_ON_STARTUP)
+
                 {
                     boolean need_add_bots = true;
                     List<TRIFADatabaseGlobals> dbg = null;
@@ -478,6 +504,7 @@ public class TrifaToxService extends Service
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 while (!stop_me)
+
                 {
                     try
                     {
@@ -511,34 +538,42 @@ public class TrifaToxService extends Service
 
 
                 try
+
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
+
                 {
                     e.printStackTrace();
                 }
 
                 try
+
                 {
                     MainActivity.tox_kill();
                 }
                 catch (Exception e)
+
                 {
                     e.printStackTrace();
                 }
 
                 try
+
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
+
                 {
                     e.printStackTrace();
                 }
 
             }
-        };
+        }
+
+        ;
 
         ToxServiceThread.start();
     }
