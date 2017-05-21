@@ -169,7 +169,7 @@ public class TrifaToxService extends Service
 
                             try
                             {
-                                Thread.sleep(150);
+                                Thread.sleep(200);
                             }
                             catch (Exception e)
                             {
@@ -193,7 +193,7 @@ public class TrifaToxService extends Service
 
                         try
                         {
-                            Thread.sleep(500);
+                            Thread.sleep(1500);
                         }
                         catch (Exception e)
                         {
