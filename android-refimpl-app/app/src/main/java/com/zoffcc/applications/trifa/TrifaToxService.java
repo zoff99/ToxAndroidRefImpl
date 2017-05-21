@@ -49,9 +49,11 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
+import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
@@ -75,7 +77,7 @@ public class TrifaToxService extends Service
     {
         Log.i(TAG, "onStartCommand");
         // this gets called all the time!
-        MainActivity.tox_service_fg = this;
+        tox_service_fg = this;
         return START_STICKY;
     }
 
@@ -97,25 +99,37 @@ public class TrifaToxService extends Service
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
-        if (a_TOXCONNECTION == 0)
+        if (bootstrapping)
         {
-            notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-            b.setSmallIcon(R.drawable.circle_red);
-            notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
+            Log.i(TAG, "change_notification_fg:bootstrapping=true");
+            notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
+            b.setSmallIcon(R.drawable.circle_orange);
+            notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping");
         }
         else
         {
-            if (a_TOXCONNECTION == 1)
+            Log.i(TAG, "change_notification_fg:bootstrapping=FALSE");
+
+            if (a_TOXCONNECTION == 0)
             {
-                notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                b.setSmallIcon(R.drawable.circle_green);
-                notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
+                notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+                b.setSmallIcon(R.drawable.circle_red);
+                notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
             }
-            else // if (a_TOXCONNECTION__f == 2)
+            else
             {
-                notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                b.setSmallIcon(R.drawable.circle_green);
-                notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+                if (a_TOXCONNECTION == 1)
+                {
+                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                    b.setSmallIcon(R.drawable.circle_green);
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
+                }
+                else // if (a_TOXCONNECTION__f == 2)
+                {
+                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                    b.setSmallIcon(R.drawable.circle_green);
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+                }
             }
         }
         notification_view.setTextViewText(R.id.text, "");
@@ -406,6 +420,17 @@ public class TrifaToxService extends Service
                 // --------------- bootstrap ---------------
                 if (!old_is_tox_started)
                 {
+                    bootstrapping = true;
+                    Log.i(TAG, "bootrapping:set to true");
+                    try
+                    {
+                        tox_service_fg.change_notification_fg(0); // set notification to "bootstrapping"
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                     // ----- UDP ------
                     Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("178.62.250.138", 33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B"));
                     Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("nodes.tox.chat", 33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E"));

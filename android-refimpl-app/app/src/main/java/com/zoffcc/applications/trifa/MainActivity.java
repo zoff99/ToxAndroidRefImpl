@@ -83,6 +83,7 @@ import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
@@ -166,6 +167,8 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        bootstrapping = false;
 
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -876,7 +879,6 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "change_notification:change");
                     try
                     {
-
                         tox_service_fg.change_notification_fg(a_TOXCONNECTION_f);
                     }
                     catch (Exception e)
@@ -1387,6 +1389,17 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_self_connection_status_cb_method(int a_TOX_CONNECTION)
     {
         Log.i(TAG, "self_connection_status:" + a_TOX_CONNECTION);
+
+        if (bootstrapping)
+        {
+            Log.i(TAG, "self_connection_status:bootstrapping=true");
+            // we just went online
+            if (a_TOX_CONNECTION != 0)
+            {
+                Log.i(TAG, "self_connection_status:bootstrapping set to false");
+                bootstrapping = false;
+            }
+        }
 
         // -- notification ------------------
         // -- notification ------------------
