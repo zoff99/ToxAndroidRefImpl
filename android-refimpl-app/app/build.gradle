@@ -121,41 +121,43 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //
     //
-    compile('com.mikepenz:materialdrawer:5.9.1@aar'){
+    compile('com.mikepenz:materialdrawer:5.9.1@aar') {
         transitive = true
     }
+    //
+    compile('com.mikepenz:google-material-typeface:3.0.1.0.original@aar') {
+        exclude group: 'com.android.support'
+    }
+    compile('com.mikepenz:fontawesome-typeface:4.7.0.0@aar') {
+        exclude group: 'com.android.support'
+    }
+    compile('com.google.zxing:core:3.3.0') {
+        exclude group: 'com.android.support'
+    }
+    //
+    compile('com.github.gfx.android.orma:orma:5.0.0-rc2') {
+        exclude group: 'com.android.support'
+    }
+    compile('com.github.gfx.android.orma:orma-encryption:5.0.0-rc2') {
+        exclude group: 'com.android.support'
+    }
+    //
+    compile('com.github.hotchemi:permissionsdispatcher:2.4.0') {
+        exclude group: 'com.android.support'
+    }
+    //
+    compile('com.github.angads25:filepicker:1.1.1') {
+        exclude group: 'com.android.support'
+    }
+    //
+    //
     compile 'com.android.support:support-vector-drawable:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    //
-    compile ('com.mikepenz:google-material-typeface:3.0.1.0.original@aar'){
-        exclude group: 'com.android.support'
-    }
-    compile ('com.mikepenz:fontawesome-typeface:4.7.0.0@aar'){
-        exclude group: 'com.android.support'
-    }
-    compile ('com.google.zxing:core:3.3.0'){
-        exclude group: 'com.android.support'
-    }
-    //
-    compile ('com.github.gfx.android.orma:orma:5.0.0-rc1') {
-        exclude group: 'com.android.support'
-    }
-    compile ('com.github.gfx.android.orma:orma-encryption:5.0.0-rc1') {
-        exclude group: 'com.android.support'
-    }
-    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc1'
-    //
-    compile ('com.github.hotchemi:permissionsdispatcher:2.4.0'){
-        exclude group: 'com.android.support'
-    }
-    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
-    //
-    compile ('com.github.angads25:filepicker:1.1.1') {
-        exclude group: 'com.android.support'
-    }
-    //
     compile 'info.guardianproject.iocipher:IOCipher:0.4'
+    compile 'com.github.medyo:android-about-page:1.2.1'
+    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc2'
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
 }

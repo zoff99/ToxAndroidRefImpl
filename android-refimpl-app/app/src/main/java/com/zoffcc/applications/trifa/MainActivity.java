@@ -20,13 +20,16 @@
 package com.zoffcc.applications.trifa;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.LabeledIntent;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
@@ -38,6 +41,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.app.NotificationCompat;
@@ -69,6 +73,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +105,7 @@ public class MainActivity extends AppCompatActivity
     Handler main_handler = null;
     static Handler main_handler_s = null;
     static Context context_s = null;
-    static Activity main_activity_s = null;
+    static MainActivity main_activity_s = null;
     static AudioManager audio_manager_s = null;
     static int AudioMode_old;
     static int RingerMode_old;
@@ -119,6 +124,7 @@ public class MainActivity extends AppCompatActivity
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
     final static int SettingsActivity_ID = 10004;
+    final static int AboutpageActivity_ID = 10005;
     final static int Notification_new_message_ID = 10023;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
@@ -238,7 +244,8 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("Profile").withIcon(GoogleMaterial.Icon.gmd_face);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName("Settings").withIcon(GoogleMaterial.Icon.gmd_settings);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Logout/Login").withIcon(GoogleMaterial.Icon.gmd_refresh);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
+        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("About").withIcon(GoogleMaterial.Icon.gmd_info);
+        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
         Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
 
@@ -256,7 +263,7 @@ public class MainActivity extends AppCompatActivity
         // create the drawer and remember the `Drawer` result object
         main_drawer = new DrawerBuilder().
                 withActivity(this).
-                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4).
+                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, new DividerDrawerItem(), item5).
                 withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).
                 withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                 {
@@ -273,7 +280,7 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     Log.i(TAG, "start profile activity");
                                     Intent intent = new Intent(context_s, ProfileActivity.class);
-                                    main_activity_s.startActivityForResult(intent, ProfileActivity_ID);
+                                    startActivityForResult(intent, ProfileActivity_ID);
                                 }
                             }
                             catch (Exception e)
@@ -290,7 +297,7 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     Log.i(TAG, "start settings activity");
                                     Intent intent = new Intent(context_s, SettingsActivity.class);
-                                    main_activity_s.startActivityForResult(intent, SettingsActivity_ID);
+                                    startActivityForResult(intent, SettingsActivity_ID);
                                 }
                             }
                             catch (Exception e)
@@ -320,6 +327,21 @@ public class MainActivity extends AppCompatActivity
                         }
                         else if (position == 5)
                         {
+                            // About
+                            try
+                            {
+                                Log.i(TAG, "start aboutpage activity");
+                                Intent intent = new Intent(context_s, Aboutpage.class);
+                                startActivityForResult(intent, AboutpageActivity_ID);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        else if (position == 7)
+                        {
                             // Exit
                             try
                             {
@@ -328,7 +350,6 @@ public class MainActivity extends AppCompatActivity
                                     tox_service_fg.stop_tox_fg();
                                     tox_service_fg.stop_me(true);
                                 }
-
                             }
                             catch (Exception e)
                             {
@@ -2070,6 +2091,65 @@ public class MainActivity extends AppCompatActivity
     {
         return bootstrap_single(ip, key_hex, port);
     }
+
+
+    void sendEmailWithAttachment(Context c, final String recipient, final String subject, final String message, final String full_file_name, final String full_file_name_suppl)
+    {
+        try
+        {
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", recipient, null));
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            ArrayList<Uri> uris = new ArrayList<>();
+            uris.add(Uri.parse("file://" + full_file_name));
+            try
+            {
+                if (new File(full_file_name_suppl).length() > 0)
+                {
+                    uris.add(Uri.parse("file://" + full_file_name_suppl));
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            List<ResolveInfo> resolveInfos = getPackageManager().queryIntentActivities(emailIntent, 0);
+            List<LabeledIntent> intents = new ArrayList<>();
+
+            if (resolveInfos.size() != 0)
+            {
+                for (ResolveInfo info : resolveInfos)
+                {
+                    Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                    System.out.println("email:" + "comp=" + info.activityInfo.packageName + " " + info.activityInfo.name);
+                    intent.setComponent(new ComponentName(info.activityInfo.packageName, info.activityInfo.name));
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipient});
+                    if (subject != null)
+                    {
+                        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                    }
+                    if (message != null)
+                    {
+                        intent.putExtra(Intent.EXTRA_TEXT, message);
+                    }
+                    intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+                    intents.add(new LabeledIntent(intent, info.activityInfo.packageName, info.loadLabel(getPackageManager()), info.icon));
+                }
+                Intent chooser = Intent.createChooser(intents.remove(intents.size() - 1), "Send email with attachments");
+                chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intents.toArray(new LabeledIntent[intents.size()]));
+                startActivity(chooser);
+            }
+            else
+            {
+                System.out.println("email:" + "No Email App found");
+                new AlertDialog.Builder(c).setMessage("No Email App found").setPositiveButton("Ok", null).show();
+            }
+        }
+        catch (ActivityNotFoundException e)
+        {
+            // cannot send email for some reason
+        }
+    }
+
 
     // --------- make app crash ---------
     // --------- make app crash ---------

@@ -40,7 +40,7 @@
     <uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY"/>
 
     <application
-        android:name="com.zoffcc.applications.trifa.MainApplication"
+        android:name=".MainApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -57,7 +57,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
         </activity>
         <activity
             android:name=".AddFriendActivity"
@@ -94,6 +93,10 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings">
+        </activity>
+        <activity
+            android:name=".Aboutpage"
+            android:label="@string/title_activity_aboutpage">
         </activity>
 
         <service

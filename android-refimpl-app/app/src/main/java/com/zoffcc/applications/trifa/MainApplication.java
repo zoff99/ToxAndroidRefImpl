@@ -49,7 +49,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 
 public class MainApplication extends Application
 {
-    String last_stack_trace_as_string = "";
+    static String last_stack_trace_as_string = "";
     int i = 0;
     int crashes = 0;
     long last_crash_time = 0L;
