@@ -10,6 +10,8 @@
     <string name="title_activity_friendinfo">Friendinfo</string>
 
 
+    <string name="settings_toolbar_title">Settings</string>
+
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
@@ -52,6 +54,28 @@
         <item>360</item>
         <item>-1</item>
     </string-array>
+
+
+
+    <string name="pref_title_min_audio_samplingrate_out">Audio Samplingrate</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>Auto</item>
+        <item>8000 kHz</item>
+        <item>16000 kHz</item>
+        <item>48000 kHz</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>Auto</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+
+
+
+
+
+
 
     <string-array name="list_preference_entries">
         <item>Entry 1</item>

@@ -44,6 +44,7 @@ public class Callstate
     {
         Callstate.state = 0;
         Callstate.call_first_video_frame_received = -1;
+        Callstate.call_first_audio_frame_received = -1;
         Callstate.call_start_timestamp = -1;
         Callstate.call_init_timestamp = -1;
         Callstate.friend_pubkey = "-1";

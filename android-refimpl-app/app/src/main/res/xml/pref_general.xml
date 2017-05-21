@@ -6,4 +6,13 @@
         android:summary="@string/pref_description_video_uv_reversed"
         android:title="@string/pref_title_video_uv_reversed"/>
 
+    <ListPreference
+        android:defaultValue="180"
+        android:entries="@array/pref_min_audio_samplingrate_out_titles"
+        android:entryValues="@array/pref_min_audio_samplingrate_out_values"
+        android:key="min_audio_samplingrate_out"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_min_audio_samplingrate_out"/>
+
 </PreferenceScreen>

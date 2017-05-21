@@ -33,9 +33,12 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import java.util.List;
 
@@ -45,18 +48,36 @@ public class SettingsActivity extends AppCompatPreferenceActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setupActionBar();
+        // setupActionBar();
     }
 
-    private void setupActionBar()
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState)
     {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
+        super.onPostCreate(savedInstanceState);
+
+        LinearLayout root = (LinearLayout) findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
+        root.addView(bar, 0); // insert at top
+        bar.setNavigationOnClickListener(new View.OnClickListener()
         {
-            // Show the Up button in the action bar.
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+            @Override
+            public void onClick(View v)
+            {
+                finish();
+            }
+        });
     }
+
+    //    private void setupActionBar()
+    //    {
+    //        ActionBar actionBar = getSupportActionBar();
+    //        if (actionBar != null)
+    //        {
+    //            // Show the Up button in the action bar.
+    //            actionBar.setDisplayHomeAsUpEnabled(true);
+    //        }
+    //    }
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener()
     {

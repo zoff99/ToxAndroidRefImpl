@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 4;
+    final static int audio_in_buffer_max_count = 8;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__notification_sound = true;
     static boolean PREF__notification_vibrate = false;
     static boolean PREF__notification = true;
+    static int PREF__min_audio_samplingrate_out = 8000;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     //
@@ -177,6 +178,22 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
+        try
+        {
+            if (settings.getString("min_audio_samplingrate_out", "8000").compareTo("Auto") == 0)
+            {
+                PREF__min_audio_samplingrate_out = 8000;
+            }
+            else
+            {
+                PREF__min_audio_samplingrate_out = Integer.parseInt(settings.getString("min_audio_samplingrate_out", "8000"));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__min_audio_samplingrate_out = 8000;
+        }
         // prefs ----------
 
         PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
@@ -640,7 +657,24 @@ public class MainActivity extends AppCompatActivity
         PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
         PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
+        try
+        {
+            if (settings.getString("min_audio_samplingrate_out", "8000").compareTo("Auto") == 0)
+            {
+                PREF__min_audio_samplingrate_out = 8000;
+            }
+            else
+            {
+                PREF__min_audio_samplingrate_out = Integer.parseInt(settings.getString("min_audio_samplingrate_out", "8000"));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__min_audio_samplingrate_out = 8000;
+        }
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
+        Log.i(TAG, "PREF__min_audio_samplingrate_out:2=" + PREF__min_audio_samplingrate_out);
         // prefs ----------
     }
 
@@ -1251,14 +1285,21 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
     {
-        if (Callstate.other_audio_enabled == 0)
-        {
-            return;
-        }
-
         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
+            return;
+        }
+
+        if (Callstate.other_audio_enabled == 0)
+        {
+            if (Callstate.call_first_audio_frame_received == -1)
+            {
+                sampling_rate_ = sampling_rate;
+                Log.i(TAG, "audio_play:read:incoming sampling_rate[0]=" + sampling_rate + " kHz");
+                channels_ = channels;
+            }
+
             return;
         }
 
@@ -1267,7 +1308,7 @@ public class MainActivity extends AppCompatActivity
             Callstate.call_first_audio_frame_received = System.currentTimeMillis();
 
             sampling_rate_ = sampling_rate;
-            Log.i(TAG, "audio_play:read:incoming sampling_rate=" + sampling_rate + " kHz");
+            Log.i(TAG, "audio_play:read:incoming sampling_rate[1]=" + sampling_rate + " kHz");
             channels_ = channels;
 
             Log.i(TAG, "audio_play:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" + sampling_rate);

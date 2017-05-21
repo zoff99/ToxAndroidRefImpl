@@ -49,8 +49,8 @@ public class AudioReceiver extends Thread
     static int channels_ = 1;
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
-    static int buffer_size = 1920 * 5; // TODO: hardcoded is bad!!!!
     final static int buffer_multiplier = 3;
+    static int buffer_size = 1920 * buffer_multiplier; // TODO: hardcoded is bad!!!!
     AudioTrack track = null;
     LoudnessEnhancer lec = null;
 
@@ -170,12 +170,13 @@ public class AudioReceiver extends Thread
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
-                    played_bytes = track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
+                    // ** // played_bytes =
+                    track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
 
-                    Thread.sleep(sleep_millis);
+                    // Thread.sleep(sleep_millis);
 
                     // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
                     // Log.i(TAG, "audio_play:recthr:play:bytes=" + played_bytes + " len=" + audio_buffer_play_length);
