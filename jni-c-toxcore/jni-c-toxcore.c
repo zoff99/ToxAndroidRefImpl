@@ -383,6 +383,7 @@ int bin_id_to_string(const char *bin_id, size_t bin_id_size, char *output, size_
 
 void bootstrap_real(Tox *tox)
 {
+
 #if 1
 
 	// these nodes seem to be faster!!
