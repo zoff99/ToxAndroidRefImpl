@@ -105,8 +105,8 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         String DATA_DEBUG_DIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes").toString();
 
         String date = new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.GERMAN).format(new Date());
-        String full_file_name = DATA_DEBUG_DIR + "/crashlog_" + date + ".txt";
-        String full_file_name_suppl = DATA_DEBUG_DIR + "/crashlog_single.txt";
+        String full_file_name = DATA_DEBUG_DIR + "/crash_" + date + ".txt";
+        String full_file_name_suppl = DATA_DEBUG_DIR + "/crash_single.txt";
         String feedback_text = "Crashlog";
 
         Logging.writeToFile(output, Aboutpage.this, full_file_name);

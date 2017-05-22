@@ -47,6 +47,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TrifaToxService.ONGOING_NOTIFICATION_ID;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 
+
 public class MainApplication extends Application
 {
     static String last_stack_trace_as_string = "";

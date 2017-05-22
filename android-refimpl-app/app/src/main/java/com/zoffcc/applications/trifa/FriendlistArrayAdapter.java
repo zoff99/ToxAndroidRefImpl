@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
+
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -45,15 +50,15 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         this.values = values;
     }
 
-//    @Override
-//    public void setNotifyOnChange(boolean notifyOnChange)
-//    {
-//        super.setNotifyOnChange(notifyOnChange);
-//        Log.i(TAG, "setNotifyOnChange");
-//    }
+    //    @Override
+    //    public void setNotifyOnChange(boolean notifyOnChange)
+    //    {
+    //        super.setNotifyOnChange(notifyOnChange);
+    //        Log.i(TAG, "setNotifyOnChange");
+    //    }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public View getView(int position, View recycled, final ViewGroup parent)
     {
         // Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
 
@@ -68,6 +73,39 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 
         TextView unread_count = (TextView) rowView.findViewById(R.id.f_unread_count);
         // Log.i(TAG, "unread_count view=" + unread_count);
+
+        de.hdodenhof.circleimageview.CircleImageView avatar = (de.hdodenhof.circleimageview.CircleImageView) rowView.findViewById(R.id.f_avatar_icon);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        avatar.setImageDrawable(d_lock);
+
+        final de.hdodenhof.circleimageview.CircleImageView avatar_f = avatar;
+        final int position_f = position;
+        try
+        {
+            // TODO: broken -------------------
+            FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(values.get(position_f).tox_public_key_string).toList().get(0);
+
+            try
+            {
+                info.guardianproject.iocipher.FileReader fr = new info.guardianproject.iocipher.FileReader(fl.avatar_pathname + "/" + fl.avatar_filename);
+            }
+            catch (FileNotFoundException e2)
+            {
+                e2.printStackTrace();
+                Log.i(TAG, "getView:EE2:" + e2.getMessage());
+            }
+
+            GlideApp.with(parent).
+                    load("").
+                    placeholder(d_lock).
+                    into(avatar_f);
+            // TODO: broken -------------------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "getView:EE:" + e.getMessage());
+        }
 
         try
         {

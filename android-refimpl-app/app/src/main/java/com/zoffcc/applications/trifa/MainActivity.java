@@ -509,7 +509,7 @@ public class MainActivity extends AppCompatActivity
         // ---------- DEBUG, just a test ----------
         if (vfs.isMounted())
         {
-            vfs_listFilesAndFilesSubDirectories("/");
+            vfs_listFilesAndFilesSubDirectories("/", 0, "");
 
             //            try
             //            {
@@ -546,23 +546,23 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void vfs_listFilesAndFilesSubDirectories(String directoryName)
+    public void vfs_listFilesAndFilesSubDirectories(String directoryName, int depth, String parent)
     {
         info.guardianproject.iocipher.File directory = new info.guardianproject.iocipher.File(directoryName);
-
-        //get all the files from a directory
         info.guardianproject.iocipher.File[] fList = directory.listFiles();
 
         for (info.guardianproject.iocipher.File file : fList)
         {
             if (file.isFile())
             {
-                Log.i(TAG, "VFS:f:" + file.getName()+" "+file.length()+" "+file.lastModified());
+                // final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                // final String human_datetime = df.format(new Date(file.lastModified()));
+                Log.i(TAG, "VFS:f:" + parent + "/" + file.getName() + " bytes=" + file.length());
             }
             else if (file.isDirectory())
             {
-                Log.i(TAG, "VFS:d:" + file.getName());
-                vfs_listFilesAndFilesSubDirectories(file.getAbsolutePath());
+                Log.i(TAG, "VFS:d:" + parent + "/" + file.getName() + "/");
+                vfs_listFilesAndFilesSubDirectories(file.getAbsolutePath(), depth + 1, parent + "/" + file.getName());
             }
         }
     }
@@ -1806,10 +1806,12 @@ public class MainActivity extends AppCompatActivity
 
             insert_into_filetransfer_db(f);
 
+            // TODO: we just accept incoming avatar, maybe make some checks first?
             tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_RESUME.value);
         }
         else
         {
+            Log.i(TAG, "file_recv:incoming regular file");
         }
     }
 
@@ -1862,10 +1864,23 @@ public class MainActivity extends AppCompatActivity
 
                 move_tmp_file_to_real_file(f.path_name, f.file_name, VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
 
+                // put into "File" table
+                com.zoffcc.applications.trifa.File file_ = new com.zoffcc.applications.trifa.File();
+                file_.kind = f.kind;
+                file_.direction = f.direction;
+                file_.tox_public_key_string = f.tox_public_key_string;
+                file_.path_name = VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
+                file_.file_name = f.file_name;
+                orma.insertIntoFile(file_);
+
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
                     set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number), VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
                 }
+
+                // remove FT from DB
+                orma.deleteFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().
+                        file_numberEq(file_number).execute();
             }
             catch (Exception e2)
             {
@@ -2045,12 +2060,18 @@ public class MainActivity extends AppCompatActivity
                     avatar_filename(avatar_file_name).
                     execute();
 
-            // update_display_friend_avatar(friend_pubkey);
+            update_display_friend_avatar(friend_pubkey, avatar_path_name, avatar_file_name);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+    }
+
+    static void update_display_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
+    {
+        // try to load avatar image, and set in friendlist fragment
+        // zzzzzzzzzz
     }
 
     static void move_tmp_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
