@@ -89,6 +89,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
@@ -1062,6 +1063,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native String tox_self_get_status_message();
 
+    public static native int tox_file_control(long friend_number, long file_number, int a_TOX_FILE_CONTROL);
+
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -1753,8 +1756,10 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "file_recv:" + friend_number + ":" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" + filename + ":" + filename_length);
 
-        if (a_TOX_FILE_KIND== ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR.value)
+        if (a_TOX_FILE_KIND == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR.value)
         {
+            Log.i(TAG, "file_recv:incoming avatar");
+            tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_RESUME.value);
         }
         else
         {

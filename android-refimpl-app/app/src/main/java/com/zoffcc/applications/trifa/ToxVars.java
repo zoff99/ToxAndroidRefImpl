@@ -819,7 +819,7 @@ public class ToxVars
          * Sent by the receiving side to accept a file send request. Also sent after a
          * TOX_FILE_CONTROL_PAUSE command to continue sending or receiving.
          */
-        TOX_FILE_CONTROL_RESUME,
+        TOX_FILE_CONTROL_RESUME(0),
 
         /**
          * Sent by clients to pause the file transfer. The initial state of a file
@@ -827,14 +827,20 @@ public class ToxVars
          * side. If both the sending and receiving side pause the transfer, then both
          * need to send TOX_FILE_CONTROL_RESUME for the transfer to resume.
          */
-        TOX_FILE_CONTROL_PAUSE,
+        TOX_FILE_CONTROL_PAUSE(1),
 
         /**
          * Sent by the receiving side to reject a file send request before any other
          * commands are sent. Also sent by either side to terminate a file transfer.
          */
-        TOX_FILE_CONTROL_CANCEL,
+        TOX_FILE_CONTROL_CANCEL(2);
 
+        public int value;
+
+        private TOX_FILE_CONTROL(int value)
+        {
+            this.value = value;
+        }
     }
 
 

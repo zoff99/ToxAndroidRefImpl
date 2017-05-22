@@ -2030,6 +2030,22 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(
 	return (*env)->NewStringUTF(env, (uint8_t *)message);
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1control(JNIEnv* env, jobject thiz, jlong friend_number, jlong file_number, jint control)
+{
+	TOX_ERR_FILE_CONTROL error;
+	bool res = tox_file_control(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (TOX_FILE_CONTROL)control, &error);
+
+	if (res == true)
+	{
+		return (jint)0;
+	}
+	else
+	{
+		return (jint)-1;
+	}
+}
+
 // -----------------------
 // TODO
 // -----------------------
@@ -2038,11 +2054,8 @@ void tox_self_get_public_key(const Tox *tox, uint8_t *public_key);
 void tox_self_get_secret_key(const Tox *tox, uint8_t *secret_key);
 uint32_t tox_self_get_nospam(const Tox *tox);
 bool tox_friend_exists(const Tox *tox, uint32_t friend_number);
-bool tox_friend_get_public_key(const Tox *tox, uint32_t friend_number, uint8_t *public_key,
-TOX_ERR_FRIEND_GET_PUBLIC_KEY *error);
 uint64_t tox_friend_get_last_online(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_GET_LAST_ONLINE *error);
 TOX_USER_STATUS tox_friend_get_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
-bool tox_friend_get_typing(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
 bool tox_hash(uint8_t *hash, const uint8_t *data, size_t length);
 
 void tox_self_set_nospam(Tox *tox, uint32_t nospam);

@@ -23,6 +23,8 @@ import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+
 @Table
 public class File
 {
@@ -30,17 +32,22 @@ public class File
     long id;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    int kind;
+    int kind = TOX_FILE_KIND_DATA.value;
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    String full_path_name = "";
 
     static File deep_copy(File in)
     {
         File out = new File();
+        out.kind = in.kind;
+        out.full_path_name = in.full_path_name;
         return out;
     }
 
     @Override
     public String toString()
     {
-        return "";
+        return "id=" + id + ", kind=" + kind + ", full_path_name=" + full_path_name;
     }
 }

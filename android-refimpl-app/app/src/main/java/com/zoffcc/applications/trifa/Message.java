@@ -71,8 +71,6 @@ public class Message
     static Message deep_copy(Message in)
     {
         Message out = new Message();
-        out.id = in.id;
-        // out.tox_friendnum = in.tox_friendnum;
         out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
         out.sent_timestamp = in.sent_timestamp;
