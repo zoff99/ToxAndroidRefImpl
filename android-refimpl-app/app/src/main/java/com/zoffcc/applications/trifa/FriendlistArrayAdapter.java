@@ -32,7 +32,6 @@ import android.widget.TextView;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -60,7 +59,7 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
     @Override
     public View getView(int position, View recycled, final ViewGroup parent)
     {
-        // Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
+        Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.friend_list_entry, parent, false);
@@ -83,17 +82,20 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         try
         {
             // TODO: broken -------------------
-            FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(values.get(position_f).tox_public_key_string).toList().get(0);
+            // FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(values.get(position_f).tox_public_key_string).toList().get(0);
 
             try
             {
-                info.guardianproject.iocipher.FileReader fr = new info.guardianproject.iocipher.FileReader(fl.avatar_pathname + "/" + fl.avatar_filename);
+                // Log.i(TAG, "getView:fl=" + fl);
+                // info.guardianproject.iocipher.FileReader fr = new info.guardianproject.iocipher.FileReader(fl.avatar_pathname + "/" + fl.avatar_filename);
             }
-            catch (FileNotFoundException e2)
+            catch (Exception e2)
             {
                 e2.printStackTrace();
                 Log.i(TAG, "getView:EE2:" + e2.getMessage());
             }
+
+            // load(new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename)).
 
             GlideApp.with(parent).
                     load("").

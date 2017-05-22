@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity
     static MessageListActivity message_list_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
+    final static boolean ORMA_TRACE = true;
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
@@ -421,7 +422,7 @@ public class MainActivity extends AppCompatActivity
             orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.NONE).
                     writeOnMainThread(AccessThreadConstraint.NONE).
-                    trace(false).
+                    trace(ORMA_TRACE).
                     build();
             Log.i(TAG, "db:open=OK:path=" + dbs_path);
         }
@@ -449,6 +450,7 @@ public class MainActivity extends AppCompatActivity
             orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.WARNING).
                     writeOnMainThread(AccessThreadConstraint.WARNING).
+                    trace(ORMA_TRACE).
                     build();
             Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
         }
@@ -1797,7 +1799,7 @@ public class MainActivity extends AppCompatActivity
             f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
             f.file_number = file_number;
-            f.kind = TOX_FILE_KIND_DATA.value;
+            f.kind = a_TOX_FILE_KIND;
             f.state = TOX_FILE_CONTROL_CANCEL.value;
             f.path_name = VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
             f.file_name = filename.substring(0, (int) filename_length);
@@ -1873,6 +1875,7 @@ public class MainActivity extends AppCompatActivity
                 file_.file_name = f.file_name;
                 orma.insertIntoFile(file_);
 
+                Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
                     set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number), VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
@@ -2055,6 +2058,8 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
+            Log.i(TAG, "set_friend_avatar:update:pubkey=" + friend_pubkey + " path=" + avatar_path_name + " file=" + avatar_file_name);
+
             orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                     avatar_pathname(avatar_path_name).
                     avatar_filename(avatar_file_name).
@@ -2064,6 +2069,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
+            Log.i(TAG, "set_friend_avatar:EE:" + e.getMessage());
             e.printStackTrace();
         }
     }
