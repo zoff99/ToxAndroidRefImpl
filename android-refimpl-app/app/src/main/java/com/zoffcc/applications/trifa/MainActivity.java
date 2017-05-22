@@ -1739,6 +1739,33 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static void android_tox_callback_file_recv_control_cb_method(long friend_number, long file_number, int control)
+    {
+        Log.i(TAG, "file_recv_control:" + friend_number + ":" + file_number + ":" + control);
+    }
+
+    static void android_tox_callback_file_chunk_request_cb_method(long friend_number, long file_number, long position, long length)
+    {
+        Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
+    }
+
+    static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
+    {
+        Log.i(TAG, "file_recv:" + friend_number + ":" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" + filename + ":" + filename_length);
+
+        if (a_TOX_FILE_KIND== ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR.value)
+        {
+        }
+        else
+        {
+        }
+    }
+
+    static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
+    {
+        Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
+    }
+
     // void test(int i)
     // {
     //    Log.i(TAG, "test:" + i);

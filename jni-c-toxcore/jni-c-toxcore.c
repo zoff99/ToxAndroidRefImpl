@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 7
-static const char global_version_string[] = "0.99.7";
+#define VERSION_PATCH 8
+static const char global_version_string[] = "0.99.8";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -139,6 +139,10 @@ jmethodID android_tox_callback_friend_typing_cb_method = NULL;
 jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_cb_method = NULL;
+jmethodID android_tox_callback_file_recv_control_cb_method = NULL;
+jmethodID android_tox_callback_file_chunk_request_cb_method = NULL;
+jmethodID android_tox_callback_file_recv_cb_method = NULL;
+jmethodID android_tox_callback_file_recv_chunk_cb_method = NULL;
 jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
@@ -175,6 +179,11 @@ void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *us
 void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_id, void *user_data);
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data);
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
+
+void file_recv_control_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control, void *user_data);
+void file_chunk_request_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, size_t length, void *user_data);
+void file_recv_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint32_t kind, uint64_t file_size, const uint8_t *filename, size_t filename_length, void *user_data);
+void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data, size_t length, void *user_data);
 
 void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message, void *user_data);
 
@@ -530,10 +539,12 @@ void init_tox_callbacks()
 	tox_callback_friend_read_receipt(tox_global, friend_read_receipt_cb);
 	tox_callback_friend_request(tox_global, friend_request_cb);
 	tox_callback_friend_message(tox_global, friend_message_cb);
-// tox_callback_file_recv_control(tox_global, tox_file_recv_control_cb *callback);
-// tox_callback_file_chunk_request(tox_global, tox_file_chunk_request_cb *callback);
-// tox_callback_file_recv(tox_global, tox_file_recv_cb *callback);
-// tox_callback_file_recv_chunk(tox_global, tox_file_recv_chunk_cb *callback);
+
+	tox_callback_file_recv_control(tox_global, file_recv_control_cb);
+	tox_callback_file_chunk_request(tox_global, file_chunk_request_cb);
+	tox_callback_file_recv(tox_global, file_recv_cb);
+	tox_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
+
 // tox_callback_conference_invite(tox_global, tox_conference_invite_cb *callback);
 // tox_callback_conference_message(tox_global, tox_conference_message_cb *callback);
 // tox_callback_conference_title(tox_global, tox_conference_title_cb *callback);
@@ -805,6 +816,94 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data)
 {
 	android_tox_callback_friend_message_cb(friend_number, type, message, length);
+}
+
+void android_tox_callback_file_recv_control_cb(uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_file_recv_control_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)file_number, (jint)control);
+}
+
+void file_recv_control_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control, void *user_data)
+{
+	android_tox_callback_file_recv_control_cb(friend_number, file_number, control);
+}
+
+void android_tox_callback_file_chunk_request_cb(uint32_t friend_number, uint32_t file_number, uint64_t position, size_t length)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_file_chunk_request_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)file_number, (jlong)(unsigned long long)position, (jlong)(unsigned long long)length);
+
+}
+
+void file_chunk_request_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, size_t length, void *user_data)
+{
+	android_tox_callback_file_chunk_request_cb(friend_number, file_number, position, length);
+}
+
+void android_tox_callback_file_recv_cb(uint32_t friend_number, uint32_t file_number, uint32_t kind, uint64_t file_size, const uint8_t *filename, size_t filename_length)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	dbg(9, "file_recv_cb:filename=%p filename_length=%d", filename, (int)filename_length);
+
+	jstring js1 = NULL;
+	if ((! filename)||(filename_length == 0))
+	{
+	}
+	else
+	{
+		js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)filename);
+	}
+
+	dbg(9, "file_recv_cb:js1=%d", js1);
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_file_recv_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)file_number, (jint)kind, (jlong)(unsigned long long)file_size,
+				js1, (jlong)(unsigned long long)filename_length);
+
+	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
+
+}
+
+void file_recv_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint32_t kind, uint64_t file_size, const uint8_t *filename, size_t filename_length, void *user_data)
+{
+	android_tox_callback_file_recv_cb(friend_number, file_number, kind, file_size, filename, filename_length);
+}
+
+void android_tox_callback_file_recv_chunk_cb(uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data, size_t length)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+    jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)length);
+    if (data2 == NULL)
+	{
+        // return NULL; // out of memory error thrown
+    }
+
+	// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+	// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    (*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)length, (const jbyte*)data);
+	// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+	// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_file_recv_chunk_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)file_number,
+				(jlong)(unsigned long long)position, data2, (jlong)(unsigned long long)length);
+
+}
+
+void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data, size_t length, void *user_data)
+{
+	android_tox_callback_file_recv_chunk_cb(friend_number, file_number, position, data, length);
 }
 
 void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message)
@@ -1212,6 +1311,12 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	android_tox_callback_friend_read_receipt_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_read_receipt_cb_method", "(JJ)V");
 	android_tox_callback_friend_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_request_cb_method", "(Ljava/lang/String;Ljava/lang/String;J)V");
 	android_tox_callback_friend_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
+
+	android_tox_callback_file_recv_control_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_file_recv_control_cb_method", "(JJI)V");
+	android_tox_callback_file_chunk_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_file_chunk_request_cb_method", "(JJJJ)V");
+	android_tox_callback_file_recv_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_file_recv_cb_method", "(JJIJLjava/lang/String;J)V");
+	android_tox_callback_file_recv_chunk_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_file_recv_chunk_cb_method", "(JJJ[BJ)V");
+
 	android_tox_log_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_log_cb_method", "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
 	dbg(9, "linking callbacks ... READY");
 	// -------- _callbacks_ --------

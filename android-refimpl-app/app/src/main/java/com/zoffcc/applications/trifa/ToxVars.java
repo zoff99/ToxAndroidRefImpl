@@ -778,7 +778,7 @@ public class ToxVars
          * Arbitrary file data. Clients can choose to handle it based on the file name
          * or magic or any other way they choose.
          */
-        TOX_FILE_KIND_DATA,
+        TOX_FILE_KIND_DATA(0),
 
         /**
          * Avatar file_id. This consists of tox_hash(image).
@@ -800,7 +800,15 @@ public class ToxVars
          * When file_size is set to 0 in the transfer request it means that the client
          * has no avatar.
          */
-        TOX_FILE_KIND_AVATAR,
+        TOX_FILE_KIND_AVATAR(1);
+
+        public int value;
+
+        private TOX_FILE_KIND(int value)
+        {
+            this.value = value;
+        }
+
 
     }
 
