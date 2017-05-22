@@ -88,9 +88,17 @@ import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 @RuntimePermissions
@@ -410,7 +418,7 @@ public class MainActivity extends AppCompatActivity
 
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
             builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-            TrifaToxService.orma = builder.name(dbs_path).
+            orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.NONE).
                     writeOnMainThread(AccessThreadConstraint.NONE).
                     trace(false).
@@ -438,7 +446,7 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "db:path(2)=" + dbs_path);
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
             builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-            TrifaToxService.orma = builder.name(dbs_path).
+            orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.WARNING).
                     writeOnMainThread(AccessThreadConstraint.WARNING).
                     build();
@@ -446,7 +454,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         Log.i(TAG, "db:migrate");
-        TrifaToxService.orma.migrate();
+        orma.migrate();
         Log.i(TAG, "db:migrate=OK");
 
         try
@@ -501,6 +509,8 @@ public class MainActivity extends AppCompatActivity
         // ---------- DEBUG, just a test ----------
         if (vfs.isMounted())
         {
+            vfs_listFilesAndFilesSubDirectories("/");
+
             //            try
             //            {
             //                BufferedWriter out = new BufferedWriter(new info.guardianproject.iocipher.FileWriter("test.txt"));
@@ -534,6 +544,29 @@ public class MainActivity extends AppCompatActivity
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
     }
+
+
+    public void vfs_listFilesAndFilesSubDirectories(String directoryName)
+    {
+        info.guardianproject.iocipher.File directory = new info.guardianproject.iocipher.File(directoryName);
+
+        //get all the files from a directory
+        info.guardianproject.iocipher.File[] fList = directory.listFiles();
+
+        for (info.guardianproject.iocipher.File file : fList)
+        {
+            if (file.isFile())
+            {
+                Log.i(TAG, "VFS:f:" + file.getName()+" "+file.length()+" "+file.lastModified());
+            }
+            else if (file.isDirectory())
+            {
+                Log.i(TAG, "VFS:d:" + file.getName());
+                vfs_listFilesAndFilesSubDirectories(file.getAbsolutePath());
+            }
+        }
+    }
+
 
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
@@ -713,7 +746,7 @@ public class MainActivity extends AppCompatActivity
     static FriendList main_get_friend(long friendnum)
     {
         FriendList f;
-        List<FriendList> fl = TrifaToxService.orma.selectFromFriendList().
+        List<FriendList> fl = orma.selectFromFriendList().
                 tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                 toList();
         if (fl.size() > 0)
@@ -732,7 +765,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            return (TrifaToxService.orma.selectFromFriendList().
+            return (orma.selectFromFriendList().
                     tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                     toList().get(0).TOX_CONNECTION);
         }
@@ -752,7 +785,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                TrifaToxService.orma.updateFriendList().
+                orma.updateFriendList().
                         TOX_CONNECTION(0).
                         execute();
                 friend_list_fragment.set_all_friends_to_offline();
@@ -763,7 +796,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db(FriendList f)
     {
-        TrifaToxService.orma.updateFriendList().
+        orma.updateFriendList().
                 tox_public_key_string(f.tox_public_key_string).
                 name(f.name).
                 status_message(f.status_message).
@@ -774,7 +807,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db_status_message(FriendList f)
     {
-        TrifaToxService.orma.updateFriendList().
+        orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
                 status_message(f.status_message).
                 execute();
@@ -782,7 +815,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db_status(FriendList f)
     {
-        TrifaToxService.orma.updateFriendList().
+        orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
                 execute();
@@ -790,7 +823,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db_connection_status(FriendList f)
     {
-        TrifaToxService.orma.updateFriendList().
+        orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_CONNECTION(f.TOX_CONNECTION).
                 execute();
@@ -798,7 +831,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db_name(FriendList f)
     {
-        TrifaToxService.orma.updateFriendList().
+        orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
                 name(f.name).
                 execute();
@@ -813,7 +846,7 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    TrifaToxService.orma.updateMessage().
+                    orma.updateMessage().
                             idEq(m.id).
                             read(m.read).
                             text(m.text).
@@ -840,7 +873,7 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    TrifaToxService.orma.updateMessage().
+                    orma.updateMessage().
                             idEq(m.id).
                             read(m.read).
                             rcvd_timestamp(m.rcvd_timestamp).
@@ -1160,7 +1193,7 @@ public class MainActivity extends AppCompatActivity
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         try
                         {
-                            Callstate.friend_name = TrifaToxService.orma.selectFromFriendList().
+                            Callstate.friend_name = orma.selectFromFriendList().
                                     tox_public_key_stringEq(Callstate.friend_pubkey).
                                     toList().get(0).name;
                         }
@@ -1561,7 +1594,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
-            final Message m = TrifaToxService.orma.selectFromMessage().
+            final Message m = orma.selectFromMessage().
                     message_idEq(message_id).
                     tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
                     directionEq(1).
@@ -1636,7 +1669,7 @@ public class MainActivity extends AppCompatActivity
 
                 try
                 {
-                    TrifaToxService.orma.insertIntoFriendList(f);
+                    orma.insertIntoFriendList(f);
                 }
                 catch (android.database.sqlite.SQLiteConstraintException e)
                 {
@@ -1667,7 +1700,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             // update "new" status on friendlist fragment
-            FriendList f = TrifaToxService.orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
             friend_list_fragment.modify_friend(f, friend_number);
         }
         catch (Exception e)
@@ -1756,9 +1789,23 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "file_recv:" + friend_number + ":" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" + filename + ":" + filename_length);
 
-        if (a_TOX_FILE_KIND == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR.value)
+        if (a_TOX_FILE_KIND == TOX_FILE_KIND_AVATAR.value)
         {
             Log.i(TAG, "file_recv:incoming avatar");
+
+            Filetransfer f = new Filetransfer();
+            f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
+            f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
+            f.file_number = file_number;
+            f.kind = TOX_FILE_KIND_DATA.value;
+            f.state = TOX_FILE_CONTROL_CANCEL.value;
+            f.path_name = VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
+            f.file_name = filename.substring(0, (int) filename_length);
+            f.filesize = file_size;
+            f.current_position = 0;
+
+            insert_into_filetransfer_db(f);
+
             tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_RESUME.value);
         }
         else
@@ -1769,6 +1816,88 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
     {
         Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
+
+        Filetransfer f = null;
+        try
+        {
+            f = orma.selectFromFiletransfer().file_numberEq(file_number).and().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).toList().get(0);
+
+            if (position == 0)
+            {
+                // file start. just to be sure, make directories
+                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(f.path_name + "/" + f.file_name);
+                info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
+                Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                f2.mkdirs();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (length == 0)
+        {
+            try
+            {
+                Log.i(TAG, "file_recv_chunk:file fully received");
+
+                info.guardianproject.iocipher.FileOutputStream fos = null;
+                fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+
+                if (f.fos_open)
+                {
+                    try
+                    {
+                        fos.close();
+                    }
+                    catch (Exception e3)
+                    {
+                        Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
+                    }
+                }
+                f.fos_open = false;
+                update_filetransfer_db_fos_open(f);
+
+                move_tmp_file_to_real_file(f.path_name, f.file_name, VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
+
+                if (f.kind == TOX_FILE_KIND_AVATAR.value)
+                {
+                    set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number), VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
+                }
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+                Log.i(TAG, "file_recv_chunk:EE2:" + e2.getMessage());
+            }
+        }
+        else
+        {
+            try
+            {
+                info.guardianproject.iocipher.FileOutputStream fos = null;
+                if (!f.fos_open)
+                {
+                    fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
+                    cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                    f.fos_open = true;
+                }
+                else
+                {
+                    fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                }
+                fos.write(data);
+                f.current_position = position;
+                update_filetransfer_db_full(f);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "file_recv_chunk:EE1:" + e.getMessage());
+            }
+        }
     }
 
     // void test(int i)
@@ -1868,6 +1997,80 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent, AddFriendActivity_ID);
     }
 
+
+    static void update_filetransfer_db_fos_open(final Filetransfer f)
+    {
+        orma.updateFiletransfer().
+                tox_public_key_stringEq(f.tox_public_key_string).
+                file_numberEq(f.file_number).
+                fos_open(f.fos_open).
+                execute();
+    }
+
+    static void update_filetransfer_db_full(final Filetransfer f)
+    {
+        orma.updateFiletransfer().
+                tox_public_key_stringEq(f.tox_public_key_string).
+                file_numberEq(f.file_number).
+                direction(f.direction).
+                kind(f.kind).
+                state(f.state).
+                path_name(f.path_name).
+                file_name(f.file_name).
+                fos_open(f.fos_open).
+                filesize(f.filesize).
+                current_position(f.current_position).
+                execute();
+    }
+
+    static void insert_into_filetransfer_db(final Filetransfer f)
+    {
+        //Thread t = new Thread()
+        //{
+        //    @Override
+        //    public void run()
+        //    {
+        orma.insertIntoFiletransfer(f);
+        //    }
+        //};
+        //t.start();
+    }
+
+    static void set_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
+    {
+        try
+        {
+            orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
+                    avatar_pathname(avatar_path_name).
+                    avatar_filename(avatar_file_name).
+                    execute();
+
+            // update_display_friend_avatar(friend_pubkey);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void move_tmp_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
+    {
+        Log.i(TAG, "move_tmp_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + dst_file_name);
+        try
+        {
+            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
+            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(dst_path_name + "/" + dst_file_name);
+            info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(dst_path_name + "/");
+            dst_dir.mkdirs();
+            f1.renameTo(f2);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
     static void insert_into_message_db(final Message m, final boolean update_message_view_flag)
     {
         Thread t = new Thread()
@@ -1876,7 +2079,7 @@ public class MainActivity extends AppCompatActivity
             public void run()
             {
                 // Log.i(TAG, "insert_into_message_db:m=" + m);
-                TrifaToxService.orma.insertIntoMessage(m);
+                orma.insertIntoMessage(m);
                 if (update_message_view_flag)
                 {
                     update_message_view();
@@ -1893,7 +2096,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                TrifaToxService.orma.insertIntoFriendList(f);
+                orma.insertIntoFriendList(f);
             }
         };
         t.start();
@@ -1906,7 +2109,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                TrifaToxService.orma.deleteFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
+                orma.deleteFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
             }
         };
         t.start();
@@ -1920,7 +2123,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                TrifaToxService.orma.deleteFromFriendList().
+                orma.deleteFromFriendList().
                         tox_public_key_stringEq(friend_pubkey).
                         execute();
             }
@@ -2025,7 +2228,7 @@ public class MainActivity extends AppCompatActivity
         String result = "Unknown";
         try
         {
-            result = TrifaToxService.orma.selectFromFriendList().
+            result = orma.selectFromFriendList().
                     tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                     toList().get(0).name;
         }

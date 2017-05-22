@@ -31,9 +31,6 @@ public class FriendList
     @PrimaryKey
     String tox_public_key_string = "";
 
-    /// @Column(indexed = true, unique = true)
-    // long tox_friendnum = 0L;
-
     @Column
     @Nullable
     String name;
@@ -48,15 +45,24 @@ public class FriendList
     @Column
     int TOX_USER_STATUS; // 0 --> NONE, 1 --> online AWAY, 2 --> online BUSY
 
+    @Column
+    @Nullable
+    String avatar_pathname = null;
+
+    @Column
+    @Nullable
+    String avatar_filename = null;
+
     static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();
         out.tox_public_key_string = in.tox_public_key_string;
-        // out.tox_friendnum = in.tox_friendnum;
         out.name = in.name;
         out.status_message = in.status_message;
         out.TOX_CONNECTION = in.TOX_CONNECTION;
         out.TOX_USER_STATUS = in.TOX_USER_STATUS;
+        out.avatar_filename = in.avatar_filename;
+        out.avatar_pathname = in.avatar_pathname;
 
         return out;
     }

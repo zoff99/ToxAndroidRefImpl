@@ -23,6 +23,7 @@ import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 
 @Table
@@ -35,19 +36,31 @@ public class File
     int kind = TOX_FILE_KIND_DATA.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    String full_path_name = "";
+    int direction = TRIFA_FT_DIRECTION_INCOMING.value;
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    String tox_public_key_string = "";
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    String path_name = "";
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    String file_name = "";
 
     static File deep_copy(File in)
     {
         File out = new File();
         out.kind = in.kind;
-        out.full_path_name = in.full_path_name;
+        out.direction = in.direction;
+        out.tox_public_key_string = in.tox_public_key_string;
+        out.path_name = in.path_name;
+        out.file_name = in.file_name;
         return out;
     }
 
     @Override
     public String toString()
     {
-        return "id=" + id + ", kind=" + kind + ", full_path_name=" + full_path_name;
+        return "id=" + id + ", kind=" + kind + ", path_name=" + path_name + ", file_name" + file_name;
     }
 }

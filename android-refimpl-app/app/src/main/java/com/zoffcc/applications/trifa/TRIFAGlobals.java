@@ -19,6 +19,9 @@
 
 package com.zoffcc.applications.trifa;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TRIFAGlobals
 {
     static String global_my_toxid = "";
@@ -36,4 +39,26 @@ public class TRIFAGlobals
     final static String GROUPBOT_TOXID = "56A1ADE4B65B86BCD51CC73E2CD4E542179F47959FE3E0E21B4B0ACDADE51855D34D34D37CB5";
 
     final static boolean ADD_BOTS_ON_STARTUP = true;
+
+    final static String VFS_TMP_FILE_DIR = "/tempdir/files/";
+    final static String VFS_FILE_DIR = "/datadir/files/";
+
+    // ---- lookup cache ----
+    static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
+    // ---- lookup cache ----
+
+    public static enum TRIFA_FT_DIRECTION
+    {
+        TRIFA_FT_DIRECTION_INCOMING(0), TRIFA_FT_DIRECTION_OUTGOING(1);
+
+        public int value;
+
+        private TRIFA_FT_DIRECTION(int value)
+        {
+            this.value = value;
+        }
+
+
+    }
+
 }
