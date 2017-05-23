@@ -104,6 +104,7 @@ jobject *android_activity;
 char *app_data_dir = NULL;
 jclass MainActivity = NULL;
 jmethodID logger_method = NULL;
+jmethodID safe_string_method = NULL;
 
 uint8_t *video_buffer_1 = NULL;
 uint8_t *video_buffer_1_u = NULL;
@@ -188,6 +189,7 @@ void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, 
 void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message, void *user_data);
 
 void android_logger(int level, const char* logtext);
+jstring c_safe_string_from_java(char *instr, size_t len);
 // functions -----------
 // functions -----------
 // functions -----------
@@ -851,26 +853,53 @@ void android_tox_callback_file_recv_cb(uint32_t friend_number, uint32_t file_num
 {
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
+	char filename_unknown[] = "unknown.png";
+	size_t len = filename_length;
+	char *mystr = NULL;
 
+	dbg(9, "file_recv_cb:001");
 	dbg(9, "file_recv_cb:filename=%p filename_length=%d", filename, (int)filename_length);
 
-	jstring js1 = NULL;
+	dbg(9, "file_recv_cb:002");
+
 	if ((! filename)||(filename_length == 0))
 	{
+		dbg(9, "file_recv_cb:003");
+		dbg(9, "file_recv_cb:004");
+		len = strlen(filename_unknown);
+		mystr = filename_unknown;
+		dbg(9, "file_recv_cb:005");
 	}
 	else
 	{
-		js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)filename);
+		dbg(9, "file_recv_cb:006");
+		mystr = (char *)filename;
+		dbg(9, "file_recv_cb:007");
 	}
 
-	dbg(9, "file_recv_cb:js1=%d", js1);
+	jstring js1 = c_safe_string_from_java(mystr, len);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
           android_tox_callback_file_recv_cb_method, (jlong)(unsigned long long)friend_number, (jlong)(unsigned long long)file_number, (jint)kind, (jlong)(unsigned long long)file_size,
-				js1, (jlong)(unsigned long long)filename_length);
+				js1, (jlong)(unsigned long long)len);
 
 	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
 
+	dbg(9, "file_recv_cb:009");
+}
+
+jstring c_safe_string_from_java(char *instr, size_t len)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	jbyteArray data = (*jnienv2)->NewByteArray(jnienv2, (int)len);
+	(*jnienv2)->SetByteArrayRegion(jnienv2, data, 0, (int)len, (const jbyte*)instr);
+
+	jstring js1 = (jstring)(*jnienv2)->CallStaticObjectMethod(jnienv2, MainActivity, safe_string_method, data);
+	(*jnienv2)->DeleteLocalRef(jnienv2, data);
+
+	return js1;
 }
 
 void file_recv_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint32_t kind, uint64_t file_size, const uint8_t *filename, size_t filename_length, void *user_data)
@@ -1294,6 +1323,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	jclass class2 = NULL;
 	android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &class2);
 	dbg(9, "class2=%p", class2);
+
+	safe_string_method = (*env)->GetStaticMethodID(env, MainActivity, "safe_string", "([B)Ljava/lang/String;");
 
 	// jmethodID test_method = NULL;
 	// android_find_method(class2, "test", "(I)V", &test_method);

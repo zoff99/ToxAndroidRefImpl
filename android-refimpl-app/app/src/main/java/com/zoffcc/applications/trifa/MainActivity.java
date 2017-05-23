@@ -96,7 +96,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
@@ -1795,6 +1794,8 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "file_recv:incoming avatar");
 
+            String file_name_avatar = "avatar.png";
+
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
@@ -1802,7 +1803,7 @@ public class MainActivity extends AppCompatActivity
             f.kind = a_TOX_FILE_KIND;
             f.state = TOX_FILE_CONTROL_CANCEL.value;
             f.path_name = VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
-            f.file_name = filename.substring(0, (int) filename_length);
+            f.file_name = file_name_avatar;
             f.filesize = file_size;
             f.current_position = 0;
 
@@ -2076,8 +2077,8 @@ public class MainActivity extends AppCompatActivity
 
     static void update_display_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
     {
+        // TODO: write me ----
         // try to load avatar image, and set in friendlist fragment
-        // zzzzzzzzzz
     }
 
     static void move_tmp_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
@@ -2412,6 +2413,33 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static String safe_string(byte[] in)
+    {
+        Log.i(TAG, "safe_string:in=" + in);
+        String out = "";
+
+        try
+        {
+            out = new String(in, "UTF-8");  // Best way to decode using "UTF-8"
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "safe_string:EE:" + e.getMessage());
+            try
+            {
+                out = new String(in);
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+                Log.i(TAG, "safe_string:EE2:" + e2.getMessage());
+            }
+        }
+
+        Log.i(TAG, "safe_string:out=" + out);
+        return out;
+    }
 
     // --------- make app crash ---------
     // --------- make app crash ---------

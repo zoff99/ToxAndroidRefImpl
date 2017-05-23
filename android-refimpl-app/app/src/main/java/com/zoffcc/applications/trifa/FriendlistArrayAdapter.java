@@ -20,6 +20,8 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,11 +31,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
@@ -60,6 +64,8 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
     public View getView(int position, View recycled, final ViewGroup parent)
     {
         Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
+        Log.i(TAG, "getView:avatar_filename=" + values.get(position).avatar_filename);
+        Log.i(TAG, "getView:avatar_pathname=" + values.get(position).avatar_pathname);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.friend_list_entry, parent, false);
@@ -97,19 +103,74 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 
             // load(new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename)).
 
-            GlideApp.with(parent).
+            try
+            {
+                final Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(values.get(position_f).avatar_pathname + "/" + values.get(position_f).avatar_filename);
+                            info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+
+                            byte[] byteArray = new byte[(int) f1.length()];
+                            fis.read(byteArray, 0, (int) f1.length());
+                            final Bitmap bmp1 = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        avatar_f.setImageBitmap(bmp1);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Log.i(TAG, "getView:EE6:" + e.getMessage());
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+                            main_handler_s.post(myRunnable);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.i(TAG, "getView:EE5:" + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                t.start();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "getView:EE4:" + e.getMessage());
+                e.printStackTrace();
+            }
+
+
+            GlideApp.
+                    with(parent).
                     load("").
                     placeholder(d_lock).
+                    diskCacheStrategy(DiskCacheStrategy.NONE).
+                    skipMemoryCache(false).
                     into(avatar_f);
             // TODO: broken -------------------
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
             Log.i(TAG, "getView:EE:" + e.getMessage());
         }
 
         try
+
         {
             int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(values.get(position).tox_public_key_string).and().is_newEq(true).count();
             if (new_messages_count > 0)
@@ -131,6 +192,7 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
             }
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
 
@@ -141,10 +203,12 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         ImageView imageView = (ImageView) rowView.findViewById(R.id.f_status_icon);
 
         if (values.get(position).TOX_CONNECTION == 0)
+
         {
             imageView.setImageResource(R.drawable.circle_red);
         }
         else
+
         {
             imageView.setImageResource(R.drawable.circle_green);
         }
@@ -152,14 +216,17 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         ImageView imageView2 = (ImageView) rowView.findViewById(R.id.f_user_status_icon);
 
         if (values.get(position).TOX_USER_STATUS == 0)
+
         {
             imageView2.setImageResource(R.drawable.circle_green);
         }
         else if (values.get(position).TOX_USER_STATUS == 1)
+
         {
             imageView2.setImageResource(R.drawable.circle_orange);
         }
         else
+
         {
             imageView2.setImageResource(R.drawable.circle_red);
         }
