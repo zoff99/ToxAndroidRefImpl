@@ -146,7 +146,8 @@ public class TrifaToxService extends Service
     void stop_me(boolean exit_app)
     {
         Log.i(TAG, "stop_me");
-        stopSelf();
+        stopForeground(true);
+
         if (exit_app)
         {
             try
@@ -183,12 +184,19 @@ public class TrifaToxService extends Service
                         {
                             if (vfs.isMounted())
                             {
+                                Log.i(TAG, "VFS:unmount:start");
                                 vfs.unmount();
+                                Log.i(TAG, "VFS:unmount:OK");
+                            }
+                            else
+                            {
+                                Log.i(TAG, "VFS:unmount:NOT MOUNTED");
                             }
                         }
                         catch (Exception e)
                         {
                             e.printStackTrace();
+                            Log.i(TAG, "VFS:unmount:EE:" + e.getMessage());
                         }
 
                         Log.i(TAG, "stop_me:004");
@@ -202,6 +210,8 @@ public class TrifaToxService extends Service
                             e.printStackTrace();
                             Log.i(TAG, "stop_me:EE" + e.getMessage());
                         }
+
+                        stopSelf();
 
                         try
                         {
@@ -224,6 +234,14 @@ public class TrifaToxService extends Service
             catch (Exception e)
             {
                 e.printStackTrace();
+                try
+                {
+                    stopSelf();
+                }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                }
             }
         }
     }

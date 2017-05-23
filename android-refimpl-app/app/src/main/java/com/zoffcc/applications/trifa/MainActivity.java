@@ -479,7 +479,6 @@ public class MainActivity extends AppCompatActivity
 
             Log.i(TAG, "vfs:path=" + dbFile);
             vfs = VirtualFileSystem.get();
-            // vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
             vfs.mount(dbFile, PREF__DB_secrect_key);
             Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
         }
@@ -492,8 +491,8 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                Log.i(TAG, "vfs:deleting database:" + dbFile);
-                new File(dbFile).delete();
+                // Log.i(TAG, "vfs:deleting database:" + dbFile);
+                // new File(dbFile).delete();
             }
             catch (Exception e3)
             {
@@ -506,7 +505,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "vfs:path=" + dbFile);
                 vfs = VirtualFileSystem.get();
                 vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
-                vfs.mount(dbFile, PREF__DB_secrect_key);
+                vfs.mount(PREF__DB_secrect_key);
                 Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
             }
             catch (Exception e2)
@@ -2127,7 +2126,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "move_tmp_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + dst_file_name);
         try
         {
-            vfs.beginTransaction();
+            // vfs.beginTransaction();
 
             info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
             info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(dst_path_name + "/" + dst_file_name);
@@ -2135,7 +2134,7 @@ public class MainActivity extends AppCompatActivity
             dst_dir.mkdirs();
             f1.renameTo(f2);
 
-            vfs.completeTransaction();
+            // vfs.completeTransaction();
         }
         catch (Exception e)
         {
@@ -2154,7 +2153,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "copy_real_file_to_vfs_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + dst_file_name);
         try
         {
-            vfs.beginTransaction();
+            // vfs.beginTransaction();
 
             String uniq_temp_filename = get_uniq_tmp_filename("???");
             Log.i(TAG, "copy_real_file_to_vfs_file:uniq_temp_filename=" + uniq_temp_filename);
@@ -2185,7 +2184,7 @@ public class MainActivity extends AppCompatActivity
 
             move_tmp_file_to_real_file(VFS_TMP_FILE_DIR, uniq_temp_filename, dst_path_name, dst_file_name);
 
-            vfs.completeTransaction();
+            // vfs.completeTransaction();
         }
         catch (Exception e)
         {
