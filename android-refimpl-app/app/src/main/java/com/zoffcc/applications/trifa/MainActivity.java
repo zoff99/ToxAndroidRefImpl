@@ -53,9 +53,11 @@ import android.support.v8.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.v8.renderscript.Type;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.github.gfx.android.orma.AccessThreadConstraint;
 import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -2121,6 +2123,58 @@ public class MainActivity extends AppCompatActivity
         };
         t.start();
     }
+
+
+    static String get_vfs_image_filename_friend_avatar(String friend_pubkey)
+    {
+        try
+        {
+            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(friend_pubkey).toList().get(0);
+            return f.avatar_pathname + "/" + f.avatar_filename;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    static String get_vfs_image_filename_friend_avatar(long friendnum)
+    {
+        try
+        {
+            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
+            return f.avatar_pathname + "/" + f.avatar_filename;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    static void put_vfs_image_on_imageview(Context c, ImageView v, Drawable placholder, String vfs_image_filename)
+    {
+        try
+        {
+            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
+            info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+
+            byte[] byteArray = new byte[(int) f1.length()];
+            fis.read(byteArray, 0, (int) f1.length());
+
+            GlideApp.
+                    with(c).
+                    load(byteArray).
+                    placeholder(placholder).
+                    diskCacheStrategy(DiskCacheStrategy.NONE).
+                    skipMemoryCache(false).
+                    into(v);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 
     static void insert_into_friendlist_db(final FriendList f)
     {

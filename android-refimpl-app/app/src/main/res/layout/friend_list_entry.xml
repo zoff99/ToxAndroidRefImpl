@@ -1,13 +1,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="?android:attr/listPreferredItemHeight"
+              android:elevation="0dp"
+              android:padding="0dip"
+              android:layout_margin="0dp"
               android:orientation="horizontal">
-
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="fill_parent"
-                    android:layout_height="?android:attr/listPreferredItemHeight"
-                    android:padding="6dip">
+                    android:layout_height="fill_parent"
+                    android:layout_margin="2dp"
+                    android:background="@color/md_grey_100"
+                    android:backgroundTintMode="multiply"
+                    android:elevation="3dp"
+                    android:padding="2dip">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/f_avatar_icon"
@@ -18,7 +24,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginRight="6dip"
             android:src="@drawable/circle_blue"
-            app:civ_border_color="#FF000000"
+            app:civ_border_color="#40000000"
             app:civ_border_width="2dp"/>
 
         <ImageView

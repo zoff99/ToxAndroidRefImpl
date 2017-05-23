@@ -25,20 +25,21 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendInfoActivity extends AppCompatActivity
 {
     static final String TAG = "trifa.FriendInfoActy";
-    ImageView profile_icon = null;
+    de.hdodenhof.circleimageview.CircleImageView profile_icon = null;
     TextView mytoxid = null;
     TextView mynick = null;
     TextView mystatus_message = null;
@@ -53,7 +54,7 @@ public class FriendInfoActivity extends AppCompatActivity
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
 
-        profile_icon = (ImageView) findViewById(R.id.fi_profile_icon);
+        profile_icon = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.fi_profile_icon);
         mytoxid = (TextView) findViewById(R.id.fi_toxprvkey_textview);
         mynick = (TextView) findViewById(R.id.fi_nick_text);
         mystatus_message = (TextView) findViewById(R.id.fi_status_message_text);
@@ -65,7 +66,7 @@ public class FriendInfoActivity extends AppCompatActivity
         mynick.setText("*error*");
         mystatus_message.setText("*error*");
 
-        Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
         profile_icon.setImageDrawable(d1);
 
         try
@@ -100,13 +101,27 @@ public class FriendInfoActivity extends AppCompatActivity
                         };
                         main_handler_s.post(myRunnable);
                     }
-                    catch(Exception e2)
+                    catch (Exception e2)
                     {
                         e2.printStackTrace();
                     }
                 }
             };
             t.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        try
+        {
+            String fname = get_vfs_image_filename_friend_avatar(friendnum);
+            if (fname != null)
+            {
+                put_vfs_image_on_imageview(this, profile_icon, d1, fname);
+            }
         }
         catch (Exception e)
         {
