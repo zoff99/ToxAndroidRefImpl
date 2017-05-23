@@ -145,20 +145,32 @@ public class TrifaToxService extends Service
 
     void stop_me(boolean exit_app)
     {
-        Log.i(TAG, "stop_me");
+        Log.i(TAG, "stop_me:001");
+
         stopForeground(true);
+        try
+        {
+            Log.i(TAG, "stop_me:002");
+            nmn2.cancel(ONGOING_NOTIFICATION_ID);
+            Log.i(TAG, "stop_me:003");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "stop_me:EEn1" + e.getMessage());
+        }
 
         if (exit_app)
         {
             try
             {
-                Log.i(TAG, "stop_me:001");
+                Log.i(TAG, "stop_me:004");
                 Thread t = new Thread()
                 {
                     @Override
                     public void run()
                     {
-                        Log.i(TAG, "stop_me:002");
+                        Log.i(TAG, "stop_me:005");
                         long i = 0;
                         while (is_tox_started)
                         {
@@ -168,7 +180,7 @@ public class TrifaToxService extends Service
                                 break;
                             }
 
-                            Log.i(TAG, "stop_me:003");
+                            Log.i(TAG, "stop_me:006");
 
                             try
                             {
@@ -179,12 +191,24 @@ public class TrifaToxService extends Service
                                 e.printStackTrace();
                             }
                         }
+                        Log.i(TAG, "stop_me:006a");
 
                         try
                         {
                             if (vfs.isMounted())
                             {
                                 Log.i(TAG, "VFS:unmount:start");
+                                try
+                                {
+                                    Log.i(TAG, "stop_me:vfs:sleep:001");
+                                    Thread.sleep(2500);
+                                    Log.i(TAG, "stop_me:vfs:sleep:002");
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+
                                 vfs.unmount();
                                 Log.i(TAG, "VFS:unmount:OK");
                             }
@@ -199,37 +223,42 @@ public class TrifaToxService extends Service
                             Log.i(TAG, "VFS:unmount:EE:" + e.getMessage());
                         }
 
-                        Log.i(TAG, "stop_me:004");
+                        Log.i(TAG, "stop_me:007");
 
                         try
                         {
+                            Log.i(TAG, "stop_me:008");
                             nmn2.cancel(ONGOING_NOTIFICATION_ID);
+                            Log.i(TAG, "stop_me:009");
                         }
                         catch (Exception e)
                         {
                             e.printStackTrace();
-                            Log.i(TAG, "stop_me:EE" + e.getMessage());
+                            Log.i(TAG, "stop_me:EEn2" + e.getMessage());
                         }
 
+                        Log.i(TAG, "stop_me:010");
                         stopSelf();
+                        Log.i(TAG, "stop_me:011");
 
                         try
                         {
+                            Log.i(TAG, "stop_me:012");
                             Thread.sleep(1500);
+                            Log.i(TAG, "stop_me:013");
                         }
                         catch (Exception e)
                         {
                             e.printStackTrace();
                         }
-
-                        Log.i(TAG, "stop_me:005");
 
                         MainActivity.exit();
 
-                        Log.i(TAG, "stop_me:099");
+                        Log.i(TAG, "stop_me:089");
                     }
                 };
                 t.start();
+                Log.i(TAG, "stop_me:099");
             }
             catch (Exception e)
             {
@@ -248,33 +277,44 @@ public class TrifaToxService extends Service
 
     void stop_tox_fg()
     {
-        Log.i(TAG, "stop_tox_fg");
+        Log.i(TAG, "stop_tox_fg:001");
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
+                Log.i(TAG, "stop_tox_fg:002");
                 stop_me = true;
                 ToxServiceThread.interrupt();
+                Log.i(TAG, "stop_tox_fg:003");
                 try
                 {
+                    Log.i(TAG, "stop_tox_fg:004");
                     ToxServiceThread.join();
+                    Log.i(TAG, "stop_tox_fg:005");
                 }
                 catch (Exception e)
                 {
+                    Log.i(TAG, "stop_tox_fg:006:EE:" + e.getMessage());
                     e.printStackTrace();
                 }
 
                 stop_me = false; // reset flag again!
+                Log.i(TAG, "stop_tox_fg:007");
                 change_notification(0); // set to offline
+                Log.i(TAG, "stop_tox_fg:008");
                 set_all_friends_offline();
                 is_tox_started = false;
+
+                Log.i(TAG, "stop_tox_fg:009");
 
                 // nmn2.cancel(ONGOING_NOTIFICATION_ID); // -> cant remove notification because of foreground service
                 // ** // MainActivity.exit();
             }
         };
         MainActivity.main_handler_s.post(myRunnable);
+
+        Log.i(TAG, "stop_tox_fg:099");
     }
 
     void tox_thread_start_fg()
@@ -497,7 +537,6 @@ public class TrifaToxService extends Service
                 MainActivity.tox_iterate();
 
                 if (ADD_BOTS_ON_STARTUP)
-
                 {
                     boolean need_add_bots = true;
 
@@ -531,7 +570,6 @@ public class TrifaToxService extends Service
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 while (!stop_me)
-
                 {
                     try
                     {
@@ -565,42 +603,34 @@ public class TrifaToxService extends Service
 
 
                 try
-
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
-
                 {
                     e.printStackTrace();
                 }
 
                 try
-
                 {
                     MainActivity.tox_kill();
                 }
                 catch (Exception e)
-
                 {
                     e.printStackTrace();
                 }
 
                 try
-
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
-
                 {
                     e.printStackTrace();
                 }
 
             }
-        }
-
-        ;
+        };
 
         ToxServiceThread.start();
     }

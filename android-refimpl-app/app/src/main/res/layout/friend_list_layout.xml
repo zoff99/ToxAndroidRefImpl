@@ -3,22 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="0dp"
-    android:background="@android:color/transparent"
-    android:orientation="vertical"
-    android:padding="0dp">
+    android:orientation="vertical">
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:layout_marginTop="2dp"
         android:background="@android:color/transparent"
         android:divider="@null"
-        android:dividerHeight="10dp"
+        android:dividerHeight="8dp"
         android:paddingBottom="2dp"
         android:paddingLeft="2dp"
         android:paddingRight="2dp"

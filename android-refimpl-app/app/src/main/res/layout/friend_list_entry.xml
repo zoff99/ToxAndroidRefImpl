@@ -11,7 +11,6 @@
                     android:layout_height="fill_parent"
                     android:layout_margin="2dp"
                     android:background="@color/md_grey_100"
-                    android:backgroundTintMode="multiply"
                     android:elevation="3dp"
                     android:padding="2dip">
 
