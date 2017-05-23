@@ -2086,14 +2086,19 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "move_tmp_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + dst_file_name);
         try
         {
+            vfs.beginTransaction();
+
             info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
             info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(dst_path_name + "/" + dst_file_name);
             info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(dst_path_name + "/");
             dst_dir.mkdirs();
             f1.renameTo(f2);
+
+            vfs.completeTransaction();
         }
         catch (Exception e)
         {
+            Log.i(TAG, "move_tmp_file_to_real_file:EE:" + e.getMessage());
             e.printStackTrace();
         }
     }

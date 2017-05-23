@@ -39,6 +39,7 @@ import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 {
@@ -144,7 +145,7 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
                         with(parent).
                         load("").
                         placeholder(d_lock).
-                        diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).
+                        diskCacheStrategy(DiskCacheStrategy.NONE).
                         skipMemoryCache(false).
                         into(avatar_f);
                 // TODO: broken -------------------
@@ -154,6 +155,28 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
                 e.printStackTrace();
                 Log.i(TAG, "getView:EE:" + e.getMessage());
             }
+        }
+
+        try
+        {
+            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
+            Log.i(TAG, "getView:f1=" + f1);
+            info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+
+            byte[] byteArray = new byte[(int) f1.length()];
+            fis.read(byteArray, 0, (int) f1.length());
+
+            GlideApp.
+                    with(parent).
+                    load(byteArray).
+                    placeholder(d_lock).
+                    diskCacheStrategy(DiskCacheStrategy.NONE).
+                    skipMemoryCache(false).
+                    into(avatar);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
 
         try
