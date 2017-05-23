@@ -31,8 +31,10 @@ import android.content.SharedPreferences;
 import android.content.pm.LabeledIntent;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
@@ -174,6 +176,7 @@ public class MainActivity extends AppCompatActivity
     // main drawer ----------
     Drawer main_drawer = null;
     AccountHeader main_drawer_header = null;
+    ProfileDrawerItem profile_d_item = null;
     // main drawer ----------
 
     @Override
@@ -258,18 +261,25 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("About").withIcon(GoogleMaterial.Icon.gmd_info);
         PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
-        Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+
+        profile_d_item = new ProfileDrawerItem().
+                withName("me").
+                withIcon(d1);
 
         // Create the AccountHeader
-        main_drawer_header = new AccountHeaderBuilder().withActivity(this).addProfiles(new ProfileDrawerItem().withName("me").withIcon(d1)).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
-        {
-            @Override
-            public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
-            {
-                return false;
-            }
-        }).build();
-
+        main_drawer_header = new AccountHeaderBuilder().
+                withSelectionListEnabledForSingleProfile(false).
+                withActivity(this).
+                addProfiles(profile_d_item).
+                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
+                {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                    {
+                        return false;
+                    }
+                }).build();
 
         // create the drawer and remember the `Drawer` result object
         main_drawer = new DrawerBuilder().
@@ -469,8 +479,8 @@ public class MainActivity extends AppCompatActivity
 
             Log.i(TAG, "vfs:path=" + dbFile);
             vfs = VirtualFileSystem.get();
-            vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
-            vfs.mount(PREF__DB_secrect_key);
+            // vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
+            vfs.mount(dbFile, PREF__DB_secrect_key);
             Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
         }
         catch (Exception e)
@@ -496,7 +506,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "vfs:path=" + dbFile);
                 vfs = VirtualFileSystem.get();
                 vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
-                vfs.mount(PREF__DB_secrect_key);
+                vfs.mount(dbFile, PREF__DB_secrect_key);
                 Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
             }
             catch (Exception e2)
@@ -737,6 +747,28 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__min_audio_samplingrate_out:2=" + PREF__min_audio_samplingrate_out);
         // prefs ----------
+
+        try
+        {
+            profile_d_item.withIcon(get_drawable_from_vfs_image(get_vfs_image_filename_own_avatar()));
+            main_drawer_header.updateProfile(profile_d_item);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onResume:EE1:" + e.getMessage());
+            try
+            {
+                final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+                profile_d_item.withIcon(d1);
+                main_drawer_header.updateProfile(profile_d_item);
+            }
+            catch (Exception e2)
+            {
+                Log.i(TAG, "onResume:EE2:" + e2.getMessage());
+                e2.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -956,7 +988,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        super.onBackPressed();
+        if (main_drawer.isDrawerOpen())
+        {
+            main_drawer.closeDrawer();
+        }
+        else
+        {
+            super.onBackPressed();
+        }
     }
 
 
@@ -2198,6 +2237,24 @@ public class MainActivity extends AppCompatActivity
         {
             FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
             return f.avatar_pathname + "/" + f.avatar_filename;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    static Drawable get_drawable_from_vfs_image(String vfs_image_filename)
+    {
+        try
+        {
+            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
+            info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+
+            byte[] byteArray = new byte[(int) f1.length()];
+            fis.read(byteArray, 0, (int) f1.length());
+
+            return new BitmapDrawable(BitmapFactory.decodeByteArray(byteArray, 0, (int) f1.length()));
         }
         catch (Exception e)
         {

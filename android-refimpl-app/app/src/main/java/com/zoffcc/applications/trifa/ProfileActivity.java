@@ -47,11 +47,14 @@ import java.io.File;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
+import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.ToxVars.OX_MAX_STATUS_MESSAGE_LENGTH;
@@ -82,7 +85,7 @@ public class ProfileActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
         profile_icon.setImageDrawable(d1);
 
         mytoxid_textview.setText("");
@@ -124,7 +127,8 @@ public class ProfileActivity extends AppCompatActivity
                     properties.root = new java.io.File("/");
                     properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
                     properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                    properties.extensions = null;
+                    // TODO: hardcoded is always bad
+                    properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF"};
                     FilePickerDialog dialog = new FilePickerDialog(ProfileActivity.this, properties);
                     dialog.setTitle("Select Avatar");
 
@@ -139,7 +143,10 @@ public class ProfileActivity extends AppCompatActivity
                                 String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
                                 String src_filename = new File(files[0]).getName();
                                 Log.i(TAG, "select_avatar:p=" + src_path + " f=" + src_filename);
-                                // copy_real_file_to_vfs_file(files[0]);
+                                copy_real_file_to_vfs_file(src_path, src_filename, VFS_OWN_AVATAR_DIR, "avatar.png");
+                                set_g_opts("VFS_OWN_AVATAR_FNAME", VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+
+                                put_vfs_image_on_imageview(ProfileActivity.this, profile_icon, d1, VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
                             }
                             catch (Exception e)
                             {
