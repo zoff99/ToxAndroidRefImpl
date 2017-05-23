@@ -1870,13 +1870,13 @@ public class MainActivity extends AppCompatActivity
                 move_tmp_file_to_real_file(f.path_name, f.file_name, VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
 
                 // put into "File" table
-                com.zoffcc.applications.trifa.File file_ = new com.zoffcc.applications.trifa.File();
+                FileDB file_ = new FileDB();
                 file_.kind = f.kind;
                 file_.direction = f.direction;
                 file_.tox_public_key_string = f.tox_public_key_string;
                 file_.path_name = VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
                 file_.file_name = f.file_name;
-                orma.insertIntoFile(file_);
+                orma.insertIntoFileDB(file_);
 
                 Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
@@ -2105,6 +2105,55 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static String get_uniq_tmp_filename(String dummy)
+    {
+        return "temp__" + System.currentTimeMillis() + (int) (Math.random() * 10000d);
+    }
+
+    static void copy_real_file_to_vfs_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
+    {
+        Log.i(TAG, "copy_real_file_to_vfs_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + dst_file_name);
+        try
+        {
+            vfs.beginTransaction();
+
+            String uniq_temp_filename = get_uniq_tmp_filename("???");
+            Log.i(TAG, "copy_real_file_to_vfs_file:uniq_temp_filename=" + uniq_temp_filename);
+
+            java.io.File f_real = new java.io.File(src_path_name + "/" + src_file_name);
+            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
+            info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(VFS_TMP_FILE_DIR + "/");
+            dst_dir.mkdirs();
+
+            java.io.FileInputStream is = null;
+            info.guardianproject.iocipher.FileOutputStream os = null;
+            try
+            {
+                is = new java.io.FileInputStream(f_real);
+                os = new info.guardianproject.iocipher.FileOutputStream(f2);
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = is.read(buffer)) > 0)
+                {
+                    os.write(buffer, 0, length);
+                }
+            }
+            finally
+            {
+                is.close();
+                os.close();
+            }
+
+            move_tmp_file_to_real_file(VFS_TMP_FILE_DIR, uniq_temp_filename, dst_path_name, dst_file_name);
+
+            vfs.completeTransaction();
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "copy_real_file_to_vfs_file:EE:" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     static void insert_into_message_db(final Message m, final boolean update_message_view_flag)
     {
@@ -2124,6 +2173,11 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
+
+    static String get_vfs_image_filename_own_avatar()
+    {
+        return get_g_opts("VFS_OWN_AVATAR_FNAME");
+    }
 
     static String get_vfs_image_filename_friend_avatar(String friend_pubkey)
     {
@@ -2175,6 +2229,55 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static String get_g_opts(String key)
+    {
+        try
+        {
+            TRIFADatabaseGlobals g_opts = orma.selectFromTRIFADatabaseGlobals().keyEq(key).get(0);
+            return g_opts.value;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "get_g_opts:EE1:" + e.getMessage());
+            return null;
+        }
+    }
+
+    static void set_g_opts(String key, String value)
+    {
+        try
+        {
+            TRIFADatabaseGlobals g_opts = new TRIFADatabaseGlobals();
+            g_opts.key = key;
+            g_opts.value = value;
+
+            try
+            {
+                orma.insertIntoTRIFADatabaseGlobals(g_opts);
+                Log.i(TAG, "set_g_opts:(INSERT)");
+            }
+            catch (android.database.sqlite.SQLiteConstraintException e)
+            {
+                e.printStackTrace();
+                try
+                {
+                    orma.updateTRIFADatabaseGlobals().keyEq(key).value(value).execute();
+                    Log.i(TAG, "set_g_opts:(UPDATE)");
+                }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                    Log.i(TAG, "set_g_opts:EE1:" + e2.getMessage());
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "set_g_opts:EE2:" + e.getMessage());
+        }
+    }
 
     static void insert_into_friendlist_db(final FriendList f)
     {

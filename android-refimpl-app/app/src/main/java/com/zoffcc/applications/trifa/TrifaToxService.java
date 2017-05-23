@@ -38,9 +38,11 @@ import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
+import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
+import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
@@ -480,26 +482,18 @@ public class TrifaToxService extends Service
 
                 {
                     boolean need_add_bots = true;
-                    List<TRIFADatabaseGlobals> dbg = null;
+
                     try
                     {
-                        dbg = orma.selectFromTRIFADatabaseGlobals().keyEq("ADD_BOTS_ON_STARTUP_done").toList();
+                        if (get_g_opts("ADD_BOTS_ON_STARTUP_done").equals("true"))
+                        {
+                            need_add_bots = false;
+                            Log.i(TAG, "need_add_bots=false");
+                        }
                     }
                     catch (Exception e)
                     {
-                        dbg = null;
-                    }
-
-                    if (dbg != null)
-                    {
-                        if (dbg.size() > 0)
-                        {
-                            if (dbg.get(0).value.equals("true"))
-                            {
-                                need_add_bots = false;
-                                Log.i(TAG, "need_add_bots=false");
-                            }
-                        }
+                        e.printStackTrace();
                     }
 
                     if (need_add_bots)
@@ -507,27 +501,8 @@ public class TrifaToxService extends Service
                         Log.i(TAG, "need_add_bots:start");
                         add_friend_real(ECHOBOT_TOXID);
                         add_friend_real(GROUPBOT_TOXID);
-                        try
-                        {
-                            TRIFADatabaseGlobals g_opts = new TRIFADatabaseGlobals();
-                            g_opts.key = "ADD_BOTS_ON_STARTUP_done";
-                            g_opts.value = "true";
-                            orma.insertIntoTRIFADatabaseGlobals(g_opts);
-                            Log.i(TAG, "need_add_bots=true (INSERT)");
-                        }
-                        catch (android.database.sqlite.SQLiteConstraintException e)
-                        {
-                            e.printStackTrace();
-                            try
-                            {
-                                orma.updateTRIFADatabaseGlobals().keyEq("ADD_BOTS_ON_STARTUP_done").value("true").execute();
-                                Log.i(TAG, "need_add_bots=true (UPDATE)");
-                            }
-                            catch (Exception e2)
-                            {
-                                e2.printStackTrace();
-                            }
-                        }
+                        set_g_opts("ADD_BOTS_ON_STARTUP_done", "true");
+                        Log.i(TAG, "need_add_bots=true (INSERT)");
                     }
                 }
 

@@ -27,7 +27,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIF
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 
 @Table
-public class File
+public class FileDB
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id;
@@ -47,9 +47,9 @@ public class File
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String file_name = "";
 
-    static File deep_copy(File in)
+    static FileDB deep_copy(FileDB in)
     {
-        File out = new File();
+        FileDB out = new FileDB();
         out.kind = in.kind;
         out.direction = in.direction;
         out.tox_public_key_string = in.tox_public_key_string;

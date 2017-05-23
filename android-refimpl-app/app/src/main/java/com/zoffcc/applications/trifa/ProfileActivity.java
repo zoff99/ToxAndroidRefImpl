@@ -22,13 +22,20 @@ package com.zoffcc.applications.trifa;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.angads25.filepicker.controller.DialogSelectionListener;
+import com.github.angads25.filepicker.model.DialogConfigs;
+import com.github.angads25.filepicker.model.DialogProperties;
+import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -36,10 +43,12 @@ import com.google.zxing.common.BitMatrix;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import java.io.File;
+
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
-import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
-import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message;
+import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
@@ -51,7 +60,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NAME_LENGTH;
 public class ProfileActivity extends AppCompatActivity
 {
     static final String TAG = "trifa.ProfileActy";
-    ImageView profile_icon = null;
+    de.hdodenhof.circleimageview.CircleImageView profile_icon = null;
     ImageView mytoxid_imageview = null;
     TextView mytoxid_textview = null;
     EditText mynick_edittext = null;
@@ -64,7 +73,7 @@ public class ProfileActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        profile_icon = (ImageView) findViewById(R.id.profile_icon);
+        profile_icon = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile_icon);
         mytoxid_imageview = (ImageView) findViewById(R.id.mytoxid_imageview);
         mytoxid_textview = (TextView) findViewById(R.id.mytoxid_textview);
         mynick_edittext = (EditText) findViewById(R.id.mynick_edittext);
@@ -101,6 +110,66 @@ public class ProfileActivity extends AppCompatActivity
 
         }
 
+        profile_icon.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    // select new avatar image
+                    DialogProperties properties = new DialogProperties();
+                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                    properties.selection_type = DialogConfigs.FILE_SELECT;
+                    properties.root = new java.io.File("/");
+                    properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                    properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                    properties.extensions = null;
+                    FilePickerDialog dialog = new FilePickerDialog(ProfileActivity.this, properties);
+                    dialog.setTitle("Select Avatar");
+
+                    dialog.setDialogSelectionListener(new DialogSelectionListener()
+                    {
+                        @Override
+                        public void onSelectedFilePaths(String[] files)
+                        {
+                            try
+                            {
+                                Log.i(TAG, "select_avatar:" + files);
+                                String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
+                                String src_filename = new File(files[0]).getName();
+                                Log.i(TAG, "select_avatar:p=" + src_path + " f=" + src_filename);
+                                // copy_real_file_to_vfs_file(files[0]);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "select_avatar:EE1:" + e.getMessage());
+                            }
+                        }
+                    });
+
+                    dialog.show();
+                }
+                else
+                {
+                }
+                return true;
+            }
+        });
+
+        try
+        {
+            String fname = get_vfs_image_filename_own_avatar();
+            if (fname != null)
+            {
+                put_vfs_image_on_imageview(this, profile_icon, d1, fname);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
