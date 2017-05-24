@@ -47,6 +47,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -267,6 +269,7 @@ public class MessageListActivity extends AppCompatActivity
             m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
             m.direction = 1; // msg sent
             m.TOX_MESSAGE_TYPE = 0;
+            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
             m.rcvd_timestamp = 0L;
             m.sent_timestamp = System.currentTimeMillis();
             m.read = false;

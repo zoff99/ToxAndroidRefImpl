@@ -25,6 +25,9 @@ import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
+
 @Table
 public class Message
 {
@@ -34,9 +37,6 @@ public class Message
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     long message_id = -1;
 
-    // @Column(indexed = true, helpers = Column.Helpers.ALL)
-    // long tox_friendnum;
-
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String tox_friendpubkey;
 
@@ -45,6 +45,18 @@ public class Message
 
     @Column(indexed = true)
     int TOX_MESSAGE_TYPE = 0; // 0 -> normal, 1 -> action
+
+    @Column(indexed = true, defaultExpr = "0")
+    int TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+
+    @Column(indexed = true, defaultExpr = "2", helpers = Column.Helpers.ALL)
+    int state = TOX_FILE_CONTROL_CANCEL.value;
+
+    @Column(indexed = true, defaultExpr = "-1")
+    long filedb_id; // f_key -> FileDB.id
+
+    @Column(indexed = true, defaultExpr = "-1")
+    long filetransfer_id; // f_key -> Filetransfer.id
 
     @Column(helpers = Column.Helpers.ALL)
     @Nullable
@@ -73,6 +85,7 @@ public class Message
         Message out = new Message();
         out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
+        out.TRIFA_MESSAGE_TYPE = in.TRIFA_MESSAGE_TYPE;
         out.sent_timestamp = in.sent_timestamp;
         out.rcvd_timestamp = in.rcvd_timestamp;
         out.read = in.read;
@@ -81,6 +94,9 @@ public class Message
         out.filename_fullpath = in.filename_fullpath;
         out.message_id = in.message_id;
         out.is_new = in.is_new;
+        out.state = in.state;
+        out.filedb_id = in.filedb_id;
+        out.filetransfer_id = in.filetransfer_id;
 
         return out;
     }
@@ -88,6 +104,6 @@ public class Message
     @Override
     public String toString()
     {
-        return "id=" + id + ", message_id=" + message_id + ", tox_friendpubkey=" + tox_friendpubkey + ", direction=" + direction + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new;
+        return "id=" + id + ", message_id=" + message_id + ", tox_friendpubkey=" + tox_friendpubkey + ", direction=" + direction + ", state=" + state + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new;
     }
 }

@@ -93,13 +93,17 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
@@ -466,10 +470,6 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
         }
 
-        Log.i(TAG, "db:migrate");
-        orma.migrate();
-        Log.i(TAG, "db:migrate=OK");
-
         try
         {
             String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
@@ -487,7 +487,7 @@ public class MainActivity extends AppCompatActivity
                     vfs.unmount();
                 }
             }
-            catch(Exception e4)
+            catch (Exception e4)
             {
                 Log.i(TAG, "vfs:EE4:" + e4.getMessage());
                 e4.printStackTrace();
@@ -505,8 +505,8 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                // Log.i(TAG, "vfs:deleting database:" + dbFile);
-                // new File(dbFile).delete();
+                Log.i(TAG, "vfs:deleting database:" + dbFile);
+                new File(dbFile).delete();
             }
             catch (Exception e3)
             {
@@ -1273,7 +1273,7 @@ public class MainActivity extends AppCompatActivity
         main_handler_s.post(myRunnable);
     }
 
-    synchronized static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
+    static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
     {
         if (Callstate.other_video_enabled == 0)
         {
@@ -1747,6 +1747,7 @@ public class MainActivity extends AppCompatActivity
         m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = friend_message;
 
@@ -1830,9 +1831,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void android_tox_callback_file_recv_control_cb_method(long friend_number, long file_number, int control)
+    static void android_tox_callback_file_recv_control_cb_method(long friend_number, long file_number, int a_TOX_FILE_CONTROL)
     {
-        Log.i(TAG, "file_recv_control:" + friend_number + ":" + file_number + ":" + control);
+        Log.i(TAG, "file_recv_control:" + friend_number + ":" + file_number + ":" + a_TOX_FILE_CONTROL);
+
+        if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_CANCEL.value)
+        {
+            cancel_filetransfer(friend_number, file_number);
+        }
+        else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_RESUME.value)
+        {
+        }
+        else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_PAUSE.value)
+        {
+        }
     }
 
     static void android_tox_callback_file_chunk_request_cb_method(long friend_number, long file_number, long position, long length)
@@ -1866,9 +1878,48 @@ public class MainActivity extends AppCompatActivity
             // TODO: we just accept incoming avatar, maybe make some checks first?
             tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_RESUME.value);
         }
-        else
+        else // DATA file ft
         {
             Log.i(TAG, "file_recv:incoming regular file");
+
+            String file_name_avatar = "avatar.png";
+
+            Filetransfer f = new Filetransfer();
+            f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
+            f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
+            f.file_number = file_number;
+            f.kind = a_TOX_FILE_KIND;
+            f.state = TOX_FILE_CONTROL_CANCEL.value;
+            f.path_name = VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
+            f.file_name = filename;
+            f.filesize = file_size;
+            f.current_position = 0;
+
+            insert_into_filetransfer_db(f);
+
+            // add FT message to UI
+            Message m = new Message();
+
+            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
+            m.direction = 0; // msg received
+            m.TOX_MESSAGE_TYPE = 0;
+            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
+            m.rcvd_timestamp = System.currentTimeMillis();
+            m.text = filename + "\n" + file_size + " bytes";
+
+            insert_into_message_db(m, true);
+
+            try
+            {
+                // update "new" status on friendlist fragment
+                FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                friend_list_fragment.modify_friend(f2, friend_number);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
+            }
         }
     }
 
@@ -2070,6 +2121,33 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent, AddFriendActivity_ID);
     }
 
+    static void cancel_filetransfer(long friend_number, long file_number)
+    {
+        Filetransfer f = null;
+        try
+        {
+            f = orma.selectFromFiletransfer().file_numberEq(file_number).and().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).toList().get(0);
+            if (f.direction == TRIFA_FT_DIRECTION_INCOMING.value)
+            {
+                if (f.kind == TOX_FILE_KIND_DATA.value)
+                {
+                    // TODO: send cancel to UI
+                }
+                else // avatar FT
+                {
+                }
+                orma.deleteFromFiletransfer().file_numberEq(file_number).and().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).execute();
+            }
+            else // outgoing FT
+            {
+            }
+            f.state = TOX_FILE_CONTROL_CANCEL.value;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     static void update_filetransfer_db_fos_open(final Filetransfer f)
     {
