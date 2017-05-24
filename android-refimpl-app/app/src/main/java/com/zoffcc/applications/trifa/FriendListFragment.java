@@ -211,13 +211,13 @@ public class FriendListFragment extends ListFragment
 
     void modify_friend(final FriendList f, final long friendnum)
     {
-        Log.i(TAG, "modify_friend:start");
+        // Log.i(TAG, "modify_friend:start");
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                Log.i(TAG, "modify_friend:run---");
+                // Log.i(TAG, "modify_friend:run---");
                 try
                 {
                     boolean found_friend = false;
@@ -230,7 +230,7 @@ public class FriendListFragment extends ListFragment
                             found_friend = true;
                             FriendList n = deep_copy(f);
                             data_values.set(i, n);
-                            Log.i(TAG, "modify_friend:found friend:" + friendnum);
+                            // Log.i(TAG, "modify_friend:found friend:" + friendnum);
                             a.notifyDataSetChanged();
                         }
                     }
@@ -244,7 +244,7 @@ public class FriendListFragment extends ListFragment
                 {
                     e.printStackTrace();
                 }
-                Log.i(TAG, "modify_friend:end---");
+                // Log.i(TAG, "modify_friend:end---");
             }
         };
         try
@@ -256,7 +256,7 @@ public class FriendListFragment extends ListFragment
             e.printStackTrace();
             Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
         }
-        Log.i(TAG, "modify_friend:finished");
+        // Log.i(TAG, "modify_friend:finished");
     }
 
     @Override

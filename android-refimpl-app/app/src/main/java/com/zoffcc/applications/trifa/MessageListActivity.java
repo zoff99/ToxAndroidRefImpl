@@ -132,7 +132,7 @@ public class MessageListActivity extends AppCompatActivity
                         }
                         catch (Exception e)
                         {
-                            e.printStackTrace();
+                            // e.printStackTrace();
                             // ok, dont update typing flag
                             skip_flag_update = true;
                         }

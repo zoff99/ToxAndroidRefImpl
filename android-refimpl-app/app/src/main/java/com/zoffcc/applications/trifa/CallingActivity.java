@@ -195,7 +195,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             }
                             catch (Exception e)
                             {
-                                e.printStackTrace();
+                                // e.printStackTrace();
                             }
                             toggle_camera();
                         }

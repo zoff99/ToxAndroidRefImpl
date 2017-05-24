@@ -112,7 +112,15 @@ import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivity";
-    final static boolean CTOXCORE_NATIVE_LOGGING = true;
+    // --------- global config ---------
+    // --------- global config ---------
+    // --------- global config ---------
+    final static boolean CTOXCORE_NATIVE_LOGGING = false;
+    final static boolean ORMA_TRACE = false;
+    // --------- global config ---------
+    // --------- global config ---------
+    // --------- global config ---------
+
     static TextView mt = null;
     static boolean native_lib_loaded = false;
     static String app_files_directory = "";
@@ -136,7 +144,6 @@ public class MainActivity extends AppCompatActivity
     static MessageListActivity message_list_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
-    final static boolean ORMA_TRACE = true;
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
@@ -156,7 +163,7 @@ public class MainActivity extends AppCompatActivity
     static int[] audio_buffer_2_read_length = new int[audio_in_buffer_max_count];
     static TrifaToxService tox_service_fg = null;
     //
-    static boolean PREF__UV_reversed = true; // TODO: on older phone this needs to be "false"
+    static boolean PREF__UV_reversed = true; // TODO: on older phones this needs to be "false"
     static boolean PREF__notification_sound = true;
     static boolean PREF__notification_vibrate = false;
     static boolean PREF__notification = true;
@@ -660,7 +667,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         catch (Exception e)
                         {
-                            e.printStackTrace();
+                            // e.printStackTrace();
                         }
                     }
 
@@ -986,7 +993,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         catch (Exception e)
                         {
-                            e.printStackTrace();
+                            // e.printStackTrace();
                         }
                     }
                     Log.i(TAG, "change_notification:change");
@@ -1578,7 +1585,7 @@ public class MainActivity extends AppCompatActivity
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
 
             try
@@ -1587,7 +1594,7 @@ public class MainActivity extends AppCompatActivity
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
     }
@@ -1609,7 +1616,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    //  e.printStackTrace();
                 }
 
                 try
@@ -1645,7 +1652,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
             }
         };
@@ -1719,7 +1726,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
@@ -2459,8 +2466,15 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            TRIFADatabaseGlobals g_opts = orma.selectFromTRIFADatabaseGlobals().keyEq(key).get(0);
-            return g_opts.value;
+            if (orma.selectFromTRIFADatabaseGlobals().keyEq(key).count() == 1)
+            {
+                TRIFADatabaseGlobals g_opts = orma.selectFromTRIFADatabaseGlobals().keyEq(key).get(0);
+                return g_opts.value;
+            }
+            else
+            {
+                return null;
+            }
         }
         catch (Exception e)
         {
@@ -2505,17 +2519,34 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void insert_into_friendlist_db(final FriendList f)
+    synchronized static void insert_into_friendlist_db(final FriendList f)
     {
-        Thread t = new Thread()
+        //        Thread t = new Thread()
+        //        {
+        //            @Override
+        //            public void run()
+        //            {
+        try
         {
-            @Override
-            public void run()
+            if (orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).count() == 0)
             {
                 orma.insertIntoFriendList(f);
+                Log.i(TAG, "friend added tp DB: " + f.tox_public_key_string);
             }
-        };
-        t.start();
+            else
+            {
+                // friend already in DB
+                Log.i(TAG, "friend already in DB: " + f.tox_public_key_string);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "friend added tp DB:EE:" + e.getMessage());
+        }
+        //            }
+        //        };
+        //        t.start();
     }
 
     static void delete_friend_all_files(final long friendnum)
@@ -2643,6 +2674,8 @@ public class MainActivity extends AppCompatActivity
             }
             f.TOX_USER_STATUS = 0;
             f.TOX_CONNECTION = 0;
+            f.avatar_filename = null;
+            f.avatar_pathname = null;
 
             try
             {
@@ -2650,7 +2683,7 @@ public class MainActivity extends AppCompatActivity
             }
             catch (android.database.sqlite.SQLiteConstraintException e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
 
             friend_list_fragment.modify_friend(f, friendnum);

@@ -102,7 +102,7 @@ public class MessageListFragment extends ListFragment
                 {
                     Log.i(TAG, "scroll to bottom:1");
                     Thread.sleep(300); // TODO: really back hack!!
-                    // scroll to bottom
+                    // scroll to bottom of message list
                     scroll_to_bottom();
                     Log.i(TAG, "scroll to bottom:1.a");
                 }
@@ -123,59 +123,6 @@ public class MessageListFragment extends ListFragment
     {
         Log.i(TAG, "onAttach(Activity)");
         super.onAttach(activity);
-
-        //        MessageListActivity mla = (MessageListActivity) (getActivity());
-        //        current_friendnum = mla.get_current_friendnum();
-        //        Log.i(TAG, "current_friendnum=" + current_friendnum);
-        //
-        //        try
-        //        {
-        //            // reset "new" flags for messages -------
-        //            orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
-        //            // reset "new" flags for messages -------
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            e.printStackTrace();
-        //        }
-        //
-        //        try
-        //        {
-        //            data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            e.printStackTrace();
-        //            // data_values is NULL here!!
-        //        }
-        //        a = new MessagelistArrayAdapter(activity, data_values);
-        //        setListAdapter(a);
-        //
-        //        // TODO this is just a bad hack, fix me!! -----------------
-        //        final Thread t1 = new Thread()
-        //        {
-        //            @Override
-        //            public void run()
-        //            {
-        //                try
-        //                {
-        //                    Log.i(TAG, "scroll to bottom:2");
-        //                    Thread.sleep(300); // TODO: really back hack!!
-        //                    // scroll to bottom
-        //                    Log.i(TAG, "scroll to bottom:3");
-        //                    scroll_to_bottom();
-        //                    Log.i(TAG, "scroll to bottom:4");
-        //                }
-        //                catch (Exception e)
-        //                {
-        //                    e.printStackTrace();
-        //                    Log.i(TAG, "scroll to bottom:EE2:" + e.getMessage());
-        //                }
-        //            }
-        //        };
-        //        t1.start();
-        //        // TODO this is just a bad hack, fix me!! -----------------
-
     }
 
 
@@ -189,6 +136,7 @@ public class MessageListFragment extends ListFragment
                 try
                 {
                     // scroll to bottom
+                    Log.i(TAG, "data_values.size()=" + data_values.size() + " data_values=" + data_values);
                     setSelection(data_values.size());
                 }
                 catch (Exception e)
@@ -197,8 +145,7 @@ public class MessageListFragment extends ListFragment
                     Log.i(TAG, "scroll_to_bottom:EE1:" + e.getMessage());
                 }
             }
-        };
-        main_handler_s.post(myRunnable);
+        }; main_handler_s.post(myRunnable);
     }
 
     void update_all_messages()

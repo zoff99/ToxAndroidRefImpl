@@ -107,7 +107,7 @@ public class CameraWrapper
                     }
                     catch (InterruptedException e1)
                     {
-                        e1.printStackTrace();
+                        // e1.printStackTrace();
                     }
 
                     try
