@@ -479,6 +479,20 @@ public class MainActivity extends AppCompatActivity
 
             Log.i(TAG, "vfs:path=" + dbFile);
             vfs = VirtualFileSystem.get();
+
+            try
+            {
+                if (vfs.isMounted())
+                {
+                    vfs.unmount();
+                }
+            }
+            catch(Exception e4)
+            {
+                Log.i(TAG, "vfs:EE4:" + e4.getMessage());
+                e4.printStackTrace();
+            }
+
             vfs.mount(dbFile, PREF__DB_secrect_key);
             Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
         }
