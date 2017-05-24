@@ -857,7 +857,7 @@ void android_tox_callback_file_recv_cb(uint32_t friend_number, uint32_t file_num
 	size_t len = filename_length;
 	char *mystr = NULL;
 
-	dbg(9, "file_recv_cb:001");
+	dbg(9, "file_recv_cb:001:file_number=%d", (int)file_number);
 	dbg(9, "file_recv_cb:filename=%p filename_length=%d", filename, (int)filename_length);
 
 	dbg(9, "file_recv_cb:002");

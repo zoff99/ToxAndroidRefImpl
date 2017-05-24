@@ -124,17 +124,17 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         {
                                             // accept FT
                                             Log.i(TAG, "button_ok:OnTouch:001");
-                                            values.get(position).ft_accepted = true;
+                                            //values.get(position).ft_accepted = true;
                                             Log.i(TAG, "button_ok:OnTouch:002");
-                                            //values.get(position).state = TOX_FILE_CONTROL_RESUME.value;
+                                            values.get(position).state = TOX_FILE_CONTROL_RESUME.value;
                                             Log.i(TAG, "button_ok:OnTouch:003");
-                                            //set_filetransfer_accepted_from_id(values.get(position).filetransfer_id);
+                                            set_filetransfer_accepted_from_id(values.get(position).filetransfer_id);
                                             Log.i(TAG, "button_ok:OnTouch:004");
-                                            //set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
+                                            set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
                                             Log.i(TAG, "button_ok:OnTouch:005");
-                                            //set_message_accepted_from_id(values.get(position).id);
+                                            set_message_accepted_from_id(values.get(position).id);
                                             Log.i(TAG, "button_ok:OnTouch:006");
-                                            //set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_RESUME.value);
+                                            set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_RESUME.value);
                                             Log.i(TAG, "button_ok:OnTouch:007");
                                             button_ok.setVisibility(View.GONE);
                                             Log.i(TAG, "button_ok:OnTouch:008");
