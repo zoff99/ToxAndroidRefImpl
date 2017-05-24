@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     final static boolean CTOXCORE_NATIVE_LOGGING = false;
-    final static boolean ORMA_TRACE = false;
+    final static boolean ORMA_TRACE = true;
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
@@ -476,6 +476,14 @@ public class MainActivity extends AppCompatActivity
                     build();
             Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
         }
+
+        // ----- Clear all messages from DB -----
+        // ----- Clear all messages from DB -----
+        // ----- Clear all messages from DB -----
+        orma.deleteFromMessage().execute();
+        // ----- Clear all messages from DB -----
+        // ----- Clear all messages from DB -----
+        // ----- Clear all messages from DB -----
 
         try
         {
@@ -1854,13 +1862,16 @@ public class MainActivity extends AppCompatActivity
 
         if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_CANCEL.value)
         {
+            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_CANCEL");
             cancel_filetransfer(friend_number, file_number);
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_RESUME.value)
         {
+            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME");
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_PAUSE.value)
         {
+            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_PAUSE");
         }
     }
 
@@ -1898,8 +1909,6 @@ public class MainActivity extends AppCompatActivity
         else // DATA file ft
         {
             Log.i(TAG, "file_recv:incoming regular file");
-
-            String file_name_avatar = "avatar.png";
 
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
@@ -2168,7 +2177,14 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            return orma.selectFromFiletransfer().idEq(filetransfer_id).get(0).file_number;
+            if (orma.selectFromFiletransfer().idEq(filetransfer_id).count() == 1)
+            {
+                return orma.selectFromFiletransfer().idEq(filetransfer_id).get(0).file_number;
+            }
+            else
+            {
+                return -1;
+            }
         }
         catch (Exception e)
         {
