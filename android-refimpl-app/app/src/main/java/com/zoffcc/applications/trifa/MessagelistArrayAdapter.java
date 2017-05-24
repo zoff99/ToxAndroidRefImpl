@@ -123,14 +123,23 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         try
                                         {
                                             // accept FT
-                                            tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_RESUME.value);
+                                            Log.i(TAG, "button_ok:OnTouch:001");
                                             values.get(position).ft_accepted = true;
-                                            values.get(position).state = TOX_FILE_CONTROL_RESUME.value;
-                                            set_filetransfer_accepted_from_id(values.get(position).filetransfer_id);
-                                            set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
-                                            set_message_accepted_from_id(values.get(position).id);
-                                            set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_RESUME.value);
+                                            Log.i(TAG, "button_ok:OnTouch:002");
+                                            //values.get(position).state = TOX_FILE_CONTROL_RESUME.value;
+                                            Log.i(TAG, "button_ok:OnTouch:003");
+                                            //set_filetransfer_accepted_from_id(values.get(position).filetransfer_id);
+                                            Log.i(TAG, "button_ok:OnTouch:004");
+                                            //set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
+                                            Log.i(TAG, "button_ok:OnTouch:005");
+                                            //set_message_accepted_from_id(values.get(position).id);
+                                            Log.i(TAG, "button_ok:OnTouch:006");
+                                            //set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_RESUME.value);
+                                            Log.i(TAG, "button_ok:OnTouch:007");
                                             button_ok.setVisibility(View.GONE);
+                                            Log.i(TAG, "button_ok:OnTouch:008");
+                                            tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_RESUME.value);
+                                            Log.i(TAG, "button_ok:OnTouch:009");
                                         }
                                         catch (Exception e)
                                         {
@@ -156,20 +165,13 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             // cancel FT
                                             Log.i(TAG, "button_cancel:OnTouch:001");
                                             values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
-                                            Log.i(TAG, "button_cancel:OnTouch:002");
                                             tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
-                                            Log.i(TAG, "button_cancel:OnTouch:003");
                                             set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
-                                            Log.i(TAG, "button_cancel:OnTouch:004");
                                             set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_CANCEL.value);
-                                            Log.i(TAG, "button_cancel:OnTouch:005");
 
                                             button_ok.setVisibility(View.GONE);
-                                            Log.i(TAG, "button_cancel:OnTouch:006");
                                             button_cancel.setVisibility(View.GONE);
-                                            Log.i(TAG, "button_cancel:OnTouch:007");
                                             ft_progressbar.setVisibility(View.GONE);
-                                            Log.i(TAG, "button_cancel:OnTouch:008");
                                         }
                                         catch (Exception e)
                                         {
@@ -184,7 +186,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 
                             TextView textView = (TextView) rowView.findViewById(R.id.m_text);
 
-                            // TODO: maybe make the FT text here?
+                            // TODO: make text betters
                             textView.setText("" + values.get(position).text);
 
                             ft_progressbar.setIndeterminate(true);

@@ -117,7 +117,7 @@ public class MessageListActivity extends AppCompatActivity
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
 
                 typing_flag_thread = new Thread()

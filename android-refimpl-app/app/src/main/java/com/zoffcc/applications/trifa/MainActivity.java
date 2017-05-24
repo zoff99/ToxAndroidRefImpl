@@ -1858,7 +1858,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_control_cb_method(long friend_number, long file_number, int a_TOX_FILE_CONTROL)
     {
-        Log.i(TAG, "file_recv_control:" + friend_number + ":" + file_number + ":" + a_TOX_FILE_CONTROL);
+        Log.i(TAG, "file_recv_control:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_CONTROL);
 
         if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_CANCEL.value)
         {
@@ -1882,7 +1882,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
     {
-        Log.i(TAG, "file_recv:" + friend_number + ":" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" + filename + ":" + filename_length);
+        Log.i(TAG, "file_recv:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" + filename + ":" + filename_length);
 
         if (a_TOX_FILE_KIND == TOX_FILE_KIND_AVATAR.value)
         {
@@ -1956,7 +1956,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
     {
-        Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
+        Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
 
         Filetransfer f = null;
         try
@@ -2790,7 +2790,7 @@ public class MainActivity extends AppCompatActivity
 
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             Log.i(TAG, "update_message_view:EE:" + e.getMessage());
         }
     }
