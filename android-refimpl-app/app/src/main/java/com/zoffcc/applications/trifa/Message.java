@@ -26,7 +26,7 @@ import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 
 @Table
 public class Message
@@ -49,8 +49,11 @@ public class Message
     @Column(indexed = true, defaultExpr = "0")
     int TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
 
-    @Column(indexed = true, defaultExpr = "2", helpers = Column.Helpers.ALL)
-    int state = TOX_FILE_CONTROL_CANCEL.value;
+    @Column(indexed = true, defaultExpr = "1", helpers = Column.Helpers.ALL)
+    int state = TOX_FILE_CONTROL_PAUSE.value;
+
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    boolean ft_accepted = false;
 
     @Column(indexed = true, defaultExpr = "-1")
     long filedb_id; // f_key -> FileDB.id
@@ -83,20 +86,21 @@ public class Message
     static Message deep_copy(Message in)
     {
         Message out = new Message();
+        out.message_id = in.message_id;
+        out.tox_friendpubkey = in.tox_friendpubkey;
         out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
         out.TRIFA_MESSAGE_TYPE = in.TRIFA_MESSAGE_TYPE;
+        out.state = in.state;
+        out.ft_accepted = in.ft_accepted;
+        out.filedb_id = in.filedb_id;
+        out.filetransfer_id = in.filetransfer_id;
         out.sent_timestamp = in.sent_timestamp;
         out.rcvd_timestamp = in.rcvd_timestamp;
         out.read = in.read;
-        out.text = in.text;
-        out.tox_friendpubkey = in.tox_friendpubkey;
-        out.filename_fullpath = in.filename_fullpath;
-        out.message_id = in.message_id;
         out.is_new = in.is_new;
-        out.state = in.state;
-        out.filedb_id = in.filedb_id;
-        out.filetransfer_id = in.filetransfer_id;
+        out.text = in.text;
+        out.filename_fullpath = in.filename_fullpath;
 
         return out;
     }

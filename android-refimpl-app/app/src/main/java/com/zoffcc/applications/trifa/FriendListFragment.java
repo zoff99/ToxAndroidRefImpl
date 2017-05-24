@@ -40,6 +40,8 @@ import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
+import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
+import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -115,14 +117,25 @@ public class FriendListFragment extends ListFragment
                                                 Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
 
                                                 // delete friend -------
-                                                Log.i(TAG, "onMenuItemClick:3:pubkey=" + data_values.get(position_).tox_public_key_string);
+                                                Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + data_values.get(position_).tox_public_key_string);
                                                 delete_friend(data_values.get(position_).tox_public_key_string);
                                                 // delete friend -------
 
                                                 // delete friends messages -------
-                                                Log.i(TAG, "onMenuItemClick:2:fnum=" + friend_num_temp);
+                                                Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
                                                 delete_friend_all_messages(friend_num_temp);
                                                 // delete friend  messages -------
+
+                                                // delete friends files -------
+                                                Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
+                                                delete_friend_all_files(friend_num_temp);
+                                                // delete friend  files -------
+
+                                                // delete friends FTs -------
+                                                Log.i(TAG, "onMenuItemClick:1.d:fnum=" + friend_num_temp);
+                                                delete_friend_all_filetransfers(friend_num_temp);
+                                                // delete friend  FTs -------
+
 
                                                 // delete friend - tox ----
                                                 Log.i(TAG, "onMenuItemClick:4");
@@ -184,27 +197,16 @@ public class FriendListFragment extends ListFragment
         data_values.clear();
         a = new FriendlistArrayAdapter(context, data_values);
         setListAdapter(a);
-
-        //        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
-        //        {
-        //            @Override
-        //            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int position, long id)
-        //            {
-        //                Toast.makeText(getActivity(), "On long click listener", Toast.LENGTH_LONG).show();
-        //                // tox_friend_delete
-        //                return true;
-        //            }
-        //        });
     }
 
     @Override
     public void onAttach(Activity activity)
     {
-        Log.i(TAG, "onAttach()");
+        Log.i(TAG, "onAttach(Activity)");
         super.onAttach(activity);
-        data_values.clear();
-        a = new FriendlistArrayAdapter(activity, data_values);
-        setListAdapter(a);
+        //data_values.clear();
+        //a = new FriendlistArrayAdapter(activity, data_values);
+        //setListAdapter(a);
     }
 
     void modify_friend(final FriendList f, final long friendnum)

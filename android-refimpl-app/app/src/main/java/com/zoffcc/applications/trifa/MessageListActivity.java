@@ -69,7 +69,9 @@ public class MessageListActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.i(TAG,"onCreate:001");
         super.onCreate(savedInstanceState);
+        Log.i(TAG,"onCreate:002");
 
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
@@ -184,6 +186,8 @@ public class MessageListActivity extends AppCompatActivity
             }
         };
         t.start();
+
+        Log.i(TAG,"onCreate:099");
     }
 
     long get_current_friendnum()

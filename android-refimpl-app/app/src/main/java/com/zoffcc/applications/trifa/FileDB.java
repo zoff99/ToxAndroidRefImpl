@@ -47,6 +47,9 @@ public class FileDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String file_name = "";
 
+    @Column(defaultExpr = "-1")
+    long filesize = -1;
+
     static FileDB deep_copy(FileDB in)
     {
         FileDB out = new FileDB();
@@ -55,12 +58,13 @@ public class FileDB
         out.tox_public_key_string = in.tox_public_key_string;
         out.path_name = in.path_name;
         out.file_name = in.file_name;
+        out.filesize = in.filesize;
         return out;
     }
 
     @Override
     public String toString()
     {
-        return "id=" + id + ", kind=" + kind + ", path_name=" + path_name + ", file_name" + file_name;
+        return "id=" + id + ", kind=" + kind + ", path_name=" + path_name + ", file_name" + file_name + ", filesize=" + filesize + ", direction=" + direction;
     }
 }

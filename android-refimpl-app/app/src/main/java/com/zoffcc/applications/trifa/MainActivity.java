@@ -482,31 +482,41 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                if (vfs.isMounted())
+                if (!vfs.isMounted())
                 {
-                    vfs.unmount();
+                    vfs.mount(dbFile, PREF__DB_secrect_key);
                 }
             }
-            catch (Exception e4)
+            catch (Exception ee)
             {
-                Log.i(TAG, "vfs:EE4:" + e4.getMessage());
-                e4.printStackTrace();
+                Log.i(TAG, "vfs:EE1:" + ee.getMessage());
+                ee.printStackTrace();
+                vfs.mount(dbFile, PREF__DB_secrect_key);
             }
-
-            vfs.mount(dbFile, PREF__DB_secrect_key);
             Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "vfs:EE:" + e.getMessage());
+            Log.i(TAG, "vfs:EE2:" + e.getMessage());
 
             String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
 
             try
             {
-                Log.i(TAG, "vfs:deleting database:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
                 new File(dbFile).delete();
+                Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
             }
             catch (Exception e3)
             {
@@ -525,7 +535,7 @@ public class MainActivity extends AppCompatActivity
             catch (Exception e2)
             {
                 e2.printStackTrace();
-                Log.i(TAG, "vfs:EE2:" + e.getMessage());
+                Log.i(TAG, "vfs:EE4:" + e.getMessage());
             }
         }
 
@@ -1867,7 +1877,7 @@ public class MainActivity extends AppCompatActivity
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
-            f.state = TOX_FILE_CONTROL_CANCEL.value;
+            f.state = TOX_FILE_CONTROL_RESUME.value;
             f.path_name = VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
             f.file_name = file_name_avatar;
             f.filesize = file_size;
@@ -1889,13 +1899,14 @@ public class MainActivity extends AppCompatActivity
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
-            f.state = TOX_FILE_CONTROL_CANCEL.value;
+            f.state = TOX_FILE_CONTROL_PAUSE.value;
             f.path_name = VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
             f.file_name = filename;
             f.filesize = file_size;
+            f.ft_accepted = false;
             f.current_position = 0;
 
-            insert_into_filetransfer_db(f);
+            long ft_id = insert_into_filetransfer_db(f);
 
             // add FT message to UI
             Message m = new Message();
@@ -1904,6 +1915,10 @@ public class MainActivity extends AppCompatActivity
             m.direction = 0; // msg received
             m.TOX_MESSAGE_TYPE = 0;
             m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
+            m.filetransfer_id = ft_id;
+            m.filedb_id = -1;
+            m.state = TOX_FILE_CONTROL_PAUSE.value;
+            m.ft_accepted = false;
             m.rcvd_timestamp = System.currentTimeMillis();
             m.text = filename + "\n" + file_size + " bytes";
 
@@ -2094,6 +2109,67 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static void set_message_state_from_id(long message_id, int state)
+    {
+        try
+        {
+            orma.updateMessage().idEq(message_id).state(state).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void set_filetransfer_state_from_id(long filetransfer_id, int state)
+    {
+        try
+        {
+            orma.updateFiletransfer().idEq(filetransfer_id).state(state).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void set_message_accepted_from_id(long message_id)
+    {
+        try
+        {
+            orma.updateMessage().idEq(message_id).ft_accepted(true).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void set_filetransfer_accepted_from_id(long filetransfer_id)
+    {
+        try
+        {
+            orma.updateFiletransfer().idEq(filetransfer_id).ft_accepted(true).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static long get_filetransfer_filenum_from_id(long filetransfer_id)
+    {
+        try
+        {
+            return orma.selectFromFiletransfer().idEq(filetransfer_id).get(0).file_number;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public static String tox_friend_get_public_key__wrapper(long friend_number)
     {
         if (cache_fnum_pubkey.containsKey(friend_number))
@@ -2141,7 +2217,6 @@ public class MainActivity extends AppCompatActivity
             else // outgoing FT
             {
             }
-            f.state = TOX_FILE_CONTROL_CANCEL.value;
         }
         catch (Exception e)
         {
@@ -2153,6 +2228,7 @@ public class MainActivity extends AppCompatActivity
     {
         orma.updateFiletransfer().
                 tox_public_key_stringEq(f.tox_public_key_string).
+                and().
                 file_numberEq(f.file_number).
                 fos_open(f.fos_open).
                 execute();
@@ -2162,8 +2238,10 @@ public class MainActivity extends AppCompatActivity
     {
         orma.updateFiletransfer().
                 tox_public_key_stringEq(f.tox_public_key_string).
+                and().
                 file_numberEq(f.file_number).
                 direction(f.direction).
+                file_number(f.file_number).
                 kind(f.kind).
                 state(f.state).
                 path_name(f.path_name).
@@ -2174,14 +2252,14 @@ public class MainActivity extends AppCompatActivity
                 execute();
     }
 
-    static void insert_into_filetransfer_db(final Filetransfer f)
+    static long insert_into_filetransfer_db(final Filetransfer f)
     {
         //Thread t = new Thread()
         //{
         //    @Override
         //    public void run()
         //    {
-        orma.insertIntoFiletransfer(f);
+        return orma.insertIntoFiletransfer(f);
         //    }
         //};
         //t.start();
@@ -2438,6 +2516,30 @@ public class MainActivity extends AppCompatActivity
             }
         };
         t.start();
+    }
+
+    static void delete_friend_all_files(final long friendnum)
+    {
+        try
+        {
+            orma.deleteFromFileDB().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void delete_friend_all_filetransfers(final long friendnum)
+    {
+        try
+        {
+            orma.deleteFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     static void delete_friend_all_messages(final long friendnum)
