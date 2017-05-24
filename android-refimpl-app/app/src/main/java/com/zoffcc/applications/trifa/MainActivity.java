@@ -2780,7 +2780,7 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "update_message_view:001 " + message_list_fragment);
             Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " + message_list_fragment.isVisible());
             // update the message view (if possbile)
-            if ((message_list_fragment.isAdded()) && (message_list_fragment.isVisible()))
+            if (message_list_fragment != null)
             {
                 Log.i(TAG, "update_message_view:003");
                 MainActivity.message_list_fragment.update_all_messages();

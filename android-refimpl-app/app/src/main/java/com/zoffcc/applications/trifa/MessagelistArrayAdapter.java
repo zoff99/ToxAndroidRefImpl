@@ -126,7 +126,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             Log.i(TAG, "button_ok:OnTouch:001");
                                             //values.get(position).ft_accepted = true;
                                             Log.i(TAG, "button_ok:OnTouch:002");
-                                            values.get(position).state = TOX_FILE_CONTROL_RESUME.value;
+                                            // values.get(position).state = TOX_FILE_CONTROL_RESUME.value;
                                             Log.i(TAG, "button_ok:OnTouch:003");
                                             set_filetransfer_accepted_from_id(values.get(position).filetransfer_id);
                                             Log.i(TAG, "button_ok:OnTouch:004");
@@ -136,9 +136,9 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             Log.i(TAG, "button_ok:OnTouch:006");
                                             set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_RESUME.value);
                                             Log.i(TAG, "button_ok:OnTouch:007");
-                                            button_ok.setVisibility(View.GONE);
-                                            Log.i(TAG, "button_ok:OnTouch:008");
                                             tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_RESUME.value);
+                                            Log.i(TAG, "button_ok:OnTouch:008");
+                                            button_ok.setVisibility(View.GONE);
                                             Log.i(TAG, "button_ok:OnTouch:009");
                                         }
                                         catch (Exception e)
@@ -164,7 +164,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         {
                                             // cancel FT
                                             Log.i(TAG, "button_cancel:OnTouch:001");
-                                            values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
+                                            // values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
                                             tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
                                             set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
                                             set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_CANCEL.value);

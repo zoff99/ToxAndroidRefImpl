@@ -145,7 +145,8 @@ public class MessageListFragment extends ListFragment
                     Log.i(TAG, "scroll_to_bottom:EE1:" + e.getMessage());
                 }
             }
-        }; main_handler_s.post(myRunnable);
+        };
+        main_handler_s.post(myRunnable);
     }
 
     void update_all_messages()
@@ -172,15 +173,26 @@ public class MessageListFragment extends ListFragment
 
                 try
                 {
-                    data_values.clear();
-                    data_values.addAll(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
+                    if (data_values != null)
+                    {
+                        data_values.clear();
+                        data_values.addAll(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
+                    }
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
-                a.notifyDataSetChanged();
-                scroll_to_bottom();
+
+                try
+                {
+                    a.notifyDataSetChanged();
+                    scroll_to_bottom();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         };
         main_handler_s.post(myRunnable);
