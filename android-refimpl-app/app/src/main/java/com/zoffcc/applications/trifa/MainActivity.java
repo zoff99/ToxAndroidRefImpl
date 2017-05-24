@@ -1888,7 +1888,7 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "file_recv:incoming avatar");
 
-            String file_name_avatar = "avatar.png";
+            String file_name_avatar = "_____xyz____avatar.png";
 
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
@@ -2019,8 +2019,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 // remove FT from DB
-                orma.deleteFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().
-                        file_numberEq(file_number).execute();
+                delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
             }
             catch (Exception e2)
             {
@@ -2125,11 +2124,77 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static long get_message_id_from_filetransfer_id_and_friendnum(long filetransfer_id, long friend_number)
+    {
+        try
+        {
+            return orma.selectFromMessage().filetransfer_idEq(filetransfer_id).and().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).get(0).id;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static long get_filetransfer_id_from_friendnum_and_filenum(long friend_number, long file_number)
+    {
+        try
+        {
+            return orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static void delete_filetransfer_tmpfile(long friend_number, long file_number)
+    {
+        try
+        {
+            delete_filetransfer_tmpfile(orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void delete_filetransfer_tmpfile(long filetransfer_id)
+    {
+        try
+        {
+            Filetransfer ft = orma.selectFromFiletransfer().idEq(filetransfer_id).get(0);
+            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
+            f1.delete();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void set_message_state_from_friendnum_and_filenum(long friend_number, long file_number, int state)
+    {
+        try
+        {
+            set_message_state_from_id(orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id, state);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public static void set_message_state_from_id(long message_id, int state)
     {
         try
         {
             orma.updateMessage().idEq(message_id).state(state).execute();
+            Log.i(TAG, "set_message_state_from_id:message_id=" + message_id + " state=" + state);
         }
         catch (Exception e)
         {
@@ -2193,6 +2258,56 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static void set_filetransfer_for_message_from_friendnum_and_filenum(long friend_number, long file_number)
+    {
+        try
+        {
+            set_filetransfer_for_message_from_filetransfer_id(orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void set_filetransfer_for_message_from_filetransfer_id(long filetransfer_id)
+    {
+        try
+        {
+            orma.updateMessage().filetransfer_idEq(filetransfer_id).filetransfer_id(-1).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void delete_filetransfers_from_friendnum_and_filenum(long friend_number, long file_number)
+    {
+        try
+        {
+            delete_filetransfers_from_id(orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void delete_filetransfers_from_id(long filetransfer_id)
+    {
+        try
+        {
+            orma.deleteFromFiletransfer().idEq(filetransfer_id).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
     public static String tox_friend_get_public_key__wrapper(long friend_number)
     {
         if (cache_fnum_pubkey.containsKey(friend_number))
@@ -2230,12 +2345,32 @@ public class MainActivity extends AppCompatActivity
             {
                 if (f.kind == TOX_FILE_KIND_DATA.value)
                 {
-                    // TODO: send cancel to UI
+                    long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+                    long msg_ig = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+
+                    // delete tmp file
+                    delete_filetransfer_tmpfile(friend_number, file_number);
+                    // set state for FT in message
+                    set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_CANCEL.value);
+                    // remove link to any message
+                    set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number);
+                    // delete FT in DB
+                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
+                    // update UI
+                    // TODO: updates all messages, this is bad
+                    update_message_view_on_UI();
                 }
                 else // avatar FT
                 {
+                    long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+                    long msg_ig = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+                    set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_CANCEL.value);
+                    set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_CANCEL.value);
+                    // delete tmp file
+                    delete_filetransfer_tmpfile(friend_number, file_number);
+                    // delete FT in DB
+                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                 }
-                orma.deleteFromFiletransfer().file_numberEq(file_number).and().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).execute();
             }
             else // outgoing FT
             {
@@ -2616,6 +2751,26 @@ public class MainActivity extends AppCompatActivity
             }
         };
         t.start();
+    }
+
+    static void update_message_view_on_UI()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    update_message_view();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
     }
 
     static void update_message_view()

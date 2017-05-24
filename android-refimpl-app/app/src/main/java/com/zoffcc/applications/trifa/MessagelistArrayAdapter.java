@@ -22,13 +22,11 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.design.widget.TabLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -156,22 +154,22 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         try
                                         {
                                             // cancel FT
-                                            Log.i(TAG,"button_cancel:OnTouch:001");
+                                            Log.i(TAG, "button_cancel:OnTouch:001");
                                             values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
-                                            Log.i(TAG,"button_cancel:OnTouch:002");
+                                            Log.i(TAG, "button_cancel:OnTouch:002");
                                             tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
-                                            Log.i(TAG,"button_cancel:OnTouch:003");
+                                            Log.i(TAG, "button_cancel:OnTouch:003");
                                             set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
-                                            Log.i(TAG,"button_cancel:OnTouch:004");
+                                            Log.i(TAG, "button_cancel:OnTouch:004");
                                             set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_CANCEL.value);
-                                            Log.i(TAG,"button_cancel:OnTouch:005");
+                                            Log.i(TAG, "button_cancel:OnTouch:005");
 
                                             button_ok.setVisibility(View.GONE);
-                                            Log.i(TAG,"button_cancel:OnTouch:006");
+                                            Log.i(TAG, "button_cancel:OnTouch:006");
                                             button_cancel.setVisibility(View.GONE);
-                                            Log.i(TAG,"button_cancel:OnTouch:007");
+                                            Log.i(TAG, "button_cancel:OnTouch:007");
                                             ft_progressbar.setVisibility(View.GONE);
-                                            Log.i(TAG,"button_cancel:OnTouch:008");
+                                            Log.i(TAG, "button_cancel:OnTouch:008");
                                         }
                                         catch (Exception e)
                                         {
