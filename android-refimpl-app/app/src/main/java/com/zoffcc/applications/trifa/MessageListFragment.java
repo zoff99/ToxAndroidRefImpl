@@ -136,7 +136,7 @@ public class MessageListFragment extends ListFragment
                 try
                 {
                     // scroll to bottom
-                    Log.i(TAG, "data_values.size()=" + data_values.size() + " data_values=" + data_values);
+                    Log.i(TAG, "scroll_to_bottom:data_values.size()=" + data_values.size() + " data_values=" + data_values);
                     setSelection(data_values.size());
                 }
                 catch (Exception e)
@@ -173,11 +173,16 @@ public class MessageListFragment extends ListFragment
 
                 try
                 {
+                    Log.i(TAG, "data_values:001");
                     if (data_values != null)
                     {
+                        Log.i(TAG, "data_values:002");
                         data_values.clear();
+                        Log.i(TAG, "data_values:003");
                         data_values.addAll(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
+                        Log.i(TAG, "data_values:004");
                     }
+                    Log.i(TAG, "data_values:005");
                 }
                 catch (Exception e)
                 {
@@ -186,8 +191,11 @@ public class MessageListFragment extends ListFragment
 
                 try
                 {
+                    Log.i(TAG, "notifyDataSetChanged:1");
                     a.notifyDataSetChanged();
+                    Log.i(TAG, "scroll to bottom:2");
                     scroll_to_bottom();
+                    Log.i(TAG, "scroll to bottom:2.a");
                 }
                 catch (Exception e)
                 {

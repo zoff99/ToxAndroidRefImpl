@@ -61,12 +61,26 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
     @Override
     public View getView(int position, View recycled, final ViewGroup parent)
     {
-        // Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
-        // Log.i(TAG, "getView:avatar_filename=" + values.get(position).avatar_filename);
-        // Log.i(TAG, "getView:avatar_pathname=" + values.get(position).avatar_pathname);
+        Log.i(TAG, "getView:fpubkey=" + values.get(position).tox_public_key_string);
+        Log.i(TAG, "getView:avatar_filename=" + values.get(position).avatar_filename);
+        Log.i(TAG, "getView:avatar_pathname=" + values.get(position).avatar_pathname);
+
+        if ((values!=null) &&(values.size()>=position))
+        {
+            Log.i(TAG, "getView:data=" + values.get(position));
+        }
+        else
+        {
+            Log.i(TAG, "getView:data=" + "*NULL*");
+        }
+
+
+        Log.i(TAG, "getView:001");
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.friend_list_entry, parent, false);
+
+        Log.i(TAG, "getView:002");
 
         TextView textView = (TextView) rowView.findViewById(R.id.f_name);
         textView.setText(values.get(position).name);
@@ -76,14 +90,20 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 
         TextView unread_count = (TextView) rowView.findViewById(R.id.f_unread_count);
 
+        Log.i(TAG, "getView:003");
+
         de.hdodenhof.circleimageview.CircleImageView avatar = (de.hdodenhof.circleimageview.CircleImageView) rowView.findViewById(R.id.f_avatar_icon);
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
         avatar.setImageDrawable(d_lock);
+
+        Log.i(TAG, "getView:004");
 
         try
         {
             if (VFS_ENCRYPT)
             {
+                Log.i(TAG, "getView:005");
+
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
                 if ((f1 != null) && (values.get(position).avatar_pathname != null))
                 {
@@ -101,6 +121,9 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
                             skipMemoryCache(false).
                             into(avatar);
                 }
+
+                Log.i(TAG, "getView:006");
+
             }
             else
             {
@@ -125,7 +148,8 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         }
         catch (Exception e)
         {
-            // e.printStackTrace();
+            e.printStackTrace();
+            Log.i(TAG,"getView:EE1:"+e.getMessage());
         }
 
         try

@@ -54,30 +54,35 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 {
     private static final String TAG = "trifa.MessagelstAAdptr";
     private final Context context;
-    private final List<Message> values;
+    private final List<Message> values_msg;
 
     public MessagelistArrayAdapter(Context context, List<Message> values)
     {
         super(context, -1, values);
         this.context = context;
-        this.values = values;
+        this.values_msg = values;
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent)
     {
+        Log.i(TAG, "getView:001:pos=" + position + " data size=" + values_msg.size());
+        Log.i(TAG, "getView:001:pos=" + position + " data=" + values_msg.get(position));
+
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = null;
 
+        Log.i(TAG, "getView:002");
+
         try
         {
-            if (values.get(position).TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+            if (values_msg.get(position).TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
             {
                 // FILE -------------
-                if (values.get(position).direction == 0)
+                if (values_msg.get(position).direction == 0)
                 {
                     // incoming file
-                    if (values.get(position).state == TOX_FILE_CONTROL_CANCEL.value)
+                    if (values_msg.get(position).state == TOX_FILE_CONTROL_CANCEL.value)
                     {
                         // ------- STATE: CANCEL -------------
                         rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
@@ -92,21 +97,21 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         ft_progressbar.setVisibility(View.GONE);
 
                         TextView textView = (TextView) rowView.findViewById(R.id.m_text);
-                        if (values.get(position).filedb_id == -1)
+                        if (values_msg.get(position).filedb_id == -1)
                         {
-                            textView.setText("" + values.get(position).text + "\n*canceled*");
+                            textView.setText("" + values_msg.get(position).text + "\n*canceled*");
                         }
                         else
                         {
                             // TODO: show preview and "click" to open/delete file
-                            textView.setText("" + values.get(position).text + "\n+OK+");
+                            textView.setText("" + values_msg.get(position).text + "\n+OK+");
                         }
                         // ------- STATE: CANCEL -------------
                     }
-                    else if (values.get(position).state == TOX_FILE_CONTROL_PAUSE.value)
+                    else if (values_msg.get(position).state == TOX_FILE_CONTROL_PAUSE.value)
                     {
                         // ------- STATE: PAUSE -------------
-                        if (values.get(position).ft_accepted == false)
+                        if (values_msg.get(position).ft_accepted == false)
                         {
                             // not yet accepted
                             rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
@@ -136,15 +141,15 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             Log.i(TAG, "button_ok:OnTouch:002");
                                             // values.get(position).state = TOX_FILE_CONTROL_RESUME.value;
                                             Log.i(TAG, "button_ok:OnTouch:003");
-                                            set_filetransfer_accepted_from_id(values.get(position).filetransfer_id);
+                                            set_filetransfer_accepted_from_id(values_msg.get(position).filetransfer_id);
                                             Log.i(TAG, "button_ok:OnTouch:004");
-                                            set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
+                                            set_filetransfer_state_from_id(values_msg.get(position).filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
                                             Log.i(TAG, "button_ok:OnTouch:005");
-                                            set_message_accepted_from_id(values.get(position).id);
+                                            set_message_accepted_from_id(values_msg.get(position).id);
                                             Log.i(TAG, "button_ok:OnTouch:006");
-                                            set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_RESUME.value);
+                                            set_message_state_from_id(values_msg.get(position).id, TOX_FILE_CONTROL_RESUME.value);
                                             Log.i(TAG, "button_ok:OnTouch:007");
-                                            tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_RESUME.value);
+                                            tox_file_control(tox_friend_by_public_key__wrapper(values_msg.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values_msg.get(position).filetransfer_id), TOX_FILE_CONTROL_RESUME.value);
                                             Log.i(TAG, "button_ok:OnTouch:008");
                                             ft_progressbar.setProgress(0);
                                             ft_progressbar.setMax(100);
@@ -177,9 +182,9 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             // cancel FT
                                             Log.i(TAG, "button_cancel:OnTouch:001");
                                             // values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
-                                            tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
-                                            set_filetransfer_state_from_id(values.get(position).filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
-                                            set_message_state_from_id(values.get(position).id, TOX_FILE_CONTROL_CANCEL.value);
+                                            tox_file_control(tox_friend_by_public_key__wrapper(values_msg.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values_msg.get(position).filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
+                                            set_filetransfer_state_from_id(values_msg.get(position).filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
+                                            set_message_state_from_id(values_msg.get(position).id, TOX_FILE_CONTROL_CANCEL.value);
 
                                             button_ok.setVisibility(View.GONE);
                                             button_cancel.setVisibility(View.GONE);
@@ -199,7 +204,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                             TextView textView = (TextView) rowView.findViewById(R.id.m_text);
 
                             // TODO: make text betters
-                            textView.setText("" + values.get(position).text);
+                            textView.setText("" + values_msg.get(position).text);
 
                             ft_progressbar.setIndeterminate(true);
                             ft_progressbar.setVisibility(View.VISIBLE);
@@ -207,6 +212,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         else
                         {
                             // has accepted
+                            rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
                         }
                         // ------- STATE: PAUSE -------------
                     }
@@ -228,16 +234,17 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                 else
                 {
                     // outgoing file
+                    rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
                 }
                 // FILE -------------
             }
             else
             {
                 // TEXT -------------
-                if (values.get(position).direction == 0)
+                if (values_msg.get(position).direction == 0)
                 {
                     // msg to me
-                    if (values.get(position).read)
+                    if (values_msg.get(position).read)
                     {
                         rowView = inflater.inflate(R.layout.message_list_entry_read, parent, false);
                     }
@@ -249,7 +256,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                 else
                 {
                     // msg from me
-                    if (values.get(position).read)
+                    if (values_msg.get(position).read)
                     {
                         rowView = inflater.inflate(R.layout.message_list_self_entry_read, parent, false);
                     }
@@ -260,11 +267,11 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                 }
 
                 TextView textView = (TextView) rowView.findViewById(R.id.m_text);
-                textView.setText("#" + values.get(position).id + ":" + values.get(position).text);
+                textView.setText("#" + values_msg.get(position).id + ":" + values_msg.get(position).text);
 
                 ImageView imageView = (ImageView) rowView.findViewById(R.id.m_icon);
 
-                if (!values.get(position).read)
+                if (!values_msg.get(position).read)
                 {
                     // not yet read
                     imageView.setImageResource(R.drawable.circle_red);
@@ -281,7 +288,16 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "getView:EE1:" + e.getMessage());
         }
+
+        if (rowView==null)
+        {
+            // should never get here, you missed something about!!
+            rowView = inflater.inflate(R.layout.message_list_error, parent, false);
+        }
+
+        Log.i(TAG, "getView:099:rowView=" + rowView);
 
         return rowView;
     }

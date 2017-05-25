@@ -61,7 +61,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.github.gfx.android.orma.AccessThreadConstraint;
-import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -446,7 +445,7 @@ public class MainActivity extends AppCompatActivity
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
             if (DB_ENCRYPT)
             {
-                builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                // builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
             }
             orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.NONE).
@@ -477,7 +476,7 @@ public class MainActivity extends AppCompatActivity
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
             if (DB_ENCRYPT)
             {
-                builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                // builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
             }
             orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.WARNING).
@@ -2072,14 +2071,19 @@ public class MainActivity extends AppCompatActivity
 
                 move_tmp_file_to_real_file(f.path_name, f.file_name, VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
 
-                // put into "File" table
-                FileDB file_ = new FileDB();
-                file_.kind = f.kind;
-                file_.direction = f.direction;
-                file_.tox_public_key_string = f.tox_public_key_string;
-                file_.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
-                file_.file_name = f.file_name;
-                long filedb_id = orma.insertIntoFileDB(file_);
+                long filedb_id = -1;
+                if (f.kind != TOX_FILE_KIND_AVATAR.value)
+                {
+                    // put into "File" table
+                    FileDB file_ = new FileDB();
+                    file_.kind = f.kind;
+                    file_.direction = f.direction;
+                    file_.tox_public_key_string = f.tox_public_key_string;
+                    file_.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
+                    file_.file_name = f.file_name;
+                    file_.filesize = f.filesize;
+                    filedb_id = orma.insertIntoFileDB(file_);
+                }
 
                 Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
@@ -2094,6 +2098,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 // remove FT from DB
+                Log.i(TAG, "FTFTFT:001");
                 delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
 
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
@@ -2491,6 +2496,8 @@ public class MainActivity extends AppCompatActivity
 
     static void cancel_filetransfer(long friend_number, long file_number)
     {
+        Log.i(TAG, "FTFTFT:cancel_filetransfer");
+
         Filetransfer f = null;
         try
         {
@@ -2509,6 +2516,7 @@ public class MainActivity extends AppCompatActivity
                     // remove link to any message
                     set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
                     // delete FT in DB
+                    Log.i(TAG, "FTFTFT:002");
                     delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                     // update UI
                     // TODO: updates all messages, this is bad
@@ -2523,6 +2531,7 @@ public class MainActivity extends AppCompatActivity
                     // delete tmp file
                     delete_filetransfer_tmpfile(friend_number, file_number);
                     // delete FT in DB
+                    Log.i(TAG, "FTFTFT:003");
                     delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                 }
             }
@@ -2996,14 +3005,14 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            Log.i(TAG, "update_message_view:001 " + message_list_fragment);
-            Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " + message_list_fragment.isVisible());
+            // Log.i(TAG, "update_message_view:001 " + message_list_fragment);
+            // Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " + message_list_fragment.isVisible());
             // update the message view (if possbile)
             if (message_list_fragment != null)
             {
-                Log.i(TAG, "update_message_view:003");
+                Log.i(TAG, "update_message_view:005");
                 MainActivity.message_list_fragment.update_all_messages();
-                Log.i(TAG, "update_message_view:004");
+                Log.i(TAG, "update_message_view:006");
             }
         }
 
