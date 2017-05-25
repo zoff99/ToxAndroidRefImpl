@@ -59,6 +59,32 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ft_preview_container"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:background="@android:color/holo_orange_dark"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/ft_preview_image"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:background="@android:color/transparent"
+                android:elevation="4dp"
+                android:maxWidth="70dp"
+                android:padding="2dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:src="@android:drawable/picture_frame"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ft_buttons_container"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
@@ -78,7 +104,8 @@
                 android:background="@android:color/transparent"
                 android:elevation="4dp"
                 android:padding="2dp"
-                android:src="@android:drawable/ic_menu_add"/>
+                android:src="@android:drawable/ic_menu_add"
+                android:visibility="gone"/>
 
             <ImageButton
                 android:id="@+id/ft_dummy1"
@@ -100,7 +127,8 @@
                 android:background="@android:color/transparent"
                 android:elevation="4dp"
                 android:padding="2dp"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

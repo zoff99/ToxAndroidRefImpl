@@ -20,8 +20,10 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -36,8 +38,10 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import java.net.URLConnection;
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_accepted_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
@@ -93,13 +97,19 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
 
                         ImageButton button_ok = (ImageButton) rowView.findViewById(R.id.ft_button_ok);
-                        button_ok.setVisibility(View.GONE);
 
                         ImageButton button_cancel = (ImageButton) rowView.findViewById(R.id.ft_button_cancel);
+                        button_ok.setVisibility(View.GONE);
                         button_cancel.setVisibility(View.GONE);
 
                         ProgressBar ft_progressbar = (ProgressBar) rowView.findViewById(R.id.ft_progressbar);
                         ft_progressbar.setVisibility(View.GONE);
+
+                        final ViewGroup ft_preview_container = (ViewGroup) rowView.findViewById(R.id.ft_preview_container);
+                        final ViewGroup ft_buttons_container = (ViewGroup) rowView.findViewById(R.id.ft_buttons_container);
+                        final ImageButton ft_preview_image = (ImageButton) rowView.findViewById(R.id.ft_preview_image);
+
+                        ft_buttons_container.setVisibility(View.GONE);
 
                         TextView textView = (TextView) rowView.findViewById(R.id.m_text);
                         if (values_msg.get(position).filedb_id == -1)
@@ -110,6 +120,79 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         {
                             // TODO: show preview and "click" to open/delete file
                             textView.setText("" + values_msg.get(position).text + "\n +OK+");
+
+                            boolean is_image = false;
+                            try
+                            {
+                                String mimeType = URLConnection.guessContentTypeFromName(values_msg.get(position).filename_fullpath.toLowerCase());
+                                if (mimeType.startsWith("image"))
+                                {
+                                    is_image = true;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            Log.i(TAG, "getView:033:STATE:CANCEL:OK:is_image=" + is_image);
+
+                            if (is_image)
+                            {
+                                final Drawable d3 = new IconicsDrawable(parent.getContext()).
+                                        icon(GoogleMaterial.Icon.gmd_photo).
+                                        backgroundColor(Color.TRANSPARENT).
+                                        color(Color.parseColor("#AA000000")).sizeDp(50);
+
+                                ft_preview_image.setImageDrawable(d3);
+                            }
+                            else
+                            {
+                                final Drawable d3 = new IconicsDrawable(parent.getContext()).
+                                        icon(GoogleMaterial.Icon.gmd_attachment).
+                                        backgroundColor(Color.TRANSPARENT).
+                                        color(Color.parseColor("#AA000000")).sizeDp(50);
+
+                                ft_preview_image.setImageDrawable(d3);
+                            }
+
+                            ft_preview_container.setVisibility(View.VISIBLE);
+                            ft_preview_image.setVisibility(View.VISIBLE);
+
+                            ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                            {
+                                @Override
+                                public boolean onTouch(View v, MotionEvent event)
+                                {
+                                    if (event.getAction() == MotionEvent.ACTION_DOWN)
+                                    {
+                                        try
+                                        {
+                                            Intent intent = new Intent();
+                                            intent.setAction(android.content.Intent.ACTION_VIEW);
+                                            String mime = URLConnection.guessContentTypeFromName(values_msg.get(position).filename_fullpath.toLowerCase());
+                                            if (VFS_ENCRYPT)
+                                            {
+                                                intent.setDataAndType(Uri.fromFile(new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath)), mime);
+                                            }
+                                            else
+                                            {
+                                                intent.setDataAndType(Uri.fromFile(new java.io.File(values_msg.get(position).filename_fullpath)), mime);
+                                            }
+                                            context.startActivity(intent);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                            Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
+                                        }
+                                    }
+                                    else
+                                    {
+                                    }
+                                    return true;
+                                }
+                            });
                         }
                         // ------- STATE: CANCEL -------------
                     }
@@ -132,6 +215,12 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                             button_cancel.setImageDrawable(d2);
 
                             final ProgressBar ft_progressbar = (ProgressBar) rowView.findViewById(R.id.ft_progressbar);
+
+                            final ViewGroup ft_buttons_container = (ViewGroup) rowView.findViewById(R.id.ft_buttons_container);
+                            ft_buttons_container.setVisibility(View.VISIBLE);
+
+                            button_ok.setVisibility(View.VISIBLE);
+                            button_cancel.setVisibility(View.VISIBLE);
 
                             button_ok.setOnTouchListener(new View.OnTouchListener()
                             {
@@ -235,6 +324,12 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 
                             final ProgressBar ft_progressbar = (ProgressBar) rowView.findViewById(R.id.ft_progressbar);
 
+                            final ViewGroup ft_buttons_container = (ViewGroup) rowView.findViewById(R.id.ft_buttons_container);
+                            ft_buttons_container.setVisibility(View.VISIBLE);
+
+                            button_ok.setVisibility(View.GONE);
+                            button_cancel.setVisibility(View.VISIBLE);
+
                             button_cancel.setOnTouchListener(new View.OnTouchListener()
                             {
                                 @Override
@@ -292,6 +387,11 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         final ProgressBar ft_progressbar = (ProgressBar) rowView.findViewById(R.id.ft_progressbar);
                         TextView textView = (TextView) rowView.findViewById(R.id.m_text);
 
+                        final ViewGroup ft_buttons_container = (ViewGroup) rowView.findViewById(R.id.ft_buttons_container);
+                        ft_buttons_container.setVisibility(View.VISIBLE);
+
+                        button_cancel.setVisibility(View.VISIBLE);
+
                         button_cancel.setOnTouchListener(new View.OnTouchListener()
                         {
                             @Override
@@ -346,7 +446,6 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         ft_progressbar.setMax(100);
                         ft_progressbar.setIndeterminate(false);
                         // ------- STATE: RESUME -------------
-
                     }
                 }
                 else

@@ -963,28 +963,66 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
+    static void update_message_in_db_filename_fullpath_friendnum_and_filenum(long friend_number, long file_number, String filename_fullpath)
+    {
+        try
+        {
+            long ft_id = orma.selectFromFiletransfer().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    and().file_numberEq(file_number).orderByIdDesc().get(0).id;
+
+            update_message_in_db_filename_fullpath_from_id(orma.selectFromMessage().
+                    filetransfer_idEq(ft_id).and().
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    get(0).id, filename_fullpath);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void update_message_in_db_filename_fullpath_from_id(long msg_id, String filename_fullpath)
+    {
+        try
+        {
+            orma.updateMessage().idEq(msg_id).filename_fullpath(filename_fullpath).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void update_message_in_db_filename_fullpath(final Message m)
+    {
+        try
+        {
+            orma.updateMessage().
+                    idEq(m.id).
+                    filename_fullpath(m.filename_fullpath).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     static void update_message_in_db_read_rcvd_timestamp(final Message m)
     {
-        final Thread t = new Thread()
+        try
         {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    orma.updateMessage().
-                            idEq(m.id).
-                            read(m.read).
-                            rcvd_timestamp(m.rcvd_timestamp).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-        t.start();
+            orma.updateMessage().
+                    idEq(m.id).
+                    read(m.read).
+                    rcvd_timestamp(m.rcvd_timestamp).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     static void change_notification(int a_TOXCONNECTION)
@@ -2120,6 +2158,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
+                    update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number, VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/" + f.file_name);
                     set_message_state_from_friendnum_and_filenum(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
                     set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
                     set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
@@ -2302,31 +2341,31 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-//            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
-//            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:" + orma.selectFromMessage().toList().size());
-//
-//            int i = 0;
-//            for (i = 0; i < orma.selectFromMessage().toList().size(); i++)
-//            {
-//                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
-//                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:#" + i + ":" + orma.selectFromMessage().toList().get(i));
-//                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
-//            }
-//
-//            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
-//
-//            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
-//            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2" + orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size());
-//
-//            for (i = 0; i < orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size(); i++)
-//            {
-//                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
-//                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2#" + i + ":" + orma.selectFromMessage().toList().get(i));
-//                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
-//            }
-//
-//            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
-//
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:" + orma.selectFromMessage().toList().size());
+            //
+            //            int i = 0;
+            //            for (i = 0; i < orma.selectFromMessage().toList().size(); i++)
+            //            {
+            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
+            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:#" + i + ":" + orma.selectFromMessage().toList().get(i));
+            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
+            //            }
+            //
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
+            //
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2" + orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size());
+            //
+            //            for (i = 0; i < orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size(); i++)
+            //            {
+            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
+            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2#" + i + ":" + orma.selectFromMessage().toList().get(i));
+            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
+            //            }
+            //
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
+            //
 
             Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id + " friend_number=" + friend_number);
 
