@@ -219,7 +219,6 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         else
                         {
                             // has accepted
-
                             Log.i(TAG, "getView:033:STATE:PAUSE:ft_accepted:" + values_msg.get(position).text + ":" + values_msg.get(position).filetransfer_id + " " + values_msg.get(position).message_id + " " + values_msg.get(position).filedb_id);
 
                             rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);

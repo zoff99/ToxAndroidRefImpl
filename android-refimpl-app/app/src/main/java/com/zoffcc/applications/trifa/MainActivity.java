@@ -1894,11 +1894,25 @@ public class MainActivity extends AppCompatActivity
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_RESUME.value)
         {
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME");
+
+            long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:ft_id=" + ft_id);
+            long msg_ig = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:msg_ig=" + msg_ig);
+            set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_RESUME.value);
+            set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_RESUME.value);
+
             update_all_messages_global(true);
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_PAUSE.value)
         {
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_PAUSE");
+
+            long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+            long msg_ig = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+            set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_PAUSE.value);
+            set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_PAUSE.value);
+
             update_all_messages_global(true);
         }
     }
@@ -2277,11 +2291,43 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            return orma.selectFromMessage().filetransfer_idEq(filetransfer_id).and().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).get(0).id;
+            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
+            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:" + orma.selectFromMessage().toList().size());
+
+            int i = 0;
+            for (i = 0; i < orma.selectFromMessage().toList().size(); i++)
+            {
+                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
+                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:#" + i + ":" + orma.selectFromMessage().toList().get(i));
+                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
+            }
+
+            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
+
+            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
+            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2" + orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size());
+
+            for (i = 0; i < orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size(); i++)
+            {
+                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
+                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2#" + i + ":" + orma.selectFromMessage().toList().get(i));
+                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
+            }
+
+            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
+
+
+            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id + " friend_number=" + friend_number);
+
+            return orma.selectFromMessage().
+                    filetransfer_idEq(filetransfer_id).and().
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    orderByIdDesc().get(0).id;
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:EE:" + e.getMessage());
             return -1;
         }
     }
@@ -2290,11 +2336,20 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            return orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id;
+            Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:friend_number=" + friend_number + " file_number=" + file_number);
+            long ft_id = orma.selectFromFiletransfer().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    and().
+                    file_numberEq(file_number).
+                    orderByIdDesc().
+                    get(0).id;
+            Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:ft_id=" + ft_id);
+            return ft_id;
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:EE:" + e.getMessage());
             return -1;
         }
     }
@@ -2556,7 +2611,13 @@ public class MainActivity extends AppCompatActivity
         Filetransfer f = null;
         try
         {
-            f = orma.selectFromFiletransfer().file_numberEq(file_number).and().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).toList().get(0);
+            f = orma.selectFromFiletransfer().
+                    file_numberEq(file_number).
+                    and().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    orderByIdDesc().
+                    toList().get(0);
+
             if (f.direction == TRIFA_FT_DIRECTION_INCOMING.value)
             {
                 if (f.kind == TOX_FILE_KIND_DATA.value)
@@ -2791,22 +2852,31 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void insert_into_message_db(final Message m, final boolean update_message_view_flag)
+    static long insert_into_message_db(final Message m, final boolean update_message_view_flag)
     {
-        Thread t = new Thread()
+        // Thread t = new Thread()
+        //{
+        //    @Override
+        //    public void run()
+        //    {
+        // Log.i(TAG, "insert_into_message_db:m=" + m);
+        long row_id = orma.insertIntoMessage(m);
+
+        Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Message where rowid='" + row_id + "'");
+        cursor.moveToFirst();
+        Log.i(TAG, "insert_into_message_db:id res count=" + cursor.getColumnCount());
+        long msg_id = cursor.getLong(0);
+        cursor.close();
+
+        if (update_message_view_flag)
         {
-            @Override
-            public void run()
-            {
-                // Log.i(TAG, "insert_into_message_db:m=" + m);
-                orma.insertIntoMessage(m);
-                if (update_message_view_flag)
-                {
-                    update_message_view();
-                }
-            }
-        };
-        t.start();
+            update_message_view();
+        }
+
+        return msg_id;
+        //    }
+        //};
+        //t.start();
     }
 
 
