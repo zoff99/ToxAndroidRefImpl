@@ -490,8 +490,7 @@ public class MainActivity extends AppCompatActivity
         // ----- Clear all messages from DB -----
         // ----- Clear all messages from DB -----
         // ----- Clear all messages from DB -----
-        // ** // ** //
-        orma.deleteFromMessage().execute();
+        // ** // ** // orma.deleteFromMessage().execute();
         // ----- Clear all messages from DB -----
         // ----- Clear all messages from DB -----
         // ----- Clear all messages from DB -----
@@ -1922,7 +1921,7 @@ public class MainActivity extends AppCompatActivity
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
             f.state = TOX_FILE_CONTROL_RESUME.value;
-            f.path_name = VFS_PREFIX+VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
+            f.path_name = VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
             f.file_name = file_name_avatar;
             f.filesize = file_size;
             f.current_position = 0;
@@ -1942,7 +1941,7 @@ public class MainActivity extends AppCompatActivity
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
             f.state = TOX_FILE_CONTROL_PAUSE.value;
-            f.path_name = VFS_PREFIX+VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
+            f.path_name = VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
             f.file_name = filename;
             f.filesize = file_size;
             f.ft_accepted = false;
@@ -2071,21 +2070,21 @@ public class MainActivity extends AppCompatActivity
 
                 update_filetransfer_db_fos_open(f);
 
-                move_tmp_file_to_real_file(f.path_name, f.file_name, VFS_PREFIX+VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
+                move_tmp_file_to_real_file(f.path_name, f.file_name, VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
 
                 // put into "File" table
                 FileDB file_ = new FileDB();
                 file_.kind = f.kind;
                 file_.direction = f.direction;
                 file_.tox_public_key_string = f.tox_public_key_string;
-                file_.path_name = VFS_PREFIX+VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
+                file_.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
                 file_.file_name = f.file_name;
                 long filedb_id = orma.insertIntoFileDB(file_);
 
                 Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
-                    set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number), VFS_PREFIX+VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
+                    set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number), VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
                 }
                 else
                 {

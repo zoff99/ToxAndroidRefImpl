@@ -55,6 +55,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.ToxVars.OX_MAX_STATUS_MESSAGE_LENGTH;
@@ -143,10 +144,10 @@ public class ProfileActivity extends AppCompatActivity
                                 String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
                                 String src_filename = new File(files[0]).getName();
                                 Log.i(TAG, "select_avatar:p=" + src_path + " f=" + src_filename);
-                                copy_real_file_to_vfs_file(src_path, src_filename, VFS_OWN_AVATAR_DIR, "avatar.png");
-                                set_g_opts("VFS_OWN_AVATAR_FNAME", VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+                                copy_real_file_to_vfs_file(src_path, src_filename, VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
+                                set_g_opts("VFS_OWN_AVATAR_FNAME", VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
 
-                                put_vfs_image_on_imageview(ProfileActivity.this, profile_icon, d1, VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+                                put_vfs_image_on_imageview(ProfileActivity.this, profile_icon, d1, VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
                             }
                             catch (Exception e)
                             {

@@ -35,6 +35,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
@@ -81,22 +82,45 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 
         try
         {
-            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
-            if ((f1 != null) && (values.get(position).avatar_pathname != null))
+            if (VFS_ENCRYPT)
             {
-                Log.i(TAG, "getView:f1=" + f1);
-                info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
+                if ((f1 != null) && (values.get(position).avatar_pathname != null))
+                {
+                    Log.i(TAG, "getView:f1=" + f1);
+                    info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
 
-                byte[] byteArray = new byte[(int) f1.length()];
-                fis.read(byteArray, 0, (int) f1.length());
+                    byte[] byteArray = new byte[(int) f1.length()];
+                    fis.read(byteArray, 0, (int) f1.length());
 
-                GlideApp.
-                        with(parent).
-                        load(byteArray).
-                        placeholder(d_lock).
-                        diskCacheStrategy(DiskCacheStrategy.NONE).
-                        skipMemoryCache(false).
-                        into(avatar);
+                    GlideApp.
+                            with(parent).
+                            load(byteArray).
+                            placeholder(d_lock).
+                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            skipMemoryCache(false).
+                            into(avatar);
+                }
+            }
+            else
+            {
+                java.io.File f1 = new java.io.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
+                if ((f1 != null) && (values.get(position).avatar_pathname != null))
+                {
+                    Log.i(TAG, "getView:f1=" + f1);
+                    java.io.FileInputStream fis = new java.io.FileInputStream(f1);
+
+                    byte[] byteArray = new byte[(int) f1.length()];
+                    fis.read(byteArray, 0, (int) f1.length());
+
+                    GlideApp.
+                            with(parent).
+                            load(byteArray).
+                            placeholder(d_lock).
+                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            skipMemoryCache(false).
+                            into(avatar);
+                }
             }
         }
         catch (Exception e)
