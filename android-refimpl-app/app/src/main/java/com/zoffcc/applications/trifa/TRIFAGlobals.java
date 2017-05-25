@@ -43,9 +43,11 @@ public class TRIFAGlobals
     final static String VFS_TMP_FILE_DIR = "/tempdir/files/";
     final static String VFS_FILE_DIR = "/datadir/files/";
     final static String VFS_OWN_AVATAR_DIR = "/datadir/myavatar/";
+    static String VFS_PREFIX = ""; // only set for normal (unencrypted) storage
 
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
+    static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
     // ---- lookup cache ----
 
     public static enum TRIFA_FT_DIRECTION

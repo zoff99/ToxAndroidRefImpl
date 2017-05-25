@@ -96,9 +96,11 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIF
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
@@ -117,6 +119,8 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     final static boolean CTOXCORE_NATIVE_LOGGING = false;
     final static boolean ORMA_TRACE = true;
+    final static boolean DB_ENCRYPT = false;
+    final static boolean VFS_ENCRYPT = true;
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
@@ -440,7 +444,10 @@ public class MainActivity extends AppCompatActivity
             database_dir.mkdirs();
 
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-            builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+            if (DB_ENCRYPT)
+            {
+                builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+            }
             orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.NONE).
                     writeOnMainThread(AccessThreadConstraint.NONE).
@@ -468,7 +475,10 @@ public class MainActivity extends AppCompatActivity
 
             Log.i(TAG, "db:path(2)=" + dbs_path);
             OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-            builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+            if (DB_ENCRYPT)
+            {
+                builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+            }
             orma = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.WARNING).
                     writeOnMainThread(AccessThreadConstraint.WARNING).
@@ -486,108 +496,97 @@ public class MainActivity extends AppCompatActivity
         // ----- Clear all messages from DB -----
         // ----- Clear all messages from DB -----
 
-        try
+        if (VFS_ENCRYPT)
         {
-            String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
-
-            File database_dir = new File(new File(dbFile).getParent());
-            database_dir.mkdirs();
-
-            Log.i(TAG, "vfs:path=" + dbFile);
-            vfs = VirtualFileSystem.get();
-
             try
             {
-                if (!vfs.isMounted())
-                {
-                    vfs.mount(dbFile, PREF__DB_secrect_key);
-                }
-            }
-            catch (Exception ee)
-            {
-                Log.i(TAG, "vfs:EE1:" + ee.getMessage());
-                ee.printStackTrace();
-                vfs.mount(dbFile, PREF__DB_secrect_key);
-            }
-            Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "vfs:EE2:" + e.getMessage());
+                String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
 
-            String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+                File database_dir = new File(new File(dbFile).getParent());
+                database_dir.mkdirs();
 
-            try
-            {
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
-                new File(dbFile).delete();
-                Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-            }
-            catch (Exception e3)
-            {
-                e3.printStackTrace();
-                Log.i(TAG, "vfs:EE3:" + e3.getMessage());
-            }
-
-            try
-            {
                 Log.i(TAG, "vfs:path=" + dbFile);
                 vfs = VirtualFileSystem.get();
-                vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
-                vfs.mount(PREF__DB_secrect_key);
-                Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
+
+                try
+                {
+                    if (!vfs.isMounted())
+                    {
+                        vfs.mount(dbFile, PREF__DB_secrect_key);
+                    }
+                }
+                catch (Exception ee)
+                {
+                    Log.i(TAG, "vfs:EE1:" + ee.getMessage());
+                    ee.printStackTrace();
+                    vfs.mount(dbFile, PREF__DB_secrect_key);
+                }
+                Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
             }
-            catch (Exception e2)
+            catch (Exception e)
             {
-                e2.printStackTrace();
-                Log.i(TAG, "vfs:EE4:" + e.getMessage());
+                e.printStackTrace();
+                Log.i(TAG, "vfs:EE2:" + e.getMessage());
+
+                String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+
+                try
+                {
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
+                    new File(dbFile).delete();
+                    Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                }
+                catch (Exception e3)
+                {
+                    e3.printStackTrace();
+                    Log.i(TAG, "vfs:EE3:" + e3.getMessage());
+                }
+
+                try
+                {
+                    Log.i(TAG, "vfs:path=" + dbFile);
+                    vfs = VirtualFileSystem.get();
+                    vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
+                    vfs.mount(PREF__DB_secrect_key);
+                    Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
+                }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                    Log.i(TAG, "vfs:EE4:" + e.getMessage());
+                }
             }
+
+            Log.i(TAG, "vfs:encrypted:(1)prefix=" + VFS_PREFIX);
+
+        }
+        else
+        {
+            // VFS not encrypted -------------
+            VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath();
+            Log.i(TAG, "vfs:not_encrypted:(2)prefix=" + VFS_PREFIX);
+            // VFS not encrypted -------------
         }
 
-
         // ---------- DEBUG, just a test ----------
         // ---------- DEBUG, just a test ----------
         // ---------- DEBUG, just a test ----------
-        if (vfs.isMounted())
+        if (VFS_ENCRYPT)
         {
-            vfs_listFilesAndFilesSubDirectories("/", 0, "");
-
-            //            try
-            //            {
-            //                BufferedWriter out = new BufferedWriter(new info.guardianproject.iocipher.FileWriter("test.txt"));
-            //                out.write("aString\nthis is a\nttest");
-            //                out.close();
-            //                Log.i(TAG, "vfs:write:OK");
-            //            }
-            //            catch (Exception e)
-            //            {
-            //                e.printStackTrace();
-            //                Log.i(TAG, "vfs:EE:write:EE1:" + e.getMessage());
-            //            }
-
-            //            try
-            //            {
-            //                BufferedReader reader = new BufferedReader(new info.guardianproject.iocipher.FileReader("test.txt"));
-            //                String txt = reader.readLine();
-            //                Log.i(TAG, "vfs:read:res=" + txt);
-            //            }
-            //            catch (Exception e)
-            //            {
-            //                e.printStackTrace();
-            //                Log.i(TAG, "vfs:EE:read:EE1:" + e.getMessage());
-            //            }
-
+            if (vfs.isMounted())
+            {
+                vfs_listFilesAndFilesSubDirectories("/", 0, "");
+            }
         }
         // ---------- DEBUG, just a test ----------
         // ---------- DEBUG, just a test ----------
@@ -600,23 +599,49 @@ public class MainActivity extends AppCompatActivity
 
     public void vfs_listFilesAndFilesSubDirectories(String directoryName, int depth, String parent)
     {
-        info.guardianproject.iocipher.File directory = new info.guardianproject.iocipher.File(directoryName);
-        info.guardianproject.iocipher.File[] fList = directory.listFiles();
-
-        for (info.guardianproject.iocipher.File file : fList)
+        if (VFS_ENCRYPT)
         {
-            if (file.isFile())
+            info.guardianproject.iocipher.File directory1 = new info.guardianproject.iocipher.File(directoryName);
+            info.guardianproject.iocipher.File[] fList1 = directory1.listFiles();
+
+            for (info.guardianproject.iocipher.File file : fList1)
             {
-                // final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                // final String human_datetime = df.format(new Date(file.lastModified()));
-                Log.i(TAG, "VFS:f:" + parent + "/" + file.getName() + " bytes=" + file.length());
+                if (file.isFile())
+                {
+                    // final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    // final String human_datetime = df.format(new Date(file.lastModified()));
+                    Log.i(TAG, "VFS:f:" + parent + "/" + file.getName() + " bytes=" + file.length());
+                }
+                else if (file.isDirectory())
+                {
+                    Log.i(TAG, "VFS:d:" + parent + "/" + file.getName() + "/");
+                    vfs_listFilesAndFilesSubDirectories(file.getAbsolutePath(), depth + 1, parent + "/" + file.getName());
+                }
             }
-            else if (file.isDirectory())
-            {
-                Log.i(TAG, "VFS:d:" + parent + "/" + file.getName() + "/");
-                vfs_listFilesAndFilesSubDirectories(file.getAbsolutePath(), depth + 1, parent + "/" + file.getName());
-            }
+
         }
+        else
+        {
+            java.io.File directory1 = new java.io.File(directoryName);
+            java.io.File[] fList1 = directory1.listFiles();
+
+            for (File file : fList1)
+            {
+                if (file.isFile())
+                {
+                    // final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    // final String human_datetime = df.format(new Date(file.lastModified()));
+                    Log.i(TAG, "VFS:f:" + parent + "/" + file.getName() + " bytes=" + file.length());
+                }
+                else if (file.isDirectory())
+                {
+                    Log.i(TAG, "VFS:d:" + parent + "/" + file.getName() + "/");
+                    vfs_listFilesAndFilesSubDirectories(file.getAbsolutePath(), depth + 1, parent + "/" + file.getName());
+                }
+            }
+
+        }
+
     }
 
 
@@ -1897,7 +1922,7 @@ public class MainActivity extends AppCompatActivity
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
             f.state = TOX_FILE_CONTROL_RESUME.value;
-            f.path_name = VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
+            f.path_name = VFS_PREFIX+VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
             f.file_name = file_name_avatar;
             f.filesize = file_size;
             f.current_position = 0;
@@ -1917,7 +1942,7 @@ public class MainActivity extends AppCompatActivity
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
             f.state = TOX_FILE_CONTROL_PAUSE.value;
-            f.path_name = VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
+            f.path_name = VFS_PREFIX+VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
             f.file_name = filename;
             f.filesize = file_size;
             f.ft_accepted = false;
@@ -1967,11 +1992,22 @@ public class MainActivity extends AppCompatActivity
             if (position == 0)
             {
                 // file start. just to be sure, make directories
-                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(f.path_name + "/" + f.file_name);
-                info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
-                Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
-                Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
-                f2.mkdirs();
+                if (VFS_ENCRYPT)
+                {
+                    info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(f.path_name + "/" + f.file_name);
+                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
+                    Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                    Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                    f2.mkdirs();
+                }
+                else
+                {
+                    java.io.File f1 = new java.io.File(f.path_name + "/" + f.file_name);
+                    java.io.File f2 = new java.io.File(f1.getParent());
+                    Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                    Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                    f2.mkdirs();
+                }
 
                 // switch progressbar to "setIndeterminate=false" and "0" percent
                 // also set max value
@@ -1996,38 +2032,60 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "file_recv_chunk:file fully received");
 
-                info.guardianproject.iocipher.FileOutputStream fos = null;
-                fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
-
-                if (f.fos_open)
+                if (VFS_ENCRYPT)
                 {
-                    try
+                    info.guardianproject.iocipher.FileOutputStream fos = null;
+                    fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+
+                    if (f.fos_open)
                     {
-                        fos.close();
+                        try
+                        {
+                            fos.close();
+                        }
+                        catch (Exception e3)
+                        {
+                            Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
+                        }
                     }
-                    catch (Exception e3)
-                    {
-                        Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
-                    }
+                    f.fos_open = false;
                 }
-                f.fos_open = false;
+                else
+                {
+                    java.io.FileOutputStream fos = null;
+                    fos = cache_ft_fos_normal.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+
+                    if (f.fos_open)
+                    {
+                        try
+                        {
+                            fos.close();
+                        }
+                        catch (Exception e3)
+                        {
+                            Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
+                        }
+                    }
+                    f.fos_open = false;
+                }
+
                 update_filetransfer_db_fos_open(f);
 
-                move_tmp_file_to_real_file(f.path_name, f.file_name, VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
+                move_tmp_file_to_real_file(f.path_name, f.file_name, VFS_PREFIX+VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
 
                 // put into "File" table
                 FileDB file_ = new FileDB();
                 file_.kind = f.kind;
                 file_.direction = f.direction;
                 file_.tox_public_key_string = f.tox_public_key_string;
-                file_.path_name = VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
+                file_.path_name = VFS_PREFIX+VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
                 file_.file_name = f.file_name;
                 long filedb_id = orma.insertIntoFileDB(file_);
 
                 Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
-                    set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number), VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
+                    set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number), VFS_PREFIX+VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
                 }
                 else
                 {
@@ -2069,23 +2127,47 @@ public class MainActivity extends AppCompatActivity
         {
             try
             {
-                info.guardianproject.iocipher.FileOutputStream fos = null;
-                if (!f.fos_open)
+                if (VFS_ENCRYPT)
                 {
-                    fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                    Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                    cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
-                    f.fos_open = true;
+                    info.guardianproject.iocipher.FileOutputStream fos = null;
+                    if (!f.fos_open)
+                    {
+                        fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
+                        Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                        f.fos_open = true;
+                    }
+                    else
+                    {
+                        fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                        Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                    }
+
+                    Log.i(TAG, "file_recv_chunk:fos:" + fos);
+
+                    fos.write(data);
                 }
                 else
                 {
-                    fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
-                    Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                    java.io.FileOutputStream fos = null;
+                    if (!f.fos_open)
+                    {
+                        fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
+                        Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                        f.fos_open = true;
+                    }
+                    else
+                    {
+                        fos = cache_ft_fos_normal.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                        Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                    }
+
+                    Log.i(TAG, "file_recv_chunk:fos:" + fos);
+
+                    fos.write(data);
                 }
 
-                Log.i(TAG, "file_recv_chunk:fos:" + fos);
-
-                fos.write(data);
                 f.current_position = position;
                 update_filetransfer_db_full(f);
             }
@@ -2210,8 +2292,16 @@ public class MainActivity extends AppCompatActivity
         try
         {
             Filetransfer ft = orma.selectFromFiletransfer().idEq(filetransfer_id).get(0);
-            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
-            f1.delete();
+            if (VFS_ENCRYPT)
+            {
+                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
+                f1.delete();
+            }
+            else
+            {
+                java.io.File f1 = new java.io.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
+                f1.delete();
+            }
         }
         catch (Exception e)
         {
@@ -2519,16 +2609,22 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "move_tmp_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + dst_file_name);
         try
         {
-            // vfs.beginTransaction();
-
-            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
-            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(dst_path_name + "/" + dst_file_name);
-            info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(dst_path_name + "/");
-            dst_dir.mkdirs();
-            f1.renameTo(f2);
-
-            // vfs.completeTransaction();
-
+            if (VFS_ENCRYPT)
+            {
+                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
+                info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(dst_path_name + "/" + dst_file_name);
+                info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(dst_path_name + "/");
+                dst_dir.mkdirs();
+                f1.renameTo(f2);
+            }
+            else
+            {
+                java.io.File f1 = new java.io.File(src_path_name + "/" + src_file_name);
+                java.io.File f2 = new java.io.File(dst_path_name + "/" + dst_file_name);
+                java.io.File dst_dir = new java.io.File(dst_path_name + "/");
+                dst_dir.mkdirs();
+                f1.renameTo(f2);
+            }
             Log.i(TAG, "move_tmp_file_to_real_file:OK");
         }
         catch (Exception e)
@@ -2548,38 +2644,63 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "copy_real_file_to_vfs_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + dst_file_name);
         try
         {
-            // vfs.beginTransaction();
-
             String uniq_temp_filename = get_uniq_tmp_filename("???");
             Log.i(TAG, "copy_real_file_to_vfs_file:uniq_temp_filename=" + uniq_temp_filename);
 
-            java.io.File f_real = new java.io.File(src_path_name + "/" + src_file_name);
-            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
-            info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(VFS_TMP_FILE_DIR + "/");
-            dst_dir.mkdirs();
-
-            java.io.FileInputStream is = null;
-            info.guardianproject.iocipher.FileOutputStream os = null;
-            try
+            if (VFS_ENCRYPT)
             {
-                is = new java.io.FileInputStream(f_real);
-                os = new info.guardianproject.iocipher.FileOutputStream(f2);
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = is.read(buffer)) > 0)
+                java.io.File f_real = new java.io.File(src_path_name + "/" + src_file_name);
+                info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
+                info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
+                dst_dir.mkdirs();
+
+                java.io.FileInputStream is = null;
+                info.guardianproject.iocipher.FileOutputStream os = null;
+                try
                 {
-                    os.write(buffer, 0, length);
+                    is = new java.io.FileInputStream(f_real);
+                    os = new info.guardianproject.iocipher.FileOutputStream(f2);
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = is.read(buffer)) > 0)
+                    {
+                        os.write(buffer, 0, length);
+                    }
+                }
+                finally
+                {
+                    is.close();
+                    os.close();
                 }
             }
-            finally
+            else
             {
-                is.close();
-                os.close();
+                java.io.File f_real = new java.io.File(src_path_name + "/" + src_file_name);
+                java.io.File f2 = new java.io.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
+                java.io.File dst_dir = new java.io.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
+                dst_dir.mkdirs();
+
+                java.io.FileInputStream is = null;
+                java.io.FileOutputStream os = null;
+                try
+                {
+                    is = new java.io.FileInputStream(f_real);
+                    os = new java.io.FileOutputStream(f2);
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = is.read(buffer)) > 0)
+                    {
+                        os.write(buffer, 0, length);
+                    }
+                }
+                finally
+                {
+                    is.close();
+                    os.close();
+                }
             }
 
-            move_tmp_file_to_real_file(VFS_TMP_FILE_DIR, uniq_temp_filename, dst_path_name, dst_file_name);
-
-            // vfs.completeTransaction();
+            move_tmp_file_to_real_file(VFS_PREFIX + VFS_TMP_FILE_DIR, uniq_temp_filename, dst_path_name, dst_file_name);
         }
         catch (Exception e)
         {
@@ -2642,13 +2763,26 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
-            info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+            if (VFS_ENCRYPT)
+            {
+                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
+                info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
 
-            byte[] byteArray = new byte[(int) f1.length()];
-            fis.read(byteArray, 0, (int) f1.length());
+                byte[] byteArray = new byte[(int) f1.length()];
+                fis.read(byteArray, 0, (int) f1.length());
 
-            return new BitmapDrawable(BitmapFactory.decodeByteArray(byteArray, 0, (int) f1.length()));
+                return new BitmapDrawable(BitmapFactory.decodeByteArray(byteArray, 0, (int) f1.length()));
+            }
+            else
+            {
+                java.io.File f1 = new java.io.File(vfs_image_filename);
+                java.io.FileInputStream fis = new java.io.FileInputStream(f1);
+
+                byte[] byteArray = new byte[(int) f1.length()];
+                fis.read(byteArray, 0, (int) f1.length());
+
+                return new BitmapDrawable(BitmapFactory.decodeByteArray(byteArray, 0, (int) f1.length()));
+            }
         }
         catch (Exception e)
         {
@@ -2660,19 +2794,38 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
-            info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+            if (VFS_ENCRYPT)
+            {
+                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
+                info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
 
-            byte[] byteArray = new byte[(int) f1.length()];
-            fis.read(byteArray, 0, (int) f1.length());
+                byte[] byteArray = new byte[(int) f1.length()];
+                fis.read(byteArray, 0, (int) f1.length());
 
-            GlideApp.
-                    with(c).
-                    load(byteArray).
-                    placeholder(placholder).
-                    diskCacheStrategy(DiskCacheStrategy.NONE).
-                    skipMemoryCache(false).
-                    into(v);
+                GlideApp.
+                        with(c).
+                        load(byteArray).
+                        placeholder(placholder).
+                        diskCacheStrategy(DiskCacheStrategy.NONE).
+                        skipMemoryCache(false).
+                        into(v);
+            }
+            else
+            {
+                java.io.File f1 = new java.io.File(vfs_image_filename);
+                java.io.FileInputStream fis = new java.io.FileInputStream(f1);
+
+                byte[] byteArray = new byte[(int) f1.length()];
+                fis.read(byteArray, 0, (int) f1.length());
+
+                GlideApp.
+                        with(c).
+                        load(byteArray).
+                        placeholder(placholder).
+                        diskCacheStrategy(DiskCacheStrategy.NONE).
+                        skipMemoryCache(false).
+                        into(v);
+            }
         }
         catch (Exception e)
         {

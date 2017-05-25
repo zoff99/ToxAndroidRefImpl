@@ -34,6 +34,7 @@ import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
 
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
@@ -193,34 +194,37 @@ public class TrifaToxService extends Service
                         }
                         Log.i(TAG, "stop_me:006a");
 
-                        try
+                        if (VFS_ENCRYPT)
                         {
-                            if (vfs.isMounted())
+                            try
                             {
-                                Log.i(TAG, "VFS:unmount:start");
-                                try
+                                if (vfs.isMounted())
                                 {
-                                    Log.i(TAG, "stop_me:vfs:sleep:001");
-                                    Thread.sleep(2500);
-                                    Log.i(TAG, "stop_me:vfs:sleep:002");
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
+                                    Log.i(TAG, "VFS:unmount:start");
+                                    try
+                                    {
+                                        Log.i(TAG, "stop_me:vfs:sleep:001");
+                                        Thread.sleep(2500);
+                                        Log.i(TAG, "stop_me:vfs:sleep:002");
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
 
-                                vfs.unmount();
-                                Log.i(TAG, "VFS:unmount:OK");
+                                    vfs.unmount();
+                                    Log.i(TAG, "VFS:unmount:OK");
+                                }
+                                else
+                                {
+                                    Log.i(TAG, "VFS:unmount:NOT MOUNTED");
+                                }
                             }
-                            else
+                            catch (Exception e)
                             {
-                                Log.i(TAG, "VFS:unmount:NOT MOUNTED");
+                                e.printStackTrace();
+                                Log.i(TAG, "VFS:unmount:EE:" + e.getMessage());
                             }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.i(TAG, "VFS:unmount:EE:" + e.getMessage());
                         }
 
                         Log.i(TAG, "stop_me:007");
