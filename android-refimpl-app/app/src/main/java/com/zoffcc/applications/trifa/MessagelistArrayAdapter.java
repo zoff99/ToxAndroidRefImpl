@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MS
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 {
@@ -69,10 +70,12 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
         Log.i(TAG, "getView:001:pos=" + position + " data size=" + values_msg.size());
         Log.i(TAG, "getView:001:pos=" + position + " data=" + values_msg.get(position));
 
+        Log.i(TAG, "getView:001:pos=" + position + " data=" + values_msg.get(position));
+
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = null;
 
-        Log.i(TAG, "getView:002");
+        Log.i(TAG, "getView:001.c:" + values_msg.get(position).direction + ":" + values_msg.get(position).state);
 
         try
         {
@@ -85,6 +88,8 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                     if (values_msg.get(position).state == TOX_FILE_CONTROL_CANCEL.value)
                     {
                         // ------- STATE: CANCEL -------------
+                        Log.i(TAG, "getView:033:STATE:CANCEL:" + values_msg.get(position).text + ":" + values_msg.get(position).filetransfer_id + " " + values_msg.get(position).message_id + " " + values_msg.get(position).filedb_id);
+
                         rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
 
                         ImageButton button_ok = (ImageButton) rowView.findViewById(R.id.ft_button_ok);
@@ -99,12 +104,12 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         TextView textView = (TextView) rowView.findViewById(R.id.m_text);
                         if (values_msg.get(position).filedb_id == -1)
                         {
-                            textView.setText("" + values_msg.get(position).text + "\n*canceled*");
+                            textView.setText("" + values_msg.get(position).text + "\n *canceled*");
                         }
                         else
                         {
                             // TODO: show preview and "click" to open/delete file
-                            textView.setText("" + values_msg.get(position).text + "\n+OK+");
+                            textView.setText("" + values_msg.get(position).text + "\n +OK+");
                         }
                         // ------- STATE: CANCEL -------------
                     }
@@ -113,6 +118,8 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         // ------- STATE: PAUSE -------------
                         if (values_msg.get(position).ft_accepted == false)
                         {
+                            Log.i(TAG, "getView:033:STATE:PAUSE:!ft_accepted:" + values_msg.get(position).text + ":" + values_msg.get(position).filetransfer_id + " " + values_msg.get(position).message_id + " " + values_msg.get(position).filedb_id);
+
                             // not yet accepted
                             rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
 
@@ -204,7 +211,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                             TextView textView = (TextView) rowView.findViewById(R.id.m_text);
 
                             // TODO: make text betters
-                            textView.setText("" + values_msg.get(position).text);
+                            textView.setText("" + values_msg.get(position).text + "\n Accept File?");
 
                             ft_progressbar.setIndeterminate(true);
                             ft_progressbar.setVisibility(View.VISIBLE);
@@ -212,28 +219,143 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         else
                         {
                             // has accepted
+
+                            Log.i(TAG, "getView:033:STATE:PAUSE:ft_accepted:" + values_msg.get(position).text + ":" + values_msg.get(position).filetransfer_id + " " + values_msg.get(position).message_id + " " + values_msg.get(position).filedb_id);
+
                             rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
+
+                            TextView textView = (TextView) rowView.findViewById(R.id.m_text);
+                            final ImageButton button_ok = (ImageButton) rowView.findViewById(R.id.ft_button_ok);
+                            final Drawable d1 = new IconicsDrawable(parent.getContext()).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50);
+                            button_ok.setImageDrawable(d1);
+                            button_ok.setVisibility(View.GONE);
+
+                            final ImageButton button_cancel = (ImageButton) rowView.findViewById(R.id.ft_button_cancel);
+                            final Drawable d2 = new IconicsDrawable(parent.getContext()).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
+                            button_cancel.setImageDrawable(d2);
+
+                            final ProgressBar ft_progressbar = (ProgressBar) rowView.findViewById(R.id.ft_progressbar);
+
+                            button_cancel.setOnTouchListener(new View.OnTouchListener()
+                            {
+                                @Override
+                                public boolean onTouch(View v, MotionEvent event)
+                                {
+                                    if (event.getAction() == MotionEvent.ACTION_DOWN)
+                                    {
+                                        try
+                                        {
+                                            // cancel FT
+                                            Log.i(TAG, "button_cancel:OnTouch:001");
+                                            // values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
+                                            tox_file_control(tox_friend_by_public_key__wrapper(values_msg.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values_msg.get(position).filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
+                                            set_filetransfer_state_from_id(values_msg.get(position).filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
+                                            set_message_state_from_id(values_msg.get(position).id, TOX_FILE_CONTROL_CANCEL.value);
+
+                                            button_ok.setVisibility(View.GONE);
+                                            button_cancel.setVisibility(View.GONE);
+                                            ft_progressbar.setVisibility(View.GONE);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+                                    }
+                                    else
+                                    {
+                                    }
+                                    return true;
+                                }
+                            });
+
+
+                            // TODO: make text betters
+                            textView.setText("" + values_msg.get(position).text + "\n PAUSED");
                         }
                         // ------- STATE: PAUSE -------------
                     }
                     else
                     {
                         // ------- STATE: RESUME -------------
-                        if (rowView != null)
-                        {
-                            final ProgressBar ft_progressbar = (ProgressBar) rowView.findViewById(R.id.ft_progressbar);
 
-                            // TODO:
-                            ft_progressbar.setProgress(0);
-                            ft_progressbar.setMax(25);
-                            ft_progressbar.setIndeterminate(false);
-                            // ------- STATE: RESUME -------------
+                        Log.i(TAG, "getView:033:STATE:RESUME:" + values_msg.get(position).text + ":" + values_msg.get(position).filetransfer_id + " " + values_msg.get(position).message_id + " " + values_msg.get(position).filedb_id);
+
+                        rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
+
+                        final ImageButton button_ok = (ImageButton) rowView.findViewById(R.id.ft_button_ok);
+                        final Drawable d1 = new IconicsDrawable(parent.getContext()).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50);
+                        button_ok.setImageDrawable(d1);
+                        button_ok.setVisibility(View.GONE);
+
+                        final ImageButton button_cancel = (ImageButton) rowView.findViewById(R.id.ft_button_cancel);
+                        final Drawable d2 = new IconicsDrawable(parent.getContext()).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
+                        button_cancel.setImageDrawable(d2);
+
+                        final ProgressBar ft_progressbar = (ProgressBar) rowView.findViewById(R.id.ft_progressbar);
+                        TextView textView = (TextView) rowView.findViewById(R.id.m_text);
+
+                        button_cancel.setOnTouchListener(new View.OnTouchListener()
+                        {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event)
+                            {
+                                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                                {
+                                    try
+                                    {
+                                        // cancel FT
+                                        Log.i(TAG, "button_cancel:OnTouch:001");
+                                        // values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
+                                        tox_file_control(tox_friend_by_public_key__wrapper(values_msg.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values_msg.get(position).filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
+                                        set_filetransfer_state_from_id(values_msg.get(position).filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
+                                        set_message_state_from_id(values_msg.get(position).id, TOX_FILE_CONTROL_CANCEL.value);
+
+                                        button_ok.setVisibility(View.GONE);
+                                        button_cancel.setVisibility(View.GONE);
+                                        ft_progressbar.setVisibility(View.GONE);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                    }
+                                }
+                                else
+                                {
+                                }
+                                return true;
+                            }
+                        });
+
+
+                        // TODO:
+                        long ft_id = values_msg.get(position).filetransfer_id;
+                        Log.i(TAG, "getView:033:STATE:RESUME:ft_id=" + ft_id);
+                        if (ft_id != -1)
+                        {
+                            final Filetransfer ft_ = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+                            final int percent = (int) (100f * (float) ft_.current_position / (float) ft_.filesize);
+                            Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
+                            ft_progressbar.setProgress(percent);
+                            // TODO: make text betters
+                            textView.setText("" + values_msg.get(position).text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n receiving ...");
                         }
+                        else
+                        {
+                            ft_progressbar.setProgress(0);
+                            // TODO: make text betters
+                            textView.setText("" + values_msg.get(position).text + "\n receiving ...");
+                        }
+
+                        ft_progressbar.setMax(100);
+                        ft_progressbar.setIndeterminate(false);
+                        // ------- STATE: RESUME -------------
+
                     }
                 }
                 else
                 {
                     // outgoing file
+
+                    Log.i(TAG, "getView:033:outgoing_file:" + values_msg.get(position).filetransfer_id + " " + values_msg.get(position).message_id + " " + values_msg.get(position).filedb_id);
+
                     rowView = inflater.inflate(R.layout.message_list_ft_incoming, parent, false);
                 }
                 // FILE -------------
@@ -291,7 +413,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
             Log.i(TAG, "getView:EE1:" + e.getMessage());
         }
 
-        if (rowView==null)
+        if (rowView == null)
         {
             // should never get here, you missed something about!!
             rowView = inflater.inflate(R.layout.message_list_error, parent, false);

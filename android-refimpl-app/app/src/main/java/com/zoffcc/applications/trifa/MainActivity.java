@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.LabeledIntent;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity
     static int audio_buffer_play_length = 0;
     static int[] audio_buffer_2_read_length = new int[audio_in_buffer_max_count];
     static TrifaToxService tox_service_fg = null;
+    static long update_all_messages_global_timestamp = -1;
     //
     static boolean PREF__UV_reversed = true; // TODO: on older phones this needs to be "false"
     static boolean PREF__notification_sound = true;
@@ -1892,10 +1894,12 @@ public class MainActivity extends AppCompatActivity
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_RESUME.value)
         {
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME");
+            update_all_messages_global(true);
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_PAUSE.value)
         {
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_PAUSE");
+            update_all_messages_global(true);
         }
     }
 
@@ -2082,7 +2086,10 @@ public class MainActivity extends AppCompatActivity
                     file_.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
                     file_.file_name = f.file_name;
                     file_.filesize = f.filesize;
-                    filedb_id = orma.insertIntoFileDB(file_);
+                    long row_id = orma.insertIntoFileDB(file_);
+                    Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
+                    filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
+                    Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
                 }
 
                 Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
@@ -2106,19 +2113,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    try
-                    {
-                        if (message_list_fragment != null)
-                        {
-                            Log.i(TAG, "update_message_view:003");
-                            MainActivity.message_list_fragment.update_all_messages();
-                            Log.i(TAG, "update_message_view:004");
-                        }
-                    }
-                    catch (Exception ee1)
-                    {
-                        ee1.printStackTrace();
-                    }
+                    update_all_messages_global(true);
                 }
             }
             catch (Exception e2)
@@ -2144,6 +2139,13 @@ public class MainActivity extends AppCompatActivity
                     else
                     {
                         fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                        if (fos == null)
+                        {
+                            fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
+                            Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                            cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                            f.fos_open = true;
+                        }
                         Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
                     }
 
@@ -2164,6 +2166,13 @@ public class MainActivity extends AppCompatActivity
                     else
                     {
                         fos = cache_ft_fos_normal.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                        if (fos == null)
+                        {
+                            fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
+                            Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                            cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                            f.fos_open = true;
+                        }
                         Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
                     }
 
@@ -2174,6 +2183,8 @@ public class MainActivity extends AppCompatActivity
 
                 f.current_position = position;
                 update_filetransfer_db_full(f);
+
+                update_all_messages_global(false);
             }
             catch (Exception e)
             {
@@ -2231,6 +2242,15 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
         // just in case, update own activity pointer!
         main_activity_s = this;
+    }
+
+    public static void update_all_messages_global(boolean force)
+    {
+        if ((force) || (update_all_messages_global_timestamp + 1000 < System.currentTimeMillis()))
+        {
+            update_all_messages_global_timestamp = System.currentTimeMillis();
+            update_message_view();
+        }
     }
 
     public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
@@ -2317,11 +2337,21 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            set_message_state_from_id(orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id, state);
+            long ft_id = orma.selectFromFiletransfer().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    and().file_numberEq(file_number).orderByIdDesc().get(0).id;
+
+            Log.i(TAG, "set_message_state_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number + " file_number=" + file_number);
+
+            set_message_state_from_id(orma.selectFromMessage().
+                    filetransfer_idEq(ft_id).and().
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    get(0).id, state);
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "set_message_state_from_friendnum_and_filenum:EE:" + e.getMessage());
         }
     }
 
@@ -2335,6 +2365,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "set_message_state_from_id:EE:" + e.getMessage());
         }
     }
 
@@ -2342,11 +2373,24 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            set_message_filedb_from_id(orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id, filedb_id);
+            long ft_id = orma.selectFromFiletransfer().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    and().file_numberEq(file_number).
+                    orderByIdDesc().
+                    get(0).id;
+
+            Log.i(TAG, "set_message_filedb_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number + " file_number=" + file_number);
+
+
+            set_message_filedb_from_id(orma.selectFromMessage().
+                    filetransfer_idEq(ft_id).and().
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    get(0).id, filedb_id);
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "set_message_filedb_from_friendnum_and_filenum:EE:" + e.getMessage());
         }
     }
 
@@ -2355,11 +2399,12 @@ public class MainActivity extends AppCompatActivity
         try
         {
             orma.updateMessage().idEq(message_id).filedb_id(filedb_id).execute();
-            Log.i(TAG, "set_message_state_from_id:message_id=" + message_id + " filedb_id=" + filedb_id);
+            Log.i(TAG, "set_message_filedb_from_id:message_id=" + message_id + " filedb_id=" + filedb_id);
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "set_message_filedb_from_id:EE:" + e.getMessage());
         }
     }
 
@@ -2423,7 +2468,12 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            set_filetransfer_for_message_from_filetransfer_id(orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id, ft_id);
+            set_filetransfer_for_message_from_filetransfer_id(orma.selectFromFiletransfer().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    and().
+                    file_numberEq(file_number).
+                    orderByIdDesc().
+                    get(0).id, ft_id);
         }
         catch (Exception e)
         {
@@ -2447,7 +2497,12 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            delete_filetransfers_from_id(orma.selectFromFiletransfer().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id);
+            delete_filetransfers_from_id(orma.selectFromFiletransfer().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    and().
+                    file_numberEq(file_number).
+                    orderByIdDesc().
+                    get(0).id);
         }
         catch (Exception e)
         {
@@ -2520,7 +2575,7 @@ public class MainActivity extends AppCompatActivity
                     delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                     // update UI
                     // TODO: updates all messages, this is bad
-                    update_message_view_on_UI();
+                    update_all_messages_global(false);
                 }
                 else // avatar FT
                 {
@@ -2580,7 +2635,26 @@ public class MainActivity extends AppCompatActivity
         //    @Override
         //    public void run()
         //    {
-        return orma.insertIntoFiletransfer(f);
+        try
+        {
+            long row_id = orma.insertIntoFiletransfer(f);
+            Log.i(TAG, "insert_into_filetransfer_db:row_id=" + row_id);
+
+            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Filetransfer where rowid='" + row_id + "'");
+            cursor.moveToFirst();
+            Log.i(TAG, "insert_into_filetransfer_db:id res count=" + cursor.getColumnCount());
+            long ft_id = cursor.getLong(0);
+            cursor.close();
+
+            Log.i(TAG, "insert_into_filetransfer_db:ft_id=" + ft_id);
+            return ft_id;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "insert_into_filetransfer_db:EE:" + e.getMessage());
+            return -1;
+        }
         //    }
         //};
         //t.start();
