@@ -101,7 +101,7 @@ public class MessageListFragment extends ListFragment
                 try
                 {
                     Log.i(TAG, "scroll to bottom:1");
-                    Thread.sleep(300); // TODO: really back hack!!
+                    Thread.sleep(350); // TODO: really back hack!!
                     // scroll to bottom of message list
                     scroll_to_bottom();
                     Log.i(TAG, "scroll to bottom:1.a");

@@ -64,7 +64,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
     }
 
     @Override
-    synchronized public View getView(final int position, View convertView, ViewGroup parent)
+    public View getView(final int position, View convertView, ViewGroup parent)
     {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = null;
@@ -92,7 +92,15 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                         ft_progressbar.setVisibility(View.GONE);
 
                         TextView textView = (TextView) rowView.findViewById(R.id.m_text);
-                        textView.setText("" + values.get(position).text + "\n*canceled*");
+                        if (values.get(position).filedb_id == -1)
+                        {
+                            textView.setText("" + values.get(position).text + "\n*canceled*");
+                        }
+                        else
+                        {
+                            // TODO: show preview and "click" to open/delete file
+                            textView.setText("" + values.get(position).text + "\n+OK+");
+                        }
                         // ------- STATE: CANCEL -------------
                     }
                     else if (values.get(position).state == TOX_FILE_CONTROL_PAUSE.value)
@@ -138,6 +146,10 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             Log.i(TAG, "button_ok:OnTouch:007");
                                             tox_file_control(tox_friend_by_public_key__wrapper(values.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values.get(position).filetransfer_id), TOX_FILE_CONTROL_RESUME.value);
                                             Log.i(TAG, "button_ok:OnTouch:008");
+                                            ft_progressbar.setProgress(0);
+                                            ft_progressbar.setMax(100);
+                                            ft_progressbar.setIndeterminate(true);
+                                            ft_progressbar.setVisibility(View.VISIBLE);
                                             button_ok.setVisibility(View.GONE);
                                             Log.i(TAG, "button_ok:OnTouch:009");
                                         }
@@ -201,8 +213,16 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                     else
                     {
                         // ------- STATE: RESUME -------------
+                        if (rowView != null)
+                        {
+                            final ProgressBar ft_progressbar = (ProgressBar) rowView.findViewById(R.id.ft_progressbar);
 
-                        // ------- STATE: RESUME -------------
+                            // TODO:
+                            ft_progressbar.setProgress(0);
+                            ft_progressbar.setMax(25);
+                            ft_progressbar.setIndeterminate(false);
+                            // ------- STATE: RESUME -------------
+                        }
                     }
                 }
                 else
