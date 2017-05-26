@@ -217,7 +217,8 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                                         GlideApp.
                                                                 with(v_).
                                                                 load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
-                                                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                                                diskCacheStrategy(DiskCacheStrategy.NONE).
+                                                                skipMemoryCache(false).
                                                                 placeholder(d3).
                                                                 listener(new com.bumptech.glide.request.RequestListener<Drawable>()
                                                                 {
@@ -343,21 +344,12 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         try
                                         {
                                             // accept FT
-                                            Log.i(TAG, "button_ok:OnTouch:001");
-                                            //values.get(position).ft_accepted = true;
-                                            Log.i(TAG, "button_ok:OnTouch:002");
-                                            // values.get(position).state = TOX_FILE_CONTROL_RESUME.value;
-                                            Log.i(TAG, "button_ok:OnTouch:003");
                                             set_filetransfer_accepted_from_id(values_msg.get(position).filetransfer_id);
-                                            Log.i(TAG, "button_ok:OnTouch:004");
                                             set_filetransfer_state_from_id(values_msg.get(position).filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
-                                            Log.i(TAG, "button_ok:OnTouch:005");
                                             set_message_accepted_from_id(values_msg.get(position).id);
-                                            Log.i(TAG, "button_ok:OnTouch:006");
                                             set_message_state_from_id(values_msg.get(position).id, TOX_FILE_CONTROL_RESUME.value);
-                                            Log.i(TAG, "button_ok:OnTouch:007");
                                             tox_file_control(tox_friend_by_public_key__wrapper(values_msg.get(position).tox_friendpubkey), get_filetransfer_filenum_from_id(values_msg.get(position).filetransfer_id), TOX_FILE_CONTROL_RESUME.value);
-                                            Log.i(TAG, "button_ok:OnTouch:008");
+
                                             ft_progressbar.setProgress(0);
                                             ft_progressbar.setMax(100);
                                             ft_progressbar.setIndeterminate(true);
