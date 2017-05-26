@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +36,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.target.Target;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -158,6 +158,33 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 
                                 if (VFS_ENCRYPT)
                                 {
+                                    ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                                    {
+                                        @Override
+                                        public boolean onTouch(View v, MotionEvent event)
+                                        {
+                                            if (event.getAction() == MotionEvent.ACTION_UP)
+                                            {
+                                                try
+                                                {
+                                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
+                                                    intent.putExtra("image_filename", values_msg.get(position).filename_fullpath);
+                                                    v.getContext().startActivity(intent);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    e.printStackTrace();
+                                                    Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
+                                                }
+                                            }
+                                            else
+                                            {
+                                            }
+                                            return true;
+                                        }
+                                    });
+
+
                                     // TODO: this is just to show that it work. really bad and slow!!!!!
                                     final View v_ = rowView;
                                     final Thread t_image_preview = new Thread()
@@ -166,7 +193,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         public void run()
                                         {
                                             info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath);
-                                            final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "dummy.png");
+                                            final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
                                             Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
 
                                             //  load(new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath)).
@@ -182,6 +209,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                                         GlideApp.
                                                                 with(v_).
                                                                 load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
+                                                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                                                 placeholder(d3).
                                                                 listener(new com.bumptech.glide.request.RequestListener<Drawable>()
                                                                 {
@@ -268,41 +296,6 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 
                             ft_preview_container.setVisibility(View.VISIBLE);
                             ft_preview_image.setVisibility(View.VISIBLE);
-
-                            ft_preview_image.setOnTouchListener(new View.OnTouchListener()
-                            {
-                                @Override
-                                public boolean onTouch(View v, MotionEvent event)
-                                {
-                                    if (event.getAction() == MotionEvent.ACTION_DOWN)
-                                    {
-                                        try
-                                        {
-                                            Intent intent = new Intent();
-                                            intent.setAction(android.content.Intent.ACTION_VIEW);
-                                            String mime = URLConnection.guessContentTypeFromName(values_msg.get(position).filename_fullpath.toLowerCase());
-                                            if (VFS_ENCRYPT)
-                                            {
-                                                intent.setDataAndType(Uri.fromFile(new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath)), mime);
-                                            }
-                                            else
-                                            {
-                                                intent.setDataAndType(Uri.fromFile(new java.io.File(values_msg.get(position).filename_fullpath)), mime);
-                                            }
-                                            context.startActivity(intent);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
-                                            Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
-                                        }
-                                    }
-                                    else
-                                    {
-                                    }
-                                    return true;
-                                }
-                            });
                         }
                         // ------- STATE: CANCEL -------------
                     }

@@ -49,9 +49,9 @@
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label,android:icon">
 
-        <!--<meta-data-->
-        <!--android:name="com.zoffcc.applications.trifa.MyGlideModule"-->
-        <!--android:value="GlideModule"/>-->
+        <!-- <meta-data -->
+        <!-- android:name="com.zoffcc.applications.trifa.MyGlideModule" -->
+        <!-- android:value="GlideModule"/> -->
 
         <activity
             android:name=".MainActivity"
@@ -95,6 +95,11 @@
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_friendinfo">
         </activity>
+        <activity
+            android:name=".ImageviewerActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings">

@@ -90,7 +90,7 @@ public class FileLoader2<Data> implements ModelLoader<info.guardianproject.iocip
                 //                fis.read((byte[]) data, 0, (int) file.length());
                 //                System.out.println("fileloader2:loadData:003");
 
-                String temp_file_name = copy_vfs_file_to_real_file(file.getParent(), file.getName(), SD_CARD_TMP_DIR, "dummy.png");
+                String temp_file_name = copy_vfs_file_to_real_file(file.getParent(), file.getName(), SD_CARD_TMP_DIR, "_2");
                 System.out.println("fileloader2:loadData:000a:temp_file_name=" + temp_file_name);
                 data = opener.open(new File(SD_CARD_TMP_DIR + "/" + temp_file_name));
                 // data = (Data) new java.io.FileInputStream(SD_CARD_TMP_DIR + "/" + temp_file_name);

@@ -3028,7 +3028,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    static String copy_vfs_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
+    static String copy_vfs_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String appl)
     {
         String uniq_temp_filename = null;
 
@@ -3038,7 +3038,7 @@ public class MainActivity extends AppCompatActivity
             {
                 info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
 
-                uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length());
+                uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length()) + appl;
                 Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
 
                 java.io.File f2 = new java.io.File(dst_path_name + "/" + uniq_temp_filename);
