@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity
     static MessageListActivity message_list_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
+    static String SD_CARD_TMP_DIR = "";
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
@@ -205,6 +206,8 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         bootstrapping = false;
+
+        SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
 
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -2911,6 +2914,54 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
+
+    static String copy_vfs_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
+    {
+        String uniq_temp_filename = get_uniq_tmp_filename("???");
+
+        Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
+
+        try
+        {
+            Log.i(TAG, "copy_vfs_file_to_real_file:uniq_temp_filename=" + uniq_temp_filename);
+
+            if (VFS_ENCRYPT)
+            {
+                info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
+                java.io.File f2 = new java.io.File(dst_path_name + "/" + uniq_temp_filename);
+                java.io.File dst_dir = new java.io.File(dst_path_name + "/");
+                dst_dir.mkdirs();
+
+                info.guardianproject.iocipher.FileInputStream is = null;
+                java.io.FileOutputStream os = null;
+                try
+                {
+                    is = new info.guardianproject.iocipher.FileInputStream(f_real);
+                    os = new java.io.FileOutputStream(f2);
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = is.read(buffer)) > 0)
+                    {
+                        os.write(buffer, 0, length);
+                    }
+                }
+                finally
+                {
+                    is.close();
+                    os.close();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "copy_vfs_file_to_real_file:EE:" + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return uniq_temp_filename;
+    }
+
 
     static long insert_into_message_db(final Message m, final boolean update_message_view_flag)
     {

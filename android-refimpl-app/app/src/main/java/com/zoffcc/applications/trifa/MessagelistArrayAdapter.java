@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -35,13 +36,21 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.target.Target;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 import java.util.List;
 
+import info.guardianproject.iocipher.File;
+
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
 import static com.zoffcc.applications.trifa.MainActivity.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_accepted_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
@@ -139,12 +148,73 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 
                             if (is_image)
                             {
+
                                 final Drawable d3 = new IconicsDrawable(parent.getContext()).
                                         icon(GoogleMaterial.Icon.gmd_photo).
                                         backgroundColor(Color.TRANSPARENT).
                                         color(Color.parseColor("#AA000000")).sizeDp(50);
 
-                                ft_preview_image.setImageDrawable(d3);
+                                if (VFS_ENCRYPT)
+                                {
+                                    // TODO: this is just to show that it work. really bad and slow!!!!!
+                                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath);
+                                    String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "dummy.png");
+                                    Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
+
+                                    //  load(new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath)).
+
+                                    Log.i(TAG, "glide:img:001");
+                                    GlideApp.
+                                            with(rowView).
+                                            load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
+                                            placeholder(d3).
+                                            listener(new com.bumptech.glide.request.RequestListener<Drawable>()
+                                            {
+                                                @Override
+                                                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource)
+                                                {
+                                                    Log.i(TAG, "glide:onResourceReady:model=" + model);
+
+                                                    try
+                                                    {
+                                                        java.io.File f = (java.io.File) model;
+                                                        f.delete();
+                                                    }
+                                                    catch (Exception e2)
+                                                    {
+                                                        e2.printStackTrace();
+                                                        Log.i(TAG, "glide:onResourceReady:EE:" + e2.getMessage());
+                                                    }
+
+                                                    return false;
+                                                }
+
+                                                @Override
+                                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource)
+                                                {
+                                                    Log.i(TAG, "glide:onLoadFailed:model=" + model);
+
+                                                    try
+                                                    {
+                                                        java.io.File f = (java.io.File) model;
+                                                        f.delete();
+                                                    }
+                                                    catch (Exception e2)
+                                                    {
+                                                        e2.printStackTrace();
+                                                        Log.i(TAG, "glide:onLoadFailed:EE:" + e2.getMessage());
+                                                    }
+
+                                                    return false;
+                                                }
+
+                                            }).
+                                            into(ft_preview_image);
+                                    Log.i(TAG, "glide:img:002");
+
+                                    // TODO: this is just to show that it work. really bad and slow!!!!!
+
+                                }
                             }
                             else
                             {

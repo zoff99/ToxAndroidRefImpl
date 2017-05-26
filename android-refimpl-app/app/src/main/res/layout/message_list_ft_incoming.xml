@@ -70,16 +70,17 @@
 
             <ImageButton
                 android:id="@+id/ft_preview_image"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="70dp"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
                 android:background="@android:color/transparent"
                 android:elevation="4dp"
-                android:maxWidth="70dp"
-                android:padding="2dp"
+                android:minWidth="50dp"
+                android:paddingTop="8dp"
+                android:scaleType="fitCenter"
+                android:paddingBottom="8dp"
                 android:paddingLeft="4dp"
                 android:paddingRight="4dp"
-                android:src="@android:drawable/picture_frame"/>
+                android:src="@null"/>
 
         </LinearLayout>
 

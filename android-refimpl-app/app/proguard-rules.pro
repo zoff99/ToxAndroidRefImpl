@@ -25,6 +25,7 @@
 #-renamesourcefileattribute SourceFile
 
 
+#-keepnames class * com.zoffcc.applications.trifa.MyGlideModule
 
 #-dontoptimize
 #-dontshrink

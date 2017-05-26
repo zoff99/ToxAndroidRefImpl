@@ -48,6 +48,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label,android:icon">
+
+        <!--<meta-data-->
+        <!--android:name="com.zoffcc.applications.trifa.MyGlideModule"-->
+        <!--android:value="GlideModule"/>-->
+
         <activity
             android:name=".MainActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
