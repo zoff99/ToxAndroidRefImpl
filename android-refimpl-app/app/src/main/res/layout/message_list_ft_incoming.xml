@@ -68,19 +68,32 @@
             android:orientation="horizontal"
             android:visibility="gone">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_weight="1"/>
+
             <ImageButton
                 android:id="@+id/ft_preview_image"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="200dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_weight="3"
                 android:background="@android:color/transparent"
                 android:elevation="4dp"
                 android:minWidth="50dp"
-                android:paddingTop="8dp"
-                android:scaleType="fitCenter"
                 android:paddingBottom="8dp"
                 android:paddingLeft="4dp"
                 android:paddingRight="4dp"
+                android:paddingTop="8dp"
+                android:scaleType="fitCenter"
                 android:src="@null"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_weight="1"/>
 
         </LinearLayout>
 

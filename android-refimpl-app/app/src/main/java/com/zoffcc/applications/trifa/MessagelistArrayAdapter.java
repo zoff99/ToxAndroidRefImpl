@@ -192,6 +192,14 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         @Override
                                         public void run()
                                         {
+                                            try
+                                            {
+                                                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+
                                             info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath);
                                             final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
                                             Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);

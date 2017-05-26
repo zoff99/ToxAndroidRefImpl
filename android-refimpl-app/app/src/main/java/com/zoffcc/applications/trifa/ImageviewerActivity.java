@@ -18,6 +18,8 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import info.guardianproject.iocipher.File;
 
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
+import static android.os.Process.setThreadPriority;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
@@ -64,6 +66,14 @@ public class ImageviewerActivity extends AppCompatActivity
                 @Override
                 public void run()
                 {
+                    try
+                    {
+                        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+                    }
+                    catch(Exception e)
+                    {
+                    }
+
                     info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(image_filename_);
                     final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_1");
                     Log.i(TAG, "loadData:temp_file_name=" + temp_file_name);
