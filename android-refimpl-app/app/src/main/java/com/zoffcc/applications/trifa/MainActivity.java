@@ -577,29 +577,105 @@ public class MainActivity extends AppCompatActivity
         else
         {
             // VFS not encrypted -------------
-            VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath() + "/" + "tmpdir/";
+            VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath() + "/vfs/";
             Log.i(TAG, "vfs:not_encrypted:(2)prefix=" + VFS_PREFIX);
             // VFS not encrypted -------------
         }
 
+        // cleanup temp dirs --------
+        cleanup_temp_dirs();
+        // cleanup temp dirs --------
+
         // ---------- DEBUG, just a test ----------
         // ---------- DEBUG, just a test ----------
         // ---------- DEBUG, just a test ----------
-        if (VFS_ENCRYPT)
-        {
-            if (vfs.isMounted())
-            {
-                vfs_listFilesAndFilesSubDirectories("/", 0, "");
-            }
-        }
-        // ---------- DEBUG, just a test ----------
-        // ---------- DEBUG, just a test ----------
-        // ---------- DEBUG, just a test ----------
+//        if (VFS_ENCRYPT)
+//        {
+//            if (vfs.isMounted())
+//            {
+//                vfs_listFilesAndFilesSubDirectories("/", 0, "");
+//            }
+//        }
+//        // ---------- DEBUG, just a test ----------
+//        // ---------- DEBUG, just a test ----------
+//        // ---------- DEBUG, just a test ----------
 
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
     }
 
+    public static void cleanup_temp_dirs()
+    {
+        try
+        {
+            if (VFS_ENCRYPT)
+            {
+                vfs_deleteFilesAndFilesSubDirectories_vfs(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
+            }
+            else
+            {
+                vfs_deleteFilesAndFilesSubDirectories_real(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            vfs_deleteFilesAndFilesSubDirectories_real(SD_CARD_TMP_DIR + "/");
+        }
+        catch (Exception e)
+        {
+            e.getMessage();
+        }
+
+    }
+
+    public static void vfs_deleteFilesAndFilesSubDirectories_real(String directoryName)
+    {
+        java.io.File directory1 = new java.io.File(directoryName);
+        java.io.File[] fList1 = directory1.listFiles();
+
+        for (java.io.File file : fList1)
+        {
+            if (file.isFile())
+            {
+                Log.i(TAG, "VFS:REAL:rm:" + file);
+                file.delete();
+            }
+            else if (file.isDirectory())
+            {
+                Log.i(TAG, "VFS:REAL:rm:D:" + file);
+                vfs_deleteFilesAndFilesSubDirectories_real(file.getAbsolutePath());
+            }
+        }
+    }
+
+    public static void vfs_deleteFilesAndFilesSubDirectories_vfs(String directoryName)
+    {
+        if (VFS_ENCRYPT)
+        {
+            info.guardianproject.iocipher.File directory1 = new info.guardianproject.iocipher.File(directoryName);
+            info.guardianproject.iocipher.File[] fList1 = directory1.listFiles();
+
+            for (info.guardianproject.iocipher.File file : fList1)
+            {
+                if (file.isFile())
+                {
+                    Log.i(TAG, "VFS:VFS:rm:" + file);
+                    file.delete();
+                }
+                else if (file.isDirectory())
+                {
+                    Log.i(TAG, "VFS:VFS:rm:D:" + file);
+                    vfs_deleteFilesAndFilesSubDirectories_vfs(file.getAbsolutePath());
+                }
+            }
+
+        }
+    }
 
     public void vfs_listFilesAndFilesSubDirectories(String directoryName, int depth, String parent)
     {
