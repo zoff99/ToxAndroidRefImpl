@@ -589,16 +589,16 @@ public class MainActivity extends AppCompatActivity
         // ---------- DEBUG, just a test ----------
         // ---------- DEBUG, just a test ----------
         // ---------- DEBUG, just a test ----------
-//        if (VFS_ENCRYPT)
-//        {
-//            if (vfs.isMounted())
-//            {
-//                vfs_listFilesAndFilesSubDirectories("/", 0, "");
-//            }
-//        }
-//        // ---------- DEBUG, just a test ----------
-//        // ---------- DEBUG, just a test ----------
-//        // ---------- DEBUG, just a test ----------
+        //        if (VFS_ENCRYPT)
+        //        {
+        //            if (vfs.isMounted())
+        //            {
+        //                vfs_listFilesAndFilesSubDirectories("/", 0, "");
+        //            }
+        //        }
+        //        // ---------- DEBUG, just a test ----------
+        //        // ---------- DEBUG, just a test ----------
+        //        // ---------- DEBUG, just a test ----------
 
         app_files_directory = getFilesDir().getAbsolutePath();
         tox_thread_start();
@@ -649,6 +649,7 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "VFS:REAL:rm:D:" + file);
                 vfs_deleteFilesAndFilesSubDirectories_real(file.getAbsolutePath());
+                file.delete();
             }
         }
     }
@@ -671,6 +672,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     Log.i(TAG, "VFS:VFS:rm:D:" + file);
                     vfs_deleteFilesAndFilesSubDirectories_vfs(file.getAbsolutePath());
+                    file.delete();
                 }
             }
 
