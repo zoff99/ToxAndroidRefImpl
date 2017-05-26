@@ -76,6 +76,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -576,7 +577,7 @@ public class MainActivity extends AppCompatActivity
         else
         {
             // VFS not encrypted -------------
-            VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath();
+            VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath() + "/" + "tmpdir/";
             Log.i(TAG, "vfs:not_encrypted:(2)prefix=" + VFS_PREFIX);
             // VFS not encrypted -------------
         }
@@ -2840,9 +2841,35 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static String get_uniq_tmp_filename(String dummy)
+    static String get_uniq_tmp_filename(String filename_with_path, long filesize)
     {
-        return "temp__" + System.currentTimeMillis() + (int) (Math.random() * 10000d);
+        String ret = null;
+
+        try
+        {
+            java.security.MessageDigest md5_ = java.security.MessageDigest.getInstance("MD5");
+            byte[] md5_digest = md5_.digest((filesize + ":" + filename_with_path).getBytes());
+
+            BigInteger bigInt = new BigInteger(1, md5_digest);
+            String hashtext = bigInt.toString(16);
+
+            // Now we need to zero pad it if you actually want the full 32 chars.
+            while (hashtext.length() < 32)
+            {
+                hashtext = "0" + hashtext;
+            }
+
+            ret = hashtext;
+            // Log.i(TAG, "get_uniq_tmp_filename:ret=" + ret);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "get_uniq_tmp_filename:EE:" + e.getMessage());
+            ret = "temp__" + System.currentTimeMillis() + (int) (Math.random() * 10000d);
+        }
+
+        return ret;
     }
 
     static void copy_real_file_to_vfs_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
@@ -2850,12 +2877,13 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "copy_real_file_to_vfs_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + dst_file_name);
         try
         {
-            String uniq_temp_filename = get_uniq_tmp_filename("???");
-            Log.i(TAG, "copy_real_file_to_vfs_file:uniq_temp_filename=" + uniq_temp_filename);
-
             if (VFS_ENCRYPT)
             {
                 java.io.File f_real = new java.io.File(src_path_name + "/" + src_file_name);
+
+                String uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length());
+                Log.i(TAG, "copy_real_file_to_vfs_file:uniq_temp_filename=" + uniq_temp_filename);
+
                 info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
                 info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
                 dst_dir.mkdirs();
@@ -2878,10 +2906,16 @@ public class MainActivity extends AppCompatActivity
                     is.close();
                     os.close();
                 }
+
+                move_tmp_file_to_real_file(VFS_PREFIX + VFS_TMP_FILE_DIR, uniq_temp_filename, dst_path_name, dst_file_name);
             }
             else
             {
                 java.io.File f_real = new java.io.File(src_path_name + "/" + src_file_name);
+
+                String uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length());
+                Log.i(TAG, "copy_real_file_to_vfs_file:uniq_temp_filename=" + uniq_temp_filename);
+
                 java.io.File f2 = new java.io.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
                 java.io.File dst_dir = new java.io.File(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
                 dst_dir.mkdirs();
@@ -2904,9 +2938,9 @@ public class MainActivity extends AppCompatActivity
                     is.close();
                     os.close();
                 }
-            }
 
-            move_tmp_file_to_real_file(VFS_PREFIX + VFS_TMP_FILE_DIR, uniq_temp_filename, dst_path_name, dst_file_name);
+                move_tmp_file_to_real_file(VFS_PREFIX + VFS_TMP_FILE_DIR, uniq_temp_filename, dst_path_name, dst_file_name);
+            }
         }
         catch (Exception e)
         {
@@ -2918,17 +2952,17 @@ public class MainActivity extends AppCompatActivity
 
     static String copy_vfs_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
     {
-        String uniq_temp_filename = get_uniq_tmp_filename("???");
-
-        Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
+        String uniq_temp_filename = null;
 
         try
         {
-            Log.i(TAG, "copy_vfs_file_to_real_file:uniq_temp_filename=" + uniq_temp_filename);
-
             if (VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
+
+                uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length());
+                Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
+
                 java.io.File f2 = new java.io.File(dst_path_name + "/" + uniq_temp_filename);
                 java.io.File dst_dir = new java.io.File(dst_path_name + "/");
                 dst_dir.mkdirs();
