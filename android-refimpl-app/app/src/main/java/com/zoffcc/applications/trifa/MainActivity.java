@@ -158,6 +158,8 @@ public class MainActivity extends AppCompatActivity
     final static int Notification_new_message_ID = 10023;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
+    final static long UPDATE_MESSAGES_WHILE_FT_ACTIVE_MILLIS = 30000; // ~30 seconds
+    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 2000; // ~30 seconds
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
@@ -2057,6 +2059,7 @@ public class MainActivity extends AppCompatActivity
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
+            f.message_id = -1;
             f.state = TOX_FILE_CONTROL_RESUME.value;
             f.path_name = VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
             f.file_name = file_name_avatar;
@@ -2100,7 +2103,10 @@ public class MainActivity extends AppCompatActivity
             m.rcvd_timestamp = System.currentTimeMillis();
             m.text = filename + "\n" + file_size + " bytes";
 
-            insert_into_message_db(m, true);
+            long new_msg_id = insert_into_message_db(m, true);
+
+            f.message_id = new_msg_id;
+            update_filetransfer_db_full(f);
 
             try
             {
@@ -2119,6 +2125,8 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
     {
         // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
+
+        Log.i(TAG, "file_recv_chunk:--START--");
 
         Filetransfer f = null;
         try
@@ -2327,10 +2335,29 @@ public class MainActivity extends AppCompatActivity
 
                 f.current_position = position;
                 // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
-                // update_filetransfer_db_full(f);
                 update_filetransfer_db_current_position(f);
 
-                update_all_messages_global(false);
+                if (f.kind != TOX_FILE_KIND_AVATAR.value)
+                {
+                    // update_all_messages_global(false);
+                    try
+                    {
+                        if (f.id != -1)
+                        {
+                            Message m = orma.selectFromMessage().filetransfer_idEq(f.id).orderByIdDesc().get(0);
+                            Log.i(TAG, "file_recv_chunk:m=" + m);
+                            if (m.id != -1)
+                            {
+                                Log.i(TAG, "file_recv_chunk:update_single_message:1");
+                                update_single_message(m);
+                                Log.i(TAG, "file_recv_chunk:update_single_message:2");
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -2338,6 +2365,8 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "file_recv_chunk:EE1:" + e.getMessage());
             }
         }
+
+        Log.i(TAG, "file_recv_chunk:--END--");
     }
 
     // void test(int i)
@@ -2390,9 +2419,25 @@ public class MainActivity extends AppCompatActivity
         main_activity_s = this;
     }
 
+    public static void update_single_message(Message m)
+    {
+        try
+        {
+            if (message_list_fragment != null)
+            {
+                MainActivity.message_list_fragment.modify_message(m);
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+            Log.i(TAG, "update_message_view:EE:" + e.getMessage());
+        }
+    }
+
     public static void update_all_messages_global(boolean force)
     {
-        if ((force) || (update_all_messages_global_timestamp + 1000 < System.currentTimeMillis()))
+        if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
         {
             update_all_messages_global_timestamp = System.currentTimeMillis();
             update_message_view();
@@ -2824,6 +2869,7 @@ public class MainActivity extends AppCompatActivity
                 kind(f.kind).
                 state(f.state).
                 path_name(f.path_name).
+                message_id(f.message_id).
                 file_name(f.file_name).
                 fos_open(f.fos_open).
                 filesize(f.filesize).
@@ -3027,7 +3073,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     static String copy_vfs_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String appl)
     {
         String uniq_temp_filename = null;
@@ -3074,7 +3119,6 @@ public class MainActivity extends AppCompatActivity
         return uniq_temp_filename;
     }
 
-
     static long insert_into_message_db(final Message m, final boolean update_message_view_flag)
     {
         // Thread t = new Thread()
@@ -3085,23 +3129,30 @@ public class MainActivity extends AppCompatActivity
         // Log.i(TAG, "insert_into_message_db:m=" + m);
         long row_id = orma.insertIntoMessage(m);
 
-        Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Message where rowid='" + row_id + "'");
-        cursor.moveToFirst();
-        Log.i(TAG, "insert_into_message_db:id res count=" + cursor.getColumnCount());
-        long msg_id = cursor.getLong(0);
-        cursor.close();
-
-        if (update_message_view_flag)
+        try
         {
-            update_message_view();
-        }
+            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Message where rowid='" + row_id + "'");
+            cursor.moveToFirst();
+            Log.i(TAG, "insert_into_message_db:id res count=" + cursor.getColumnCount());
+            long msg_id = cursor.getLong(0);
+            cursor.close();
 
-        return msg_id;
+            if (update_message_view_flag)
+            {
+                update_message_view();
+            }
+
+            return msg_id;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
         //    }
         //};
         //t.start();
     }
-
 
     static String get_vfs_image_filename_own_avatar()
     {
@@ -3332,7 +3383,6 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
-
     static void delete_friend(final String friend_pubkey)
     {
         Thread t = new Thread()
@@ -3382,7 +3432,6 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "update_message_view:006");
             }
         }
-
         catch (Exception e)
         {
             // e.printStackTrace();
@@ -3565,7 +3614,6 @@ public class MainActivity extends AppCompatActivity
     {
         return bootstrap_single(ip, key_hex, port);
     }
-
 
     void sendEmailWithAttachment(Context c, final String recipient, final String subject, final String message, final String full_file_name, final String full_file_name_suppl)
     {

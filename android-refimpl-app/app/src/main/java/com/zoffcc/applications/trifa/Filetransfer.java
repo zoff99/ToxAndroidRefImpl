@@ -66,6 +66,9 @@ public class Filetransfer
     @Column(defaultExpr = "0")
     long current_position = 0;
 
+    @Column(indexed = true, defaultExpr = "-1")
+    long message_id; // f_key -> Message.id
+
     static Filetransfer deep_copy(Filetransfer in)
     {
         Filetransfer out = new Filetransfer();
@@ -80,12 +83,13 @@ public class Filetransfer
         out.fos_open = in.fos_open;
         out.filesize = in.filesize;
         out.current_position = in.current_position;
+        out.message_id = in.message_id;
         return out;
     }
 
     @Override
     public String toString()
     {
-        return "id=" + id + ", kind=" + kind + ", path_name=" + path_name + ", file_name=" + file_name + ", filesize=" + filesize + ", current_position=" + current_position;
+        return "id=" + id + ", kind=" + kind + ", path_name=" + path_name + ", file_name=" + file_name + ", filesize=" + filesize + ", current_position=" + current_position + ", message_id=" + message_id;
     }
 }

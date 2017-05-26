@@ -206,14 +206,33 @@ public class MessageListFragment extends ListFragment
         main_handler_s.post(myRunnable);
     }
 
-    void modify_message(final Message m)
+    synchronized void modify_message(final Message m)
     {
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                // TODO
+                try
+                {
+                    if (data_values != null)
+                    {
+                        int i = 0;
+                        for (i = 0; i < data_values.size(); i++)
+                        {
+                            if (data_values.get(i).id == m.id)
+                            {
+                                data_values.set(i, m);
+                                a.notifyDataSetChanged();
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         };
         main_handler_s.post(myRunnable);
