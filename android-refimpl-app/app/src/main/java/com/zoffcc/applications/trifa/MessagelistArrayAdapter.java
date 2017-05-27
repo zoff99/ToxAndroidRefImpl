@@ -358,7 +358,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             button_ok.setVisibility(View.GONE);
 
                                             // update message view
-                                            update_single_message_from_messge_id(values_msg.get(position).id,true);
+                                            update_single_message_from_messge_id(values_msg.get(position).id, true);
 
                                             Log.i(TAG, "button_ok:OnTouch:009");
                                         }
@@ -395,7 +395,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             ft_progressbar.setVisibility(View.GONE);
 
                                             // update message view
-                                            update_single_message_from_messge_id(values_msg.get(position).id,true);
+                                            update_single_message_from_messge_id(values_msg.get(position).id, true);
                                         }
                                         catch (Exception e)
                                         {
@@ -462,7 +462,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             ft_progressbar.setVisibility(View.GONE);
 
                                             // update message view
-                                            update_single_message_from_messge_id(values_msg.get(position).id,true);
+                                            update_single_message_from_messge_id(values_msg.get(position).id, true);
                                         }
                                         catch (Exception e)
                                         {
@@ -527,7 +527,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         ft_progressbar.setVisibility(View.GONE);
 
                                         // update message view
-                                        update_single_message_from_messge_id(values_msg.get(position).id,true);
+                                        update_single_message_from_messge_id(values_msg.get(position).id, true);
                                     }
                                     catch (Exception e)
                                     {

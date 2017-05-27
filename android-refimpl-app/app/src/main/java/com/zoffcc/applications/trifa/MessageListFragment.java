@@ -125,7 +125,6 @@ public class MessageListFragment extends ListFragment
         super.onAttach(activity);
     }
 
-
     void scroll_to_bottom()
     {
         Runnable myRunnable = new Runnable()

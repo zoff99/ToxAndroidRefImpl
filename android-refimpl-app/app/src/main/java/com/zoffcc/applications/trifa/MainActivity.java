@@ -2030,13 +2030,12 @@ public class MainActivity extends AppCompatActivity
             {
                 if (ft_id != -1)
                 {
-                    update_single_message_from_ftid(ft_id, true);
+                    update_single_message_from_messge_id(msg_ig, true);
                 }
             }
             catch (Exception e)
             {
             }
-
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_PAUSE.value)
         {
@@ -2052,7 +2051,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (ft_id != -1)
                 {
-                    update_single_message_from_ftid(ft_id, true);
+                    update_single_message_from_messge_id(msg_ig, true);
                 }
             }
             catch (Exception e)
@@ -2275,18 +2274,7 @@ public class MainActivity extends AppCompatActivity
                     set_message_state_from_friendnum_and_filenum(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
                     set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
                     set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
-                }
 
-                // remove FT from DB
-                Log.i(TAG, "FTFTFT:001");
-                delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
-
-                if (f.kind == TOX_FILE_KIND_AVATAR.value)
-                {
-                }
-                else
-                {
-                    // update_all_messages_global(true);
                     try
                     {
                         if (f.id != -1)
@@ -2299,6 +2287,11 @@ public class MainActivity extends AppCompatActivity
                     }
 
                 }
+
+                // remove FT from DB
+                Log.i(TAG, "FTFTFT:001");
+                delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
+
             }
             catch (Exception e2)
             {
@@ -2969,7 +2962,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (f.id != -1)
                         {
-                            update_single_message_from_ftid(f.id, false);
+                            update_single_message_from_messge_id(msg_ig, true);
                         }
                     }
                     catch (Exception e)
