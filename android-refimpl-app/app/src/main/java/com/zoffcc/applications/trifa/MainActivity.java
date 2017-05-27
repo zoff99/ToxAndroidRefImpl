@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
     final static long UPDATE_MESSAGES_WHILE_FT_ACTIVE_MILLIS = 30000; // ~30 seconds
-    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 500; // ~2 seconds
+    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 2500; // ~2.5 seconds
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
@@ -2147,8 +2147,7 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
     {
         // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
-
-        Log.i(TAG, "file_recv_chunk:--START--");
+        // Log.i(TAG, "file_recv_chunk:--START--");
 
         Filetransfer f = null;
         try
@@ -2180,17 +2179,6 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
                     Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
                     f2.mkdirs();
-                }
-
-                // switch progressbar to "setIndeterminate=false" and "0" percent
-                // also set max value
-                try
-                {
-                    // TODO
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
                 }
             }
         }
@@ -2296,7 +2284,6 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 // remove FT from DB
-                Log.i(TAG, "FTFTFT:001");
                 delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
 
             }
@@ -2393,7 +2380,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        Log.i(TAG, "file_recv_chunk:--END--");
+        // Log.i(TAG, "file_recv_chunk:--END--");
     }
 
     // void test(int i)
