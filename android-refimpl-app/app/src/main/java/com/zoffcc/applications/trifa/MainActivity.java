@@ -176,7 +176,8 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__notification_sound = true;
     static boolean PREF__notification_vibrate = false;
     static boolean PREF__notification = true;
-    static int PREF__min_audio_samplingrate_out = 8000;
+    static final int MIN_AUDIO_SAMPLINGRATE_OUT = 48000;
+    static int PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     //
@@ -231,13 +232,13 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                PREF__min_audio_samplingrate_out = Integer.parseInt(settings.getString("min_audio_samplingrate_out", "8000"));
+                PREF__min_audio_samplingrate_out = Integer.parseInt(settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__min_audio_samplingrate_out = 8000;
+            PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
         }
         // prefs ----------
 
@@ -884,13 +885,13 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                PREF__min_audio_samplingrate_out = Integer.parseInt(settings.getString("min_audio_samplingrate_out", "8000"));
+                PREF__min_audio_samplingrate_out = Integer.parseInt(settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__min_audio_samplingrate_out = 8000;
+            PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
         }
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__min_audio_samplingrate_out:2=" + PREF__min_audio_samplingrate_out);
