@@ -2020,17 +2020,17 @@ public class MainActivity extends AppCompatActivity
 
             long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:ft_id=" + ft_id);
-            long msg_ig = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
-            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:msg_ig=" + msg_ig);
+            long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:msg_id=" + msg_id);
             set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_RESUME.value);
-            set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_RESUME.value);
+            set_message_state_from_id(msg_id, TOX_FILE_CONTROL_RESUME.value);
 
             // update_all_messages_global(true);
             try
             {
                 if (ft_id != -1)
                 {
-                    update_single_message_from_messge_id(msg_ig, true);
+                    update_single_message_from_messge_id(msg_id, true);
                 }
             }
             catch (Exception e)
@@ -2042,16 +2042,16 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_PAUSE");
 
             long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
-            long msg_ig = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+            long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
             set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_PAUSE.value);
-            set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_PAUSE.value);
+            set_message_state_from_id(msg_id, TOX_FILE_CONTROL_PAUSE.value);
 
             // update_all_messages_global(true);
             try
             {
                 if (ft_id != -1)
                 {
-                    update_single_message_from_messge_id(msg_ig, true);
+                    update_single_message_from_messge_id(msg_id, true);
                 }
             }
             catch (Exception e)
@@ -2270,6 +2270,10 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
+                    Log.i(TAG, "file_recv_chunk:file_READY:001:f.id=" + f.id);
+                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(f.id, friend_number);
+                    Log.i(TAG, "file_recv_chunk:file_READY:001a:msg_id=" + msg_id);
+
                     update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number, VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/" + f.file_name);
                     set_message_state_from_friendnum_and_filenum(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
                     set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
@@ -2277,13 +2281,16 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
+                        Log.i(TAG, "file_recv_chunk:file_READY:002");
                         if (f.id != -1)
                         {
-                            update_single_message_from_ftid(f.id, true);
+                            Log.i(TAG, "file_recv_chunk:file_READY:003:f.id=" + f.id + " msg_id=" + msg_id);
+                            update_single_message_from_messge_id(msg_id, true);
                         }
                     }
                     catch (Exception e)
                     {
+                        Log.i(TAG, "file_recv_chunk:file_READY:EE:" + e.getMessage());
                     }
 
                 }
@@ -2546,6 +2553,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         catch (Exception e2)
                         {
+                            e2.printStackTrace();
                         }
                     }
                 };
@@ -2554,7 +2562,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            // e.printStackTrace();
+            e.printStackTrace();
             Log.i(TAG, "update_message_view:EE:" + e.getMessage());
         }
     }
@@ -2945,12 +2953,12 @@ public class MainActivity extends AppCompatActivity
                 if (f.kind == TOX_FILE_KIND_DATA.value)
                 {
                     long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
-                    long msg_ig = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
 
                     // delete tmp file
                     delete_filetransfer_tmpfile(friend_number, file_number);
                     // set state for FT in message
-                    set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_CANCEL.value);
+                    set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
                     // remove link to any message
                     set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
                     // delete FT in DB
@@ -2963,7 +2971,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (f.id != -1)
                         {
-                            update_single_message_from_messge_id(msg_ig, true);
+                            update_single_message_from_messge_id(msg_id, true);
                         }
                     }
                     catch (Exception e)
@@ -2973,9 +2981,9 @@ public class MainActivity extends AppCompatActivity
                 else // avatar FT
                 {
                     long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
-                    long msg_ig = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
                     set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_CANCEL.value);
-                    set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_CANCEL.value);
+                    set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
                     // delete tmp file
                     delete_filetransfer_tmpfile(friend_number, file_number);
                     // delete FT in DB
