@@ -2761,6 +2761,7 @@ public class MainActivity extends AppCompatActivity
             set_message_filedb_from_id(orma.selectFromMessage().
                     filetransfer_idEq(ft_id).and().
                     tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    orderByIdDesc().
                     get(0).id, filedb_id);
         }
         catch (Exception e)
