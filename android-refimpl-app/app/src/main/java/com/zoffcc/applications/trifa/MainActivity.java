@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
     final static long UPDATE_MESSAGES_WHILE_FT_ACTIVE_MILLIS = 30000; // ~30 seconds
-    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 2000; // ~30 seconds
+    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 500; // ~2 seconds
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
@@ -1847,7 +1847,8 @@ public class MainActivity extends AppCompatActivity
                             update_message_in_db_read_rcvd_timestamp(m);
 
                             // TODO this updates all messages. should be done nicer and faster!
-                            update_message_view();
+                            // update_message_view();
+                            update_single_message(m, true);
                         }
                         catch (Exception e)
                         {
@@ -2024,7 +2025,18 @@ public class MainActivity extends AppCompatActivity
             set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_RESUME.value);
             set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_RESUME.value);
 
-            update_all_messages_global(true);
+            // update_all_messages_global(true);
+            try
+            {
+                if (ft_id != -1)
+                {
+                    update_single_message_from_ftid(ft_id, true);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_PAUSE.value)
         {
@@ -2035,7 +2047,18 @@ public class MainActivity extends AppCompatActivity
             set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_PAUSE.value);
             set_message_state_from_id(msg_ig, TOX_FILE_CONTROL_PAUSE.value);
 
-            update_all_messages_global(true);
+            // update_all_messages_global(true);
+            try
+            {
+                if (ft_id != -1)
+                {
+                    update_single_message_from_ftid(ft_id, true);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+
         }
     }
 
@@ -2263,7 +2286,18 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    update_all_messages_global(true);
+                    // update_all_messages_global(true);
+                    try
+                    {
+                        if (f.id != -1)
+                        {
+                            update_single_message_from_ftid(f.id, true);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                    }
+
                 }
             }
             catch (Exception e2)
@@ -2344,14 +2378,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (f.id != -1)
                         {
-                            Message m = orma.selectFromMessage().filetransfer_idEq(f.id).orderByIdDesc().get(0);
-                            Log.i(TAG, "file_recv_chunk:m=" + m);
-                            if (m.id != -1)
-                            {
-                                Log.i(TAG, "file_recv_chunk:update_single_message:1");
-                                update_single_message(m);
-                                Log.i(TAG, "file_recv_chunk:update_single_message:2");
-                            }
+                            update_single_message_from_ftid(f.id, false);
                         }
                     }
                     catch (Exception e)
@@ -2419,13 +2446,117 @@ public class MainActivity extends AppCompatActivity
         main_activity_s = this;
     }
 
-    public static void update_single_message(Message m)
+
+    public static void add_single_message_from_messge_id(final long message_id, final boolean force)
     {
         try
         {
             if (message_list_fragment != null)
             {
-                MainActivity.message_list_fragment.modify_message(m);
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (message_id != -1)
+                        {
+                            try
+                            {
+                                Message m = orma.selectFromMessage().idEq(message_id).orderByIdDesc().get(0);
+                                if (m.id != -1)
+                                {
+                                    if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
+                                    {
+                                        update_all_messages_global_timestamp = System.currentTimeMillis();
+                                        MainActivity.message_list_fragment.add_message(m);
+                                    }
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                            }
+                        }
+                    }
+                };
+                t.start();
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+        }
+
+    }
+
+    public static void update_single_message_from_messge_id(final long message_id, final boolean force)
+    {
+        try
+        {
+            if (message_list_fragment != null)
+            {
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (message_id != -1)
+                        {
+                            try
+                            {
+                                Message m = orma.selectFromMessage().idEq(message_id).orderByIdDesc().get(0);
+                                if (m.id != -1)
+                                {
+                                    if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
+                                    {
+                                        update_all_messages_global_timestamp = System.currentTimeMillis();
+                                        MainActivity.message_list_fragment.modify_message(m);
+                                    }
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                            }
+                        }
+                    }
+                };
+                t.start();
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+        }
+    }
+
+    public static void update_single_message_from_ftid(final long filetransfer_id, final boolean force)
+    {
+        try
+        {
+            if (message_list_fragment != null)
+            {
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Message m = orma.selectFromMessage().filetransfer_idEq(filetransfer_id).orderByIdDesc().get(0);
+                            if (m.id != -1)
+                            {
+                                if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
+                                {
+                                    update_all_messages_global_timestamp = System.currentTimeMillis();
+                                    MainActivity.message_list_fragment.modify_message(m);
+                                }
+                            }
+                        }
+                        catch (Exception e2)
+                        {
+                        }
+                    }
+                };
+                t.start();
             }
         }
         catch (Exception e)
@@ -2435,14 +2566,34 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public static void update_all_messages_global(boolean force)
+    public static void update_single_message(Message m, boolean force)
     {
-        if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
+        try
         {
-            update_all_messages_global_timestamp = System.currentTimeMillis();
-            update_message_view();
+            if (message_list_fragment != null)
+            {
+                if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
+                {
+                    update_all_messages_global_timestamp = System.currentTimeMillis();
+                    MainActivity.message_list_fragment.modify_message(m);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+            Log.i(TAG, "update_message_view:EE:" + e.getMessage());
         }
     }
+
+    //    public static void update_all_messages_global(boolean force)
+    //    {
+    //        if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
+    //        {
+    //            update_all_messages_global_timestamp = System.currentTimeMillis();
+    //            update_message_view();
+    //        }
+    //    }
 
     public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
     {
@@ -2813,7 +2964,17 @@ public class MainActivity extends AppCompatActivity
                     delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                     // update UI
                     // TODO: updates all messages, this is bad
-                    update_all_messages_global(false);
+                    // update_all_messages_global(false);
+                    try
+                    {
+                        if (f.id != -1)
+                        {
+                            update_single_message_from_ftid(f.id, false);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                    }
                 }
                 else // avatar FT
                 {
@@ -3139,7 +3300,8 @@ public class MainActivity extends AppCompatActivity
 
             if (update_message_view_flag)
             {
-                update_message_view();
+                // update_message_view();
+                add_single_message_from_messge_id(msg_id, true);
             }
 
             return msg_id;
@@ -3398,25 +3560,25 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
-    static void update_message_view_on_UI()
-    {
-        Runnable myRunnable = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    update_message_view();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-        main_handler_s.post(myRunnable);
-    }
+    //    static void update_message_view_on_UI()
+    //    {
+    //        Runnable myRunnable = new Runnable()
+    //        {
+    //            @Override
+    //            public void run()
+    //            {
+    //                try
+    //                {
+    //                    update_message_view();
+    //                }
+    //                catch (Exception e)
+    //                {
+    //                    e.printStackTrace();
+    //                }
+    //            }
+    //        };
+    //        main_handler_s.post(myRunnable);
+    //    }
 
     static void update_message_view()
     {

@@ -58,6 +58,7 @@ import static com.zoffcc.applications.trifa.MainActivity.set_message_accepted_fr
 import static com.zoffcc.applications.trifa.MainActivity.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.update_single_message_from_messge_id;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
@@ -355,6 +356,10 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             ft_progressbar.setIndeterminate(true);
                                             ft_progressbar.setVisibility(View.VISIBLE);
                                             button_ok.setVisibility(View.GONE);
+
+                                            // update message view
+                                            update_single_message_from_messge_id(values_msg.get(position).id,true);
+
                                             Log.i(TAG, "button_ok:OnTouch:009");
                                         }
                                         catch (Exception e)
@@ -388,6 +393,9 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             button_ok.setVisibility(View.GONE);
                                             button_cancel.setVisibility(View.GONE);
                                             ft_progressbar.setVisibility(View.GONE);
+
+                                            // update message view
+                                            update_single_message_from_messge_id(values_msg.get(position).id,true);
                                         }
                                         catch (Exception e)
                                         {
@@ -452,6 +460,9 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                             button_ok.setVisibility(View.GONE);
                                             button_cancel.setVisibility(View.GONE);
                                             ft_progressbar.setVisibility(View.GONE);
+
+                                            // update message view
+                                            update_single_message_from_messge_id(values_msg.get(position).id,true);
                                         }
                                         catch (Exception e)
                                         {
@@ -514,6 +525,9 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                         button_ok.setVisibility(View.GONE);
                                         button_cancel.setVisibility(View.GONE);
                                         ft_progressbar.setVisibility(View.GONE);
+
+                                        // update message view
+                                        update_single_message_from_messge_id(values_msg.get(position).id,true);
                                     }
                                     catch (Exception e)
                                     {

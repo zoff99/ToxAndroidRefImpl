@@ -238,14 +238,16 @@ public class MessageListFragment extends ListFragment
         main_handler_s.post(myRunnable);
     }
 
-    void add_message(final Message m)
+    synchronized void add_message(final Message m)
     {
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                // TODO
+                data_values.add(m);
+                a.notifyDataSetChanged();
+                scroll_to_bottom();
             }
         };
 
