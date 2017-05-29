@@ -329,6 +329,7 @@ public class MessageListActivity extends AppCompatActivity
                 m.TOX_MESSAGE_TYPE = 0;
                 m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
                 m.rcvd_timestamp = 0L;
+                m.is_new = false; // own messages are always "not new"
                 m.sent_timestamp = System.currentTimeMillis();
                 m.read = false;
                 m.text = msg;

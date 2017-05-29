@@ -1963,8 +1963,13 @@ public class MainActivity extends AppCompatActivity
 
         if (!do_badge_update)
         {
-            Log.i(TAG, "noti_and_badge:004:");
+            Log.i(TAG, "noti_and_badge:004a:");
             m.is_new = false;
+        }
+        else
+        {
+            Log.i(TAG, "noti_and_badge:004b:");
+            m.is_new = true;
         }
 
         // m.tox_friendnum = friend_number;
