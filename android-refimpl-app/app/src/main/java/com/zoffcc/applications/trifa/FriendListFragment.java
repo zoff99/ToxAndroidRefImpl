@@ -58,12 +58,14 @@ public class FriendListFragment extends ListFragment
     List<FriendList> data_values = new ArrayList<FriendList>();
     FriendlistArrayAdapter a = null;
 
+    private boolean onattach_ready = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.friend_list_layout, container, false);
-        MainActivity.friend_list_fragment = this;
+        onattach_ready = false;
         return view;
     }
 
@@ -181,6 +183,8 @@ public class FriendListFragment extends ListFragment
             e.printStackTrace();
             Log.i(TAG, "onCreateView:2:EE:" + e.getMessage());
         }
+
+        MainActivity.friend_list_fragment = this;
     }
 
     @Override
@@ -194,9 +198,12 @@ public class FriendListFragment extends ListFragment
     {
         Log.i(TAG, "onAttach(Context)");
         super.onAttach(context);
+
         data_values.clear();
         a = new FriendlistArrayAdapter(context, data_values);
         setListAdapter(a);
+        MainActivity.friend_list_fragment = this;
+        onattach_ready = true;
     }
 
     @Override
@@ -204,9 +211,15 @@ public class FriendListFragment extends ListFragment
     {
         Log.i(TAG, "onAttach(Activity)");
         super.onAttach(activity);
-        //data_values.clear();
-        //a = new FriendlistArrayAdapter(activity, data_values);
-        //setListAdapter(a);
+
+        if (!onattach_ready)
+        {
+            data_values.clear();
+            a = new FriendlistArrayAdapter(activity, data_values);
+            setListAdapter(a);
+            MainActivity.friend_list_fragment = this;
+            onattach_ready = true;
+        }
     }
 
     void modify_friend(final FriendList f, final long friendnum)
@@ -262,7 +275,10 @@ public class FriendListFragment extends ListFragment
     @Override
     public void onResume()
     {
+        Log.i(TAG, "onResume");
         super.onResume();
+
+        onattach_ready = false;
 
         try
         {
@@ -273,6 +289,8 @@ public class FriendListFragment extends ListFragment
         {
             e.printStackTrace();
         }
+
+        MainActivity.friend_list_fragment = this;
     }
 
     void clear_friends()

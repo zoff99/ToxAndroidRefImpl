@@ -399,7 +399,14 @@ public class TrifaToxService extends Service
 
                 int fc = 0;
                 boolean exists_in_db = false;
-                MainActivity.friend_list_fragment.clear_friends();
+                try
+                {
+                    MainActivity.friend_list_fragment.clear_friends();
+                }
+                catch (Exception e)
+                {
+                }
+
                 for (fc = 0; fc < MainActivity.friends.length; fc++)
                 {
                     Log.i(TAG, "loading_friend:" + fc + " friendnum=" + MainActivity.friends[fc]);
@@ -457,7 +464,13 @@ public class TrifaToxService extends Service
 
                     if (MainActivity.friend_list_fragment != null)
                     {
-                        MainActivity.friend_list_fragment.add_friends(f);
+                        try
+                        {
+                            MainActivity.friend_list_fragment.add_friends(f);
+                        }
+                        catch (Exception e)
+                        {
+                        }
                     }
 
                     if (exists_in_db == false)

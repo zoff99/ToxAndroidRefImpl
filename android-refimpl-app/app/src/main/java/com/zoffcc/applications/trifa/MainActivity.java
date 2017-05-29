@@ -203,6 +203,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.i(TAG, "onCreate");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -869,9 +871,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onPause()
+    {
+        Log.i(TAG, "onPause");
+        super.onPause();
+
+        MainActivity.friend_list_fragment = null;
+    }
+
+    @Override
     protected void onResume()
     {
+        Log.i(TAG, "onResume");
         super.onResume();
+
         // prefs ----------
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
@@ -969,10 +982,23 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                orma.updateFriendList().
-                        TOX_CONNECTION(0).
-                        execute();
-                friend_list_fragment.set_all_friends_to_offline();
+                try
+                {
+                    orma.updateFriendList().
+                            TOX_CONNECTION(0).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                }
+
+                try
+                {
+                    friend_list_fragment.set_all_friends_to_offline();
+                }
+                catch (Exception e)
+                {
+                }
             }
         };
         t.start();
@@ -1928,11 +1954,28 @@ public class MainActivity extends AppCompatActivity
 
         insert_into_message_db(m, true);
 
+
+        // if message list for this friend is open, then don't do notification and "new" badge
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        if (message_list_activity != null)
+        {
+            if (message_list_activity.get_current_friendnum() != friend_number)
+            {
+                // no notifcation and no badge update
+                do_notification = false;
+                do_badge_update = false;
+            }
+        }
+
         try
         {
-            // update "new" status on friendlist fragment
-            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-            friend_list_fragment.modify_friend(f, friend_number);
+            if (do_badge_update)
+            {
+                // update "new" status on friendlist fragment
+                FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                friend_list_fragment.modify_friend(f, friend_number);
+            }
         }
         catch (Exception e)
         {
@@ -1940,69 +1983,73 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
         }
 
-        // start "new" notification
-        Runnable myRunnable = new Runnable()
+        if (do_notification)
         {
-            @Override
-            public void run()
+            // start "new" notification
+            Runnable myRunnable = new Runnable()
             {
-                try
+                @Override
+                public void run()
                 {
-                    // allow notification every n seconds
-                    if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) < System.currentTimeMillis())
+                    try
                     {
-
-                        if (PREF__notification)
+                        // allow notification every n seconds
+                        if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) < System.currentTimeMillis())
                         {
-                            Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
 
-                            Intent notificationIntent = new Intent(context_s, MainActivity.class);
-                            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
-
-                            // -- notification ------------------
-                            // -- notification ------------------
-
-                            NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
-                            b.setContentIntent(pendingIntent);
-                            b.setSmallIcon(R.drawable.circle_orange);
-                            b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                            Uri default_notification_sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-                            if (PREF__notification_sound)
+                            if (PREF__notification)
                             {
-                                b.setSound(default_notification_sound);
+                                Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
+
+                                Intent notificationIntent = new Intent(context_s, MainActivity.class);
+                                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
+
+                                // -- notification ------------------
+                                // -- notification ------------------
+
+                                NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                                b.setContentIntent(pendingIntent);
+                                b.setSmallIcon(R.drawable.circle_orange);
+                                b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                                Uri default_notification_sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                                if (PREF__notification_sound)
+                                {
+                                    b.setSound(default_notification_sound);
+                                }
+
+                                if (PREF__notification_vibrate)
+                                {
+                                    long[] vibrate_pattern = {100, 300};
+                                    b.setVibrate(vibrate_pattern);
+                                }
+
+                                b.setContentTitle("TRIfA");
+                                b.setAutoCancel(true);
+                                b.setContentText("new Message");
+
+                                Notification notification3 = b.build();
+                                nmn3.notify(Notification_new_message_ID, notification3);
+                                // -- notification ------------------
+                                // -- notification ------------------
                             }
-
-                            if (PREF__notification_vibrate)
-                            {
-                                long[] vibrate_pattern = {100, 300};
-                                b.setVibrate(vibrate_pattern);
-                            }
-
-                            b.setContentTitle("TRIfA");
-                            b.setAutoCancel(true);
-                            b.setContentText("new Message");
-
-                            Notification notification3 = b.build();
-                            nmn3.notify(Notification_new_message_ID, notification3);
-                            // -- notification ------------------
-                            // -- notification ------------------
                         }
                     }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+            };
+
+            try
+            {
+                main_handler_s.post(myRunnable);
             }
-        };
-        try
-        {
-            main_handler_s.post(myRunnable);
-        }
-        catch (Exception e)
-        {
+            catch (Exception e)
+            {
+            }
         }
     }
 
@@ -3653,7 +3700,13 @@ public class MainActivity extends AppCompatActivity
                 // e.printStackTrace();
             }
 
-            friend_list_fragment.modify_friend(f, friendnum);
+            try
+            {
+                friend_list_fragment.modify_friend(f, friendnum);
+            }
+            catch (Exception e)
+            {
+            }
         }
 
         if (friendnum == -1)

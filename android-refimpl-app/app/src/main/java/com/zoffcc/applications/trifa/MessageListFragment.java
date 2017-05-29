@@ -41,12 +41,14 @@ public class MessageListFragment extends ListFragment
     List<Message> data_values = null;
     MessagelistArrayAdapter a = null;
     long current_friendnum = -1;
+    private boolean onattach_ready = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
-        MainActivity.message_list_fragment = this;
+        onattach_ready = false;
         return view;
     }
 
@@ -116,6 +118,8 @@ public class MessageListFragment extends ListFragment
         t1.start();
         // TODO this is just a bad hack, fix me!! -----------------
 
+        MainActivity.message_list_fragment = this;
+        onattach_ready = true;
     }
 
     @Override
@@ -123,6 +127,77 @@ public class MessageListFragment extends ListFragment
     {
         Log.i(TAG, "onAttach(Activity)");
         super.onAttach(activity);
+
+        if (!onattach_ready)
+        {
+            MessageListActivity mla = (MessageListActivity) (getActivity());
+            current_friendnum = mla.get_current_friendnum();
+            Log.i(TAG, "current_friendnum=" + current_friendnum);
+
+            try
+            {
+                // reset "new" flags for messages -------
+                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                // reset "new" flags for messages -------
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                // data_values is NULL here!!
+            }
+            a = new MessagelistArrayAdapter(activity, data_values);
+            setListAdapter(a);
+
+            // TODO this is just a bad hack, fix me!! -----------------
+            final Thread t1 = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Log.i(TAG, "scroll to bottom:1");
+                        Thread.sleep(350); // TODO: really back hack!!
+                        // scroll to bottom of message list
+                        scroll_to_bottom();
+                        Log.i(TAG, "scroll to bottom:1.a");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "scroll to bottom:EE1:" + e.getMessage());
+                    }
+                }
+            };
+            t1.start();
+            // TODO this is just a bad hack, fix me!! -----------------
+
+            MainActivity.message_list_fragment = this;
+            onattach_ready = true;
+        }
+    }
+
+    @Override
+    public void onResume()
+    {
+        Log.i(TAG, "onResume");
+        super.onResume();
+
+        onattach_ready = false;
+
+        MainActivity.message_list_fragment = this;
     }
 
     void scroll_to_bottom()

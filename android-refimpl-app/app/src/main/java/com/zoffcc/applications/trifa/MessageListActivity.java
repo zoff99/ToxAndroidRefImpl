@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
@@ -47,7 +48,6 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -62,16 +62,18 @@ public class MessageListActivity extends AppCompatActivity
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
     ImageButton ml_phone_icon = null;
+    ImageButton ml_button_01 = null;
     int global_typing = 0;
     Thread typing_flag_thread = null;
     final static int TYPING_FLAG_DEACTIVATE_DELAY_IN_MILLIS = 1000; // 1 second
+    static boolean attachemnt_instead_of_send = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Log.i(TAG,"onCreate:001");
+        Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        Log.i(TAG,"onCreate:002");
+        Log.i(TAG, "onCreate:002");
 
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
@@ -89,19 +91,38 @@ public class MessageListActivity extends AppCompatActivity
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
         ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
         ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
+        ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
+
+        final ImageButton button01_ = ml_button_01;
 
         ml_icon.setImageResource(R.drawable.circle_red);
         set_friend_connection_status_icon();
         ml_status_icon.setImageResource(R.drawable.circle_green);
         set_friend_status_icon();
 
+        final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(40);
+        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(40);
+
         ml_friend_typing.setText("");
+        attachemnt_instead_of_send = true;
+        ml_button_01.setImageDrawable(add_attachement_icon);
 
         ml_new_message.addTextChangedListener(new TextWatcher()
         {
 
             public void afterTextChanged(Editable s)
             {
+                if (s.length() > 0)
+                {
+                    attachemnt_instead_of_send = false;
+                    button01_.setImageDrawable(send_message_icon);
+                }
+                else
+                {
+                    attachemnt_instead_of_send = true;
+                    button01_.setImageDrawable(add_attachement_icon);
+                }
+
                 // TODO bad hack!
                 Log.i(TAG, "TextWatcher:afterTextChanged");
                 if (global_typing == 0)
@@ -187,7 +208,26 @@ public class MessageListActivity extends AppCompatActivity
         };
         t.start();
 
-        Log.i(TAG,"onCreate:099");
+        Log.i(TAG, "onCreate:099");
+    }
+
+    @Override
+    protected void onPause()
+    {
+        Log.i(TAG, "onPause");
+        super.onPause();
+
+        MainActivity.message_list_fragment = null;
+        MainActivity.message_list_activity = null;
+    }
+
+    @Override
+    protected void onResume()
+    {
+        Log.i(TAG, "onResume");
+        super.onResume();
+
+        MainActivity.message_list_activity = this;
     }
 
     long get_current_friendnum()
@@ -266,29 +306,36 @@ public class MessageListActivity extends AppCompatActivity
         String msg = "";
         try
         {
-            // send typed message to friend
-            msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
-
-            Message m = new Message();
-            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
-            m.direction = 1; // msg sent
-            m.TOX_MESSAGE_TYPE = 0;
-            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
-            m.rcvd_timestamp = 0L;
-            m.sent_timestamp = System.currentTimeMillis();
-            m.read = false;
-            m.text = msg;
-
-            if ((msg != null) && (!msg.equalsIgnoreCase("")))
+            if (attachemnt_instead_of_send)
             {
-                long res = tox_friend_send_message(friendnum, 0, msg);
-                Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
+                // add attachement
+            }
+            else
+            {
+                // send typed message to friend
+                msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
 
-                if (res > -1)
+                Message m = new Message();
+                m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
+                m.direction = 1; // msg sent
+                m.TOX_MESSAGE_TYPE = 0;
+                m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                m.rcvd_timestamp = 0L;
+                m.sent_timestamp = System.currentTimeMillis();
+                m.read = false;
+                m.text = msg;
+
+                if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
-                    m.message_id = res;
-                    insert_into_message_db(m, true);
-                    ml_new_message.setText("");
+                    long res = tox_friend_send_message(friendnum, 0, msg);
+                    Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
+
+                    if (res > -1)
+                    {
+                        m.message_id = res;
+                        insert_into_message_db(m, true);
+                        ml_new_message.setText("");
+                    }
                 }
             }
         }
