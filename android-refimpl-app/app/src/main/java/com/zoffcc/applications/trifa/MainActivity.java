@@ -1943,7 +1943,30 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
 
+        // if message list for this friend is open, then don't do notification and "new" badge
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        Log.i(TAG, "noti_and_badge:001:" + message_list_activity);
+        if (message_list_activity != null)
+        {
+            Log.i(TAG, "noti_and_badge:002:" + message_list_activity.get_current_friendnum() + ":" + friend_number);
+            if (message_list_activity.get_current_friendnum() == friend_number)
+            {
+                Log.i(TAG, "noti_and_badge:003:");
+                // no notifcation and no badge update
+                do_notification = false;
+                do_badge_update = false;
+            }
+        }
+
         Message m = new Message();
+
+        if (!do_badge_update)
+        {
+            Log.i(TAG, "noti_and_badge:004:");
+            m.is_new = false;
+        }
+
         // m.tox_friendnum = friend_number;
         m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
         m.direction = 0; // msg received
@@ -1954,28 +1977,11 @@ public class MainActivity extends AppCompatActivity
 
         insert_into_message_db(m, true);
 
-
-        // if message list for this friend is open, then don't do notification and "new" badge
-        boolean do_notification = true;
-        boolean do_badge_update = true;
-        if (message_list_activity != null)
-        {
-            if (message_list_activity.get_current_friendnum() != friend_number)
-            {
-                // no notifcation and no badge update
-                do_notification = false;
-                do_badge_update = false;
-            }
-        }
-
         try
         {
-            if (do_badge_update)
-            {
-                // update "new" status on friendlist fragment
-                FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                friend_list_fragment.modify_friend(f, friend_number);
-            }
+            // update "new" status on friendlist fragment
+            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+            friend_list_fragment.modify_friend(f, friend_number);
         }
         catch (Exception e)
         {
@@ -1985,6 +1991,8 @@ public class MainActivity extends AppCompatActivity
 
         if (do_notification)
         {
+            Log.i(TAG, "noti_and_badge:005:");
+
             // start "new" notification
             Runnable myRunnable = new Runnable()
             {

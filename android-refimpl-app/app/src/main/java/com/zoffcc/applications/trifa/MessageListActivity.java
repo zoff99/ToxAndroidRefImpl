@@ -56,6 +56,7 @@ public class MessageListActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MsgListActivity";
     long friendnum = -1;
+    long friendnum_prev = -1;
     EditText ml_new_message = null;
     TextView ml_maintext = null;
     static TextView ml_friend_typing = null;
@@ -77,6 +78,7 @@ public class MessageListActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
+        friendnum_prev = friendnum;
 
         setContentView(R.layout.activity_message_list);
 
@@ -219,6 +221,7 @@ public class MessageListActivity extends AppCompatActivity
 
         MainActivity.message_list_fragment = null;
         MainActivity.message_list_activity = null;
+        friendnum = -1;
     }
 
     @Override
@@ -226,6 +229,11 @@ public class MessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+
+        if (friendnum == -1)
+        {
+            friendnum = friendnum_prev;
+        }
 
         MainActivity.message_list_activity = this;
     }
