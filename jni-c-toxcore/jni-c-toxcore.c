@@ -106,6 +106,9 @@ jclass MainActivity = NULL;
 jmethodID logger_method = NULL;
 jmethodID safe_string_method = NULL;
 
+jmethodID logger_method2 = NULL;
+jmethodID safe_string_method2 = NULL;
+
 uint8_t *video_buffer_1 = NULL;
 uint8_t *video_buffer_1_u = NULL;
 uint8_t *video_buffer_1_v = NULL;
@@ -1307,11 +1310,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	MainActivity = (*env)->NewGlobalRef(env, cls_local);
 	logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
 
-	jclass TrifaToxService_class = NULL;
-	android_find_class_global("com/zoffcc/applications/trifa/TrifaToxService", &TrifaToxService_class);
-	dbg(9, "TrifaToxService=%p", TrifaToxService_class);
-
-
 	dbg(9, "cls_local=%p", cls_local);
 	dbg(9, "MainActivity=%p", MainActivity);
 
@@ -1330,6 +1328,32 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	dbg(9, "class2=%p", class2);
 
 	safe_string_method = (*env)->GetStaticMethodID(env, MainActivity, "safe_string", "([B)Ljava/lang/String;");
+
+
+	// ------------------- *********** -------------------
+	// ------------------- *********** -------------------
+	// ------------------- *********** -------------------
+	jclass TrifaToxService_class = NULL;
+	android_find_class_global("com/zoffcc/applications/trifa/TrifaToxService", &TrifaToxService_class);
+	dbg(9, "TrifaToxService=%p", TrifaToxService_class);
+	logger_method2 = (*env)->GetStaticMethodID(env, TrifaToxService_class, "logger2", "(ILjava/lang/String;)V");
+	dbg(9, "logger_method2=%p", logger_method2);
+	safe_string_method2 = (*env)->GetStaticMethodID(env, TrifaToxService_class, "safe_string2", "([B)Ljava/lang/String;");
+	dbg(9, "safe_string_method2=%p", safe_string_method2);
+
+	const char test_string[] = "le4j543 k5o j4io5jo4i5 jio4eöfweörlpo3";
+	jstring js_test1 = (*env)->NewStringUTF(env, test_string);
+	(*env)->CallStaticVoidMethod(env, TrifaToxService_class, logger_method2, level, js_test1);
+	(*env)->DeleteLocalRef(env, js_test1);
+	// ------------------- *********** -------------------
+	// ------------------- *********** -------------------
+	// ------------------- *********** -------------------
+
+
+
+
+
+
 
 	// jmethodID test_method = NULL;
 	// android_find_method(class2, "test", "(I)V", &test_method);

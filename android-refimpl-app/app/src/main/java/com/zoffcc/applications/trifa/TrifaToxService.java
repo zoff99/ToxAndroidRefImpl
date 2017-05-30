@@ -724,6 +724,34 @@ public class TrifaToxService extends Service
     {
         Log.i(TAG, text);
     }
+
+    static String safe_string2(byte[] in)
+    {
+        Log.i(TAG, "safe_string:in=" + in);
+        String out = "";
+
+        try
+        {
+            out = new String(in, "UTF-8");  // Best way to decode using "UTF-8"
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "safe_string:EE:" + e.getMessage());
+            try
+            {
+                out = new String(in);
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+                Log.i(TAG, "safe_string:EE2:" + e2.getMessage());
+            }
+        }
+
+        Log.i(TAG, "safe_string:out=" + out);
+        return out;
+    }
     // --------------- JNI ---------------
     // --------------- JNI ---------------
     // --------------- JNI ---------------
