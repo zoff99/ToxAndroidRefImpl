@@ -796,6 +796,7 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
+                        // TODO: move this also to Service
                         if (!is_tox_started)
                         {
                             init(app_files_directory);
