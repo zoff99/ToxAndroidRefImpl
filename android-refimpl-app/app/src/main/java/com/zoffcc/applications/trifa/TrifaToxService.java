@@ -720,12 +720,12 @@ public class TrifaToxService extends Service
     // --------------- JNI ---------------
     // --------------- JNI ---------------
     // --------------- JNI ---------------
-    static void logger2(int level, String text)
+    static void logger(int level, String text)
     {
         Log.i(TAG, text);
     }
 
-    static String safe_string2(byte[] in)
+    static String safe_string(byte[] in)
     {
         Log.i(TAG, "safe_string:in=" + in);
         String out = "";

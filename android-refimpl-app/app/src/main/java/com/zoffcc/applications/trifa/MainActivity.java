@@ -2459,7 +2459,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void logger(int level, String text)
+    static void logger_XX(int level, String text)
     {
         Log.i(TAG, text);
     }
@@ -3892,7 +3892,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static String safe_string(byte[] in)
+    static String safe_string_XX(byte[] in)
     {
         Log.i(TAG, "safe_string:in=" + in);
         String out = "";

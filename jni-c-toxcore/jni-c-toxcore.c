@@ -103,11 +103,9 @@ jobject *android_activity;
 
 char *app_data_dir = NULL;
 jclass MainActivity = NULL;
+jclass TrifaToxService_class = NULL;
 jmethodID logger_method = NULL;
 jmethodID safe_string_method = NULL;
-
-jmethodID logger_method2 = NULL;
-jmethodID safe_string_method2 = NULL;
 
 uint8_t *video_buffer_1 = NULL;
 uint8_t *video_buffer_1_u = NULL;
@@ -899,7 +897,7 @@ jstring c_safe_string_from_java(char *instr, size_t len)
 	jbyteArray data = (*jnienv2)->NewByteArray(jnienv2, (int)len);
 	(*jnienv2)->SetByteArrayRegion(jnienv2, data, 0, (int)len, (const jbyte*)instr);
 
-	jstring js1 = (jstring)(*jnienv2)->CallStaticObjectMethod(jnienv2, MainActivity, safe_string_method, data);
+	jstring js1 = (jstring)(*jnienv2)->CallStaticObjectMethod(jnienv2, TrifaToxService_class, safe_string_method, data);
 	(*jnienv2)->DeleteLocalRef(jnienv2, data);
 
 	return js1;
@@ -1192,7 +1190,7 @@ void toxav_call_cb_(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool 
 
 void android_logger(int level, const char* logtext)
 {
-	if ((MainActivity) && (logger_method) && (logtext))
+	if ((TrifaToxService_class) && (logger_method) && (logtext))
 	{
 		if (strlen(logtext) > 0)
 		{
@@ -1200,7 +1198,7 @@ void android_logger(int level, const char* logtext)
 			jnienv2 = jni_getenv();
 
 			jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
-			(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, logger_method, level, js2);
+			(*jnienv2)->CallStaticVoidMethod(jnienv2, TrifaToxService_class, logger_method, level, js2);
 			(*jnienv2)->DeleteLocalRef(jnienv2, js2);
 		}
 	}
@@ -1306,10 +1304,25 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	// SET GLOBAL JNIENV here, this is bad!!
 	// SET GLOBAL JNIENV here, this is bad!!
 
+	// ------------------- *********** -------------------
+	// ------------------- *********** -------------------
+	// ------------------- *********** -------------------
+	TrifaToxService_class = NULL;
+	android_find_class_global("com/zoffcc/applications/trifa/TrifaToxService", &TrifaToxService_class);
+	logger_method = (*env)->GetStaticMethodID(env, TrifaToxService_class, "logger", "(ILjava/lang/String;)V");
+	safe_string_method = (*env)->GetStaticMethodID(env, TrifaToxService_class, "safe_string", "([B)Ljava/lang/String;");
+
+	dbg(9, "TrifaToxService=%p", TrifaToxService_class);
+	dbg(9, "safe_string_method=%p", safe_string_method);
+	dbg(9, "logger_method=%p", logger_method);
+	// ------------------- *********** -------------------
+	// ------------------- *********** -------------------
+	// ------------------- *********** -------------------
+
+
 	jclass cls_local = (*env)->GetObjectClass(env, thiz);
 	MainActivity = (*env)->NewGlobalRef(env, cls_local);
-	logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
-
+	// logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
 	dbg(9, "cls_local=%p", cls_local);
 	dbg(9, "MainActivity=%p", MainActivity);
 
@@ -1323,36 +1336,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	dbg(9, "app_data_dir=%s", app_data_dir);
 	(*env)->ReleaseStringUTFChars(env, datadir, s);
 
-	jclass class2 = NULL;
-	android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &class2);
-	dbg(9, "class2=%p", class2);
-
-	safe_string_method = (*env)->GetStaticMethodID(env, MainActivity, "safe_string", "([B)Ljava/lang/String;");
-
-
-	// ------------------- *********** -------------------
-	// ------------------- *********** -------------------
-	// ------------------- *********** -------------------
-	jclass TrifaToxService_class = NULL;
-	android_find_class_global("com/zoffcc/applications/trifa/TrifaToxService", &TrifaToxService_class);
-	dbg(9, "TrifaToxService=%p", TrifaToxService_class);
-	logger_method2 = (*env)->GetStaticMethodID(env, TrifaToxService_class, "logger2", "(ILjava/lang/String;)V");
-	dbg(9, "logger_method2=%p", logger_method2);
-	safe_string_method2 = (*env)->GetStaticMethodID(env, TrifaToxService_class, "safe_string2", "([B)Ljava/lang/String;");
-	dbg(9, "safe_string_method2=%p", safe_string_method2);
-
-	const char test_string[] = "le4j543 k5o j4io5jo4i5 jio4eöfweörlpo3";
-	jstring js_test1 = (*env)->NewStringUTF(env, test_string);
-	(*env)->CallStaticVoidMethod(env, TrifaToxService_class, logger_method2, level, js_test1);
-	(*env)->DeleteLocalRef(env, js_test1);
-	// ------------------- *********** -------------------
-	// ------------------- *********** -------------------
-	// ------------------- *********** -------------------
-
-
-
-
-
+	// jclass class2 = NULL;
+	// android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &class2);
+	// dbg(9, "class2=%p", class2);
+	// safe_string_method = (*env)->GetStaticMethodID(env, MainActivity, "safe_string", "([B)Ljava/lang/String;");
 
 
 	// jmethodID test_method = NULL;
