@@ -1307,6 +1307,11 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	MainActivity = (*env)->NewGlobalRef(env, cls_local);
 	logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
 
+	jclass TrifaToxService_class = NULL;
+	android_find_class_global("com/zoffcc/applications/trifa/TrifaToxService", &TrifaToxService_class);
+	dbg(9, "TrifaToxService=%p", TrifaToxService_class);
+
+
 	dbg(9, "cls_local=%p", cls_local);
 	dbg(9, "MainActivity=%p", MainActivity);
 

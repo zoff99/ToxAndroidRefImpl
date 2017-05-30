@@ -89,8 +89,9 @@ public class TrifaToxService extends Service
     {
         Log.i(TAG, "onCreate");
         // serivce is created ---
-        start_me();
         super.onCreate();
+
+        start_me();
     }
 
     void change_notification_fg(int a_TOXCONNECTION)
@@ -142,7 +143,6 @@ public class TrifaToxService extends Service
         notification2 = b.build();
         nmn2.notify(ONGOING_NOTIFICATION_ID, notification2);
     }
-
 
     void stop_me(boolean exit_app)
     {
@@ -716,4 +716,15 @@ public class TrifaToxService extends Service
 
     // ------------------------------
 
+
+    // --------------- JNI ---------------
+    // --------------- JNI ---------------
+    // --------------- JNI ---------------
+    static void logger2(int level, String text)
+    {
+        Log.i(TAG, text);
+    }
+    // --------------- JNI ---------------
+    // --------------- JNI ---------------
+    // --------------- JNI ---------------
 }

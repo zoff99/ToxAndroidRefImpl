@@ -217,6 +217,8 @@ public class MainActivity extends AppCompatActivity
 
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
+        Log.i(TAG, "java.library.path:" + System.getProperty("java.library.path"));
+
         // prefs ----------
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
