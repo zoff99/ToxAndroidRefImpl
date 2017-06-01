@@ -239,7 +239,7 @@ compile:
 # ----------- show generated aar file -----------
   - cd android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/ ; exit 0
   - cd android-refimpl-app/ ; find ./ -name '*.aar' ; exit 0
-  - mkdir -p jnilib/build/outputs/aar/
+  - cd android-refimpl-app/ ; unzip -t /jnilib/build/outputs/aar/jnilib-release.aar ; exit 0
   - cd android-refimpl-app/ ; cp -av ./jnilib/build/outputs/aar/jnilib-release.aar $CIRCLE_ARTIFACTS/
 # ----------- show generated aar file -----------
 
