@@ -11,6 +11,10 @@ buildscript {
     }
 }
 
+plugins {
+   id "com.jfrog.bintray" version "1.7.3"
+}
+
 allprojects {
     repositories {
         jcenter()
@@ -18,10 +22,6 @@ allprojects {
             url "https://jitpack.io"
         }
     }
-}
-
-plugins {
-   id "com.jfrog.bintray" version "1.7.3"
 }
 
 task clean(type: Delete) {
