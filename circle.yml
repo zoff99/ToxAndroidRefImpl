@@ -232,7 +232,7 @@ compile:
 # - cd android-refimpl-app/ ; if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then gradle wrapper --no-daemon --gradle-version "$GRADLE_CUSTOM_VNUM" --info ; else gradle wrapper --no-daemon --info ; fi ; exit 0
   - cd android-refimpl-app/ ; chmod a+rx ./gradlew
   - cd android-refimpl-app/ ; ./gradlew :app:dependencies
-  - cd android-refimpl-app/ ; ./gradlew build --max-workers=1 --stacktrace --no-daemon || ./gradlew build --stacktrace --no-daemon # first build may FAIL
+  - cd android-refimpl-app/ ; ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
 # --------- GRADLE -------------
 
 
