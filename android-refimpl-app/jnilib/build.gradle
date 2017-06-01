@@ -17,8 +17,22 @@
  * Boston, MA  02110-1301, USA.
  */
  
- // Android library
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+// If your directory matches the name, you do not need to set archivesBaseName.
+archivesBaseName = "jnilib"
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            group "com.zoffcc.applications.trifa"
+            artifactId "trifa-jni-lib"
+            version "1.0.0"
+        }
+    }
+}
 
 android {
     compileSdkVersion 25
