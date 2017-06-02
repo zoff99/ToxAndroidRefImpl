@@ -42,7 +42,7 @@ bintray {
   // Package info for BinTray
 	 pkg {
 		  repo = 'maven'
-		  name = 'rifajni'
+		  name = 'trifajni'
 		  licenses = ['GPL-2.0']
 		  vcsUrl = 'https://github.com/zoff99/ToxAndroidRefImpl'
 		  version {
