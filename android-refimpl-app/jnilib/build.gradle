@@ -45,7 +45,6 @@ bintray {
 		  name = 'trifajni'
 		  licenses = ['GPL-2.0']
 		  vcsUrl = 'https://github.com/zoff99/ToxAndroidRefImpl'
-		  publishVersion '1.0.0'
 		  version {
 			   name = '1.0.0'
 			   desc = 'trifa-jni'
