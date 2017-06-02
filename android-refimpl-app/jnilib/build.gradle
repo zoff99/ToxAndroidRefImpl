@@ -22,7 +22,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
 // If your directory matches the name, you do not need to set archivesBaseName.
-archivesBaseName = 'jnilib'
+archivesBaseName = 'trifa-jni-lib'
 group = 'com.zoffcc.applications.trifajni'
 // libraryName = 'trifa-jni-lib'
 // artifact = 'trifa-jni-lib'
