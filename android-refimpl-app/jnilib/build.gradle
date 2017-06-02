@@ -27,10 +27,11 @@ archivesBaseName = "jnilib"
 install {
     repositories.mavenInstaller {
         pom.project {
-            group "com.zoffcc.applications.trifajni"
-            artifactId "trifa-jni-lib"
-            version "1.0.0"
-	    publishVersion "1.0.0"
+            groupId 'com.zoffcc.applications.trifajni'
+            group 'com.zoffcc.applications.trifajni'
+            artifactId 'trifa-jni-lib'
+            version '1.0.0'
+	    publishVersion '1.0.0'
         }
     }
 }
@@ -46,12 +47,11 @@ bintray {
 		  name = 'trifajni'
 		  licenses = ['GPL-2.0']
 		  vcsUrl = 'https://github.com/zoff99/ToxAndroidRefImpl'
-		  publishVersion "1.0.0"
+		  publishVersion '1.0.0'
 		  version {
 			   name = '1.0.0'
 			   desc = 'trifa-jni'
 			   released  = new Date()
-			   vcsTag = '1.0.0'
 			   attributes = ['gradle-plugin': 'com.zoffcc.applications.trifajni:trifa-jni-lib']
 		  }	
 	 }
