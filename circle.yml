@@ -235,7 +235,8 @@ compile:
   - cd android-refimpl-app/ ; ./gradlew :jnilib:dependencies
   - cd android-refimpl-app/ ; ./gradlew :jnilib:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :jnilib:build --stacktrace --no-daemon # first build may FAIL
   - cd android-refimpl-app/ ; ./gradlew :jnilib:install ; exit 0
-  - find ~/.m2/repository -exec ls -al {} \; ; exit 0
+  - cd android-refimpl-app/ ; ./gradlew :jnilib:bintrayUpload ; exit 0
+  - find ~/.m2/repository -type f -exec ls -al {} \; ; exit 0
 # --------- GRADLE -------------
 
 # ----------- show generated aar file -----------
