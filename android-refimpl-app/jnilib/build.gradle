@@ -43,14 +43,14 @@ bintray {
 	 pkg {
 		  repo = 'maven'
 		  name = 'rifajni'
-		  licenses = ['Apache-2.0']
+		  licenses = ['GPL-2.0']
 		  vcsUrl = 'https://github.com/zoff99/ToxAndroidRefImpl'
 		  version {
 			   name = '1.0.0'
 			   desc = 'trifa-jni'
 			   released  = new Date()
 			   vcsTag = '1.0.0'
-			   attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+			   attributes = ['gradle-plugin': 'com.zoffcc.applications.trifajni:trifa-jni-lib']
 		  }	
 	 }
 }
