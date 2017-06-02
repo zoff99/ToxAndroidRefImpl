@@ -27,7 +27,7 @@ archivesBaseName = "jnilib"
 install {
     repositories.mavenInstaller {
         pom.project {
-            groupId 'com.zoffcc.applications.trifajni'
+            // groupId 'com.zoffcc.applications.trifajni'
             artifactId 'trifa-jni-lib'
             version '1.0.0'
         }
