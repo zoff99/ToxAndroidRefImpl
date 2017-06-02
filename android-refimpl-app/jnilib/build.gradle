@@ -24,7 +24,7 @@ apply plugin: 'com.jfrog.bintray'
 // If your directory matches the name, you do not need to set archivesBaseName.
 archivesBaseName = 'jnilib'
 group = 'com.zoffcc.applications.trifajni'
-libraryName = 'trifa-jni-lib'
+// libraryName = 'trifa-jni-lib'
 artifact = 'trifa-jni-lib'
 version = '1.0.0'
 
