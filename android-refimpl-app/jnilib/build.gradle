@@ -28,10 +28,8 @@ install {
     repositories.mavenInstaller {
         pom.project {
             groupId 'com.zoffcc.applications.trifajni'
-            group 'com.zoffcc.applications.trifajni'
             artifactId 'trifa-jni-lib'
             version '1.0.0'
-	    publishVersion '1.0.0'
         }
     }
 }
