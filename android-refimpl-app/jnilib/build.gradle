@@ -42,14 +42,15 @@ bintray {
   // Package info for BinTray
 	 pkg {
 		  repo = 'maven'
-		  name = 'android-oauth-handler'
-		  userOrg = user
+		  name = 'rifajni'
 		  licenses = ['Apache-2.0']
-		  vcsUrl = 'https://github.com/bintray/gradle-bintray-plugin.git'
+		  vcsUrl = 'https://github.com/zoff99/ToxAndroidRefImpl'
 		  version {
-			   name = '0.1'
-			   desc = 'Gradle Bintray Plugin 1.0 final'
-			   vcsTag = '0.1'
+			   name = '1.0.0'
+			   desc = 'trifa-jni'
+			   released  = new Date()
+			   vcsTag = '1.0.0'
+			   attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
 		  }	
 	 }
 }
