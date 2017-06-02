@@ -241,6 +241,9 @@ compile:
 # ----------- show generated aar file -----------
   - cd android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/ ; exit 0
   - cd android-refimpl-app/ ; find ./ -name '*.aar' ; exit 0
+  - unzip -t /home/ubuntu/.m2/repository/android-refimpl-app/trifa-jni-lib/1.0.0/trifa-jni-lib-1.0.0.aar ; exit 0
+  - cat /home/ubuntu/.m2/repository/android-refimpl-app/trifa-jni-lib/1.0.0/trifa-jni-lib-1.0.0.pom ; exit 0
+  - cat /home/ubuntu/.m2/repository/android-refimpl-app/trifa-jni-lib/maven-metadata-local.xml ; exit 0
   - cd android-refimpl-app/ ; unzip -t /jnilib/build/outputs/aar/jnilib-release.aar ; exit 0
   - cd android-refimpl-app/ ; cp -av ./jnilib/build/outputs/aar/jnilib-release.aar $CIRCLE_ARTIFACTS/
 # ----------- show generated aar file -----------
