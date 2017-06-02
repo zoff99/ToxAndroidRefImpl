@@ -25,7 +25,7 @@ apply plugin: 'com.jfrog.bintray'
 archivesBaseName = 'jnilib'
 group = 'com.zoffcc.applications.trifajni'
 // libraryName = 'trifa-jni-lib'
-artifact = 'trifa-jni-lib'
+// artifact = 'trifa-jni-lib'
 version = '1.0.0'
 
 install {
