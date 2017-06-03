@@ -109,7 +109,7 @@ public class TrifaToxService extends Service
         {
             Log.i(TAG, "change_notification_fg:bootstrapping=true");
             notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
-            b.setSmallIcon(R.drawable.circle_orange);
+            b.setSmallIcon(R.drawable.circle_orange_notification);
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             {
                 b.setColor(Color.parseColor("#ffce00"));
@@ -123,7 +123,7 @@ public class TrifaToxService extends Service
             if (a_TOXCONNECTION == 0)
             {
                 notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-                b.setSmallIcon(R.drawable.circle_red);
+                b.setSmallIcon(R.drawable.circle_red_notification);
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 {
                     b.setColor(Color.parseColor("#ff0000"));
@@ -135,7 +135,7 @@ public class TrifaToxService extends Service
                 if (a_TOXCONNECTION == 1)
                 {
                     notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    b.setSmallIcon(R.drawable.circle_green);
+                    b.setSmallIcon(R.drawable.circle_green_notification);
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     {
                         b.setColor(Color.parseColor("#04b431"));
@@ -145,7 +145,7 @@ public class TrifaToxService extends Service
                 else // if (a_TOXCONNECTION__f == 2)
                 {
                     notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    b.setSmallIcon(R.drawable.circle_green);
+                    b.setSmallIcon(R.drawable.circle_green_notification);
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     {
                         b.setColor(Color.parseColor("#04b431"));
@@ -696,7 +696,7 @@ public class TrifaToxService extends Service
         NotificationCompat.Builder b = new NotificationCompat.Builder(this);
         b.setContent(notification_view);
         b.setContentIntent(pendingIntent);
-        b.setSmallIcon(R.drawable.circle_red);
+        b.setSmallIcon(R.drawable.circle_red_notification);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
             b.setColor(Color.parseColor("#ff0000"));
