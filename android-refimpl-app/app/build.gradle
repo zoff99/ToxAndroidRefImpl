@@ -17,6 +17,12 @@
  * Boston, MA  02110-1301, USA.
  */
 
+repositories {
+    maven {
+        url "https://dl.bintray.com/zoff99/maven"
+    }
+}
+
 apply plugin: 'com.android.application'
 
 android {
@@ -119,6 +125,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.0@aar'
     //
     //
     compile('com.mikepenz:materialdrawer:5.9.1@aar') {
