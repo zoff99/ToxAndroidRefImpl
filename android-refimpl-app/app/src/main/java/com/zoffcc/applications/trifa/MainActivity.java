@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.LabeledIntent;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -54,6 +55,7 @@ import android.support.v8.renderscript.Element;
 import android.support.v8.renderscript.RenderScript;
 import android.support.v8.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.v8.renderscript.Type;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -136,6 +138,8 @@ public class MainActivity extends AppCompatActivity
     static Context context_s = null;
     static MainActivity main_activity_s = null;
     static AudioManager audio_manager_s = null;
+    static Resources resources = null;
+    static DisplayMetrics metrics = null;
     static int AudioMode_old;
     static int RingerMode_old;
     static boolean isSpeakerPhoneOn_old;
@@ -212,6 +216,9 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         bootstrapping = false;
+
+        resources = this.getResources();
+        metrics = resources.getDisplayMetrics();
 
         SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
 
@@ -3920,6 +3927,32 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "safe_string:out=" + out);
         return out;
     }
+
+
+    /**
+     * This method converts dp unit to equivalent pixels, depending on device density.
+     *
+     * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
+     * @return A float value to represent px equivalent to dp depending on device density
+     */
+    public static float dp2px(float dp)
+    {
+        float px = dp * ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return px;
+    }
+
+    /**
+     * This method converts device specific pixels to density independent pixels.
+     *
+     * @param px A value in px (pixels) unit. Which we need to convert into db
+     * @return A float value to represent dp equivalent to px value
+     */
+    public static float px2dp(float px)
+    {
+        float dp = px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return dp;
+    }
+
 
     // --------- make app crash ---------
     // --------- make app crash ---------
