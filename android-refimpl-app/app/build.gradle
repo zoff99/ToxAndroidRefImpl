@@ -18,9 +18,9 @@
  */
 
 repositories {
-    maven {
-        url "https://dl.bintray.com/zoff99/maven"
-    }
+//    maven {
+//        url "https://dl.bintray.com/zoff99/maven"
+//    }
 }
 
 apply plugin: 'com.android.application'
