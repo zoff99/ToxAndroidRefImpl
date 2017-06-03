@@ -25,6 +25,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -108,6 +110,10 @@ public class TrifaToxService extends Service
             Log.i(TAG, "change_notification_fg:bootstrapping=true");
             notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
             b.setSmallIcon(R.drawable.circle_orange);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            {
+                b.setColor(Color.parseColor("#ffce00"));
+            }
             notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping");
         }
         else
@@ -118,6 +124,10 @@ public class TrifaToxService extends Service
             {
                 notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
                 b.setSmallIcon(R.drawable.circle_red);
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                {
+                    b.setColor(Color.parseColor("#ff0000"));
+                }
                 notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
             }
             else
@@ -126,12 +136,20 @@ public class TrifaToxService extends Service
                 {
                     notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
                     b.setSmallIcon(R.drawable.circle_green);
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    {
+                        b.setColor(Color.parseColor("#04b431"));
+                    }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
                 }
                 else // if (a_TOXCONNECTION__f == 2)
                 {
                     notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
                     b.setSmallIcon(R.drawable.circle_green);
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    {
+                        b.setColor(Color.parseColor("#04b431"));
+                    }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
                 }
             }
@@ -679,6 +697,11 @@ public class TrifaToxService extends Service
         b.setContent(notification_view);
         b.setContentIntent(pendingIntent);
         b.setSmallIcon(R.drawable.circle_red);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            b.setColor(Color.parseColor("#ff0000"));
+        }
+
         notification2 = b.build();
         // -- notification ------------------
         // -- notification ------------------
