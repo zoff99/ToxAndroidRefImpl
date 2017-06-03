@@ -45,7 +45,7 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filet
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -57,6 +57,7 @@ public class FriendListFragment extends ListFragment
     static final int FriendInfoActivity_ID = 3;
     List<FriendList> data_values = new ArrayList<FriendList>();
     FriendlistArrayAdapter a = null;
+    static Boolean in_update_data = false;
 
     private boolean onattach_ready = false;
 
@@ -95,8 +96,8 @@ public class FriendListFragment extends ListFragment
                             {
                                 case R.id.item_info:
                                     // show friend info page -----------------
-                                    long friend_num_temp = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
-                                    long friend_num_temp_safety = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
+                                    long friend_num_temp = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
+                                    long friend_num_temp_safety = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
 
                                     Log.i(TAG, "onMenuItemClick:info:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
 
@@ -114,7 +115,7 @@ public class FriendListFragment extends ListFragment
                                         {
                                             try
                                             {
-                                                long friend_num_temp = tox_friend_by_public_key(data_values.get(position_).tox_public_key_string);
+                                                long friend_num_temp = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
 
                                                 Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
 
@@ -199,10 +200,11 @@ public class FriendListFragment extends ListFragment
         Log.i(TAG, "onAttach(Context)");
         super.onAttach(context);
 
+        in_update_data = false;
         data_values.clear();
         a = new FriendlistArrayAdapter(context, data_values);
-        setListAdapter(a);
         MainActivity.friend_list_fragment = this;
+        setListAdapter(a);
         onattach_ready = true;
     }
 
@@ -214,10 +216,11 @@ public class FriendListFragment extends ListFragment
 
         if (!onattach_ready)
         {
+            in_update_data = false;
             data_values.clear();
             a = new FriendlistArrayAdapter(activity, data_values);
-            setListAdapter(a);
             MainActivity.friend_list_fragment = this;
+            setListAdapter(a);
             onattach_ready = true;
         }
     }
@@ -238,7 +241,7 @@ public class FriendListFragment extends ListFragment
                     int i = 0;
                     for (i = 0; i < size; i++)
                     {
-                        if (tox_friend_by_public_key(data_values.get(i).tox_public_key_string) == friendnum)
+                        if (tox_friend_by_public_key__wrapper(data_values.get(i).tox_public_key_string) == friendnum)
                         {
                             found_friend = true;
                             FriendList n = deep_copy(f);
@@ -282,8 +285,10 @@ public class FriendListFragment extends ListFragment
 
         try
         {
-            // update "new" status on friendlist fragment
-            a.notifyDataSetChanged();
+            // reload friendlist
+            Log.i(TAG, "onResume:AA");
+            add_all_friends_clear(50);
+            Log.i(TAG, "onResume:BB");
         }
         catch (Exception e)
         {
@@ -306,42 +311,59 @@ public class FriendListFragment extends ListFragment
         add_friends(f);
     }
 
-    void add_all_friends_clear(final int delay)
+    synchronized void add_all_friends_clear(final int delay)
     {
         Log.i(TAG, "add_all_friends_clear");
-        data_values.clear();
 
-        Runnable myRunnable = new Runnable()
+        final Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
                 try
                 {
-                    Thread.sleep(delay);
-
-                    List<FriendList> fl = orma.selectFromFriendList().toList();
-                    if (fl != null)
+                    synchronized (in_update_data)
                     {
-                        Log.i(TAG, "add_all_friends_clear:fl.size=" + fl.size());
-                        if (fl.size() > 0)
+                        if (in_update_data == true)
                         {
-                            int i = 0;
-                            for (i = 0; i < fl.size(); i++)
+                            Log.i(TAG, "add_all_friends_clear:already updating!");
+                        }
+                        else
+                        {
+                            in_update_data = true;
+
+                            Thread.sleep(delay);
+
+                            data_values.clear();
+
+                            List<FriendList> fl = orma.selectFromFriendList().toList();
+                            if (fl != null)
                             {
-                                FriendList n = deep_copy(fl.get(i));
-                                data_values.add(n);
-                                Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                Log.i(TAG, "add_all_friends_clear:fl.size=" + fl.size());
+                                if (fl.size() > 0)
+                                {
+                                    int i = 0;
+                                    for (i = 0; i < fl.size(); i++)
+                                    {
+                                        FriendList n = deep_copy(fl.get(i));
+                                        data_values.add(n);
+                                        Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                    }
+                                }
                             }
+                            a.notifyDataSetChanged();
                         }
                     }
-                    a.notifyDataSetChanged();
                 }
                 catch (Exception e)
                 {
                     Log.i(TAG, "add_all_friends_clear:EE:" + e.getMessage());
                     e.printStackTrace();
                 }
+
+                in_update_data = false;
+
+                Log.i(TAG, "add_all_friends_clear:READY");
             }
         };
         Log.i(TAG, "add_all_friends_clear:A:");
@@ -406,7 +428,7 @@ public class FriendListFragment extends ListFragment
         Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_public_key_string);
 
         Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
-        intent.putExtra("friendnum", tox_friend_by_public_key(data_values.get(position).tox_public_key_string));
+        intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(data_values.get(position).tox_public_key_string));
         startActivityForResult(intent, MessageListActivity_ID);
     }
 

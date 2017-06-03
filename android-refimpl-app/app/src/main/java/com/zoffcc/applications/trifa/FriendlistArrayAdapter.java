@@ -42,13 +42,14 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
 {
     private static final String TAG = "trifa.FriendListAA";
     private final Context context;
-    private final List<FriendList> values;
+    private List<FriendList> values;
 
-    public FriendlistArrayAdapter(Context context, List<FriendList> values)
+    public FriendlistArrayAdapter(Context context, List<FriendList> values2)
     {
-        super(context, -1, values);
+        super(context, -1, values2);
         this.context = context;
-        this.values = values;
+
+        this.values = values2;
     }
 
     //    @Override
@@ -65,7 +66,7 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         Log.i(TAG, "getView:avatar_filename=" + values.get(position).avatar_filename);
         Log.i(TAG, "getView:avatar_pathname=" + values.get(position).avatar_pathname);
 
-        if ((values!=null) &&(values.size()>=position))
+        if ((values != null) && (values.size() >= position))
         {
             Log.i(TAG, "getView:data=" + values.get(position));
         }
@@ -104,7 +105,16 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
             {
                 Log.i(TAG, "getView:005");
 
-                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
+                info.guardianproject.iocipher.File f1 = null;
+                try
+                {
+                    f1 = new info.guardianproject.iocipher.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 if ((f1 != null) && (values.get(position).avatar_pathname != null))
                 {
                     Log.i(TAG, "getView:f1=" + f1);
@@ -127,7 +137,16 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
             }
             else
             {
-                java.io.File f1 = new java.io.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
+                java.io.File f1 = null;
+                try
+                {
+                    f1 = new java.io.File(values.get(position).avatar_pathname + "/" + values.get(position).avatar_filename);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 if ((f1 != null) && (values.get(position).avatar_pathname != null))
                 {
                     Log.i(TAG, "getView:f1=" + f1);
@@ -149,7 +168,7 @@ public class FriendlistArrayAdapter extends ArrayAdapter<FriendList>
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG,"getView:EE1:"+e.getMessage());
+            Log.i(TAG, "getView:EE1:" + e.getMessage());
         }
 
         try

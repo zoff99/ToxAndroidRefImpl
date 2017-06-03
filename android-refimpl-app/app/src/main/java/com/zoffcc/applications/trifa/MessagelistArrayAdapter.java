@@ -72,7 +72,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 {
     private static final String TAG = "trifa.MessagelstAAdptr";
     private final Context context;
-    private final List<Message> values_msg;
+    private List<Message> values_msg;
 
     public MessagelistArrayAdapter(Context context, List<Message> values)
     {

@@ -1996,7 +1996,13 @@ public class MainActivity extends AppCompatActivity
         {
             // update "new" status on friendlist fragment
             FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-            friend_list_fragment.modify_friend(f, friend_number);
+            if (friend_list_fragment != null)
+            {
+                if (f != null)
+                {
+                    friend_list_fragment.modify_friend(f, friend_number);
+                }
+            }
         }
         catch (Exception e)
         {
@@ -3550,7 +3556,7 @@ public class MainActivity extends AppCompatActivity
             if (orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).count() == 0)
             {
                 orma.insertIntoFriendList(f);
-                Log.i(TAG, "friend added tp DB: " + f.tox_public_key_string);
+                Log.i(TAG, "friend added to DB: " + f.tox_public_key_string);
             }
             else
             {
@@ -3561,7 +3567,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "friend added tp DB:EE:" + e.getMessage());
+            Log.i(TAG, "friend added to DB:EE:" + e.getMessage());
         }
         //            }
         //        };
@@ -3684,18 +3690,18 @@ public class MainActivity extends AppCompatActivity
 
     static void add_friend_real(String friend_tox_id)
     {
-        Log.i(TAG, "add friend ID:" + friend_tox_id);
+        Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
 
         // add friend ---------------
         long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
-        Log.i(TAG, "add friend  #:" + friendnum);
+        Log.i(TAG, "add_friend_real:add friend  #:" + friendnum);
         update_savedata_file(); // save toxcore datafile (new friend added)
 
         if (friendnum > -1)
         {
             // nospam=8 chars, checksum=4 chars
             String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
-            Log.i(TAG, "add friend PK:" + friend_public_key);
+            Log.i(TAG, "add_friend_real:add friend PK:" + friend_public_key);
 
             FriendList f = new FriendList();
             f.tox_public_key_string = friend_public_key;
@@ -3718,23 +3724,34 @@ public class MainActivity extends AppCompatActivity
             {
                 insert_into_friendlist_db(f);
             }
-            catch (android.database.sqlite.SQLiteConstraintException e)
+            catch (Exception e)
             {
                 // e.printStackTrace();
             }
 
             try
             {
-                friend_list_fragment.modify_friend(f, friendnum);
+                if (friend_list_fragment != null)
+                {
+                    Log.i(TAG, "add_friend_real:add:001:friendnum=" + friendnum);
+                    friend_list_fragment.modify_friend(f, friendnum);
+                    Log.i(TAG, "add_friend_real:add:002:friendnum=" + friendnum);
+                }
+                else
+                {
+                    Log.i(TAG, "add_friend_real:add:003:no friend_list_fragment yet!!");
+                }
             }
             catch (Exception e)
             {
+                Log.i(TAG, "add_friend_real:EE1:" + e.getMessage());
+                e.printStackTrace();
             }
         }
 
         if (friendnum == -1)
         {
-            Log.i(TAG, "friend already added, or request already sent");
+            Log.i(TAG, "add_friend_real:friend already added, or request already sent");
         }
         // add friend ---------------
     }

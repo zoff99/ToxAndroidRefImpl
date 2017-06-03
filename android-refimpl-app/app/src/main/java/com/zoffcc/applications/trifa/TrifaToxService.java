@@ -480,16 +480,22 @@ public class TrifaToxService extends Service
                         e.printStackTrace();
                     }
 
-                    if (MainActivity.friend_list_fragment != null)
-                    {
-                        try
-                        {
-                            MainActivity.friend_list_fragment.add_friends(f);
-                        }
-                        catch (Exception e)
-                        {
-                        }
-                    }
+                    // ----- would be double in list -----
+                    // ----- would be double in list -----
+                    // ----- would be double in list -----
+                    //                    if (MainActivity.friend_list_fragment != null)
+                    //                    {
+                    //                        try
+                    //                        {
+                    //                            MainActivity.friend_list_fragment.add_friends(f);
+                    //                        }
+                    //                        catch (Exception e)
+                    //                        {
+                    //                        }
+                    //                    }
+                    // ----- would be double in list -----
+                    // ----- would be double in list -----
+                    // ----- would be double in list -----
 
                     if (exists_in_db == false)
                     {
@@ -517,6 +523,19 @@ public class TrifaToxService extends Service
                         Log.i(TAG, "loading_friend:check:EE:" + e.getMessage());
                     }
 
+                }
+
+                try
+                {
+                    if (MainActivity.friend_list_fragment != null)
+                    {
+                        // reload friendlist
+                        MainActivity.friend_list_fragment.add_all_friends_clear(50);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
 
                 // --------------- bootstrap ---------------
