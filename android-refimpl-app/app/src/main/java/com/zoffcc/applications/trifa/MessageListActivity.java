@@ -78,6 +78,7 @@ public class MessageListActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
+        Log.i(TAG, "onCreate:003:friendnum=" + friendnum + " friendnum_prev=" + friendnum_prev);
         friendnum_prev = friendnum;
 
         setContentView(R.layout.activity_message_list);
@@ -221,7 +222,9 @@ public class MessageListActivity extends AppCompatActivity
 
         MainActivity.message_list_fragment = null;
         MainActivity.message_list_activity = null;
+        Log.i(TAG, "onPause:001:friendnum=" + friendnum);
         friendnum = -1;
+        Log.i(TAG, "onPause:002:friendnum=" + friendnum);
     }
 
     @Override
@@ -230,9 +233,12 @@ public class MessageListActivity extends AppCompatActivity
         Log.i(TAG, "onResume");
         super.onResume();
 
+        Log.i(TAG, "onResume:001:friendnum=" + friendnum);
+
         if (friendnum == -1)
         {
             friendnum = friendnum_prev;
+            Log.i(TAG, "onResume:001:friendnum=" + friendnum);
         }
 
         MainActivity.message_list_activity = this;
@@ -459,10 +465,14 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     CallingActivity.top_text_line_str2 = "0s";
                                     update_top_text_line();
-                                    MainActivity.toxav_call(friendnum, f_audio_enabled, f_video_enabled);
+                                    Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled + " f_video_enabled=" + f_video_enabled);
+                                    MainActivity.toxav_call(fn, f_audio_enabled, f_video_enabled);
+                                    Log.i(TAG, "CALL_OUT:002");
                                 }
-                                catch (android.database.sqlite.SQLiteConstraintException e)
+                                catch (Exception e)
                                 {
+                                    Log.i(TAG, "CALL_OUT:EE1:" + e.getMessage());
+                                    e.printStackTrace();
                                 }
                             }
                         };
