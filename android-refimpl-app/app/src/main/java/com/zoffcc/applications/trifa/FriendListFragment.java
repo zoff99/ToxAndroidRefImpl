@@ -383,15 +383,4 @@ public class FriendListFragment extends Fragment
     {
         add_all_friends_clear(0);
     }
-
-    //    @Override
-    //    public void onListItemClick(ListView l, View v, int position, long id)
-    //    {
-    //        Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_public_key_string);
-    //
-    //        Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
-    //        intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(data_values.get(position).tox_public_key_string));
-    //        startActivityForResult(intent, MessageListActivity_ID);
-    //    }
-
 }
