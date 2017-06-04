@@ -31,7 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.futuremind.recyclerviewfastscroll.FastScroller;
+import com.l4digital.fastscroll.FastScrollRecyclerView;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class MessageListFragment extends Fragment
     List<Message> data_values = null;
     // MessagelistArrayAdapter a = null;
     long current_friendnum = -1;
-    RecyclerView listingsView = null;
+    FastScrollRecyclerView listingsView = null;
     MessagelistAdapter adapter = null;
 
     @Override
@@ -87,15 +87,11 @@ public class MessageListFragment extends Fragment
         // --------------
         adapter = new MessagelistAdapter(view.getContext(), data_values);
         Log.i(TAG, "onCreateView:adapter=" + adapter);
-        listingsView = (RecyclerView) view.findViewById(R.id.msg_rv_list);
+        listingsView = (FastScrollRecyclerView) view.findViewById(R.id.msg_rv_list);
         Log.i(TAG, "onCreateView:listingsView=" + listingsView);
-        FastScroller fastScroller = (FastScroller) view.findViewById(R.id.fastscroll);
 
         listingsView.setHasFixedSize(false);
         listingsView.setAdapter(adapter);
-
-        //has to be called AFTER RecyclerView.setAdapter()
-        fastScroller.setRecyclerView(listingsView);
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setStackFromEnd(true); // pin to bottom element

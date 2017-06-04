@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
+import com.l4digital.fastscroll.FastScroller;
 
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +16,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MS
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 
-public class MessagelistAdapter extends RecyclerView.Adapter implements SectionTitleProvider
+public class MessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
     private static final String TAG = "trifa.MessagelistAdptr";
 
@@ -267,9 +267,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements SectionT
     }
 
     @Override
-    public String getSectionTitle(int position)
+    public String getSectionText(int position)
     {
-        //this String will be shown in a bubble for specified position
         return "_A_";
     }
 }
