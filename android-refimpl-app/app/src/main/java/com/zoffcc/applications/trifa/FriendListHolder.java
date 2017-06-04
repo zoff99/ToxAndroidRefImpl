@@ -1,6 +1,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,6 +14,7 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendListHolder extends RecyclerView.ViewHolder implements View.OnClickListener
@@ -35,10 +37,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         Log.i(TAG, "FriendListHolder");
 
-        // 1. Set the context
         this.context = c;
 
-        // 2. Set up the UI widgets of the holder
         textView = (TextView) itemView.findViewById(R.id.f_name);
         statusText = (TextView) itemView.findViewById(R.id.f_status_message);
         unread_count = (TextView) itemView.findViewById(R.id.f_unread_count);
@@ -46,7 +46,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         imageView = (ImageView) itemView.findViewById(R.id.f_status_icon);
         imageView2 = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
 
-        // 3. Set the "onClick" listener of the holder
         itemView.setOnClickListener(this);
     }
 
@@ -56,7 +55,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
 
-        // 4. Bind the data to the ViewHolder
         this.friendlist = fl;
 
         textView.setText(fl.name);
@@ -191,10 +189,18 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     @Override
     public void onClick(View v)
     {
-        // 5. Handle the onClick event for the ViewHolder
-        if (this.friendlist != null)
+        Log.i(TAG, "onClick");
+        try
         {
-            // Toast.makeText(this.context, "Clicked on " + this.bakery.bakeryName, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(v.getContext(), MessageListActivity.class);
+            intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(this.friendlist.tox_public_key_string));
+            v.getContext().startActivity(intent);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onClick:EE:" + e.getMessage());
         }
     }
+
 }

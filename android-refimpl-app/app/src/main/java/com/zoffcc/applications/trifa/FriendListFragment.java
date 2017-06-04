@@ -69,6 +69,7 @@ public class FriendListFragment extends Fragment
         Log.i(TAG, "onCreateView:adapter=" + adapter);
         listingsView = (RecyclerView) view1.findViewById(R.id.rv_list);
         Log.i(TAG, "onCreateView:listingsView=" + listingsView);
+
         listingsView.setHasFixedSize(true);
         MainActivity.friend_list_fragment = this;
         listingsView.setAdapter(adapter);

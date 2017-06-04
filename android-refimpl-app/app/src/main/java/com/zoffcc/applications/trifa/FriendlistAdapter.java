@@ -130,5 +130,4 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
 
         return found_item;
     }
-
 }
