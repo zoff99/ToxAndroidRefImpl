@@ -35,7 +35,6 @@ import java.util.List;
 
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendListFragment extends Fragment
@@ -43,7 +42,7 @@ public class FriendListFragment extends Fragment
     private static final String TAG = "trifa.FriendListFrgnt";
     static final int MessageListActivity_ID = 2;
     static final int FriendInfoActivity_ID = 3;
-    List<FriendList> data_values = new ArrayList<FriendList>();
+    List<FriendList> data_values2 = new ArrayList<FriendList>();
     // FriendlistArrayAdapter a = null;
     static Boolean in_update_data = false;
     //  View view1 = null;
@@ -63,6 +62,7 @@ public class FriendListFragment extends Fragment
         // -------------------------------------------
         // -------------------------------------------
         // -------------------------------------------
+        List<FriendList> data_values = new ArrayList<FriendList>();
         data_values.clear();
 
         adapter = new FriendlistAdapter(view1.getContext(), R.layout.friend_list_entry, data_values);
@@ -212,19 +212,6 @@ public class FriendListFragment extends Fragment
         super.onAttach(context);
 
         in_update_data = false;
-        //        data_values.clear();
-        //
-        //        adapter = new FriendlistAdapter(context, R.layout.friend_list_entry, data_values);
-        //        Log.i(TAG, "onAttach(Context):adapter=" + adapter);
-        //        listingsView = (RecyclerView) getView().findViewById(R.id.rv_list);
-        //        Log.i(TAG, "onAttach(Context):listingsView=" + listingsView);
-        //        listingsView.setHasFixedSize(true);
-        //
-        //        // a = new FriendlistArrayAdapter(context, data_values);
-        //        MainActivity.friend_list_fragment = this;
-        //        // setListAdapter(a);
-        //        listingsView.setAdapter(adapter);
-
         onattach_ready = true;
     }
 
@@ -233,62 +220,32 @@ public class FriendListFragment extends Fragment
     {
         Log.i(TAG, "onAttach(Activity)");
         super.onAttach(activity);
-
-        //        if (!onattach_ready)
-        //        {
-        //            in_update_data = false;
-        //            data_values.clear();
-        //
-        //            adapter = new FriendlistAdapter(activity, R.layout.friend_list_entry, data_values);
-        //            Log.i(TAG, "onAttach(Activity):adapter=" + adapter);
-        //            listingsView = (RecyclerView) activity.findViewById(R.id.rv_list);
-        //            Log.i(TAG, "onAttach(Activity):listingsView=" + listingsView);
-        //            listingsView.setHasFixedSize(true);
-        //
-        //            MainActivity.friend_list_fragment = this;
-        //            listingsView.setAdapter(adapter);
-        //
-        //            onattach_ready = true;
-        //        }
     }
 
     void modify_friend(final FriendList f, final long friendnum)
     {
-        // Log.i(TAG, "modify_friend:start");
+        Log.i(TAG, "modify_friend:start");
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
-                // Log.i(TAG, "modify_friend:run---");
                 try
                 {
-                    boolean found_friend = false;
-                    int size = data_values.size();
-                    int i = 0;
-                    for (i = 0; i < size; i++)
-                    {
-                        if (tox_friend_by_public_key__wrapper(data_values.get(i).tox_public_key_string) == friendnum)
-                        {
-                            found_friend = true;
-                            FriendList n = deep_copy(f);
-                            data_values.set(i, n);
-                            adapter.update_item(n);
-                            // adapter.notifyDataSetChanged();
-                        }
-                    }
+                    FriendList n = deep_copy(f);
+                    boolean found_friend = adapter.update_item(n);
+                    Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
 
                     if (!found_friend)
                     {
-                        // add_friends(f);
-                        adapter.add_item(f);
+                        adapter.add_item(n);
+                        Log.i(TAG, "modify_friend:add_item");
                     }
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
-                // Log.i(TAG, "modify_friend:end---");
             }
         };
         try
@@ -300,7 +257,6 @@ public class FriendListFragment extends Fragment
             e.printStackTrace();
             Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
         }
-        // Log.i(TAG, "modify_friend:finished");
     }
 
     @Override
@@ -329,16 +285,14 @@ public class FriendListFragment extends Fragment
     void clear_friends()
     {
         Log.i(TAG, "clear_friends");
-        data_values.clear();
-        adapter.add_list_clear(data_values);
+        adapter.clear_items();
     }
 
     void add_friends_clear(final FriendList f)
     {
         Log.i(TAG, "add_friends_clear");
-        data_values.clear();
-        data_values.add(f);
-        adapter.add_list_clear(data_values);
+        adapter.clear_items();
+        adapter.add_item(f);
     }
 
     synchronized void add_all_friends_clear(final int delay)
@@ -364,8 +318,7 @@ public class FriendListFragment extends Fragment
 
                             Thread.sleep(delay);
 
-                            data_values.clear();
-
+                            adapter.clear_items();
                             List<FriendList> fl = orma.selectFromFriendList().toList();
                             if (fl != null)
                             {
@@ -376,13 +329,11 @@ public class FriendListFragment extends Fragment
                                     for (i = 0; i < fl.size(); i++)
                                     {
                                         FriendList n = deep_copy(fl.get(i));
-                                        data_values.add(n);
                                         adapter.add_item(n);
                                         Log.i(TAG, "add_all_friends_clear:add:" + n);
                                     }
                                 }
                             }
-                            // adapter.notifyDataSetChanged();
                         }
                     }
                 }
@@ -413,7 +364,6 @@ public class FriendListFragment extends Fragment
                 try
                 {
                     FriendList n = deep_copy(f);
-                    data_values.add(n);
                     adapter.add_item(n);
                     // adapter.notifyDataSetChanged();
                 }
@@ -427,32 +377,10 @@ public class FriendListFragment extends Fragment
         main_handler_s.post(myRunnable);
     }
 
+    // name is confusing, just update all friends!! already set to offline in DB
     public void set_all_friends_to_offline()
     {
-        Log.i(TAG, "add_friends");
-        Runnable myRunnable = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    int i = 0;
-                    for (i = 0; i < data_values.size(); i++)
-                    {
-                        data_values.get(i).TOX_CONNECTION = 0;
-                        adapter.update_item(data_values.get(i));
-                    }
-                    // adapter.notifyDataSetChanged();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        main_handler_s.post(myRunnable);
+        add_all_friends_clear(0);
     }
 
     //    @Override

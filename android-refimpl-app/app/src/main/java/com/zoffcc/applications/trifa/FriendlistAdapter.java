@@ -23,33 +23,26 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
     {
         Log.i(TAG, "FriendlistAdapter");
 
-        // 1. Initialize our adapter
         this.friendlistitems = items;
         this.context = context;
         this.itemResource = itemResource;
     }
 
-    // 2. Override the onCreateViewHolder method
     @Override
     public FriendListHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         Log.i(TAG, "onCreateViewHolder");
 
-        // 3. Inflate the view and return the new ViewHolder
         View view = LayoutInflater.from(parent.getContext()).inflate(this.itemResource, parent, false);
         return new FriendListHolder(view, this.context);
     }
 
-    // 4. Override the onBindViewHolder method
     @Override
     public void onBindViewHolder(FriendListHolder holder, int position)
     {
         Log.i(TAG, "onBindViewHolder:position=" + position);
 
-        // 5. Use position to access the correct Bakery object
         FriendList fl2 = this.friendlistitems.get(position);
-
-        // 6. Bind the bakery object to the holder
         holder.bindFriendList(fl2);
     }
 
@@ -81,12 +74,13 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
 
     public void add_item(FriendList new_item)
     {
-        Log.i(TAG, "add_item:" + new_item);
+        Log.i(TAG, "add_item:" + new_item + ":" + this.friendlistitems.size());
 
         try
         {
             this.friendlistitems.add(new_item);
             this.notifyDataSetChanged();
+            Log.i(TAG, "add_item:002:" + this.friendlistitems.size());
         }
         catch (Exception e)
         {
@@ -95,20 +89,32 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
         }
     }
 
-    public void update_item(FriendList new_item)
+    public void clear_items()
+    {
+        this.friendlistitems.clear();
+        this.notifyDataSetChanged();
+    }
+
+    public boolean update_item(FriendList new_item)
     {
         Log.i(TAG, "update_item:" + new_item);
 
+        boolean found_item = false;
+
         try
         {
-
             Iterator it = this.friendlistitems.iterator();
             while (it.hasNext())
             {
                 FriendList f = (FriendList) it.next();
-                if (f.tox_public_key_string == new_item.tox_public_key_string)
+
+                // Log.i(TAG, "update_item:001:" + f);
+                // Log.i(TAG, "update_item:002:" + f.tox_public_key_string + ":" + new_item.tox_public_key_string);
+                if (f.tox_public_key_string.compareTo(new_item.tox_public_key_string) == 0)
                 {
+                    found_item = true;
                     int pos = this.friendlistitems.indexOf(f);
+                    Log.i(TAG, "update_item:003:" + pos);
                     this.friendlistitems.set(pos, new_item);
                     break;
                 }
@@ -121,6 +127,8 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
             e.printStackTrace();
             Log.i(TAG, "update_item:EE:" + e.getMessage());
         }
+
+        return found_item;
     }
 
 }
