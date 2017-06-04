@@ -20,44 +20,34 @@
 package com.zoffcc.applications.trifa;
 
 import android.app.Activity;
-import android.app.ListFragment;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.PopupMenu;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
-import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
-import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
-import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
-import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
-import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
-import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
-import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
-import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
-public class FriendListFragment extends ListFragment
+public class FriendListFragment extends Fragment
 {
     private static final String TAG = "trifa.FriendListFrgnt";
     static final int MessageListActivity_ID = 2;
     static final int FriendInfoActivity_ID = 3;
     List<FriendList> data_values = new ArrayList<FriendList>();
-    FriendlistArrayAdapter a = null;
+    // FriendlistArrayAdapter a = null;
     static Boolean in_update_data = false;
+    //  View view1 = null;
+    RecyclerView listingsView = null;
+    FriendlistAdapter adapter = null;
 
     private boolean onattach_ready = false;
 
@@ -65,9 +55,27 @@ public class FriendListFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Log.i(TAG, "onCreateView");
-        View view = inflater.inflate(R.layout.friend_list_layout, container, false);
+        View view1 = inflater.inflate(R.layout.friend_list_layout, container, false);
+        Log.i(TAG, "onCreateView:view1=" + view1);
         onattach_ready = false;
-        return view;
+
+        // -------------------------------------------
+        // -------------------------------------------
+        // -------------------------------------------
+        data_values.clear();
+
+        adapter = new FriendlistAdapter(view1.getContext(), R.layout.friend_list_entry, data_values);
+        Log.i(TAG, "onCreateView:adapter=" + adapter);
+        listingsView = (RecyclerView) view1.findViewById(R.id.rv_list);
+        Log.i(TAG, "onCreateView:listingsView=" + listingsView);
+        listingsView.setHasFixedSize(true);
+        MainActivity.friend_list_fragment = this;
+        listingsView.setAdapter(adapter);
+        // -------------------------------------------
+        // -------------------------------------------
+        // -------------------------------------------
+
+        return view1;
     }
 
     @Override
@@ -78,106 +86,106 @@ public class FriendListFragment extends ListFragment
 
         try
         {
-            ListView lv = getListView();
-            lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
-            {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id)
-                {
-                    final int position_ = position;
-                    PopupMenu menu = new PopupMenu(v.getContext(), v);
-                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-                    {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item)
-                        {
-                            int id = item.getItemId();
-                            switch (id)
-                            {
-                                case R.id.item_info:
-                                    // show friend info page -----------------
-                                    long friend_num_temp = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
-                                    long friend_num_temp_safety = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
-
-                                    Log.i(TAG, "onMenuItemClick:info:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
-
-                                    Intent intent = new Intent(main_activity_s, FriendInfoActivity.class);
-                                    intent.putExtra("friendnum", friend_num_temp_safety);
-                                    startActivityForResult(intent, FriendInfoActivity_ID);
-                                    // show friend info page -----------------
-                                    break;
-                                case R.id.item_delete:
-                                    // delete friend -----------------
-                                    Runnable myRunnable = new Runnable()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            try
-                                            {
-                                                long friend_num_temp = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
-
-                                                Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
-
-                                                // delete friend -------
-                                                Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + data_values.get(position_).tox_public_key_string);
-                                                delete_friend(data_values.get(position_).tox_public_key_string);
-                                                // delete friend -------
-
-                                                // delete friends messages -------
-                                                Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
-                                                delete_friend_all_messages(friend_num_temp);
-                                                // delete friend  messages -------
-
-                                                // delete friends files -------
-                                                Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
-                                                delete_friend_all_files(friend_num_temp);
-                                                // delete friend  files -------
-
-                                                // delete friends FTs -------
-                                                Log.i(TAG, "onMenuItemClick:1.d:fnum=" + friend_num_temp);
-                                                delete_friend_all_filetransfers(friend_num_temp);
-                                                // delete friend  FTs -------
-
-
-                                                // delete friend - tox ----
-                                                Log.i(TAG, "onMenuItemClick:4");
-                                                if (friend_num_temp > -1)
-                                                {
-                                                    int res = tox_friend_delete(friend_num_temp);
-                                                    cache_pubkey_fnum.clear();
-                                                    cache_fnum_pubkey.clear();
-                                                    update_savedata_file(); // save toxcore datafile (friend removed)
-                                                    Log.i(TAG, "onMenuItemClick:5:res=" + res);
-                                                }
-                                                // delete friend - tox ----
-
-                                                // load all friends into data list ---
-                                                Log.i(TAG, "onMenuItemClick:6");
-                                                add_all_friends_clear(200);
-                                                Log.i(TAG, "onMenuItemClick:7");
-                                                // load all friends into data list ---
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                e.printStackTrace();
-                                                Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
-                                            }
-                                        }
-                                    };
-                                    main_handler_s.post(myRunnable);
-                                    // delete friend -----------------
-                                    break;
-                            }
-                            return true;
-                        }
-                    });
-                    menu.inflate(R.menu.menu_friendlist_item);
-                    menu.show();
-
-                    return true;
-                }
-            });
+            //            RecyclerView lv = getListView();
+            //            lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+            //            {
+            //                @Override
+            //                public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id)
+            //                {
+            //                    final int position_ = position;
+            //                    PopupMenu menu = new PopupMenu(v.getContext(), v);
+            //                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+            //                    {
+            //                        @Override
+            //                        public boolean onMenuItemClick(MenuItem item)
+            //                        {
+            //                            int id = item.getItemId();
+            //                            switch (id)
+            //                            {
+            //                                case R.id.item_info:
+            //                                    // show friend info page -----------------
+            //                                    long friend_num_temp = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
+            //                                    long friend_num_temp_safety = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
+            //
+            //                                    Log.i(TAG, "onMenuItemClick:info:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
+            //
+            //                                    Intent intent = new Intent(main_activity_s, FriendInfoActivity.class);
+            //                                    intent.putExtra("friendnum", friend_num_temp_safety);
+            //                                    startActivityForResult(intent, FriendInfoActivity_ID);
+            //                                    // show friend info page -----------------
+            //                                    break;
+            //                                case R.id.item_delete:
+            //                                    // delete friend -----------------
+            //                                    Runnable myRunnable = new Runnable()
+            //                                    {
+            //                                        @Override
+            //                                        public void run()
+            //                                        {
+            //                                            try
+            //                                            {
+            //                                                long friend_num_temp = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
+            //
+            //                                                Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
+            //
+            //                                                // delete friend -------
+            //                                                Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + data_values.get(position_).tox_public_key_string);
+            //                                                delete_friend(data_values.get(position_).tox_public_key_string);
+            //                                                // delete friend -------
+            //
+            //                                                // delete friends messages -------
+            //                                                Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
+            //                                                delete_friend_all_messages(friend_num_temp);
+            //                                                // delete friend  messages -------
+            //
+            //                                                // delete friends files -------
+            //                                                Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
+            //                                                delete_friend_all_files(friend_num_temp);
+            //                                                // delete friend  files -------
+            //
+            //                                                // delete friends FTs -------
+            //                                                Log.i(TAG, "onMenuItemClick:1.d:fnum=" + friend_num_temp);
+            //                                                delete_friend_all_filetransfers(friend_num_temp);
+            //                                                // delete friend  FTs -------
+            //
+            //
+            //                                                // delete friend - tox ----
+            //                                                Log.i(TAG, "onMenuItemClick:4");
+            //                                                if (friend_num_temp > -1)
+            //                                                {
+            //                                                    int res = tox_friend_delete(friend_num_temp);
+            //                                                    cache_pubkey_fnum.clear();
+            //                                                    cache_fnum_pubkey.clear();
+            //                                                    update_savedata_file(); // save toxcore datafile (friend removed)
+            //                                                    Log.i(TAG, "onMenuItemClick:5:res=" + res);
+            //                                                }
+            //                                                // delete friend - tox ----
+            //
+            //                                                // load all friends into data list ---
+            //                                                Log.i(TAG, "onMenuItemClick:6");
+            //                                                add_all_friends_clear(200);
+            //                                                Log.i(TAG, "onMenuItemClick:7");
+            //                                                // load all friends into data list ---
+            //                                            }
+            //                                            catch (Exception e)
+            //                                            {
+            //                                                e.printStackTrace();
+            //                                                Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
+            //                                            }
+            //                                        }
+            //                                    };
+            //                                    main_handler_s.post(myRunnable);
+            //                                    // delete friend -----------------
+            //                                    break;
+            //                            }
+            //                            return true;
+            //                        }
+            //                    });
+            //                    menu.inflate(R.menu.menu_friendlist_item);
+            //                    menu.show();
+            //
+            //                    return true;
+            //                }
+            //            });
         }
         catch (Exception e)
         {
@@ -191,6 +199,7 @@ public class FriendListFragment extends ListFragment
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
+        Log.i(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -201,10 +210,19 @@ public class FriendListFragment extends ListFragment
         super.onAttach(context);
 
         in_update_data = false;
-        data_values.clear();
-        a = new FriendlistArrayAdapter(context, data_values);
-        MainActivity.friend_list_fragment = this;
-        setListAdapter(a);
+        //        data_values.clear();
+        //
+        //        adapter = new FriendlistAdapter(context, R.layout.friend_list_entry, data_values);
+        //        Log.i(TAG, "onAttach(Context):adapter=" + adapter);
+        //        listingsView = (RecyclerView) getView().findViewById(R.id.rv_list);
+        //        Log.i(TAG, "onAttach(Context):listingsView=" + listingsView);
+        //        listingsView.setHasFixedSize(true);
+        //
+        //        // a = new FriendlistArrayAdapter(context, data_values);
+        //        MainActivity.friend_list_fragment = this;
+        //        // setListAdapter(a);
+        //        listingsView.setAdapter(adapter);
+
         onattach_ready = true;
     }
 
@@ -214,15 +232,22 @@ public class FriendListFragment extends ListFragment
         Log.i(TAG, "onAttach(Activity)");
         super.onAttach(activity);
 
-        if (!onattach_ready)
-        {
-            in_update_data = false;
-            data_values.clear();
-            a = new FriendlistArrayAdapter(activity, data_values);
-            MainActivity.friend_list_fragment = this;
-            setListAdapter(a);
-            onattach_ready = true;
-        }
+        //        if (!onattach_ready)
+        //        {
+        //            in_update_data = false;
+        //            data_values.clear();
+        //
+        //            adapter = new FriendlistAdapter(activity, R.layout.friend_list_entry, data_values);
+        //            Log.i(TAG, "onAttach(Activity):adapter=" + adapter);
+        //            listingsView = (RecyclerView) activity.findViewById(R.id.rv_list);
+        //            Log.i(TAG, "onAttach(Activity):listingsView=" + listingsView);
+        //            listingsView.setHasFixedSize(true);
+        //
+        //            MainActivity.friend_list_fragment = this;
+        //            listingsView.setAdapter(adapter);
+        //
+        //            onattach_ready = true;
+        //        }
     }
 
     void modify_friend(final FriendList f, final long friendnum)
@@ -246,14 +271,15 @@ public class FriendListFragment extends ListFragment
                             found_friend = true;
                             FriendList n = deep_copy(f);
                             data_values.set(i, n);
-                            // Log.i(TAG, "modify_friend:found friend:" + friendnum);
-                            a.notifyDataSetChanged();
+                            adapter.update_item(n);
+                            // adapter.notifyDataSetChanged();
                         }
                     }
 
                     if (!found_friend)
                     {
-                        add_friends(f);
+                        // add_friends(f);
+                        adapter.add_item(f);
                     }
                 }
                 catch (Exception e)
@@ -302,13 +328,15 @@ public class FriendListFragment extends ListFragment
     {
         Log.i(TAG, "clear_friends");
         data_values.clear();
+        adapter.add_list_clear(data_values);
     }
 
     void add_friends_clear(final FriendList f)
     {
         Log.i(TAG, "add_friends_clear");
         data_values.clear();
-        add_friends(f);
+        data_values.add(f);
+        adapter.add_list_clear(data_values);
     }
 
     synchronized void add_all_friends_clear(final int delay)
@@ -347,11 +375,12 @@ public class FriendListFragment extends ListFragment
                                     {
                                         FriendList n = deep_copy(fl.get(i));
                                         data_values.add(n);
+                                        adapter.add_item(n);
                                         Log.i(TAG, "add_all_friends_clear:add:" + n);
                                     }
                                 }
                             }
-                            a.notifyDataSetChanged();
+                            // adapter.notifyDataSetChanged();
                         }
                     }
                 }
@@ -383,7 +412,8 @@ public class FriendListFragment extends ListFragment
                 {
                     FriendList n = deep_copy(f);
                     data_values.add(n);
-                    a.notifyDataSetChanged();
+                    adapter.add_item(n);
+                    // adapter.notifyDataSetChanged();
                 }
                 catch (Exception e)
                 {
@@ -409,8 +439,9 @@ public class FriendListFragment extends ListFragment
                     for (i = 0; i < data_values.size(); i++)
                     {
                         data_values.get(i).TOX_CONNECTION = 0;
+                        adapter.update_item(data_values.get(i));
                     }
-                    a.notifyDataSetChanged();
+                    // adapter.notifyDataSetChanged();
                 }
                 catch (Exception e)
                 {
@@ -422,14 +453,14 @@ public class FriendListFragment extends ListFragment
         main_handler_s.post(myRunnable);
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id)
-    {
-        Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_public_key_string);
-
-        Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
-        intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(data_values.get(position).tox_public_key_string));
-        startActivityForResult(intent, MessageListActivity_ID);
-    }
+    //    @Override
+    //    public void onListItemClick(ListView l, View v, int position, long id)
+    //    {
+    //        Log.i(TAG, "onListItemClick pos=" + position + " id=" + id + " friendnum=" + data_values.get(position).tox_public_key_string);
+    //
+    //        Intent intent = new Intent(this.getActivity(), MessageListActivity.class);
+    //        intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(data_values.get(position).tox_public_key_string));
+    //        startActivityForResult(intent, MessageListActivity_ID);
+    //    }
 
 }
