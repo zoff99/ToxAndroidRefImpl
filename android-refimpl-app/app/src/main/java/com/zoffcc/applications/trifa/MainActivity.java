@@ -109,6 +109,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
@@ -449,155 +450,169 @@ public class MainActivity extends AppCompatActivity
         // --- forground service ---
         // --- forground service ---
         Intent i = new Intent(this, TrifaToxService.class);
-        startService(i);
-        // --- forground service ---
-        // --- forground service ---
-        // --- forground service ---
-
-        try
+        if (!TOX_SERVICE_STARTED)
         {
-            String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-            Log.i(TAG, "db:path=" + dbs_path);
-
-            File database_dir = new File(new File(dbs_path).getParent());
-            database_dir.mkdirs();
-
-            OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-            if (DB_ENCRYPT)
-            {
-                // builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-            }
-            orma = builder.name(dbs_path).
-                    readOnMainThread(AccessThreadConstraint.NONE).
-                    writeOnMainThread(AccessThreadConstraint.NONE).
-                    trace(ORMA_TRACE).
-                    build();
-            Log.i(TAG, "db:open=OK:path=" + dbs_path);
+            startService(i);
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "db:EE1:" + e.getMessage());
+        // --- forground service ---
+        // --- forground service ---
+        // --- forground service ---
 
-            String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-
-            try
-            {
-                Log.i(TAG, "db:deleting database:" + dbs_path);
-                new File(dbs_path).delete();
-            }
-            catch (Exception e3)
-            {
-                e3.printStackTrace();
-                Log.i(TAG, "db:EE3:" + e3.getMessage());
-            }
-
-            Log.i(TAG, "db:path(2)=" + dbs_path);
-            OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-            if (DB_ENCRYPT)
-            {
-                // builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-            }
-            orma = builder.name(dbs_path).
-                    readOnMainThread(AccessThreadConstraint.WARNING).
-                    writeOnMainThread(AccessThreadConstraint.WARNING).
-                    trace(ORMA_TRACE).
-                    build();
-            Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
-        }
-
-        // ----- Clear all messages from DB -----
-        // ----- Clear all messages from DB -----
-        // ----- Clear all messages from DB -----
-        // ** // ** // orma.deleteFromMessage().execute();
-        // ----- Clear all messages from DB -----
-        // ----- Clear all messages from DB -----
-        // ----- Clear all messages from DB -----
-
-        if (VFS_ENCRYPT)
+        if ((!TOX_SERVICE_STARTED) || (orma == null))
         {
             try
             {
-                String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+                String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+                Log.i(TAG, "db:path=" + dbs_path);
 
-                File database_dir = new File(new File(dbFile).getParent());
+                File database_dir = new File(new File(dbs_path).getParent());
                 database_dir.mkdirs();
 
-                Log.i(TAG, "vfs:path=" + dbFile);
-                vfs = VirtualFileSystem.get();
-
-                try
+                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+                if (DB_ENCRYPT)
                 {
-                    if (!vfs.isMounted())
-                    {
-                        vfs.mount(dbFile, PREF__DB_secrect_key);
-                    }
+                    // builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
                 }
-                catch (Exception ee)
-                {
-                    Log.i(TAG, "vfs:EE1:" + ee.getMessage());
-                    ee.printStackTrace();
-                    vfs.mount(dbFile, PREF__DB_secrect_key);
-                }
-                Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
+                orma = builder.name(dbs_path).
+                        readOnMainThread(AccessThreadConstraint.NONE).
+                        writeOnMainThread(AccessThreadConstraint.NONE).
+                        trace(ORMA_TRACE).
+                        build();
+                Log.i(TAG, "db:open=OK:path=" + dbs_path);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-                Log.i(TAG, "vfs:EE2:" + e.getMessage());
+                Log.i(TAG, "db:EE1:" + e.getMessage());
 
-                String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+                String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
 
                 try
                 {
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
-                    new File(dbFile).delete();
-                    Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    Log.i(TAG, "db:deleting database:" + dbs_path);
+                    new File(dbs_path).delete();
                 }
                 catch (Exception e3)
                 {
                     e3.printStackTrace();
-                    Log.i(TAG, "vfs:EE3:" + e3.getMessage());
+                    Log.i(TAG, "db:EE3:" + e3.getMessage());
                 }
 
-                try
+                Log.i(TAG, "db:path(2)=" + dbs_path);
+                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+                if (DB_ENCRYPT)
                 {
-                    Log.i(TAG, "vfs:path=" + dbFile);
-                    vfs = VirtualFileSystem.get();
-                    vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
-                    vfs.mount(PREF__DB_secrect_key);
-                    Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
+                    // builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
                 }
-                catch (Exception e2)
-                {
-                    e2.printStackTrace();
-                    Log.i(TAG, "vfs:EE4:" + e.getMessage());
-                }
+                orma = builder.name(dbs_path).
+                        readOnMainThread(AccessThreadConstraint.WARNING).
+                        writeOnMainThread(AccessThreadConstraint.WARNING).
+                        trace(ORMA_TRACE).
+                        build();
+                Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
             }
 
-            Log.i(TAG, "vfs:encrypted:(1)prefix=" + VFS_PREFIX);
+            // ----- Clear all messages from DB -----
+            // ----- Clear all messages from DB -----
+            // ----- Clear all messages from DB -----
+            // ** // ** // orma.deleteFromMessage().execute();
+            // ----- Clear all messages from DB -----
+            // ----- Clear all messages from DB -----
+            // ----- Clear all messages from DB -----
 
         }
-        else
+
+        if ((!TOX_SERVICE_STARTED) || (vfs == null))
         {
-            // VFS not encrypted -------------
-            VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath() + "/vfs/";
-            Log.i(TAG, "vfs:not_encrypted:(2)prefix=" + VFS_PREFIX);
-            // VFS not encrypted -------------
+            if (VFS_ENCRYPT)
+            {
+                try
+                {
+                    String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+
+                    File database_dir = new File(new File(dbFile).getParent());
+                    database_dir.mkdirs();
+
+                    Log.i(TAG, "vfs:path=" + dbFile);
+                    vfs = VirtualFileSystem.get();
+
+                    try
+                    {
+                        if (!vfs.isMounted())
+                        {
+                            vfs.mount(dbFile, PREF__DB_secrect_key);
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        Log.i(TAG, "vfs:EE1:" + ee.getMessage());
+                        ee.printStackTrace();
+                        vfs.mount(dbFile, PREF__DB_secrect_key);
+                    }
+                    Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "vfs:EE2:" + e.getMessage());
+
+                    String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+
+                    try
+                    {
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
+                        new File(dbFile).delete();
+                        Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                    }
+                    catch (Exception e3)
+                    {
+                        e3.printStackTrace();
+                        Log.i(TAG, "vfs:EE3:" + e3.getMessage());
+                    }
+
+                    try
+                    {
+                        Log.i(TAG, "vfs:path=" + dbFile);
+                        vfs = VirtualFileSystem.get();
+                        vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
+                        vfs.mount(PREF__DB_secrect_key);
+                        Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                        Log.i(TAG, "vfs:EE4:" + e.getMessage());
+                    }
+                }
+
+                Log.i(TAG, "vfs:encrypted:(1)prefix=" + VFS_PREFIX);
+
+            }
+            else
+            {
+                // VFS not encrypted -------------
+                VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath() + "/vfs/";
+                Log.i(TAG, "vfs:not_encrypted:(2)prefix=" + VFS_PREFIX);
+                // VFS not encrypted -------------
+
+            }
         }
 
         // cleanup temp dirs --------
-        cleanup_temp_dirs();
+        if (!TOX_SERVICE_STARTED)
+        {
+            cleanup_temp_dirs();
+        }
         // cleanup temp dirs --------
 
         // ---------- DEBUG, just a test ----------
@@ -615,7 +630,11 @@ public class MainActivity extends AppCompatActivity
         //        // ---------- DEBUG, just a test ----------
 
         app_files_directory = getFilesDir().getAbsolutePath();
-        tox_thread_start();
+
+        if (!TOX_SERVICE_STARTED)
+        {
+            tox_thread_start();
+        }
     }
 
     public static void cleanup_temp_dirs()

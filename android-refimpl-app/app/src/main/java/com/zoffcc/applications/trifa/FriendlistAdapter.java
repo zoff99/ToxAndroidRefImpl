@@ -42,8 +42,16 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
     {
         Log.i(TAG, "onBindViewHolder:position=" + position);
 
-        FriendList fl2 = this.friendlistitems.get(position);
-        holder.bindFriendList(fl2);
+        try
+        {
+            FriendList fl2 = this.friendlistitems.get(position);
+            holder.bindFriendList(fl2);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            holder.bindFriendList(null);
+        }
     }
 
     @Override

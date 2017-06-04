@@ -75,6 +75,7 @@ public class TrifaToxService extends Service
     static VirtualFileSystem vfs = null;
     static boolean is_tox_started = false;
     static boolean global_toxid_text_set = false;
+    static boolean TOX_SERVICE_STARTED = false;
 
 
     @Override
@@ -93,6 +94,7 @@ public class TrifaToxService extends Service
         // serivce is created ---
         super.onCreate();
 
+        TOX_SERVICE_STARTED = true;
         start_me();
     }
 
