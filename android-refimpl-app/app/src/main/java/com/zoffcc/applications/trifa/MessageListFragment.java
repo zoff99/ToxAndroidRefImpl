@@ -31,6 +31,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.futuremind.recyclerviewfastscroll.FastScroller;
+
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
@@ -87,9 +89,13 @@ public class MessageListFragment extends Fragment
         Log.i(TAG, "onCreateView:adapter=" + adapter);
         listingsView = (RecyclerView) view.findViewById(R.id.msg_rv_list);
         Log.i(TAG, "onCreateView:listingsView=" + listingsView);
+        FastScroller fastScroller = (FastScroller) view.findViewById(R.id.fastscroll);
 
         listingsView.setHasFixedSize(false);
         listingsView.setAdapter(adapter);
+
+        //has to be called AFTER RecyclerView.setAdapter()
+        fastScroller.setRecyclerView(listingsView);
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setStackFromEnd(true); // pin to bottom element
