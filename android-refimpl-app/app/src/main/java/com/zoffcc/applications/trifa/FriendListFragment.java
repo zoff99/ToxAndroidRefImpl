@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,6 +72,7 @@ public class FriendListFragment extends Fragment
         listingsView.setHasFixedSize(true);
         MainActivity.friend_list_fragment = this;
         listingsView.setAdapter(adapter);
+        listingsView.setLayoutManager(new LinearLayoutManager(view1.getContext()));
         // -------------------------------------------
         // -------------------------------------------
         // -------------------------------------------
