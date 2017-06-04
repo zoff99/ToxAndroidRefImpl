@@ -29,6 +29,7 @@ public class ToxVars
     public static final int TOX_MAX_NAME_LENGTH = 128;
     public static final int OX_MAX_STATUS_MESSAGE_LENGTH = 1007;
     public static final int TOX_MAX_FRIEND_REQUEST_LENGTH = 1016;
+    public static final int TOX_PUBLIC_KEY_SIZE = 32; // --> 64 hex chars!!
     // public static final int TOX_MAX_MESSAGE_LENGTH = 1372; // -> tox_max_message_length [DONE]
     // TODO: get these with the appropriate JNI functions!
     // ------ global defines ------

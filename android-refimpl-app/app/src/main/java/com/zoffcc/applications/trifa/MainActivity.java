@@ -109,6 +109,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false;
+    final static boolean CTOXCORE_NATIVE_LOGGING = true;
     final static boolean ORMA_TRACE = true;
     final static boolean DB_ENCRYPT = false;
     final static boolean VFS_ENCRYPT = true;
@@ -971,13 +972,21 @@ public class MainActivity extends AppCompatActivity
 
     static FriendList main_get_friend(long friendnum)
     {
+
+        String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
+        Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
+
         FriendList f;
         List<FriendList> fl = orma.selectFromFriendList().
                 tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                 toList();
+
+        Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
+
         if (fl.size() > 0)
         {
             f = fl.get(0);
+            Log.i(TAG, "main_get_friend:f=" + f);
         }
         else
         {
@@ -1753,16 +1762,19 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "friend_name:friend:" + friend_number + " name:" + friend_name);
 
-        if (friend_list_fragment != null)
+        FriendList f = main_get_friend(friend_number);
+        Log.i(TAG, "friend_name:002:" + f);
+        if (f != null)
         {
-            FriendList f = main_get_friend(friend_number);
-            if (f != null)
+            f.name = friend_name;
+            update_friend_in_db_name(f);
+            if (friend_list_fragment != null)
             {
-                f.name = friend_name;
-                update_friend_in_db_name(f);
+                Log.i(TAG, "friend_name:003");
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
+
     }
 
     static void android_tox_callback_friend_status_message_cb_method(long friend_number, String status_message, long length)
@@ -1925,8 +1937,9 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_request_cb_method(String friend_public_key, String friend_request_message, long length)
     {
         Log.i(TAG, "friend_request:friend:" + friend_public_key + " friend request message:" + friend_request_message);
+        Log.i(TAG, "friend_request:friend:" + friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2) + " friend request message:" + friend_request_message);
 
-        final String friend_public_key__final = friend_public_key;
+        final String friend_public_key__final = friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2);
 
         Thread t = new Thread()
         {
@@ -1935,29 +1948,59 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    Thread.sleep(20); // wait a bit
+                    // toxcore needs this!!
+                    Thread.sleep(120);
                 }
                 catch (Exception e)
                 {
-                    // e.printStackTrace();
+                    e.printStackTrace();
                 }
+
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
                 long friendnum = tox_friend_add_norequest(friend_public_key__final); // add friend
-                update_savedata_file(); // save toxcore datafile (new friend added)
-
-                FriendList f = new FriendList();
-                f.tox_public_key_string = friend_public_key__final;
-                f.TOX_USER_STATUS = 0;
-                f.TOX_CONNECTION = 0;
 
                 try
                 {
-                    orma.insertIntoFriendList(f);
+                    Thread.sleep(20);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                update_savedata_file(); // save toxcore datafile (new friend added)
+
+                final FriendList f = new FriendList();
+                f.tox_public_key_string = friend_public_key__final;
+                f.TOX_USER_STATUS = 0;
+                f.TOX_CONNECTION = 0;
+                // set name as the last 5 char of the publickey (until we get a proper name)
+                f.name = friend_public_key__final.substring(friend_public_key__final.length() - 5, friend_public_key__final.length());
+                f.avatar_pathname = null;
+                f.avatar_filename = null;
+
+                try
+                {
+                    Log.i(TAG, "friend_request:insert:001:f=" + f);
+                    long res = orma.insertIntoFriendList(f);
+                    Log.i(TAG, "friend_request:insert:002:res=" + res);
                 }
                 catch (android.database.sqlite.SQLiteConstraintException e)
                 {
+                    e.printStackTrace();
+                    Log.i(TAG, "friend_request:insert:EE1:" + e.getMessage());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "friend_request:insert:EE2:" + e.getMessage());
+                }
+
+                if (friend_list_fragment != null)
+                {
+                    Log.i(TAG, "friend_request:003");
+                    friend_list_fragment.modify_friend(f, friendnum);
                 }
 
                 // ---- auto add all friends ----

@@ -233,14 +233,18 @@ public class FriendListFragment extends Fragment
             {
                 try
                 {
-                    FriendList n = deep_copy(f);
-                    boolean found_friend = adapter.update_item(n);
-                    Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
-
-                    if (!found_friend)
+                    final FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).toList().get(0);
+                    if (f2 != null)
                     {
-                        adapter.add_item(n);
-                        Log.i(TAG, "modify_friend:add_item");
+                        FriendList n = deep_copy(f2);
+                        boolean found_friend = adapter.update_item(n);
+                        Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
+
+                        if (!found_friend)
+                        {
+                            adapter.add_item(n);
+                            Log.i(TAG, "modify_friend:add_item");
+                        }
                     }
                 }
                 catch (Exception e)
@@ -249,6 +253,7 @@ public class FriendListFragment extends Fragment
                 }
             }
         };
+
         try
         {
             main_handler_s.post(myRunnable);
