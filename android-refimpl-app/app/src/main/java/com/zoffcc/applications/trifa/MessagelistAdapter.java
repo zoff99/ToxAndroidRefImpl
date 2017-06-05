@@ -73,6 +73,25 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             case Message_model.TEXT_OUTGOING_HAVE_READ:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read, parent, false);
                 return new MessageListHolder_text_outgoing_read(view, this.context);
+
+            case Message_model.FILE_INCOMING_STATE_CANCEL:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                return new MessageListHolder_file_incoming_state_cancel(view, this.context);
+            case Message_model.FILE_INCOMING_STATE_PAUSE_HAS_ACCEPTED:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                return new MessageListHolder_file_incoming_state_pause_has_accepted(view, this.context);
+            case Message_model.FILE_INCOMING_STATE_PAUSE_NOT_YET_ACCEPTED:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                return new MessageListHolder_file_incoming_state_pause_not_yet_accepted(view, this.context);
+            case Message_model.FILE_INCOMING_STATE_RESUME:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                return new MessageListHolder_file_incoming_state_resume(view, this.context);
+
+            case Message_model.FILE_OUTGOING:
+                // TODO: make file outgoing layout
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                return new MessageListHolder_file_outgoing(view, this.context);
+
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_error, parent, false);
@@ -189,6 +208,24 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 case Message_model.TEXT_OUTGOING_HAVE_READ:
                     ((MessageListHolder_text_outgoing_read) holder).bindMessageList(m2);
                     break;
+
+                case Message_model.FILE_INCOMING_STATE_CANCEL:
+                    ((MessageListHolder_file_incoming_state_cancel) holder).bindMessageList(m2);
+                    break;
+                case Message_model.FILE_INCOMING_STATE_PAUSE_HAS_ACCEPTED:
+                    ((MessageListHolder_file_incoming_state_pause_has_accepted) holder).bindMessageList(m2);
+                    break;
+                case Message_model.FILE_INCOMING_STATE_PAUSE_NOT_YET_ACCEPTED:
+                    ((MessageListHolder_file_incoming_state_pause_not_yet_accepted) holder).bindMessageList(m2);
+                    break;
+                case Message_model.FILE_INCOMING_STATE_RESUME:
+                    ((MessageListHolder_file_incoming_state_resume) holder).bindMessageList(m2);
+                    break;
+
+                case Message_model.FILE_OUTGOING:
+                    ((MessageListHolder_file_outgoing) holder).bindMessageList(m2);
+                    break;
+
                 default:
                     ((MessageListHolder_error) holder).bindMessageList(null);
                     break;

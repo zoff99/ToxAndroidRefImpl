@@ -189,7 +189,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                     });
 
 
-                                    // TODO: this is just to show that it work. really bad and slow!!!!!
+                                    // TODO: this is just to show that it works. really bad and slow!!!!!
                                     final View v_ = rowView;
                                     final Thread t_image_preview = new Thread()
                                     {
