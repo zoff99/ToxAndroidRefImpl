@@ -302,6 +302,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                         if (MainActivity.friend_list_fragment != null)
                                         {
                                             // reload friendlist
+                                            // TODO: only remove 1 item, don't clear all!! this can crash
                                             MainActivity.friend_list_fragment.add_all_friends_clear(200);
                                         }
                                     }

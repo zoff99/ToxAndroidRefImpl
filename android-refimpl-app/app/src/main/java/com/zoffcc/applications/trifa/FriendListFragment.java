@@ -49,15 +49,12 @@ public class FriendListFragment extends Fragment
     RecyclerView listingsView = null;
     FriendlistAdapter adapter = null;
 
-    private boolean onattach_ready = false;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Log.i(TAG, "onCreateView");
         View view1 = inflater.inflate(R.layout.friend_list_layout, container, false);
         Log.i(TAG, "onCreateView:view1=" + view1);
-        onattach_ready = false;
 
         // -------------------------------------------
         // -------------------------------------------
@@ -65,15 +62,20 @@ public class FriendListFragment extends Fragment
         List<FriendList> data_values = new ArrayList<FriendList>();
         data_values.clear();
 
+        listingsView = (RecyclerView) view1.findViewById(R.id.rv_list);
+        listingsView.getRecycledViewPool().clear();
+        listingsView.setHasFixedSize(true);
+        listingsView.setLayoutManager(new LinearLayoutManager(view1.getContext()));
+
         adapter = new FriendlistAdapter(view1.getContext(), R.layout.friend_list_entry, data_values);
         Log.i(TAG, "onCreateView:adapter=" + adapter);
-        listingsView = (RecyclerView) view1.findViewById(R.id.rv_list);
         Log.i(TAG, "onCreateView:listingsView=" + listingsView);
-
-        listingsView.setHasFixedSize(true);
-        MainActivity.friend_list_fragment = this;
         listingsView.setAdapter(adapter);
-        listingsView.setLayoutManager(new LinearLayoutManager(view1.getContext()));
+        listingsView.getRecycledViewPool().clear();
+        adapter.clear_items();
+        adapter.notifyDataSetChanged();
+
+        MainActivity.friend_list_fragment = this;
         // -------------------------------------------
         // -------------------------------------------
         // -------------------------------------------
@@ -213,7 +215,6 @@ public class FriendListFragment extends Fragment
         super.onAttach(context);
 
         in_update_data = false;
-        onattach_ready = true;
     }
 
     @Override
@@ -223,7 +224,10 @@ public class FriendListFragment extends Fragment
         super.onAttach(activity);
     }
 
-    void modify_friend(final FriendList f, final long friendnum)
+    // -----------------
+    // actually "friendnum" is ignored here, only "f.tox_public_key_string" is used as key!!
+    // -----------------
+    synchronized void modify_friend(final FriendList f, final long friendnum)
     {
         Log.i(TAG, "modify_friend:start");
         Runnable myRunnable = new Runnable()
@@ -266,18 +270,37 @@ public class FriendListFragment extends Fragment
     }
 
     @Override
+    public void onStart()
+    {
+        Log.i(TAG, "onStart");
+        super.onStart();
+    }
+
+    @Override
     public void onResume()
     {
         Log.i(TAG, "onResume");
         super.onResume();
 
-        onattach_ready = false;
-
         try
         {
             // reload friendlist
             Log.i(TAG, "onResume:AA");
-            add_all_friends_clear(50);
+            List<FriendList> fl = orma.selectFromFriendList().toList();
+            if (fl != null)
+            {
+                Log.i(TAG, "onResume:fl.size=" + fl.size());
+                if (fl.size() > 0)
+                {
+                    int i = 0;
+                    for (i = 0; i < fl.size(); i++)
+                    {
+                        FriendList n = deep_copy(fl.get(i));
+                        modify_friend(n, -1);
+                        Log.i(TAG, "onResume:modify_friend:" + n);
+                    }
+                }
+            }
             Log.i(TAG, "onResume:BB");
         }
         catch (Exception e)

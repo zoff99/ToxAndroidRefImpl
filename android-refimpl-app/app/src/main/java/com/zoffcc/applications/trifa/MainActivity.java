@@ -901,6 +901,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart()
+    {
+        super.onStart();
+        // just in case, update own activity pointer!
+        main_activity_s = this;
+    }
+
+    @Override
     protected void onPause()
     {
         Log.i(TAG, "onPause");
@@ -961,6 +969,9 @@ public class MainActivity extends AppCompatActivity
                 e2.printStackTrace();
             }
         }
+
+        // just in case, update own activity pointer!
+        main_activity_s = this;
     }
 
     @Override
@@ -2589,15 +2600,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
-
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        // just in case, update own activity pointer!
-        main_activity_s = this;
-    }
-
 
     public static void add_single_message_from_messge_id(final long message_id, final boolean force)
     {

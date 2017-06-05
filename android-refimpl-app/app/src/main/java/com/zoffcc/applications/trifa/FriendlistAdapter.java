@@ -116,19 +116,18 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
             {
                 FriendList f = (FriendList) it.next();
 
-                // Log.i(TAG, "update_item:001:" + f);
-                // Log.i(TAG, "update_item:002:" + f.tox_public_key_string + ":" + new_item.tox_public_key_string);
+                Log.i(TAG, "update_item:001:" + f);
+                Log.i(TAG, "update_item:002:" + f.tox_public_key_string + ":" + new_item.tox_public_key_string);
                 if (f.tox_public_key_string.compareTo(new_item.tox_public_key_string) == 0)
                 {
                     found_item = true;
                     int pos = this.friendlistitems.indexOf(f);
                     Log.i(TAG, "update_item:003:" + pos);
                     this.friendlistitems.set(pos, new_item);
+                    this.notifyDataSetChanged();
                     break;
                 }
             }
-
-            this.notifyDataSetChanged();
         }
         catch (Exception e)
         {

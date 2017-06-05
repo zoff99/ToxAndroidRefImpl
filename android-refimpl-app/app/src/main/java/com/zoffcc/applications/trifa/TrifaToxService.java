@@ -419,13 +419,13 @@ public class TrifaToxService extends Service
 
                 int fc = 0;
                 boolean exists_in_db = false;
-                try
-                {
-                    MainActivity.friend_list_fragment.clear_friends();
-                }
-                catch (Exception e)
-                {
-                }
+                //                try
+                //                {
+                //                    MainActivity.friend_list_fragment.clear_friends();
+                //                }
+                //                catch (Exception e)
+                //                {
+                //                }
 
                 for (fc = 0; fc < MainActivity.friends.length; fc++)
                 {
@@ -518,6 +518,21 @@ public class TrifaToxService extends Service
                     try
                     {
                         Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
+
+                        try
+                        {
+                            if (MainActivity.friend_list_fragment != null)
+                            {
+                                // reload friend in friendlist
+                                MainActivity.friend_list_fragment.modify_friend(fl_check.get(0), -1);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+
                     }
                     catch (Exception e)
                     {
@@ -527,18 +542,18 @@ public class TrifaToxService extends Service
 
                 }
 
-                try
-                {
-                    if (MainActivity.friend_list_fragment != null)
-                    {
-                        // reload friendlist
-                        MainActivity.friend_list_fragment.add_all_friends_clear(50);
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                //                try
+                //                {
+                //                    if (MainActivity.friend_list_fragment != null)
+                //                    {
+                //                        // reload friendlist
+                //                        MainActivity.friend_list_fragment.add_all_friends_clear(50);
+                //                    }
+                //                }
+                //                catch (Exception e)
+                //                {
+                //                    e.printStackTrace();
+                //                }
 
                 // --------------- bootstrap ---------------
                 // --------------- bootstrap ---------------
