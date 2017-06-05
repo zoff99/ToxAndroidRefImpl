@@ -31,10 +31,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.l4digital.fastscroll.FastScrollRecyclerView;
-
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -44,7 +43,7 @@ public class MessageListFragment extends Fragment
     List<Message> data_values = null;
     // MessagelistArrayAdapter a = null;
     long current_friendnum = -1;
-    FastScrollRecyclerView listingsView = null;
+    RecyclerView listingsView = null;
     MessagelistAdapter adapter = null;
 
     @Override
@@ -87,7 +86,7 @@ public class MessageListFragment extends Fragment
         // --------------
         adapter = new MessagelistAdapter(view.getContext(), data_values);
         Log.i(TAG, "onCreateView:adapter=" + adapter);
-        listingsView = (FastScrollRecyclerView) view.findViewById(R.id.msg_rv_list);
+        listingsView = (RecyclerView) view.findViewById(R.id.msg_rv_list);
         Log.i(TAG, "onCreateView:listingsView=" + listingsView);
 
         listingsView.setHasFixedSize(false);
@@ -169,13 +168,44 @@ public class MessageListFragment extends Fragment
 
     }
 
-    void modify_message(Message m)
+    synchronized void modify_message(final Message m)
     {
-        adapter.update_item(m);
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    adapter.update_item(m);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
     }
 
-    void add_message(Message m)
+    synchronized void add_message(final Message m)
     {
-        adapter.add_item(m);
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    adapter.add_item(m);
+                    listingsView.scrollToPosition(adapter.getItemCount() - 1);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        main_handler_s.post(myRunnable);
     }
 }

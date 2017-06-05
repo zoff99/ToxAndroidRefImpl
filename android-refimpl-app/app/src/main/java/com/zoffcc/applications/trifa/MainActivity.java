@@ -3456,7 +3456,6 @@ public class MainActivity extends AppCompatActivity
 
             if (update_message_view_flag)
             {
-                // update_message_view();
                 add_single_message_from_messge_id(msg_id, true);
             }
 

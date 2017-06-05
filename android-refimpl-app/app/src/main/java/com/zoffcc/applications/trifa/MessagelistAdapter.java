@@ -26,8 +26,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.l4digital.fastscroll.FastScroller;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,7 +33,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MS
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 
-public class MessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
+public class MessagelistAdapter extends RecyclerView.Adapter
 {
     private static final String TAG = "trifa.MessagelistAdptr";
 
@@ -282,11 +280,11 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         }
     }
 
-    public void clear_items()
-    {
-        this.messagelistitems.clear();
-        this.notifyDataSetChanged();
-    }
+    //    public void clear_items()
+    //    {
+    //        this.messagelistitems.clear();
+    //        this.notifyDataSetChanged();
+    //    }
 
     public boolean update_item(Message new_item)
     {
@@ -322,9 +320,9 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         return found_item;
     }
 
-    @Override
-    public String getSectionText(int position)
-    {
-        return "_A_";
-    }
+    //    @Override
+    //    public String getSectionText(int position)
+    //    {
+    //        return "_A_";
+    //    }
 }
