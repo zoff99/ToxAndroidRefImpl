@@ -1063,10 +1063,15 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db_status(FriendList f)
     {
-        orma.updateFriendList().
+        Log.i(TAG, "update_friend_in_db_status:f=" + f);
+
+        int numrows = orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
                 execute();
+
+        Log.i(TAG, "update_friend_in_db_status:numrows=" + numrows);
+
     }
 
     synchronized static void update_friend_in_db_connection_status(FriendList f)
@@ -1781,13 +1786,13 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "friend_status_message:friend:" + friend_number + " status message:" + status_message);
 
-        if (friend_list_fragment != null)
+        FriendList f = main_get_friend(friend_number);
+        if (f != null)
         {
-            FriendList f = main_get_friend(friend_number);
-            if (f != null)
+            f.status_message = status_message;
+            update_friend_in_db_status_message(f);
+            if (friend_list_fragment != null)
             {
-                f.status_message = status_message;
-                update_friend_in_db_status_message(f);
                 friend_list_fragment.modify_friend(f, friend_number);
             }
         }
@@ -1798,27 +1803,37 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
 
         FriendList f = main_get_friend(friend_number);
+        Log.i(TAG, "friend_status:f=" + f);
+        Log.i(TAG, "friend_status:1:f.TOX_USER_STATUS=" + f.TOX_USER_STATUS);
+
         if (f != null)
         {
             f.TOX_USER_STATUS = a_TOX_USER_STATUS;
+            Log.i(TAG, "friend_status:2:f.TOX_USER_STATUS=" + f.TOX_USER_STATUS);
             update_friend_in_db_status(f);
 
             try
             {
+                Log.i(TAG, "friend_status:002");
                 message_list_activity.set_friend_status_icon();
+                Log.i(TAG, "friend_status:003");
             }
             catch (Exception e)
             {
                 // e.printStackTrace();
+                Log.i(TAG, "friend_status:EE1:" + e.getMessage());
             }
 
             try
             {
+                Log.i(TAG, "friend_status:004");
                 friend_list_fragment.modify_friend(f, friend_number);
+                Log.i(TAG, "friend_status:004");
             }
             catch (Exception e)
             {
                 // e.printStackTrace();
+                Log.i(TAG, "friend_status:EE2:" + e.getMessage());
             }
         }
     }
@@ -1826,33 +1841,37 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
     {
         Log.i(TAG, "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION);
-        if (friend_list_fragment != null)
+        FriendList f = main_get_friend(friend_number);
+        if (f != null)
         {
-            FriendList f = main_get_friend(friend_number);
-            if (f != null)
-            {
-                f.TOX_CONNECTION = a_TOX_CONNECTION;
-                update_friend_in_db_connection_status(f);
+            f.TOX_CONNECTION = a_TOX_CONNECTION;
+            update_friend_in_db_connection_status(f);
 
-                try
+            try
+            {
+                if (message_list_activity != null)
                 {
                     message_list_activity.set_friend_connection_status_icon();
                 }
-                catch (Exception e)
-                {
-                    //  e.printStackTrace();
-                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
 
-                try
+            try
+            {
+                if (friend_list_fragment != null)
                 {
                     friend_list_fragment.modify_friend(f, friend_number);
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
+
     }
 
     static void android_tox_callback_friend_typing_cb_method(long friend_number, final int typing)
@@ -1865,18 +1884,25 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    if (typing == 1)
+                    if (message_list_activity != null)
                     {
-                        ml_friend_typing.setText("friend is typing ...");
-                    }
-                    else
-                    {
-                        ml_friend_typing.setText("");
+                        if (ml_friend_typing != null)
+                        {
+                            if (typing == 1)
+                            {
+                                ml_friend_typing.setText("friend is typing ...");
+                            }
+                            else
+                            {
+                                ml_friend_typing.setText("");
+                            }
+                        }
                     }
                 }
                 catch (Exception e)
                 {
                     // e.printStackTrace();
+                    Log.i(TAG, "friend_typing_cb:EE:" + e.getMessage());
                 }
             }
         };
@@ -2702,7 +2728,7 @@ public class MainActivity extends AppCompatActivity
                 if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
                 {
                     update_all_messages_global_timestamp = System.currentTimeMillis();
-                    MainActivity.message_list_fragment.modify_message(m);
+                    message_list_fragment.modify_message(m);
                 }
             }
         }
