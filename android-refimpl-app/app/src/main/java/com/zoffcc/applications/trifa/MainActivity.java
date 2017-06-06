@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     final static boolean CTOXCORE_NATIVE_LOGGING = true;
-    final static boolean ORMA_TRACE = true;
+    final static boolean ORMA_TRACE = true; // set "false" for release builds
     final static boolean DB_ENCRYPT = true;
     final static boolean VFS_ENCRYPT = true;
     // --------- global config ---------
