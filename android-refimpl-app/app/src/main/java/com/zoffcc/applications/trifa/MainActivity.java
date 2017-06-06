@@ -64,6 +64,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.github.gfx.android.orma.AccessThreadConstraint;
+import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     final static boolean CTOXCORE_NATIVE_LOGGING = true;
     final static boolean ORMA_TRACE = true;
-    final static boolean DB_ENCRYPT = false;
+    final static boolean DB_ENCRYPT = true;
     final static boolean VFS_ENCRYPT = true;
     // --------- global config ---------
     // --------- global config ---------
@@ -477,7 +478,7 @@ public class MainActivity extends AppCompatActivity
                 OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
                 if (DB_ENCRYPT)
                 {
-                    // builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
                 }
                 orma = builder.name(dbs_path).
                         readOnMainThread(AccessThreadConstraint.NONE).
@@ -508,7 +509,7 @@ public class MainActivity extends AppCompatActivity
                 OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
                 if (DB_ENCRYPT)
                 {
-                    // builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
                 }
                 orma = builder.name(dbs_path).
                         readOnMainThread(AccessThreadConstraint.WARNING).
