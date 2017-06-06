@@ -89,13 +89,13 @@ public class MessageListFragment extends Fragment
         listingsView = (RecyclerView) view.findViewById(R.id.msg_rv_list);
         Log.i(TAG, "onCreateView:listingsView=" + listingsView);
 
-        listingsView.setHasFixedSize(false);
-        listingsView.setAdapter(adapter);
-
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setStackFromEnd(true); // pin to bottom element
         listingsView.setLayoutManager(linearLayoutManager);
         listingsView.setItemAnimator(new DefaultItemAnimator());
+        listingsView.setHasFixedSize(false);
+
+        listingsView.setAdapter(adapter);
         // --------------
         // --------------
 
