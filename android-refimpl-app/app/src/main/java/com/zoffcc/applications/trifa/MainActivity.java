@@ -407,6 +407,11 @@ public class MainActivity extends AppCompatActivity
                                     tox_service_fg.stop_tox_fg();
                                     tox_service_fg.stop_me(true);
                                 }
+                                else
+                                {
+                                    // just exit
+                                    tox_service_fg.stop_me(true);
+                                }
                             }
                             catch (Exception e)
                             {
@@ -640,31 +645,55 @@ public class MainActivity extends AppCompatActivity
 
     public static void cleanup_temp_dirs()
     {
-        try
-        {
-            if (VFS_ENCRYPT)
-            {
-                vfs_deleteFilesAndFilesSubDirectories_vfs(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
-            }
-            else
-            {
-                vfs_deleteFilesAndFilesSubDirectories_real(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
 
-        try
+        Thread t = new Thread()
         {
-            vfs_deleteFilesAndFilesSubDirectories_real(SD_CARD_TMP_DIR + "/");
-        }
-        catch (Exception e)
-        {
-            e.getMessage();
-        }
+            @Override
+            public void run()
+            {
+                Log.i(TAG, "cleanup_temp_dirs:---START---");
 
+                try
+                {
+                    Thread.sleep(400);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    if (VFS_ENCRYPT)
+                    {
+                        Log.i(TAG, "cleanup_temp_dirs:001");
+                        vfs_deleteFilesAndFilesSubDirectories_vfs(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
+                        Log.i(TAG, "cleanup_temp_dirs:002");
+                    }
+                    else
+                    {
+                        Log.i(TAG, "cleanup_temp_dirs:003");
+                        vfs_deleteFilesAndFilesSubDirectories_real(VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
+                        Log.i(TAG, "cleanup_temp_dirs:004");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    vfs_deleteFilesAndFilesSubDirectories_real(SD_CARD_TMP_DIR + "/");
+                }
+                catch (Exception e)
+                {
+                    e.getMessage();
+                }
+                Log.i(TAG, "cleanup_temp_dirs:---READY---");
+            }
+        };
+        t.start();
     }
 
     public static void vfs_deleteFilesAndFilesSubDirectories_real(String directoryName)
@@ -692,6 +721,7 @@ public class MainActivity extends AppCompatActivity
     {
         if (VFS_ENCRYPT)
         {
+            Log.i(TAG, "cleanup_temp_dirs:00a");
             info.guardianproject.iocipher.File directory1 = new info.guardianproject.iocipher.File(directoryName);
             info.guardianproject.iocipher.File[] fList1 = directory1.listFiles();
 
@@ -709,7 +739,7 @@ public class MainActivity extends AppCompatActivity
                     file.delete();
                 }
             }
-
+            Log.i(TAG, "cleanup_temp_dirs:00b");
         }
     }
 
