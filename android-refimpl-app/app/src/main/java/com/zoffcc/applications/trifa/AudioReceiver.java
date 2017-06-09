@@ -26,10 +26,12 @@ import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.util.Log;
 
+import static com.zoffcc.applications.trifa.AudioRecording.soft_echo_canceller_ready;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play_length;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_read_write;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
+import static com.zoffcc.applications.trifa.TrifaToxService.canceller;
 
 public class AudioReceiver extends Thread
 {
@@ -154,9 +156,10 @@ public class AudioReceiver extends Thread
             e.printStackTrace();
         }
 
-        int res = 0;
-        int read_bytes = 0;
-        int played_bytes = 0;
+        // int res = 0;
+        // int read_bytes = 0;
+        // int played_bytes = 0;
+        short[] temp_buf = null;
         while (!stopped)
         {
             try
@@ -167,10 +170,28 @@ public class AudioReceiver extends Thread
                 {
                     // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
 
+                    if (soft_echo_canceller_ready)
+                    {
+                        // TODO: this is slow!!!!!!! ---------------
+                        audio_buffer_play.rewind();
+                        byte[] b = new byte[audio_buffer_play.limit()];
+                        audio_buffer_play.get(b, 0, b.length);
+                        int size_ = b.length;
+                        temp_buf = new short[size_];
+                        for (int index = 0; index < size_; index++)
+                        {
+                            temp_buf[index] = (short) b[index];
+                        }
+                        // TODO: this is slow!!!!!!! ---------------
+
+                        canceller.playback(temp_buf);
+                        Log.i(TAG, "audio_play:canceller.playback:size=" + temp_buf.length);
+                    }
+
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
-                    // ** // played_bytes =
+                    // track.write(temp_buf, 0, temp_buf.length);
                     track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
@@ -190,13 +211,13 @@ public class AudioReceiver extends Thread
                     }
                     catch (InterruptedException esleep)
                     {
-                        // Log.i(TAG, "audio_play:recthr:wake up:" + esleep.getMessage());
+                        Log.i(TAG, "audio_play:recthr:wake up:" + esleep.getMessage());
                     }
                 }
             }
             catch (Exception e)
             {
-                // e.printStackTrace();
+                e.printStackTrace();
                 Log.i(TAG, "audio_play:recthr:EE2:" + e.getMessage());
             }
         }
