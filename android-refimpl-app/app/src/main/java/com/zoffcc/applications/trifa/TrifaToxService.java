@@ -35,6 +35,7 @@ import android.widget.RemoteViews;
 import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
+import speex.EchoCanceller;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
@@ -70,6 +71,7 @@ public class TrifaToxService extends Service
     Notification notification2 = null;
     NotificationManager nmn2 = null;
     static Thread ToxServiceThread = null;
+    static EchoCanceller canceller = null;
     static boolean stop_me = false;
     static OrmaDatabase orma = null;
     static VirtualFileSystem vfs = null;
