@@ -273,7 +273,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                     }
                                 }
                             };
-                            main_handler_s.post(myRunnable);
+
+                            if (main_handler_s != null)
+                            {
+                                main_handler_s.post(myRunnable);
+                            }
                         }
                     };
                     t_image_preview.start();

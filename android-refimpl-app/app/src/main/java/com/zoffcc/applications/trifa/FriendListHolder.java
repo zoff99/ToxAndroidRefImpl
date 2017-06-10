@@ -341,7 +341,10 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             }
                         };
                         // TODO: use own handler
-                        main_handler_s.post(myRunnable);
+                        if (main_handler_s != null)
+                        {
+                            main_handler_s.post(myRunnable);
+                        }
                         // delete friend -----------------
                         break;
                 }

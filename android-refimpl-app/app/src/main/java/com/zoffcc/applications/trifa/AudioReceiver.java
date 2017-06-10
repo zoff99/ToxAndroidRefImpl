@@ -56,6 +56,7 @@ public class AudioReceiver extends Thread
     AudioTrack track = null;
     LoudnessEnhancer lec = null;
 
+    static short[] temp_buf = null;
 
     public AudioReceiver()
     {
@@ -159,7 +160,6 @@ public class AudioReceiver extends Thread
         // int res = 0;
         // int read_bytes = 0;
         // int played_bytes = 0;
-        short[] temp_buf = null;
         while (!stopped)
         {
             try
@@ -184,6 +184,7 @@ public class AudioReceiver extends Thread
                         }
                         // TODO: this is slow!!!!!!! ---------------
 
+                        Log.i(TAG, "audio_play:temp_buf=" + temp_buf);
                         canceller.playback(temp_buf);
                         Log.i(TAG, "audio_play:canceller.playback:size=" + temp_buf.length);
                     }

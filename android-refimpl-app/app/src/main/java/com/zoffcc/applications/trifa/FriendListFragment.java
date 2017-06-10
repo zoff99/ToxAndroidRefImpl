@@ -260,7 +260,10 @@ public class FriendListFragment extends Fragment
 
         try
         {
-            main_handler_s.post(myRunnable);
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
         }
         catch (Exception e)
         {
@@ -378,7 +381,10 @@ public class FriendListFragment extends Fragment
             }
         };
         Log.i(TAG, "add_all_friends_clear:A:");
-        main_handler_s.post(myRunnable);
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
         Log.i(TAG, "add_all_friends_clear:B:");
     }
 
@@ -403,7 +409,10 @@ public class FriendListFragment extends Fragment
             }
         };
 
-        main_handler_s.post(myRunnable);
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     // name is confusing, just update all friends!! already set to offline in DB

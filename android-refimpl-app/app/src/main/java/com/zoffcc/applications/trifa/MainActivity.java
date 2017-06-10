@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 8;
+    final static int audio_in_buffer_max_count = 4;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
+    static boolean PREF__software_echo_cancel = false;
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -215,6 +216,12 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
+
+        main_handler = new Handler(getMainLooper());
+        main_handler_s = main_handler;
+        context_s = this.getBaseContext();
+        main_activity_s = this;
+
         setContentView(R.layout.activity_main);
 
         if (canceller == null)
@@ -239,12 +246,13 @@ public class MainActivity extends AppCompatActivity
         // prefs ----------
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
-        Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
-        Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
-        Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
+        PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
+        Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
+        Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
+        Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
         try
         {
             if (settings.getString("min_audio_samplingrate_out", "8000").compareTo("Auto") == 0)
@@ -284,11 +292,6 @@ public class MainActivity extends AppCompatActivity
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
-
-        main_handler = new Handler(getMainLooper());
-        main_handler_s = main_handler;
-        context_s = this.getBaseContext();
-        main_activity_s = this;
 
         nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
 
@@ -966,6 +969,8 @@ public class MainActivity extends AppCompatActivity
         PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
         PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
+        PREF__notification = settings.getBoolean("notifications_new_message", true);
+        PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         try
         {
             if (settings.getString("min_audio_samplingrate_out", "8000").compareTo("Auto") == 0)
@@ -1562,7 +1567,11 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
@@ -1617,7 +1626,11 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
@@ -1738,7 +1751,13 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    audio_buffer_2[i].clear();
+                    if (audio_buffer_2 != null)
+                    {
+                        if (audio_buffer_2[i] != null)
+                        {
+                            audio_buffer_2[i].clear();
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1955,7 +1974,11 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
@@ -1999,7 +2022,10 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 };
-                main_handler_s.post(myRunnable);
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
             }
         }
         catch (Exception e)
@@ -2211,7 +2237,10 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                main_handler_s.post(myRunnable);
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
             }
             catch (Exception e)
             {

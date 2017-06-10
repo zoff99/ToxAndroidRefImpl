@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__software_echo_cancel;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
@@ -56,6 +57,9 @@ public class AudioRecording extends Thread
     static int audio_session_id = -1;
     AutomaticGainControl agc = null;
     AcousticEchoCanceler aec = null;
+
+    static short[] buffer_short = null;
+
 
     /**
      * Give the thread high priority so that it's not canceled unexpectedly, and start it
@@ -83,7 +87,6 @@ public class AudioRecording extends Thread
         Log.i(TAG, "Running Audio Thread [OUT]");
         AudioRecord recorder = null;
         // byte[] buffer = null;
-        short[] buffer_short = null;
 
         try
         {
@@ -113,8 +116,11 @@ public class AudioRecording extends Thread
             buffer_short = new short[buffer_size / 2];
 
             // init echo canceller -----------
-            canceller.open(RECORDING_RATE, buffer_size / 2, buffer_size * 10);
-            soft_echo_canceller_ready = true;
+            if (PREF__software_echo_cancel)
+            {
+                canceller.open(RECORDING_RATE, buffer_size, (int) ((float) SMAPLINGRATE_TOX / 10f));
+                soft_echo_canceller_ready = true;
+            }
             // init echo canceller -----------
 
             audio_buffer = ByteBuffer.allocateDirect(buffer_size);
@@ -189,19 +195,27 @@ public class AudioRecording extends Thread
                         Log.i(TAG, "audio buffer:" + "read_shorts=" + read_shorts + " buffer_short.length=" + buffer_short.length + " buffer_size=" + buffer_size);
                         // Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
 
-                        if (read_shorts != buffer_short.length)
+                        if (PREF__software_echo_cancel)
                         {
-                            short[] buffer_short_copy = java.util.Arrays.copyOf(buffer_short, read_shorts);
-                            buffer_short_with_soft_ec = canceller.capture(buffer_short_copy);
+                            if (read_shorts != buffer_short.length)
+                            {
+                                short[] buffer_short_copy = java.util.Arrays.copyOf(buffer_short, read_shorts);
+                                buffer_short_with_soft_ec = canceller.capture(buffer_short_copy);
+                            }
+                            else
+                            {
+                                buffer_short_with_soft_ec = canceller.capture(buffer_short);
+                            }
+
+                            audio_buffer.rewind();
+                            // audio_buffer.put(buffer);
+                            audio_buffer.order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(buffer_short_with_soft_ec);
                         }
                         else
                         {
-                            buffer_short_with_soft_ec = canceller.capture(buffer_short);
+                            audio_buffer.rewind();
+                            audio_buffer.order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(buffer_short);
                         }
-
-                        audio_buffer.rewind();
-                        // audio_buffer.put(buffer);
-                        audio_buffer.order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(buffer_short_with_soft_ec);
 
                         // Log.i(TAG, "audio length=" + ((float) read_bytes * (float) 1000 / (float) SMAPLINGRATE_TOX));
                         // Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000))
@@ -243,8 +257,11 @@ public class AudioRecording extends Thread
         recorder.stop();
         recorder.release();
 
-        soft_echo_canceller_ready = false;
-        canceller.close();
+        if (PREF__software_echo_cancel)
+        {
+            soft_echo_canceller_ready = false;
+            canceller.close();
+        }
 
         finished = true;
 

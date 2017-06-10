@@ -293,7 +293,11 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                                     }
                                                 }
                                             };
-                                            main_handler_s.post(myRunnable);
+
+                                            if (main_handler_s != null)
+                                            {
+                                                main_handler_s.post(myRunnable);
+                                            }
                                         }
                                     };
                                     t_image_preview.start();

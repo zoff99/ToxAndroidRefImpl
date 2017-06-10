@@ -548,7 +548,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            wl1.release();
+            if (wl1 != null)
+            {
+                wl1.release();
+            }
         }
         catch (Exception e)
         {
@@ -556,7 +559,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
         try
         {
-            wl2.release();
+            if (wl2 != null)
+            {
+                wl2.release();
+            }
         }
         catch (Exception e)
         {

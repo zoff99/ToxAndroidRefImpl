@@ -6,8 +6,14 @@
         android:summary="@string/pref_description_video_uv_reversed"
         android:title="@string/pref_title_video_uv_reversed"/>
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="software_echo_cancel"
+        android:summary="@string/pref_description_software_echo_cancel"
+        android:title="@string/pref_title_software_echo_cancel"/>
+
     <ListPreference
-        android:defaultValue="180"
+        android:defaultValue="48000"
         android:entries="@array/pref_min_audio_samplingrate_out_titles"
         android:entryValues="@array/pref_min_audio_samplingrate_out_values"
         android:key="min_audio_samplingrate_out"

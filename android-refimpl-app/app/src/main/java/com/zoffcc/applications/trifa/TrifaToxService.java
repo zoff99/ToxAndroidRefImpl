@@ -44,6 +44,7 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
@@ -338,7 +339,11 @@ public class TrifaToxService extends Service
                 // ** // MainActivity.exit();
             }
         };
-        MainActivity.main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
 
         Log.i(TAG, "stop_tox_fg:099");
     }
@@ -372,7 +377,11 @@ public class TrifaToxService extends Service
                         }
                     }
                 };
-                MainActivity.main_handler_s.post(myRunnable);
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
 
                 if (!old_is_tox_started)
                 {

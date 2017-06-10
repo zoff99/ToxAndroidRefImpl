@@ -60,7 +60,10 @@ public class MessageListFragment extends Fragment
         try
         {
             // reset "new" flags for messages -------
-            orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            if (orma != null)
+            {
+                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            }
             // reset "new" flags for messages -------
         }
         catch (Exception e)
@@ -70,10 +73,13 @@ public class MessageListFragment extends Fragment
 
         try
         {
-            Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-            data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
-            // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
-            // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            if (orma != null)
+            {
+                Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            }
         }
         catch (Exception e)
         {
@@ -185,7 +191,11 @@ public class MessageListFragment extends Fragment
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     synchronized void add_message(final Message m)
@@ -206,6 +216,10 @@ public class MessageListFragment extends Fragment
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 }

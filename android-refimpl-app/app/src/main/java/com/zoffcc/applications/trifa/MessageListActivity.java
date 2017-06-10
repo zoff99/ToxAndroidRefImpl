@@ -206,7 +206,11 @@ public class MessageListActivity extends AppCompatActivity
                         ml_maintext.setText(f_name);
                     }
                 };
-                main_handler_s.post(myRunnable);
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
             }
         };
         t.start();
@@ -282,7 +286,10 @@ public class MessageListActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     public void set_friend_connection_status_icon()
@@ -310,7 +317,11 @@ public class MessageListActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     synchronized public void send_message_onclick(View view)
@@ -491,7 +502,10 @@ public class MessageListActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
 
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 }

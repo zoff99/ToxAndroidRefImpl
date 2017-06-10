@@ -21,6 +21,10 @@
     <string name="pref_title_video_uv_reversed">reverse UV in Video</string>
     <string name="pref_description_video_uv_reversed">Reverse the order of UV planes in the camera video</string>
 
+    <string name="pref_title_software_echo_cancel">Echo Cancellation</string>
+    <string name="pref_description_software_echo_cancel">Use Software Echo Cancellation</string>
+
+
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
 
