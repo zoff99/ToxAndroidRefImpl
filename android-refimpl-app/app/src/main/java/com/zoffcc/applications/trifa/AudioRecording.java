@@ -58,7 +58,7 @@ public class AudioRecording extends Thread
     AutomaticGainControl agc = null;
     AcousticEchoCanceler aec = null;
 
-    static short[] buffer_short = null;
+    short[] buffer_short = null;
 
 
     /**
@@ -204,7 +204,7 @@ public class AudioRecording extends Thread
                                 {
                                     buffer_short_with_soft_ec = canceller.capture(buffer_short_copy);
                                 }
-                                catch(Exception e)
+                                catch (Exception e)
                                 {
                                     e.printStackTrace();
                                 }
@@ -215,7 +215,7 @@ public class AudioRecording extends Thread
                                 {
                                     buffer_short_with_soft_ec = canceller.capture(buffer_short);
                                 }
-                                catch(Exception e)
+                                catch (Exception e)
                                 {
                                     e.printStackTrace();
                                 }

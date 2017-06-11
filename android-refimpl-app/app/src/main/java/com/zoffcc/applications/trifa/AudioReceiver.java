@@ -56,7 +56,7 @@ public class AudioReceiver extends Thread
     AudioTrack track = null;
     LoudnessEnhancer lec = null;
 
-    static short[] temp_buf = null;
+    short[] temp_buf = null;
 
     public AudioReceiver()
     {
