@@ -31,7 +31,6 @@ import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play_length;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_read_write;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
-import static com.zoffcc.applications.trifa.TrifaToxService.canceller;
 
 public class AudioReceiver extends Thread
 {
@@ -184,16 +183,16 @@ public class AudioReceiver extends Thread
                         }
                         // TODO: this is slow!!!!!!! ---------------
 
-                        Log.i(TAG, "audio_play:temp_buf=" + temp_buf);
+                        // Log.i(TAG, "audio_play:temp_buf=" + temp_buf);
                         try
                         {
-                            canceller.playback(temp_buf);
+                            // canceller.playback(temp_buf);
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             e.printStackTrace();
                         }
-                        Log.i(TAG, "audio_play:canceller.playback:size=" + temp_buf.length);
+                        // Log.i(TAG, "audio_play:canceller.playback:size=" + temp_buf.length);
                     }
 
                     // ------- HINT: this will block !! -------

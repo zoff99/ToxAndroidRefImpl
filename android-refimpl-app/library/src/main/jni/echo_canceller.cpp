@@ -90,9 +90,10 @@ jshortArray Java_speex_EchoCanceller_capture__real
 JNIEXPORT jshortArray JNICALL Java_speex_EchoCanceller_capture
   (JNIEnv *env, jobject jObj, jshortArray input_frame)
 {
-	jshortArray output_shorts;
-	COFFEE_TRY_JNI(env, output_shorts = Java_speex_EchoCanceller_capture__real(env, jObj, input_frame));
-	return output_shorts;
+	//jshortArray output_shorts;
+	//COFFEE_TRY_JNI(env, output_shorts = Java_speex_EchoCanceller_capture__real(env, jObj, input_frame));
+	//return output_shorts;
+    return Java_speex_EchoCanceller_capture__real(env, jObj, input_frame);
 }
 
 JNIEXPORT void JNICALL Java_speex_EchoCanceller_reset(JNIEnv *env, jobject jObj) {

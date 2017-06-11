@@ -36,7 +36,6 @@ import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_audio_send_frame;
-import static com.zoffcc.applications.trifa.TrifaToxService.canceller;
 
 public class AudioRecording extends Thread
 {
@@ -118,7 +117,7 @@ public class AudioRecording extends Thread
             // init echo canceller -----------
             if (PREF__software_echo_cancel)
             {
-                canceller.open(RECORDING_RATE, buffer_size * 4, (int) ((float) SMAPLINGRATE_TOX / 10f));
+                // canceller.open(RECORDING_RATE, buffer_size * 4, (int) ((float) SMAPLINGRATE_TOX / 10f));
                 soft_echo_canceller_ready = true;
             }
             // init echo canceller -----------
@@ -192,7 +191,7 @@ public class AudioRecording extends Thread
                     {
                         read_shorts = recorder.read(buffer_short, 0, buffer_short.length);
                         // read_bytes = recorder.read(buffer, 0, buffer.length);
-                        Log.i(TAG, "audio buffer:" + "read_shorts=" + read_shorts + " buffer_short.length=" + buffer_short.length + " buffer_size=" + buffer_size);
+                        // Log.i(TAG, "audio buffer:" + "read_shorts=" + read_shorts + " buffer_short.length=" + buffer_short.length + " buffer_size=" + buffer_size);
                         // Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
 
                         if (PREF__software_echo_cancel)
@@ -202,7 +201,7 @@ public class AudioRecording extends Thread
                                 short[] buffer_short_copy = java.util.Arrays.copyOf(buffer_short, read_shorts);
                                 try
                                 {
-                                    buffer_short_with_soft_ec = canceller.capture(buffer_short_copy);
+                                    // buffer_short_with_soft_ec = canceller.capture(buffer_short_copy);
                                 }
                                 catch (Exception e)
                                 {
@@ -213,7 +212,7 @@ public class AudioRecording extends Thread
                             {
                                 try
                                 {
-                                    buffer_short_with_soft_ec = canceller.capture(buffer_short);
+                                    // buffer_short_with_soft_ec = canceller.capture(buffer_short);
                                 }
                                 catch (Exception e)
                                 {
@@ -237,7 +236,7 @@ public class AudioRecording extends Thread
 
                         res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (read_shorts), CHANNELS_TOX, SMAPLINGRATE_TOX);
                         // res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                        Log.i(TAG, "audio:res=" + res);
+                        // Log.i(TAG, "audio:res=" + res);
                     }
                 }
             }
@@ -274,7 +273,7 @@ public class AudioRecording extends Thread
         if (PREF__software_echo_cancel)
         {
             soft_echo_canceller_ready = false;
-            canceller.close();
+            // canceller.close();
         }
 
         finished = true;
