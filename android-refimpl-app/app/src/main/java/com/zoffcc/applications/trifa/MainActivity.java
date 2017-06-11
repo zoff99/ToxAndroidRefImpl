@@ -3917,9 +3917,12 @@ public class MainActivity extends AppCompatActivity
         String result = "Unknown";
         try
         {
-            result = orma.selectFromFriendList().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                    toList().get(0).name;
+            if (orma != null)
+            {
+                result = orma.selectFromFriendList().
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        toList().get(0).name;
+            }
         }
         catch (Exception e)
         {

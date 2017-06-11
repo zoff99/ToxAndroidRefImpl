@@ -2,6 +2,10 @@
 #define _Included_speex_EchoCanceller
 
 #include <jni.h>
+// ------- Android coffeecatch -------
+#include "speex/coffeecatch.h"
+#include "speex/coffeejni.h"
+// ------- Android coffeecatch -------
 #include "speex/speex_echo.h"
 #include "speex/speex_preprocess.h"
 

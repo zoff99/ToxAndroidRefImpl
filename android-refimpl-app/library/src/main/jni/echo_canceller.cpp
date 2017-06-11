@@ -1,8 +1,9 @@
 #include "echo_canceller.h"
+
 SpeexEchoState *st;
 SpeexPreprocessState *den;
 
-JNIEXPORT void JNICALL Java_speex_EchoCanceller_open
+void Java_speex_EchoCanceller_open__real
   (JNIEnv *env, jobject jObj, jint jSampleRate, jint jBufSize, jint jTotalSize)
 {
      int sampleRate=jSampleRate;
@@ -12,6 +13,12 @@ JNIEXPORT void JNICALL Java_speex_EchoCanceller_open
      speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_ECHO_STATE, st);
      //speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_DENOISE, st);
      //speex_preprocess_ctl(den, SPEEX_PREPROCESS_SET_DEREVERB, st);
+}
+
+JNIEXPORT void JNICALL Java_speex_EchoCanceller_open
+  (JNIEnv *env, jobject jObj, jint jSampleRate, jint jBufSize, jint jTotalSize)
+{
+	COFFEE_TRY_JNI(env, Java_speex_EchoCanceller_open__real(env, jObj, jSampleRate, jBufSize, jTotalSize));
 }
 
 JNIEXPORT jshortArray JNICALL Java_speex_EchoCanceller_process
@@ -44,7 +51,7 @@ JNIEXPORT jshortArray JNICALL Java_speex_EchoCanceller_process
 }
 
 
-JNIEXPORT void JNICALL Java_speex_EchoCanceller_playback
+void Java_speex_EchoCanceller_playback__real
   (JNIEnv *env, jobject jObj, jshortArray echo_frame)
 {
     jshort *native_echo_frame = env->GetShortArrayElements(echo_frame, 0);
@@ -52,7 +59,13 @@ JNIEXPORT void JNICALL Java_speex_EchoCanceller_playback
     env->ReleaseShortArrayElements(echo_frame, native_echo_frame, 0);
 }
 
-JNIEXPORT jshortArray JNICALL Java_speex_EchoCanceller_capture
+JNIEXPORT void JNICALL Java_speex_EchoCanceller_playback
+  (JNIEnv *env, jobject jObj, jshortArray echo_frame)
+{
+	COFFEE_TRY_JNI(env, Java_speex_EchoCanceller_playback__real(env, jObj, echo_frame));
+}
+
+jshortArray Java_speex_EchoCanceller_capture__real
   (JNIEnv *env, jobject jObj, jshortArray input_frame)
 {
     env->MonitorEnter(jObj);
@@ -72,6 +85,14 @@ JNIEXPORT jshortArray JNICALL Java_speex_EchoCanceller_capture
     env->ReleaseShortArrayElements(temp, native_output_frame, 0);
     env->MonitorExit(jObj);
     return output_shorts;
+}
+
+JNIEXPORT jshortArray JNICALL Java_speex_EchoCanceller_capture
+  (JNIEnv *env, jobject jObj, jshortArray input_frame)
+{
+	jshortArray output_shorts;
+	COFFEE_TRY_JNI(env, output_shorts = Java_speex_EchoCanceller_capture__real(env, jObj, input_frame));
+	return output_shorts;
 }
 
 JNIEXPORT void JNICALL Java_speex_EchoCanceller_reset(JNIEnv *env, jobject jObj) {

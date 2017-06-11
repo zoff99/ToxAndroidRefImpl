@@ -12,6 +12,7 @@ speexincludedir = $(includedir)/speex
 nodist_speexinclude_HEADERS = speexdsp_config_types.h
 
 speexinclude_HEADERS = speex_echo.h speex_jitter.h speex_preprocess.h speex_resampler.h \
+    coffeecatch.c coffeejni.c \
 	speexdsp_types.h
 
 noinst_HEADERS=speex_buffer.h

@@ -24,10 +24,15 @@ model {
             moduleName = 'speex'
             platformVersion = '9'
             toolchain = 'clang'
+            abiFilters.addAll(["armeabi-v7a"])
 
+            CFlags.add('-g')
             CFlags.add('-DFIXED_POINT')
             CFlags.add('-DUSE_KISS_FFT')
-            CFlags.add('-D EXPORT=\"\"')
+            CFlags.add('-DEXPORT=\"\"')
+            CFlags.add('-D__ANDROID__=1')
+            CFlags.add('-funwind-tables')
+            CFlags.add('-Wl,--no-merge-exidx-entries')
         }
     }
 }
