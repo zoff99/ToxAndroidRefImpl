@@ -2022,6 +2022,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 };
+
                 if (main_handler_s != null)
                 {
                     main_handler_s.post(myRunnable);

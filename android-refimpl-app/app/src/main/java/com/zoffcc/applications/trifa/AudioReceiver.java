@@ -185,7 +185,14 @@ public class AudioReceiver extends Thread
                         // TODO: this is slow!!!!!!! ---------------
 
                         Log.i(TAG, "audio_play:temp_buf=" + temp_buf);
-                        canceller.playback(temp_buf);
+                        try
+                        {
+                            canceller.playback(temp_buf);
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                         Log.i(TAG, "audio_play:canceller.playback:size=" + temp_buf.length);
                     }
 

@@ -118,7 +118,7 @@ public class AudioRecording extends Thread
             // init echo canceller -----------
             if (PREF__software_echo_cancel)
             {
-                canceller.open(RECORDING_RATE, buffer_size, (int) ((float) SMAPLINGRATE_TOX / 10f));
+                canceller.open(RECORDING_RATE, buffer_size * 4, (int) ((float) SMAPLINGRATE_TOX / 10f));
                 soft_echo_canceller_ready = true;
             }
             // init echo canceller -----------
@@ -200,11 +200,25 @@ public class AudioRecording extends Thread
                             if (read_shorts != buffer_short.length)
                             {
                                 short[] buffer_short_copy = java.util.Arrays.copyOf(buffer_short, read_shorts);
-                                buffer_short_with_soft_ec = canceller.capture(buffer_short_copy);
+                                try
+                                {
+                                    buffer_short_with_soft_ec = canceller.capture(buffer_short_copy);
+                                }
+                                catch(Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
                             }
                             else
                             {
-                                buffer_short_with_soft_ec = canceller.capture(buffer_short);
+                                try
+                                {
+                                    buffer_short_with_soft_ec = canceller.capture(buffer_short);
+                                }
+                                catch(Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
                             }
 
                             audio_buffer.rewind();

@@ -240,8 +240,15 @@ public class MessagelistAdapter extends RecyclerView.Adapter
     @Override
     public int getItemCount()
     {
-        Log.i(TAG, "getItemCount:" + this.messagelistitems.size());
-        return this.messagelistitems.size();
+        if (this.messagelistitems != null)
+        {
+            Log.i(TAG, "getItemCount:" + this.messagelistitems.size());
+            return this.messagelistitems.size();
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     public void add_list_clear(List<Message> new_items)

@@ -131,8 +131,28 @@ public class MessageListActivity extends AppCompatActivity
                 if (global_typing == 0)
                 {
                     global_typing = 1;  // typing = 1
-                    tox_self_set_typing(friendnum, global_typing);
-                    Log.i(TAG, "typing:fn#" + friendnum + ":activated");
+
+                    Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                tox_self_set_typing(friendnum, global_typing);
+                                Log.i(TAG, "typing:fn#" + friendnum + ":activated");
+                            }
+                            catch (Exception e)
+                            {
+                                Log.i(TAG, "typing:fn#" + friendnum + ":EE1" + e.getMessage());
+                            }
+                        }
+                    };
+
+                    if (main_handler_s != null)
+                    {
+                        main_handler_s.post(myRunnable);
+                    }
                 }
 
                 try
@@ -166,8 +186,27 @@ public class MessageListActivity extends AppCompatActivity
                             if (skip_flag_update == false)
                             {
                                 global_typing = 0;  // typing = 0
-                                tox_self_set_typing(friendnum, global_typing);
-                                Log.i(TAG, "typing:fn#" + friendnum + ":DEactivated");
+                                Runnable myRunnable = new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            tox_self_set_typing(friendnum, global_typing);
+                                            Log.i(TAG, "typing:fn#" + friendnum + ":DEactivated");
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Log.i(TAG, "typing:fn#" + friendnum + ":EE2" + e.getMessage());
+                                        }
+                                    }
+                                };
+
+                                if (main_handler_s != null)
+                                {
+                                    main_handler_s.post(myRunnable);
+                                }
                             }
                         }
                     }
