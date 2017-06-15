@@ -21,6 +21,8 @@ package com.zoffcc.applications.trifa;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -49,9 +51,12 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
 
         try
         {
+            // Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.drawable.web_hi_res_512);
+            // Bitmap bMapScaled = Bitmap.createScaledBitmap(bMap, bMap.getWidth() / 2, bMap.getHeight() / 2, true);
+
             AboutPage aboutPage = new AboutPage(this).
                     isRTL(false).
-                    setImage(R.mipmap.ic_launcher_round).
+                    setImage(R.drawable.web_hi_res_512).
                     addWebsite("https://github.com/zoff99/ToxAndroidRefImpl");
 
             mehdi.sakout.aboutpage.Element e001 = new mehdi.sakout.aboutpage.Element();
@@ -86,6 +91,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                 }
             });
             aboutPage.addItem(e001);
+            aboutPage.setDescription("TRIfa a Tox Client for Android");
 
             setContentView(aboutPage.create());
         }
