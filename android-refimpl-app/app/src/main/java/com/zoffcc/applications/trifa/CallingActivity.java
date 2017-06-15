@@ -508,7 +508,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             @Override
             public void run()
             {
-                Log.i(TAG, "update_call_time -> call");
+                // Log.i(TAG, "update_call_time -> call");
                 update_call_time();
                 if (activity_state != 0)
                 {

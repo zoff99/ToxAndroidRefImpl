@@ -4240,7 +4240,7 @@ public class MainActivity extends AppCompatActivity
     {
         String positive = "";
         final long absSeconds = Math.abs(seconds);
-        Log.i(TAG,"format_timeduration_from_seconds:seconds="+seconds+" absSeconds="+absSeconds);
+        // Log.i(TAG,"format_timeduration_from_seconds:seconds="+seconds+" absSeconds="+absSeconds);
         int hours = (int) (absSeconds / 3600);
         if (hours < 1)
         {
