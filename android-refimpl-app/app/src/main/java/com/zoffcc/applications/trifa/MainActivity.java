@@ -98,6 +98,8 @@ import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
@@ -1700,11 +1702,53 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "toxav_bit_rate_status:from=" + friend_number + " audio_bit_rate=" + audio_bit_rate + " video_bit_rate=" + video_bit_rate);
 
         // TODO: for now ignore suggested bitrates!!!! ---------------
-        //        if (Callstate.state == 1)
-        //        {
-        //            Callstate.audio_bitrate = audio_bit_rate;
-        //            Callstate.video_bitrate = video_bit_rate;
-        //        }
+        if (Callstate.state == 1)
+        {
+            // Callstate.audio_bitrate = audio_bit_rate;
+            // Callstate.video_bitrate = video_bit_rate;
+
+            final long friend_number_ = friend_number;
+
+            long audio_bit_rate2 = audio_bit_rate;
+            long video_bit_rate2 = video_bit_rate;
+
+            if (audio_bit_rate2 < GLOBAL_MIN_AUDIO_BITRATE)
+            {
+                audio_bit_rate2 = GLOBAL_MIN_AUDIO_BITRATE;
+            }
+
+            if (video_bit_rate2 < GLOBAL_MIN_VIDEO_BITRATE)
+            {
+                video_bit_rate2 = GLOBAL_MIN_VIDEO_BITRATE;
+            }
+
+            final long audio_bit_rate_ = audio_bit_rate2;
+            final long video_bit_rate_ = video_bit_rate2;
+
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // set audio and video bitrate according to suggestion from c-toxcore
+                        toxav_bit_rate_set(friend_number_, audio_bit_rate_, video_bit_rate_);
+                        Log.i(TAG, "toxav_bit_rate_status:CALL:toxav_bit_rate_set");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "toxav_bit_rate_status:CALL:EE:" + e.getMessage());
+                    }
+                }
+            };
+
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
+        }
         // TODO: for now ignore suggested bitrates!!!! ---------------
     }
 

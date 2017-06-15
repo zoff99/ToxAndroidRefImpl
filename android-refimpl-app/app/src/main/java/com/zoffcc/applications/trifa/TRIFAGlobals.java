@@ -46,7 +46,10 @@ public class TRIFAGlobals
     static String VFS_PREFIX = ""; // only set for normal (unencrypted) storage
 
     static int GLOBAL_VIDEO_BITRATE = 6000;
-    static int GLOBAL_AUDIO_BITRATE = 400; // allowed values: (xx>=6) && (xx<=510)
+    static int GLOBAL_AUDIO_BITRATE = 350; // allowed values: (xx>=6) && (xx<=510)
+
+    final static int GLOBAL_MIN_VIDEO_BITRATE = 1200;
+    final static int GLOBAL_MIN_AUDIO_BITRATE = 90; // allowed values: (xx>=6) && (xx<=510)
 
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
