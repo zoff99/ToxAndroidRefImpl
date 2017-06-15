@@ -518,6 +518,10 @@ public class MessageListActivity extends AppCompatActivity
                                     CallingActivity.top_text_line_str2 = "0s";
                                     update_top_text_line();
                                     Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled + " f_video_enabled=" + f_video_enabled);
+
+                                    Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
+                                    Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
+
                                     MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
                                     Log.i(TAG, "CALL_OUT:002");
                                 }

@@ -37,10 +37,79 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/black"/>
 
+
             <FrameLayout
                 android:layout_width="125dp"
                 android:layout_height="125dp"
-                android:layout_gravity="bottom|right">
+                android:layout_gravity="top|left"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="5dp"
+                android:background="@null">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/right_left_text_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:elevation="2dp"
+                        android:text="1m 20s"
+                        android:textColor="@color/md_grey_400"
+                        android:textSize="18sp"
+                        android:background="@color/md_grey_900"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:layout_width="125dp"
+                android:layout_height="125dp"
+                android:layout_gravity="top|right"
+                android:layout_marginTop="5dp"
+                android:background="@null">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/right_top_text_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="V 4000 kbit/s"
+                        android:textColor="@color/md_green_700"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/right_top_text_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="A 350 kbit/s"
+                        android:textColor="@color/md_red_700"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:layout_width="125dp"
+                android:layout_height="125dp"
+                android:layout_gravity="bottom|right"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="5dp">
 
                 <FrameLayout
                     android:layout_width="120dp"

@@ -1704,9 +1704,6 @@ public class MainActivity extends AppCompatActivity
         // TODO: for now ignore suggested bitrates!!!! ---------------
         if (Callstate.state == 1)
         {
-            // Callstate.audio_bitrate = audio_bit_rate;
-            // Callstate.video_bitrate = video_bit_rate;
-
             final long friend_number_ = friend_number;
 
             long audio_bit_rate2 = audio_bit_rate;
@@ -1734,6 +1731,11 @@ public class MainActivity extends AppCompatActivity
                     {
                         // set audio and video bitrate according to suggestion from c-toxcore
                         toxav_bit_rate_set(friend_number_, audio_bit_rate_, video_bit_rate_);
+
+                        Callstate.audio_bitrate = audio_bit_rate_;
+                        Callstate.video_bitrate = video_bit_rate_;
+                        update_bitrates();
+
                         Log.i(TAG, "toxav_bit_rate_status:CALL:toxav_bit_rate_set");
                     }
                     catch (Exception e)
@@ -4194,6 +4196,62 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static void update_bitrates()
+    {
+        // these were updated: Callstate.audio_bitrate, Callstate.video_bitrate
+        try
+        {
+            if (CallingActivity.ca != null)
+            {
+                if (CallingActivity.ca.callactivity_handler != null)
+                {
+                    final Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                CallingActivity.ca.right_top_text_1.setText("V " + Callstate.video_bitrate + " kbit/s");
+                                CallingActivity.ca.right_top_text_2.setText("A " + Callstate.audio_bitrate + " kbit/s");
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
+                    if (CallingActivity.ca.callactivity_handler != null)
+                    {
+                        CallingActivity.ca.callactivity_handler.post(myRunnable);
+                    }
+
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static String format_timeduration_from_seconds(long seconds)
+    {
+        String positive = "";
+        final long absSeconds = Math.abs(seconds);
+        Log.i(TAG,"format_timeduration_from_seconds:seconds="+seconds+" absSeconds="+absSeconds);
+        int hours = (int) (absSeconds / 3600);
+        if (hours < 1)
+        {
+            positive = String.format("%02d:%02d", hours, (absSeconds % 3600) / 60, absSeconds % 60);
+        }
+        else
+        {
+            positive = String.format("%d:%02d:%02d", hours, (absSeconds % 3600) / 60, absSeconds % 60);
+        }
+        return seconds < 0 ? "-" + positive : positive;
+    }
 
     // --------- make app crash ---------
     // --------- make app crash ---------

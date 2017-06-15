@@ -49,9 +49,11 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
+import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
+import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 
@@ -91,7 +93,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     PowerManager pm = null;
     PowerManager.WakeLock wl1 = null;
     PowerManager.WakeLock wl2 = null;
-
+    TextView right_top_text_1 = null;
+    TextView right_top_text_2 = null;
+    TextView right_left_text_1 = null;
+    int activity_state = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -102,14 +107,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         setContentView(R.layout.activity_calling);
 
+        ca = this;
+
         sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         proximity_sensor = sensor_manager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
         callactivity_handler = new Handler(getMainLooper());
         callactivity_handler_s = callactivity_handler;
-
-        ca = this;
 
         // set volume control -------------
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
@@ -119,6 +124,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         mVisible = true;
         mContentView = (ImageView) findViewById(R.id.video_view);
+
+        right_top_text_1 = (TextView) findViewById(R.id.right_top_text_1);
+        right_top_text_2 = (TextView) findViewById(R.id.right_top_text_2);
+        right_left_text_1 = (TextView) findViewById(R.id.right_left_text_1);
+
+        update_bitrates();
+        update_call_time();
 
         top_text_line = (TextView) findViewById(R.id.top_text_line);
         accept_button = (ImageButton) findViewById(R.id.accept_button);
@@ -460,6 +472,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         super.onResume();
 
+        activity_state = 1;
+
         sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         try
@@ -485,6 +499,25 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+
+        // update call time every second -----------
+        final Handler ha = new Handler();
+        ha.postDelayed(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                Log.i(TAG, "update_call_time -> call");
+                update_call_time();
+                if (activity_state != 0)
+                {
+                    ha.postDelayed(this, 1000);
+                }
+            }
+        }, 1000);
+        // update call time every second -----------
+
     }
 
     void toggle_camera()
@@ -547,6 +580,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onPause();
 
         sensor_manager.unregisterListener(this);
+        activity_state = 0;
 
         try
         {
@@ -774,5 +808,25 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     public void onAccuracyChanged(Sensor sensor, int accuracy)
     {
 
+    }
+
+    void update_call_time()
+    {
+        if (Callstate.accepted_call == 1)
+        {
+            if (Callstate.call_start_timestamp != -1)
+            {
+
+                right_left_text_1.setText(format_timeduration_from_seconds((System.currentTimeMillis() - Callstate.call_start_timestamp) / 1000));
+            }
+            else
+            {
+                right_left_text_1.setText("...");
+            }
+        }
+        else
+        {
+            right_left_text_1.setText("...");
+        }
     }
 }
