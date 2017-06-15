@@ -52,6 +52,8 @@ import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 
 public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback, SensorEventListener
 {
@@ -233,7 +235,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             Callstate.accepted_call = 1;
 
                             Log.i(TAG, "answer button pressed");
-                            toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 10, 10); // these 2 bitrate values are very strange!! sometimes no video incoming!!
+                            toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE); // these 2 bitrate values are very strange!! sometimes no video incoming!!
                             // need to set our state manually here, no callback from toxcore :-(
                             Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             // need to set our state manually here, no callback from toxcore :-(

@@ -1699,11 +1699,13 @@ public class MainActivity extends AppCompatActivity
 
         Log.i(TAG, "toxav_bit_rate_status:from=" + friend_number + " audio_bit_rate=" + audio_bit_rate + " video_bit_rate=" + video_bit_rate);
 
-        if (Callstate.state == 1)
-        {
-            Callstate.audio_bitrate = audio_bit_rate;
-            Callstate.video_bitrate = video_bit_rate;
-        }
+        // TODO: for now ignore suggested bitrates!!!! ---------------
+        //        if (Callstate.state == 1)
+        //        {
+        //            Callstate.audio_bitrate = audio_bit_rate;
+        //            Callstate.video_bitrate = video_bit_rate;
+        //        }
+        // TODO: for now ignore suggested bitrates!!!! ---------------
     }
 
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)

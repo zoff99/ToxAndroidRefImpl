@@ -45,6 +45,9 @@ public class TRIFAGlobals
     final static String VFS_OWN_AVATAR_DIR = "/datadir/myavatar/";
     static String VFS_PREFIX = ""; // only set for normal (unencrypted) storage
 
+    static int GLOBAL_VIDEO_BITRATE = 6000;
+    static int GLOBAL_AUDIO_BITRATE = 400; // allowed values: (xx>=6) && (xx<=510)
+
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();

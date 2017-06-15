@@ -48,6 +48,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -432,8 +434,8 @@ public class MessageListActivity extends AppCompatActivity
         final long fn = friendnum;
 
         // these 2 bitrate values are very strange!! sometimes no video!!
-        final int f_audio_enabled = 10;
-        final int f_video_enabled = 10;
+        final int f_audio_enabled = 1;
+        final int f_video_enabled = 1;
 
         Runnable myRunnable = new Runnable()
         {
@@ -516,7 +518,7 @@ public class MessageListActivity extends AppCompatActivity
                                     CallingActivity.top_text_line_str2 = "0s";
                                     update_top_text_line();
                                     Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled + " f_video_enabled=" + f_video_enabled);
-                                    MainActivity.toxav_call(fn, f_audio_enabled, f_video_enabled);
+                                    MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
                                     Log.i(TAG, "CALL_OUT:002");
                                 }
                                 catch (Exception e)
