@@ -4244,7 +4244,7 @@ public class MainActivity extends AppCompatActivity
         int hours = (int) (absSeconds / 3600);
         if (hours < 1)
         {
-            positive = String.format("%02d:%02d", hours, (absSeconds % 3600) / 60, absSeconds % 60);
+            positive = String.format("%02d:%02d", (absSeconds % 3600) / 60, absSeconds % 60);
         }
         else
         {
