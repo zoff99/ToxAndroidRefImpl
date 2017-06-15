@@ -21,13 +21,17 @@ package com.zoffcc.applications.trifa;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.zoffcc.applications.logging.Logging;
 
@@ -37,11 +41,14 @@ import java.util.Date;
 import java.util.Locale;
 
 import mehdi.sakout.aboutpage.AboutPage;
+import mehdi.sakout.aboutpage.Element;
 
+import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 
 public class Aboutpage extends AppCompatActivity implements Logging.AsyncResponse
 {
+    private static final String TAG = "trifa.Aboutpage";
     ProgressDialog progressDialog2 = null;
 
     @Override
@@ -51,9 +58,6 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
 
         try
         {
-            // Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.drawable.web_hi_res_512);
-            // Bitmap bMapScaled = Bitmap.createScaledBitmap(bMap, bMap.getWidth() / 2, bMap.getHeight() / 2, true);
-
             AboutPage aboutPage = new AboutPage(this).
                     isRTL(false).
                     setImage(R.drawable.web_hi_res_512).
@@ -91,14 +95,41 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                 }
             });
             aboutPage.addItem(e001);
-            aboutPage.setDescription("TRIfa a Tox Client for Android");
+            aboutPage.setDescription("TRIfa a Tox Client for Android\nVersion: " + MainActivity.versionName);
+
+            Element tox_link = new Element();
+            tox_link.setTitle("What is Tox?");
+            Intent tox_faq_page = new Intent(Intent.ACTION_VIEW, Uri.parse("https://tox.chat/faq.html"));
+            tox_link.setIntent(tox_faq_page);
+            aboutPage.addItem(tox_link);
 
             setContentView(aboutPage.create());
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "onCreate:EE1:" + e.getMessage());
         }
+
+        try
+        {
+            // find the large top icon in aboutpage layout
+            ImageView icon_big = (ImageView) findViewById(R.id.image);
+            Log.i(TAG, "onCreate:icon_big=" + icon_big);
+
+            final Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.web_hi_res_512);
+            Log.i(TAG, "onCreate:bm1.getWidth()=" + bm1.getWidth() + " bm1.getHeight()=" + bm1.getHeight());
+            final Bitmap bm1_scaled = Bitmap.createScaledBitmap(bm1, (int) dp2px(200), (int) dp2px(200), true);
+            Log.i(TAG, "onCreate:dp2px(200)=" + dp2px(200));
+
+            icon_big.setImageBitmap(bm1_scaled);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onCreate:EE2:" + e.getMessage());
+        }
+
     }
 
 
