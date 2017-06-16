@@ -24,7 +24,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -55,7 +54,8 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
     {
         Log.i(TAG, "bindMessageList");
 
-        textView.setText("#" + m.id + ":" + m.text);
+        // textView.setText("#" + m.id + ":" + m.text);
+        textView.setText(m.text);
         if (!m.read)
         {
             // not yet read
