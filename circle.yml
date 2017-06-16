@@ -17,6 +17,8 @@ machine:
 # --- Android build ---
 
     # ---------------------------------------------------
+    # c-toxcore v0.1.9 a429ef4a28a5e5e0ad010efffb76d2abc3ada0af
+    # c-toxcore v0.1.8 f6db9333e2d1262e7ba3846563c30f63c98ffa38
     # c-toxcore v0.1.7 48c86e942d487a8856cbd25797b320bfb1879ddc
     # c-toxcore v0.1.6 895de7ef26e7617769f2271345e414545c2581f8
     # c-toxcore v0.1.5 995578f1038842288c1ff552fd796ab2377db6e1
@@ -25,8 +27,8 @@ machine:
     # c-toxcore v0.1.2 a096c71db867ac83fc3e01e0fbe98573d20f9286
     # ---------------------------------------------------
 
-    # c-toxcore v0.1.7
-    AND_CTOXCORE_VERSION: "48c86e942d487a8856cbd25797b320bfb1879ddc"
+    # c-toxcore v0.1.9
+    AND_CTOXCORE_VERSION: "a429ef4a28a5e5e0ad010efffb76d2abc3ada0af"
 
     _SDK_: /usr/local/android-sdk-linux/
     _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
@@ -148,7 +150,7 @@ compile:
   - . ~/pp;cd ~/build/;make install
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.0 https://github.com/webmproject/libvpx.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
   - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=armv7-android-gcc
@@ -160,7 +162,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.3 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -173,7 +175,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
     
     
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.11 https://github.com/jedisct1/libsodium.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -202,7 +204,7 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O0 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;export V=2;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -217,7 +219,7 @@ compile:
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O0 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
   - . ~/pp;cd jni-c-toxcore/; ls -al
   #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
