@@ -1461,6 +1461,14 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_file_control(long friend_number, long file_number, int a_TOX_FILE_CONTROL);
 
+    public static native int tox_hash(ByteBuffer hash_buffer, ByteBuffer data_buffer, long data_length);
+
+    public static native int tox_file_seek(long friend_number, long file_number, long position);
+
+    public static native int tox_file_get_file_id(long friend_number, long file_number, ByteBuffer file_id_buffer);
+
+    public static native long tox_file_send(long friend_number, long kind, long file_size, ByteBuffer file_id_buffer, String file_name, long file_length);
+
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -2365,6 +2373,8 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_file_chunk_request_cb_method(long friend_number, long file_number, long position, long length)
     {
         Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
+
+        // TODO: we must send a chuck of that file ...
     }
 
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)

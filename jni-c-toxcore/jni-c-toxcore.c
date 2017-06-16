@@ -2096,7 +2096,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1control(JNIEnv* env, 
 }
 
 JNIEXPORT jint JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_hash(JNIEnv* env, jobject thiz, jobject hash_buffer, jobject data_buffer, jlong length)
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1hash(JNIEnv* env, jobject thiz, jobject hash_buffer, jobject data_buffer, jlong data_length)
 {
 	uint8_t *hash_buffer_c = NULL;
 	long capacity_hash = 0;
@@ -2117,7 +2117,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_hash(JNIEnv* env, jobject th
 		capacity_data = (*env)->GetDirectBufferCapacity(env, data_buffer);
 	}
 
-	bool res = tox_hash(hash_buffer_c, data_buffer_c, size_t(capacity_data));
+	if (capacity_data < data_length)
+	{
+		return -3;
+	}
+
+	bool res = tox_hash(hash_buffer_c, data_buffer_c, (size_t)data_length);
 
 	if (res != true)
 	{
@@ -2129,6 +2134,88 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_hash(JNIEnv* env, jobject th
 	}
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1seek(JNIEnv* env, jobject thiz, jlong friend_number, jlong file_number, jlong position)
+{
+
+	TOX_ERR_FILE_SEEK error;
+	bool res = tox_file_seek(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (uint64_t)position, &error);
+
+	if (res != true)
+	{
+		if (error == TOX_ERR_FILE_GET_NULL)
+		{
+			dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_NULL");
+			return (jint)-1;
+		}
+		else if (error == TOX_ERR_FILE_GET_FRIEND_NOT_FOUND)
+		{
+			dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_FRIEND_NOT_FOUND");
+			return (jint)-2;
+		}
+		else if (error == TOX_ERR_FILE_GET_NOT_FOUND)
+		{
+			dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_NOT_FOUND");
+			return (jint)-3;
+		}
+		else
+		{
+			dbg(9, "tox_file_seek:ERROR:%d", (int)error);
+			return (jint)-99;
+		}
+	}
+	else
+	{
+		dbg(9, "tox_file_seek");
+		return (jint)res;
+	}
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1get_1file_1id(JNIEnv* env, jobject thiz, jlong friend_number, jlong file_number, jobject file_id_buffer)
+{
+	uint8_t *file_id_buffer_c = NULL;
+	long capacity = 0;
+
+	if (file_id_buffer == NULL)
+	{
+		return -3;
+	}
+
+	file_id_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, file_id_buffer);
+	capacity = (*env)->GetDirectBufferCapacity(env, file_id_buffer);
+
+	if (capacity < TOX_FILE_ID_LENGTH)
+	{
+		return -2;
+	}
+
+	TOX_ERR_FILE_GET error;
+	bool res = tox_file_get_file_id(tox_global, (uint32_t)friend_number, (uint32_t)file_number, file_id_buffer_c, &error);
+
+	if (res != true)
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
+/*
+uint32_t tox_file_send(Tox *tox, uint32_t friend_number, uint32_t kind, uint64_t file_size, const uint8_t *file_id,
+                       const uint8_t *filename, size_t filename_length, TOX_ERR_FILE_SEND *error);
+
+bool tox_file_send_chunk(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data,
+size_t length, TOX_ERR_FILE_SEND_CHUNK *error);
+
+*/
+
+// zzzzzzzzzzzzzzz
 
 
 // -----------------------
