@@ -613,7 +613,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                     }
                 }
 
-                TextView textView = (TextView) rowView.findViewById(R.id.m_text);
+                com.vanniktech.emoji.EmojiEditText textView = (com.vanniktech.emoji.EmojiEditText) rowView.findViewById(R.id.m_text);
                 textView.setText("#" + values_msg.get(position).id + ":" + values_msg.get(position).text);
 
                 ImageView imageView = (ImageView) rowView.findViewById(R.id.m_icon);

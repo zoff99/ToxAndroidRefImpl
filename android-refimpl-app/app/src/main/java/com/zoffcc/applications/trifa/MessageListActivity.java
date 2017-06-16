@@ -22,13 +22,15 @@ package com.zoffcc.applications.trifa;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Px;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,6 +38,14 @@ import android.widget.TextView;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.vanniktech.emoji.EmojiPopup;
+import com.vanniktech.emoji.emoji.Emoji;
+import com.vanniktech.emoji.listeners.OnEmojiBackspaceClickListener;
+import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
+import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
+import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
+import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
+import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
@@ -59,8 +69,13 @@ public class MessageListActivity extends AppCompatActivity
     private static final String TAG = "trifa.MsgListActivity";
     long friendnum = -1;
     long friendnum_prev = -1;
-    EditText ml_new_message = null;
+    //
+    com.vanniktech.emoji.EmojiEditText ml_new_message = null;
+    EmojiPopup emojiPopup = null;
+    ImageView insert_emoji = null;
     TextView ml_maintext = null;
+    ViewGroup rootView = null;
+    //
     static TextView ml_friend_typing = null;
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
@@ -90,7 +105,9 @@ public class MessageListActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ml_new_message = (EditText) findViewById(R.id.ml_new_message);
+        rootView = (ViewGroup) findViewById(R.id.emoji_bar);
+        ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
+        insert_emoji = (ImageView) findViewById(R.id.insert_emoji);
         ml_friend_typing = (TextView) findViewById(R.id.ml_friend_typing);
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
@@ -104,6 +121,27 @@ public class MessageListActivity extends AppCompatActivity
         set_friend_connection_status_icon();
         ml_status_icon.setImageResource(R.drawable.circle_green);
         set_friend_status_icon();
+
+        setUpEmojiPopup();
+
+        final Drawable d1 = new IconicsDrawable(getBaseContext()).
+                icon(FontAwesome.Icon.faw_smile_o).
+                color(getResources().
+                        getColor(R.color.colorPrimaryDark)).
+                sizeDp(24);
+
+        insert_emoji.setImageDrawable(d1);
+        // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
+
+
+        insert_emoji.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                emojiPopup.toggle();
+            }
+        });
 
         final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(40);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(40);
@@ -228,8 +266,8 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-        Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
-        ml_phone_icon.setImageDrawable(d1);
+        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
+        ml_phone_icon.setImageDrawable(d2);
 
         final long fn = friendnum;
         Thread t = new Thread()
@@ -273,6 +311,17 @@ public class MessageListActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStop()
+    {
+        if (emojiPopup != null)
+        {
+            emojiPopup.dismiss();
+        }
+
+        super.onStop();
+    }
+
+    @Override
     protected void onResume()
     {
         Log.i(TAG, "onResume");
@@ -287,6 +336,68 @@ public class MessageListActivity extends AppCompatActivity
         }
 
         MainActivity.message_list_activity = this;
+    }
+
+
+    private void setUpEmojiPopup()
+    {
+        emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener()
+        {
+            @Override
+            public void onEmojiBackspaceClicked(final View v)
+            {
+                Log.d(TAG, "Clicked on Backspace");
+            }
+        }).setOnEmojiClickedListener(new OnEmojiClickedListener()
+        {
+            @Override
+            public void onEmojiClicked(@NonNull final Emoji emoji)
+            {
+                Log.d(TAG, "Clicked on emoji");
+            }
+        }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
+        {
+            @Override
+            public void onEmojiPopupShown()
+            {
+                final Drawable d1 = new IconicsDrawable(getBaseContext()).
+                        icon(FontAwesome.Icon.faw_keyboard_o).
+                        color(getResources().
+                                getColor(R.color.colorPrimaryDark)).
+                        sizeDp(24);
+
+                insert_emoji.setImageDrawable(d1);
+                // insert_emoji.setImageResource(R.drawable.about_icon_email);
+            }
+        }).setOnSoftKeyboardOpenListener(new OnSoftKeyboardOpenListener()
+        {
+            @Override
+            public void onKeyboardOpen(@Px final int keyBoardHeight)
+            {
+                Log.d(TAG, "Opened soft keyboard");
+            }
+        }).setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener()
+        {
+            @Override
+            public void onEmojiPopupDismiss()
+            {
+                final Drawable d1 = new IconicsDrawable(getBaseContext()).
+                        icon(FontAwesome.Icon.faw_smile_o).
+                        color(getResources().
+                                getColor(R.color.colorPrimaryDark)).
+                        sizeDp(24);
+
+                insert_emoji.setImageDrawable(d1);
+                // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
+            }
+        }).setOnSoftKeyboardCloseListener(new OnSoftKeyboardCloseListener()
+        {
+            @Override
+            public void onKeyboardClose()
+            {
+                Log.d(TAG, "Closed soft keyboard");
+            }
+        }).build(ml_new_message);
     }
 
     long get_current_friendnum()

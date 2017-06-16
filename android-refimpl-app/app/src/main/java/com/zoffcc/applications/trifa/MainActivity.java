@@ -79,6 +79,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.ios.IosEmojiProvider;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -218,6 +220,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         Log.i(TAG, "onCreate");
+
+        EmojiManager.install(new IosEmojiProvider());
+        // EmojiManager.install(new EmojiOneProvider());
 
         super.onCreate(savedInstanceState);
 

@@ -33,7 +33,7 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
     private Message message;
     private Context context;
 
-    TextView textView;
+    com.vanniktech.emoji.EmojiTextView textView;
     ImageView imageView;
 
     public MessageListHolder_text_outgoing_not_read(View itemView, Context c)
@@ -44,7 +44,7 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
 
         this.context = c;
 
-        textView = (TextView) itemView.findViewById(R.id.m_text);
+        textView = (com.vanniktech.emoji.EmojiTextView) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
 
         itemView.setOnClickListener(this);
