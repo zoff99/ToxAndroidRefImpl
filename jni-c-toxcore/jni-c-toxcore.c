@@ -2095,6 +2095,42 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1control(JNIEnv* env, 
 	}
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_hash(JNIEnv* env, jobject thiz, jobject hash_buffer, jobject data_buffer, jlong length)
+{
+	uint8_t *hash_buffer_c = NULL;
+	long capacity_hash = 0;
+	uint8_t *data_buffer_c = NULL;
+	long capacity_data = 0;
+
+    hash_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, hash_buffer);
+    capacity_hash = (*env)->GetDirectBufferCapacity(env, hash_buffer);
+
+	if (capacity_hash < TOX_HASH_LENGTH)
+	{
+		return -2;
+	}
+
+	if (data_buffer != NULL)
+	{
+		data_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, data_buffer);
+		capacity_data = (*env)->GetDirectBufferCapacity(env, data_buffer);
+	}
+
+	bool res = tox_hash(hash_buffer_c, data_buffer_c, size_t(capacity_data));
+
+	if (res != true)
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
+
 // -----------------------
 // TODO
 // -----------------------
@@ -2105,7 +2141,6 @@ uint32_t tox_self_get_nospam(const Tox *tox);
 bool tox_friend_exists(const Tox *tox, uint32_t friend_number);
 uint64_t tox_friend_get_last_online(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_GET_LAST_ONLINE *error);
 TOX_USER_STATUS tox_friend_get_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
-bool tox_hash(uint8_t *hash, const uint8_t *data, size_t length);
 
 void tox_self_set_nospam(Tox *tox, uint32_t nospam);
 */
