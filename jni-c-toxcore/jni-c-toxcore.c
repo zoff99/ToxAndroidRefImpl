@@ -783,7 +783,9 @@ void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uin
 	jnienv2 = jni_getenv();
 
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
+	CLEAR(tox_id_hex);
 	toxid_bin_to_hex(public_key, tox_id_hex);
+	tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
 
 	dbg(9, "pubkey string=%s", tox_id_hex);
 
