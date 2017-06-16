@@ -185,7 +185,7 @@ dependencies {
     compile 'com.github.medyo:android-about-page:1.2.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.vanniktech:emoji-ios:0.4.0'
-    compile 'com.vanniktech:emoji-one:0.4.0'
+    // compile 'com.vanniktech:emoji-one:0.4.0'
     //
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
     //
