@@ -82,6 +82,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -103,6 +104,7 @@ import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
@@ -111,11 +113,13 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
@@ -1467,7 +1471,9 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_file_get_file_id(long friend_number, long file_number, ByteBuffer file_id_buffer);
 
-    public static native long tox_file_send(long friend_number, long kind, long file_size, ByteBuffer file_id_buffer, String file_name, long file_length);
+    public static native long tox_file_send(long friend_number, long kind, long file_size, ByteBuffer file_id_buffer, String file_name, long filename_length);
+
+    public static native int tox_file_send_chunk(long friend_number, long file_number, long position, ByteBuffer data_buffer, long data_length);
 
     // --------------- AV -------------
     // --------------- AV -------------
@@ -1977,6 +1983,72 @@ public class MainActivity extends AppCompatActivity
         FriendList f = main_get_friend(friend_number);
         if (f != null)
         {
+            if (f.TOX_CONNECTION != a_TOX_CONNECTION)
+            {
+                if (f.TOX_CONNECTION == TOX_CONNECTION_NONE.value)
+                {
+
+                    final long friend_number_ = friend_number;
+                    final Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                // friend just came online
+                                if (VFS_ENCRYPT)
+                                {
+                                    String fname = get_vfs_image_filename_own_avatar();
+                                    if (fname != null)
+                                    {
+                                        ByteBuffer avatar_bytes = file_to_bytebuffer(fname, true);
+                                        if (avatar_bytes != null)
+                                        {
+                                            // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:avatar_bytes=" + bytes_to_hex(avatar_bytes));
+
+                                            ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+                                            int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
+                                            if (res == 0)
+                                            {
+                                                Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:hash(1)=" + bytes_to_hex(hash_bytes));
+
+
+                                                // send avatar to friend -------
+                                                long filenum = tox_file_send(friend_number_, TOX_FILE_KIND_AVATAR.value, avatar_bytes.capacity(), hash_bytes, "avatar.png", "avatar.png".length());
+                                                Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:filenum=" + filenum);
+
+                                                // save FT to db ---------------
+                                                Filetransfer ft_avatar_outgoing = new Filetransfer();
+                                                ft_avatar_outgoing.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number_);
+                                                ft_avatar_outgoing.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
+                                                ft_avatar_outgoing.file_number = filenum;
+                                                ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
+                                                ft_avatar_outgoing.filesize = avatar_bytes.capacity();
+                                                long rowid = insert_into_filetransfer_db(ft_avatar_outgoing);
+                                            }
+                                            else
+                                            {
+                                                Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:tox_hash res=" + res);
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // TODO: write code
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    main_handler_s.post(myRunnable);
+                }
+            }
+
             f.TOX_CONNECTION = a_TOX_CONNECTION;
             update_friend_in_db_connection_status(f);
 
@@ -2374,7 +2446,68 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
 
-        // TODO: we must send a chuck of that file ...
+        // TODO: we must send a chunck of that file ...
+
+        try
+        {
+            Filetransfer ft = orma.selectFromFiletransfer().
+                    directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    file_numberEq(file_number).
+                    stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
+                    orderByIdDesc().
+                    toList().get(0);
+
+            if (ft == null)
+            {
+                Log.i(TAG, "file_chunk_request:ft=NULL");
+                return;
+            }
+
+            if (ft.kind == TOX_FILE_KIND_AVATAR.value)
+            {
+                if (length == 0)
+                {
+                    // avatar transfer finished -----------
+                    orma.deleteFromFiletransfer().idEq(ft.id);
+                    // avatar transfer finished -----------
+
+                    ByteBuffer avatar_chunk = ByteBuffer.allocateDirect(1);
+                    int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, 0);
+                    Log.i(TAG, "file_chunk_request:res(2)=" + res);
+                }
+                else
+                {
+                    // TODO: this is really aweful and slow. FIX ME -------------
+                    if (VFS_ENCRYPT)
+                    {
+                        final String fname = get_vfs_image_filename_own_avatar();
+                        if (fname != null)
+                        {
+                            final ByteBuffer avatar_bytes = file_to_bytebuffer(fname, true);
+                            if (avatar_bytes != null)
+                            {
+                                long avatar_chunk_length = length;
+                                byte[] bytes_chunck = new byte[(int) avatar_chunk_length];
+                                avatar_bytes.position((int) position);
+                                avatar_bytes.get(bytes_chunck, 0, (int) avatar_chunk_length);
+                                ByteBuffer avatar_chunk = ByteBuffer.allocateDirect((int) avatar_chunk_length);
+                                avatar_chunk.put(bytes_chunck);
+                                int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, avatar_chunk_length);
+                                Log.i(TAG, "file_chunk_request:res(1)=" + res);
+                                // int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
+                            }
+                        }
+                    }
+                }
+            }
+            // TODO: this is really aweful and slow. FIX ME -------------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "file_chunk_request:EE1:" + e.getMessage());
+        }
     }
 
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
@@ -4172,7 +4305,6 @@ public class MainActivity extends AppCompatActivity
         return out;
     }
 
-
     /**
      * This method converts dp unit to equivalent pixels, depending on device density.
      *
@@ -4266,6 +4398,85 @@ public class MainActivity extends AppCompatActivity
             positive = String.format("%d:%02d:%02d", hours, (absSeconds % 3600) / 60, absSeconds % 60);
         }
         return seconds < 0 ? "-" + positive : positive;
+    }
+
+    public static ByteBuffer string_to_bytebuffer(String input_chars, int output_number_of_bytes)
+    {
+        try
+        {
+            ByteBuffer ret = ByteBuffer.allocateDirect(output_number_of_bytes);
+            ret.rewind();
+            ret.put(input_chars.getBytes());
+            return ret;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static ByteBuffer file_to_bytebuffer(String filename_with_fullpath, boolean is_vfs)
+    {
+        if (is_vfs)
+        {
+            info.guardianproject.iocipher.File file = new info.guardianproject.iocipher.File(filename_with_fullpath);
+            int size = (int) file.length();
+            ByteBuffer ret = ByteBuffer.allocateDirect(size);
+            byte[] bytes = new byte[size];
+            try
+            {
+                BufferedInputStream buf = new BufferedInputStream(new info.guardianproject.iocipher.FileInputStream(file));
+                buf.read(bytes, 0, bytes.length);
+                buf.close();
+                ret = ret.put(bytes);
+                return ret;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public static String bytes_to_hex(ByteBuffer in)
+    {
+        try
+        {
+            final StringBuilder builder = new StringBuilder();
+            for (byte b : in.array())
+            {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return "*ERROR*";
+    }
+
+    public static String bytes_to_hex(byte[] in)
+    {
+        try
+        {
+            final StringBuilder builder = new StringBuilder();
+            for (byte b : in)
+            {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return "*ERROR*";
+
     }
 
     // --------- make app crash ---------
