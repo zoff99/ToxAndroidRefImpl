@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
+    <!--android:scrollbarAlwaysDrawVerticalTrack="true"-->
+    <!--android:scrollbars="vertical"-->
+
+    <com.l4digital.fastscroll.FastScrollRecyclerView
         android:id="@+id/msg_rv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null"
         android:dividerHeight="2dp"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbars="vertical">
-    </android.support.v7.widget.RecyclerView>
+        app:bubbleColor="?attr/colorPrimary"
+        app:bubbleTextColor="#ffffff"
+        app:handleColor="?attr/colorPrimary"
+        app:hideScrollbar="false"
+        app:showTrack="false"
+        app:trackColor="?attr/colorPrimary">
+    </com.l4digital.fastscroll.FastScrollRecyclerView>
 
 </RelativeLayout>

@@ -43,7 +43,7 @@ public class MessageListFragment extends Fragment
     List<Message> data_values = null;
     // MessagelistArrayAdapter a = null;
     long current_friendnum = -1;
-    RecyclerView listingsView = null;
+    com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     MessagelistAdapter adapter = null;
 
     @Override
@@ -92,7 +92,7 @@ public class MessageListFragment extends Fragment
         // --------------
         adapter = new MessagelistAdapter(view.getContext(), data_values);
         Log.i(TAG, "onCreateView:adapter=" + adapter);
-        listingsView = (RecyclerView) view.findViewById(R.id.msg_rv_list);
+        listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view.findViewById(R.id.msg_rv_list);
         Log.i(TAG, "onCreateView:listingsView=" + listingsView);
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
