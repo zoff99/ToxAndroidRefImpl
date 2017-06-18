@@ -46,7 +46,9 @@ import java.net.URLConnection;
 
 import info.guardianproject.iocipher.File;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
@@ -110,6 +112,9 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         if (message.filedb_id == -1)
         {
             textView.setText("" + message.text + "\n *canceled*");
+            ft_preview_image.setImageDrawable(null);
+            ft_preview_container.setVisibility(View.GONE);
+            ft_preview_image.setVisibility(View.GONE);
         }
         else
         {
@@ -141,6 +146,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                         color(Color.parseColor("#AA000000")).sizeDp(50);
 
                 ft_preview_image.setImageDrawable(d3);
+                // final ImageButton ft_preview_image_ = ft_preview_image;
 
                 if (VFS_ENCRYPT)
                 {
@@ -172,7 +178,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
 
                     // TODO: this is just to show that it works. really bad and slow!!!!!
-                    // final View v_ = rowView;
                     final Thread t_image_preview = new Thread()
                     {
                         @Override
@@ -199,13 +204,15 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                     {
                                         Log.i(TAG, "glide:img:001");
 
-                                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(40)));
+                                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
                                         GlideApp.
-                                                with(context).
+                                                with(ft_preview_image.getContext()).
                                                 load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
-                                                diskCacheStrategy(DiskCacheStrategy.NONE).
+                                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                                signature(StringSignature2(SD_CARD_TMP_DIR + "/" + temp_file_name)).
                                                 skipMemoryCache(false).
-                                                placeholder(d3).
+                                                transition(withCrossFade()).
+                                                placeholder(null).
                                                 listener(new com.bumptech.glide.request.RequestListener<Drawable>()
                                                 {
                                                     @Override
