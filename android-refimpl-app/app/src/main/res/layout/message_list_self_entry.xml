@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:minHeight="45dp"
-        android:background="@android:color/holo_blue_dark">
+        android:background="@drawable/rounded_blue_dark_bg">
 
         <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/m_text"

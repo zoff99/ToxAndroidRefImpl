@@ -7,8 +7,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="20dp"
-        android:minHeight="45dp"
-        android:background="@android:color/holo_orange_light">
+        android:background="@drawable/rounded_orange_bg"
+        android:minHeight="45dp">
 
 
         <ImageView
@@ -19,7 +19,8 @@
             android:layout_marginRight="6dip"
             android:padding="2dp"
             android:scaleType="centerInside"
-            android:src="@drawable/circle_red"/>
+            android:src="@drawable/circle_red"
+            android:visibility="invisible"/>
 
         <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/m_text"
