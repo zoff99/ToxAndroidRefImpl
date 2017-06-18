@@ -103,6 +103,55 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             tox_link.setIntent(tox_faq_page);
             aboutPage.addItem(tox_link);
 
+            //  --------------------------------
+            Element el2 = null;
+            Intent link2 = null;
+            //  --------------------------------
+            //  --------- used libs ------------
+            el2 = new Element();
+            el2.setTitle("com.github.gfx.android.orma:orma:5.0.0-rc4");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/gfx/Android-Orma"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.gfx.android.orma:orma-encryption:5.0.0-rc4");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/gfx/Android-Orma"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.gfx.android.orma:orma-processor:5.0.0-rc4");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/gfx/Android-Orma"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("info.guardianproject.iocipher:IOCipher:0.4");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/guardianproject/IOCipher"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.l4digital.fastscroll:fastscroll:1.0.4");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/L4Digital/FastScroll"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.bumptech.glide:glide:4.0.0-RC0");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bumptech/glide"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.bumptech.glide:compiler:4.0.0-RC0");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bumptech/glide"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            //  --------- used libs ------------
+
             setContentView(aboutPage.create());
         }
         catch (Exception e)
