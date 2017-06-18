@@ -240,6 +240,27 @@ compile:
 # --------- GRADLE -------------
 
 
+# --------- bintray aretefact -------------
+  - cd android-refimpl-app/ ; ./gradlew :jnilib:dependencies
+  - cd android-refimpl-app/ ; ./gradlew :jnilib:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :jnilib:build --stacktrace --no-daemon # first build may FAIL
+  - cd android-refimpl-app/ ; ./gradlew :jnilib:install --info; exit 0
+  - if [ "$CIRCLE_BRANCH""x" == "maven_artefactx" ]; then cd android-refimpl-app/ ; ./gradlew :jnilib:bintrayUpload --info; exit 0 ; fi
+  - find ~/.m2/repository -type f -exec ls -al {} \; ; exit 0
+# --------- bintray aretefact -------------
+# ----------- show generated aar file -----------
+  - cd android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/ ; exit 0
+  - cd android-refimpl-app/ ; find ./ -name '*.aar' ; exit 0
+
+  - unzip -t /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.1/trifa-jni-lib-1.0.1.aar ; exit 0
+  - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.1/trifa-jni-lib-1.0.1.pom ; exit 0
+  - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/maven-metadata-local.xml ; exit 0
+
+  - cd android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar ; exit 0
+  - cd android-refimpl-app/ ; cp -av ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar $CIRCLE_ARTIFACTS/
+# ----------- show generated aar file -----------
+
+
+
 # --- save lint output ---
   - cd android-refimpl-app/ ; find . -name '*lint-report*' -exec ls -al {} \; ; exit 0
   - cd android-refimpl-app/ ; cp -av ./app/lint-report.html $CIRCLE_ARTIFACTS/ ; exit 0
