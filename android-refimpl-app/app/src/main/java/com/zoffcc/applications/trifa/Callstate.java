@@ -20,6 +20,9 @@
 package com.zoffcc.applications.trifa;
 
 
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+
 public class Callstate
 {
     static int state = 0; // 0 -> not in a call, 1 -> ringing/calling
@@ -30,8 +33,8 @@ public class Callstate
     static int other_video_enabled = 1;
     static int my_audio_enabled = 1;
     static int my_video_enabled = 1;
-    static long audio_bitrate = 0;
-    static long video_bitrate = 0;
+    static long audio_bitrate = GLOBAL_AUDIO_BITRATE;
+    static long video_bitrate = GLOBAL_VIDEO_BITRATE;
     static int accepted_call = 0;
     static long call_init_timestamp = -1L; // when it starts ringing (someone calls us)
     static long call_start_timestamp = -1L; // when we actually start the call (someone calls us)
@@ -53,8 +56,8 @@ public class Callstate
         Callstate.other_video_enabled = 1;
         Callstate.my_audio_enabled = 1;
         Callstate.my_video_enabled = 1;
-        Callstate.audio_bitrate = 0;
-        Callstate.video_bitrate = 0;
+        Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
+        Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
         Callstate.accepted_call = 0;
         Callstate.audio_speaker = true;
     }

@@ -25,11 +25,20 @@ public class ToxVars
     // ------ global defines ------
     // ------ global defines ------
     // ------ global defines ------
+    public static final int sizeof_uint16_t = 2; // 2 bytes
+    public static final int sizeof_uint32_t = 4; // 4 bytes
     // TODO: get these with the appropriate JNI functions!
     public static final int TOX_MAX_NAME_LENGTH = 128;
     public static final int OX_MAX_STATUS_MESSAGE_LENGTH = 1007;
     public static final int TOX_MAX_FRIEND_REQUEST_LENGTH = 1016;
+    public static final int TOX_PUBLIC_KEY_SIZE = 32; // --> 64 hex chars!!
+    public static final int TOX_SECRET_KEY_SIZE = 32;
+    public static final int TOX_NOSPAM_SIZE = sizeof_uint32_t;
+    public static final int TOX_ADDRESS_SIZE = TOX_PUBLIC_KEY_SIZE + TOX_NOSPAM_SIZE + sizeof_uint16_t;
     // public static final int TOX_MAX_MESSAGE_LENGTH = 1372; // -> tox_max_message_length [DONE]
+    public static final int TOX_HASH_LENGTH = 32;
+    public static final int TOX_FILE_ID_LENGTH = 32;
+    public static final int TOX_MAX_FILENAME_LENGTH = 255;
     // TODO: get these with the appropriate JNI functions!
     // ------ global defines ------
     // ------ global defines ------
@@ -636,14 +645,14 @@ public class ToxVars
          * There is no connection. This instance, or the friend the state change is
          * about, is now offline.
          */
-        TOX_CONNECTION_NONE,
+        TOX_CONNECTION_NONE(0),
 
         /**
          * A TCP connection has been established. For the own instance, this means it
          * is connected through a TCP relay, only. For a friend, this means that the
          * connection to that particular friend goes through a TCP relay.
          */
-        TOX_CONNECTION_TCP,
+        TOX_CONNECTION_TCP(1),
 
         /**
          * A UDP connection has been established. For the own instance, this means it
@@ -651,7 +660,15 @@ public class ToxVars
          * a TCP relay. For a friend, this means that the connection to that
          * particular friend was built using direct UDP packets.
          */
-        TOX_CONNECTION_UDP,
+        TOX_CONNECTION_UDP(2);
+
+        public int value;
+
+        private TOX_CONNECTION(int value)
+        {
+            this.value = value;
+        }
+
 
     }
 

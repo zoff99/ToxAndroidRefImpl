@@ -1,0 +1,39 @@
+apply plugin: 'com.android.model.library'
+
+model {
+    android {
+        compileSdkVersion = 25
+        buildToolsVersion = '25.0.0'
+
+        defaultConfig {
+            minSdkVersion.apiLevel = 9
+            targetSdkVersion.apiLevel = 24
+        }
+
+        sources {
+            main {
+                jni {
+                    exportedHeaders {
+                        srcDir 'src/main/jni/include'
+                    }
+                }
+            }
+        }
+
+        ndk {
+            moduleName = 'speex'
+            platformVersion = '9'
+            toolchain = 'clang'
+            abiFilters.addAll(["armeabi-v7a"])
+
+            CFlags.add('-g')
+            CFlags.add('-DFIXED_POINT')
+            CFlags.add('-DUSE_KISS_FFT')
+            CFlags.add('-DEXPORT=\"\"')
+            CFlags.add('-D__ANDROID__=1')
+            CFlags.add('-funwind-tables')
+            CFlags.add('-Wl,--no-merge-exidx-entries')
+        }
+    }
+}
+

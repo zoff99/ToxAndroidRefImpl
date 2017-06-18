@@ -25,6 +25,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -33,6 +35,7 @@ import android.widget.RemoteViews;
 import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
+import speex.EchoCanceller;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
@@ -41,6 +44,7 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
@@ -68,11 +72,13 @@ public class TrifaToxService extends Service
     Notification notification2 = null;
     NotificationManager nmn2 = null;
     static Thread ToxServiceThread = null;
+    // static EchoCanceller canceller = null;
     static boolean stop_me = false;
     static OrmaDatabase orma = null;
     static VirtualFileSystem vfs = null;
     static boolean is_tox_started = false;
     static boolean global_toxid_text_set = false;
+    static boolean TOX_SERVICE_STARTED = false;
 
 
     @Override
@@ -91,6 +97,7 @@ public class TrifaToxService extends Service
         // serivce is created ---
         super.onCreate();
 
+        TOX_SERVICE_STARTED = true;
         start_me();
     }
 
@@ -107,7 +114,11 @@ public class TrifaToxService extends Service
         {
             Log.i(TAG, "change_notification_fg:bootstrapping=true");
             notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
-            b.setSmallIcon(R.drawable.circle_orange);
+            b.setSmallIcon(R.drawable.circle_orange_notification);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            {
+                b.setColor(Color.parseColor("#ffce00"));
+            }
             notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping");
         }
         else
@@ -117,7 +128,11 @@ public class TrifaToxService extends Service
             if (a_TOXCONNECTION == 0)
             {
                 notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-                b.setSmallIcon(R.drawable.circle_red);
+                b.setSmallIcon(R.drawable.circle_red_notification);
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                {
+                    b.setColor(Color.parseColor("#ff0000"));
+                }
                 notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
             }
             else
@@ -125,13 +140,21 @@ public class TrifaToxService extends Service
                 if (a_TOXCONNECTION == 1)
                 {
                     notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    b.setSmallIcon(R.drawable.circle_green);
+                    b.setSmallIcon(R.drawable.circle_green_notification);
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    {
+                        b.setColor(Color.parseColor("#04b431"));
+                    }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
                 }
                 else // if (a_TOXCONNECTION__f == 2)
                 {
                     notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    b.setSmallIcon(R.drawable.circle_green);
+                    b.setSmallIcon(R.drawable.circle_green_notification);
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    {
+                        b.setColor(Color.parseColor("#04b431"));
+                    }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
                 }
             }
@@ -316,7 +339,11 @@ public class TrifaToxService extends Service
                 // ** // MainActivity.exit();
             }
         };
-        MainActivity.main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
 
         Log.i(TAG, "stop_tox_fg:099");
     }
@@ -350,7 +377,11 @@ public class TrifaToxService extends Service
                         }
                     }
                 };
-                MainActivity.main_handler_s.post(myRunnable);
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
 
                 if (!old_is_tox_started)
                 {
@@ -399,13 +430,13 @@ public class TrifaToxService extends Service
 
                 int fc = 0;
                 boolean exists_in_db = false;
-                try
-                {
-                    MainActivity.friend_list_fragment.clear_friends();
-                }
-                catch (Exception e)
-                {
-                }
+                //                try
+                //                {
+                //                    MainActivity.friend_list_fragment.clear_friends();
+                //                }
+                //                catch (Exception e)
+                //                {
+                //                }
 
                 for (fc = 0; fc < MainActivity.friends.length; fc++)
                 {
@@ -462,16 +493,22 @@ public class TrifaToxService extends Service
                         e.printStackTrace();
                     }
 
-                    if (MainActivity.friend_list_fragment != null)
-                    {
-                        try
-                        {
-                            MainActivity.friend_list_fragment.add_friends(f);
-                        }
-                        catch (Exception e)
-                        {
-                        }
-                    }
+                    // ----- would be double in list -----
+                    // ----- would be double in list -----
+                    // ----- would be double in list -----
+                    //                    if (MainActivity.friend_list_fragment != null)
+                    //                    {
+                    //                        try
+                    //                        {
+                    //                            MainActivity.friend_list_fragment.add_friends(f);
+                    //                        }
+                    //                        catch (Exception e)
+                    //                        {
+                    //                        }
+                    //                    }
+                    // ----- would be double in list -----
+                    // ----- would be double in list -----
+                    // ----- would be double in list -----
 
                     if (exists_in_db == false)
                     {
@@ -492,6 +529,21 @@ public class TrifaToxService extends Service
                     try
                     {
                         Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
+
+                        try
+                        {
+                            if (MainActivity.friend_list_fragment != null)
+                            {
+                                // reload friend in friendlist
+                                MainActivity.friend_list_fragment.modify_friend(fl_check.get(0), -1);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+
                     }
                     catch (Exception e)
                     {
@@ -500,6 +552,19 @@ public class TrifaToxService extends Service
                     }
 
                 }
+
+                //                try
+                //                {
+                //                    if (MainActivity.friend_list_fragment != null)
+                //                    {
+                //                        // reload friendlist
+                //                        MainActivity.friend_list_fragment.add_all_friends_clear(50);
+                //                    }
+                //                }
+                //                catch (Exception e)
+                //                {
+                //                    e.printStackTrace();
+                //                }
 
                 // --------------- bootstrap ---------------
                 // --------------- bootstrap ---------------
@@ -678,7 +743,12 @@ public class TrifaToxService extends Service
         NotificationCompat.Builder b = new NotificationCompat.Builder(this);
         b.setContent(notification_view);
         b.setContentIntent(pendingIntent);
-        b.setSmallIcon(R.drawable.circle_red);
+        b.setSmallIcon(R.drawable.circle_red_notification);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            b.setColor(Color.parseColor("#ff0000"));
+        }
+
         notification2 = b.build();
         // -- notification ------------------
         // -- notification ------------------

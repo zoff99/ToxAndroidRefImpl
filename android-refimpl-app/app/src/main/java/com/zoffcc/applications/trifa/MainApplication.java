@@ -50,6 +50,13 @@ import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 
 public class MainApplication extends Application
 {
+    // -----------------------
+    // -----------------------
+    // -----------------------
+    final static boolean CATCH_EXCEPTIONS = false; // set true for release builds
+    // -----------------------
+    // -----------------------
+    // -----------------------
     static String last_stack_trace_as_string = "";
     int i = 0;
     int crashes = 0;
@@ -81,15 +88,17 @@ public class MainApplication extends Application
         prevlast_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong("prevlast_crash_time", 0);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "prevlast_crash_time[load]=" + prevlast_crash_time);
 
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
+        if (CATCH_EXCEPTIONS)
         {
-            @Override
-            public void uncaughtException(Thread thread, Throwable e)
+            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
             {
-                handleUncaughtException(thread, e);
-            }
-        });
-
+                @Override
+                public void uncaughtException(Thread thread, Throwable e)
+                {
+                    handleUncaughtException(thread, e);
+                }
+            });
+        }
     }
 
     @Override
@@ -149,7 +158,6 @@ public class MainApplication extends Application
             return null;
         }
     }
-
 
     void save_error_msg() throws IOException
     {

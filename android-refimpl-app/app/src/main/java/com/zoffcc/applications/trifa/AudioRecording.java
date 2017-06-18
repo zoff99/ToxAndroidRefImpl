@@ -28,8 +28,10 @@ import android.media.audiofx.AutomaticGainControl;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__software_echo_cancel;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
@@ -47,12 +49,16 @@ public class AudioRecording extends Thread
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     static final int CHANNELS_TOX = 1;
     static long SMAPLINGRATE_TOX = 48000; // 16000;
+    static boolean soft_echo_canceller_ready = false;
 
     ByteBuffer audio_buffer = null;
     static int buffer_size = 0;
     static int audio_session_id = -1;
     AutomaticGainControl agc = null;
     AcousticEchoCanceler aec = null;
+
+    short[] buffer_short = null;
+
 
     /**
      * Give the thread high priority so that it's not canceled unexpectedly, and start it
@@ -79,7 +85,7 @@ public class AudioRecording extends Thread
     {
         Log.i(TAG, "Running Audio Thread [OUT]");
         AudioRecord recorder = null;
-        byte[] buffer = null;
+        // byte[] buffer = null;
 
         try
         {
@@ -105,12 +111,23 @@ public class AudioRecording extends Thread
              * Initialize buffer to hold continuously recorded audio data, start recording
              */
             buffer_size = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL, FORMAT);
-            buffer = new byte[buffer_size];
+            // buffer = new byte[buffer_size];
+            buffer_short = new short[buffer_size / 2];
+
+            // init echo canceller -----------
+            if (PREF__software_echo_cancel)
+            {
+                // canceller.open(RECORDING_RATE, buffer_size * 4, (int) ((float) SMAPLINGRATE_TOX / 10f));
+                soft_echo_canceller_ready = true;
+            }
+            // init echo canceller -----------
 
             audio_buffer = ByteBuffer.allocateDirect(buffer_size);
             set_JNI_audio_buffer(audio_buffer);
 
-            // recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, buffer_size * 5);
+            Log.i(TAG, "buffer_sizes:buffer_size=" + buffer_size + " buffer_short.length=" + buffer_short.length + " audio_buffer.limit=" + audio_buffer.limit());
+
+            //**// recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, buffer_size * 5);
             recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDING_RATE, CHANNEL, FORMAT, buffer_size * 5);
             audio_session_id = recorder.getAudioSessionId();
 
@@ -158,7 +175,10 @@ public class AudioRecording extends Thread
          * Reads the data from the recorder and writes it to the audio track for playback.
          */
         int res = 0;
-        int read_bytes = 0;
+        // int read_bytes = 0;
+        int read_shorts = 0;
+        short[] buffer_short_with_soft_ec = null;
+
         while (!stopped)
         {
             try
@@ -169,17 +189,53 @@ public class AudioRecording extends Thread
                 {
                     if (Callstate.my_audio_enabled == 1)
                     {
-                        read_bytes = recorder.read(buffer, 0, buffer.length);
+                        read_shorts = recorder.read(buffer_short, 0, buffer_short.length);
+                        // read_bytes = recorder.read(buffer, 0, buffer.length);
+                        // Log.i(TAG, "audio buffer:" + "read_shorts=" + read_shorts + " buffer_short.length=" + buffer_short.length + " buffer_size=" + buffer_size);
                         // Log.i(TAG, "audio buffer:" + "read_bytes=" + read_bytes + " buffer.length=" + buffer.length + " buffer_size=" + buffer_size);
 
-                        audio_buffer.rewind();
-                        audio_buffer.put(buffer);
+                        if (PREF__software_echo_cancel)
+                        {
+                            if (read_shorts != buffer_short.length)
+                            {
+                                short[] buffer_short_copy = java.util.Arrays.copyOf(buffer_short, read_shorts);
+                                try
+                                {
+                                    // buffer_short_with_soft_ec = canceller.capture(buffer_short_copy);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    // buffer_short_with_soft_ec = canceller.capture(buffer_short);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            audio_buffer.rewind();
+                            // audio_buffer.put(buffer);
+                            audio_buffer.order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(buffer_short_with_soft_ec);
+                        }
+                        else
+                        {
+                            audio_buffer.rewind();
+                            audio_buffer.order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(buffer_short);
+                        }
 
                         // Log.i(TAG, "audio length=" + ((float) read_bytes * (float) 1000 / (float) SMAPLINGRATE_TOX));
                         // Log.i(TAG, "audio length=" + ((float) read_bytes / (float) SMAPLINGRATE_TOX * (float) 1000))
                         // Log.i(TAG, "audio xxxxxx=" + (((float) SMAPLINGRATE_TOX) * (float) (60) / (float) 1000));
 
-                        res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                        res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (read_shorts), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                        // res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (read_bytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
                         // Log.i(TAG, "audio:res=" + res);
                     }
                 }
@@ -214,7 +270,14 @@ public class AudioRecording extends Thread
         recorder.stop();
         recorder.release();
 
+        if (PREF__software_echo_cancel)
+        {
+            soft_echo_canceller_ready = false;
+            // canceller.close();
+        }
+
         finished = true;
+
         Log.i(TAG, "Audio Thread [OUT]:finished");
     }
 

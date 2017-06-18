@@ -46,26 +46,38 @@ android {
         exclude 'lib/armeabi/librsjni.so'
         exclude 'lib/armeabi/libsqlcipher.so'
         exclude 'lib/armeabi/libiocipher.so'
+        exclude 'lib/armeabi/libspeex.so'
+        //
         exclude 'lib/arm64-v8a/libRSSupport.so'
         exclude 'lib/arm64-v8a/librsjni.so'
         exclude 'lib/arm64-v8a/libsqlcipher.so'
         exclude 'lib/arm64-v8a/libiocipher.so'
+        exclude 'lib/arm64-v8a/libspeex.so'
+        //
         exclude 'lib/mips64/libRSSupport.so'
         exclude 'lib/mips64/librsjni.so'
         exclude 'lib/mips64/libsqlcipher.so'
         exclude 'lib/mips64/libiocipher.so'
+        exclude 'lib/mips64/libspeex.so'
+        //
         exclude 'lib/mips/libRSSupport.so'
         exclude 'lib/mips/librsjni.so'
         exclude 'lib/mips/libsqlcipher.so'
         exclude 'lib/mips/libiocipher.so'
+        exclude 'lib/mips/libspeex.so'
+        //
         exclude 'lib/x86/libRSSupport.so'
         exclude 'lib/x86/librsjni.so'
         exclude 'lib/x86/libsqlcipher.so'
         exclude 'lib/x86/libiocipher.so'
+        exclude 'lib/x86/libspeex.so'
+        //
         exclude 'lib/x86_64/libRSSupport.so'
         exclude 'lib/x86_64/librsjni.so'
         exclude 'lib/x86_64/libsqlcipher.so'
         exclude 'lib/x86_64/libiocipher.so'
+        exclude 'lib/x86_64/libspeex.so'
+        //
     }
 
     lintOptions {
@@ -95,8 +107,8 @@ android {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 10001
-        versionName "1.0.1"
+        versionCode 10003
+        versionName "1.0.3"
 
         renderscriptTargetApi 25
         renderscriptSupportModeEnabled true
@@ -119,9 +131,11 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.0@aar'
+    compile project(':library')
     //
     //
-    compile('com.mikepenz:materialdrawer:5.9.1@aar') {
+    compile('com.mikepenz:materialdrawer:5.9.2@aar') {
         transitive = true
     }
     //
@@ -135,12 +149,18 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.github.gfx.android.orma:orma:4.2.5') {
+    //compile('com.github.gfx.android.orma:orma:4.2.5') {
+    //    exclude group: 'com.android.support'
+    //}
+    // annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.5'
+    //
+    compile('com.github.gfx.android.orma:orma:5.0.0-rc3') {
         exclude group: 'com.android.support'
     }
-//    compile('com.github.gfx.android.orma:orma-encryption:5.0.0-rc3') {
-//        exclude group: 'com.android.support'
-//    }
+    compile('com.github.gfx.android.orma:orma-encryption:5.0.0-rc3') {
+        exclude group: 'com.android.support'
+    }
+    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc3'
     //
     compile('com.github.hotchemi:permissionsdispatcher:2.4.0') {
         exclude group: 'com.android.support'
@@ -155,19 +175,22 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     //
-    compile 'net.zetetic:android-database-sqlcipher:3.5.7@aar'
+    // compile 'net.zetetic:android-database-sqlcipher:3.5.7@aar'
     compile 'info.guardianproject.iocipher:IOCipher:0.4'
-    //compile 'info.guardianproject.iocipher:IOCipherStandalone:0.4'
+    // compile 'info.guardianproject.iocipher:IOCipherStandalone:0.4'
     //
     compile 'com.github.medyo:android-about-page:1.2.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.vanniktech:emoji-ios:0.4.0'
+    // compile 'com.vanniktech:emoji-one:0.4.0'
+    compile 'com.l4digital.fastscroll:fastscroll:1.0.4'
     //
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
     //
     compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
-    annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.5'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
 }

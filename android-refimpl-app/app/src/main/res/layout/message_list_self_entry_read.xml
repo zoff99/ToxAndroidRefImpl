@@ -10,13 +10,11 @@
         android:minHeight="45dp"
         android:background="@android:color/holo_blue_light">
 
-        <TextView
+        <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/m_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ellipsize="marquee"
-
             android:text="..."
             android:textSize="20sp"/>
 

@@ -20,14 +20,16 @@
 package com.zoffcc.applications.trifa;
 
 import android.app.Activity;
-import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import java.util.List;
 
@@ -35,20 +37,80 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
-public class MessageListFragment extends ListFragment
+public class MessageListFragment extends Fragment
 {
     private static final String TAG = "trifa.MsgListFrgnt";
     List<Message> data_values = null;
-    MessagelistArrayAdapter a = null;
+    // MessagelistArrayAdapter a = null;
     long current_friendnum = -1;
-    private boolean onattach_ready = false;
+    com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
+    MessagelistAdapter adapter = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
-        onattach_ready = false;
+
+
+        MessageListActivity mla = (MessageListActivity) (getActivity());
+        current_friendnum = mla.get_current_friendnum();
+        Log.i(TAG, "current_friendnum=" + current_friendnum);
+
+        try
+        {
+            // reset "new" flags for messages -------
+            if (orma != null)
+            {
+                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            }
+            // reset "new" flags for messages -------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (orma != null)
+            {
+                Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            // data_values is NULL here!!
+        }
+
+        // --------------
+        // --------------
+        // --------------
+        adapter = new MessagelistAdapter(view.getContext(), data_values);
+        Log.i(TAG, "onCreateView:adapter=" + adapter);
+        listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view.findViewById(R.id.msg_rv_list);
+        Log.i(TAG, "onCreateView:listingsView=" + listingsView);
+
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager.setStackFromEnd(true); // pin to bottom element
+        listingsView.setLayoutManager(linearLayoutManager);
+        listingsView.setItemAnimator(new DefaultItemAnimator());
+        listingsView.setHasFixedSize(false);
+
+        listingsView.setAdapter(adapter);
+        // --------------
+        // --------------
+
+
+        // a = new MessagelistArrayAdapter(context, data_values);
+        // setListAdapter(a);
+
+        MainActivity.message_list_fragment = this;
+
         return view;
     }
 
@@ -63,10 +125,27 @@ public class MessageListFragment extends ListFragment
     {
         Log.i(TAG, "onAttach(Context)");
         super.onAttach(context);
+    }
 
-        MessageListActivity mla = (MessageListActivity) (getActivity());
-        current_friendnum = mla.get_current_friendnum();
-        Log.i(TAG, "current_friendnum=" + current_friendnum);
+    @Override
+    public void onAttach(Activity activity)
+    {
+        Log.i(TAG, "onAttach(Activity)");
+        super.onAttach(activity);
+    }
+
+    @Override
+    public void onResume()
+    {
+        Log.i(TAG, "onResume");
+        super.onResume();
+
+        MainActivity.message_list_fragment = this;
+    }
+
+    void update_all_messages()
+    {
+        Log.i(TAG, "update_all_messages");
 
         try
         {
@@ -81,203 +160,18 @@ public class MessageListFragment extends ListFragment
 
         try
         {
-            Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-            data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
-            // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
-            // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            if (data_values != null)
+            {
+                data_values.clear();
+                adapter.add_list_clear(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
+            }
+            Log.i(TAG, "data_values:005");
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            // data_values is NULL here!!
         }
-        a = new MessagelistArrayAdapter(context, data_values);
-        setListAdapter(a);
 
-        // TODO this is just a bad hack, fix me!! -----------------
-        final Thread t1 = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    Log.i(TAG, "scroll to bottom:1");
-                    Thread.sleep(350); // TODO: really back hack!!
-                    // scroll to bottom of message list
-                    scroll_to_bottom();
-                    Log.i(TAG, "scroll to bottom:1.a");
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "scroll to bottom:EE1:" + e.getMessage());
-                }
-            }
-        };
-        t1.start();
-        // TODO this is just a bad hack, fix me!! -----------------
-
-        MainActivity.message_list_fragment = this;
-        onattach_ready = true;
-    }
-
-    @Override
-    public void onAttach(Activity activity)
-    {
-        Log.i(TAG, "onAttach(Activity)");
-        super.onAttach(activity);
-
-        if (!onattach_ready)
-        {
-            MessageListActivity mla = (MessageListActivity) (getActivity());
-            current_friendnum = mla.get_current_friendnum();
-            Log.i(TAG, "current_friendnum=" + current_friendnum);
-
-            try
-            {
-                // reset "new" flags for messages -------
-                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
-                // reset "new" flags for messages -------
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            try
-            {
-                Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
-                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
-                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                // data_values is NULL here!!
-            }
-            a = new MessagelistArrayAdapter(activity, data_values);
-            setListAdapter(a);
-
-            // TODO this is just a bad hack, fix me!! -----------------
-            final Thread t1 = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        Log.i(TAG, "scroll to bottom:1");
-                        Thread.sleep(350); // TODO: really back hack!!
-                        // scroll to bottom of message list
-                        scroll_to_bottom();
-                        Log.i(TAG, "scroll to bottom:1.a");
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "scroll to bottom:EE1:" + e.getMessage());
-                    }
-                }
-            };
-            t1.start();
-            // TODO this is just a bad hack, fix me!! -----------------
-
-            MainActivity.message_list_fragment = this;
-            onattach_ready = true;
-        }
-    }
-
-    @Override
-    public void onResume()
-    {
-        Log.i(TAG, "onResume");
-        super.onResume();
-
-        onattach_ready = false;
-
-        MainActivity.message_list_fragment = this;
-    }
-
-    void scroll_to_bottom()
-    {
-        Runnable myRunnable = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    // scroll to bottom
-                    Log.i(TAG, "scroll_to_bottom:data_values.size()=" + data_values.size() + " data_values=" + data_values);
-                    setSelection(data_values.size());
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "scroll_to_bottom:EE1:" + e.getMessage());
-                }
-            }
-        };
-        main_handler_s.post(myRunnable);
-    }
-
-    void update_all_messages()
-    {
-        Log.i(TAG, "update_all_messages");
-
-        Runnable myRunnable = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Log.i(TAG, "current_friendnum=" + current_friendnum);
-
-                try
-                {
-                    // reset "new" flags for messages -------
-                    orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
-                    // reset "new" flags for messages -------
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    Log.i(TAG, "data_values:001");
-                    if (data_values != null)
-                    {
-                        Log.i(TAG, "data_values:002");
-                        data_values.clear();
-                        Log.i(TAG, "data_values:003");
-                        data_values.addAll(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
-                        Log.i(TAG, "data_values:004");
-                    }
-                    Log.i(TAG, "data_values:005");
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    Log.i(TAG, "notifyDataSetChanged:1");
-                    a.notifyDataSetChanged();
-                    Log.i(TAG, "scroll to bottom:2");
-                    scroll_to_bottom();
-                    Log.i(TAG, "scroll to bottom:2.a");
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-        main_handler_s.post(myRunnable);
     }
 
     synchronized void modify_message(final Message m)
@@ -289,19 +183,7 @@ public class MessageListFragment extends ListFragment
             {
                 try
                 {
-                    if (data_values != null)
-                    {
-                        int i = 0;
-                        for (i = 0; i < data_values.size(); i++)
-                        {
-                            if (data_values.get(i).id == m.id)
-                            {
-                                data_values.set(i, m);
-                                a.notifyDataSetChanged();
-                                break;
-                            }
-                        }
-                    }
+                    adapter.update_item(m);
                 }
                 catch (Exception e)
                 {
@@ -309,39 +191,11 @@ public class MessageListFragment extends ListFragment
                 }
             }
         };
-        main_handler_s.post(myRunnable);
-    }
 
-    synchronized void modify_message(final Message m, final boolean scroll_to_bottom)
-    {
-        Runnable myRunnable = new Runnable()
+        if (main_handler_s != null)
         {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    if (data_values != null)
-                    {
-                        int i = 0;
-                        for (i = 0; i < data_values.size(); i++)
-                        {
-                            if (data_values.get(i).id == m.id)
-                            {
-                                data_values.set(i, m);
-                                a.notifyDataSetChanged();
-                                break;
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-        main_handler_s.post(myRunnable);
+            main_handler_s.post(myRunnable);
+        }
     }
 
     synchronized void add_message(final Message m)
@@ -351,18 +205,21 @@ public class MessageListFragment extends ListFragment
             @Override
             public void run()
             {
-                data_values.add(m);
-                a.notifyDataSetChanged();
-                scroll_to_bottom();
+                try
+                {
+                    adapter.add_item(m);
+                    listingsView.scrollToPosition(adapter.getItemCount() - 1);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         };
 
-        main_handler_s.post(myRunnable);
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id)
-    {
-        // TODO
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -110,19 +111,34 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/emoji_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="bottom"
         android:layout_weight="0"
         android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/insert_emoji"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="2dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/emoji_ios_category_people"
+            tools:ignore="ContentDescription"/>
 
-        <EditText
+        <com.vanniktech.emoji.EmojiEditText
             android:id="@+id/ml_new_message"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
             android:cursorVisible="true"
+            android:ellipsize="end"
+            android:imeOptions="actionSend"
+            android:inputType="textMultiLine"
+            android:maxLines="5"
             android:singleLine="false"
             android:text=""
             android:textColor="@android:color/primary_text_light"

@@ -22,13 +22,15 @@ package com.zoffcc.applications.trifa;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Px;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,6 +38,14 @@ import android.widget.TextView;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.vanniktech.emoji.EmojiPopup;
+import com.vanniktech.emoji.emoji.Emoji;
+import com.vanniktech.emoji.listeners.OnEmojiBackspaceClickListener;
+import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
+import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
+import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
+import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
+import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
@@ -48,6 +58,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -57,8 +69,13 @@ public class MessageListActivity extends AppCompatActivity
     private static final String TAG = "trifa.MsgListActivity";
     long friendnum = -1;
     long friendnum_prev = -1;
-    EditText ml_new_message = null;
+    //
+    com.vanniktech.emoji.EmojiEditText ml_new_message = null;
+    EmojiPopup emojiPopup = null;
+    ImageView insert_emoji = null;
     TextView ml_maintext = null;
+    ViewGroup rootView = null;
+    //
     static TextView ml_friend_typing = null;
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
@@ -78,6 +95,7 @@ public class MessageListActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
+        Log.i(TAG, "onCreate:003:friendnum=" + friendnum + " friendnum_prev=" + friendnum_prev);
         friendnum_prev = friendnum;
 
         setContentView(R.layout.activity_message_list);
@@ -87,7 +105,9 @@ public class MessageListActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ml_new_message = (EditText) findViewById(R.id.ml_new_message);
+        rootView = (ViewGroup) findViewById(R.id.emoji_bar);
+        ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
+        insert_emoji = (ImageView) findViewById(R.id.insert_emoji);
         ml_friend_typing = (TextView) findViewById(R.id.ml_friend_typing);
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
@@ -101,6 +121,27 @@ public class MessageListActivity extends AppCompatActivity
         set_friend_connection_status_icon();
         ml_status_icon.setImageResource(R.drawable.circle_green);
         set_friend_status_icon();
+
+        setUpEmojiPopup();
+
+        final Drawable d1 = new IconicsDrawable(getBaseContext()).
+                icon(FontAwesome.Icon.faw_smile_o).
+                color(getResources().
+                        getColor(R.color.colorPrimaryDark)).
+                sizeDp(24);
+
+        insert_emoji.setImageDrawable(d1);
+        // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
+
+
+        insert_emoji.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                emojiPopup.toggle();
+            }
+        });
 
         final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(40);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(40);
@@ -130,8 +171,28 @@ public class MessageListActivity extends AppCompatActivity
                 if (global_typing == 0)
                 {
                     global_typing = 1;  // typing = 1
-                    tox_self_set_typing(friendnum, global_typing);
-                    Log.i(TAG, "typing:fn#" + friendnum + ":activated");
+
+                    Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                tox_self_set_typing(friendnum, global_typing);
+                                Log.i(TAG, "typing:fn#" + friendnum + ":activated");
+                            }
+                            catch (Exception e)
+                            {
+                                Log.i(TAG, "typing:fn#" + friendnum + ":EE1" + e.getMessage());
+                            }
+                        }
+                    };
+
+                    if (main_handler_s != null)
+                    {
+                        main_handler_s.post(myRunnable);
+                    }
                 }
 
                 try
@@ -165,8 +226,27 @@ public class MessageListActivity extends AppCompatActivity
                             if (skip_flag_update == false)
                             {
                                 global_typing = 0;  // typing = 0
-                                tox_self_set_typing(friendnum, global_typing);
-                                Log.i(TAG, "typing:fn#" + friendnum + ":DEactivated");
+                                Runnable myRunnable = new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            tox_self_set_typing(friendnum, global_typing);
+                                            Log.i(TAG, "typing:fn#" + friendnum + ":DEactivated");
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Log.i(TAG, "typing:fn#" + friendnum + ":EE2" + e.getMessage());
+                                        }
+                                    }
+                                };
+
+                                if (main_handler_s != null)
+                                {
+                                    main_handler_s.post(myRunnable);
+                                }
                             }
                         }
                     }
@@ -186,8 +266,8 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-        Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
-        ml_phone_icon.setImageDrawable(d1);
+        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
+        ml_phone_icon.setImageDrawable(d2);
 
         final long fn = friendnum;
         Thread t = new Thread()
@@ -205,7 +285,11 @@ public class MessageListActivity extends AppCompatActivity
                         ml_maintext.setText(f_name);
                     }
                 };
-                main_handler_s.post(myRunnable);
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
             }
         };
         t.start();
@@ -221,7 +305,20 @@ public class MessageListActivity extends AppCompatActivity
 
         MainActivity.message_list_fragment = null;
         MainActivity.message_list_activity = null;
+        Log.i(TAG, "onPause:001:friendnum=" + friendnum);
         friendnum = -1;
+        Log.i(TAG, "onPause:002:friendnum=" + friendnum);
+    }
+
+    @Override
+    protected void onStop()
+    {
+        if (emojiPopup != null)
+        {
+            emojiPopup.dismiss();
+        }
+
+        super.onStop();
     }
 
     @Override
@@ -230,12 +327,77 @@ public class MessageListActivity extends AppCompatActivity
         Log.i(TAG, "onResume");
         super.onResume();
 
+        Log.i(TAG, "onResume:001:friendnum=" + friendnum);
+
         if (friendnum == -1)
         {
             friendnum = friendnum_prev;
+            Log.i(TAG, "onResume:001:friendnum=" + friendnum);
         }
 
         MainActivity.message_list_activity = this;
+    }
+
+
+    private void setUpEmojiPopup()
+    {
+        emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener()
+        {
+            @Override
+            public void onEmojiBackspaceClicked(final View v)
+            {
+                Log.d(TAG, "Clicked on Backspace");
+            }
+        }).setOnEmojiClickedListener(new OnEmojiClickedListener()
+        {
+            @Override
+            public void onEmojiClicked(@NonNull final Emoji emoji)
+            {
+                Log.d(TAG, "Clicked on emoji");
+            }
+        }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
+        {
+            @Override
+            public void onEmojiPopupShown()
+            {
+                final Drawable d1 = new IconicsDrawable(getBaseContext()).
+                        icon(FontAwesome.Icon.faw_keyboard_o).
+                        color(getResources().
+                                getColor(R.color.colorPrimaryDark)).
+                        sizeDp(24);
+
+                insert_emoji.setImageDrawable(d1);
+                // insert_emoji.setImageResource(R.drawable.about_icon_email);
+            }
+        }).setOnSoftKeyboardOpenListener(new OnSoftKeyboardOpenListener()
+        {
+            @Override
+            public void onKeyboardOpen(@Px final int keyBoardHeight)
+            {
+                Log.d(TAG, "Opened soft keyboard");
+            }
+        }).setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener()
+        {
+            @Override
+            public void onEmojiPopupDismiss()
+            {
+                final Drawable d1 = new IconicsDrawable(getBaseContext()).
+                        icon(FontAwesome.Icon.faw_smile_o).
+                        color(getResources().
+                                getColor(R.color.colorPrimaryDark)).
+                        sizeDp(24);
+
+                insert_emoji.setImageDrawable(d1);
+                // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
+            }
+        }).setOnSoftKeyboardCloseListener(new OnSoftKeyboardCloseListener()
+        {
+            @Override
+            public void onKeyboardClose()
+            {
+                Log.d(TAG, "Closed soft keyboard");
+            }
+        }).build(ml_new_message);
     }
 
     long get_current_friendnum()
@@ -276,7 +438,10 @@ public class MessageListActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     public void set_friend_connection_status_icon()
@@ -304,7 +469,11 @@ public class MessageListActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     synchronized public void send_message_onclick(View view)
@@ -376,8 +545,8 @@ public class MessageListActivity extends AppCompatActivity
         final long fn = friendnum;
 
         // these 2 bitrate values are very strange!! sometimes no video!!
-        final int f_audio_enabled = 10;
-        final int f_video_enabled = 10;
+        final int f_audio_enabled = 1;
+        final int f_video_enabled = 1;
 
         Runnable myRunnable = new Runnable()
         {
@@ -459,10 +628,18 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     CallingActivity.top_text_line_str2 = "0s";
                                     update_top_text_line();
-                                    MainActivity.toxav_call(friendnum, f_audio_enabled, f_video_enabled);
+                                    Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled + " f_video_enabled=" + f_video_enabled);
+
+                                    Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
+                                    Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
+
+                                    MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                    Log.i(TAG, "CALL_OUT:002");
                                 }
-                                catch (android.database.sqlite.SQLiteConstraintException e)
+                                catch (Exception e)
                                 {
+                                    Log.i(TAG, "CALL_OUT:EE1:" + e.getMessage());
+                                    e.printStackTrace();
                                 }
                             }
                         };
@@ -481,7 +658,10 @@ public class MessageListActivity extends AppCompatActivity
                 }
             }
         };
-        main_handler_s.post(myRunnable);
 
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 }

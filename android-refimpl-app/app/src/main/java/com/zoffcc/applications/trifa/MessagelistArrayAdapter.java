@@ -38,6 +38,8 @@ import android.widget.TextView;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -50,6 +52,7 @@ import info.guardianproject.iocipher.File;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
+import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_accepted_from_id;
@@ -186,7 +189,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                     });
 
 
-                                    // TODO: this is just to show that it work. really bad and slow!!!!!
+                                    // TODO: this is just to show that it works. really bad and slow!!!!!
                                     final View v_ = rowView;
                                     final Thread t_image_preview = new Thread()
                                     {
@@ -215,6 +218,8 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                                     try
                                                     {
                                                         Log.i(TAG, "glide:img:001");
+
+                                                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(40)));
                                                         GlideApp.
                                                                 with(v_).
                                                                 load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
@@ -264,6 +269,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                                                     }
 
                                                                 }).
+                                                                apply(glide_options).
                                                                 into(ft_preview_image);
                                                         Log.i(TAG, "glide:img:002");
 
@@ -287,7 +293,11 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                                                     }
                                                 }
                                             };
-                                            main_handler_s.post(myRunnable);
+
+                                            if (main_handler_s != null)
+                                            {
+                                                main_handler_s.post(myRunnable);
+                                            }
                                         }
                                     };
                                     t_image_preview.start();
@@ -603,7 +613,7 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                     }
                 }
 
-                TextView textView = (TextView) rowView.findViewById(R.id.m_text);
+                com.vanniktech.emoji.EmojiEditText textView = (com.vanniktech.emoji.EmojiEditText) rowView.findViewById(R.id.m_text);
                 textView.setText("#" + values_msg.get(position).id + ":" + values_msg.get(position).text);
 
                 ImageView imageView = (ImageView) rowView.findViewById(R.id.m_icon);

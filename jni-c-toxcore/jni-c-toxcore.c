@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 8
-static const char global_version_string[] = "0.99.8";
+#define VERSION_PATCH 9
+static const char global_version_string[] = "0.99.9";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -783,7 +783,9 @@ void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uin
 	jnienv2 = jni_getenv();
 
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
+	CLEAR(tox_id_hex);
 	toxid_bin_to_hex(public_key, tox_id_hex);
+	tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
 
 	dbg(9, "pubkey string=%s", tox_id_hex);
 
@@ -1497,7 +1499,7 @@ int add_tcp_relay_single(Tox *tox, const char *ip, uint16_t port, const char *ke
 	}
 }
 
-int Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single__real(JNIEnv* env, jobject thiz, jobject ip, jobject key_hex, long port)
+int Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single__real(JNIEnv* env, jobject thiz, jstring ip, jstring key_hex, long port)
 {
 	dbg(9, "add_tcp_relay_single1");
 
@@ -2093,6 +2095,245 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1control(JNIEnv* env, 
 	}
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1hash(JNIEnv* env, jobject thiz, jobject hash_buffer, jobject data_buffer, jlong data_length)
+{
+	uint8_t *hash_buffer_c = NULL;
+	long capacity_hash = 0;
+	uint8_t *data_buffer_c = NULL;
+	long capacity_data = 0;
+
+    hash_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, hash_buffer);
+    capacity_hash = (*env)->GetDirectBufferCapacity(env, hash_buffer);
+
+	if (capacity_hash < TOX_HASH_LENGTH)
+	{
+		return -2;
+	}
+
+	if (data_buffer != NULL)
+	{
+		data_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, data_buffer);
+		capacity_data = (*env)->GetDirectBufferCapacity(env, data_buffer);
+	}
+
+	if (capacity_data < data_length)
+	{
+		return -3;
+	}
+
+	bool res = tox_hash(hash_buffer_c, data_buffer_c, (size_t)data_length);
+
+	if (res != true)
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1seek(JNIEnv* env, jobject thiz, jlong friend_number, jlong file_number, jlong position)
+{
+
+	TOX_ERR_FILE_SEEK error;
+	bool res = tox_file_seek(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (uint64_t)position, &error);
+
+	if (res != true)
+	{
+		if (error == TOX_ERR_FILE_GET_NULL)
+		{
+			dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_NULL");
+			return (jint)-1;
+		}
+		else if (error == TOX_ERR_FILE_GET_FRIEND_NOT_FOUND)
+		{
+			dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_FRIEND_NOT_FOUND");
+			return (jint)-2;
+		}
+		else if (error == TOX_ERR_FILE_GET_NOT_FOUND)
+		{
+			dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_NOT_FOUND");
+			return (jint)-3;
+		}
+		else
+		{
+			dbg(9, "tox_file_seek:ERROR:%d", (int)error);
+			return (jint)-99;
+		}
+	}
+	else
+	{
+		dbg(9, "tox_file_seek");
+		return (jint)res;
+	}
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1get_1file_1id(JNIEnv* env, jobject thiz, jlong friend_number, jlong file_number, jobject file_id_buffer)
+{
+	uint8_t *file_id_buffer_c = NULL;
+	long capacity = 0;
+
+	if (file_id_buffer == NULL)
+	{
+		return -3;
+	}
+
+	file_id_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, file_id_buffer);
+	capacity = (*env)->GetDirectBufferCapacity(env, file_id_buffer);
+
+	if (capacity < TOX_FILE_ID_LENGTH)
+	{
+		return -2;
+	}
+
+	TOX_ERR_FILE_GET error;
+	bool res = tox_file_get_file_id(tox_global, (uint32_t)friend_number, (uint32_t)file_number, file_id_buffer_c, &error);
+
+	if (res != true)
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send(JNIEnv* env, jobject thiz, jlong friend_number, jlong kind, jlong file_size, jobject file_id_buffer, jstring file_name, jlong filename_length)
+{
+	uint8_t *file_id_buffer_c = NULL;
+	long capacity = 0;
+
+	if (file_id_buffer == NULL)
+	{
+		return -21;
+	}
+
+	file_id_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, file_id_buffer);
+	capacity = (*env)->GetDirectBufferCapacity(env, file_id_buffer);
+
+	if (capacity < TOX_FILE_ID_LENGTH)
+	{
+		return -22;
+	}
+
+	const char *filename_str = NULL;
+	filename_str =  (*env)->GetStringUTFChars(env, file_name, NULL);
+
+	TOX_ERR_FILE_SEND error;
+	uint32_t res = tox_file_send(tox_global, (uint32_t)friend_number, (uint32_t)kind, (uint64_t)file_size, file_id_buffer_c,
+                       (uint8_t *)filename_str, (size_t)filename_length, &error);
+
+	(*env)->ReleaseStringUTFChars(env, file_name, filename_str);
+
+	if (error == TOX_ERR_FILE_SEND_NULL)
+	{
+		dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_NULL");
+		return (jlong)-1;
+	}
+	else if (error == TOX_ERR_FILE_SEND_FRIEND_NOT_FOUND)
+	{
+		dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_FRIEND_NOT_FOUND");
+		return (jlong)-2;
+	}
+	else if (error == TOX_ERR_FILE_SEND_FRIEND_NOT_CONNECTED)
+	{
+		dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_FRIEND_NOT_CONNECTED");
+		return (jlong)-3;
+	}
+	else if (error == TOX_ERR_FILE_SEND_NAME_TOO_LONG)
+	{
+		dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_NAME_TOO_LONG");
+		return (jlong)-4;
+	}
+	else if (error == TOX_ERR_FILE_SEND_TOO_MANY)
+	{
+		dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_TOO_MANY");
+		return (jlong)-5;
+	}
+	else
+	{
+		return (jlong)res;
+	}
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv* env, jobject thiz, jlong friend_number, jlong file_number, jlong position, jobject data_buffer, jlong data_length)
+{
+	uint8_t *data_buffer_c = NULL;
+	long capacity = 0;
+
+	if (data_buffer == NULL)
+	{
+		return -21;
+	}
+
+	data_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, data_buffer);
+	capacity = (*env)->GetDirectBufferCapacity(env, data_buffer);
+
+	TOX_ERR_FILE_SEND_CHUNK error;
+	bool res = tox_file_send_chunk(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (uint64_t)position, data_buffer_c,
+                       (size_t)data_length, &error);
+
+	if (res != true)
+	{
+		if (error == TOX_ERR_FILE_SEND_CHUNK_NULL)
+		{
+			dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_NULL");
+			return (jint)-1;
+		}
+		else if (error == TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_FOUND)
+		{
+			dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_FOUND");
+			return (jint)-2;
+		}
+		else if (error == TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_CONNECTED)
+		{
+			dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_CONNECTED");
+			return (jint)-3;
+		}
+		else if (error == TOX_ERR_FILE_SEND_CHUNK_NOT_FOUND)
+		{
+			dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_NOT_FOUND");
+			return (jint)-4;
+		}
+		else if (error == TOX_ERR_FILE_SEND_CHUNK_NOT_TRANSFERRING)
+		{
+			dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_NOT_TRANSFERRING");
+			return (jint)-5;
+		}
+		else if (error == TOX_ERR_FILE_SEND_CHUNK_INVALID_LENGTH)
+		{
+			dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_INVALID_LENGTH");
+			return (jint)-6;
+		}
+		else if (error == TOX_ERR_FILE_SEND_CHUNK_SENDQ)
+		{
+			dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_SENDQ");
+			return (jint)-7;
+		}
+		else if (error == TOX_ERR_FILE_SEND_CHUNK_WRONG_POSITION)
+		{
+			dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_WRONG_POSITION");
+			return (jint)-8;
+		}
+		else
+		{
+			return (jint)-99;
+		}
+	}
+
+	return (jint)0;
+}
+
 // -----------------------
 // TODO
 // -----------------------
@@ -2103,7 +2344,6 @@ uint32_t tox_self_get_nospam(const Tox *tox);
 bool tox_friend_exists(const Tox *tox, uint32_t friend_number);
 uint64_t tox_friend_get_last_online(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_GET_LAST_ONLINE *error);
 TOX_USER_STATUS tox_friend_get_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
-bool tox_hash(uint8_t *hash, const uint8_t *data, size_t length);
 
 void tox_self_set_nospam(Tox *tox, uint32_t nospam);
 */

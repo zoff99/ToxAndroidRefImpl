@@ -21,13 +21,12 @@
             android:scaleType="centerInside"
             android:src="@drawable/circle_red"/>
 
-        <TextView
+        <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/m_text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@id/m_icon"
-            android:ellipsize="marquee"
             android:text="..."
             android:textSize="20sp"/>
 
