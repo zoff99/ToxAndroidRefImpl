@@ -70,6 +70,14 @@ import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 {
+    /*
+     *
+     *
+     * NOT USED ANYMORE !!!!!!!!!
+     *
+     *
+     */
+
     private static final String TAG = "trifa.MessagelstAAdptr";
     private final Context context;
     private final List<Message> values_msg;

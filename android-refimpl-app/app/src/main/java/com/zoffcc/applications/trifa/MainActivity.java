@@ -38,6 +38,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -3818,7 +3819,8 @@ public class MainActivity extends AppCompatActivity
                         with(c).
                         load(byteArray).
                         placeholder(placholder).
-                        diskCacheStrategy(DiskCacheStrategy.NONE).
+                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                        signature(StringSignature2(vfs_image_filename)).
                         skipMemoryCache(false).
                         into(v);
             }
@@ -3834,7 +3836,7 @@ public class MainActivity extends AppCompatActivity
                         with(c).
                         load(byteArray).
                         placeholder(placholder).
-                        diskCacheStrategy(DiskCacheStrategy.NONE).
+                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                         skipMemoryCache(false).
                         into(v);
             }
@@ -4484,6 +4486,27 @@ public class MainActivity extends AppCompatActivity
     {
         com.bumptech.glide.load.Key ret = new ObjectKey(in);
         return ret;
+    }
+
+    public static Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth)
+    {
+
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+
+        // resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // recreate the new Bitmap
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+
+        return resizedBitmap;
     }
 
     // --------- make app crash ---------

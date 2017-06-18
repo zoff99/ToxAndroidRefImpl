@@ -19,7 +19,6 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,14 +31,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.target.Target;
 import com.github.chrisbanes.photoview.PhotoView;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
-import com.mikepenz.iconics.IconicsDrawable;
 
 import info.guardianproject.iocipher.File;
 
-import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-import static android.os.Process.setThreadPriority;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
 
@@ -66,13 +62,18 @@ public class ImageviewerActivity extends AppCompatActivity
             e.getMessage();
         }
 
-        final Drawable d3 = new IconicsDrawable(this).
-                icon(GoogleMaterial.Icon.gmd_photo).
-                backgroundColor(Color.TRANSPARENT).
-                color(Color.parseColor("#AA000000")).sizeDp(50);
+        //        final Drawable d3 = new IconicsDrawable(this).
+        //                icon(GoogleMaterial.Icon.gmd_photo).
+        //                backgroundColor(Color.TRANSPARENT).
+        //                color(Color.parseColor("#AA000000")).sizeDp(200);
+
+        //        final Drawable d1 = new IconicsDrawable(ImageviewerActivity.this).
+        //                icon(GoogleMaterial.Icon.gmd_insert_photo).
+        //                color(ImageviewerActivity.this.getResources().getColor(R.color.colorPrimaryDark)).
+        //                sizeDp(200);
 
         final PhotoView photoView = (PhotoView) findViewById(R.id.big_image);
-        photoView.setImageDrawable(d3);
+        photoView.setImageResource(R.drawable.round_loading_animation);
 
         final Handler imageviewer_handler = new Handler(getMainLooper());
 
@@ -89,7 +90,7 @@ public class ImageviewerActivity extends AppCompatActivity
                     {
                         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                     }
 
@@ -104,10 +105,17 @@ public class ImageviewerActivity extends AppCompatActivity
                         {
                             try
                             {
+                                //                                final Drawable d1 = new IconicsDrawable(ImageviewerActivity.this).
+                                //                                        icon(GoogleMaterial.Icon.gmd_insert_photo).
+                                //                                        color(ImageviewerActivity.this.getResources().getColor(R.color.colorPrimaryDark)).
+                                //                                        sizeDp(200);
+
                                 GlideApp.
                                         with(ImageviewerActivity.this).
                                         load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
                                         diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                        signature(StringSignature2(SD_CARD_TMP_DIR + "/" + temp_file_name)).
+                                        placeholder(R.drawable.round_loading_animation).
                                         listener(new com.bumptech.glide.request.RequestListener<Drawable>()
                                         {
                                             @Override
