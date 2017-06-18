@@ -24,7 +24,9 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.media.audiofx.AcousticEchoCanceler;
+import android.media.audiofx.AudioEffect;
 import android.media.audiofx.AutomaticGainControl;
+import android.media.audiofx.NoiseSuppressor;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
@@ -56,6 +58,7 @@ public class AudioRecording extends Thread
     static int audio_session_id = -1;
     AutomaticGainControl agc = null;
     AcousticEchoCanceler aec = null;
+    NoiseSuppressor np = null;
 
     short[] buffer_short = null;
 
@@ -162,6 +165,23 @@ public class AudioRecording extends Thread
                 Log.i(TAG, "Audio Thread [OUT]:EE2:" + e.getMessage());
             }
             Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:===============================");
+
+
+            Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:===============================");
+            aec = null;
+            try
+            {
+                Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:isAvailable:" + NoiseSuppressor.isAvailable());
+                np = NoiseSuppressor.create(audio_session_id);
+                int res = np.setEnabled(true);
+                Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:setEnabled:" + res + " audio_session_id=" + audio_session_id);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "Audio Thread [OUT]:EE2:" + e.getMessage());
+            }
+            Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:===============================");
 
             recorder.startRecording();
         }

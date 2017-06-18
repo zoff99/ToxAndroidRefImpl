@@ -22,6 +22,8 @@ package com.zoffcc.applications.trifa;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.audiofx.AudioEffect;
+import android.media.audiofx.EnvironmentalReverb;
 import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.util.Log;
@@ -54,6 +56,7 @@ public class AudioReceiver extends Thread
     static int buffer_size = 1920 * buffer_multiplier; // TODO: hardcoded is bad!!!!
     AudioTrack track = null;
     LoudnessEnhancer lec = null;
+    EnvironmentalReverb erv = null;
 
     short[] temp_buf = null;
 
@@ -128,6 +131,9 @@ public class AudioReceiver extends Thread
                 {
                     lec = new LoudnessEnhancer(track.getAudioSessionId());
 
+                    int res = lec.setEnabled(true);
+                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res + " SUCCESS=" + AudioEffect.SUCCESS);
+
                     float target_gain = lec.getTargetGain();
                     Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
 
@@ -136,8 +142,6 @@ public class AudioReceiver extends Thread
                     target_gain = lec.getTargetGain();
                     Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
 
-                    int res = lec.setEnabled(true);
-                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res);
                 }
                 catch (Exception e)
                 {
@@ -145,6 +149,32 @@ public class AudioReceiver extends Thread
                     e.printStackTrace();
                 }
                 Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
+
+
+                Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:===============================");
+                erv = null;
+                try
+                {
+                    erv = new EnvironmentalReverb(0, track.getAudioSessionId());
+                    int res = erv.setEnabled(true);
+                    erv.setReflectionsLevel((short) -8500);
+                    erv.setRoomLevel((short) -8500);
+                    //                    erv.setDecayHFRatio((short) 1000);
+                    //                    erv.setDecayTime(10000);
+                    //                    erv.setDensity((short) 1000);
+                    //                    erv.setDiffusion((short) 1000);
+                    //                    erv.setReverbLevel((short) 1000);
+                    //                    erv.setReverbDelay(100);
+                    Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:setEnabled:" + res + " SUCCESS=" + AudioEffect.SUCCESS);
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "Audio Thread [IN]:EE1:" + e.getMessage());
+                    e.printStackTrace();
+                }
+                Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:===============================");
+
+
             }
 
             track.setPlaybackRate((int) sampling_rate_);
