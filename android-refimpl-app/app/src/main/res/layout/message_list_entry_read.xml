@@ -8,7 +8,8 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="20dp"
         android:background="@drawable/rounded_orange_bg"
-        android:minHeight="45dp">
+        android:minHeight="45dp"
+        android:orientation="horizontal">
 
 
         <ImageView
@@ -24,12 +25,17 @@
 
         <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/m_text"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_toRightOf="@id/m_icon"
+            android:layout_weight="1"
             android:text="..."
             android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/dummy"
+            android:layout_width="10dp"
+            android:layout_height="wrap_content"
+            android:text=""/>
 
     </LinearLayout>
 </RelativeLayout>

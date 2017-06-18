@@ -6,6 +6,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_orange_dark_bg"
         android:layout_marginRight="0dp"
         android:orientation="vertical">
 
@@ -13,7 +14,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
-            android:background="@android:color/holo_orange_dark"
             android:minHeight="45dp"
             android:orientation="horizontal">
 
@@ -25,7 +25,8 @@
                 android:layout_marginRight="6dip"
                 android:padding="2dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/circle_red"/>
+                android:src="@drawable/circle_red"
+                android:visibility="invisible"/>
 
             <TextView
                 android:id="@+id/m_text"
@@ -43,7 +44,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
-            android:background="@android:color/holo_orange_dark"
             android:orientation="horizontal">
 
             <ProgressBar
@@ -63,7 +63,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
-            android:background="@android:color/holo_orange_dark"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:visibility="gone">
@@ -102,7 +101,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
-            android:background="@android:color/holo_orange_dark"
             android:minHeight="65dp"
             android:orientation="horizontal">
 

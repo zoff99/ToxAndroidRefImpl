@@ -13,12 +13,13 @@
         android:id="@+id/msg_rv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginRight="5dp"
         android:divider="@null"
         android:dividerHeight="2dp"
         app:bubbleColor="?attr/colorPrimary"
         app:bubbleTextColor="#ffffff"
         app:handleColor="?attr/colorPrimary"
-        app:hideScrollbar="false"
+        app:hideScrollbar="true"
         app:showTrack="false"
         app:trackColor="?attr/colorPrimary">
     </com.l4digital.fastscroll.FastScrollRecyclerView>

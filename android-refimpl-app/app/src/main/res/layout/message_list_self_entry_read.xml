@@ -7,14 +7,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
-        android:minHeight="45dp"
-        android:background="@drawable/rounded_blue_bg">
+        android:background="@drawable/rounded_blue_bg"
+        android:minHeight="45dp">
 
         <com.vanniktech.emoji.EmojiTextView
             android:id="@+id/m_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:paddingLeft="10dp"
             android:text="..."
             android:textSize="20sp"/>
 
