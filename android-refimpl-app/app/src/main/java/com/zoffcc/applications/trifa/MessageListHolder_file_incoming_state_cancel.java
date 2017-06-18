@@ -212,7 +212,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                                 signature(StringSignature2(SD_CARD_TMP_DIR + "/" + temp_file_name)).
                                                 skipMemoryCache(false).
                                                 transition(withCrossFade()).
-                                                placeholder(null).
+                                                placeholder(d3).
                                                 listener(new com.bumptech.glide.request.RequestListener<Drawable>()
                                                 {
                                                     @Override
