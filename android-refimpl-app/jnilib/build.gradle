@@ -34,7 +34,7 @@ install {
             groupId 'com.zoffcc.applications.trifajni'
             artifactId 'trifa-jni-lib'
             version '1.0.1'
-            name 'trifa-jni-lib2'
+            name 'trifa-jni-lib'
             description 'trifa-jni-lib'
         }
     }
