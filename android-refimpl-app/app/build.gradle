@@ -131,7 +131,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.0@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.1@aar'
     compile project(':library')
     //
     //
@@ -154,13 +154,13 @@ dependencies {
     //}
     // annotationProcessor 'com.github.gfx.android.orma:orma-processor:4.2.5'
     //
-    compile('com.github.gfx.android.orma:orma:5.0.0-rc3') {
+    compile('com.github.gfx.android.orma:orma:5.0.0-rc4') {
         exclude group: 'com.android.support'
     }
-    compile('com.github.gfx.android.orma:orma-encryption:5.0.0-rc3') {
+    compile('com.github.gfx.android.orma:orma-encryption:5.0.0-rc4') {
         exclude group: 'com.android.support'
     }
-    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc3'
+    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
     //
     compile('com.github.hotchemi:permissionsdispatcher:2.4.0') {
         exclude group: 'com.android.support'
