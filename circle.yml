@@ -17,6 +17,8 @@ machine:
 # --- Android build ---
 
     # ---------------------------------------------------
+    # c-toxcore v0.1.9 a429ef4a28a5e5e0ad010efffb76d2abc3ada0af
+    # c-toxcore v0.1.8 f6db9333e2d1262e7ba3846563c30f63c98ffa38
     # c-toxcore v0.1.7 48c86e942d487a8856cbd25797b320bfb1879ddc
     # c-toxcore v0.1.6 895de7ef26e7617769f2271345e414545c2581f8
     # c-toxcore v0.1.5 995578f1038842288c1ff552fd796ab2377db6e1
@@ -25,8 +27,8 @@ machine:
     # c-toxcore v0.1.2 a096c71db867ac83fc3e01e0fbe98573d20f9286
     # ---------------------------------------------------
 
-    # c-toxcore v0.1.7
-    AND_CTOXCORE_VERSION: "48c86e942d487a8856cbd25797b320bfb1879ddc"
+    # c-toxcore v0.1.9
+    AND_CTOXCORE_VERSION: "a429ef4a28a5e5e0ad010efffb76d2abc3ada0af"
 
     _SDK_: /usr/local/android-sdk-linux/
     _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
@@ -87,6 +89,7 @@ dependencies:
   - echo y | android update sdk --no-ui --all --filter build-tools-23.0.3
   - echo y | android update sdk --no-ui --all --filter build-tools-24.0.2
   - echo y | android update sdk --no-ui --all --filter build-tools-24.0.3
+  - echo y | android update sdk --no-ui --all --filter build-tools-25.0.0
   - echo y | android update sdk --no-ui --all --filter build-tools-25.0.2
   - echo y | android update sdk --no-ui --all --filter build-tools-25.0.3
   - echo y | android update sdk --no-ui --all --filter android-16 ; exit 0
@@ -147,7 +150,7 @@ compile:
   - . ~/pp;cd ~/build/;make install
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.0 https://github.com/webmproject/libvpx.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
   - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=armv7-android-gcc
@@ -159,7 +162,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.3 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -172,7 +175,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
     
     
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.11 https://github.com/jedisct1/libsodium.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -201,7 +204,7 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O0 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;export V=2;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -216,7 +219,7 @@ compile:
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O0 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
   - . ~/pp;cd jni-c-toxcore/; ls -al
   #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
@@ -224,27 +227,32 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
-  - cd jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
-  - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
+  - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
 # --- Android build ---
 
 
 # --------- GRADLE -------------
 # - cd android-refimpl-app/ ; if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then gradle wrapper --no-daemon --gradle-version "$GRADLE_CUSTOM_VNUM" --info ; else gradle wrapper --no-daemon --info ; fi ; exit 0
   - cd android-refimpl-app/ ; chmod a+rx ./gradlew
+  - ls -al /home/ubuntu/android-ndk
+  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:dependencies
+  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
+# --------- GRADLE -------------
+
+
+# --------- bintray aretefact -------------
   - cd android-refimpl-app/ ; ./gradlew :jnilib:dependencies
   - cd android-refimpl-app/ ; ./gradlew :jnilib:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :jnilib:build --stacktrace --no-daemon # first build may FAIL
   - cd android-refimpl-app/ ; ./gradlew :jnilib:install --info; exit 0
-  - cd android-refimpl-app/ ; ./gradlew :jnilib:bintrayUpload --info; exit 0
+  - if [ "$CIRCLE_BRANCH""x" == "maven_artefactx" ]; then cd android-refimpl-app/ ; ./gradlew :jnilib:bintrayUpload --info; exit 0 ; fi
   - find ~/.m2/repository -type f -exec ls -al {} \; ; exit 0
-# --------- GRADLE -------------
-
+# --------- bintray aretefact -------------
 # ----------- show generated aar file -----------
   - cd android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/ ; exit 0
   - cd android-refimpl-app/ ; find ./ -name '*.aar' ; exit 0
 
-  - unzip -t /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.0/trifa-jni-lib-1.0.0.aar ; exit 0
-  - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.0/trifa-jni-lib-1.0.0.pom ; exit 0
+  - unzip -t /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.1/trifa-jni-lib-1.0.1.aar ; exit 0
+  - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.1/trifa-jni-lib-1.0.1.pom ; exit 0
   - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/maven-metadata-local.xml ; exit 0
 
   - cd android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar ; exit 0
@@ -252,11 +260,113 @@ compile:
 # ----------- show generated aar file -----------
 
 
+
+# --- save lint output ---
+  - cd android-refimpl-app/ ; find . -name '*lint-report*' -exec ls -al {} \; ; exit 0
+  - cd android-refimpl-app/ ; cp -av ./app/lint-report.html $CIRCLE_ARTIFACTS/ ; exit 0
+  - cd android-refimpl-app/ ; cp -av ./app/lint-report.xml $CIRCLE_ARTIFACTS/ ; exit 0
+  - cd android-refimpl-app/ ; cp -av ./lint-report.txt $CIRCLE_ARTIFACTS/ ; exit 0
+# --- save lint output ---
+
+# ----------- show generated apk file -----------
+  - cd android-refimpl-app/ ; ls -al app/build/outputs/apk/ ; exit 0
+  - cd android-refimpl-app/ ; find ./ -name '*.apk' ; exit 0
+  - mkdir -p app/build/outputs/apk/
+  - cd android-refimpl-app/ ; cp -av ./app/build/outputs/apk/app-release-unsigned.apk ../app/build/outputs/apk/
+# ----------- show generated apk file -----------
+
+
+
+
+# ----------- make zipfile for builds [for download-dependencies.sh] -----------
+    #- . f;mkdir -p ~/and_stud_prj/app/libs/
+    #- . f;cp -av app/libs/tox*jar ~/and_stud_prj/app/libs/
+    #- . f;mkdir -p ~/and_stud_prj/app/src/main/jniLibs/
+    #- . f;cp -av app/src/main/jniLibs/* ~/and_stud_prj/app/src/main/jniLibs/
+    #- . f;cd ~/and_stud_prj/ ; zip -r $CIRCLE_ARTIFACTS/supplement.zip *
+# ----------- make zipfile for builds [for download-dependencies.sh] -----------
+
+  - zip -d app/build/outputs/apk/app-release-unsigned.apk META-INF/\*     # remove signature !!
+  - cp -av app/build/outputs/apk/app-release-unsigned.apk ~/app.apk ;
+    cd ~/ ;
+    echo xxxxxxrm -f ~/.android/debug.keystore ;
+    ls -al ~/.android/debug.keystore ;
+    if [ ! -f ~/.android/debug.keystore ]; then echo "*** generating new signer key ***" ;
+    echo "*** generating new signer key ***";
+    echo "*** generating new signer key ***";
+    keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US" ;
+    fi ;
+    ls -al ~/ ;
+    jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androiddebugkey ;
+    ls -al ~/ ;
+    $_SDK_/build-tools/23.0.3/zipalign -v 4 app-signed.apk app-signed-aligned.apk ;
+    ls -al ~/ ;
+    pwd ;
+    ls -al ;
+    cp -av app-signed-aligned.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk || exit 1
+
+##   also make apk files with different names for each build (for individual downloads)
+  - cp -av $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk
+##   qr code to scan with your phone to directly download the apk file (for convenience)
+  - qrencode -o $CIRCLE_ARTIFACTS/QR_apk.png 'https://circle-artifacts.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'/artifacts/'${CIRCLE_NODE_INDEX}'/tmp/'`basename $CIRCLE_ARTIFACTS`'/'"${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk" ; exit 0
+##   qr code to go directly to the aritfacts (to scan with phone)
+  - qrencode -o $CIRCLE_ARTIFACTS/QR_artifacts.png 'https://circleci.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'#artifacts' ; exit 0
+
+
+
   pre:
-    - echo dummy
+    - mksdcard -l e 180M sdcard.img
+    - echo 'mtools_skip_check=1' > ~/.mtoolsrc
+    - android list targets
+#
+    - if [ "$EMU_" == "appemu23" ]; then echo "no" | android create avd -n appemu23 -f -t android-23 --abi default/armeabi-v7a --skin "WXGA720" ; fi
+    - if [ "$EMU_" == "appemu23" ]; then cat ~/.android/avd/appemu23.avd/config.ini ; fi
+#
+    - if [ "$EMU_" == "appemu21" ]; then echo "no" | android create avd -n appemu21 -f -t android-21 --abi default/armeabi-v7a --skin "WXGA720" ; fi
+    - if [ "$EMU_" == "appemu21" ]; then cat ~/.android/avd/appemu21.avd/config.ini ; fi
+#
+    - if [ "$EMU_" == "appemu10" ]; then echo "no" | android create avd -n appemu10 -f -t android-10 --abi default/armeabi --skin "WQVGA432" ; fi
+    - if [ "$EMU_" == "appemu10" ]; then cat ~/.android/avd/appemu10.avd/config.ini ; fi
+#
+    - echo "$EMU_"
+    - echo "$sdpath"
+
 test:
   override:
-    - echo dummy
+    - ls -alR "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/
+
+    - emulator -avd "$EMU_" -sdcard sdcard.img -no-audio:
+        background: true
+        parallel: true
+    - circle-android wait-for-boot
+
+    - sleep 210 # let the emulator settle down first
+
+    - adb shell input keyevent 82 # remove lock screen on emulator
+    - sleep 10
+    - import -window root $CIRCLE_ARTIFACTS/capture_emulator_running.png
+
+    - adb shell "cat /proc/meminfo" ; exit 0
+
+    - adb shell ls -al / ; exit 0
+    - adb shell ls -al /storage/ ; exit 0
+    - adb shell ls -al /sdcard/ ; exit 0
+
+    - adb install ~/app-signed-aligned.apk
+
+    - adb logcat -v time > $CIRCLE_ARTIFACTS/adb_out.txt 2>&1 :
+        background: true
+    - sleep 60 # let the emulator settle down first
+
+    - adb shell am start -n $CLASS_P/$START_INTENT_P
+    - sleep 60
+    - sleep 120 # wait to be sure the app has started fully
+    - sleep 120 # wait a bit more
+
+    - died_count=`cat $CIRCLE_ARTIFACTS/adb_out.txt|grep 'Process. '"$CLASS_P"', PID.'|wc -l|tr -d ' '` ; if [ $died_count -gt 0 ]; then echo "app crashed"; exit 1; fi
+
+    - import -window root $CIRCLE_ARTIFACTS/capture_app_running.png # get proof that the app is running
+    - adb shell screencap -p | sed 's/\r$//' > $CIRCLE_ARTIFACTS/capture_app_running_2.png
 
 # ----- CI artifact cleanup -----
     - mkdir -p $CIRCLE_ARTIFACTS/other/
