@@ -28,7 +28,6 @@ import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.util.Log;
 
-import static com.zoffcc.applications.trifa.AudioRecording.soft_echo_canceller_ready;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play_length;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_read_write;
@@ -46,7 +45,6 @@ public class AudioReceiver extends Thread
     static final int CHANNEL_2 = AudioFormat.CHANNEL_OUT_STEREO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     static final int AUDIO_GAIN_VALUE = 900;
-    // static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
     static long sampling_rate_ = SMAPLINGRATE_TOX;
     static int channels_ = 1;
@@ -58,11 +56,19 @@ public class AudioReceiver extends Thread
     LoudnessEnhancer lec = null;
     EnvironmentalReverb erv = null;
 
-    short[] temp_buf = null;
+    private int playBufSize = 0;
+    private int buffer_mem_factor2 = 30;
 
     public AudioReceiver()
     {
-        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        try
+        {
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         stopped = false;
         finished = false;
         start();
@@ -85,8 +91,25 @@ public class AudioReceiver extends Thread
         Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
 
-        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size22 * buffer_multiplier, AudioTrack.MODE_STREAM);
-        // track = new AudioTrack(AudioManager.ROUTE_HEADSET, (int) sampling_rate_, CHANNEL, FORMAT, buffer_size22 * buffer_multiplier, AudioTrack.MODE_STREAM);
+        // ---------- 222 ----------
+        playBufSize = (int) (2 * (sampling_rate_ / buffer_mem_factor2));
+        Log.i(TAG, "want_buf_size_in_bytes(1)=" + playBufSize);
+        if (playBufSize < buffer_size22)
+        {
+            playBufSize = buffer_size22;
+        }
+
+        if (playBufSize < 6000)
+        {
+            playBufSize = playBufSize * 2;
+        }
+
+        Log.i(TAG, "want_buf_size_in_bytes(2)=" + playBufSize);
+        // ---------- 222 ----------
+
+
+        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize, AudioTrack.MODE_STREAM);
+        // track = new AudioTrack(AudioManager.ROUTE_HEADSET, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize, AudioTrack.MODE_STREAM);
 
         try
         {
@@ -96,12 +119,12 @@ public class AudioReceiver extends Thread
 
             if (Callstate.audio_speaker)
             {
-                audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 audio_manager_s.setSpeakerphoneOn(true);
             }
             else
             {
-                audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 audio_manager_s.setSpeakerphoneOn(false);
             }
         }
@@ -178,7 +201,14 @@ public class AudioReceiver extends Thread
             }
 
             track.setPlaybackRate((int) sampling_rate_);
-
+            try
+            {
+                track.setPlaybackHeadPosition(0);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
             track.play();
         }
         catch (Exception e)
@@ -199,36 +229,9 @@ public class AudioReceiver extends Thread
                 {
                     // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
 
-                    if (soft_echo_canceller_ready)
-                    {
-                        // TODO: this is slow!!!!!!! ---------------
-                        audio_buffer_play.rewind();
-                        byte[] b = new byte[audio_buffer_play.limit()];
-                        audio_buffer_play.get(b, 0, b.length);
-                        int size_ = b.length;
-                        temp_buf = new short[size_];
-                        for (int index = 0; index < size_; index++)
-                        {
-                            temp_buf[index] = (short) b[index];
-                        }
-                        // TODO: this is slow!!!!!!! ---------------
-
-                        // Log.i(TAG, "audio_play:temp_buf=" + temp_buf);
-                        try
-                        {
-                            // canceller.playback(temp_buf);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        // Log.i(TAG, "audio_play:canceller.playback:size=" + temp_buf.length);
-                    }
-
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
-                    // track.write(temp_buf, 0, temp_buf.length);
                     track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
                     // ------- HINT: this will block !! -------
                     // ------- HINT: this will block !! -------
@@ -272,8 +275,22 @@ public class AudioReceiver extends Thread
             }
         }
 
-
-        track.stop();
+        try
+        {
+            track.stop();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            track.flush();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         track.release();
 
         try

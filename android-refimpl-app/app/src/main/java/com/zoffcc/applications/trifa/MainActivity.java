@@ -182,7 +182,8 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 3;
+    final static int audio_in_buffer_max_count = 2;
+    final static int audio_out_buffer_mult = 3;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -1800,7 +1801,7 @@ public class MainActivity extends AppCompatActivity
             Callstate.call_first_audio_frame_received = System.currentTimeMillis();
 
             sampling_rate_ = sampling_rate;
-            Log.i(TAG, "audio_play:read:incoming sampling_rate[1]=" + sampling_rate + " kHz");
+            Log.i(TAG, "audio_play:read:incoming sampling_rate[1]=" + sampling_rate + " Hz");
             channels_ = channels;
 
             Log.i(TAG, "audio_play:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" + sampling_rate);
@@ -1809,11 +1810,8 @@ public class MainActivity extends AppCompatActivity
             temp_string_a = "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a, 4);
 
-            // AudioReceiver.buffer_size = AudioTrack.getMinBufferSize((int) sampling_rate, channels, AudioFormat.ENCODING_PCM_16BIT);
-            // Log.i(TAG, "audio_play:read:init min buffer size(calc)=" + AudioReceiver.buffer_size);
-
             // HINT: PCM_16 needs 2 bytes per sample per channel
-            AudioReceiver.buffer_size = (int) ((sample_count * channels) * 2); // TODO: this is really bad
+            AudioReceiver.buffer_size = ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult; // TODO: this is really bad
             AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f * 0.9f); // TODO: this is bad also
             Log.i(TAG, "audio_play:read:init buffer_size=" + AudioReceiver.buffer_size);
             Log.i(TAG, "audio_play:read:init sleep_millis=" + AudioReceiver.sleep_millis);
