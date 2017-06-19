@@ -44,10 +44,11 @@ public class AudioReceiver extends Thread
     static final int CHANNEL_1 = AudioFormat.CHANNEL_OUT_MONO;
     static final int CHANNEL_2 = AudioFormat.CHANNEL_OUT_STEREO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-    static final int AUDIO_GAIN_VALUE = 900;
+    static final int AUDIO_GAIN_VALUE = 800;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
     static long sampling_rate_ = SMAPLINGRATE_TOX;
     static int channels_ = 1;
+    static final boolean ACTVIATE_LEC = true;
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
     final static int buffer_multiplier = 4;
@@ -152,19 +153,21 @@ public class AudioReceiver extends Thread
                 lec = null;
                 try
                 {
-                    lec = new LoudnessEnhancer(track.getAudioSessionId());
+                    if (ACTVIATE_LEC)
+                    {
+                        lec = new LoudnessEnhancer(track.getAudioSessionId());
 
-                    int res = lec.setEnabled(true);
-                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res + " SUCCESS=" + AudioEffect.SUCCESS);
+                        int res = lec.setEnabled(true);
+                        Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res + " SUCCESS=" + AudioEffect.SUCCESS);
 
-                    float target_gain = lec.getTargetGain();
-                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
+                        float target_gain = lec.getTargetGain();
+                        Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
 
-                    lec.setTargetGain(AUDIO_GAIN_VALUE);
+                        lec.setTargetGain(AUDIO_GAIN_VALUE);
 
-                    target_gain = lec.getTargetGain();
-                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
-
+                        target_gain = lec.getTargetGain();
+                        Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
+                    }
                 }
                 catch (Exception e)
                 {
