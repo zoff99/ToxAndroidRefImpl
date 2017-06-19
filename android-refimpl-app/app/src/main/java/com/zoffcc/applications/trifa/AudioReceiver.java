@@ -45,14 +45,14 @@ public class AudioReceiver extends Thread
     static final int CHANNEL_1 = AudioFormat.CHANNEL_OUT_MONO;
     static final int CHANNEL_2 = AudioFormat.CHANNEL_OUT_STEREO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-    static final int AUDIO_GAIN_VALUE = 1000;
+    static final int AUDIO_GAIN_VALUE = 900;
     // static final int CHANNELS_TOX = 1;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
     static long sampling_rate_ = SMAPLINGRATE_TOX;
     static int channels_ = 1;
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
-    final static int buffer_multiplier = 3;
+    final static int buffer_multiplier = 4;
     static int buffer_size = 1920 * buffer_multiplier; // TODO: hardcoded is bad!!!!
     AudioTrack track = null;
     LoudnessEnhancer lec = null;
