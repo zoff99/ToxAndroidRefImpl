@@ -211,7 +211,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                                 with(ft_preview_image.getContext()).
                                                 load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
                                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                                signature(StringSignature2(SD_CARD_TMP_DIR + "/" + temp_file_name)).
+                                                signature(StringSignature2(message2.filename_fullpath)).
                                                 skipMemoryCache(false).
                                                 placeholder(R.drawable.round_loading_animation).
                                                 listener(new com.bumptech.glide.request.RequestListener<Drawable>()

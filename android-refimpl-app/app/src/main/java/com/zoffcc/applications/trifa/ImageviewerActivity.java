@@ -114,7 +114,7 @@ public class ImageviewerActivity extends AppCompatActivity
                                         with(ImageviewerActivity.this).
                                         load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
                                         diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                        signature(StringSignature2(SD_CARD_TMP_DIR + "/" + temp_file_name)).
+                                        signature(StringSignature2(image_filename_)).
                                         placeholder(R.drawable.round_loading_animation).
                                         listener(new com.bumptech.glide.request.RequestListener<Drawable>()
                                         {
