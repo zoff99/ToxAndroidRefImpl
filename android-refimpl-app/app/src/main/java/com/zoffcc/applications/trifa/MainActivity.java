@@ -66,7 +66,6 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.signature.ObjectKey;
 import com.github.gfx.android.orma.AccessThreadConstraint;
 import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -4482,7 +4481,7 @@ public class MainActivity extends AppCompatActivity
 
     public static com.bumptech.glide.load.Key StringSignature2(final String in)
     {
-        com.bumptech.glide.load.Key ret = new ObjectKey(in);
+        com.bumptech.glide.load.Key ret = new StringObjectKey(in);
         return ret;
     }
 

@@ -29,6 +29,7 @@ import android.util.Log;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.github.chrisbanes.photoview.PhotoView;
 
@@ -86,13 +87,6 @@ public class ImageviewerActivity extends AppCompatActivity
                 @Override
                 public void run()
                 {
-                    try
-                    {
-                        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-                    }
-                    catch (Exception e)
-                    {
-                    }
 
                     info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(image_filename_);
                     final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_1");
@@ -110,11 +104,15 @@ public class ImageviewerActivity extends AppCompatActivity
                                 //                                        color(ImageviewerActivity.this.getResources().getColor(R.color.colorPrimaryDark)).
                                 //                                        sizeDp(200);
 
+                                RequestOptions req_options = new RequestOptions().onlyRetrieveFromCache(true);
+
                                 GlideApp.
                                         with(ImageviewerActivity.this).
                                         load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
                                         diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                        skipMemoryCache(false).
                                         signature(StringSignature2(image_filename_)).
+                                        apply(req_options).
                                         placeholder(R.drawable.round_loading_animation).
                                         listener(new com.bumptech.glide.request.RequestListener<Drawable>()
                                         {
