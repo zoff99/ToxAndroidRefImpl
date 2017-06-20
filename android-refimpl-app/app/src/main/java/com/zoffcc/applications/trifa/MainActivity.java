@@ -168,6 +168,8 @@ public class MainActivity extends AppCompatActivity
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
     static String SD_CARD_TMP_DIR = "";
+    static String SD_CARD_STATIC_DIR = "";
+    static String SD_CARD_TMP_DUMMYFILE = null;
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
@@ -239,6 +241,26 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
+        // ------ clear Glide image cache ------
+        //        final Thread t_glide_clean_cache = new Thread()
+        //        {
+        //            @Override
+        //            public void run()
+        //            {
+        //                try
+        //                {
+        //                    Glide.get(MainActivity.this).clearMemory();
+        //                    Glide.get(MainActivity.this).clearDiskCache();
+        //                }
+        //                catch (Exception e)
+        //                {
+        //                    e.printStackTrace();
+        //                }
+        //            }
+        //        };
+        //        t_glide_clean_cache.start();
+        // ------ clear Glide image cache ------
+
         getVersionInfo();
 
         //        if (canceller == null)
@@ -255,6 +277,8 @@ public class MainActivity extends AppCompatActivity
         metrics = resources.getDisplayMetrics();
 
         SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
+        SD_CARD_STATIC_DIR = getExternalFilesDir(null).getAbsolutePath() + "/_staticdir/";
+        SD_CARD_TMP_DUMMYFILE = make_some_static_dummy_file(this.getBaseContext());
 
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -3655,6 +3679,93 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "copy_real_file_to_vfs_file:EE:" + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    static String make_some_static_dummy_file(Context context)
+    {
+        String ret = null;
+
+        try
+        {
+            java.io.File dst_dir = new java.io.File(SD_CARD_STATIC_DIR + "/");
+            dst_dir.mkdirs();
+
+            java.io.File fout = new java.io.File(SD_CARD_STATIC_DIR + "/" + "__dummy__dummy_.jpg");
+            java.io.FileOutputStream os = new java.io.FileOutputStream(fout);
+            //            int len = 2 + 2 + 2 + 5 + 2 + 1 + 2 + 2;
+            //            byte[] buffer = new byte[len];
+            //
+            //            int a = 0;
+            //            buffer[a] = (byte) 0xff;
+            //            a++;
+            //            buffer[a] = (byte) 0xd8;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0xff;
+            //            a++;
+            //            buffer[a] = (byte) 0xe0;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //            buffer[a] = (byte) 0x10;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x4a;
+            //            a++;
+            //            buffer[a] = (byte) 0x46;
+            //            a++;
+            //            buffer[a] = (byte) 0x49;
+            //            a++;
+            //            a++;
+            //            buffer[a] = (byte) 0x46;
+            //            a++;
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x01;
+            //            a++;
+            //            buffer[a] = (byte) 0x02;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //            buffer[a] = (byte) 0x0a;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //            buffer[a] = (byte) 0x0a;
+            //            a++;
+            //
+            //            os.write(buffer, 0, len);
+            //            os.close();
+
+            java.io.InputStream ins = context.getResources().
+                    openRawResource(context.getResources().
+                            getIdentifier("ic_plus_sign", "drawable", context.getPackageName()));
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = ins.read(buffer)) > 0)
+            {
+                os.write(buffer, 0, length);
+            }
+
+            ins.close();
+            os.close();
+
+            ret = fout.getAbsolutePath();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return ret;
     }
 
     static String copy_vfs_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String appl)

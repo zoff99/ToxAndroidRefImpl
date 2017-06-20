@@ -90,7 +90,7 @@ public class ImageviewerActivity extends AppCompatActivity
 
                     info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(image_filename_);
                     final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_1");
-                    Log.i(TAG, "loadData:temp_file_name=" + temp_file_name);
+                    // Log.i(TAG, "loadData:temp_file_name=" + temp_file_name);
 
                     final Runnable myRunnable = new Runnable()
                     {
@@ -99,12 +99,7 @@ public class ImageviewerActivity extends AppCompatActivity
                         {
                             try
                             {
-                                //                                final Drawable d1 = new IconicsDrawable(ImageviewerActivity.this).
-                                //                                        icon(GoogleMaterial.Icon.gmd_insert_photo).
-                                //                                        color(ImageviewerActivity.this.getResources().getColor(R.color.colorPrimaryDark)).
-                                //                                        sizeDp(200);
-
-                                RequestOptions req_options = new RequestOptions().onlyRetrieveFromCache(true);
+                                RequestOptions req_options = new RequestOptions(); //.onlyRetrieveFromCache(true);
 
                                 GlideApp.
                                         with(ImageviewerActivity.this).
@@ -123,8 +118,8 @@ public class ImageviewerActivity extends AppCompatActivity
 
                                                 try
                                                 {
-                                                    java.io.File f = (java.io.File) model;
-                                                    f.delete();
+                                                    //java.io.File f = (java.io.File) model;
+                                                    //f.delete();
                                                     Log.i(TAG, "glide:cleanup:001");
                                                 }
                                                 catch (Exception e2)
@@ -143,8 +138,8 @@ public class ImageviewerActivity extends AppCompatActivity
 
                                                 try
                                                 {
-                                                    java.io.File f = (java.io.File) model;
-                                                    f.delete();
+                                                    //java.io.File f = (java.io.File) model;
+                                                    //f.delete();
                                                     Log.i(TAG, "glide:cleanup:002");
                                                 }
                                                 catch (Exception e2)
@@ -152,6 +147,13 @@ public class ImageviewerActivity extends AppCompatActivity
                                                     e2.printStackTrace();
                                                     Log.i(TAG, "glide:onLoadFailed:EE:" + e2.getMessage());
                                                 }
+
+                                                // --- image not loaded from cache ---
+                                                // info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(image_filename_);
+                                                // final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_1");
+                                                // Log.i(TAG, "loadData:temp_file_name=" + temp_file_name);
+
+                                                // --- image not loaded from cache ---
 
                                                 return false;
                                             }
@@ -165,9 +167,9 @@ public class ImageviewerActivity extends AppCompatActivity
 
                                 try
                                 {
-                                    java.io.File f = new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
-                                    f.delete();
-                                    Log.i(TAG, "glide:cleanup:003");
+                                    //java.io.File f = new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
+                                    //f.delete();
+                                    Log.i(TAG, "glide:cleanup:003:EE0:" + e.getMessage());
                                 }
                                 catch (Exception e2)
                                 {
