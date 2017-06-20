@@ -28,9 +28,6 @@ import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.util.Log;
 
-import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play;
-import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_play_length;
-import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_read_write;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 
 public class AudioReceiver extends Thread
@@ -49,6 +46,7 @@ public class AudioReceiver extends Thread
     static long sampling_rate_ = SMAPLINGRATE_TOX;
     static int channels_ = 1;
     static final boolean ACTVIATE_LEC = true;
+    static final boolean ACTVIATE_ERVB = false;
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
     final static int buffer_multiplier = 4;
@@ -91,6 +89,19 @@ public class AudioReceiver extends Thread
         int buffer_size22 = AudioTrack.getMinBufferSize((int) sampling_rate_, CHANNEL, FORMAT);
         Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
+
+        String sampleRateStr = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
+        {
+            sampleRateStr = audio_manager_s.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+            int sampleRate = Integer.parseInt(sampleRateStr);
+            Log.i(TAG, "audio_play:PROPERTY_OUTPUT_SAMPLE_RATE=" + sampleRate);
+
+            String framesPerBuffer = audio_manager_s.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+            int framesPerBufferInt = Integer.parseInt(framesPerBuffer);
+            Log.i(TAG, "audio_play:PROPERTY_OUTPUT_FRAMES_PER_BUFFER=" + framesPerBufferInt);
+        }
+
 
         // ---------- 222 ----------
         playBufSize = (int) (2 * (sampling_rate_ / buffer_mem_factor2));
@@ -181,17 +192,20 @@ public class AudioReceiver extends Thread
                 erv = null;
                 try
                 {
-                    erv = new EnvironmentalReverb(0, track.getAudioSessionId());
-                    int res = erv.setEnabled(true);
-                    erv.setReflectionsLevel((short) -8500);
-                    erv.setRoomLevel((short) -8500);
-                    //                    erv.setDecayHFRatio((short) 1000);
-                    //                    erv.setDecayTime(10000);
-                    //                    erv.setDensity((short) 1000);
-                    //                    erv.setDiffusion((short) 1000);
-                    //                    erv.setReverbLevel((short) 1000);
-                    //                    erv.setReverbDelay(100);
-                    Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:setEnabled:" + res + " SUCCESS=" + AudioEffect.SUCCESS);
+                    if (ACTVIATE_ERVB)
+                    {
+                        erv = new EnvironmentalReverb(0, track.getAudioSessionId());
+                        int res = erv.setEnabled(true);
+                        // erv.setReflectionsLevel((short) -8500);
+                        // erv.setRoomLevel((short) -8500);
+                        // **//                    erv.setDecayHFRatio((short) 1000);
+                        // **//                    erv.setDecayTime(10000);
+                        // **//                    erv.setDensity((short) 1000);
+                        // **//                    erv.setDiffusion((short) 1000);
+                        // **//                    erv.setReverbLevel((short) 1000);
+                        // **//                    erv.setReverbDelay(100);
+                        Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:setEnabled:" + res + " SUCCESS=" + AudioEffect.SUCCESS);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -203,7 +217,13 @@ public class AudioReceiver extends Thread
 
             }
 
-            track.setPlaybackRate((int) sampling_rate_);
+            int res = track.setPlaybackRate((int) sampling_rate_);
+
+            if (res != AudioTrack.SUCCESS)
+            {
+                Log.i(TAG, "Audio Thread [IN]:setPlaybackRate(" + sampling_rate_ + ")=" + res);
+            }
+
             try
             {
                 track.setPlaybackHeadPosition(0);
@@ -226,37 +246,39 @@ public class AudioReceiver extends Thread
         {
             try
             {
-                // puts data into "audio_buffer_play"
-                // if ((audio_buffer_read_write(0, 0, 0, false)) && (audio_buffer_play_length > 0))
-                if (audio_buffer_read_write(0, 0, 0, false))
-                {
-                    // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
+                //                // puts data into "audio_buffer_play"
+                //                // if ((audio_buffer_read_write(0, 0, 0, false)) && (audio_buffer_play_length > 0))
+                //                if (audio_buffer_read_write(0, 0, 0, false))
+                //                {
+                //                    // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
+                //
+                //                    // ------- HINT: this will block !! -------
+                //                    // ------- HINT: this will block !! -------
+                //                    // ------- HINT: this will block !! -------
+                //                    track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
+                //                    // ------- HINT: this will block !! -------
+                //                    // ------- HINT: this will block !! -------
+                //                    // ------- HINT: this will block !! -------
+                //
+                //                    // Thread.sleep(sleep_millis);
+                //
+                //                    // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
+                //                    // Log.i(TAG, "audio_play:recthr:play:bytes=" + played_bytes + " len=" + audio_buffer_play_length);
+                //                }
+                //                else
+                //                {
+                //                    try
+                //                    {
+                //                        // Log.i(TAG, "audio_play:recthr:no data");
+                //                        Thread.sleep(sleep_millis);
+                //                    }
+                //                    catch (InterruptedException esleep)
+                //                    {
+                //                        Log.i(TAG, "audio_play:recthr:wake up:" + esleep.getMessage());
+                //                    }
+                //                }
 
-                    // ------- HINT: this will block !! -------
-                    // ------- HINT: this will block !! -------
-                    // ------- HINT: this will block !! -------
-                    track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
-                    // ------- HINT: this will block !! -------
-                    // ------- HINT: this will block !! -------
-                    // ------- HINT: this will block !! -------
-
-                    // Thread.sleep(sleep_millis);
-
-                    // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
-                    // Log.i(TAG, "audio_play:recthr:play:bytes=" + played_bytes + " len=" + audio_buffer_play_length);
-                }
-                else
-                {
-                    try
-                    {
-                        // Log.i(TAG, "audio_play:recthr:no data");
-                        Thread.sleep(sleep_millis);
-                    }
-                    catch (InterruptedException esleep)
-                    {
-                        Log.i(TAG, "audio_play:recthr:wake up:" + esleep.getMessage());
-                    }
-                }
+                Thread.sleep(sleep_millis);
             }
             catch (Exception e)
             {

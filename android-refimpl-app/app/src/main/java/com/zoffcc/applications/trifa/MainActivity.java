@@ -99,6 +99,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
+import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
@@ -1885,7 +1886,14 @@ public class MainActivity extends AppCompatActivity
         // TODO: dirty hack, "make good"
         try
         {
-            audio_buffer_read_write(sample_count, channels, sampling_rate, true);
+            // audio_buffer_read_write(sample_count, channels, sampling_rate, true);
+            if (audio_receiver_thread != null)
+            {
+                if (!audio_receiver_thread.stopped)
+                {
+                    audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2));
+                }
+            }
         }
         catch (Exception e)
         {
