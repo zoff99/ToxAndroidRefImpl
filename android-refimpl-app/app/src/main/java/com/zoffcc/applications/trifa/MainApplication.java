@@ -107,6 +107,48 @@ public class MainApplication extends Application
         super.attachBaseContext(base);
     }
 
+    public static String run_adb_command()
+    {
+        try
+        {
+            final Process process = Runtime.getRuntime().exec("ps -w -e -T -o PID,TID,CMDLINE,CMD,PRI,NI,STAT,PCY,CPU"); // |grep -i trifa
+
+            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            final StringBuilder log = new StringBuilder();
+            final String separator = System.getProperty("line.separator");
+
+            String line = "";
+            log.append("=======================================");
+            log.append(separator);
+            log.append("=======================================");
+            log.append(separator);
+            log.append("=======================================");
+            log.append(separator);
+            log.append("PID,TID,CMDLINE,CMD,PRI,NI,STAT,PCY,CPU");
+            log.append(separator);
+            log.append("=======================================");
+            log.append(separator);
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                log.append(line);
+                log.append(separator);
+            }
+            log.append("=======================================");
+            log.append(separator);
+            log.append("=======================================");
+            log.append(separator);
+            log.append("=======================================");
+            log.append(separator);
+
+            return line;
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "MainApplication:" + "EE3:" + e.getMessage());
+            return null;
+        }
+    }
+
     private String grabLogcat()
     {
         try
@@ -119,7 +161,7 @@ public class MainApplication extends Application
             final StringBuilder log = new StringBuilder();
             final String separator = System.getProperty("line.separator");
 
-            String line;
+            String line = "";
             while ((line = bufferedReader.readLine()) != null)
             {
                 log.append(line);

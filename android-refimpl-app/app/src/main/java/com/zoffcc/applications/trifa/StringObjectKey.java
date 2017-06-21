@@ -31,8 +31,8 @@ public final class StringObjectKey implements Key
         if (o instanceof StringObjectKey)
         {
             StringObjectKey other = (StringObjectKey) o;
-            Log.i(TAG, "equals:me=" + object.toString() + " o=" + o.toString());
-            Log.i(TAG, "equals:res=" + object.toString().equals(o.toString()));
+            // Log.i(TAG, "equals:me=" + object.toString() + " o=" + o.toString());
+            // Log.i(TAG, "equals:res=" + object.toString().equals(o.toString()));
             return object.toString().equals(o.toString());
         }
         return false;
@@ -47,7 +47,7 @@ public final class StringObjectKey implements Key
     @Override
     public void updateDiskCacheKey(MessageDigest messageDigest)
     {
-        Log.i(TAG, "updateDiskCacheKey:digest=" + object.toString().getBytes(CHARSET));
+        // Log.i(TAG, "updateDiskCacheKey:digest=" + object.toString().getBytes(CHARSET));
         messageDigest.update(object.toString().getBytes(CHARSET));
     }
 }

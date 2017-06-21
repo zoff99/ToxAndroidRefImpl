@@ -35,7 +35,6 @@ import android.widget.RemoteViews;
 import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
-import speex.EchoCanceller;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
@@ -357,6 +356,7 @@ public class TrifaToxService extends Service
             @Override
             public void run()
             {
+
                 // ------ correct startup order ------
                 boolean old_is_tox_started = is_tox_started;
                 Log.i(TAG, "is_tox_started:==============================");

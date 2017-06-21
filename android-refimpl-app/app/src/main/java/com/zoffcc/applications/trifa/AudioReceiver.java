@@ -113,12 +113,25 @@ public class AudioReceiver extends Thread
 
         if (playBufSize < 6000)
         {
-            playBufSize = playBufSize * 2;
+            playBufSize = 8192;
         }
+
+        /*
+         *
+         * HINT: if <playBufSize> is larger then audio delay will get longer!!
+         *
+         *
+         */
+
+        //        if (playBufSize < 16000)
+        //        {
+        //            playBufSize = 16384;
+        //        }
 
         Log.i(TAG, "want_buf_size_in_bytes(2)=" + playBufSize);
         // ---------- 222 ----------
 
+        // Log.i(TAG, "t_prio:" + run_adb_command());
 
         track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize, AudioTrack.MODE_STREAM);
         // track = new AudioTrack(AudioManager.ROUTE_HEADSET, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize, AudioTrack.MODE_STREAM);

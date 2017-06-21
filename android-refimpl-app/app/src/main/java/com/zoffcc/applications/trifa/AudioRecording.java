@@ -61,6 +61,7 @@ public class AudioRecording extends Thread
     private byte[] _tempBufRec = null;
     // private int _bufferedRecSamples = 0;
     private int buffer_mem_factor = 30;
+    private int buf_multiplier = 2;
     // -----------------------
 
     /**
@@ -128,9 +129,15 @@ public class AudioRecording extends Thread
             {
                 want_buf_size_in_bytes = buffer_size;
             }
+
+            //            if (want_buf_size_in_bytes < 6000)
+            //            {
+            //                want_buf_size_in_bytes = 6550;
+            //            }
+
             _recBuffer = ByteBuffer.allocateDirect(want_buf_size_in_bytes); // Max 10 ms @ 48 kHz
             _tempBufRec = new byte[want_buf_size_in_bytes];
-            int recBufSize = buffer_size * 2;
+            int recBufSize = buffer_size * buf_multiplier;
             // _bufferedRecSamples = RECORDING_RATE / 200;
             // ---------- 222 ----------
             Log.i(TAG, "want_buf_size_in_bytes(2)=" + want_buf_size_in_bytes);
@@ -203,7 +210,7 @@ public class AudioRecording extends Thread
          * Reads the data from the recorder and writes it to the audio track for playback.
          */
 
-        int res = 0;
+        int audio_send_res = 0;
         int readBytes = 0;
         while (!stopped)
         {
@@ -226,10 +233,10 @@ public class AudioRecording extends Thread
                             Log.i(TAG, "audio buffer:" + "ERROR:readBytes != _tempBufRec.length");
                         }
 
-                        res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (readBytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                        if (res != 0)
+                        audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (readBytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                        if (audio_send_res != 0)
                         {
-                            Log.i(TAG, "audio:res=" + res);
+                            Log.i(TAG, "audio:res=" + audio_send_res + ":" + ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
                         }
                     }
                 }

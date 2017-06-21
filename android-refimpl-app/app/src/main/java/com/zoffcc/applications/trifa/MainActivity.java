@@ -135,8 +135,8 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = true;
-    final static boolean ORMA_TRACE = true; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = false;
+    final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true;
     final static boolean VFS_ENCRYPT = true;
     // --------- global config ---------
@@ -241,6 +241,16 @@ public class MainActivity extends AppCompatActivity
         main_activity_s = this;
 
         setContentView(R.layout.activity_main);
+
+        //        try
+        //        {
+        //            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //            Log.i(TAG, "onCreate:setThreadPriority:EE:" + e.getMessage());
+        //        }
 
         // ------ clear Glide image cache ------
         //        final Thread t_glide_clean_cache = new Thread()

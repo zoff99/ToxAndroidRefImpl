@@ -337,45 +337,90 @@ public class ToxVars
         /**
          * The function returned successfully.
          */
-        TOXAV_ERR_SEND_FRAME_OK,
+        TOXAV_ERR_SEND_FRAME_OK(0),
 
         /**
          * In case of video, one of Y, U, or V was NULL. In case of audio, the samples
          * data pointer was NULL.
          */
-        TOXAV_ERR_SEND_FRAME_NULL,
+        TOXAV_ERR_SEND_FRAME_NULL(1),
 
         /**
          * The friend_number passed did not designate a valid friend.
          */
-        TOXAV_ERR_SEND_FRAME_FRIEND_NOT_FOUND,
+        TOXAV_ERR_SEND_FRAME_FRIEND_NOT_FOUND(2),
 
         /**
          * This client is currently not in a call with the friend.
          */
-        TOXAV_ERR_SEND_FRAME_FRIEND_NOT_IN_CALL,
+        TOXAV_ERR_SEND_FRAME_FRIEND_NOT_IN_CALL(3),
 
         /**
          * Synchronization error occurred.
          */
-        TOXAV_ERR_SEND_FRAME_SYNC,
+        TOXAV_ERR_SEND_FRAME_SYNC(4),
 
         /**
          * One of the frame parameters was invalid. E.g. the resolution may be too
          * small or too large, or the audio sampling rate may be unsupported.
          */
-        TOXAV_ERR_SEND_FRAME_INVALID,
+        TOXAV_ERR_SEND_FRAME_INVALID(5),
 
         /**
          * Either friend turned off audio or video receiving or we turned off sending
          * for the said payload.
          */
-        TOXAV_ERR_SEND_FRAME_PAYLOAD_TYPE_DISABLED,
+        TOXAV_ERR_SEND_FRAME_PAYLOAD_TYPE_DISABLED(6),
 
         /**
          * Failed to push frame through rtp interface.
          */
-        TOXAV_ERR_SEND_FRAME_RTP_FAILED,
+        TOXAV_ERR_SEND_FRAME_RTP_FAILED(7);
+
+        public int value;
+
+        private TOXAV_ERR_SEND_FRAME(int value)
+        {
+            this.value = value;
+        }
+
+        public static String value_str(int value)
+        {
+            if (value == TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_OK.value)
+            {
+                return "TOXAV_ERR_SEND_FRAME_OK";
+            }
+            else if (value == TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_NULL.value)
+            {
+                return "TOXAV_ERR_SEND_FRAME_NULL";
+            }
+            else if (value == TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_FRIEND_NOT_FOUND.value)
+            {
+                return "TOXAV_ERR_SEND_FRAME_FRIEND_NOT_FOUND";
+            }
+            else if (value == TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_FRIEND_NOT_IN_CALL.value)
+            {
+                return "TOXAV_ERR_SEND_FRAME_FRIEND_NOT_IN_CALL";
+            }
+
+            else if (value == TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_SYNC.value)
+            {
+                return "TOXAV_ERR_SEND_FRAME_SYNC";
+            }
+            else if (value == TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_INVALID.value)
+            {
+                return "TOXAV_ERR_SEND_FRAME_INVALID";
+            }
+            else if (value == TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_PAYLOAD_TYPE_DISABLED.value)
+            {
+                return "TOXAV_ERR_SEND_FRAME_PAYLOAD_TYPE_DISABLED";
+            }
+            else if (value == TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_RTP_FAILED.value)
+            {
+                return "TOXAV_ERR_SEND_FRAME_RTP_FAILED";
+            }
+            return "UNKNOWN";
+        }
 
     }
 
