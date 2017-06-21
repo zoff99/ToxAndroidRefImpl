@@ -76,21 +76,21 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
     @Override
     public int getItemCount()
     {
-        Log.i(TAG, "getItemCount:" + this.friendlistitems.size());
+        // Log.i(TAG, "getItemCount:" + this.friendlistitems.size());
         return this.friendlistitems.size();
     }
 
     public void add_list_clear(List<FriendList> new_items)
     {
-        Log.i(TAG, "add_list_clear:" + new_items);
+        // Log.i(TAG, "add_list_clear:" + new_items);
 
         try
         {
-            Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
+            // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.friendlistitems.clear();
             this.friendlistitems.addAll(new_items);
             this.notifyDataSetChanged();
-            Log.i(TAG, "add_list_clear:002");
+            // Log.i(TAG, "add_list_clear:002");
         }
         catch (Exception e)
         {
@@ -101,13 +101,13 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
 
     public void add_item(FriendList new_item)
     {
-        Log.i(TAG, "add_item:" + new_item + ":" + this.friendlistitems.size());
+        // Log.i(TAG, "add_item:" + new_item + ":" + this.friendlistitems.size());
 
         try
         {
             this.friendlistitems.add(new_item);
             this.notifyDataSetChanged();
-            Log.i(TAG, "add_item:002:" + this.friendlistitems.size());
+            // Log.i(TAG, "add_item:002:" + this.friendlistitems.size());
         }
         catch (Exception e)
         {
@@ -124,7 +124,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
 
     public boolean update_item(FriendList new_item)
     {
-        Log.i(TAG, "update_item:" + new_item);
+        // Log.i(TAG, "update_item:" + new_item);
 
         boolean found_item = false;
 
@@ -135,13 +135,13 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
             {
                 FriendList f = (FriendList) it.next();
 
-                Log.i(TAG, "update_item:001:" + f);
-                Log.i(TAG, "update_item:002:" + f.tox_public_key_string + ":" + new_item.tox_public_key_string);
+                // Log.i(TAG, "update_item:001:" + f);
+                // Log.i(TAG, "update_item:002:" + f.tox_public_key_string + ":" + new_item.tox_public_key_string);
                 if (f.tox_public_key_string.compareTo(new_item.tox_public_key_string) == 0)
                 {
                     found_item = true;
                     int pos = this.friendlistitems.indexOf(f);
-                    Log.i(TAG, "update_item:003:" + pos);
+                    // Log.i(TAG, "update_item:003:" + pos);
                     this.friendlistitems.set(pos, new_item);
                     this.notifyDataSetChanged();
                     break;
