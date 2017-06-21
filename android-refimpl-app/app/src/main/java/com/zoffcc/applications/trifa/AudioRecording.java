@@ -61,7 +61,7 @@ public class AudioRecording extends Thread
     private byte[] _tempBufRec = null;
     // private int _bufferedRecSamples = 0;
     private int buffer_mem_factor = 30;
-    private int buf_multiplier = 2;
+    private int buf_multiplier = 5;
     // -----------------------
 
     /**
