@@ -61,7 +61,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         switch (viewType)
         {
             case Message_model.TEXT_INCOMING_NOT_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
                 return new MessageListHolder_text_incoming_not_read(view, this.context);
             case Message_model.TEXT_INCOMING_HAVE_READ:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);

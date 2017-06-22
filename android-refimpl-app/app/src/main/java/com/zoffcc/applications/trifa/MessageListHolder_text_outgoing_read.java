@@ -20,10 +20,23 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
+
+import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -34,6 +47,9 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
 
     com.vanniktech.emoji.EmojiTextView textView;
     ImageView imageView;
+    de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    ImageView img_corner;
+    LinearLayout text_block_group;
 
     public MessageListHolder_text_outgoing_read(View itemView, Context c)
     {
@@ -45,6 +61,9 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
 
         textView = (com.vanniktech.emoji.EmojiTextView) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
+        img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
+        img_corner = (ImageView) itemView.findViewById(R.id.img_corner);
+        text_block_group = (LinearLayout) itemView.findViewById(R.id.text_block_group);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -65,6 +84,54 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         {
             // msg read by other party
             imageView.setImageResource(R.drawable.circle_green);
+        }
+
+
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        img_avatar.setImageDrawable(d_lock);
+
+        try
+        {
+            if (VFS_ENCRYPT)
+            {
+                String fname = get_vfs_image_filename_own_avatar();
+
+                info.guardianproject.iocipher.File f1 = null;
+                try
+                {
+                    f1 = new info.guardianproject.iocipher.File(fname);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                if ((f1 != null) && (fname != null))
+                {
+                    info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+
+                    if (f1.length() > 0)
+                    {
+                        byte[] byteArray = new byte[(int) f1.length()];
+                        fis.read(byteArray, 0, (int) f1.length());
+                        fis.close();
+
+                        final RequestOptions glide_options = new RequestOptions().fitCenter();
+                        GlideApp.
+                                with(context).
+                                load(byteArray).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(StringSignature2(fname)).
+                                skipMemoryCache(false).
+                                apply(glide_options).
+                                into(img_avatar);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 

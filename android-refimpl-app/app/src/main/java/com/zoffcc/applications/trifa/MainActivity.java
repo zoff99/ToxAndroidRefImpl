@@ -2328,6 +2328,7 @@ public class MainActivity extends AppCompatActivity
         m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
+        m.read = false;
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = friend_message;

@@ -1,34 +1,72 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:padding="6dip">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="6dip">
+
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:background="@drawable/rounded_blue_bg"
-        android:minHeight="45dp">
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
-        <com.vanniktech.emoji.EmojiTextView
-            android:id="@+id/m_text"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/text_block_group"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingLeft="10dp"
-            android:text="..."
-            android:textSize="20sp"/>
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="0dp"
+            android:layout_weight="6"
+            android:background="@drawable/rounded_blue_bg"
+            android:minHeight="45dp"
+            android:orientation="horizontal">
+
+            <com.vanniktech.emoji.EmojiTextView
+                android:id="@+id/m_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="10dp"
+                android:text="..."
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:id="@+id/m_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="6dip"
+                android:padding="2dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/circle_red"/>
+        </LinearLayout>
+
 
         <ImageView
-            android:id="@+id/m_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="6dip"
-            android:padding="2dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/circle_red"/>
+            android:id="@+id/img_corner"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="6.5dp"
+            android:layout_weight="1"
+            android:src="@drawable/arrow_bg1"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_avatar"
+            android:layout_width="75dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="0dp"
+            android:layout_weight="3"
+            android:gravity="top"
+            android:src="@drawable/user_pratikshya"
+            app:civ_border_color="#40000000"
+            app:civ_border_width="2dp"
+            app:civ_fill_color="@color/md_white_1000"/>
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
 
