@@ -354,7 +354,7 @@ public class CameraWrapper
         {
             data = _data;
             cb = _cb;
-            num = (int) ((Math.random() * 10000f));
+            // num = (int) ((Math.random() * 10000f));
         }
 
         @Override

@@ -48,8 +48,8 @@ public class TRIFAGlobals
     static int GLOBAL_VIDEO_BITRATE = 5000;
     static int GLOBAL_AUDIO_BITRATE = 92; // allowed values: (xx>=6) && (xx<=510)
 
-    final static int GLOBAL_MIN_VIDEO_BITRATE = 50;
-    final static int GLOBAL_MIN_AUDIO_BITRATE = 64; // allowed values: (xx>=6) && (xx<=510)
+    final static int GLOBAL_MIN_VIDEO_BITRATE = 10;
+    final static int GLOBAL_MIN_AUDIO_BITRATE = 32; // allowed values: (xx>=6) && (xx<=510)
 
     static final int CAMPREVIEW_NUM_BUFFERS = 10;
 
