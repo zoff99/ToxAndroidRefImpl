@@ -28,6 +28,7 @@ import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.util.Log;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 
 public class AudioReceiver extends Thread
@@ -62,7 +63,8 @@ public class AudioReceiver extends Thread
     {
         try
         {
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
         }
         catch (Exception e)
         {
@@ -187,7 +189,14 @@ public class AudioReceiver extends Thread
                         float target_gain = lec.getTargetGain();
                         Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
 
-                        lec.setTargetGain(AUDIO_GAIN_VALUE);
+                        if (PREF__audiosource == 1)
+                        {
+                            lec.setTargetGain(AUDIO_GAIN_VALUE);
+                        }
+                        else
+                        {
+                            // leave sound as is
+                        }
 
                         target_gain = lec.getTargetGain();
                         Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);

@@ -643,14 +643,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             @Override
             public void run()
             {
-                try
-                {
-                    // Thread.sleep(5000);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
                 active_camera_type = FRONT_CAMERA_USED;
                 CameraWrapper.camera_preview_size2 = null;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);

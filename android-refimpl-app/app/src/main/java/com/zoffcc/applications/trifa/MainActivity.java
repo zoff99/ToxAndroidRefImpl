@@ -203,6 +203,8 @@ public class MainActivity extends AppCompatActivity
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
+    static int PREF__audiosource = 1; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
+    static boolean PREF__cam_recording_hint = true;
     static String versionName = "";
     static int versionCode = -1;
     //

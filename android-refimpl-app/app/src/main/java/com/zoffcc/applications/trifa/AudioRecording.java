@@ -30,6 +30,7 @@ import android.util.Log;
 
 import java.nio.ByteBuffer;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
@@ -62,6 +63,7 @@ public class AudioRecording extends Thread
     // private int _bufferedRecSamples = 0;
     private int buffer_mem_factor = 30;
     private int buf_multiplier = 5;
+    private boolean android_M_bug = false;
     // -----------------------
 
     /**
@@ -76,7 +78,8 @@ public class AudioRecording extends Thread
 
         try
         {
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
         }
         catch (Exception e)
         {
@@ -122,6 +125,8 @@ public class AudioRecording extends Thread
              */
             buffer_size = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL, FORMAT);
 
+            int buffer_size_M = buffer_size;
+
             // ---------- 222 ----------
             int want_buf_size_in_bytes = (int) (2 * (RECORDING_RATE / buffer_mem_factor));
             Log.i(TAG, "want_buf_size_in_bytes(1)=" + want_buf_size_in_bytes);
@@ -135,9 +140,20 @@ public class AudioRecording extends Thread
             //                want_buf_size_in_bytes = 6550;
             //            }
 
+            if (android_M_bug)
+            {
+                want_buf_size_in_bytes = buffer_size_M;
+            }
+
             _recBuffer = ByteBuffer.allocateDirect(want_buf_size_in_bytes); // Max 10 ms @ 48 kHz
             _tempBufRec = new byte[want_buf_size_in_bytes];
             int recBufSize = buffer_size * buf_multiplier;
+
+            if (android_M_bug)
+            {
+                recBufSize = buffer_size_M;
+            }
+
             // _bufferedRecSamples = RECORDING_RATE / 200;
             // ---------- 222 ----------
             Log.i(TAG, "want_buf_size_in_bytes(2)=" + want_buf_size_in_bytes);
@@ -145,7 +161,14 @@ public class AudioRecording extends Thread
 
             set_JNI_audio_buffer(_recBuffer);
 
-            recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, recBufSize);
+            if (PREF__audiosource == 1)
+            {
+                recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, recBufSize);
+            }
+            else
+            {
+                recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, RECORDING_RATE, CHANNEL, FORMAT, recBufSize);
+            }
             // recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDING_RATE, CHANNEL, FORMAT, recBufSize);
             audio_session_id = recorder.getAudioSessionId();
 

@@ -33,7 +33,9 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hint;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
 
 public class CameraWrapper
 {
@@ -72,7 +74,6 @@ public class CameraWrapper
         }
         return mCameraWrapper;
     }
-
 
     public void doOpenCamera(CamOpenOverCallback callback, boolean front_camera)
     {
@@ -258,7 +259,6 @@ public class CameraWrapper
         return result;
     }
 
-
     private void initCamera()
     {
         if (this.mCamera != null)
@@ -296,6 +296,10 @@ public class CameraWrapper
                 e.printStackTrace();
             }
 
+            if (PREF__cam_recording_hint)
+            {
+                this.mCameraParamters.setRecordingHint(true);
+            }
             this.mCameraParamters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
             this.mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
             Log.i(TAG, "preview size before=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
@@ -312,8 +316,9 @@ public class CameraWrapper
 
             // ------ use buffer ------
             Camera.Size s = this.mCameraParamters.getPreviewSize();
-            mCamera.addCallbackBuffer(new byte[3 * s.width * s.height / 2]);  // create a reusable buffer for the data passed to onPreviewFrame call (in order to avoid GC)
             mCamera.setPreviewCallbackWithBuffer(mCameraPreviewCallback);    // assign the callback called when a frame is shown by the camera preview (for frame processing)
+            setupCallback((3 * s.width * s.height / 2));
+            // mCamera.addCallbackBuffer(new byte[3 * s.width * s.height / 2]);  // create a reusable buffer for the data passed to onPreviewFrame call (in order to avoid GC)
             mCameraPreviewCallback.reset();
             // ------ use buffer ------
 
@@ -323,10 +328,18 @@ public class CameraWrapper
                 this.mCameraParamters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             }
             this.mCamera.setParameters(this.mCameraParamters);
-
             this.mCamera.startPreview();
 
             this.mIsPreviewing = true;
+        }
+    }
+
+    private void setupCallback(int bufferSize)
+    {
+        for (int i = 0; i <= CAMPREVIEW_NUM_BUFFERS; ++i)
+        {
+            byte[] cameraBuffer = new byte[bufferSize];
+            mCamera.addCallbackBuffer(cameraBuffer);
         }
     }
 
@@ -334,18 +347,20 @@ public class CameraWrapper
     {
         private byte[] data;
         public int[] procImage;
+        private int num = -1;
         CameraPreviewCallback cb;
 
         proccesImageOnBackground(byte[] _data, CameraPreviewCallback _cb)
         {
             data = _data;
             cb = _cb;
+            num = (int) ((Math.random() * 10000f));
         }
 
         @Override
         protected Void doInBackground(Void... voids)
         {
-            //Log.d("HOOK", "doInBackground ...");
+            // Log.i(TAG, "doInBackground:start:#" + num);
             try
             {
                 // Log.i(TAG, "Callstate.tox_call_state=" + Callstate.tox_call_state + " my_video_enabled=" + Callstate.my_video_enabled);
@@ -514,7 +529,7 @@ public class CameraWrapper
         @Override
         protected void onPostExecute(Void voids)
         {
-            //Log.d("HOOK", "onPostExecute ...");
+            // Log.i(TAG, "doInBackground:end:#" + num);
 
             if (data != null)
             {
@@ -535,7 +550,6 @@ public class CameraWrapper
         @Override
         protected void onCancelled(Void voids)
         {
-
         }
     }
 
@@ -626,7 +640,6 @@ public class CameraWrapper
             }
         }
     }
-
 
     private byte[] flipYUV420Horizontal(byte[] data, int imageWidth, int imageHeight)
     {
