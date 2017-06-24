@@ -101,20 +101,19 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
                 if ((f1 != null) && (fl.avatar_pathname != null))
                 {
-                    info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+                    // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
 
                     if (f1.length() > 0)
                     {
-                        byte[] byteArray = new byte[(int) f1.length()];
-                        fis.read(byteArray, 0, (int) f1.length());
-                        fis.close();
+                        // byte[] byteArray = new byte[(int) f1.length()];
+                        // fis.read(byteArray, 0, (int) f1.length());
+                        // fis.close();
 
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
                         GlideApp.
                                 with(context).
-                                load(byteArray).
+                                load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
                                 skipMemoryCache(false).
                                 apply(glide_options).
                                 into(img_avatar);

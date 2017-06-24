@@ -19,11 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.Options;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.bumptech.glide.load.model.ModelLoader;
@@ -31,101 +31,74 @@ import com.bumptech.glide.load.model.ModelLoaderFactory;
 import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.bumptech.glide.signature.ObjectKey;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import info.guardianproject.iocipher.File;
+import java.io.File;
 
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
 
-public class FileLoader2<Data> implements ModelLoader<info.guardianproject.iocipher.File, Data>
+public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.File, java.io.InputStream>
 {
     private static final String TAG = "trifa.FileLoader2";
 
-    private final FileOpener<Data> fileOpener;
-
-    public FileLoader2(FileOpener<Data> fileOpener)
+    public FileLoader2()
     {
         Log.i(TAG, "FileLoader2");
-        this.fileOpener = fileOpener;
     }
 
     @Override
-    public LoadData<Data> buildLoadData(info.guardianproject.iocipher.File model, int width, int height, Options options)
+    public LoadData<java.io.InputStream> buildLoadData(info.guardianproject.iocipher.File model, int width, int height, Options options)
     {
-        Log.i(TAG, "buildLoadData");
-        return new LoadData<>(new ObjectKey(model), new FileFetcher<>(model, fileOpener));
+        Key k = new ObjectKey(model);
+        Log.i(TAG, "buildLoadData:key=" + k + " model=" + model);
+        return new LoadData<>(k, new MyDataFetcher(model));
     }
 
     @Override
     public boolean handles(info.guardianproject.iocipher.File model)
     {
         Log.i(TAG, "handles:f=" + model);
-
         return true;
     }
 
-    public interface FileOpener<Data>
+    private class MyDataFetcher implements DataFetcher<java.io.InputStream>
     {
-        Data open(info.guardianproject.iocipher.File file) throws FileNotFoundException;
+        info.guardianproject.iocipher.File in;
+        String temp_file_name = null;
 
-        void close(Data data) throws IOException;
-
-        Class<Data> getDataClass();
-    }
-
-    private static class FileFetcher<Data> implements DataFetcher<Data>
-    {
-        private final info.guardianproject.iocipher.File file;
-        private java.io.File file2;
-        private final FileOpener<Data> opener;
-        private Data data;
-
-        public FileFetcher(info.guardianproject.iocipher.File file, FileOpener<Data> opener)
+        public MyDataFetcher(info.guardianproject.iocipher.File model_)
         {
-            Log.i(TAG, "FileFetcher");
-
-            this.file = file;
-            this.file2 = null;
-            this.opener = opener;
+            Log.i(TAG, "MyDataFetcher");
+            in = model_;
         }
 
         @Override
-        public void loadData(Priority priority, DataCallback<? super Data> callback)
+        public void loadData(Priority priority, DataCallback<? super java.io.InputStream> callback)
         {
             Log.i(TAG, "loadData");
 
+            java.io.InputStream out = null;
+
             try
             {
-                // data = opener.open(file);
-                System.out.println("fileloader2:loadData:000a:data=" + data);
-                System.out.println("fileloader2:loadData:000b:data=" + (java.io.FileInputStream) data);
-                System.out.println("fileloader2:loadData:001:" + file.getAbsolutePath());
-                //                data = (Data) new byte[(int) file.length()];
-                //                java.io.FileInputStream fis = new java.io.FileInputStream(file);
-                //
-                //                System.out.println("fileloader2:loadData:002");
-                //                fis.read((byte[]) data, 0, (int) file.length());
-                //                System.out.println("fileloader2:loadData:003");
+                System.out.println("fileloader2:loadData:000b:data=" + in);
+                System.out.println("fileloader2:loadData:001:" + in.getAbsolutePath());
 
-                String temp_file_name = copy_vfs_file_to_real_file(file.getParent(), file.getName(), SD_CARD_TMP_DIR, "_2");
+                temp_file_name = copy_vfs_file_to_real_file(in.getParent(), in.getName(), SD_CARD_TMP_DIR, "_2");
                 System.out.println("fileloader2:loadData:000a:temp_file_name=" + temp_file_name);
-                data = opener.open(new File(SD_CARD_TMP_DIR + "/" + temp_file_name));
-                // data = (Data) new java.io.FileInputStream(SD_CARD_TMP_DIR + "/" + temp_file_name);
-                System.out.println("fileloader2:loadData:000a:data=" + data + " file_new=" + SD_CARD_TMP_DIR + "/" + temp_file_name);
+                new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
+                out = new java.io.FileInputStream(SD_CARD_TMP_DIR + "/" + temp_file_name);
+                System.out.println("fileloader2:loadData:000a:data=" + in + " file_new=" + SD_CARD_TMP_DIR + "/" + temp_file_name);
             }
             catch (Exception e)
             {
                 System.out.println("fileloader2:EE:" + e.getMessage());
                 e.printStackTrace();
             }
-            System.out.println("fileloader2:loadData:004:onDataReady=" + data);
+            System.out.println("fileloader2:loadData:004:onDataReady=" + out);
 
-            callback.onDataReady(data);
+            callback.onDataReady(out);
 
             Log.i(TAG, "loadData:end");
-
         }
 
         @Override
@@ -133,15 +106,16 @@ public class FileLoader2<Data> implements ModelLoader<info.guardianproject.iocip
         {
             Log.i(TAG, "cleanup");
 
-            if (data != null)
+            try
             {
-                try
+                // close stuff and remove temp files
+                if (temp_file_name != null)
                 {
-                    opener.close(data);
+                    new File(temp_file_name).delete();
                 }
-                catch (IOException e)
-                {
-                }
+            }
+            catch (Exception e)
+            {
             }
         }
 
@@ -149,14 +123,25 @@ public class FileLoader2<Data> implements ModelLoader<info.guardianproject.iocip
         public void cancel()
         {
             Log.i(TAG, "cancel");
+
+            try
+            {
+                // close stuff and remove temp files
+                if (temp_file_name != null)
+                {
+                    new File(temp_file_name).delete();
+                }
+            }
+            catch (Exception e)
+            {
+            }
         }
 
         @Override
-        public Class<Data> getDataClass()
+        public Class<java.io.InputStream> getDataClass()
         {
-            Log.i(TAG, "getDataClass:" + opener.getDataClass());
-
-            return opener.getDataClass();
+            Log.i(TAG, "Class:" + java.io.InputStream.class);
+            return java.io.InputStream.class;
         }
 
         @Override
@@ -168,95 +153,25 @@ public class FileLoader2<Data> implements ModelLoader<info.guardianproject.iocip
         }
     }
 
-    public static class Factory<Data> implements ModelLoaderFactory<info.guardianproject.iocipher.File, Data>
+    public static class StreamFactory<Data> implements ModelLoaderFactory<info.guardianproject.iocipher.File, java.io.InputStream>
     {
-        private final FileOpener<Data> opener;
-
-        public Factory(FileOpener<Data> opener)
+        public StreamFactory()
         {
-            Log.i(TAG, "Factory");
-
-            this.opener = opener;
+            Log.i(TAG, "StreamFactory");
         }
 
         @Override
-        public ModelLoader<info.guardianproject.iocipher.File, Data> build(MultiModelLoaderFactory multiFactory)
+        public ModelLoader<info.guardianproject.iocipher.File, java.io.InputStream> build(MultiModelLoaderFactory multiFactory)
         {
             Log.i(TAG, "ModelLoader");
-
-            return new FileLoader2<>(opener);
+            return new FileLoader2();
         }
 
         @Override
-        public final void teardown()
+        public void teardown()
         {
             Log.i(TAG, "teardown");
         }
     }
 
-    public static class StreamFactory extends Factory<java.io.FileInputStream>
-    {
-        public StreamFactory()
-        {
-            super(new FileOpener<java.io.FileInputStream>()
-            {
-                @Override
-                public java.io.FileInputStream open(File file) throws FileNotFoundException
-                {
-                    Log.i(TAG, "StreamFactory:open+f=" + file);
-
-                    return new java.io.FileInputStream(file);
-                }
-
-                @Override
-                public void close(java.io.FileInputStream inputStream) throws IOException
-                {
-                    Log.i(TAG, "StreamFactory:close:is=" + inputStream);
-
-                    inputStream.close();
-                }
-
-                @Override
-                public Class<java.io.FileInputStream> getDataClass()
-                {
-                    Log.i(TAG, "StreamFactory:getDataClass");
-
-                    return java.io.FileInputStream.class;
-                }
-            });
-        }
-    }
-
-    public static class FileDescriptorFactory extends Factory<ParcelFileDescriptor>
-    {
-        public FileDescriptorFactory()
-        {
-            super(new FileOpener<ParcelFileDescriptor>()
-            {
-                @Override
-                public ParcelFileDescriptor open(File file) throws FileNotFoundException
-                {
-                    Log.i(TAG, "FileDescriptorFactory:open:f=" + file);
-
-                    return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
-                }
-
-                @Override
-                public void close(ParcelFileDescriptor parcelFileDescriptor) throws IOException
-                {
-                    Log.i(TAG, "FileDescriptorFactory:close:fd=" + parcelFileDescriptor);
-
-                    parcelFileDescriptor.close();
-                }
-
-                @Override
-                public Class<ParcelFileDescriptor> getDataClass()
-                {
-                    Log.i(TAG, "FileDescriptorFactory:getDataClass:class=" + ParcelFileDescriptor.class);
-
-                    return ParcelFileDescriptor.class;
-                }
-            });
-        }
-    }
 }

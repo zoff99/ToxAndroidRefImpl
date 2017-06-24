@@ -24,10 +24,11 @@ import android.util.Log;
 
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Registry;
-import com.bumptech.glide.load.resource.bytes.ByteBufferRewinder;
-import com.bumptech.glide.module.GlideModule;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 
-public class MyGlideModule implements GlideModule
+@GlideModule
+public class MyGlideModule extends AppGlideModule
 {
     private static final String TAG = "trifa.MyGlideModule";
 
@@ -42,9 +43,14 @@ public class MyGlideModule implements GlideModule
     public void registerComponents(Context context, Registry registry)
     {
         Log.i(TAG, "registerComponents");
+        registry.prepend(info.guardianproject.iocipher.File.class, java.io.FileInputStream.class, new com.zoffcc.applications.trifa.FileLoader2.StreamFactory());
+    }
 
-        registry.
-                register(new ByteBufferRewinder.Factory()).
-                prepend(info.guardianproject.iocipher.File.class, java.io.FileInputStream.class, new com.zoffcc.applications.trifa.FileLoader2.StreamFactory());
+    // Disable manifest parsing to avoid adding similar modules twice.
+    @Override
+    public boolean isManifestParsingEnabled()
+    {
+        Log.i(TAG, "isManifestParsingEnabled");
+        return false;
     }
 }

@@ -178,28 +178,20 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
 
                     // TODO: this is just to show that it works. really bad and slow!!!!!
-                    final Thread t_image_preview = new Thread()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-                            }
-                            catch (Exception e)
-                            {
-                            }
-
+                    //final Thread t_image_preview = new Thread()
+                    //{
+                        //@Override
+                       // public void run()
+                       // {
                             info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
-                            final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
-                            Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
+                            // final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
+                            //Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
 
-                            final Runnable myRunnable = new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
+                            //final Runnable myRunnable = new Runnable()
+                           // {
+                               // @Override
+                               // public void run()
+                               // {
                                     try
                                     {
                                         Log.i(TAG, "glide:img:001");
@@ -209,54 +201,10 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
                                         GlideApp.
                                                 with(ft_preview_image.getContext()).
-                                                load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
+                                                load(f2).
                                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                                signature(StringSignature2(message2.filename_fullpath)).
                                                 skipMemoryCache(false).
                                                 placeholder(R.drawable.round_loading_animation).
-                                                listener(new com.bumptech.glide.request.RequestListener<Drawable>()
-                                                {
-                                                    @Override
-                                                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource)
-                                                    {
-                                                        Log.i(TAG, "glide:onResourceReady:model=" + model);
-
-                                                        try
-                                                        {
-                                                            java.io.File f = (java.io.File) model;
-                                                            f.delete();
-                                                            Log.i(TAG, "glide:cleanup:001");
-                                                        }
-                                                        catch (Exception e2)
-                                                        {
-                                                            e2.printStackTrace();
-                                                            Log.i(TAG, "glide:onResourceReady:EE:" + e2.getMessage());
-                                                        }
-
-                                                        return false;
-                                                    }
-
-                                                    @Override
-                                                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource)
-                                                    {
-                                                        Log.i(TAG, "glide:onLoadFailed:model=" + model);
-
-                                                        try
-                                                        {
-                                                            java.io.File f = (java.io.File) model;
-                                                            f.delete();
-                                                            Log.i(TAG, "glide:cleanup:002");
-                                                        }
-                                                        catch (Exception e2)
-                                                        {
-                                                            e2.printStackTrace();
-                                                            Log.i(TAG, "glide:onLoadFailed:EE:" + e2.getMessage());
-                                                        }
-
-                                                        return false;
-                                                    }
-
-                                                }).
                                                 into(ft_preview_image);
                                         Log.i(TAG, "glide:img:002");
 
@@ -264,30 +212,17 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                     catch (Exception e)
                                     {
                                         e.printStackTrace();
-
-                                        try
-                                        {
-                                            java.io.File f = new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
-                                            f.delete();
-                                            Log.i(TAG, "glide:cleanup:003");
-                                        }
-                                        catch (Exception e2)
-                                        {
-                                            e2.printStackTrace();
-                                            Log.i(TAG, "glide:cleanup:EE2:" + e2.getMessage());
-                                        }
-
                                     }
-                                }
-                            };
+                                //}
+                            //};
 
-                            if (main_handler_s != null)
-                            {
-                                main_handler_s.post(myRunnable);
-                            }
-                        }
-                    };
-                    t_image_preview.start();
+                            //if (main_handler_s != null)
+                            //{
+                            //    main_handler_s.post(myRunnable);
+                            //}
+                      //  }
+                    //};
+                    //t_image_preview.start();
                     // TODO: this is just to show that it work. really bad and slow!!!!!
                 }
             }

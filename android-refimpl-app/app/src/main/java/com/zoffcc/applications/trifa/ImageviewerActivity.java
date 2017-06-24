@@ -19,26 +19,16 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 import com.github.chrisbanes.photoview.PhotoView;
 
-import info.guardianproject.iocipher.File;
-
-import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
-import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
 
 public class ImageviewerActivity extends AppCompatActivity
 {
@@ -82,107 +72,44 @@ public class ImageviewerActivity extends AppCompatActivity
         {
             final String image_filename_ = image_filename;
 
-            final Thread t_image_loader = new Thread()
+            //final Thread t_image_loader = new Thread()
+            //{
+            //   @Override
+            //  public void run()
+            // {
+
+            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(image_filename_);
+            // final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_1");
+            // Log.i(TAG, "loadData:temp_file_name=" + temp_file_name);
+
+            // final Runnable myRunnable = new Runnable()
+            //{
+            //  @Override
+            // public void run()
+            //{
+            try
             {
-                @Override
-                public void run()
-                {
+                RequestOptions req_options = new RequestOptions(); //.onlyRetrieveFromCache(true);
 
-                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(image_filename_);
-                    final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_1");
-                    // Log.i(TAG, "loadData:temp_file_name=" + temp_file_name);
-
-                    final Runnable myRunnable = new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                RequestOptions req_options = new RequestOptions(); //.onlyRetrieveFromCache(true);
-
-                                GlideApp.
-                                        with(ImageviewerActivity.this).
-                                        load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
-                                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                        skipMemoryCache(false).
-                                        signature(StringSignature2(image_filename_)).
-                                        apply(req_options).
-                                        placeholder(R.drawable.round_loading_animation).
-                                        listener(new com.bumptech.glide.request.RequestListener<Drawable>()
-                                        {
-                                            @Override
-                                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource)
-                                            {
-                                                Log.i(TAG, "glide:onResourceReady:model=" + model);
-
-                                                try
-                                                {
-                                                    //java.io.File f = (java.io.File) model;
-                                                    //f.delete();
-                                                    Log.i(TAG, "glide:cleanup:001");
-                                                }
-                                                catch (Exception e2)
-                                                {
-                                                    e2.printStackTrace();
-                                                    Log.i(TAG, "glide:onResourceReady:EE:" + e2.getMessage());
-                                                }
-
-                                                return false;
-                                            }
-
-                                            @Override
-                                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource)
-                                            {
-                                                Log.i(TAG, "glide:onLoadFailed:model=" + model);
-
-                                                try
-                                                {
-                                                    //java.io.File f = (java.io.File) model;
-                                                    //f.delete();
-                                                    Log.i(TAG, "glide:cleanup:002");
-                                                }
-                                                catch (Exception e2)
-                                                {
-                                                    e2.printStackTrace();
-                                                    Log.i(TAG, "glide:onLoadFailed:EE:" + e2.getMessage());
-                                                }
-
-                                                // --- image not loaded from cache ---
-                                                // info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(image_filename_);
-                                                // final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_1");
-                                                // Log.i(TAG, "loadData:temp_file_name=" + temp_file_name);
-
-                                                // --- image not loaded from cache ---
-
-                                                return false;
-                                            }
-
-                                        }).
-                                        into(photoView);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-
-                                try
-                                {
-                                    //java.io.File f = new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
-                                    //f.delete();
-                                    Log.i(TAG, "glide:cleanup:003:EE0:" + e.getMessage());
-                                }
-                                catch (Exception e2)
-                                {
-                                    e2.printStackTrace();
-                                    Log.i(TAG, "glide:cleanup:EE2:" + e2.getMessage());
-                                }
-                            }
-                        }
-                    };
-                    imageviewer_handler.post(myRunnable);
-                }
-            };
-            t_image_loader.start();
+                GlideApp.
+                        with(ImageviewerActivity.this).
+                        load(f2).
+                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                        skipMemoryCache(false).
+                        apply(req_options).
+                        placeholder(R.drawable.round_loading_animation).
+                        into(photoView);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            // }
+            //};
+            //imageviewer_handler.post(myRunnable);
+            // }
+            //};
+            // t_image_loader.start();
         }
     }
 }

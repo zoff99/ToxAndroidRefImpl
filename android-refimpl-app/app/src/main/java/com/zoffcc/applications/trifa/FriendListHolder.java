@@ -31,13 +31,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
@@ -46,7 +43,6 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
-import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
@@ -121,26 +117,38 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                 if ((f1 != null) && (fl.avatar_pathname != null))
                 {
-                    info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+                    // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
 
                     if (f1.length() > 0)
                     {
-                        byte[] byteArray = new byte[(int) f1.length()];
-                        fis.read(byteArray, 0, (int) f1.length());
-                        fis.close();
+                        //                        byte[] byteArray = new byte[(int) f1.length()];
+                        //                        fis.read(byteArray, 0, (int) f1.length());
+                        //                        fis.close();
 
                         if (context != null)
                         {
+                            // Log.i(TAG, "AVATAR_GLIDE:" + (fl.avatar_pathname + "/" + fl.avatar_filename) + " " + f1);
+
                             final RequestOptions glide_options = new RequestOptions().fitCenter();
                             GlideApp.
                                     with(context).
-                                    load(byteArray).
+                                    load(f1).
                                     diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                    signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
                                     placeholder(d_lock).
                                     skipMemoryCache(false).
                                     apply(glide_options).
                                     into(avatar);
+
+                            //                            GlideApp.
+                            //                                    with(context).
+                            //                                    load(byteArray).
+                            //                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            //                                    signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
+                            //                                    placeholder(d_lock).
+                            //                                    skipMemoryCache(false).
+                            //                                    apply(glide_options).
+                            //                                    into(avatar);
+
                         }
                     }
                 }
