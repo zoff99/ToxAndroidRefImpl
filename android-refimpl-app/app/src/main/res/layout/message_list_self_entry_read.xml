@@ -31,6 +31,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:autoLink="all"
+                android:textColorLink="@color/textblock_link_color_for_blue"
                 android:paddingLeft="10dp"
                 android:text="..."
                 android:textSize="20sp"/>

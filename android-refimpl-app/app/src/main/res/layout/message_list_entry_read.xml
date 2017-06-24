@@ -58,7 +58,9 @@
                 android:id="@+id/m_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:textColorLink="@color/textblock_link_color_for_orange"
                 android:layout_weight="1"
+                android:autoLink="all"
                 android:text="..."
                 android:textSize="20sp"/>
 
