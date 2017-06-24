@@ -3940,17 +3940,16 @@ public class MainActivity extends AppCompatActivity
             if (VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
-                info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+                // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
 
-                byte[] byteArray = new byte[(int) f1.length()];
-                fis.read(byteArray, 0, (int) f1.length());
+                //byte[] byteArray = new byte[(int) f1.length()];
+                // fis.read(byteArray, 0, (int) f1.length());
 
                 GlideApp.
                         with(c).
-                        load(byteArray).
+                        load(f1).
                         placeholder(placholder).
                         diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                        signature(StringSignature2(vfs_image_filename)).
                         skipMemoryCache(false).
                         into(v);
             }

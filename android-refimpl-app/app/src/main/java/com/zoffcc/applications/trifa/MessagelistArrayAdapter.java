@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -35,26 +34,18 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 import java.util.List;
 
-import info.guardianproject.iocipher.File;
-
-import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.get_filetransfer_filenum_from_id;
-import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_accepted_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_message_accepted_from_id;
@@ -199,116 +190,60 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 
                                     // TODO: this is just to show that it works. really bad and slow!!!!!
                                     final View v_ = rowView;
-                                    final Thread t_image_preview = new Thread()
+                                    //final Thread t_image_preview = new Thread()
+                                    //{
+                                    // @Override
+                                    //public void run()
+                                    //{
+                                    //try
+                                    //{
+                                    //    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+                                    //}
+                                    //catch (Exception e)
+                                    //{
+                                    //}
+
+                                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath);
+                                    //final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
+                                    //Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
+
+                                    //  load(new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath)).
+
+                                    //final Runnable myRunnable = new Runnable()
+                                    //{
+                                    //@Override
+                                    //public void run()
+                                    //{
+                                    try
                                     {
-                                        @Override
-                                        public void run()
-                                        {
-                                            try
-                                            {
-                                                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                            }
+                                        // Log.i(TAG, "glide:img:001");
 
-                                            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath);
-                                            final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
-                                            Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
+                                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(40)));
+                                        GlideApp.
+                                                with(v_).
+                                                load(f2).
+                                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                                skipMemoryCache(false).
+                                                placeholder(d3).
+                                                apply(glide_options).
+                                                into(ft_preview_image);
+                                        // Log.i(TAG, "glide:img:002");
 
-                                            //  load(new info.guardianproject.iocipher.File(values_msg.get(position).filename_fullpath)).
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                    //}
+                                    //};
 
-                                            final Runnable myRunnable = new Runnable()
-                                            {
-                                                @Override
-                                                public void run()
-                                                {
-                                                    try
-                                                    {
-                                                        Log.i(TAG, "glide:img:001");
-
-                                                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(40)));
-                                                        GlideApp.
-                                                                with(v_).
-                                                                load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
-                                                                diskCacheStrategy(DiskCacheStrategy.NONE).
-                                                                skipMemoryCache(false).
-                                                                placeholder(d3).
-                                                                listener(new com.bumptech.glide.request.RequestListener<Drawable>()
-                                                                {
-                                                                    @Override
-                                                                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource)
-                                                                    {
-                                                                        Log.i(TAG, "glide:onResourceReady:model=" + model);
-
-                                                                        try
-                                                                        {
-                                                                            java.io.File f = (java.io.File) model;
-                                                                            f.delete();
-                                                                            Log.i(TAG, "glide:cleanup:001");
-                                                                        }
-                                                                        catch (Exception e2)
-                                                                        {
-                                                                            e2.printStackTrace();
-                                                                            Log.i(TAG, "glide:onResourceReady:EE:" + e2.getMessage());
-                                                                        }
-
-                                                                        return false;
-                                                                    }
-
-                                                                    @Override
-                                                                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource)
-                                                                    {
-                                                                        Log.i(TAG, "glide:onLoadFailed:model=" + model);
-
-                                                                        try
-                                                                        {
-                                                                            java.io.File f = (java.io.File) model;
-                                                                            f.delete();
-                                                                            Log.i(TAG, "glide:cleanup:002");
-                                                                        }
-                                                                        catch (Exception e2)
-                                                                        {
-                                                                            e2.printStackTrace();
-                                                                            Log.i(TAG, "glide:onLoadFailed:EE:" + e2.getMessage());
-                                                                        }
-
-                                                                        return false;
-                                                                    }
-
-                                                                }).
-                                                                apply(glide_options).
-                                                                into(ft_preview_image);
-                                                        Log.i(TAG, "glide:img:002");
-
-                                                    }
-                                                    catch (Exception e)
-                                                    {
-                                                        e.printStackTrace();
-
-                                                        try
-                                                        {
-                                                            java.io.File f = new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
-                                                            f.delete();
-                                                            Log.i(TAG, "glide:cleanup:003");
-                                                        }
-                                                        catch (Exception e2)
-                                                        {
-                                                            e2.printStackTrace();
-                                                            Log.i(TAG, "glide:cleanup:EE2:" + e2.getMessage());
-                                                        }
-
-                                                    }
-                                                }
-                                            };
-
-                                            if (main_handler_s != null)
-                                            {
-                                                main_handler_s.post(myRunnable);
-                                            }
-                                        }
-                                    };
-                                    t_image_preview.start();
+                                    //if (main_handler_s != null)
+                                    //{
+                                    //    main_handler_s.post(myRunnable);
+                                    //}
+                                    //}
+                                    //};
+                                    //t_image_preview.start();
                                     // TODO: this is just to show that it work. really bad and slow!!!!!
                                 }
                             }
@@ -641,12 +576,14 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
 
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
             Log.i(TAG, "getView:EE1:" + e.getMessage());
         }
 
         if (rowView == null)
+
         {
             // should never get here, you missed something about!!
             rowView = inflater.inflate(R.layout.message_list_error, parent, false);

@@ -32,11 +32,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
-import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
-import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -112,9 +109,9 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
 
                     if (f1.length() > 0)
                     {
-                       // byte[] byteArray = new byte[(int) f1.length()];
-                       // fis.read(byteArray, 0, (int) f1.length());
-                       // fis.close();
+                        // byte[] byteArray = new byte[(int) f1.length()];
+                        // fis.read(byteArray, 0, (int) f1.length());
+                        // fis.close();
 
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
                         GlideApp.

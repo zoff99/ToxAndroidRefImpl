@@ -194,7 +194,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                // {
                                     try
                                     {
-                                        Log.i(TAG, "glide:img:001");
+                                        // Log.i(TAG, "glide:img:001");
 
                                         final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
                                         // apply(glide_options).
@@ -206,7 +206,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                                 skipMemoryCache(false).
                                                 placeholder(R.drawable.round_loading_animation).
                                                 into(ft_preview_image);
-                                        Log.i(TAG, "glide:img:002");
+                                        // Log.i(TAG, "glide:img:002");
 
                                     }
                                     catch (Exception e)
