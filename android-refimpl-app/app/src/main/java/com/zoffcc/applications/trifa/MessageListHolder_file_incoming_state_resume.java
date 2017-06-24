@@ -62,7 +62,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
     {
         super(itemView);
 
-        Log.i(TAG, "MessageListHolder");
+        // Log.i(TAG, "MessageListHolder");
 
         this.context = c;
 

@@ -22,7 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -46,7 +45,7 @@ public class ImageviewerActivity extends AppCompatActivity
         try
         {
             image_filename = getIntent().getStringExtra("image_filename");
-            Log.i(TAG, "onCreate:image_filename=" + image_filename);
+            // Log.i(TAG, "onCreate:image_filename=" + image_filename);
         }
         catch (Exception e)
         {

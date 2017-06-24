@@ -62,7 +62,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     {
         super(itemView);
 
-        Log.i(TAG, "MessageListHolder");
+        // Log.i(TAG, "MessageListHolder");
 
         this.context = c;
 
@@ -80,7 +80,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
 
         if (m == null)
         {
@@ -124,7 +124,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 e.printStackTrace();
             }
 
-            Log.i(TAG, "getView:033:STATE:CANCEL:OK:is_image=" + is_image);
+            // Log.i(TAG, "getView:033:STATE:CANCEL:OK:is_image=" + is_image);
 
             if (is_image)
             {

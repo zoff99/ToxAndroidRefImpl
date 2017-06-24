@@ -42,21 +42,21 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
 
     public FileLoader2()
     {
-        Log.i(TAG, "FileLoader2");
+        // Log.i(TAG, "FileLoader2");
     }
 
     @Override
     public LoadData<java.io.InputStream> buildLoadData(info.guardianproject.iocipher.File model, int width, int height, Options options)
     {
         Key k = new ObjectKey(model);
-        Log.i(TAG, "buildLoadData:key=" + k + " model=" + model);
+        // Log.i(TAG, "buildLoadData:key=" + k + " model=" + model);
         return new LoadData<>(k, new MyDataFetcher(model));
     }
 
     @Override
     public boolean handles(info.guardianproject.iocipher.File model)
     {
-        Log.i(TAG, "handles:f=" + model);
+        // Log.i(TAG, "handles:f=" + model);
         return true;
     }
 
@@ -67,38 +67,38 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
 
         public MyDataFetcher(info.guardianproject.iocipher.File model_)
         {
-            Log.i(TAG, "MyDataFetcher");
+            // Log.i(TAG, "MyDataFetcher");
             in = model_;
         }
 
         @Override
         public void loadData(Priority priority, DataCallback<? super java.io.InputStream> callback)
         {
-            Log.i(TAG, "loadData");
+            // Log.i(TAG, "loadData");
 
             java.io.InputStream out = null;
 
             try
             {
-                System.out.println("fileloader2:loadData:000b:data=" + in);
-                System.out.println("fileloader2:loadData:001:" + in.getAbsolutePath());
+                // System.out.println("fileloader2:loadData:000b:data=" + in);
+                // System.out.println("fileloader2:loadData:001:" + in.getAbsolutePath());
 
                 temp_file_name = copy_vfs_file_to_real_file(in.getParent(), in.getName(), SD_CARD_TMP_DIR, "_2");
-                System.out.println("fileloader2:loadData:000a:temp_file_name=" + temp_file_name);
+                // System.out.println("fileloader2:loadData:000a:temp_file_name=" + temp_file_name);
                 new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
                 out = new java.io.FileInputStream(SD_CARD_TMP_DIR + "/" + temp_file_name);
-                System.out.println("fileloader2:loadData:000a:data=" + in + " file_new=" + SD_CARD_TMP_DIR + "/" + temp_file_name);
+                // System.out.println("fileloader2:loadData:000a:data=" + in + " file_new=" + SD_CARD_TMP_DIR + "/" + temp_file_name);
             }
             catch (Exception e)
             {
-                System.out.println("fileloader2:EE:" + e.getMessage());
+                // System.out.println("fileloader2:EE:" + e.getMessage());
                 e.printStackTrace();
             }
-            System.out.println("fileloader2:loadData:004:onDataReady=" + out);
+            // System.out.println("fileloader2:loadData:004:onDataReady=" + out);
 
             callback.onDataReady(out);
 
-            Log.i(TAG, "loadData:end");
+            // Log.i(TAG, "loadData:end");
         }
 
         @Override
@@ -116,6 +116,7 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
             }
             catch (Exception e)
             {
+                e.printStackTrace();
             }
         }
 
@@ -134,20 +135,21 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
             }
             catch (Exception e)
             {
+                e.printStackTrace();
             }
         }
 
         @Override
         public Class<java.io.InputStream> getDataClass()
         {
-            Log.i(TAG, "Class:" + java.io.InputStream.class);
+            // Log.i(TAG, "Class:" + java.io.InputStream.class);
             return java.io.InputStream.class;
         }
 
         @Override
         public DataSource getDataSource()
         {
-            Log.i(TAG, "getDataSource:" + DataSource.LOCAL);
+            // Log.i(TAG, "getDataSource:" + DataSource.LOCAL);
 
             return DataSource.LOCAL;
         }
@@ -157,20 +159,20 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
     {
         public StreamFactory()
         {
-            Log.i(TAG, "StreamFactory");
+            // Log.i(TAG, "StreamFactory");
         }
 
         @Override
         public ModelLoader<info.guardianproject.iocipher.File, java.io.InputStream> build(MultiModelLoaderFactory multiFactory)
         {
-            Log.i(TAG, "ModelLoader");
+            // Log.i(TAG, "ModelLoader");
             return new FileLoader2();
         }
 
         @Override
         public void teardown()
         {
-            Log.i(TAG, "teardown");
+            // Log.i(TAG, "teardown");
         }
     }
 
