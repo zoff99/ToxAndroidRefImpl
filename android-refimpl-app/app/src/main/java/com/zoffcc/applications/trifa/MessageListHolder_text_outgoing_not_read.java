@@ -25,6 +25,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.luseen.autolinklibrary.AutoLinkMode;
+import com.luseen.autolinklibrary.AutoLinkOnClickListener;
+import com.luseen.autolinklibrary.EmojiTextViewLinks;
+
 public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
     private static final String TAG = "trifa.MessageListHolder";
@@ -32,7 +36,7 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
     private Message message;
     private Context context;
 
-    com.vanniktech.emoji.EmojiTextView textView;
+    EmojiTextViewLinks textView;
     ImageView imageView;
 
     public MessageListHolder_text_outgoing_not_read(View itemView, Context c)
@@ -43,8 +47,9 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
 
         this.context = c;
 
-        textView = (com.vanniktech.emoji.EmojiTextView) itemView.findViewById(R.id.m_text);
+        textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -56,6 +61,7 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
 
         // textView.setText("#" + m.id + ":" + m.text);
         textView.setText(m.text);
+        textView.setAutoLinkText(m.text);
         if (!m.read)
         {
             // not yet read
@@ -66,6 +72,15 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
             // msg read by other party
             imageView.setImageResource(R.drawable.circle_green);
         }
+
+        textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
+        {
+            @Override
+            public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText)
+            {
+            }
+        });
+
     }
 
     @Override

@@ -10,7 +10,7 @@
         android:background="@drawable/rounded_blue_dark_bg"
         android:minHeight="45dp">
 
-        <com.vanniktech.emoji.EmojiTextView
+        <com.luseen.autolinklibrary.EmojiTextViewLinks
             android:id="@+id/m_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

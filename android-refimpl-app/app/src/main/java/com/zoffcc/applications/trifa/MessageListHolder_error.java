@@ -24,18 +24,25 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.luseen.autolinklibrary.AutoLinkMode;
+import com.luseen.autolinklibrary.EmojiTextViewLinks;
+
 public class MessageListHolder_error extends RecyclerView.ViewHolder
 {
     private static final String TAG = "trifa.MessageListHolder";
 
     private Message message;
     private Context context;
+    EmojiTextViewLinks textView;
 
     public MessageListHolder_error(View itemView, Context c)
     {
         super(itemView);
         Log.i(TAG, "MessageListHolder");
         this.context = c;
+
+        textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL);
     }
 
     public void bindMessageList(Message m)

@@ -28,10 +28,12 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.luseen.autolinklibrary.AutoLinkMode;
+import com.luseen.autolinklibrary.AutoLinkOnClickListener;
+import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -42,7 +44,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     private Message message;
     private Context context;
 
-    com.vanniktech.emoji.EmojiTextView textView;
+    EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
 
@@ -54,9 +56,10 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
         this.context = c;
 
-        textView = (com.vanniktech.emoji.EmojiTextView) itemView.findViewById(R.id.m_text);
+        textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -68,6 +71,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
         // textView.setText("#" + m.id + ":" + m.text);
         textView.setText(m.text);
+        textView.setAutoLinkText(m.text);
         if (!m.read)
         {
             // not yet read
@@ -78,6 +82,15 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
             // msg read by other party
             imageView.setImageResource(R.drawable.circle_green);
         }
+
+        textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
+        {
+            @Override
+            public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText)
+            {
+            }
+        });
+
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
         img_avatar.setImageDrawable(d_lock);
