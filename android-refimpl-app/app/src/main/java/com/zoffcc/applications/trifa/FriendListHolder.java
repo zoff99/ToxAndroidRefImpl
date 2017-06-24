@@ -67,7 +67,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     {
         super(itemView);
 
-        Log.i(TAG, "FriendListHolder");
+        // Log.i(TAG, "FriendListHolder");
 
         this.context = c;
 
@@ -84,7 +84,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
     public void bindFriendList(FriendList fl)
     {
-        Log.i(TAG, "bindFriendList");
+        Log.i(TAG, "bindFriendList:" + fl.name);
 
         if (fl == null)
         {
@@ -101,6 +101,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         statusText.setText(fl.status_message);
 
         avatar.setImageDrawable(d_lock);
+
         try
         {
             if (VFS_ENCRYPT)
@@ -124,32 +125,27 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         //                        byte[] byteArray = new byte[(int) f1.length()];
                         //                        fis.read(byteArray, 0, (int) f1.length());
                         //                        fis.close();
+                        Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + fl.avatar_filename);
 
-                        if (context != null)
-                        {
-                            // Log.i(TAG, "AVATAR_GLIDE:" + (fl.avatar_pathname + "/" + fl.avatar_filename) + " " + f1);
+                        final RequestOptions glide_options = new RequestOptions().fitCenter();
+                        GlideApp.
+                                with(avatar).
+                                load(f1).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                placeholder(d_lock).
+                                skipMemoryCache(false).
+                                apply(glide_options).
+                                into(avatar);
 
-                            final RequestOptions glide_options = new RequestOptions().fitCenter();
-                            GlideApp.
-                                    with(context).
-                                    load(f1).
-                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                    placeholder(d_lock).
-                                    skipMemoryCache(false).
-                                    apply(glide_options).
-                                    into(avatar);
-
-                            //                            GlideApp.
-                            //                                    with(context).
-                            //                                    load(byteArray).
-                            //                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            //                                    signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
-                            //                                    placeholder(d_lock).
-                            //                                    skipMemoryCache(false).
-                            //                                    apply(glide_options).
-                            //                                    into(avatar);
-
-                        }
+                        //                            GlideApp.
+                        //                                    with(context).
+                        //                                    load(byteArray).
+                        //                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                        //                                    signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
+                        //                                    placeholder(d_lock).
+                        //                                    skipMemoryCache(false).
+                        //                                    apply(glide_options).
+                        //                                    into(avatar);
                     }
                 }
             }

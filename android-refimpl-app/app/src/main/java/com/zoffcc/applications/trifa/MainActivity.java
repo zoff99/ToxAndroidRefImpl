@@ -65,6 +65,7 @@ import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.github.gfx.android.orma.AccessThreadConstraint;
 import com.github.gfx.android.orma.encryption.EncryptedDatabase;
@@ -255,26 +256,6 @@ public class MainActivity extends AppCompatActivity
         //            Log.i(TAG, "onCreate:setThreadPriority:EE:" + e.getMessage());
         //        }
 
-        // ------ clear Glide image cache ------
-        //        final Thread t_glide_clean_cache = new Thread()
-        //        {
-        //            @Override
-        //            public void run()
-        //            {
-        //                try
-        //                {
-        //                    Glide.get(MainActivity.this).clearMemory();
-        //                    Glide.get(MainActivity.this).clearDiskCache();
-        //                }
-        //                catch (Exception e)
-        //                {
-        //                    e.printStackTrace();
-        //                }
-        //            }
-        //        };
-        //        t_glide_clean_cache.start();
-        // ------ clear Glide image cache ------
-
         getVersionInfo();
 
         //        if (canceller == null)
@@ -289,6 +270,7 @@ public class MainActivity extends AppCompatActivity
 
         resources = this.getResources();
         metrics = resources.getDisplayMetrics();
+
 
         SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
         SD_CARD_STATIC_DIR = getExternalFilesDir(null).getAbsolutePath() + "/_staticdir/";
@@ -360,10 +342,12 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("Profile").withIcon(GoogleMaterial.Icon.gmd_face);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName("Settings").withIcon(GoogleMaterial.Icon.gmd_settings);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Logout/Login").withIcon(GoogleMaterial.Icon.gmd_refresh);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("About").withIcon(GoogleMaterial.Icon.gmd_info);
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
+        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("Clear Cache").withIcon(GoogleMaterial.Icon.gmd_delete_sweep);
+        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName("About").withIcon(GoogleMaterial.Icon.gmd_info);
+        PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
-        final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
+                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
 
         profile_d_item = new ProfileDrawerItem().
                 withName("me").
@@ -386,7 +370,7 @@ public class MainActivity extends AppCompatActivity
         // create the drawer and remember the `Drawer` result object
         main_drawer = new DrawerBuilder().
                 withActivity(this).
-                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, new DividerDrawerItem(), item5).
+                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(), item6).
                 withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).
                 withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                 {
@@ -448,7 +432,7 @@ public class MainActivity extends AppCompatActivity
                                 e.printStackTrace();
                             }
                         }
-                        else if (position == 5)
+                        else if (position == 6)
                         {
                             // About
                             try
@@ -462,8 +446,16 @@ public class MainActivity extends AppCompatActivity
                                 e.printStackTrace();
                             }
                         }
+                        else if (position == 5)
+                        {
+                            // -- clear Glide cache --
+                            // -- clear Glide cache --
+                            clearCache();
+                            // -- clear Glide cache --
+                            // -- clear Glide cache --
 
-                        else if (position == 7)
+                        }
+                        else if (position == 8)
                         {
                             // Exit
                             try
@@ -707,6 +699,60 @@ public class MainActivity extends AppCompatActivity
         {
             tox_thread_start();
         }
+    }
+
+    public void clearCache()
+    {
+        Log.i(TAG, "clearCache");
+
+        try
+        {
+            Glide.get(MainActivity.this).clearMemory();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "clearCache:EE2:" + e.getMessage());
+        }
+
+        // ------clear Glide image cache------
+        final Thread t_glide_clean_cache = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Log.i(TAG, "clearCache:bg:start");
+
+                    File cacheDir = Glide.getPhotoCacheDir(MainActivity.this);
+                    if (cacheDir.isDirectory())
+                    {
+                        for (File child : cacheDir.listFiles())
+                        {
+                            if (!child.delete())
+                            {
+                            }
+                            else
+                            {
+                                Log.i(TAG, "clearCache:" + child.getAbsolutePath());
+                            }
+                        }
+                    }
+
+                    Glide.get(MainActivity.this).clearDiskCache();
+                    Log.i(TAG, "clearCache:bg:end");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "clearCache:EE1:" + e.getMessage());
+                }
+            }
+        };
+        t_glide_clean_cache.start();
+        // ------clear Glide image cache------
+
     }
 
     public static void cleanup_temp_dirs()
@@ -3943,6 +3989,8 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
+            // Log.i(TAG, "put_vfs_image_on_imageview:" + vfs_image_filename);
+
             if (VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
