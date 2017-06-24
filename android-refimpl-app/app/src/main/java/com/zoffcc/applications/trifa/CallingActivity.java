@@ -586,7 +586,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             if (wl1 != null)
             {
-                wl1.release();
+                if (wl1.isHeld())
+                {
+                    wl1.release();
+                }
             }
         }
         catch (Exception e)
@@ -597,7 +600,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             if (wl2 != null)
             {
-                wl2.release();
+                if (wl2.isHeld())
+                {
+                    wl2.release();
+                }
             }
         }
         catch (Exception e)
@@ -684,15 +690,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // turn on screen
         try
         {
-            wl1.release();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            wl2.release();
+            if (wl2 != null)
+            {
+                if (wl2.isHeld())
+                {
+                    wl2.release();
+                }
+            }
         }
         catch (Exception e)
         {
@@ -703,8 +707,25 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Callstate.other_video_enabled = 1;
         Callstate.my_video_enabled = 1;
 
-        wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "trifa_screen_on");
-        wl1.acquire();
+        if (wl1 == null)
+        {
+            wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "trifa_screen_on");
+        }
+
+        try
+        {
+            if (wl1 != null)
+            {
+                if (!wl1.isHeld())
+                {
+                    wl1.acquire();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @TargetApi(21)
@@ -712,28 +733,45 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         try
         {
-            wl1.release();
+            if (wl1 != null)
+            {
+                if (wl1.isHeld())
+                {
+                    wl1.release();
+                }
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        try
-        {
-            wl2.release();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+
 
         Log.i(TAG, "turnOffScreen");
         Callstate.other_video_enabled = 0;
         Callstate.my_video_enabled = 0;
 
         // turn off screen
-        wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "trifa_screen_OFF");
-        wl2.acquire();
+        if (wl2 == null)
+        {
+            wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "trifa_screen_OFF");
+        }
+
+
+        try
+        {
+            if (wl2 != null)
+            {
+                if (!wl2.isHeld())
+                {
+                    wl2.acquire();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
