@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -33,25 +32,16 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 
-import info.guardianproject.iocipher.File;
-
-import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
-import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
-import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 
 public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -180,47 +170,47 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     // TODO: this is just to show that it works. really bad and slow!!!!!
                     //final Thread t_image_preview = new Thread()
                     //{
-                        //@Override
-                       // public void run()
-                       // {
-                            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
-                            // final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
-                            //Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
+                    //@Override
+                    // public void run()
+                    // {
+                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
+                    // final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
+                    //Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
 
-                            //final Runnable myRunnable = new Runnable()
-                           // {
-                               // @Override
-                               // public void run()
-                               // {
-                                    try
-                                    {
-                                        // Log.i(TAG, "glide:img:001");
+                    //final Runnable myRunnable = new Runnable()
+                    // {
+                    // @Override
+                    // public void run()
+                    // {
+                    try
+                    {
+                        // Log.i(TAG, "glide:img:001");
 
-                                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
-                                        // apply(glide_options).
+                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+                        // apply(glide_options).
 
-                                        GlideApp.
-                                                with(ft_preview_image.getContext()).
-                                                load(f2).
-                                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                                skipMemoryCache(false).
-                                                placeholder(R.drawable.round_loading_animation).
-                                                into(ft_preview_image);
-                                        // Log.i(TAG, "glide:img:002");
+                        GlideApp.
+                                with(ft_preview_image.getContext()).
+                                load(f2).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(false).
+                                placeholder(R.drawable.round_loading_animation).
+                                into(ft_preview_image);
+                        // Log.i(TAG, "glide:img:002");
 
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                //}
-                            //};
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    //}
+                    //};
 
-                            //if (main_handler_s != null)
-                            //{
-                            //    main_handler_s.post(myRunnable);
-                            //}
-                      //  }
+                    //if (main_handler_s != null)
+                    //{
+                    //    main_handler_s.post(myRunnable);
+                    //}
+                    //  }
                     //};
                     //t_image_preview.start();
                     // TODO: this is just to show that it work. really bad and slow!!!!!

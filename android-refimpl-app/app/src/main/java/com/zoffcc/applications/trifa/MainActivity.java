@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
     final static long UPDATE_MESSAGES_WHILE_FT_ACTIVE_MILLIS = 30000; // ~30 seconds
-    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 2500; // ~2.5 seconds
+    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 500; // ~0.5 seconds
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
@@ -2657,16 +2657,16 @@ public class MainActivity extends AppCompatActivity
                 {
                     info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(f.path_name + "/" + f.file_name);
                     info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
-                    Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
-                    Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                    // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                    // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
                     f2.mkdirs();
                 }
                 else
                 {
                     java.io.File f1 = new java.io.File(f.path_name + "/" + f.file_name);
                     java.io.File f2 = new java.io.File(f1.getParent());
-                    Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
-                    Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                    // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                    // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
                     f2.mkdirs();
                 }
             }

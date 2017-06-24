@@ -54,7 +54,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        Log.i(TAG, "MessageListHolder");
+        // Log.i(TAG, "MessageListHolder");
 
         View view = null;
 
@@ -188,7 +188,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
-        Log.i(TAG, "onBindViewHolder:position=" + position);
+        // Log.i(TAG, "onBindViewHolder:position=" + position);
 
         try
         {
@@ -244,7 +244,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     {
         if (this.messagelistitems != null)
         {
-            Log.i(TAG, "getItemCount:" + this.messagelistitems.size());
+            // Log.i(TAG, "getItemCount:" + this.messagelistitems.size());
             return this.messagelistitems.size();
         }
         else
@@ -274,13 +274,14 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     public void add_item(Message new_item)
     {
-        Log.i(TAG, "add_item:" + new_item + ":" + this.messagelistitems.size());
+        // Log.i(TAG, "add_item:" + new_item + ":" + this.messagelistitems.size());
 
         try
         {
             this.messagelistitems.add(new_item);
+            // TODO: use "notifyItemInserted" !!
             this.notifyDataSetChanged();
-            Log.i(TAG, "add_item:002:" + this.messagelistitems.size());
+            // Log.i(TAG, "add_item:002:" + this.messagelistitems.size());
         }
         catch (Exception e)
         {
@@ -295,9 +296,9 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     //        this.notifyDataSetChanged();
     //    }
 
-    public boolean update_item(Message new_item)
+    synchronized public boolean update_item(final Message new_item)
     {
-        Log.i(TAG, "update_item:" + new_item);
+        // Log.i(TAG, "update_item:" + new_item);
 
         boolean found_item = false;
 
@@ -312,13 +313,14 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 {
                     found_item = true;
                     int pos = this.messagelistitems.indexOf(m2);
-                    Log.i(TAG, "update_item:003:" + pos);
+                    // Log.i(TAG, "update_item:003:" + pos);
                     this.messagelistitems.set(pos, new_item);
+                    this.notifyItemChanged(pos);
                     break;
                 }
             }
 
-            this.notifyDataSetChanged();
+            // this.notifyDataSetChanged();
         }
         catch (Exception e)
         {
