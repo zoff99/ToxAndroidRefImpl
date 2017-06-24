@@ -39,7 +39,7 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
     {
         super(itemView);
 
-        Log.i(TAG, "MessageListHolder");
+        // Log.i(TAG, "MessageListHolder");
 
         this.context = c;
 
@@ -52,7 +52,7 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
 
         // textView.setText("#" + m.id + ":" + m.text);
         textView.setText(m.text);

@@ -49,7 +49,7 @@ public class MessageListFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.i(TAG, "onCreateView");
+        // Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
 
 
@@ -75,7 +75,7 @@ public class MessageListFragment extends Fragment
         {
             if (orma != null)
             {
-                Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
                 data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
                 // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
                 // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
@@ -91,9 +91,9 @@ public class MessageListFragment extends Fragment
         // --------------
         // --------------
         adapter = new MessagelistAdapter(view.getContext(), data_values);
-        Log.i(TAG, "onCreateView:adapter=" + adapter);
+        // Log.i(TAG, "onCreateView:adapter=" + adapter);
         listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view.findViewById(R.id.msg_rv_list);
-        Log.i(TAG, "onCreateView:listingsView=" + listingsView);
+        // Log.i(TAG, "onCreateView:listingsView=" + listingsView);
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setStackFromEnd(true); // pin to bottom element

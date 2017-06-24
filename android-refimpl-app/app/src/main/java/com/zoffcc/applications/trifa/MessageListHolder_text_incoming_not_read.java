@@ -50,7 +50,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     {
         super(itemView);
 
-        Log.i(TAG, "MessageListHolder");
+        // Log.i(TAG, "MessageListHolder");
 
         this.context = c;
 
@@ -64,7 +64,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
 
         // textView.setText("#" + m.id + ":" + m.text);
         textView.setText(m.text);
