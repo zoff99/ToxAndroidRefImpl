@@ -91,7 +91,7 @@ public class ImageviewerActivity extends AppCompatActivity
                 RequestOptions req_options = new RequestOptions(); //.onlyRetrieveFromCache(true);
 
                 GlideApp.
-                        with(ImageviewerActivity.this).
+                        with(this).
                         load(f2).
                         diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                         skipMemoryCache(false).

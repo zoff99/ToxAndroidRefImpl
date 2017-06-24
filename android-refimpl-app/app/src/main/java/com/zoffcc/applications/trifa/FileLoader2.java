@@ -48,7 +48,7 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
     @Override
     public LoadData<java.io.InputStream> buildLoadData(info.guardianproject.iocipher.File model, int width, int height, Options options)
     {
-        Key k = new ObjectKey(model);
+        Key k = new ObjectKey(model.getAbsoluteFile() + ":" + model.length());
         // Log.i(TAG, "buildLoadData:key=" + k + " model=" + model);
         return new LoadData<>(k, new MyDataFetcher(model));
     }
@@ -64,6 +64,7 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
     {
         info.guardianproject.iocipher.File in;
         String temp_file_name = null;
+        long rand_num = -1L;
 
         public MyDataFetcher(info.guardianproject.iocipher.File model_)
         {
@@ -83,7 +84,8 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
                 // System.out.println("fileloader2:loadData:000b:data=" + in);
                 // System.out.println("fileloader2:loadData:001:" + in.getAbsolutePath());
 
-                temp_file_name = copy_vfs_file_to_real_file(in.getParent(), in.getName(), SD_CARD_TMP_DIR, "_2");
+                rand_num = (long) (Math.random() * 10000d);
+                temp_file_name = copy_vfs_file_to_real_file(in.getParent(), in.getName(), SD_CARD_TMP_DIR, "_glide" + "_" + rand_num);
                 // System.out.println("fileloader2:loadData:000a:temp_file_name=" + temp_file_name);
                 new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
                 out = new java.io.FileInputStream(SD_CARD_TMP_DIR + "/" + temp_file_name);
