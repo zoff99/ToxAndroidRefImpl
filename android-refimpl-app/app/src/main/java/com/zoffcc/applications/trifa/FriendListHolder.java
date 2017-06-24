@@ -129,7 +129,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
                         GlideApp.
-                                with(avatar).
+                                with(avatar.getContext()).
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                 placeholder(d_lock).
