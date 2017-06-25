@@ -259,8 +259,9 @@ compile:
   - cd android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/ ; exit 0
   - cd android-refimpl-app/ ; find ./ -name '*.aar' ; exit 0
 
-  - unzip -t /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.1/trifa-jni-lib-1.0.1.aar ; exit 0
-  - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.1/trifa-jni-lib-1.0.1.pom ; exit 0
+  - unzip -t /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar ; exit 0
+  - sha256sum /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar ; exit 0
+  - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.pom ; exit 0
   - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/maven-metadata-local.xml ; exit 0
 
   - cd android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar ; exit 0
