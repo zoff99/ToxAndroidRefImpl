@@ -301,7 +301,15 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__udp_enabled = settings.getInt("udp_enabled", 0);
+        boolean tmp1 = settings.getBoolean("udp_enabled", false);
+        if (tmp1)
+        {
+            PREF__udp_enabled = 1;
+        }
+        else
+        {
+            PREF__udp_enabled = 0;
+        }
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
         Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
@@ -1087,7 +1095,16 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__udp_enabled = settings.getInt("udp_enabled", 0);
+        boolean tmp1 = settings.getBoolean("udp_enabled", false);
+        if (tmp1)
+        {
+            PREF__udp_enabled = 1;
+        }
+        else
+        {
+            PREF__udp_enabled = 0;
+        }
+
         try
         {
             if (settings.getString("min_audio_samplingrate_out", "8000").compareTo("Auto") == 0)

@@ -24,6 +24,8 @@
     <string name="pref_title_software_echo_cancel">Echo Cancellation</string>
     <string name="pref_description_software_echo_cancel">Use Software Echo Cancellation</string>
 
+    <string name="pref_title_udp_enabled">enable UDP</string>
+    <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
@@ -62,11 +64,12 @@
 
 
     <string name="pref_title_min_audio_samplingrate_out">Audio Samplingrate</string>
+    <string name="pref_description_min_audio_samplingrate_out">Default setting is 48000 Hz</string>
     <string-array name="pref_min_audio_samplingrate_out_titles">
         <item>Auto</item>
-        <item>8000 kHz</item>
-        <item>16000 kHz</item>
-        <item>48000 kHz</item>
+        <item>8000 Hz</item>
+        <item>16000 Hz</item>
+        <item>48000 Hz</item>
     </string-array>
     <string-array name="pref_min_audio_samplingrate_out_values">
         <item>Auto</item>
