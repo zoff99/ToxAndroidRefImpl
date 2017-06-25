@@ -17,7 +17,16 @@
  * Boston, MA  02110-1301, USA.
  */
 
+import java.security.MessageDigest
+
+buildscript {
+    dependencies {
+        classpath files('../gwitness/build/libs/gwitness.jar')
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'witness'
 
 android {
     compileSdkVersion 25
@@ -95,8 +104,8 @@ android {
 
     compileOptions {
         encoding "UTF-8"
-        // sourceCompatibility JavaVersion.VERSION_1_8
-        // targetCompatibility JavaVersion.VERSION_1_8
+        // sourceCompatibility JavaVersion.VERSION_1_7
+        // targetCompatibility JavaVersion.VERSION_1_7
     }
 
     dexOptions {
@@ -186,3 +195,57 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
 }
+
+dependencyVerification {
+    verify = [
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:8326564083e6c2e97a56c7090128bd08328dca448bb0574caace38f86ecbda28',
+            'android-refimpl-app:library:351de06e3ba6b14d60994f947e300ac4be6b4b334079dcff6f884c61af56612f',
+            'com.mikepenz:materialdrawer:030c51b2ca97378b09dddaf21961ede6106c5a6f176d06c805b96679b142d342',
+            'com.mikepenz:google-material-typeface:89f88bb2553641e8c510d742edc45fc6c7d943817cda4334a2848e40114d7807',
+            'com.mikepenz:fontawesome-typeface:683832521b378d74e8d03a26a82f616010715dd8f82249814fb42bc77d01b3c2',
+            'com.google.zxing:core:bba7724e02a997cec38213af77133ee8e24b0d5cf5fa7ecbc16a4fa93f11ee0d',
+            'com.github.gfx.android.orma:orma:a639113c84239b52f7c58641b86b4ce3e13a395567bf7b1f3d04069939abce53',
+            'com.github.gfx.android.orma:orma-encryption:9971a52bcadebebb53662ba0a0eb26836af6d9919c7fe2e43a54167b9a45d82d',
+            'com.github.hotchemi:permissionsdispatcher:f7344982c92d26a1e0bc0ea2b02d4311b543d560e57f42131467e60a3bcdcf6a',
+            'com.github.angads25:filepicker:8582d3a57d590945c05a00af265f63258da85523a61bd14556f545ad54da228b',
+            'com.android.support:support-vector-drawable:13728f337f36d1c02d52198a6c20724edb447a0875454d829f95cb9eb4aa293b',
+            'com.android.support:support-v4:07d389154bcf73b47e514964df1578136b26cba78257b8a577a3ccb54beff0ae',
+            'com.android.support:appcompat-v7:ac1ebbc46589195dda3e0b1becfe410bafd75bdf3edd1cd9acf04850f3895830',
+            'com.android.support:design:a3e83064fe99d0a4369f9b46d8bfbe77d0c3022fffdee4be3ac3857b87cc89e3',
+            'com.android.support:recyclerview-v7:375974a8724e359d97d77fa8522c614f813a3ac4583c1807f154a3f9a054b0a1',
+            'com.android.support.constraint:constraint-layout:b0c688cc2b7172608f8153a689d746da40f71e52d7e2fe2bfd9df2f92db77085',
+            'info.guardianproject.iocipher:IOCipher:ab7da0f23e256a2ced9492c73e37812c26e7beccc1a99815e6d65a75728ba6d3',
+            'com.github.medyo:android-about-page:262adb9c4e2ee9eea2ede2a1f4f64594c5f0f3a142255a70e6393361b158ad40',
+            'de.hdodenhof:circleimageview:bcbc588e19e6dcf8c120b1957776bfe229efba5d2fbe5da7156372eeacf65503',
+            'com.vanniktech:emoji-ios:8c8492311a83fad0e22d785a976de9b5ed2a6970c60aeb034e1b5fdcf1f5dd1d',
+            'com.l4digital.fastscroll:fastscroll:54886e21c76ca3fbad958c0c21d8f8cc83f24cf41f83e0138bd7a3d6f2b5bbe5',
+            'com.github.armcha:AutoLinkTextView:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
+            'com.github.chrisbanes:PhotoView:458cfff9421cc28b608139fd9dffba6399d7f654b688e3f105a3a03a9b82cc7d',
+            'com.github.bumptech.glide:glide:72bbcdb2087c4f0baf36ff6488fd5b36d35d602d60dc5826da724597bf0504ba',
+            'com.android.support:support-annotations:aedf76962584adfaed2bd3fcaa22406461c4310237fc27e301128edaa2dba2fa',
+            'com.mikepenz:materialize:7add9fff9ccc20e4bbc508b7d2727594369def95d9ca58c620503cf0d1ee67f1',
+            'com.mikepenz:iconics-core:e1c4e3b6200acfca71af0698d140fa63a57a6ce6b61c0eac4a8325766ca87bc7',
+            'com.mikepenz:fastadapter:178441f46d7f911301978f4753cc628c92eb3e44468071e8b2c23286dbfa794d',
+            'com.github.gfx.android.orma:orma-migration:be4f09f3e89a93ff68c5a2af65c8e8c9b3cea4acb4bc2bf2ffd86c1a8fc38229',
+            'com.github.gfx.android.orma:orma-annotations:288b71aace681a9320284f74ce56b184c16979048e22b8021fe0da7ce06f0682',
+            'io.reactivex.rxjava2:rxjava:dc612f6887f8a4ff1ae33f55eeef59d8028e53f0cea9b40c7ddba1d8fee51736',
+            'io.reactivex.rxjava2:rxandroid:f81bc2b2553ce77bdcdadbcb28e748344f9cfe57511bfc2f488cbbc6d7782f3e',
+            'com.github.gfx.android.orma:orma-core:0929c79c3a6e96042fa8dcbba8dc91ff9047ca35b09a3fedaf015c1c27cc3c8a',
+            'net.zetetic:android-database-sqlcipher:20e9276aacd18f0fffe62221545046696460775af56736ddd33b8a04a78bc756',
+            'com.android.support:support-compat:e02d781268dc60aab6638d8dc20156ea11ca20b962d294b85e6f1e8418cabfa7',
+            'com.android.support:support-media-compat:cbed07d07e0e84fdb4b75712f5fd946229a8af155933c9a92e41db64d00791e0',
+            'com.android.support:support-core-utils:32fac02eb2c20a77fa3e3bc3ede62392a19613f72b8f8e10f5dfa84bb4c89ea1',
+            'com.android.support:support-core-ui:6182278a6653e6c111c888963626cbb16f2d0022571cb239760475119e0b92a8',
+            'com.android.support:support-fragment:541d6393c1e024453aca2a14f31bea0c7270ff4e2a02783f3528aa426367444d',
+            'com.android.support:animated-vector-drawable:4bc46edf1946b32d518b41416d1734e915e0cbb28021de3b340527419b070691',
+            'com.android.support:transition:36c688825a8c0e6e879e18886de83dc90673322822d5b606ee302f70fb558e16',
+            'com.android.support.constraint:constraint-layout-solver:8c62525a9bc5cff5633a96cb9b32fffeccaf41b8841aa87fc22607070dea9b8d',
+            'com.vanniktech:emoji:741ef2eff9c4cbc176292bea40cdf898a7a2219909cfaa86f67b77694df44d1d',
+            'com.github.bumptech.glide:gifdecoder:0ab61481061c1237711f70652c4abf83d461e5ca0fd2e55af0fe3f9fdcf73c6e',
+            'com.github.bumptech.glide:disklrucache:da55fe28ae8b8003f4fe963fec67b7620ad6c545b58cec01f599fb788c419a18',
+            'com.github.bumptech.glide:annotations:36efd480cbd30ef29a461621776592427e50e072614d29bd006f5f3fa6f18127',
+            'org.antlr:antlr4-runtime:08b519ce8883f9e0c92d5e16b911dbbb3d29faa434efc4c3c62435341ec4b332',
+            'org.reactivestreams:reactive-streams:ef867702a614b96eb6c64fb65a8f5e14bdfcabbc1ae056f78a1643f7b79ca0eb',
+    ]
+}
+
