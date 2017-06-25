@@ -43,6 +43,7 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
+import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
@@ -145,6 +146,8 @@ public class TrifaToxService extends Service
                         b.setColor(Color.parseColor("#04b431"));
                     }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
+
+                    get_network_connections();
                 }
                 else // if (a_TOXCONNECTION__f == 2)
                 {
@@ -155,6 +158,8 @@ public class TrifaToxService extends Service
                         b.setColor(Color.parseColor("#04b431"));
                     }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+
+                    get_network_connections();
                 }
             }
         }

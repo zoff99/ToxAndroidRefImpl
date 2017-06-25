@@ -84,6 +84,9 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
 
+import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
+import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.math.BigInteger;
@@ -204,11 +207,13 @@ public class MainActivity extends AppCompatActivity
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
+    static int PREF__udp_enabled = 1; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = true;
     static String versionName = "";
     static int versionCode = -1;
+    static PackageInfo packageInfo_s = null;
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -258,6 +263,15 @@ public class MainActivity extends AppCompatActivity
 
         getVersionInfo();
 
+        try
+        {
+            packageInfo_s = getPackageManager().getPackageInfo(getPackageName(), 0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         //        if (canceller == null)
         //        {
         //            canceller = new EchoCanceller();
@@ -287,6 +301,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
+        PREF__udp_enabled = settings.getInt("udp_enabled", 1);
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
         Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
@@ -423,7 +438,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 else
                                 {
-                                    init(app_files_directory);
+                                    init(app_files_directory, PREF__udp_enabled);
                                     tox_service_fg.tox_thread_start_fg();
                                 }
                             }
@@ -968,7 +983,7 @@ public class MainActivity extends AppCompatActivity
                         // TODO: move this also to Service
                         if (!is_tox_started)
                         {
-                            init(app_files_directory);
+                            init(app_files_directory, PREF__udp_enabled);
                         }
 
                         tox_service_fg.tox_thread_start_fg();
@@ -1072,6 +1087,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
+        PREF__udp_enabled = settings.getInt("udp_enabled", 1);
         try
         {
             if (settings.getString("min_audio_samplingrate_out", "8000").compareTo("Auto") == 0)
@@ -1477,7 +1493,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir);
+    public native void init(@NonNull String data_dir, int udp_enabled);
 
     public native String getNativeLibAPI();
 
@@ -4690,6 +4706,17 @@ public class MainActivity extends AppCompatActivity
         Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
 
         return resizedBitmap;
+    }
+
+    public static PackageInfo get_my_pkg_info()
+    {
+        return packageInfo_s;
+    }
+
+    static void get_network_connections()
+    {
+        Detector.updateReportMap();
+        Collector.updateReports();
     }
 
     // --------- make app crash ---------

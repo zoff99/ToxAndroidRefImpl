@@ -29,6 +29,8 @@ public class TRIFAGlobals
     static String global_my_status_message = "";
     static boolean bootstrapping = false;
 
+    public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
+
     // ----------
     // https://toxme.io/u/echobot
     //  echobot@toxme.io
