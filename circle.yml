@@ -227,20 +227,25 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
-  - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
+  # --------- we use gradle witness, so we need to use the maven artefact ---------
+  # - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
+  # --------- we use gradle witness, so we need to use the maven artefact ---------
 # --- Android build ---
 
 
 # --------- GRADLE -------------
 # - cd android-refimpl-app/ ; if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then gradle wrapper --no-daemon --gradle-version "$GRADLE_CUSTOM_VNUM" --info ; else gradle wrapper --no-daemon --info ; fi ; exit 0
   - cd android-refimpl-app/ ; chmod a+rx ./gradlew
+  - cd android-refimpl-app/gwitness ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ../gradlew build --info
   - ls -al /home/ubuntu/android-ndk
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:dependencies
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
+  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:'
+  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:' > $CIRCLE_ARTIFACTS/android/calculateChecksums.txt
 # --------- GRADLE -------------
 
 
-# --------- bintray aretefact -------------
+# --------- bintray artefact -------------
   - cd jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
   - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
 
@@ -249,8 +254,8 @@ compile:
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ./gradlew :jnilib:install --info; exit 0
   - if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ./gradlew :jnilib:bintrayUpload --info; exit 0 ; fi
   - find ~/.m2/repository -type f -exec ls -al {} \; ; exit 0
-# --------- bintray aretefact -------------
-# ----------- show generated aar file -----------
+# --------- bintray artefact -------------
+# --------- show generated aar file -----------
   - cd android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/ ; exit 0
   - cd android-refimpl-app/ ; find ./ -name '*.aar' ; exit 0
 
@@ -259,8 +264,9 @@ compile:
   - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/maven-metadata-local.xml ; exit 0
 
   - cd android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar ; exit 0
+  - cd android-refimpl-app/ ; sha256sum ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar ; exit 0
   - cd android-refimpl-app/ ; cp -av ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar $CIRCLE_ARTIFACTS/
-# ----------- show generated aar file -----------
+# --------- show generated aar file -----------
 
 
 

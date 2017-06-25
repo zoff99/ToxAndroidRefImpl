@@ -29,6 +29,8 @@ public class TRIFAGlobals
     static String global_my_status_message = "";
     static boolean bootstrapping = false;
 
+    public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
+
     // ----------
     // https://toxme.io/u/echobot
     //  echobot@toxme.io
@@ -45,11 +47,13 @@ public class TRIFAGlobals
     final static String VFS_OWN_AVATAR_DIR = "/datadir/myavatar/";
     static String VFS_PREFIX = ""; // only set for normal (unencrypted) storage
 
-    static int GLOBAL_VIDEO_BITRATE = 6000;
-    static int GLOBAL_AUDIO_BITRATE = 350; // allowed values: (xx>=6) && (xx<=510)
+    static int GLOBAL_VIDEO_BITRATE = 5000;
+    static int GLOBAL_AUDIO_BITRATE = 92; // allowed values: (xx>=6) && (xx<=510)
 
-    final static int GLOBAL_MIN_VIDEO_BITRATE = 1200;
-    final static int GLOBAL_MIN_AUDIO_BITRATE = 90; // allowed values: (xx>=6) && (xx<=510)
+    final static int GLOBAL_MIN_VIDEO_BITRATE = 10;
+    final static int GLOBAL_MIN_AUDIO_BITRATE = 32; // allowed values: (xx>=6) && (xx<=510)
+
+    static final int CAMPREVIEW_NUM_BUFFERS = 10;
 
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();

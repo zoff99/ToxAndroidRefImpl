@@ -31,9 +31,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
@@ -65,7 +67,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     {
         super(itemView);
 
-        Log.i(TAG, "FriendListHolder");
+        // Log.i(TAG, "FriendListHolder");
 
         this.context = c;
 
@@ -82,7 +84,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
     public void bindFriendList(FriendList fl)
     {
-        Log.i(TAG, "bindFriendList");
+        Log.i(TAG, "bindFriendList:" + fl.name);
 
         if (fl == null)
         {
@@ -99,6 +101,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         statusText.setText(fl.status_message);
 
         avatar.setImageDrawable(d_lock);
+
         try
         {
             if (VFS_ENCRYPT)
@@ -115,23 +118,34 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                 if ((f1 != null) && (fl.avatar_pathname != null))
                 {
-                    info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+                    // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
 
                     if (f1.length() > 0)
                     {
-                        byte[] byteArray = new byte[(int) f1.length()];
-                        fis.read(byteArray, 0, (int) f1.length());
+                        //                        byte[] byteArray = new byte[(int) f1.length()];
+                        //                        fis.read(byteArray, 0, (int) f1.length());
+                        //                        fis.close();
+                        Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + fl.avatar_filename);
 
-                        if (context != null)
-                        {
-                            GlideApp.
-                                    with(context).
-                                    load(byteArray).
-                                    placeholder(d_lock).
-                                    diskCacheStrategy(DiskCacheStrategy.NONE).
-                                    skipMemoryCache(false).
-                                    into(avatar);
-                        }
+                        final RequestOptions glide_options = new RequestOptions().fitCenter();
+                        GlideApp.
+                                with(avatar.getContext()).
+                                load(f1).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                placeholder(d_lock).
+                                skipMemoryCache(false).
+                                apply(glide_options).
+                                into(avatar);
+
+                        //                            GlideApp.
+                        //                                    with(context).
+                        //                                    load(byteArray).
+                        //                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                        //                                    signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
+                        //                                    placeholder(d_lock).
+                        //                                    skipMemoryCache(false).
+                        //                                    apply(glide_options).
+                        //                                    into(avatar);
                     }
                 }
             }
@@ -153,13 +167,17 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                     byte[] byteArray = new byte[(int) f1.length()];
                     fis.read(byteArray, 0, (int) f1.length());
+                    fis.close();
 
+                    final RequestOptions glide_options = new RequestOptions().fitCenter();
                     GlideApp.
                             with(context).
                             load(byteArray).
                             placeholder(d_lock).
-                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
                             skipMemoryCache(false).
+                            apply(glide_options).
                             into(avatar);
                 }
             }

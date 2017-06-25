@@ -1,33 +1,74 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:padding="6dip">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="6dip">
+
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:minHeight="45dp"
-        android:background="@android:color/holo_blue_light">
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal">
 
-        <com.vanniktech.emoji.EmojiTextView
-            android:id="@+id/m_text"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/text_block_group"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="..."
-            android:textSize="20sp"/>
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="0dp"
+            android:layout_weight="6"
+            android:background="@drawable/rounded_blue_bg"
+            android:minHeight="45dp"
+            android:orientation="horizontal">
+
+            <com.luseen.autolinklibrary.EmojiTextViewLinks
+                android:id="@+id/m_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColorLink="@color/textblock_link_color_for_blue"
+                android:paddingLeft="10dp"
+                android:text="..."
+                android:textSize="20sp"/>
+
+            <ImageView
+                android:id="@+id/m_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="6dip"
+                android:padding="2dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/circle_red"/>
+        </LinearLayout>
+
 
         <ImageView
-            android:id="@+id/m_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="6dip"
-            android:padding="2dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/circle_red"/>
+            android:id="@+id/img_corner"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="14dp"
+            android:layout_weight="1"
+            android:alpha="0.5"
+            android:src="@drawable/arrow_bg1"/>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_avatar"
+            android:layout_width="75dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="0dp"
+            android:layout_weight="3"
+            android:gravity="top"
+            android:src="@drawable/user_pacific"
+            app:civ_border_color="#50000000"
+            app:civ_border_width="2dp"
+            app:civ_fill_color="@color/md_grey_400"/>
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
 

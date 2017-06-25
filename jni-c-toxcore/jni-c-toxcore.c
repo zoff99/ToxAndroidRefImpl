@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 9
-static const char global_version_string[] = "0.99.9";
+#define VERSION_PATCH 10
+static const char global_version_string[] = "0.99.10";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -267,7 +267,7 @@ void dbg(int level, const char *fmt, ...)
 }
 
 
-Tox *create_tox()
+Tox *create_tox(int udp_enabled)
 {
 	Tox *tox = NULL;
 	TOX_ERR_NEW error;
@@ -280,7 +280,15 @@ Tox *create_tox()
 	uint16_t tcp_port = 33776;
 
 	options.ipv6_enabled = true;
-	options.udp_enabled = false; // set TCP as default mode for android !!
+
+	if (udp_enabled == 1)
+	{
+		options.udp_enabled = true;
+	}
+	else
+	{
+		options.udp_enabled = false; // set TCP as default mode for android !!
+	}
 	options.local_discovery_enabled = true;
 	options.hole_punching_enabled = true;
 	// options.tcp_port = tcp_port;
@@ -1293,7 +1301,7 @@ void *thread_video_av(void *data)
 }
 
 
-void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir)
+void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled)
 {
 	const char *s = NULL;
 
@@ -1372,7 +1380,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 
 
 	// ----------- create Tox instance -----------
-	tox_global = create_tox();
+	tox_global = create_tox((int)udp_enabled);
 	dbg(9, "tox_global=%p", tox_global);
 	// ----------- create Tox instance -----------
 
@@ -1438,9 +1446,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir)
+Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled)
 {
-	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir));
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled));
 }
 
 
@@ -1458,9 +1466,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv* e
 {
 	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz));
 }
-
-
-
 
 // -----------------
 // -----------------

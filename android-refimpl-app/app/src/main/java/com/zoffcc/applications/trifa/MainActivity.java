@@ -38,6 +38,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -64,6 +65,7 @@ import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.github.gfx.android.orma.AccessThreadConstraint;
 import com.github.gfx.android.orma.encryption.EncryptedDatabase;
@@ -82,6 +84,9 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
 
+import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
+import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.math.BigInteger;
@@ -98,6 +103,7 @@ import permissions.dispatcher.RuntimePermissions;
 
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
+import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
@@ -133,8 +139,8 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = true;
-    final static boolean ORMA_TRACE = true; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = false;
+    final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true;
     final static boolean VFS_ENCRYPT = true;
     // --------- global config ---------
@@ -167,6 +173,8 @@ public class MainActivity extends AppCompatActivity
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
     static String SD_CARD_TMP_DIR = "";
+    static String SD_CARD_STATIC_DIR = "";
+    static String SD_CARD_TMP_DUMMYFILE = null;
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
     final static int ProfileActivity_ID = 10003;
@@ -176,11 +184,12 @@ public class MainActivity extends AppCompatActivity
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
     final static long UPDATE_MESSAGES_WHILE_FT_ACTIVE_MILLIS = 30000; // ~30 seconds
-    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 2500; // ~2.5 seconds
+    final static long UPDATE_MESSAGES_NORMAL_MILLIS = 500; // ~0.5 seconds
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 20;
+    final static int audio_in_buffer_max_count = 2; // how many out play buffers?
+    final static int audio_out_buffer_mult = 3;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -198,8 +207,13 @@ public class MainActivity extends AppCompatActivity
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
+    static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
+    static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
+    static boolean PREF__audiorec_asynctask = true;
+    static boolean PREF__cam_recording_hint = true;
     static String versionName = "";
     static int versionCode = -1;
+    static PackageInfo packageInfo_s = null;
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -237,7 +251,26 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
+        //        try
+        //        {
+        //            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //            Log.i(TAG, "onCreate:setThreadPriority:EE:" + e.getMessage());
+        //        }
+
         getVersionInfo();
+
+        try
+        {
+            packageInfo_s = getPackageManager().getPackageInfo(getPackageName(), 0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         //        if (canceller == null)
         //        {
@@ -252,7 +285,10 @@ public class MainActivity extends AppCompatActivity
         resources = this.getResources();
         metrics = resources.getDisplayMetrics();
 
+
         SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
+        SD_CARD_STATIC_DIR = getExternalFilesDir(null).getAbsolutePath() + "/_staticdir/";
+        SD_CARD_TMP_DUMMYFILE = make_some_static_dummy_file(this.getBaseContext());
 
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -265,6 +301,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
+        PREF__udp_enabled = settings.getInt("udp_enabled", 0);
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
         Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
@@ -320,10 +357,12 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("Profile").withIcon(GoogleMaterial.Icon.gmd_face);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName("Settings").withIcon(GoogleMaterial.Icon.gmd_settings);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Logout/Login").withIcon(GoogleMaterial.Icon.gmd_refresh);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("About").withIcon(GoogleMaterial.Icon.gmd_info);
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
+        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("Clear Cache").withIcon(GoogleMaterial.Icon.gmd_delete_sweep);
+        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName("About").withIcon(GoogleMaterial.Icon.gmd_info);
+        PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
-        final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
+                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
 
         profile_d_item = new ProfileDrawerItem().
                 withName("me").
@@ -346,7 +385,7 @@ public class MainActivity extends AppCompatActivity
         // create the drawer and remember the `Drawer` result object
         main_drawer = new DrawerBuilder().
                 withActivity(this).
-                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, new DividerDrawerItem(), item5).
+                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(), item6).
                 withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).
                 withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                 {
@@ -399,7 +438,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 else
                                 {
-                                    init(app_files_directory);
+                                    init(app_files_directory, PREF__udp_enabled);
                                     tox_service_fg.tox_thread_start_fg();
                                 }
                             }
@@ -408,7 +447,7 @@ public class MainActivity extends AppCompatActivity
                                 e.printStackTrace();
                             }
                         }
-                        else if (position == 5)
+                        else if (position == 6)
                         {
                             // About
                             try
@@ -422,8 +461,16 @@ public class MainActivity extends AppCompatActivity
                                 e.printStackTrace();
                             }
                         }
+                        else if (position == 5)
+                        {
+                            // -- clear Glide cache --
+                            // -- clear Glide cache --
+                            clearCache();
+                            // -- clear Glide cache --
+                            // -- clear Glide cache --
 
-                        else if (position == 7)
+                        }
+                        else if (position == 8)
                         {
                             // Exit
                             try
@@ -669,6 +716,60 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void clearCache()
+    {
+        Log.i(TAG, "clearCache");
+
+        try
+        {
+            Glide.get(MainActivity.this).clearMemory();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "clearCache:EE2:" + e.getMessage());
+        }
+
+        // ------clear Glide image cache------
+        final Thread t_glide_clean_cache = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Log.i(TAG, "clearCache:bg:start");
+
+                    File cacheDir = Glide.getPhotoCacheDir(MainActivity.this);
+                    if (cacheDir.isDirectory())
+                    {
+                        for (File child : cacheDir.listFiles())
+                        {
+                            if (!child.delete())
+                            {
+                            }
+                            else
+                            {
+                                Log.i(TAG, "clearCache:" + child.getAbsolutePath());
+                            }
+                        }
+                    }
+
+                    Glide.get(MainActivity.this).clearDiskCache();
+                    Log.i(TAG, "clearCache:bg:end");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "clearCache:EE1:" + e.getMessage());
+                }
+            }
+        };
+        t_glide_clean_cache.start();
+        // ------clear Glide image cache------
+
+    }
+
     public static void cleanup_temp_dirs()
     {
 
@@ -882,7 +983,7 @@ public class MainActivity extends AppCompatActivity
                         // TODO: move this also to Service
                         if (!is_tox_started)
                         {
-                            init(app_files_directory);
+                            init(app_files_directory, PREF__udp_enabled);
                         }
 
                         tox_service_fg.tox_thread_start_fg();
@@ -986,6 +1087,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
+        PREF__udp_enabled = settings.getInt("udp_enabled", 0);
         try
         {
             if (settings.getString("min_audio_samplingrate_out", "8000").compareTo("Auto") == 0)
@@ -1391,7 +1493,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir);
+    public native void init(@NonNull String data_dir, int udp_enabled);
 
     public native String getNativeLibAPI();
 
@@ -1798,7 +1900,7 @@ public class MainActivity extends AppCompatActivity
             Callstate.call_first_audio_frame_received = System.currentTimeMillis();
 
             sampling_rate_ = sampling_rate;
-            Log.i(TAG, "audio_play:read:incoming sampling_rate[1]=" + sampling_rate + " kHz");
+            Log.i(TAG, "audio_play:read:incoming sampling_rate[1]=" + sampling_rate + " Hz");
             channels_ = channels;
 
             Log.i(TAG, "audio_play:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" + sampling_rate);
@@ -1807,11 +1909,8 @@ public class MainActivity extends AppCompatActivity
             temp_string_a = "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a, 4);
 
-            // AudioReceiver.buffer_size = AudioTrack.getMinBufferSize((int) sampling_rate, channels, AudioFormat.ENCODING_PCM_16BIT);
-            // Log.i(TAG, "audio_play:read:init min buffer size(calc)=" + AudioReceiver.buffer_size);
-
             // HINT: PCM_16 needs 2 bytes per sample per channel
-            AudioReceiver.buffer_size = (int) ((sample_count * channels) * 2); // TODO: this is really bad
+            AudioReceiver.buffer_size = ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult; // TODO: this is really bad
             AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f * 0.9f); // TODO: this is bad also
             Log.i(TAG, "audio_play:read:init buffer_size=" + AudioReceiver.buffer_size);
             Log.i(TAG, "audio_play:read:init sleep_millis=" + AudioReceiver.sleep_millis);
@@ -1862,7 +1961,14 @@ public class MainActivity extends AppCompatActivity
         // TODO: dirty hack, "make good"
         try
         {
-            audio_buffer_read_write(sample_count, channels, sampling_rate, true);
+            // audio_buffer_read_write(sample_count, channels, sampling_rate, true);
+            if (audio_receiver_thread != null)
+            {
+                if (!audio_receiver_thread.stopped)
+                {
+                    audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2));
+                }
+            }
         }
         catch (Exception e)
         {
@@ -2287,6 +2393,7 @@ public class MainActivity extends AppCompatActivity
         m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
+        m.read = false;
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = friend_message;
@@ -2593,6 +2700,8 @@ public class MainActivity extends AppCompatActivity
         // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
         // Log.i(TAG, "file_recv_chunk:--START--");
 
+        // Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":" + position + ":" + length);
+
         Filetransfer f = null;
         try
         {
@@ -2607,21 +2716,23 @@ public class MainActivity extends AppCompatActivity
 
             if (position == 0)
             {
+                Log.i(TAG, "file_recv_chunk:START-O-F:filesize==" + f.filesize);
+
                 // file start. just to be sure, make directories
                 if (VFS_ENCRYPT)
                 {
                     info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(f.path_name + "/" + f.file_name);
                     info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
-                    Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
-                    Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                    // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                    // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
                     f2.mkdirs();
                 }
                 else
                 {
                     java.io.File f1 = new java.io.File(f.path_name + "/" + f.file_name);
                     java.io.File f2 = new java.io.File(f1.getParent());
-                    Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
-                    Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                    // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                    // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
                     f2.mkdirs();
                 }
             }
@@ -2633,6 +2744,8 @@ public class MainActivity extends AppCompatActivity
 
         if (length == 0)
         {
+            Log.i(TAG, "file_recv_chunk:END-O-F:filesize==" + f.filesize);
+
             try
             {
                 Log.i(TAG, "file_recv_chunk:file fully received");
@@ -2640,7 +2753,7 @@ public class MainActivity extends AppCompatActivity
                 if (VFS_ENCRYPT)
                 {
                     info.guardianproject.iocipher.FileOutputStream fos = null;
-                    fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                    fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                     if (f.fos_open)
                     {
@@ -2658,7 +2771,7 @@ public class MainActivity extends AppCompatActivity
                 else
                 {
                     java.io.FileOutputStream fos = null;
-                    fos = cache_ft_fos_normal.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                    fos = cache_ft_fos_normal.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                     if (f.fos_open)
                     {
@@ -2737,7 +2850,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "file_recv_chunk:EE2:" + e2.getMessage());
             }
         }
-        else
+        else // normal chunck recevied ---------- (NOT start, and NOT end)
         {
             try
             {
@@ -2747,19 +2860,19 @@ public class MainActivity extends AppCompatActivity
                     if (!f.fos_open)
                     {
                         fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                        Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                        cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                        Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                         f.fos_open = true;
                         update_filetransfer_db_fos_open(f);
                     }
                     else
                     {
-                        fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                        fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
                         if (fos == null)
                         {
                             fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                            Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                            cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                            Log.i(TAG, "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                            cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                             f.fos_open = true;
                             update_filetransfer_db_fos_open(f);
                         }
@@ -2775,19 +2888,19 @@ public class MainActivity extends AppCompatActivity
                     if (!f.fos_open)
                     {
                         fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                        Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                        cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                        Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                         f.fos_open = true;
                         update_filetransfer_db_fos_open(f);
                     }
                     else
                     {
-                        fos = cache_ft_fos_normal.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number);
+                        fos = cache_ft_fos_normal.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
                         if (fos == null)
                         {
                             fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                            Log.i(TAG, "file_recv_chunk:new fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                            cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + friend_number, fos);
+                            Log.i(TAG, "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                            cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                             f.fos_open = true;
                             update_filetransfer_db_fos_open(f);
                         }
@@ -3658,6 +3771,93 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static String make_some_static_dummy_file(Context context)
+    {
+        String ret = null;
+
+        try
+        {
+            java.io.File dst_dir = new java.io.File(SD_CARD_STATIC_DIR + "/");
+            dst_dir.mkdirs();
+
+            java.io.File fout = new java.io.File(SD_CARD_STATIC_DIR + "/" + "__dummy__dummy_.jpg");
+            java.io.FileOutputStream os = new java.io.FileOutputStream(fout);
+            //            int len = 2 + 2 + 2 + 5 + 2 + 1 + 2 + 2;
+            //            byte[] buffer = new byte[len];
+            //
+            //            int a = 0;
+            //            buffer[a] = (byte) 0xff;
+            //            a++;
+            //            buffer[a] = (byte) 0xd8;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0xff;
+            //            a++;
+            //            buffer[a] = (byte) 0xe0;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //            buffer[a] = (byte) 0x10;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x4a;
+            //            a++;
+            //            buffer[a] = (byte) 0x46;
+            //            a++;
+            //            buffer[a] = (byte) 0x49;
+            //            a++;
+            //            a++;
+            //            buffer[a] = (byte) 0x46;
+            //            a++;
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x01;
+            //            a++;
+            //            buffer[a] = (byte) 0x02;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //            buffer[a] = (byte) 0x0a;
+            //            a++;
+            //
+            //            buffer[a] = (byte) 0x0;
+            //            a++;
+            //            buffer[a] = (byte) 0x0a;
+            //            a++;
+            //
+            //            os.write(buffer, 0, len);
+            //            os.close();
+
+            java.io.InputStream ins = context.getResources().
+                    openRawResource(context.getResources().
+                            getIdentifier("ic_plus_sign", "drawable", context.getPackageName()));
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = ins.read(buffer)) > 0)
+            {
+                os.write(buffer, 0, length);
+            }
+
+            ins.close();
+            os.close();
+
+            ret = fout.getAbsolutePath();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
     static String copy_vfs_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String appl)
     {
         String uniq_temp_filename = null;
@@ -3669,7 +3869,7 @@ public class MainActivity extends AppCompatActivity
                 info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(src_path_name + "/" + src_file_name);
 
                 uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length()) + appl;
-                Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
+                // Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
 
                 java.io.File f2 = new java.io.File(dst_path_name + "/" + uniq_temp_filename);
                 java.io.File dst_dir = new java.io.File(dst_path_name + "/");
@@ -3805,19 +4005,21 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
+            // Log.i(TAG, "put_vfs_image_on_imageview:" + vfs_image_filename);
+
             if (VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
-                info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+                // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
 
-                byte[] byteArray = new byte[(int) f1.length()];
-                fis.read(byteArray, 0, (int) f1.length());
+                //byte[] byteArray = new byte[(int) f1.length()];
+                // fis.read(byteArray, 0, (int) f1.length());
 
                 GlideApp.
                         with(c).
-                        load(byteArray).
+                        load(f1).
                         placeholder(placholder).
-                        diskCacheStrategy(DiskCacheStrategy.NONE).
+                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                         skipMemoryCache(false).
                         into(v);
             }
@@ -3833,7 +4035,7 @@ public class MainActivity extends AppCompatActivity
                         with(c).
                         load(byteArray).
                         placeholder(placholder).
-                        diskCacheStrategy(DiskCacheStrategy.NONE).
+                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                         skipMemoryCache(false).
                         into(v);
             }
@@ -4477,6 +4679,44 @@ public class MainActivity extends AppCompatActivity
         }
         return "*ERROR*";
 
+    }
+
+    public static com.bumptech.glide.load.Key StringSignature2(final String in)
+    {
+        com.bumptech.glide.load.Key ret = new StringObjectKey(in);
+        return ret;
+    }
+
+    public static Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth)
+    {
+
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+
+        // resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // recreate the new Bitmap
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+
+        return resizedBitmap;
+    }
+
+    public static PackageInfo get_my_pkg_info()
+    {
+        return packageInfo_s;
+    }
+
+    static void get_network_connections()
+    {
+        Detector.updateReportMap();
+        Collector.updateReports();
     }
 
     // --------- make app crash ---------

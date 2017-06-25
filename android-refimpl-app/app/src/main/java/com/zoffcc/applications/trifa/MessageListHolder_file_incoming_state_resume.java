@@ -62,7 +62,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
     {
         super(itemView);
 
-        Log.i(TAG, "MessageListHolder");
+        // Log.i(TAG, "MessageListHolder");
 
         this.context = c;
 
@@ -80,7 +80,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
 
         if (m == null)
         {
@@ -108,20 +108,20 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
 
         // TODO:
         long ft_id = message.filetransfer_id;
-        Log.i(TAG, "getView:033:STATE:RESUME:ft_id=" + ft_id);
+        // Log.i(TAG, "getView:033:STATE:RESUME:ft_id=" + ft_id);
         if (ft_id != -1)
         {
             final Filetransfer ft_ = orma.selectFromFiletransfer().idEq(ft_id).get(0);
             final int percent = (int) (100f * (float) ft_.current_position / (float) ft_.filesize);
-            Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
+            // Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
             ft_progressbar.setProgress(percent);
-            // TODO: make text betters
+            // TODO: make text better
             textView.setText("" + message.text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n receiving ...");
         }
         else
         {
             ft_progressbar.setProgress(0);
-            // TODO: make text betters
+            // TODO: make text better
             textView.setText("" + message.text + "\n receiving ...");
         }
 

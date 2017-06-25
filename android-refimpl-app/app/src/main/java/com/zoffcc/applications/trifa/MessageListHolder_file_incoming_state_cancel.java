@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -33,24 +32,16 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 
-import info.guardianproject.iocipher.File;
-
-import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.copy_vfs_file_to_real_file;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
-import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 
 public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -71,7 +62,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     {
         super(itemView);
 
-        Log.i(TAG, "MessageListHolder");
+        // Log.i(TAG, "MessageListHolder");
 
         this.context = c;
 
@@ -89,7 +80,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
 
         if (m == null)
         {
@@ -110,6 +101,9 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         if (message.filedb_id == -1)
         {
             textView.setText("" + message.text + "\n *canceled*");
+            ft_preview_image.setImageDrawable(null);
+            ft_preview_container.setVisibility(View.GONE);
+            ft_preview_image.setVisibility(View.GONE);
         }
         else
         {
@@ -130,17 +124,19 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 e.printStackTrace();
             }
 
-            Log.i(TAG, "getView:033:STATE:CANCEL:OK:is_image=" + is_image);
+            // Log.i(TAG, "getView:033:STATE:CANCEL:OK:is_image=" + is_image);
 
             if (is_image)
             {
 
-                final Drawable d3 = new IconicsDrawable(this.context).
-                        icon(GoogleMaterial.Icon.gmd_photo).
-                        backgroundColor(Color.TRANSPARENT).
-                        color(Color.parseColor("#AA000000")).sizeDp(50);
+                //                final Drawable d3 = new IconicsDrawable(this.context).
+                //                        icon(GoogleMaterial.Icon.gmd_photo).
+                //                        backgroundColor(Color.TRANSPARENT).
+                //                        color(Color.parseColor("#AA000000")).sizeDp(50);
 
-                ft_preview_image.setImageDrawable(d3);
+                // ft_preview_image.setImageDrawable(d3);
+                ft_preview_image.setImageResource(R.drawable.round_loading_animation);
+                // final ImageButton ft_preview_image_ = ft_preview_image;
 
                 if (VFS_ENCRYPT)
                 {
@@ -172,115 +168,51 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
 
                     // TODO: this is just to show that it works. really bad and slow!!!!!
-                    // final View v_ = rowView;
-                    final Thread t_image_preview = new Thread()
+                    //final Thread t_image_preview = new Thread()
+                    //{
+                    //@Override
+                    // public void run()
+                    // {
+                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
+                    // final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
+                    //Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
+
+                    //final Runnable myRunnable = new Runnable()
+                    // {
+                    // @Override
+                    // public void run()
+                    // {
+                    try
                     {
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-                            }
-                            catch (Exception e)
-                            {
-                            }
+                        // Log.i(TAG, "glide:img:001");
 
-                            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
-                            final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
-                            Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
+                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+                        // apply(glide_options).
 
-                            final Runnable myRunnable = new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    try
-                                    {
-                                        Log.i(TAG, "glide:img:001");
+                        GlideApp.
+                                with(ft_preview_image.getContext()).
+                                load(f2).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(false).
+                                placeholder(R.drawable.round_loading_animation).
+                                into(ft_preview_image);
+                        // Log.i(TAG, "glide:img:002");
 
-                                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(40)));
-                                        GlideApp.
-                                                with(context).
-                                                load(new File(SD_CARD_TMP_DIR + "/" + temp_file_name)).
-                                                diskCacheStrategy(DiskCacheStrategy.NONE).
-                                                skipMemoryCache(false).
-                                                placeholder(d3).
-                                                listener(new com.bumptech.glide.request.RequestListener<Drawable>()
-                                                {
-                                                    @Override
-                                                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource)
-                                                    {
-                                                        Log.i(TAG, "glide:onResourceReady:model=" + model);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    //}
+                    //};
 
-                                                        try
-                                                        {
-                                                            java.io.File f = (java.io.File) model;
-                                                            f.delete();
-                                                            Log.i(TAG, "glide:cleanup:001");
-                                                        }
-                                                        catch (Exception e2)
-                                                        {
-                                                            e2.printStackTrace();
-                                                            Log.i(TAG, "glide:onResourceReady:EE:" + e2.getMessage());
-                                                        }
-
-                                                        return false;
-                                                    }
-
-                                                    @Override
-                                                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target target, boolean isFirstResource)
-                                                    {
-                                                        Log.i(TAG, "glide:onLoadFailed:model=" + model);
-
-                                                        try
-                                                        {
-                                                            java.io.File f = (java.io.File) model;
-                                                            f.delete();
-                                                            Log.i(TAG, "glide:cleanup:002");
-                                                        }
-                                                        catch (Exception e2)
-                                                        {
-                                                            e2.printStackTrace();
-                                                            Log.i(TAG, "glide:onLoadFailed:EE:" + e2.getMessage());
-                                                        }
-
-                                                        return false;
-                                                    }
-
-                                                }).
-                                                apply(glide_options).
-                                                into(ft_preview_image);
-                                        Log.i(TAG, "glide:img:002");
-
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-
-                                        try
-                                        {
-                                            java.io.File f = new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
-                                            f.delete();
-                                            Log.i(TAG, "glide:cleanup:003");
-                                        }
-                                        catch (Exception e2)
-                                        {
-                                            e2.printStackTrace();
-                                            Log.i(TAG, "glide:cleanup:EE2:" + e2.getMessage());
-                                        }
-
-                                    }
-                                }
-                            };
-
-                            if (main_handler_s != null)
-                            {
-                                main_handler_s.post(myRunnable);
-                            }
-                        }
-                    };
-                    t_image_preview.start();
+                    //if (main_handler_s != null)
+                    //{
+                    //    main_handler_s.post(myRunnable);
+                    //}
+                    //  }
+                    //};
+                    //t_image_preview.start();
                     // TODO: this is just to show that it work. really bad and slow!!!!!
                 }
             }

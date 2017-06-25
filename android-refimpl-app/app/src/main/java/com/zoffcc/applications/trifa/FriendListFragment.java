@@ -229,7 +229,7 @@ public class FriendListFragment extends Fragment
     // -----------------
     synchronized void modify_friend(final FriendList f, final long friendnum)
     {
-        Log.i(TAG, "modify_friend:start");
+        // Log.i(TAG, "modify_friend:start");
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -242,12 +242,12 @@ public class FriendListFragment extends Fragment
                     {
                         FriendList n = deep_copy(f2);
                         boolean found_friend = adapter.update_item(n);
-                        Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
+                        // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
 
                         if (!found_friend)
                         {
                             adapter.add_item(n);
-                            Log.i(TAG, "modify_friend:add_item");
+                            // Log.i(TAG, "modify_friend:add_item");
                         }
                     }
                 }
@@ -316,20 +316,20 @@ public class FriendListFragment extends Fragment
 
     void clear_friends()
     {
-        Log.i(TAG, "clear_friends");
+        // Log.i(TAG, "clear_friends");
         adapter.clear_items();
     }
 
     void add_friends_clear(final FriendList f)
     {
-        Log.i(TAG, "add_friends_clear");
+        // Log.i(TAG, "add_friends_clear");
         adapter.clear_items();
         adapter.add_item(f);
     }
 
     synchronized void add_all_friends_clear(final int delay)
     {
-        Log.i(TAG, "add_all_friends_clear");
+        // Log.i(TAG, "add_all_friends_clear");
 
         final Runnable myRunnable = new Runnable()
         {
@@ -342,7 +342,7 @@ public class FriendListFragment extends Fragment
                     {
                         if (in_update_data == true)
                         {
-                            Log.i(TAG, "add_all_friends_clear:already updating!");
+                            // Log.i(TAG, "add_all_friends_clear:already updating!");
                         }
                         else
                         {
@@ -354,7 +354,7 @@ public class FriendListFragment extends Fragment
                             List<FriendList> fl = orma.selectFromFriendList().toList();
                             if (fl != null)
                             {
-                                Log.i(TAG, "add_all_friends_clear:fl.size=" + fl.size());
+                                // Log.i(TAG, "add_all_friends_clear:fl.size=" + fl.size());
                                 if (fl.size() > 0)
                                 {
                                     int i = 0;
@@ -362,7 +362,7 @@ public class FriendListFragment extends Fragment
                                     {
                                         FriendList n = deep_copy(fl.get(i));
                                         adapter.add_item(n);
-                                        Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                        // Log.i(TAG, "add_all_friends_clear:add:" + n);
                                     }
                                 }
                             }
@@ -377,20 +377,20 @@ public class FriendListFragment extends Fragment
 
                 in_update_data = false;
 
-                Log.i(TAG, "add_all_friends_clear:READY");
+                // Log.i(TAG, "add_all_friends_clear:READY");
             }
         };
-        Log.i(TAG, "add_all_friends_clear:A:");
+        // Log.i(TAG, "add_all_friends_clear:A:");
         if (main_handler_s != null)
         {
             main_handler_s.post(myRunnable);
         }
-        Log.i(TAG, "add_all_friends_clear:B:");
+        // Log.i(TAG, "add_all_friends_clear:B:");
     }
 
     void add_friends(final FriendList f)
     {
-        Log.i(TAG, "add_friends");
+        // Log.i(TAG, "add_friends");
         Runnable myRunnable = new Runnable()
         {
             @Override

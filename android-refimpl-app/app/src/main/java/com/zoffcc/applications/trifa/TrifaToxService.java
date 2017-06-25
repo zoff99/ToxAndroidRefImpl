@@ -35,7 +35,6 @@ import android.widget.RemoteViews;
 import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
-import speex.EchoCanceller;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
@@ -44,6 +43,7 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
+import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
@@ -146,6 +146,8 @@ public class TrifaToxService extends Service
                         b.setColor(Color.parseColor("#04b431"));
                     }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
+
+                    get_network_connections();
                 }
                 else // if (a_TOXCONNECTION__f == 2)
                 {
@@ -156,6 +158,8 @@ public class TrifaToxService extends Service
                         b.setColor(Color.parseColor("#04b431"));
                     }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+
+                    get_network_connections();
                 }
             }
         }
@@ -357,6 +361,7 @@ public class TrifaToxService extends Service
             @Override
             public void run()
             {
+
                 // ------ correct startup order ------
                 boolean old_is_tox_started = is_tox_started;
                 Log.i(TAG, "is_tox_started:==============================");

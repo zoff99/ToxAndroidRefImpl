@@ -27,15 +27,16 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/circle_red"/>
 
-            <com.vanniktech.emoji.EmojiTextView
+            <com.luseen.autolinklibrary.EmojiTextViewLinks
                 android:id="@+id/m_text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_toRightOf="@id/m_icon"
                 android:ellipsize="marquee"
-                android:textColor="@color/md_black_1000"
+                android:textColorLink="@color/textblock_link_color_for_red"
                 android:text="** ERROR **"
+                android:textColor="@color/md_black_1000"
                 android:textSize="20sp"/>
 
         </LinearLayout>
