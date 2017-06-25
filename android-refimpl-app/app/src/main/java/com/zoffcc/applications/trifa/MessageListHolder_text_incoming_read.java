@@ -20,6 +20,10 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -49,7 +53,6 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
 
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -60,8 +63,9 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
         // Log.i(TAG, "bindMessageList");
 
         // textView.setText("#" + m.id + ":" + m.text);
-        textView.setText(m.text);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
         textView.setAutoLinkText(m.text);
+
         if (!m.read)
         {
             // not yet read
@@ -78,6 +82,22 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
             @Override
             public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText)
             {
+                if (autoLinkMode == AutoLinkMode.MODE_URL)
+                {
+                    showDialog_url(context, "open URL?", matchedText);
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_EMAIL)
+                {
+                    showDialog_email(context, "send Email?", matchedText);
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
+                {
+                    showDialog_url(context, "open URL?", "https://twitter.com/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
+                {
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^#", ""));
+                }
             }
         });
 
@@ -118,5 +138,70 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
         //        menu.show();
 
         return true;
+    }
+
+    private void showDialog_url(final Context c, final String title, final String url)
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+        builder.setMessage(url).setTitle(title).
+                setCancelable(false).
+                setPositiveButton("OK", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        try
+                        {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            c.startActivity(intent);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
+            {
+            }
+        });
+
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void showDialog_email(final Context c, final String title, final String email_addr)
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+        builder.setMessage(email_addr).setTitle(title).
+                setCancelable(false).
+                setPositiveButton("OK", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        try
+                        {
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email_addr, null));
+                            emailIntent.setType("message/rfc822");
+                            // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                            // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                            c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
+            {
+            }
+        });
+
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 }

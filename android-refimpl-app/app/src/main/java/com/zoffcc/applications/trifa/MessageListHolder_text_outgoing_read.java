@@ -68,7 +68,6 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         img_corner = (ImageView) itemView.findViewById(R.id.img_corner);
         text_block_group = (LinearLayout) itemView.findViewById(R.id.text_block_group);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -79,7 +78,7 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         // Log.i(TAG, "bindMessageList");
 
         // textView.setText("#" + m.id + ":" + m.text);
-        textView.setText(m.text);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
         textView.setAutoLinkText(m.text);
         if (!m.read)
         {
@@ -259,5 +258,4 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         final AlertDialog alert = builder.create();
         alert.show();
     }
-
 }
