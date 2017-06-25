@@ -3,4 +3,4 @@
 build
 *.iml
 local.properties
-gwitness.jar
+!gwitness.jar
