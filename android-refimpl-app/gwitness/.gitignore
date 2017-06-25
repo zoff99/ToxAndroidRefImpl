@@ -1,6 +1,7 @@
 .gradle
 .idea
-build
+build/classes
+build/tmp
+build/resources
 *.iml
 local.properties
-!gwitness.jar
