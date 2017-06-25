@@ -94,11 +94,11 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
             {
                 if (autoLinkMode == AutoLinkMode.MODE_URL)
                 {
-                    showDialog_url(context, "open URL?", matchedText);
+                    showDialog_url(context, "open URL?", matchedText.replaceFirst("^\\s", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_EMAIL)
                 {
-                    showDialog_email(context, "send Email?", matchedText);
+                    showDialog_email(context, "send Email?", matchedText.replaceFirst("^\\s", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
                 {
@@ -106,7 +106,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^#", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
                 }
             }
         });
@@ -196,9 +196,18 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
         return true;
     }
-    
-    private void showDialog_url(final Context c, final String title, final String url)
+
+    private void showDialog_url(final Context c, final String title, final String url1)
     {
+        String url2 = url1;
+
+        // check to see if protocol is specified in URL, otherwise add "http://"
+        if (!url2.contains("://"))
+        {
+            url2 = "http://" + url1;
+        }
+        final String url = url2;
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(url).setTitle(title).
                 setCancelable(false).
