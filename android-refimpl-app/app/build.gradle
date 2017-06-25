@@ -199,7 +199,7 @@ dependencies {
 dependencyVerification {
     verify = [
             'com.zoffcc.applications.trifajni:trifa-jni-lib:8326564083e6c2e97a56c7090128bd08328dca448bb0574caace38f86ecbda28',
-            'android-refimpl-app:library:351de06e3ba6b14d60994f947e300ac4be6b4b334079dcff6f884c61af56612f',
+            // 'android-refimpl-app:library:351de06e3ba6b14d60994f947e300ac4be6b4b334079dcff6f884c61af56612f',
             'com.mikepenz:materialdrawer:030c51b2ca97378b09dddaf21961ede6106c5a6f176d06c805b96679b142d342',
             'com.mikepenz:google-material-typeface:89f88bb2553641e8c510d742edc45fc6c7d943817cda4334a2848e40114d7807',
             'com.mikepenz:fontawesome-typeface:683832521b378d74e8d03a26a82f616010715dd8f82249814fb42bc77d01b3c2',

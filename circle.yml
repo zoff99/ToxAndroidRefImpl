@@ -240,6 +240,8 @@ compile:
   - ls -al /home/ubuntu/android-ndk
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:dependencies
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
+  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:'
+  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:' > $CIRCLE_ARTIFACTS/android/calculateChecksums.txt
 # --------- GRADLE -------------
 
 
