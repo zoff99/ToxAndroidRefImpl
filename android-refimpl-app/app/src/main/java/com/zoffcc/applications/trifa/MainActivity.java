@@ -737,7 +737,6 @@ public class MainActivity extends AppCompatActivity
         receiverFilter2 = new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
         receiver2 = new HeadsetStateReceiver();
         registerReceiver(receiver2, receiverFilter2);
-
     }
 
     public void clearCache()

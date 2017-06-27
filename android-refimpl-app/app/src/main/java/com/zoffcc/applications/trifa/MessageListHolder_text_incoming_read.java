@@ -35,6 +35,22 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 
 public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
+
+    /*
+     *
+     *
+     *  --- NOT USED NOW --- !!!!!!!!
+     *  --- NOT USED NOW --- !!!!!!!!
+     *  --- NOT USED NOW --- !!!!!!!!
+     *  --- NOT USED NOW --- !!!!!!!!
+     *  --- NOT USED NOW --- !!!!!!!!
+     *  --- NOT USED NOW --- !!!!!!!!
+     *  --- NOT USED NOW --- !!!!!!!!
+     *  --- NOT USED NOW --- !!!!!!!!
+     *
+     *
+     */
+
     private static final String TAG = "trifa.MessageListHolder";
 
     private Message message;
@@ -66,16 +82,16 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
         textView.setAutoLinkText(m.text);
 
-        if (!m.read)
-        {
-            // not yet read
-            imageView.setImageResource(R.drawable.circle_red);
-        }
-        else
-        {
-            // msg read by other party
-            imageView.setImageResource(R.drawable.circle_green);
-        }
+        //        if (!m.read)
+        //        {
+        //            // not yet read
+        //            imageView.setImageResource(R.drawable.circle_red);
+        //        }
+        //        else
+        //        {
+        //            // msg read by other party
+        //            imageView.setImageResource(R.drawable.circle_green);
+        //        }
 
         textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
         {

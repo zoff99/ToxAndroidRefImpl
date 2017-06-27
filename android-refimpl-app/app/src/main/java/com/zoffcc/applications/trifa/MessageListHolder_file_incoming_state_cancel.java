@@ -29,12 +29,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.luseen.autolinklibrary.AutoLinkMode;
+import com.luseen.autolinklibrary.EmojiTextViewLinks;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -42,6 +45,7 @@ import java.net.URLConnection;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -56,7 +60,9 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     ViewGroup ft_preview_container;
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
-    TextView textView;
+    EmojiTextViewLinks textView;
+    ImageView imageView;
+    de.hdodenhof.circleimageview.CircleImageView img_avatar;
 
     public MessageListHolder_file_incoming_state_cancel(View itemView, Context c)
     {
@@ -72,7 +78,9 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
-        textView = (TextView) itemView.findViewById(R.id.m_text);
+        textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
+        imageView = (ImageView) itemView.findViewById(R.id.m_icon);
+        img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -91,6 +99,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
         final Message message = m;
 
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
+
         button_ok.setVisibility(View.GONE);
         button_cancel.setVisibility(View.GONE);
         ft_progressbar.setVisibility(View.GONE);
@@ -100,7 +110,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
         if (message.filedb_id == -1)
         {
-            textView.setText("" + message.text + "\n *canceled*");
+            textView.setAutoLinkText("" + message.text + "\n *canceled*");
             ft_preview_image.setImageDrawable(null);
             ft_preview_container.setVisibility(View.GONE);
             ft_preview_image.setVisibility(View.GONE);
@@ -108,7 +118,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         else
         {
             // TODO: show preview and "click" to open/delete file
-            textView.setText("" + message.text + "\n +OK+");
+            textView.setAutoLinkText("" + message.text + "\n OK");
 
             boolean is_image = false;
             try
@@ -229,6 +239,53 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             ft_preview_container.setVisibility(View.VISIBLE);
             ft_preview_image.setVisibility(View.VISIBLE);
         }
+
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        img_avatar.setImageDrawable(d_lock);
+
+        try
+        {
+            if (VFS_ENCRYPT)
+            {
+                FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).get(0);
+
+                info.guardianproject.iocipher.File f1 = null;
+                try
+                {
+                    f1 = new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                if ((f1 != null) && (fl.avatar_pathname != null))
+                {
+                    // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+
+                    if (f1.length() > 0)
+                    {
+                        // byte[] byteArray = new byte[(int) f1.length()];
+                        // fis.read(byteArray, 0, (int) f1.length());
+                        // fis.close();
+
+                        final RequestOptions glide_options = new RequestOptions().fitCenter();
+                        GlideApp.
+                                with(context).
+                                load(f1).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(false).
+                                apply(glide_options).
+                                into(img_avatar);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

@@ -76,16 +76,16 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
         textView.setAutoLinkText(m.text);
 
-        if (!m.read)
-        {
-            // not yet read
-            imageView.setImageResource(R.drawable.circle_red);
-        }
-        else
-        {
-            // msg read by other party
-            imageView.setImageResource(R.drawable.circle_green);
-        }
+        //        if (!m.read)
+        //        {
+        //            // not yet read
+        //            imageView.setImageResource(R.drawable.circle_red);
+        //        }
+        //        else
+        //        {
+        //            // msg read by other party
+        //            imageView.setImageResource(R.drawable.circle_green);
+        //        }
 
         textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
         {
@@ -114,7 +114,6 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
         img_avatar.setImageDrawable(d_lock);
-
 
         try
         {
