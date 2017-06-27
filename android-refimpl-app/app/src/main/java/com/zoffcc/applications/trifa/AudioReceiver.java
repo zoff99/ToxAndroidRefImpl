@@ -30,6 +30,8 @@ import android.util.Log;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
+import static com.zoffcc.applications.trifa.MainActivity.isBluetoothScoOn_old;
+import static com.zoffcc.applications.trifa.MainActivity.isWiredHeadsetOn_old;
 
 public class AudioReceiver extends Thread
 {
@@ -143,16 +145,36 @@ public class AudioReceiver extends Thread
             MainActivity.AudioMode_old = audio_manager_s.getMode();
             MainActivity.RingerMode_old = audio_manager_s.getRingerMode();
             MainActivity.isSpeakerPhoneOn_old = audio_manager_s.isSpeakerphoneOn();
+            isWiredHeadsetOn_old = audio_manager_s.isWiredHeadsetOn();
+            isBluetoothScoOn_old = audio_manager_s.isBluetoothScoOn();
 
-            if (Callstate.audio_speaker)
+            if (audio_manager_s.isWiredHeadsetOn())
             {
-                // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
-                audio_manager_s.setSpeakerphoneOn(true);
+                if (Callstate.audio_speaker)
+                {
+                    audio_manager_s.setSpeakerphoneOn(true);
+                }
+                else
+                {
+                    audio_manager_s.setSpeakerphoneOn(false);
+                }
             }
             else
             {
-                // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 audio_manager_s.setSpeakerphoneOn(false);
+            }
+
+            if (audio_manager_s.isWiredHeadsetOn())
+            {
+                audio_manager_s.setWiredHeadsetOn(true);
+                try
+                {
+                    audio_manager_s.setBluetoothScoOn(false);
+                }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                }
             }
         }
         catch (Exception e)
@@ -345,6 +367,8 @@ public class AudioReceiver extends Thread
             audio_manager_s.setSpeakerphoneOn(MainActivity.isSpeakerPhoneOn_old);
             audio_manager_s.setMode(MainActivity.AudioMode_old);
             audio_manager_s.setRingerMode(MainActivity.RingerMode_old);
+            audio_manager_s.setWiredHeadsetOn(isWiredHeadsetOn_old);
+            audio_manager_s.setBluetoothScoOn(isBluetoothScoOn_old);
         }
         catch (Exception e)
         {

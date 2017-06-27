@@ -27,6 +27,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.LabeledIntent;
 import android.content.pm.PackageInfo;
@@ -162,6 +163,8 @@ public class MainActivity extends AppCompatActivity
     static int AudioMode_old;
     static int RingerMode_old;
     static boolean isSpeakerPhoneOn_old;
+    static boolean isWiredHeadsetOn_old;
+    static boolean isBluetoothScoOn_old;
     static Notification notification = null;
     static NotificationManager nmn3 = null;
     static int NOTIFICATION_ID = 293821038;
@@ -214,6 +217,10 @@ public class MainActivity extends AppCompatActivity
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
+    IntentFilter receiverFilter1 = null;
+    IntentFilter receiverFilter2 = null;
+    HeadsetStateReceiver receiver1 = null;
+    HeadsetStateReceiver receiver2 = null;
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -722,6 +729,15 @@ public class MainActivity extends AppCompatActivity
         {
             tox_thread_start();
         }
+
+        receiverFilter1 = new IntentFilter(AudioManager.ACTION_HEADSET_PLUG);
+        receiver1 = new HeadsetStateReceiver();
+        registerReceiver(receiver1, receiverFilter1);
+
+        receiverFilter2 = new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
+        receiver2 = new HeadsetStateReceiver();
+        registerReceiver(receiver2, receiverFilter2);
+
     }
 
     public void clearCache()

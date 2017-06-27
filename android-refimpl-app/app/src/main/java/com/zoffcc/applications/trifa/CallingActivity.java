@@ -96,7 +96,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     TextView right_top_text_1 = null;
     TextView right_top_text_2 = null;
     TextView right_left_text_1 = null;
-    int activity_state = 0;
+    static int activity_state = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -147,13 +147,45 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (event.getAction() != MotionEvent.ACTION_UP)
                 {
-                    Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
-                    mute_button.setImageDrawable(d1a);
+                    try
+                    {
+                        if (audio_manager_s.isMicrophoneMute())
+                        {
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                            mute_button.setImageDrawable(d1a);
+                        }
+                        else
+                        {
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                            mute_button.setImageDrawable(d1a);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 else
                 {
-                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
-                    mute_button.setImageDrawable(d2a);
+                    try
+                    {
+                        if (audio_manager_s.isMicrophoneMute())
+                        {
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                            mute_button.setImageDrawable(d2a);
+                            audio_manager_s.setMicrophoneMute(false);
+                        }
+                        else
+                        {
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                            mute_button.setImageDrawable(d2a);
+                            audio_manager_s.setMicrophoneMute(true);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 return true;
             }
@@ -789,7 +821,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     Callstate.audio_speaker = false;
                     try
                     {
-                        audio_manager_s.setSpeakerphoneOn(false);
+                        if (!audio_manager_s.isWiredHeadsetOn())
+                        {
+                            audio_manager_s.setSpeakerphoneOn(false);
+                        }
+
                         try
                         {
                             turnOffScreen();
@@ -814,7 +850,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     Callstate.audio_speaker = true;
                     try
                     {
-                        audio_manager_s.setSpeakerphoneOn(true);
+                        if (!audio_manager_s.isWiredHeadsetOn())
+                        {
+                            audio_manager_s.setSpeakerphoneOn(true);
+                        }
+
                         try
                         {
                             turnOnScreen();
