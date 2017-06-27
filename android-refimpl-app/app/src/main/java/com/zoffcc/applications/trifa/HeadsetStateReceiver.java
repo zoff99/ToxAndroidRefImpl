@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import static com.zoffcc.applications.trifa.CallingActivity.update_audio_device_icon;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 
 class HeadsetStateReceiver extends BroadcastReceiver
@@ -28,6 +29,8 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         Log.i(TAG, "onReceive:headset:plugged in");
                         audio_manager_s.setSpeakerphoneOn(false);
                         audio_manager_s.setWiredHeadsetOn(true);
+                        Callstate.audio_device = 1;
+                        update_audio_device_icon();
                         audio_manager_s.setBluetoothScoOn(false);
                     }
                     else
@@ -35,6 +38,8 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         // headset unplugged
                         Log.i(TAG, "onReceive:headset:unplugged");
                         audio_manager_s.setWiredHeadsetOn(false);
+                        Callstate.audio_device = 0;
+                        update_audio_device_icon();
                         if (Callstate.audio_speaker)
                         {
                             audio_manager_s.setSpeakerphoneOn(true);

@@ -28,6 +28,7 @@ import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.util.Log;
 
+import static com.zoffcc.applications.trifa.CallingActivity.update_audio_device_icon;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.isBluetoothScoOn_old;
@@ -167,6 +168,8 @@ public class AudioReceiver extends Thread
             if (audio_manager_s.isWiredHeadsetOn())
             {
                 audio_manager_s.setWiredHeadsetOn(true);
+                Callstate.audio_device = 1;
+                update_audio_device_icon();
                 try
                 {
                     audio_manager_s.setBluetoothScoOn(false);
@@ -175,6 +178,11 @@ public class AudioReceiver extends Thread
                 {
                     e2.printStackTrace();
                 }
+            }
+            else
+            {
+                Callstate.audio_device = 0;
+                update_audio_device_icon();
             }
         }
         catch (Exception e)

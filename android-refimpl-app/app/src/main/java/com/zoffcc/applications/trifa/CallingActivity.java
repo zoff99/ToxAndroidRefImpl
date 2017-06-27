@@ -71,6 +71,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     ImageButton decline_button = null;
     static ImageButton camera_toggle_button = null;
     static ImageButton mute_button = null;
+    static ImageView audio_device_icon = null;
     static TextView top_text_line = null;
     static CallingActivity ca = null;
     static String top_text_line_str1 = "";
@@ -137,8 +138,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         decline_button = (ImageButton) findViewById(R.id.decline_button);
         camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
         mute_button = (ImageButton) findViewById(R.id.mute_button);
+        audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
 
-        Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+        Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        audio_device_icon.setImageDrawable(null);
+
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         mute_button.setImageDrawable(d1);
         mute_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -151,12 +156,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         if (audio_manager_s.isMicrophoneMute())
                         {
-                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             mute_button.setImageDrawable(d1a);
                         }
                         else
                         {
-                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             mute_button.setImageDrawable(d1a);
                         }
                     }
@@ -171,13 +176,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         if (audio_manager_s.isMicrophoneMute())
                         {
-                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
                             audio_manager_s.setMicrophoneMute(false);
                         }
                         else
                         {
-                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
                             audio_manager_s.setMicrophoneMute(true);
                         }
@@ -191,14 +196,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-        Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
-        camera_toggle_button.setImageDrawable(d2);
+        final Drawable d5 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        camera_toggle_button.setImageDrawable(d5);
 
-        Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(12);
+        final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
         decline_button.setImageDrawable(d3);
         // #AARRGGBB
 
-        Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(12);
+        final Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50);
         accept_button.setImageDrawable(d4);
 
         if (Callstate.accepted_call == 1)
@@ -899,4 +904,41 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             right_left_text_1.setText("...");
         }
     }
+
+    static void update_audio_device_icon()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (Callstate.audio_device == 0)
+                    {
+                        audio_device_icon.setImageDrawable(null);
+                    }
+                    else if (Callstate.audio_device == 1)
+                    {
+                        Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        audio_device_icon.setImageDrawable(d4);
+                    }
+                    else if (Callstate.audio_device == 2)
+                    {
+                        Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        audio_device_icon.setImageDrawable(d4);
+                    }
+                    else // audio_device == ??
+                    {
+                        audio_device_icon.setImageDrawable(null);
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+        callactivity_handler_s.post(myRunnable);
+    }
+
 }
