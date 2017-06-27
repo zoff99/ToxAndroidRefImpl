@@ -88,7 +88,8 @@
         android:name="com.zoffcc.applications.trifa.MessageListFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        tools:layout="@layout/message_list_layout"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -124,7 +125,8 @@
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="12dp"
+            android:padding="7dp"
+            android:layout_margin="7dp"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/emoji_ios_category_people"
             tools:ignore="ContentDescription"/>
@@ -159,7 +161,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:onClick="send_message_onclick"
-                android:padding="2dp"
+                android:padding="5dp"
                 android:scaleType="fitCenter"
                 android:src="@android:drawable/ic_menu_send"/>
         </LinearLayout>
