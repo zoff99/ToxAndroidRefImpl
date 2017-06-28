@@ -101,6 +101,7 @@ import java.util.Map;
 import java.util.Random;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
+import info.guardianproject.netcipher.proxy.OrbotHelper;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
@@ -112,6 +113,8 @@ import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activi
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
@@ -215,6 +218,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__software_echo_cancel = false;
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
+    static boolean PREF__orbot_enabled = false;
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = true;
     static String versionName = "";
@@ -320,6 +324,41 @@ public class MainActivity extends AppCompatActivity
         {
             PREF__udp_enabled = 0;
         }
+
+        PREF__orbot_enabled = false;
+        boolean PREF__orbot_enabled__temp = settings.getBoolean("orbot_enabled", false);
+        if (PREF__orbot_enabled__temp)
+        {
+            boolean orbot_installed = OrbotHelper.isOrbotInstalled(this);
+            if (orbot_installed)
+            {
+                boolean orbot_running = OrbotHelper.isOrbotRunning(this);
+                if (orbot_running)
+                {
+                    PREF__orbot_enabled = true;
+                }
+                else
+                {
+                    if (OrbotHelper.requestStartTor(this))
+                    {
+                        PREF__orbot_enabled = true;
+                    }
+                }
+            }
+            else
+            {
+                Intent orbot_get = OrbotHelper.getOrbotInstallIntent(this);
+                try
+                {
+                    startActivity(orbot_get);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__notification_sound:2=" + PREF__notification_sound);
         Log.i(TAG, "PREF__notification_vibrate:2=" + PREF__notification_vibrate);
@@ -456,7 +495,12 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 else
                                 {
-                                    init(app_files_directory, PREF__udp_enabled);
+                                    int PREF__orbot_enabled_to_int = 0;
+                                    if (PREF__orbot_enabled)
+                                    {
+                                        PREF__orbot_enabled_to_int = 1;
+                                    }
+                                    init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
                                     tox_service_fg.tox_thread_start_fg();
                                 }
                             }
@@ -1006,10 +1050,39 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
-                        // TODO: move this also to Service
+                        // [TODO: move this also to Service.]
+                        // HINT: seems to work pretty ok now.
                         if (!is_tox_started)
                         {
-                            init(app_files_directory, PREF__udp_enabled);
+                            int PREF__orbot_enabled_to_int = 0;
+                            if (PREF__orbot_enabled)
+                            {
+                                PREF__orbot_enabled_to_int = 1;
+
+                                // need to wait for Orbot to be active ...
+                                // max 20 seconds!
+                                int max_sleep_iterations = 40;
+                                int sleep_iteration = 0;
+                                while (!OrbotHelper.isOrbotRunning(context_s))
+                                {
+                                    // sleep 0.5 seconds
+                                    sleep_iteration++;
+                                    try
+                                    {
+                                        Thread.sleep(500);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                    if (sleep_iteration > max_sleep_iterations)
+                                    {
+                                        // giving up
+                                        break;
+                                    }
+                                }
+                            }
+                            init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
                         }
 
                         tox_service_fg.tox_thread_start_fg();
@@ -1528,7 +1601,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir, int udp_enabled);
+    public native void init(@NonNull String data_dir, int udp_enabled, int orbot_enabled, String orbot_host, long orbot_port);
 
     public native String getNativeLibAPI();
 

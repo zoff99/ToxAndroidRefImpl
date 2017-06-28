@@ -27,6 +27,9 @@
     <string name="pref_title_udp_enabled">enable UDP</string>
     <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
 
+    <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
+    <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
+
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
 

@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 10
-static const char global_version_string[] = "0.99.10";
+#define VERSION_PATCH 11
+static const char global_version_string[] = "0.99.11";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -267,7 +267,7 @@ void dbg(int level, const char *fmt, ...)
 }
 
 
-Tox *create_tox(int udp_enabled)
+Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port)
 {
 	Tox *tox = NULL;
 	TOX_ERR_NEW error;
@@ -280,6 +280,17 @@ Tox *create_tox(int udp_enabled)
 	uint16_t tcp_port = 33776;
 
 	options.ipv6_enabled = true;
+
+	if (orbot_enabled == 1)
+	{
+		options.proxy_type = TOX_PROXY_TYPE_SOCKS5;
+		options.proxy_host = proxy_host;
+		options.proxy_port = proxy_port;
+	}
+	else
+	{
+		options.proxy_type = TOX_PROXY_TYPE_NONE;
+	}
 
 	if (udp_enabled == 1)
 	{
@@ -1301,7 +1312,7 @@ void *thread_video_av(void *data)
 }
 
 
-void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled)
+void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port)
 {
 	const char *s = NULL;
 
@@ -1380,7 +1391,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 
 
 	// ----------- create Tox instance -----------
-	tox_global = create_tox((int)udp_enabled);
+	const char *proxy_host_str =  (*env)->GetStringUTFChars(env, proxy_host, NULL);
+	tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port);
+	(*env)->ReleaseStringUTFChars(env, proxy_host, proxy_host_str);
 	dbg(9, "tox_global=%p", tox_global);
 	// ----------- create Tox instance -----------
 
@@ -1446,9 +1459,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled)
+Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port)
 {
-	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled));
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled, orbot_enabled, proxy_host, proxy_port));
 }
 
 

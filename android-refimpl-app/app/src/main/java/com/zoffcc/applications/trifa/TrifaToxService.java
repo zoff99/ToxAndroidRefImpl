@@ -239,8 +239,16 @@ public class TrifaToxService extends Service
                                         e.printStackTrace();
                                     }
 
-                                    vfs.unmount();
-                                    Log.i(TAG, "VFS:unmount:OK");
+                                    try
+                                    {
+                                        vfs.unmount();
+                                        Log.i(TAG, "VFS:unmount[1]:OK");
+                                    }
+                                    catch (Exception e5)
+                                    {
+                                        Log.i(TAG, "VFS:unmount[1]:EE5:" + e5.getMessage());
+                                        e5.printStackTrace();
+                                    }
                                 }
                                 else
                                 {
@@ -271,6 +279,17 @@ public class TrifaToxService extends Service
                         Log.i(TAG, "stop_me:010");
                         stopSelf();
                         Log.i(TAG, "stop_me:011");
+
+                        try
+                        {
+                            vfs.unmount();
+                            Log.i(TAG, "VFS:unmount[3]:OK");
+                        }
+                        catch (Exception e55)
+                        {
+                            Log.i(TAG, "VFS:unmount[3]:EE55:" + e55.getMessage());
+                            e55.printStackTrace();
+                        }
 
                         try
                         {

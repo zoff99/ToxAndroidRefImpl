@@ -55,6 +55,9 @@ public class TRIFAGlobals
 
     static final int CAMPREVIEW_NUM_BUFFERS = 3;
 
+    static final String ORBOT_PROXY_HOST = "127.0.0.1";
+    static final long ORBOT_PROXY_PORT = 9050;
+
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
