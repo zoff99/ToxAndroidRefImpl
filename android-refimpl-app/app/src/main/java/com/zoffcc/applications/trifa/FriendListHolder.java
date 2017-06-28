@@ -93,7 +93,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             return;
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         this.friendlist = fl;
 
