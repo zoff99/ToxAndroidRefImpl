@@ -140,7 +140,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.2@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.3@aar'
     compile project(':library')
     //
     //
@@ -148,10 +148,10 @@ dependencies {
         transitive = true
     }
     //
-    compile('com.mikepenz:google-material-typeface:3.0.1.0.original@aar') {
+    compile('com.mikepenz:google-material-typeface:3.0.1.1.original@aar') {
         exclude group: 'com.android.support'
     }
-    compile('com.mikepenz:fontawesome-typeface:4.7.0.0@aar') {
+    compile('com.mikepenz:fontawesome-typeface:4.7.0.1@aar') {
         exclude group: 'com.android.support'
     }
     compile('com.google.zxing:core:3.3.0') {
@@ -200,10 +200,9 @@ dependencies {
 dependencyVerification {
     verify = [
             // 'com.zoffcc.applications.trifajni:trifa-jni-lib:551750f3664336ec809a17f9aed37d63a7e9385df7803176940cc4ff30c30850',
-            // 'android-refimpl-app:library:351de06e3ba6b14d60994f947e300ac4be6b4b334079dcff6f884c61af56612f',
             'com.mikepenz:materialdrawer:030c51b2ca97378b09dddaf21961ede6106c5a6f176d06c805b96679b142d342',
-            'com.mikepenz:google-material-typeface:89f88bb2553641e8c510d742edc45fc6c7d943817cda4334a2848e40114d7807',
-            'com.mikepenz:fontawesome-typeface:683832521b378d74e8d03a26a82f616010715dd8f82249814fb42bc77d01b3c2',
+            //'com.mikepenz:google-material-typeface:89f88bb2553641e8c510d742edc45fc6c7d943817cda4334a2848e40114d7807',
+            //'com.mikepenz:fontawesome-typeface:683832521b378d74e8d03a26a82f616010715dd8f82249814fb42bc77d01b3c2',
             'com.google.zxing:core:bba7724e02a997cec38213af77133ee8e24b0d5cf5fa7ecbc16a4fa93f11ee0d',
             'com.github.gfx.android.orma:orma:a639113c84239b52f7c58641b86b4ce3e13a395567bf7b1f3d04069939abce53',
             'com.github.gfx.android.orma:orma-encryption:9971a52bcadebebb53662ba0a0eb26836af6d9919c7fe2e43a54167b9a45d82d',
