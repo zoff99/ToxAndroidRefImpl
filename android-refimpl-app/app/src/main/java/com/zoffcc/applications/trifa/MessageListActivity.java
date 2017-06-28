@@ -128,7 +128,7 @@ public class MessageListActivity extends AppCompatActivity
                 icon(FontAwesome.Icon.faw_smile_o).
                 color(getResources().
                         getColor(R.color.colorPrimaryDark)).
-                sizeDp(24);
+                sizeDp(80);
 
         insert_emoji.setImageDrawable(d1);
         // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
@@ -143,8 +143,8 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-        final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(40);
-        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(40);
+        final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         ml_friend_typing.setText("");
         attachemnt_instead_of_send = true;
@@ -266,7 +266,7 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(20);
+        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
         final long fn = friendnum;
@@ -364,7 +364,7 @@ public class MessageListActivity extends AppCompatActivity
                         icon(FontAwesome.Icon.faw_keyboard_o).
                         color(getResources().
                                 getColor(R.color.colorPrimaryDark)).
-                        sizeDp(24);
+                        sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.about_icon_email);
@@ -385,7 +385,7 @@ public class MessageListActivity extends AppCompatActivity
                         icon(FontAwesome.Icon.faw_smile_o).
                         color(getResources().
                                 getColor(R.color.colorPrimaryDark)).
-                        sizeDp(24);
+                        sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
