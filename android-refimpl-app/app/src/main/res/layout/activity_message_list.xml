@@ -20,7 +20,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:orientation="horizontal">
 
         <ImageView
@@ -68,15 +68,14 @@
 
         <ImageButton
             android:id="@+id/ml_phone_icon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="6dip"
-            android:layout_marginRight="6dip"
+            android:layout_margin="7dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:onClick="start_call_to_friend"
-            android:padding="2dp"
+            android:padding="7dp"
             android:scaleType="centerInside"
             android:src="@drawable/circle_orange"/>
 
@@ -124,9 +123,9 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
+            android:layout_margin="7dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="7dp"
-            android:layout_margin="7dp"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/emoji_ios_category_people"
             tools:ignore="ContentDescription"/>

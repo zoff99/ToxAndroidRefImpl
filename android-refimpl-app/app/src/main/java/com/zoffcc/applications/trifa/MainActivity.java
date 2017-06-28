@@ -92,7 +92,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -200,6 +202,7 @@ public class MainActivity extends AppCompatActivity
     static int[] audio_buffer_2_read_length = new int[audio_in_buffer_max_count];
     static TrifaToxService tox_service_fg = null;
     static long update_all_messages_global_timestamp = -1;
+    final static SimpleDateFormat df_date_time_long = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     //
     static boolean PREF__UV_reversed = true; // TODO: on older phones this needs to be "false"
     static boolean PREF__notification_sound = true;
@@ -4749,6 +4752,19 @@ public class MainActivity extends AppCompatActivity
     {
         Detector.updateReportMap();
         Collector.updateReports();
+    }
+
+    static String long_date_time_format(long timestamp_in_millis)
+    {
+        try
+        {
+            return df_date_time_long.format(new Date(timestamp_in_millis));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "*Datetime ERROR*";
+        }
     }
 
     // --------- make app crash ---------

@@ -29,6 +29,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -39,6 +40,7 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -51,6 +53,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    TextView date_time;
 
     public MessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -63,6 +66,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -75,6 +79,8 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         // textView.setText("#" + m.id + ":" + m.text);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
         textView.setAutoLinkText(m.text);
+
+        date_time.setText(long_date_time_format(m.rcvd_timestamp));
 
         //        if (!m.read)
         //        {
