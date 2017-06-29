@@ -40,7 +40,9 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 
 public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -75,11 +77,10 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
 
     public void bindMessageList(Message m)
     {
-        // Log.i(TAG, "bindMessageList");
-
-        // textView.setText("#" + m.id + ":" + m.text);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
+        textView.setCustomRegex(TOXURL_PATTERN);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
         textView.setAutoLinkText(m.text);
+
         if (!m.read)
         {
             // not yet read
@@ -90,6 +91,16 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
             // msg read by other party
             imageView.setImageResource(R.drawable.circle_green);
         }
+
+
+        // textView.setHashtagModeColor(ContextCompat.getColor(this.context, android.R.color.holo_blue_dark));
+        // textView.setPhoneModeColor(ContextCompat.getColor(this.context, android.R.color.holo_red_dark));
+        // textView.setCustomModeColor(ContextCompat.getColor(this.context, android.R.color.holo_orange_dark));
+        // textView.setUrlModeColor(ContextCompat.getColor(this.context, android.R.color.holo_green_dark));
+        // textView.setMentionModeColor(ContextCompat.getColor(this.context, android.R.color.holo_green_light));
+        // textView.setEmailModeColor(ContextCompat.getColor(this.context, android.R.color.holo_blue_bright));
+        // textView.setSelectedStateColor(ContextCompat.getColor(this.context, android.R.color.holo_blue_dark));
+        // textView.enableUnderLine();
 
         textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
         {
@@ -111,6 +122,10 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
                     showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
+                {
+                    showDialog_tox(context, "add ToxID?", matchedText.replaceFirst("^\\s", ""));
                 }
             }
         });
@@ -250,6 +265,37 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
                             // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                             // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
                             c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
+            {
+            }
+        });
+
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void showDialog_tox(final Context c, final String title, final String toxid)
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+        builder.setMessage(toxid.toUpperCase()).setTitle(title).
+                setCancelable(false).
+                setPositiveButton("OK", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        try
+                        {
+                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
+                            add_friend_real(friend_tox_id);
                         }
                         catch (Exception e)
                         {

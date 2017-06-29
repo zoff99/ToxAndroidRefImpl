@@ -33,6 +33,9 @@ import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 
+import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
+
 public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
     private static final String TAG = "trifa.MessageListHolder";
@@ -60,10 +63,8 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
 
     public void bindMessageList(Message m)
     {
-        // Log.i(TAG, "bindMessageList");
-
-        // textView.setText("#" + m.id + ":" + m.text);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
+        textView.setCustomRegex(TOXURL_PATTERN);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
         textView.setAutoLinkText(m.text);
 
         if (!m.read)
@@ -97,6 +98,10 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
                     showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
+                {
+                    showDialog_tox(context, "add ToxID?", matchedText.replaceFirst("^\\s", ""));
                 }
             }
         });
@@ -196,6 +201,37 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
                             // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                             // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
                             c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
+            {
+            }
+        });
+
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void showDialog_tox(final Context c, final String title, final String toxid)
+    {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+        builder.setMessage(toxid.toUpperCase()).setTitle(title).
+                setCancelable(false).
+                setPositiveButton("OK", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        try
+                        {
+                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
+                            add_friend_real(friend_tox_id);
                         }
                         catch (Exception e)
                         {
