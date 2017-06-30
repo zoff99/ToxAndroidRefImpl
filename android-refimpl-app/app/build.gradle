@@ -21,7 +21,7 @@ import java.security.MessageDigest
 
 buildscript {
     dependencies {
-        classpath files('../gwitness/build/libs/gwitness.jar')
+        classpath files('../gwitness/gwit/libs/gwitness.jar')
     }
 }
 
