@@ -236,7 +236,7 @@ compile:
 # --------- GRADLE -------------
 # - cd android-refimpl-app/ ; if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then gradle wrapper --no-daemon --gradle-version "$GRADLE_CUSTOM_VNUM" --info ; else gradle wrapper --no-daemon --info ; fi ; exit 0
   - cd android-refimpl-app/ ; chmod a+rx ./gradlew
-  - cd android-refimpl-app/gwitness ; mkdir gwit ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ../gradlew build --info
+  - cd android-refimpl-app/gwitness ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ../gradlew clean ; ../gradlew build --info
   - ls -al /home/ubuntu/android-ndk
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:dependencies
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
