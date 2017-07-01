@@ -1,6 +1,6 @@
 apply plugin: 'groovy'
 
-project.buildDir = '/gwit'
+project.buildDir = 'gwit'
 
 dependencies {
     compile gradleApi()
