@@ -33,7 +33,11 @@ public class Message_model
     public static final int FILE_INCOMING_STATE_PAUSE_HAS_ACCEPTED = 3003;
     public static final int FILE_INCOMING_STATE_RESUME = 3004;
 
-    public static final int FILE_OUTGOING = 4001;
+    public static final int FILE_OUTGOING_STATE_CANCEL = 4001;
+    public static final int FILE_OUTGOING_STATE_PAUSE_NOT_YET_STARTED = 4002;
+    public static final int FILE_OUTGOING_STATE_PAUSE_NOT_YET_ACCEPTED = 4003;
+    public static final int FILE_OUTGOING_STATE_PAUSE_HAS_ACCEPTED = 4004;
+    public static final int FILE_OUTGOING_STATE_RESUME = 4005;
 
     public static final int ERROR_UNKNOWN = 9999;
 }

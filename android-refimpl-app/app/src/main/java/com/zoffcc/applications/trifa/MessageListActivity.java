@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Px;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +36,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.angads25.filepicker.controller.DialogSelectionListener;
+import com.github.angads25.filepicker.model.DialogConfigs;
+import com.github.angads25.filepicker.model.DialogProperties;
+import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -47,9 +52,12 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
+import java.io.File;
+
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
+import static com.zoffcc.applications.trifa.MainActivity.insert_into_filetransfer_db;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
@@ -58,9 +66,13 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -338,7 +350,6 @@ public class MessageListActivity extends AppCompatActivity
         MainActivity.message_list_activity = this;
     }
 
-
     private void setUpEmojiPopup()
     {
         emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener()
@@ -483,36 +494,81 @@ public class MessageListActivity extends AppCompatActivity
         String msg = "";
         try
         {
-            if (attachemnt_instead_of_send)
+            if (is_friend_online(friendnum) != 0)
             {
-                // add attachement
-            }
-            else
-            {
-                // send typed message to friend
-                msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
-
-                Message m = new Message();
-                m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
-                m.direction = 1; // msg sent
-                m.TOX_MESSAGE_TYPE = 0;
-                m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
-                m.rcvd_timestamp = 0L;
-                m.is_new = false; // own messages are always "not new"
-                m.sent_timestamp = System.currentTimeMillis();
-                m.read = false;
-                m.text = msg;
-
-                if ((msg != null) && (!msg.equalsIgnoreCase("")))
+                if (attachemnt_instead_of_send)
                 {
-                    long res = tox_friend_send_message(friendnum, 0, msg);
-                    Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
+                    // add attachement
+                    DialogProperties properties = new DialogProperties();
+                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                    properties.selection_type = DialogConfigs.FILE_SELECT;
+                    properties.root = new java.io.File("/");
+                    properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                    properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                    // TODO: hardcoded is always bad
+                    properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF", "zip", "ZIP", "avi", "AVI", "mp4", "MP4"};
+                    FilePickerDialog dialog = new FilePickerDialog(this, properties);
+                    dialog.setTitle("Select File");
 
-                    if (res > -1)
+                    dialog.setDialogSelectionListener(new DialogSelectionListener()
                     {
-                        m.message_id = res;
-                        insert_into_message_db(m, true);
-                        ml_new_message.setText("");
+                        @Override
+                        public void onSelectedFilePaths(String[] files)
+                        {
+                            try
+                            {
+                                Log.i(TAG, "select_file:" + files);
+                                final String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
+                                final String src_filename = new File(files[0]).getName();
+                                Log.i(TAG, "select_file:p=" + src_path + " f=" + src_filename);
+
+                                final Thread t = new Thread()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        add_outgoing_file(src_path, src_filename);
+                                    }
+                                };
+                                t.start();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "select_file:EE1:" + e.getMessage());
+                            }
+                        }
+                    });
+
+                    dialog.show();
+                }
+                else
+                {
+                    // send typed message to friend
+                    msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
+
+                    Message m = new Message();
+                    m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
+                    m.direction = 1; // msg sent
+                    m.TOX_MESSAGE_TYPE = 0;
+                    m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                    m.rcvd_timestamp = 0L;
+                    m.is_new = false; // own messages are always "not new"
+                    m.sent_timestamp = System.currentTimeMillis();
+                    m.read = false;
+                    m.text = msg;
+
+                    if ((msg != null) && (!msg.equalsIgnoreCase("")))
+                    {
+                        long res = tox_friend_send_message(friendnum, 0, msg);
+                        Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
+
+                        if (res > -1)
+                        {
+                            m.message_id = res;
+                            insert_into_message_db(m, true);
+                            ml_new_message.setText("");
+                        }
                     }
                 }
             }
@@ -524,6 +580,80 @@ public class MessageListActivity extends AppCompatActivity
         }
 
         // Log.i(TAG,"send_message_onclick:---end");
+    }
+
+    void add_outgoing_file(String filepath, String filename)
+    {
+        Log.i(TAG, "file_recv:incoming regular file");
+
+        long file_size = -1;
+        try
+        {
+            file_size = new java.io.File(filepath + "/" + filename).length();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            // file length unknown?
+            return;
+        }
+
+        if (file_size < 1)
+        {
+            // file length "zero"?
+            return;
+        }
+
+        Filetransfer f = new Filetransfer();
+        f.tox_public_key_string = tox_friend_get_public_key__wrapper(friendnum);
+        f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
+        f.file_number = friendnum;
+        f.kind = ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA.value;
+        f.state = TOX_FILE_CONTROL_PAUSE.value;
+        f.path_name = filepath;
+        f.file_name = filename;
+        f.filesize = file_size;
+        f.ft_accepted = false;
+        f.ft_outgoing_started = false;
+        f.current_position = 0;
+
+        long ft_id = insert_into_filetransfer_db(f);
+
+
+        // add FT message to UI
+        Message m = new Message();
+
+        m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
+        m.direction = 1; // msg outgoing
+        m.TOX_MESSAGE_TYPE = 0;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
+        m.filetransfer_id = ft_id;
+        m.filedb_id = -1;
+        m.state = TOX_FILE_CONTROL_PAUSE.value;
+        m.ft_accepted = false;
+        m.ft_outgoing_started = false;
+        m.filename_fullpath = new java.io.File(filepath + "/" + filename).getAbsolutePath();
+        m.sent_timestamp = System.currentTimeMillis();
+        m.text = filename + "\n" + file_size + " bytes";
+
+        long new_msg_id = insert_into_message_db(m, true);
+
+        f.message_id = new_msg_id;
+        update_filetransfer_db_full(f);
+
+        // --- ??? should we do this here?
+        //        try
+        //        {
+        //            // update "new" status on friendlist fragment
+        //            FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+        //            friend_list_fragment.modify_friend(f2, friendnum);
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
+        //        }
+        // --- ??? should we do this here?
     }
 
     public void start_call_to_friend(View view)

@@ -87,11 +87,21 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
                 return new MessageListHolder_file_incoming_state_resume(view, this.context);
 
-            case Message_model.FILE_OUTGOING:
-                // TODO: make file outgoing layout
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
-                return new MessageListHolder_file_outgoing(view, this.context);
-
+            case Message_model.FILE_OUTGOING_STATE_CANCEL:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                return new MessageListHolder_file_outgoing_state_cancel(view, this.context);
+            case Message_model.FILE_OUTGOING_STATE_PAUSE_HAS_ACCEPTED:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                return new MessageListHolder_file_outgoing_state_pause_has_accepted(view, this.context);
+            case Message_model.FILE_OUTGOING_STATE_PAUSE_NOT_YET_ACCEPTED:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                return new MessageListHolder_file_outgoing_state_pause_not_yet_accepted(view, this.context);
+            case Message_model.FILE_OUTGOING_STATE_PAUSE_NOT_YET_STARTED:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                return new MessageListHolder_file_outgoing_state_pause_not_yet_started(view, this.context);
+            case Message_model.FILE_OUTGOING_STATE_RESUME:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                return new MessageListHolder_file_outgoing_state_resume(view, this.context);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_error, parent, false);
@@ -142,7 +152,42 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             else
             {
                 // outgoing file -----------
-                return Message_model.FILE_OUTGOING;
+                if (my_msg.state == TOX_FILE_CONTROL_CANCEL.value)
+                {
+                    // ------- STATE: CANCEL -------------
+                    return Message_model.FILE_OUTGOING_STATE_CANCEL;
+                    // ------- STATE: CANCEL -------------
+                }
+                else if (my_msg.state == TOX_FILE_CONTROL_PAUSE.value)
+                {
+                    // ------- STATE: PAUSE -------------
+                    if (my_msg.ft_accepted == false)
+                    {
+                        if (my_msg.ft_outgoing_started == false)
+                        {
+                            return Message_model.FILE_OUTGOING_STATE_PAUSE_NOT_YET_STARTED;
+                        }
+                        else
+                        {
+                            // not yet accepted
+                            return Message_model.FILE_OUTGOING_STATE_PAUSE_NOT_YET_ACCEPTED;
+                            // not yet accepted
+                        }
+                    }
+                    else
+                    {
+                        // has accepted
+                        return Message_model.FILE_OUTGOING_STATE_PAUSE_HAS_ACCEPTED;
+                        // has accepted
+                    }
+                    // ------- STATE: PAUSE -------------
+                }
+                else
+                {
+                    // ------- STATE: RESUME -------------
+                    return Message_model.FILE_OUTGOING_STATE_RESUME;
+                    // ------- STATE: RESUME -------------
+                }
             }
             // FILE -------------
         }
@@ -222,8 +267,20 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                     ((MessageListHolder_file_incoming_state_resume) holder).bindMessageList(m2);
                     break;
 
-                case Message_model.FILE_OUTGOING:
-                    ((MessageListHolder_file_outgoing) holder).bindMessageList(m2);
+                case Message_model.FILE_OUTGOING_STATE_CANCEL:
+                    ((MessageListHolder_file_outgoing_state_cancel) holder).bindMessageList(m2);
+                    break;
+                case Message_model.FILE_OUTGOING_STATE_PAUSE_HAS_ACCEPTED:
+                    ((MessageListHolder_file_outgoing_state_pause_has_accepted) holder).bindMessageList(m2);
+                    break;
+                case Message_model.FILE_OUTGOING_STATE_PAUSE_NOT_YET_ACCEPTED:
+                    ((MessageListHolder_file_outgoing_state_pause_not_yet_accepted) holder).bindMessageList(m2);
+                    break;
+                case Message_model.FILE_OUTGOING_STATE_PAUSE_NOT_YET_STARTED:
+                    ((MessageListHolder_file_outgoing_state_pause_not_yet_started) holder).bindMessageList(m2);
+                    break;
+                case Message_model.FILE_OUTGOING_STATE_RESUME:
+                    ((MessageListHolder_file_outgoing_state_resume) holder).bindMessageList(m2);
                     break;
 
                 default:

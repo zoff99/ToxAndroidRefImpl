@@ -50,6 +50,9 @@ public class FileDB
     @Column(defaultExpr = "-1")
     long filesize = -1;
 
+    @Column(indexed = true, defaultExpr = "true", helpers = Column.Helpers.ALL)
+    boolean is_in_VFS = true;
+
     static FileDB deep_copy(FileDB in)
     {
         FileDB out = new FileDB();
@@ -59,12 +62,13 @@ public class FileDB
         out.path_name = in.path_name;
         out.file_name = in.file_name;
         out.filesize = in.filesize;
+        out.is_in_VFS = in.is_in_VFS;
         return out;
     }
 
     @Override
     public String toString()
     {
-        return "id=" + id + ", kind=" + kind + ", path_name=" + path_name + ", file_name" + file_name + ", filesize=" + filesize + ", direction=" + direction;
+        return "id=" + id + ", kind=" + kind + ", is_in_VFS=" + is_in_VFS + ", path_name=" + path_name + ", file_name" + file_name + ", filesize=" + filesize + ", direction=" + direction;
     }
 }

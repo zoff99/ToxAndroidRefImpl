@@ -55,6 +55,9 @@ public class Message
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     boolean ft_accepted = false;
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    boolean ft_outgoing_started = false;
+
     @Column(indexed = true, defaultExpr = "-1")
     long filedb_id; // f_key -> FileDB.id
 
@@ -93,6 +96,7 @@ public class Message
         out.TRIFA_MESSAGE_TYPE = in.TRIFA_MESSAGE_TYPE;
         out.state = in.state;
         out.ft_accepted = in.ft_accepted;
+        out.ft_outgoing_started = in.ft_outgoing_started;
         out.filedb_id = in.filedb_id;
         out.filetransfer_id = in.filetransfer_id;
         out.sent_timestamp = in.sent_timestamp;

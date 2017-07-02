@@ -51,6 +51,9 @@ public class Filetransfer
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     boolean ft_accepted = false;
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    boolean ft_outgoing_started = false;
+
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String path_name = "";
 
@@ -78,6 +81,7 @@ public class Filetransfer
         out.kind = in.kind;
         out.state = in.state;
         out.ft_accepted = in.ft_accepted;
+        out.ft_outgoing_started=in.ft_outgoing_started;
         out.path_name = in.path_name;
         out.file_name = in.file_name;
         out.fos_open = in.fos_open;

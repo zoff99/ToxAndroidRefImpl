@@ -46,9 +46,9 @@ import java.net.URLConnection;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
-import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 
-public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
+public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
     private static final String TAG = "trifa.MessageListHolder";
 
@@ -65,7 +65,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
 
-    public MessageListHolder_file_incoming_state_cancel(View itemView, Context c)
+    public MessageListHolder_file_outgoing_state_pause_not_yet_started(View itemView, Context c)
     {
         super(itemView);
 
@@ -102,120 +102,27 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
 
-        button_ok.setVisibility(View.GONE);
-        button_cancel.setVisibility(View.GONE);
         ft_progressbar.setVisibility(View.GONE);
-        ft_buttons_container.setVisibility(View.GONE);
+        ft_buttons_container.setVisibility(View.VISIBLE);
+        ft_preview_container.setVisibility(View.VISIBLE);
+        ft_preview_image.setVisibility(View.VISIBLE);
 
         final Message message2 = message;
 
-        if (message.filedb_id == -1)
-        {
-            textView.setAutoLinkText("" + message.text + "\n *canceled*");
-            ft_preview_image.setImageDrawable(null);
-            ft_preview_container.setVisibility(View.GONE);
-            ft_preview_image.setVisibility(View.GONE);
-        }
-        else
-        {
-            // TODO: show preview and "click" to open/delete file
-            textView.setAutoLinkText("" + message.text + "\n OK");
+        final Drawable d1 = new IconicsDrawable(context).
+                icon(GoogleMaterial.Icon.gmd_check_circle).
+                backgroundColor(Color.TRANSPARENT).
+                color(Color.parseColor("#EF088A29")).sizeDp(50);
+        button_ok.setImageDrawable(d1);
+        final Drawable d2 = new IconicsDrawable(context).
+                icon(GoogleMaterial.Icon.gmd_highlight_off).
+                backgroundColor(Color.TRANSPARENT).
+                color(Color.parseColor("#A0FF0000")).sizeDp(50);
+        button_cancel.setImageDrawable(d2);
+        ft_buttons_container.setVisibility(View.VISIBLE);
 
-            boolean is_image = false;
-            try
-            {
-                String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
-                if (mimeType.startsWith("image"))
-                {
-                    is_image = true;
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            // Log.i(TAG, "getView:033:STATE:CANCEL:OK:is_image=" + is_image);
-
-            if (is_image)
-            {
-
-                //                final Drawable d3 = new IconicsDrawable(this.context).
-                //                        icon(GoogleMaterial.Icon.gmd_photo).
-                //                        backgroundColor(Color.TRANSPARENT).
-                //                        color(Color.parseColor("#AA000000")).sizeDp(50);
-
-                // ft_preview_image.setImageDrawable(d3);
-                ft_preview_image.setImageResource(R.drawable.round_loading_animation);
-                // final ImageButton ft_preview_image_ = ft_preview_image;
-
-                if (VFS_ENCRYPT)
-                {
-                    ft_preview_image.setOnTouchListener(new View.OnTouchListener()
-                    {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event)
-                        {
-                            if (event.getAction() == MotionEvent.ACTION_UP)
-                            {
-                                try
-                                {
-                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
-                                    intent.putExtra("image_filename", message2.filename_fullpath);
-                                    v.getContext().startActivity(intent);
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                    Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
-                                }
-                            }
-                            else
-                            {
-                            }
-                            return true;
-                        }
-                    });
-
-
-                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
-                    try
-                    {
-                        // Log.i(TAG, "glide:img:001");
-
-                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
-                        // apply(glide_options).
-
-                        GlideApp.
-                                with(context).
-                                load(f2).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(false).
-                                priority(Priority.LOW).
-                                placeholder(R.drawable.round_loading_animation).
-                                into(ft_preview_image);
-                        // Log.i(TAG, "glide:img:002");
-
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            else
-            {
-                final Drawable d3 = new IconicsDrawable(this.context).
-                        icon(GoogleMaterial.Icon.gmd_attachment).
-                        backgroundColor(Color.TRANSPARENT).
-                        color(Color.parseColor("#AA000000")).sizeDp(50);
-
-                ft_preview_image.setImageDrawable(d3);
-            }
-
-            ft_preview_container.setVisibility(View.VISIBLE);
-            ft_preview_image.setVisibility(View.VISIBLE);
-        }
+        button_ok.setVisibility(View.VISIBLE);
+        button_cancel.setVisibility(View.VISIBLE);
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
         img_avatar.setImageDrawable(d_lock);
@@ -224,19 +131,19 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         {
             if (VFS_ENCRYPT)
             {
-                FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).get(0);
+                String fname = get_vfs_image_filename_own_avatar();
 
                 info.guardianproject.iocipher.File f1 = null;
                 try
                 {
-                    f1 = new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename);
+                    f1 = new info.guardianproject.iocipher.File(fname);
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
 
-                if ((f1 != null) && (fl.avatar_pathname != null))
+                if ((f1 != null) && (fname != null))
                 {
                     if (f1.length() > 0)
                     {
@@ -247,7 +154,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                 skipMemoryCache(false).
                                 apply(glide_options).
-                                priority(Priority.HIGH).
                                 into(img_avatar);
                     }
                 }
@@ -258,6 +164,84 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             e.printStackTrace();
         }
 
+
+        textView.setAutoLinkText("" + message.text + "\n\nSend this file?");
+
+        boolean is_image = false;
+        try
+        {
+            String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+            if (mimeType.startsWith("image"))
+            {
+                is_image = true;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        if (is_image)
+        {
+            ft_preview_image.setImageResource(R.drawable.round_loading_animation);
+
+            ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+            {
+                @Override
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    if (event.getAction() == MotionEvent.ACTION_UP)
+                    {
+                        try
+                        {
+                            Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                            intent.putExtra("image_filename", message2.filename_fullpath);
+                            v.getContext().startActivity(intent);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
+                        }
+                    }
+                    else
+                    {
+                    }
+                    return true;
+                }
+            });
+
+
+            java.io.File f2 = new java.io.File(message2.filename_fullpath);
+            try
+            {
+                final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+
+                GlideApp.
+                        with(context).
+                        load(f2).
+                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                        skipMemoryCache(false).
+                        priority(Priority.LOW).
+                        placeholder(R.drawable.round_loading_animation).
+                        into(ft_preview_image);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+        else
+        {
+            final Drawable d3 = new IconicsDrawable(this.context).
+                    icon(GoogleMaterial.Icon.gmd_attachment).
+                    backgroundColor(Color.TRANSPARENT).
+                    color(Color.parseColor("#AA000000")).sizeDp(50);
+
+            ft_preview_image.setImageDrawable(d3);
+        }
     }
 
     @Override
@@ -279,7 +263,20 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     {
         Log.i(TAG, "onLongClick");
 
-        // sfinal Message m2 = this.message;
+        // final Message m2 = this.message;
+
+        //        PopupMenu menu = new PopupMenu(v.getContext(), v);
+        //        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+        //        {
+        //            @Override
+        //            public boolean onMenuItemClick(MenuItem item)
+        //            {
+        //                int id = item.getItemId();
+        //                return true;
+        //            }
+        //        });
+        //        menu.inflate(R.menu.menu_friendlist_item);
+        //        menu.show();
 
         return true;
     }

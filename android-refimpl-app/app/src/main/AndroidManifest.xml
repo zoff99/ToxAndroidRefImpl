@@ -98,6 +98,10 @@
             android:name=".ImageviewerActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>
+        <activity
+            android:name=".ImageviewerActivity_SD"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
 
         <activity
             android:name=".SettingsActivity"

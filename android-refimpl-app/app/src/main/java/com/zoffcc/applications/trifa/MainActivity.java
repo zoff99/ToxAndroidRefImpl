@@ -2766,6 +2766,7 @@ public class MainActivity extends AppCompatActivity
             f.file_name = filename;
             f.filesize = file_size;
             f.ft_accepted = false;
+            f.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
             f.current_position = 0;
 
             long ft_id = insert_into_filetransfer_db(f);
@@ -2781,6 +2782,7 @@ public class MainActivity extends AppCompatActivity
             m.filedb_id = -1;
             m.state = TOX_FILE_CONTROL_PAUSE.value;
             m.ft_accepted = false;
+            m.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
             m.rcvd_timestamp = System.currentTimeMillis();
             m.text = filename + "\n" + file_size + " bytes";
 

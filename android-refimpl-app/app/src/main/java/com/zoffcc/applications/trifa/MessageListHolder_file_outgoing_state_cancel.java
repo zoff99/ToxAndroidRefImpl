@@ -26,7 +26,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class MessageListHolder_file_outgoing extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
+public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
     private static final String TAG = "trifa.MessageListHolder";
 
@@ -36,7 +36,7 @@ public class MessageListHolder_file_outgoing extends RecyclerView.ViewHolder imp
     TextView textView;
     ImageView imageView;
 
-    public MessageListHolder_file_outgoing(View itemView, Context c)
+    public MessageListHolder_file_outgoing_state_cancel(View itemView, Context c)
     {
         super(itemView);
 
