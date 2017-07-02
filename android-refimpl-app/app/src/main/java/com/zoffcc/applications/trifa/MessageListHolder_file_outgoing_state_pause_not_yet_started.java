@@ -46,7 +46,16 @@ import java.net.URLConnection;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
+import static com.zoffcc.applications.trifa.MainActivity.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_start_sending_from_id;
+import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
+import static com.zoffcc.applications.trifa.MainActivity.set_message_start_sending_from_id;
+import static com.zoffcc.applications.trifa.MainActivity.set_message_state_from_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.update_single_message_from_messge_id;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 
 public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -180,6 +189,72 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
         {
             e.printStackTrace();
         }
+
+
+        button_ok.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    try
+                    {
+                        // accept FT
+                        set_message_start_sending_from_id(message.id);
+                        set_filetransfer_start_sending_from_id(message.filetransfer_id);
+
+                        button_ok.setVisibility(View.GONE);
+
+                        // update message view
+                        update_single_message_from_messge_id(message.id, true);
+
+                        Log.i(TAG, "button_ok:OnTouch:009");
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+                else
+                {
+                }
+                return true;
+            }
+        });
+
+
+        button_cancel.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    try
+                    {
+                        // cancel FT
+                        Log.i(TAG, "button_cancel:OnTouch:001");
+                        tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey), get_filetransfer_filenum_from_id(message.filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
+                        set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
+                        set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+
+                        button_ok.setVisibility(View.GONE);
+                        button_cancel.setVisibility(View.GONE);
+                        ft_progressbar.setVisibility(View.GONE);
+
+                        // update message view
+                        update_single_message_from_messge_id(message.id, true);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+                else
+                {
+                }
+                return true;
+            }
+        });
 
 
         if (is_image)

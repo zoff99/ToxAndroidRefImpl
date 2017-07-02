@@ -3398,6 +3398,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static void set_message_start_sending_from_id(long message_id)
+    {
+        try
+        {
+            orma.updateMessage().idEq(message_id).ft_outgoing_started(true).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "set_message_start_sending_from_id:EE:" + e.getMessage());
+        }
+    }
+
     public static void set_message_filedb_from_friendnum_and_filenum(long friend_number, long file_number, long filedb_id)
     {
         try
@@ -3443,6 +3456,18 @@ public class MainActivity extends AppCompatActivity
         try
         {
             orma.updateFiletransfer().idEq(filetransfer_id).state(state).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void set_filetransfer_start_sending_from_id(long filetransfer_id)
+    {
+        try
+        {
+            orma.updateFiletransfer().idEq(filetransfer_id).ft_outgoing_started(true).execute();
         }
         catch (Exception e)
         {
