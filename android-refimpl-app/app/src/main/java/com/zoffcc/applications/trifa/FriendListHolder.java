@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -133,6 +134,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                 placeholder(d_lock).
+                                priority(Priority.HIGH).
                                 skipMemoryCache(false).
                                 apply(glide_options).
                                 into(avatar);

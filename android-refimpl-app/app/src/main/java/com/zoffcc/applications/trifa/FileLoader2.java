@@ -62,33 +62,86 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
 
     private class MyDataFetcher implements DataFetcher<java.io.InputStream>
     {
-        info.guardianproject.iocipher.File in;
+        info.guardianproject.iocipher.File in = null;
         String temp_file_name = null;
         long rand_num = -1L;
+        long rand_num_model = -1L;
+        java.io.InputStream out = null;
 
         public MyDataFetcher(info.guardianproject.iocipher.File model_)
         {
             // Log.i(TAG, "MyDataFetcher");
             in = model_;
+            out = null;
+            // rand_num_model = (long) (Math.random() * 10000d);
         }
 
         @Override
-        public void loadData(Priority priority, DataCallback<? super java.io.InputStream> callback)
+        public void loadData(final Priority priority, DataCallback<? super java.io.InputStream> callback)
         {
-            // Log.i(TAG, "loadData");
-
-            java.io.InputStream out = null;
-
+            // Log.i(TAG, "loadData:" + rand_num_model + ":" + "001");
             try
             {
+
+                if (priority == Priority.LOW)
+                {
+                    // Log.i(TAG, "loadData:Priority.LOW");
+                    try
+                    {
+                        Thread.sleep(300); // sleep 0.3s
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+                //                else if (priority == Priority.NORMAL)
+                //                {
+                //                    // Log.i(TAG, "loadData:Priority.NORMAL");
+                //                    try
+                //                    {
+                //                        Thread.sleep(50); // sleep 0.05s
+                //                    }
+                //                    catch (Exception e)
+                //                    {
+                //                    }
+                //                }
+
                 // System.out.println("fileloader2:loadData:000b:data=" + in);
                 // System.out.println("fileloader2:loadData:001:" + in.getAbsolutePath());
 
-                rand_num = (long) (Math.random() * 10000d);
-                temp_file_name = copy_vfs_file_to_real_file(in.getParent(), in.getName(), SD_CARD_TMP_DIR, "_glide" + "_" + rand_num);
+                // Log.i(TAG, "loadData:" + rand_num_model + ":" + "002");
+
+                final Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (priority == Priority.LOW)
+                        {
+                            this.setPriority(Thread.MIN_PRIORITY);
+                        }
+                        else if (priority == Priority.NORMAL)
+                        {
+                            this.setPriority(Thread.NORM_PRIORITY);
+                        }
+                        else if (priority == Priority.HIGH)
+                        {
+                            this.setPriority(Thread.MAX_PRIORITY);
+                        }
+                        rand_num = (long) (Math.random() * 10000d);
+                        temp_file_name = copy_vfs_file_to_real_file(in.getParent(), in.getName(), SD_CARD_TMP_DIR, "_glide" + "_" + rand_num);
+                    }
+                };
+                // Log.i(TAG, "loadData:" + rand_num_model + ":" + "003");
+                t.start();
+                // Log.i(TAG, "loadData:" + rand_num_model + ":" + "004");
+                t.join();
+                // Log.i(TAG, "loadData:" + rand_num_model + ":" + "005");
+
                 // System.out.println("fileloader2:loadData:000a:temp_file_name=" + temp_file_name);
-                new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
+                // new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
                 out = new java.io.FileInputStream(SD_CARD_TMP_DIR + "/" + temp_file_name);
+                // Log.i(TAG, "loadData:" + rand_num_model + ":" + "006");
                 // System.out.println("fileloader2:loadData:000a:data=" + in + " file_new=" + SD_CARD_TMP_DIR + "/" + temp_file_name);
             }
             catch (Exception e)
@@ -98,15 +151,34 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
             }
             // System.out.println("fileloader2:loadData:004:onDataReady=" + out);
 
+            // Log.i(TAG, "loadData:" + rand_num_model + ":" + "007");
             callback.onDataReady(out);
-
+            // Log.i(TAG, "loadData:" + rand_num_model + ":" + "099");
             // Log.i(TAG, "loadData:end");
         }
 
         @Override
         public void cleanup()
         {
-            Log.i(TAG, "cleanup");
+            // Log.i(TAG, "cleanup:" + rand_num_model + ":" + "001");
+
+            //            try
+            //            {
+            //                Thread.sleep(200); // sleep 0.2s
+            //            }
+            //            catch (Exception e)
+            //            {
+            //            }
+
+            try
+            {
+                out.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "cleanup:EE1:" + e.getMessage());
+            }
 
             try
             {
@@ -119,26 +191,17 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
             catch (Exception e)
             {
                 e.printStackTrace();
+                Log.i(TAG, "cleanup:EE2:" + e.getMessage());
             }
+
+            // Log.i(TAG, "cleanup:" + rand_num_model + ":" + "099");
         }
 
         @Override
         public void cancel()
         {
-            Log.i(TAG, "cancel");
-
-            try
-            {
-                // close stuff and remove temp files
-                if (temp_file_name != null)
-                {
-                    new File(temp_file_name).delete();
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            // this is run on the main UI thread!!
+            // Log.i(TAG, "cancel");
         }
 
         @Override
@@ -152,7 +215,6 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
         public DataSource getDataSource()
         {
             // Log.i(TAG, "getDataSource:" + DataSource.LOCAL);
-
             return DataSource.LOCAL;
         }
     }

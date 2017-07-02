@@ -32,6 +32,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -177,21 +178,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     });
 
 
-                    // TODO: this is just to show that it works. really bad and slow!!!!!
-                    //final Thread t_image_preview = new Thread()
-                    //{
-                    //@Override
-                    // public void run()
-                    // {
                     info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
-                    // final String temp_file_name = copy_vfs_file_to_real_file(f2.getParent(), f2.getName(), SD_CARD_TMP_DIR, "_3");
-                    //Log.i(TAG, "glide:loadData:000a:temp_file_name=" + temp_file_name);
-
-                    //final Runnable myRunnable = new Runnable()
-                    // {
-                    // @Override
-                    // public void run()
-                    // {
                     try
                     {
                         // Log.i(TAG, "glide:img:001");
@@ -200,10 +187,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                         // apply(glide_options).
 
                         GlideApp.
-                                with(ft_preview_image.getContext()).
+                                with(context).
                                 load(f2).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                 skipMemoryCache(false).
+                                priority(Priority.LOW).
                                 placeholder(R.drawable.round_loading_animation).
                                 into(ft_preview_image);
                         // Log.i(TAG, "glide:img:002");
@@ -213,17 +201,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     {
                         e.printStackTrace();
                     }
-                    //}
-                    //};
-
-                    //if (main_handler_s != null)
-                    //{
-                    //    main_handler_s.post(myRunnable);
-                    //}
-                    //  }
-                    //};
-                    //t_image_preview.start();
-                    // TODO: this is just to show that it work. really bad and slow!!!!!
                 }
             }
             else
@@ -276,6 +253,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                 skipMemoryCache(false).
                                 apply(glide_options).
+                                priority(Priority.HIGH).
                                 into(img_avatar);
                     }
                 }
