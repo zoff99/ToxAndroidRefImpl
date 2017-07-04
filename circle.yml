@@ -140,13 +140,13 @@ compile:
   override:
 
 # --- generic build ---
-  - . ~/pp;curl -s http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+  - curl -s http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
 # --- verfiy NDK package ---
   - echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' > android-ndk-r13b-linux-x86_64.zip.sha256
   - sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256
 # --- verfiy NDK package ---
-  - . ~/pp;unzip android-ndk-r13b-linux-x86_64.zip
-  - . ~/pp;mv -v /home/ubuntu/ToxAndroidRefImpl/android-ndk-r13b /home/ubuntu/android-ndk
+  - unzip android-ndk-r13b-linux-x86_64.zip
+  - mv -v /home/ubuntu/ToxAndroidRefImpl/android-ndk-r13b /home/ubuntu/android-ndk
 # --- generic build ---
 
 
