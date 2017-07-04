@@ -286,7 +286,9 @@ compile:
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk # --target=armv7-android-gcc
+
+  # --force-target=x86-android-gcc --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --sdk-path=/Downloads/android-ndk-r9d/
+  - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=x86-android-gcc
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
