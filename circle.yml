@@ -329,9 +329,9 @@ compile:
   - cd ~/ ; git clone https://github.com/TokTok/c-toxcore ~/tmp111
   - cd ~/ ; ls -al c-toxcore/
   - mkdir -p ~/tc_save
-  - cd ~/ ; mv -v c-toxcore/toolchains ~/tc_save
+  - cd ~/ ; mv -v c-toxcore/toolchains ~/tc_save/
   - cd ~/ ; rm -Rf c-toxcore/ ; mkdir c-toxcore/
-  - cd ~/ ; mv -v ~/tc_save c-toxcore/toolchains
+  - cd ~/ ; mv -v ~/tc_save/toolchains c-toxcore/
   - cd ~/ ; mv -v ~/tmp111/.??* c-toxcore/
   - cd ~/ ; mv -v ~/tmp111/* c-toxcore/
   - cd ~/ ; ls -al ~/tmp111/
