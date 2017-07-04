@@ -8,12 +8,25 @@ machine:
 # --- Android build ---
     _toolchain_: "/home/ubuntu/c-toxcore/toolchains/"
     _s_: "/home/ubuntu/c-toxcore/src/"
+    # ---- arm -----
+    AND_TOOLCHAIN_ARCH: "arm"
+    AND_TOOLCHAIN_ARCH2: "arm-linux-androideabi"
     AND_PATH: "$_toolchain_/arm-linux-androideabi/bin:$PATH"
     AND_PKG_CONFIG_PATH: "$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
     AND_CC: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
     AND_GCC: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-gcc"
     AND_CXX: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang++"
     AND_READELF: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-readelf"
+    # ---- x86 -----
+    AND_TOOLCHAIN_ARCH_X86: "x86"
+    AND_TOOLCHAIN_ARCH2_X86: "x86"
+    AND_PATH_X86: "$_toolchain_/x86/bin:$PATH"
+    AND_PKG_CONFIG_PATH_X86: "$_toolchain_/x86/sysroot/usr/lib/pkgconfig"
+    AND_CC_X86: "$_toolchain_/x86/bin/i686-linux-android-clang"
+    AND_GCC_X86: "$_toolchain_/x86/bin/i686-linux-android-gcc"
+    AND_CXX_X86: "$_toolchain_/x86/bin/i686-linux-android-clang++"
+    AND_READELF_X86: "$_toolchain_/x86/bin/i686-linux-android-readelf"
+
 # --- Android build ---
 
     # ---------------------------------------------------
@@ -126,20 +139,30 @@ dependencies:
 compile:
   override:
 
+# --- generic build ---
+  - . ~/pp;curl -s http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+# --- verfiy NDK package ---
+  - echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' > android-ndk-r13b-linux-x86_64.zip.sha256
+  - sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256
+# --- verfiy NDK package ---
+  - . ~/pp;unzip android-ndk-r13b-linux-x86_64.zip
+  - . ~/pp;mv -v /home/ubuntu/ToxAndroidRefImpl/android-ndk-r13b /home/ubuntu/android-ndk
+# --- generic build ---
+
+
+
+
 # --- Android build ---
-  - echo 'export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS=""' > ~/pp
+  - echo 'export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > ~/pp
   - chmod u+x ~/pp
+  - rm -Rf "$_s_"
   - mkdir -p "$_s_"
 
   - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
   - mkdir -p $CIRCLE_ARTIFACTS/android/
 
-
   - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
-  - . ~/pp;curl -s http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
-  - . ~/pp;unzip android-ndk-r13b-linux-x86_64.zip
-  - . ~/pp;mv -v /home/ubuntu/ToxAndroidRefImpl/android-ndk-r13b /home/ubuntu/android-ndk
-  - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch arm --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
+  - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
 
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
   - . ~/pp;cd $_s_/yasm/;autoreconf -fi
@@ -231,6 +254,126 @@ compile:
   # - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
   # --------- we use gradle witness, so we need to use the maven artefact ---------
 # --- Android build ---
+
+
+
+
+
+
+
+
+# --- Android x86 build ---
+  - echo 'export PATH="$AND_PATH_X86";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH_X86";export READELF="$AND_READELF_X86";export GCC="$AND_GCC_X86";export CC="$AND_CC_X86";export CXX="$AND_CXX_X86";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH_X86";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2_X86"' > ~/pp
+  - chmod u+x ~/pp
+  - rm -Rf "$_s_"
+  - mkdir -p "$_s_"
+
+  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
+  - mkdir -p $CIRCLE_ARTIFACTS/android/
+
+  - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
+  - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/"$TOOLCHAIN_ARCH2" --api 12 --force   
+
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
+  - . ~/pp;cd $_s_/yasm/;autoreconf -fi
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;$_s_/yasm/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
+  - . ~/pp;cd ~/build/;make -j4
+  - . ~/pp;cd ~/build/;make install
+
+
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk # --target=armv7-android-gcc
+  - . ~/pp;cd ~/build/;make -j4
+  - . ~/pp;cd ~/build/;make install
+  - . ~/pp;cd ~/build/;make clean
+  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
+  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
+  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
+
+
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_/opus/;autoreconf -fi
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;$_s_/opus/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
+  - . ~/pp;cd ~/build/;make -j4
+  - . ~/pp;cd ~/build/;make install
+  - . ~/pp;cd ~/build/;make clean
+  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
+  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
+  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
+    
+    
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
+  - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --enable-minimal --disable-pie
+  - . ~/pp;cd ~/build/;make -j4
+  - . ~/pp;cd ~/build/;make install
+  - . ~/pp;cd ~/build/;make clean
+  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
+  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
+  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libsodium.zip *
+
+
+  # --- get wanted c-toxcore version ---
+  # ---- git does not clone into existing dir. why? --> so use workaround here ---
+  - cd ~/ ; git clone https://github.com/TokTok/c-toxcore ~/tmp111
+  - cd ~/ ; mv -v ~/tmp111/.??* c-toxcore/
+  - cd ~/ ; mv -v ~/tmp111/* c-toxcore/
+  - cd ~/ ; ls -al ~/tmp111/
+  - cd ~/ ; rm -Rf ~/tmp111
+  # ---- git does not clone into existing dir. why? --> so use workaround here ---
+  - cd ~/c-toxcore/ ; git checkout "$AND_CTOXCORE_VERSION"
+  - ls -al ~
+  - ls -al ~/c-toxcore/
+  # --- get wanted c-toxcore version ---
+
+  - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --enable-logging --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --disable-testing --disable-rt
+  - . ~/pp;cd ~/build/;export V=2;make -j4
+  - . ~/pp;cd ~/build/;make install
+  - . ~/pp;cd ~/build/;make clean
+  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
+  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
+  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/c-toxcore.zip *
+
+
+  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
+  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
+
+  - find / -name 'cpu-features*' 2>/dev/null ; exit 0
+  - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
+
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxav.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libvpx.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libopus.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+  - . ~/pp;cd jni-c-toxcore/; ls -al
+  #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
+  - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
+  - . ~/pp;cd jni-c-toxcore/; $READELF -a libjni-c-toxcore.so
+  - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
+  - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/x86/
+
+  # --------- we use gradle witness, so we need to use the maven artefact ---------
+  # - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
+  # --------- we use gradle witness, so we need to use the maven artefact ---------
+# --- Android x86 build ---
+
+
+
+
+
+
+
+
+
+
 
 
 # --------- GRADLE -------------
