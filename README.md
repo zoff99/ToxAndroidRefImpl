@@ -2,7 +2,7 @@
 
 This is not a Reference Client, it's c-toxcore for Android.
 
-<a href="https://f-droid.org/app/YOUR.APP.ID"><img src="https://gitlab.com/fdroid/artwork/raw/master/badge/get-it-on.png" width="200"></a>
+<a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://gitlab.com/fdroid/artwork/raw/master/badge/get-it-on.png" width="200"></a>
 
 Build Status
 =
