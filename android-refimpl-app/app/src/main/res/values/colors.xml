@@ -9,4 +9,5 @@
     <color name="textblock_link_color_for_blue">@android:color/holo_orange_dark</color>
     <color name="textblock_link_color_for_orange">@android:color/holo_blue_dark</color>
     <color name="textblock_link_color_for_red">@android:color/holo_blue_bright</color>
+
 </resources>

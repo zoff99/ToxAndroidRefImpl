@@ -25,6 +25,8 @@ buildscript {
     }
 }
 
+// gradlew -q calculateChecksums
+
 apply plugin: 'com.android.application'
 apply plugin: 'witness'
 
@@ -116,8 +118,8 @@ android {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 10005
-        versionName "1.0.5"
+        versionCode 10006
+        versionName "1.0.6"
 
         renderscriptTargetApi 25
         renderscriptSupportModeEnabled true
@@ -140,11 +142,11 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.3@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.4@aar'
     compile project(':library')
     //
     //
-    compile('com.mikepenz:materialdrawer:5.9.3@aar') {
+    compile('com.mikepenz:materialdrawer:5.9.4@aar') {
         transitive = true
         exclude group: 'com.android.support'
         exclude group: 'com.github.bumptech.glide'
@@ -187,7 +189,9 @@ dependencies {
     //
     compile 'com.github.medyo:android-about-page:1.2.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile 'com.vanniktech:emoji-ios:0.4.0'
+    compile ('com.vanniktech:emoji-ios:0.5.1') {
+        exclude group: 'com.android.support'
+    }
     compile 'com.l4digital.fastscroll:fastscroll:1.0.4'
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
     compile 'info.guardianproject.netcipher:netcipher:1.2.1'
@@ -201,8 +205,8 @@ dependencies {
 
 dependencyVerification {
     verify = [
-            'com.zoffcc.applications.trifajni:trifa-jni-lib:fcbe677d3ce2abfe2aba2a00b312d2f2d8ed1829d854af918137017c2348bf9f',
-            'com.mikepenz:materialdrawer:f8a0e341da6fd62588fd87260208dd616e16fcd79c8605720f3f25b65ce41ea1',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:dbce06111d805f5629a8cc8f9f6d8d0e61b03e61259e95ec21b17402967fc90b',
+            'com.mikepenz:materialdrawer:e126b6bb3f362e23875710d4bb3c3c9e6e0c0fbda62376218b454f1604e90251',
             'com.mikepenz:google-material-typeface:72f56673dd5f646193cfe7b7513a4689869365069d27ac60faf4c4fdfb330054',
             'com.mikepenz:fontawesome-typeface:ea35952a9126ddf01ad9c804c24fa97fad577ab4eb2af74e364d198040eabcd4',
             'com.google.zxing:core:bba7724e02a997cec38213af77133ee8e24b0d5cf5fa7ecbc16a4fa93f11ee0d',
@@ -219,7 +223,7 @@ dependencyVerification {
             'info.guardianproject.iocipher:IOCipher:ab7da0f23e256a2ced9492c73e37812c26e7beccc1a99815e6d65a75728ba6d3',
             'com.github.medyo:android-about-page:262adb9c4e2ee9eea2ede2a1f4f64594c5f0f3a142255a70e6393361b158ad40',
             'de.hdodenhof:circleimageview:bcbc588e19e6dcf8c120b1957776bfe229efba5d2fbe5da7156372eeacf65503',
-            'com.vanniktech:emoji-ios:8c8492311a83fad0e22d785a976de9b5ed2a6970c60aeb034e1b5fdcf1f5dd1d',
+            'com.vanniktech:emoji-ios:f30f5ad996b81d3a1a5987055d22b2e1bcecc5067c1524addabb271366452e80',
             'com.l4digital.fastscroll:fastscroll:54886e21c76ca3fbad958c0c21d8f8cc83f24cf41f83e0138bd7a3d6f2b5bbe5',
             'com.github.armcha:AutoLinkTextView:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
             'info.guardianproject.netcipher:netcipher:611ec5bde9d799fd57e1efec5c375f9f460de2cdda98918541decc9a7d02f2ad',
@@ -243,7 +247,7 @@ dependencyVerification {
             'com.android.support:animated-vector-drawable:4bc46edf1946b32d518b41416d1734e915e0cbb28021de3b340527419b070691',
             'com.android.support:transition:36c688825a8c0e6e879e18886de83dc90673322822d5b606ee302f70fb558e16',
             'com.android.support.constraint:constraint-layout-solver:8c62525a9bc5cff5633a96cb9b32fffeccaf41b8841aa87fc22607070dea9b8d',
-            'com.vanniktech:emoji:741ef2eff9c4cbc176292bea40cdf898a7a2219909cfaa86f67b77694df44d1d',
+            'com.vanniktech:emoji:d55f44e04e31895647d62c33c34a8d501995e9e1b5c5f5cee6cbb8630eeb37f7',
             'com.github.bumptech.glide:gifdecoder:0ab61481061c1237711f70652c4abf83d461e5ca0fd2e55af0fe3f9fdcf73c6e',
             'com.github.bumptech.glide:disklrucache:da55fe28ae8b8003f4fe963fec67b7620ad6c545b58cec01f599fb788c419a18',
             'com.github.bumptech.glide:annotations:36efd480cbd30ef29a461621776592427e50e072614d29bd006f5f3fa6f18127',

@@ -9,4 +9,11 @@
         <attr name="metaButtonBarButtonStyle" format="reference"/>
     </declare-styleable>
 
+    <!-- for emoji 0.5.1 ?? -->
+    <attr name="cardBackgroundColor" format="color"></attr>
+    <attr name="cardCornerRadius" format="dimension"></attr>
+    <attr name="cardElevation" format="dimension"></attr>
+    <attr name="cardUseCompatPadding" format="boolean"></attr>
+    <!-- for emoji 0.5.1 ?? -->
+
 </resources>

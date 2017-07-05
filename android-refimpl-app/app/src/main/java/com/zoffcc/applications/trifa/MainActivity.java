@@ -442,6 +442,7 @@ public class MainActivity extends AppCompatActivity
         // create the drawer and remember the `Drawer` result object
         main_drawer = new DrawerBuilder().
                 withActivity(this).
+                withToolbar(toolbar).
                 addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(), item6).
                 withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).
                 withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()

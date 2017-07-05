@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.annotation.Px;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -44,9 +43,7 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.vanniktech.emoji.EmojiPopup;
-import com.vanniktech.emoji.emoji.Emoji;
 import com.vanniktech.emoji.listeners.OnEmojiBackspaceClickListener;
-import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
@@ -75,6 +72,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MS
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+
+// import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
 
 public class MessageListActivity extends AppCompatActivity
 {
@@ -352,20 +351,24 @@ public class MessageListActivity extends AppCompatActivity
 
     private void setUpEmojiPopup()
     {
+
+        //        .setOnEmojiClickedListener(new OnEmojiClickedListener()
+        //        {
+        //        @Override
+        //        public void onEmojiClicked(@NonNull final Emoji emoji)
+        //        {
+        //            Log.d(TAG, "Clicked on emoji");
+        //        }})
+
+
         emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener()
         {
             @Override
-            public void onEmojiBackspaceClicked(final View v)
+            public void onEmojiBackspaceClick(View v)
             {
-                Log.d(TAG, "Clicked on Backspace");
+
             }
-        }).setOnEmojiClickedListener(new OnEmojiClickedListener()
-        {
-            @Override
-            public void onEmojiClicked(@NonNull final Emoji emoji)
-            {
-                Log.d(TAG, "Clicked on emoji");
-            }
+
         }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
         {
             @Override
