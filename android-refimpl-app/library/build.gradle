@@ -24,7 +24,7 @@ model {
             moduleName = 'speex'
             platformVersion = '9'
             toolchain = 'clang'
-            abiFilters.addAll(["armeabi-v7a"])
+            abiFilters.addAll(["armeabi-v7a","x86"])
 
             CFlags.add('-g')
             CFlags.add('-DFIXED_POINT')
