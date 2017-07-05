@@ -6,7 +6,7 @@ model {
         buildToolsVersion = '25.0.0'
 
         defaultConfig {
-            minSdkVersion.apiLevel = 9
+            minSdkVersion.apiLevel = 12
             targetSdkVersion.apiLevel = 24
         }
 
@@ -22,7 +22,7 @@ model {
 
         ndk {
             moduleName = 'speex'
-            platformVersion = '9'
+            platformVersion = '12'
             toolchain = 'clang'
             abiFilters.addAll(["armeabi-v7a","x86"])
 
