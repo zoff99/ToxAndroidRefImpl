@@ -17,6 +17,7 @@ machine:
     AND_GCC: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-gcc"
     AND_CXX: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang++"
     AND_READELF: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-readelf"
+    AND_ARTEFACT_DIR: "arm"
     # ---- x86 -----
     AND_TOOLCHAIN_ARCH_X86: "x86"
     AND_TOOLCHAIN_ARCH2_X86: "x86"
@@ -26,6 +27,7 @@ machine:
     AND_GCC_X86: "$_toolchain_/x86/bin/i686-linux-android-gcc"
     AND_CXX_X86: "$_toolchain_/x86/bin/i686-linux-android-clang++"
     AND_READELF_X86: "$_toolchain_/x86/bin/i686-linux-android-readelf"
+    AND_ARTEFACT_DIR_X86: "x86"
 
 # --- Android build ---
 
@@ -147,19 +149,22 @@ compile:
 # --- verfiy NDK package ---
   - unzip android-ndk-r13b-linux-x86_64.zip
   - mv -v /home/ubuntu/ToxAndroidRefImpl/android-ndk-r13b /home/ubuntu/android-ndk
+
+  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
+  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
 # --- generic build ---
 
 
 
 
 # --- Android build ---
-  - echo 'export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > ~/pp
+  - echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > ~/pp
   - chmod u+x ~/pp
   - rm -Rf "$_s_"
   - mkdir -p "$_s_"
 
   - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - mkdir -p $CIRCLE_ARTIFACTS/android/
+  - mkdir -p $CIRCLE_ARTIFACTS/android/$ARTEFACT_DIR
 
   - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
   - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
@@ -236,10 +241,6 @@ compile:
   - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/c-toxcore.zip *
 
-
-  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
-  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
-
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
@@ -264,13 +265,13 @@ compile:
 
 
 # --- Android x86 build ---
-  - echo 'export PATH="$AND_PATH_X86";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH_X86";export READELF="$AND_READELF_X86";export GCC="$AND_GCC_X86";export CC="$AND_CC_X86";export CXX="$AND_CXX_X86";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH_X86";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2_X86"' > ~/pp
+  - echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR_X86";export PATH="$AND_PATH_X86";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH_X86";export READELF="$AND_READELF_X86";export GCC="$AND_GCC_X86";export CC="$AND_CC_X86";export CXX="$AND_CXX_X86";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH_X86";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2_X86"' > ~/pp
   - chmod u+x ~/pp
   - rm -Rf "$_s_"
   - mkdir -p "$_s_"
 
   - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - mkdir -p $CIRCLE_ARTIFACTS/android/
+  - mkdir -p $CIRCLE_ARTIFACTS/android/"$ARTEFACT_DIR"
 
   - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
   - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/"$TOOLCHAIN_ARCH2" --api 12 --force   
@@ -353,10 +354,6 @@ compile:
   - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/c-toxcore.zip *
 
-
-  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
-  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
-
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
@@ -366,7 +363,7 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; $READELF -a libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/x86/
+  - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/"$TOOLCHAIN_ARCH"/
 
   # --------- we use gradle witness, so we need to use the maven artefact ---------
   # - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
@@ -398,7 +395,9 @@ compile:
 
 # --------- bintray artefact -------------
   - cd jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
-  - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
+  - cd jni-c-toxcore/; cp -av $CIRCLE_ARTIFACTS/android/libs/armeabi/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
+  - cd jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
+  - cd jni-c-toxcore/; cp -av $CIRCLE_ARTIFACTS/android/libs/x86/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
 
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ./gradlew :jnilib:dependencies
   - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ./gradlew :jnilib:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :jnilib:build --stacktrace --no-daemon # first build may FAIL
