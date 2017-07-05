@@ -445,12 +445,14 @@ public class MainActivity extends AppCompatActivity
         main_drawer = new DrawerBuilder().
                 withActivity(this).
                 withInnerShadow(false).
+                withRootView(R.id.drawer_container).
                 withShowDrawerOnFirstLaunch(true).
                 withActionBarDrawerToggleAnimated(true).
                 withActionBarDrawerToggle(true).
                 withToolbar(toolbar).
                 addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(), item6).
-                withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).
+                withTranslucentStatusBar(false).
+                withAccountHeader(main_drawer_header).
                 withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                 {
                     @Override
@@ -565,14 +567,14 @@ public class MainActivity extends AppCompatActivity
                 }).build();
 
 
-//        DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.material_drawer_layout);
-//        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.faw_envelope_open, R.string.faw_envelope_open);
-//
-//        drawer_layout.setDrawerListener(drawerToggle);
-//
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setHomeButtonEnabled(true);
-//        drawerToggle.syncState();
+        //        DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.material_drawer_layout);
+        //        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.faw_envelope_open, R.string.faw_envelope_open);
+        //
+        //        drawer_layout.setDrawerListener(drawerToggle);
+        //
+        //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //        getSupportActionBar().setHomeButtonEnabled(true);
+        //        drawerToggle.syncState();
 
 
         // show hambuger icon -------
