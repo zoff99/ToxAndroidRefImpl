@@ -18,4 +18,4 @@ the latest Development Snapshot can be downloaded from CircleCI, [here](https://
 <img src="https://circleci.com/api/v1/project/zoff99/ToxAndroidRefImpl/latest/artifacts/0/$CIRCLE_ARTIFACTS/capture_app_running_2.png?filter=successful&branch=zoff99%2Fdev003" width="148">
 
 
-<img src="http://i.imgur.com/QM3uviW.png" width="160">
+<img src="https://i.imgur.com/QM3uviW.png" width="160">
