@@ -49,6 +49,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -442,6 +444,10 @@ public class MainActivity extends AppCompatActivity
         // create the drawer and remember the `Drawer` result object
         main_drawer = new DrawerBuilder().
                 withActivity(this).
+                withInnerShadow(false).
+                withShowDrawerOnFirstLaunch(true).
+                withActionBarDrawerToggleAnimated(true).
+                withActionBarDrawerToggle(true).
                 withToolbar(toolbar).
                 addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(), item6).
                 withTranslucentStatusBar(true).withAccountHeader(main_drawer_header).
@@ -557,6 +563,25 @@ public class MainActivity extends AppCompatActivity
                         return true;
                     }
                 }).build();
+
+
+//        DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.material_drawer_layout);
+//        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.faw_envelope_open, R.string.faw_envelope_open);
+//
+//        drawer_layout.setDrawerListener(drawerToggle);
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
+//        drawerToggle.syncState();
+
+
+        // show hambuger icon -------
+        // getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        // main_drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
+
+        // show back icon -------
+        // main_drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // -------- drawer ------------
         // -------- drawer ------------
