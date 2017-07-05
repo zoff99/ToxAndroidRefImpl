@@ -6,7 +6,7 @@ This is not a Reference Client, it's c-toxcore for Android.
 
 Build Status
 =
-**CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/master.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl)
+**CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/master.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/master)
 **Bintray:** [![Download](https://api.bintray.com/packages/zoff99/maven/trifajni/images/download.svg)](https://bintray.com/zoff99/maven/trifajni/_latestVersion)
 
 
