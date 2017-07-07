@@ -116,16 +116,6 @@ public class SetPasswordActivity extends AppCompatActivity
         // create new key -------------
         String key = getRandomString(20);
         settings.edit().putString("DB_secrect_key", key).commit();
-
-        // TODO: don't print this!!
-        // ------ don't print this ------
-        // ------ don't print this ------
-        // ------ don't print this ------
-        Log.i(TAG, "PREF__DB_secrect_key[1]=" + key);
-        // ------ don't print this ------
-        // ------ don't print this ------
-        // ------ don't print this ------
-
         // create new key -------------
     }
 
@@ -263,14 +253,6 @@ public class SetPasswordActivity extends AppCompatActivity
             }
 
             String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes(mPassword1)));
-            // TODO: don't print this!!
-            // ------ don't print this ------
-            // ------ don't print this ------
-            // ------ don't print this ------
-            Log.i(TAG, "PREF__DB_secrect_key[TH:1]=" + try_password_hash);
-            // ------ don't print this ------
-            // ------ don't print this ------
-            // ------ don't print this ------
 
             // remember hash ---------------
             PREF__DB_secrect_key__user_hash = try_password_hash;

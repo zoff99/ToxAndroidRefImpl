@@ -417,31 +417,11 @@ public class MainActivity extends AppCompatActivity
         // prefs ----------
 
         PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
-
-        // TODO: don't print this!!
-        // ------ don't print this ------
-        // ------ don't print this ------
-        // ------ don't print this ------
-        Log.i(TAG, "PREF__DB_secrect_key[ZERO]=" + PREF__DB_secrect_key);
-        // ------ don't print this ------
-        // ------ don't print this ------
-        // ------ don't print this ------
-
-
         if (PREF__DB_secrect_key.isEmpty())
         {
             // ok, use hash of user entered password
             PREF__DB_secrect_key = PREF__DB_secrect_key__user_hash;
         }
-
-        // TODO: don't print this!!
-        // ------ don't print this ------
-        // ------ don't print this ------
-        // ------ don't print this ------
-        Log.i(TAG, "PREF__DB_secrect_key[2]=" + PREF__DB_secrect_key);
-        // ------ don't print this ------
-        // ------ don't print this ------
-        // ------ don't print this ------
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");

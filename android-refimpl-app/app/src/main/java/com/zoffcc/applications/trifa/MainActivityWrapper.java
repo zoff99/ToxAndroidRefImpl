@@ -24,7 +24,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
+
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
+import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 
 public class MainActivityWrapper extends AppCompatActivity
@@ -40,40 +44,63 @@ public class MainActivityWrapper extends AppCompatActivity
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         String DB_secrect_key__tmp = settings.getString("DB_secrect_key", "");
 
-        // TODO: don't print this!!
-        // ------ don't print this ------
-        // ------ don't print this ------
-        // ------ don't print this ------
-        Log.i(TAG, "PREF__DB_secrect_key[W]=" + DB_secrect_key__tmp);
-        // ------ don't print this ------
-        // ------ don't print this ------
-        // ------ don't print this ------
-
         if (DB_secrect_key__tmp.isEmpty())
         {
-            boolean pw_set_screen_done = settings.getBoolean("PW_SET_SCREEN_DONE", false);
-            if (pw_set_screen_done)
+            boolean already_unlocked = false;
+
+            try
             {
-                set_pattern = false;
+                if (vfs.isMounted())
+                {
+                    Log.i(TAG, "PREF__DB_secrect_key[vfs.isMounted]=" + vfs.isMounted());
+                    already_unlocked = true;
+                }
             }
-            else
+            catch (Exception e)
             {
-                set_pattern = true;
+                e.printStackTrace();
             }
 
-            if (set_pattern)
+            Log.i(TAG, "PREF__DB_secrect_key[PREF__DB_secrect_key__user_hash.isMounted]=" + PREF__DB_secrect_key__user_hash);
+
+            if (!TextUtils.isEmpty(PREF__DB_secrect_key__user_hash))
             {
-                // Intent pattern = new Intent(this, TrifaSetPatternActivity.class);
-                Intent pattern = new Intent(this, SetPasswordActivity.class);
+                already_unlocked = true;
+            }
+
+            if (already_unlocked)
+            {
+                // we already unlocked ---------
+                Intent pattern = new Intent(this, MainActivity.class);
                 startActivity(pattern);
                 finish();
             }
             else
             {
-                // Intent pattern = new Intent(this, TrifaCheckPatternActivity.class);
-                Intent pattern = new Intent(this, CheckPasswordActivity.class);
-                startActivity(pattern);
-                finish();
+                boolean pw_set_screen_done = settings.getBoolean("PW_SET_SCREEN_DONE", false);
+                if (pw_set_screen_done)
+                {
+                    set_pattern = false;
+                }
+                else
+                {
+                    set_pattern = true;
+                }
+
+                if (set_pattern)
+                {
+                    // Intent pattern = new Intent(this, TrifaSetPatternActivity.class);
+                    Intent pattern = new Intent(this, SetPasswordActivity.class);
+                    startActivity(pattern);
+                    finish();
+                }
+                else
+                {
+                    // Intent pattern = new Intent(this, TrifaCheckPatternActivity.class);
+                    Intent pattern = new Intent(this, CheckPasswordActivity.class);
+                    startActivity(pattern);
+                    finish();
+                }
             }
         }
         else

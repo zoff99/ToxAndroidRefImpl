@@ -260,25 +260,7 @@ public class CheckPasswordActivity extends AppCompatActivity
 
         try
         {
-            // TODO: don't print this!!
-            // ------ don't print this ------
-            // ------ don't print this ------
-            // ------ don't print this ------
-            Log.i(TAG, "PREF__DB_secrect_key[TP:1]=" + try_password);
-            // ------ don't print this ------
-            // ------ don't print this ------
-            // ------ don't print this ------
-
             String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes(try_password)));
-
-            // TODO: don't print this!!
-            // ------ don't print this ------
-            // ------ don't print this ------
-            // ------ don't print this ------
-            Log.i(TAG, "PREF__DB_secrect_key[TH:1]=" + try_password_hash);
-            // ------ don't print this ------
-            // ------ don't print this ------
-            // ------ don't print this ------
 
             String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
             Log.i(TAG, "db:path=" + dbs_path);
