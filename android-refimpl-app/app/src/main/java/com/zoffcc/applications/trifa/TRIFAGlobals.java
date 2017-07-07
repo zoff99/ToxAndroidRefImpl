@@ -47,6 +47,8 @@ public class TRIFAGlobals
     final static String VFS_OWN_AVATAR_DIR = "/datadir/myavatar/";
     static String VFS_PREFIX = ""; // only set for normal (unencrypted) storage
 
+    static boolean orbot_is_really_running = false;
+
     static int GLOBAL_VIDEO_BITRATE = 2500;
     static int GLOBAL_AUDIO_BITRATE = 64; // allowed values: (xx>=6) && (xx<=510)
 

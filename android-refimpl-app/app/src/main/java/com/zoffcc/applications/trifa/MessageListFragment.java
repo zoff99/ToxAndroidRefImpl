@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,7 @@ public class MessageListFragment extends Fragment
     long current_friendnum = -1;
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     MessagelistAdapter adapter = null;
+    static boolean is_at_bottom = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -55,6 +57,9 @@ public class MessageListFragment extends Fragment
         MessageListActivity mla = (MessageListActivity) (getActivity());
         current_friendnum = mla.get_current_friendnum();
         Log.i(TAG, "current_friendnum=" + current_friendnum);
+
+        // default is: at bottom
+        is_at_bottom = true;
 
         try
         {
@@ -100,6 +105,35 @@ public class MessageListFragment extends Fragment
         listingsView.setItemAnimator(new DefaultItemAnimator());
         listingsView.setHasFixedSize(false);
 
+        RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                int visibleItemCount = linearLayoutManager.getChildCount();
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
+                if (pastVisibleItems + visibleItemCount >= totalItemCount)
+                {
+                    // Bottom of the list
+                    if (!is_at_bottom)
+                    {
+                        // Log.i(TAG, "onScrolled:at bottom");
+                        is_at_bottom = true;
+                    }
+                }
+                else
+                {
+                    if (is_at_bottom)
+                    {
+                        // Log.i(TAG, "onScrolled:NOT at bottom");
+                        is_at_bottom = false;
+                    }
+                }
+            }
+        };
+
+        listingsView.addOnScrollListener(mScrollListener);
         listingsView.setAdapter(adapter);
         // --------------
         // --------------
@@ -207,7 +241,10 @@ public class MessageListFragment extends Fragment
                 try
                 {
                     adapter.add_item(m);
-                    listingsView.scrollToPosition(adapter.getItemCount() - 1);
+                    if (is_at_bottom)
+                    {
+                        listingsView.scrollToPosition(adapter.getItemCount() - 1);
+                    }
                 }
                 catch (Exception e)
                 {

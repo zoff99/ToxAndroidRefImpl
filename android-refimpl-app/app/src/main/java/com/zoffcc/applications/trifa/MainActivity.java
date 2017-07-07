@@ -49,8 +49,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -64,7 +62,9 @@ import android.support.v8.renderscript.Type;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
@@ -127,6 +127,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
@@ -230,6 +231,9 @@ public class MainActivity extends AppCompatActivity
     IntentFilter receiverFilter2 = null;
     HeadsetStateReceiver receiver1 = null;
     HeadsetStateReceiver receiver2 = null;
+    static TextView waiting_view = null;
+    static ProgressBar waiting_image = null;
+    static ViewGroup normal_container = null;
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -301,6 +305,13 @@ public class MainActivity extends AppCompatActivity
         resources = this.getResources();
         metrics = resources.getDisplayMetrics();
 
+        waiting_view = (TextView) findViewById(R.id.waiting_view);
+        waiting_image = (ProgressBar) findViewById(R.id.waiting_image);
+        normal_container = (ViewGroup) findViewById(R.id.normal_container);
+
+        waiting_view.setVisibility(View.GONE);
+        waiting_image.setVisibility(View.GONE);
+        normal_container.setVisibility(View.VISIBLE);
 
         SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
         SD_CARD_STATIC_DIR = getExternalFilesDir(null).getAbsolutePath() + "/_staticdir/";
@@ -334,21 +345,37 @@ public class MainActivity extends AppCompatActivity
             boolean orbot_installed = OrbotHelper.isOrbotInstalled(this);
             if (orbot_installed)
             {
-                boolean orbot_running = OrbotHelper.isOrbotRunning(this);
+                boolean orbot_running = orbot_is_really_running; // OrbotHelper.isOrbotRunning(this);
+                Log.i(TAG, "waiting_for_orbot_info:orbot_running=" + orbot_running);
                 if (orbot_running)
                 {
                     PREF__orbot_enabled = true;
+                    Log.i(TAG, "waiting_for_orbot_info:F1");
+                    waiting_for_orbot_info(false);
                 }
                 else
                 {
+                    orbot_is_really_running = false;
+
                     if (OrbotHelper.requestStartTor(this))
                     {
                         PREF__orbot_enabled = true;
+                        Log.i(TAG, "waiting_for_orbot_info:*T2");
+                        waiting_for_orbot_info(true);
+                    }
+                    else
+                    {
+                        // should never get here
+                        Log.i(TAG, "waiting_for_orbot_info:F3");
+                        waiting_for_orbot_info(false);
                     }
                 }
             }
             else
             {
+                Log.i(TAG, "waiting_for_orbot_info:F4");
+                waiting_for_orbot_info(false);
+
                 Intent orbot_get = OrbotHelper.getOrbotInstallIntent(this);
                 try
                 {
@@ -359,6 +386,11 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
+        }
+        else
+        {
+            Log.i(TAG, "waiting_for_orbot_info:F5");
+            waiting_for_orbot_info(false);
         }
 
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
@@ -1103,12 +1135,18 @@ public class MainActivity extends AppCompatActivity
                                     {
                                         e.printStackTrace();
                                     }
+
                                     if (sleep_iteration > max_sleep_iterations)
                                     {
                                         // giving up
                                         break;
                                     }
                                 }
+
+                                // remove "waiting for orbot view"
+                                Log.i(TAG, "waiting_for_orbot_info:+F99");
+                                orbot_is_really_running = true;
+                                waiting_for_orbot_info(false);
                             }
                             init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
                         }
@@ -2298,7 +2336,10 @@ public class MainActivity extends AppCompatActivity
             {
                 if (message_list_activity != null)
                 {
-                    message_list_activity.set_friend_connection_status_icon();
+                    if (message_list_activity.get_current_friendnum() == friend_number)
+                    {
+                        message_list_activity.set_friend_connection_status_icon();
+                    }
                 }
             }
             catch (Exception e)
@@ -2324,6 +2365,7 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_typing_cb_method(long friend_number, final int typing)
     {
         Log.i(TAG, "friend_typing_cb:fn=" + friend_number + " typing=" + typing);
+        final long friend_number_ = friend_number;
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -2335,13 +2377,16 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (ml_friend_typing != null)
                         {
-                            if (typing == 1)
+                            if (message_list_activity.get_current_friendnum() == friend_number_)
                             {
-                                ml_friend_typing.setText("friend is typing ...");
-                            }
-                            else
-                            {
-                                ml_friend_typing.setText("");
+                                if (typing == 1)
+                                {
+                                    ml_friend_typing.setText("friend is typing ...");
+                                }
+                                else
+                                {
+                                    ml_friend_typing.setText("");
+                                }
                             }
                         }
                     }
@@ -2534,7 +2579,14 @@ public class MainActivity extends AppCompatActivity
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = friend_message;
 
-        insert_into_message_db(m, true);
+        if (message_list_activity.get_current_friendnum() == friend_number)
+        {
+            insert_into_message_db(m, true);
+        }
+        else
+        {
+            insert_into_message_db(m, false);
+        }
 
         try
         {
@@ -2814,7 +2866,16 @@ public class MainActivity extends AppCompatActivity
             m.rcvd_timestamp = System.currentTimeMillis();
             m.text = filename + "\n" + file_size + " bytes";
 
-            long new_msg_id = insert_into_message_db(m, true);
+            long new_msg_id = -1;
+
+            if (message_list_activity.get_current_friendnum() == friend_number)
+            {
+                new_msg_id = insert_into_message_db(m, true);
+            }
+            else
+            {
+                new_msg_id = insert_into_message_db(m, false);
+            }
 
             f.message_id = new_msg_id;
             update_filetransfer_db_full(f);
@@ -4892,6 +4953,62 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             return "*Datetime ERROR*";
+        }
+    }
+
+    static void waiting_for_orbot_info(final boolean enable)
+    {
+        if (enable)
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Log.i(TAG, "waiting_for_orbot_info:" + enable);
+                        waiting_view.setVisibility(View.VISIBLE);
+                        waiting_image.setVisibility(View.VISIBLE);
+                        normal_container.setVisibility(View.INVISIBLE);
+                    }
+                    catch (Exception e)
+                    {
+
+                        Log.i(TAG, "waiting_for_orbot_info:EE:" + e.getMessage());
+                    }
+                }
+            };
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
+        }
+        else
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Log.i(TAG, "waiting_for_orbot_info:" + enable);
+                        waiting_view.setVisibility(View.GONE);
+                        waiting_image.setVisibility(View.GONE);
+                        normal_container.setVisibility(View.VISIBLE);
+                    }
+                    catch (Exception e)
+                    {
+
+                        Log.i(TAG, "waiting_for_orbot_info:EE:" + e.getMessage());
+                    }
+                }
+            };
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
         }
     }
 
