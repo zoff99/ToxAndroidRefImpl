@@ -26,7 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 public class MainActivityWrapper extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivityWrpr";
-    boolean set_pattern = false;
+    boolean set_pattern = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -35,13 +35,15 @@ public class MainActivityWrapper extends AppCompatActivity
 
         if (set_pattern)
         {
-            Intent pattern = new Intent(MainActivityWrapper.this, TrifaSetPatternActivity.class);
+            // Intent pattern = new Intent(this, TrifaSetPatternActivity.class);
+            Intent pattern = new Intent(this, SetPasswordActivity.class);
             startActivity(pattern);
             finish();
         }
         else
         {
-            Intent pattern = new Intent(MainActivityWrapper.this, TrifaCheckPatternActivity.class);
+            // Intent pattern = new Intent(this, TrifaCheckPatternActivity.class);
+            Intent pattern = new Intent(this, CheckPasswordActivity.class);
             startActivity(pattern);
             finish();
         }
