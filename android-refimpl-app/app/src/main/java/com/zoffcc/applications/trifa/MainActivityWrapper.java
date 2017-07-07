@@ -52,7 +52,7 @@ public class MainActivityWrapper extends AppCompatActivity
             {
                 if (vfs.isMounted())
                 {
-                    Log.i(TAG, "PREF__DB_secrect_key[vfs.isMounted]=" + vfs.isMounted());
+                    // Log.i(TAG, "PREF__DB_secrect_key[vfs.isMounted]=" + vfs.isMounted());
                     already_unlocked = true;
                 }
             }
@@ -61,7 +61,7 @@ public class MainActivityWrapper extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            Log.i(TAG, "PREF__DB_secrect_key[PREF__DB_secrect_key__user_hash.isMounted]=" + PREF__DB_secrect_key__user_hash);
+            // Log.i(TAG, "PREF__DB_secrect_key[PREF__DB_secrect_key__user_hash.isMounted]=" + PREF__DB_secrect_key__user_hash);
 
             if (!TextUtils.isEmpty(PREF__DB_secrect_key__user_hash))
             {
