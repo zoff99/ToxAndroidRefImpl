@@ -112,7 +112,6 @@ import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
-import static com.zoffcc.applications.trifa.MainActivity.getRandomString;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
@@ -2572,9 +2571,16 @@ public class MainActivity extends AppCompatActivity
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = friend_message;
 
-        if (message_list_activity.get_current_friendnum() == friend_number)
+        if (message_list_activity != null)
         {
-            insert_into_message_db(m, true);
+            if (message_list_activity.get_current_friendnum() == friend_number)
+            {
+                insert_into_message_db(m, true);
+            }
+            else
+            {
+                insert_into_message_db(m, false);
+            }
         }
         else
         {
@@ -2861,9 +2867,16 @@ public class MainActivity extends AppCompatActivity
 
             long new_msg_id = -1;
 
-            if (message_list_activity.get_current_friendnum() == friend_number)
+            if (message_list_activity != null)
             {
-                new_msg_id = insert_into_message_db(m, true);
+                if (message_list_activity.get_current_friendnum() == friend_number)
+                {
+                    new_msg_id = insert_into_message_db(m, true);
+                }
+                else
+                {
+                    new_msg_id = insert_into_message_db(m, false);
+                }
             }
             else
             {

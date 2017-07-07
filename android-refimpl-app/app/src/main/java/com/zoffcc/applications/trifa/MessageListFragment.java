@@ -55,7 +55,10 @@ public class MessageListFragment extends Fragment
 
 
         MessageListActivity mla = (MessageListActivity) (getActivity());
-        current_friendnum = mla.get_current_friendnum();
+        if (mla != null)
+        {
+            current_friendnum = mla.get_current_friendnum();
+        }
         Log.i(TAG, "current_friendnum=" + current_friendnum);
 
         // default is: at bottom
