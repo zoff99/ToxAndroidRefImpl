@@ -1,96 +1,98 @@
+/**
+ * [TRIfA], Java part of Tox Reference Implementation for Android
+ * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * <p>
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ */
+
 package com.zoffcc.applications.trifa;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.github.gfx.android.orma.AccessThreadConstraint;
+import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 
-import static android.Manifest.permission.READ_CONTACTS;
+import java.io.File;
 
-/**
- * A login screen that offers login via email/password.
- */
-public class CheckPasswordActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>
+import static com.zoffcc.applications.trifa.MainActivity.DB_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
+import static com.zoffcc.applications.trifa.MainActivity.ORMA_TRACE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+
+public class CheckPasswordActivity extends AppCompatActivity
 {
+    private static final String TAG = "trifa.CheckPasswordActy";
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{"foo@example.com:hello", "bar@example.com:world"};
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
+    private EditText mPasswordView1;
     private View mProgressView;
     private View mLoginFormView;
+
+    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_password);
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener()
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mPasswordView1 = (EditText) findViewById(R.id.password_1);
+        mPasswordView1.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent)
             {
-                if (id == R.id.login || id == EditorInfo.IME_NULL)
+                if (id == R.id.set_button || id == EditorInfo.IME_NULL)
                 {
-                    attemptLogin();
+                    attemptUnlock();
                     return true;
                 }
                 return false;
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener()
+        Button SignInButton = (Button) findViewById(R.id.set_button);
+        SignInButton.setOnClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                attemptLogin();
+                attemptUnlock();
             }
         });
 
@@ -98,43 +100,36 @@ public class CheckPasswordActivity extends AppCompatActivity implements LoaderCa
         mProgressView = findViewById(R.id.login_progress);
     }
 
-    private void attemptLogin()
+
+    private void attemptUnlock()
     {
+        Log.i(TAG, "attemptUnlock");
+
         if (mAuthTask != null)
         {
             return;
         }
 
         // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
+        mPasswordView1.setError(null);
 
-        // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        String password1 = mPasswordView1.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password))
+        if (TextUtils.isEmpty(password1))
         {
-            mPasswordView.setError("Error");
-            focusView = mPasswordView;
+            mPasswordView1.setError("Enter Password");
+            focusView = mPasswordView1;
             cancel = true;
         }
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email))
+        // Check for a valid password, if the user entered one.
+        if (!TextUtils.isEmpty(password1) && !isPasswordValid(password1))
         {
-            mEmailView.setError("required");
-            focusView = mEmailView;
-            cancel = true;
-        }
-        else if (!isEmailValid(email))
-        {
-            mEmailView.setError("invalid");
-            focusView = mEmailView;
+            mPasswordView1.setError("Invalid Password");
+            focusView = mPasswordView1;
             cancel = true;
         }
 
@@ -149,21 +144,15 @@ public class CheckPasswordActivity extends AppCompatActivity implements LoaderCa
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(password1);
             mAuthTask.execute((Void) null);
         }
-    }
-
-    private boolean isEmailValid(String email)
-    {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
     }
 
     private boolean isPasswordValid(String password)
     {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 7;
     }
 
     /**
@@ -208,57 +197,6 @@ public class CheckPasswordActivity extends AppCompatActivity implements LoaderCa
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle)
-    {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI, ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE + " = ?", new String[]{ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor)
-    {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast())
-        {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader)
-    {
-
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection)
-    {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(CheckPasswordActivity.this, android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
-    }
-
-
-    private interface ProfileQuery
-    {
-        String[] PROJECTION = {ContactsContract.CommonDataKinds.Email.ADDRESS, ContactsContract.CommonDataKinds.Email.IS_PRIMARY,};
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -267,41 +205,24 @@ public class CheckPasswordActivity extends AppCompatActivity implements LoaderCa
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean>
     {
 
-        private final String mEmail;
-        private final String mPassword;
+        private final String mPassword1;
 
-        UserLoginTask(String email, String password)
+        UserLoginTask(String password1)
         {
-            mEmail = email;
-            mPassword = password;
+            mPassword1 = password1;
         }
 
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            // TODO: attempt authentication against a network service.
+            boolean pass_is_correct = check_password(mPassword1);
 
-            try
+            if (!pass_is_correct)
             {
-                // Simulate network access.
-                Thread.sleep(2000);
-            }
-            catch (InterruptedException e)
-            {
+                // password seems not correct
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS)
-            {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail))
-                {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
             return true;
         }
 
@@ -313,12 +234,15 @@ public class CheckPasswordActivity extends AppCompatActivity implements LoaderCa
 
             if (success)
             {
+                // ok open main activity
+                Intent main_act = new Intent(CheckPasswordActivity.this, MainActivity.class);
+                startActivity(main_act);
                 finish();
             }
             else
             {
-                mPasswordView.setError("wrong password");
-                mPasswordView.requestFocus();
+                mPasswordView1.setError("* Error *");
+                mPasswordView1.requestFocus();
             }
         }
 
@@ -328,6 +252,72 @@ public class CheckPasswordActivity extends AppCompatActivity implements LoaderCa
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    boolean check_password(String try_password)
+    {
+        boolean ret = false;
+
+        try
+        {
+            // TODO: don't print this!!
+            // ------ don't print this ------
+            // ------ don't print this ------
+            // ------ don't print this ------
+            Log.i(TAG, "PREF__DB_secrect_key[TP:1]=" + try_password);
+            // ------ don't print this ------
+            // ------ don't print this ------
+            // ------ don't print this ------
+
+            String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes(try_password)));
+
+            // TODO: don't print this!!
+            // ------ don't print this ------
+            // ------ don't print this ------
+            // ------ don't print this ------
+            Log.i(TAG, "PREF__DB_secrect_key[TH:1]=" + try_password_hash);
+            // ------ don't print this ------
+            // ------ don't print this ------
+            // ------ don't print this ------
+
+            String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+            Log.i(TAG, "db:path=" + dbs_path);
+
+            File database_dir = new File(new File(dbs_path).getParent());
+            database_dir.mkdirs();
+
+            OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+            if (DB_ENCRYPT)
+            {
+                builder = builder.provider(new EncryptedDatabase.Provider(try_password_hash));
+            }
+            orma = builder.name(dbs_path).
+                    readOnMainThread(AccessThreadConstraint.NONE).
+                    writeOnMainThread(AccessThreadConstraint.NONE).
+                    trace(ORMA_TRACE).
+                    build();
+            Log.i(TAG, "db:open=OK:path=" + dbs_path);
+
+            // remember hash ---------------
+            PREF__DB_secrect_key__user_hash = try_password_hash;
+            // remember hash ---------------
+
+            ret = true;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "db:open=ERROR:" + e.getMessage());
+        }
+
+        return ret;
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        // super.onBackPressed();
+        // do nothing!!
     }
 }
 

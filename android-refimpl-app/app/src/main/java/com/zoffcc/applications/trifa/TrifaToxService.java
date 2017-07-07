@@ -46,6 +46,8 @@ import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
+import static com.zoffcc.applications.trifa.MainActivity.receiver1;
+import static com.zoffcc.applications.trifa.MainActivity.receiver2;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
@@ -263,6 +265,24 @@ public class TrifaToxService extends Service
                         }
 
                         Log.i(TAG, "stop_me:007");
+
+                        try
+                        {
+                            unregisterReceiver(receiver1);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        try
+                        {
+                            unregisterReceiver(receiver2);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
 
                         try
                         {

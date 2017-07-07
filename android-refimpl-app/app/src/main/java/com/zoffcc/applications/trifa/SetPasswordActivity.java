@@ -1,12 +1,33 @@
+/**
+ * [TRIfA], Java part of Tox Reference Implementation for Android
+ * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * <p>
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ */
+
 package com.zoffcc.applications.trifa;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,6 +38,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import static com.zoffcc.applications.trifa.MainActivity.getRandomString;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 
 public class SetPasswordActivity extends AppCompatActivity
 {
@@ -30,11 +54,15 @@ public class SetPasswordActivity extends AppCompatActivity
     private View mProgressView;
     private View mLoginFormView;
 
+    private SharedPreferences settings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_password);
+
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         mPasswordView1 = (EditText) findViewById(R.id.password_1);
         mPasswordView2 = (EditText) findViewById(R.id.password_2);
@@ -43,7 +71,7 @@ public class SetPasswordActivity extends AppCompatActivity
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent)
             {
-                if (id == R.id.login || id == EditorInfo.IME_NULL)
+                if (id == R.id.set_button || id == EditorInfo.IME_NULL)
                 {
                     attemptLogin();
                     return true;
@@ -69,6 +97,7 @@ public class SetPasswordActivity extends AppCompatActivity
             public void onClick(View view)
             {
                 auto_create_password();
+                settings.edit().putBoolean("PW_SET_SCREEN_DONE", true).commit();
                 // ok open main activity
                 Intent main_act = new Intent(SetPasswordActivity.this, MainActivity.class);
                 startActivity(main_act);
@@ -83,7 +112,21 @@ public class SetPasswordActivity extends AppCompatActivity
 
     void auto_create_password()
     {
-        // TODO: write me!
+        // TODO: bad, make better
+        // create new key -------------
+        String key = getRandomString(20);
+        settings.edit().putString("DB_secrect_key", key).commit();
+
+        // TODO: don't print this!!
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ------ don't print this ------
+        Log.i(TAG, "PREF__DB_secrect_key[1]=" + key);
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ------ don't print this ------
+
+        // create new key -------------
     }
 
     private void attemptLogin()
@@ -213,17 +256,25 @@ public class SetPasswordActivity extends AppCompatActivity
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            // TODO: attempt authentication against a network service.
-
-            try
-            {
-                // Simulate network access.
-                Thread.sleep(2000);
-            }
-            catch (InterruptedException e)
+            // just in case, check here again if both passwords actually match
+            if (!TextUtils.equals(mPassword1, mPassword2))
             {
                 return false;
             }
+
+            String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes(mPassword1)));
+            // TODO: don't print this!!
+            // ------ don't print this ------
+            // ------ don't print this ------
+            // ------ don't print this ------
+            Log.i(TAG, "PREF__DB_secrect_key[TH:1]=" + try_password_hash);
+            // ------ don't print this ------
+            // ------ don't print this ------
+            // ------ don't print this ------
+
+            // remember hash ---------------
+            PREF__DB_secrect_key__user_hash = try_password_hash;
+            // remember hash ---------------
 
             return true;
         }
@@ -236,6 +287,7 @@ public class SetPasswordActivity extends AppCompatActivity
 
             if (success)
             {
+                settings.edit().putBoolean("PW_SET_SCREEN_DONE", true).commit();
                 // ok open main activity
                 Intent main_act = new Intent(SetPasswordActivity.this, MainActivity.class);
                 startActivity(main_act);
@@ -254,6 +306,13 @@ public class SetPasswordActivity extends AppCompatActivity
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        // super.onBackPressed();
+        // do nothing!!
     }
 }
 

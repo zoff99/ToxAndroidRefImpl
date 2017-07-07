@@ -112,11 +112,13 @@ import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
+import static com.zoffcc.applications.trifa.MainActivity.getRandomString;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
@@ -229,8 +231,8 @@ public class MainActivity extends AppCompatActivity
     static PackageInfo packageInfo_s = null;
     IntentFilter receiverFilter1 = null;
     IntentFilter receiverFilter2 = null;
-    HeadsetStateReceiver receiver1 = null;
-    HeadsetStateReceiver receiver2 = null;
+    static HeadsetStateReceiver receiver1 = null;
+    static HeadsetStateReceiver receiver2 = null;
     static TextView waiting_view = null;
     static ProgressBar waiting_image = null;
     static ViewGroup normal_container = null;
@@ -415,20 +417,28 @@ public class MainActivity extends AppCompatActivity
         // prefs ----------
 
         PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
+
+        // TODO: don't print this!!
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ------ don't print this ------
+        Log.i(TAG, "PREF__DB_secrect_key[ZERO]=" + PREF__DB_secrect_key);
+        // ------ don't print this ------
+        // ------ don't print this ------
+        // ------ don't print this ------
+
+
         if (PREF__DB_secrect_key.isEmpty())
         {
-            // TODO: bad, make better
-            // create new key -------------
-            PREF__DB_secrect_key = getRandomString(20);
-            settings.edit().putString("DB_secrect_key", PREF__DB_secrect_key).commit();
-            // create new key -------------
+            // ok, use hash of user entered password
+            PREF__DB_secrect_key = PREF__DB_secrect_key__user_hash;
         }
 
         // TODO: don't print this!!
         // ------ don't print this ------
         // ------ don't print this ------
         // ------ don't print this ------
-        // ** // Log.i(TAG, "PREF__DB_secrect_key=" + PREF__DB_secrect_key);
+        Log.i(TAG, "PREF__DB_secrect_key[2]=" + PREF__DB_secrect_key);
         // ------ don't print this ------
         // ------ don't print this ------
         // ------ don't print this ------
@@ -1069,7 +1079,7 @@ public class MainActivity extends AppCompatActivity
     // ------- for runtime permissions -------
 
 
-    private static String getRandomString(final int sizeOfRandomString)
+    static String getRandomString(final int sizeOfRandomString)
     {
         final Random random = new Random();
         final StringBuilder sb = new StringBuilder(sizeOfRandomString);
@@ -1220,6 +1230,9 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
+
+        unregisterReceiver(receiver1);
+        unregisterReceiver(receiver2);
     }
 
     @Override

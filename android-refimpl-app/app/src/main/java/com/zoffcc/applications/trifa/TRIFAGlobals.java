@@ -62,6 +62,8 @@ public class TRIFAGlobals
 
     static final String TOXURL_PATTERN = "(?:^|\\s|$)[Tt][Oo][Xx]:[a-fA-F0-9]*";
 
+    static String PREF__DB_secrect_key__user_hash = "";
+
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();

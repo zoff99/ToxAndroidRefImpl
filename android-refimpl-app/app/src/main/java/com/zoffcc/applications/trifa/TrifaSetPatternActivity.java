@@ -74,7 +74,7 @@ public class TrifaSetPatternActivity extends SetPatternActivity
         return sha256(patternToBytes(pattern, columnCount));
     }
 
-    private static String bytesToString(byte[] bytes)
+    public static String bytesToString(byte[] bytes)
     {
         return Base64.encodeToString(bytes, Base64.NO_WRAP);
     }
@@ -89,7 +89,12 @@ public class TrifaSetPatternActivity extends SetPatternActivity
         return patternToSha256String(pattern, PatternView.PATTERN_SIZE_DEFAULT);
     }
 
-    private static byte[] sha256(byte[] input)
+    public static byte[] StringToBytes(String in)
+    {
+        return Base64.decode(in, Base64.NO_WRAP);
+    }
+
+    public static byte[] sha256(byte[] input)
     {
         try
         {
