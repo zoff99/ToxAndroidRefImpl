@@ -2229,10 +2229,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send(JNIEnv* env, job
 	uint8_t *file_id_buffer_c = NULL;
 	long capacity = 0;
 
+	// TODO: this can be NULL !! -- fix me --
 	if (file_id_buffer == NULL)
 	{
 		return -21;
 	}
+	// TODO: this can be NULL !! -- fix me --
 
 	file_id_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, file_id_buffer);
 	capacity = (*env)->GetDirectBufferCapacity(env, file_id_buffer);

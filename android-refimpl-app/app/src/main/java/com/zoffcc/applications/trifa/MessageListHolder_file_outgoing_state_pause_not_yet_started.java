@@ -43,6 +43,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
@@ -53,15 +54,18 @@ import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_
 import static com.zoffcc.applications.trifa.MainActivity.set_message_start_sending_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
+import static com.zoffcc.applications.trifa.MainActivity.tox_file_send;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
 import static com.zoffcc.applications.trifa.MainActivity.update_single_message_from_messge_id;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_ID_LENGTH;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
-    private static final String TAG = "trifa.MessageListHolder";
+    private static final String TAG = "trifa.MessageListHldr01";
 
-    private Message message2;
     private Context context;
 
     ImageButton button_ok;
@@ -200,6 +204,8 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                 {
                     try
                     {
+                        Log.i(TAG, "MM2MM:7:mid=" + message.id + " ftid:" + message.filetransfer_id);
+
                         // accept FT
                         set_message_start_sending_from_id(message.id);
                         set_filetransfer_start_sending_from_id(message.filetransfer_id);
@@ -209,7 +215,28 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                         // update message view
                         update_single_message_from_messge_id(message.id, true);
 
-                        Log.i(TAG, "button_ok:OnTouch:009");
+                        Filetransfer ft = orma.selectFromFiletransfer().idEq(message.filetransfer_id).orderByIdDesc().get(0);
+
+                        Log.i(TAG, "MM2MM:8:ft.filesize=" + ft.filesize + " ftid=" + ft.id + " mid=" + ft.message_id);
+
+                        ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
+                        byte[] sha256_buf = TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes(ft.path_name + ":" + ft.file_name + ":" + ft.filesize));
+
+                        Log.i(TAG, "TOX_FILE_ID_LENGTH=" + TOX_FILE_ID_LENGTH + " sha_byte=" + sha256_buf.length);
+
+                        file_id_buffer.put(sha256_buf);
+
+                        // actually start sending the file to friend
+                        long file_number = tox_file_send(tox_friend_by_public_key__wrapper(message.tox_friendpubkey), ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA.value, ft.filesize, file_id_buffer, ft.file_name, ft.file_name.length());
+
+                        Log.i(TAG, "MM2MM:8:new filenum=" + file_number);
+
+                        // update the tox file number in DB -----------
+                        ft.file_number = file_number;
+                        update_filetransfer_db_full(ft);
+                        // update the tox file number in DB -----------
+
+                        Log.i(TAG, "button_ok:OnTouch:009:f_num=" + file_number);
                     }
                     catch (Exception e)
                     {

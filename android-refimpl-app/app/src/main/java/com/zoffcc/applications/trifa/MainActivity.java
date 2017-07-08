@@ -92,8 +92,11 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1057,7 +1060,6 @@ public class MainActivity extends AppCompatActivity
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
 
-
     static String getRandomString(final int sizeOfRandomString)
     {
         final Random random = new Random();
@@ -1591,7 +1593,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     // -- this is for incoming video --
     // -- this is for incoming video --
     static void allocate_video_buffer_1(int frame_width_px1, int frame_height_px1, long ystride, long ustride, long vstride)
@@ -1649,7 +1650,6 @@ public class MainActivity extends AppCompatActivity
     }
     // -- this is for incoming video --
     // -- this is for incoming video --
-
 
     static
     {
@@ -2696,9 +2696,15 @@ public class MainActivity extends AppCompatActivity
             long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:ft_id=" + ft_id);
             long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+
+
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:msg_id=" + msg_id);
             set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_RESUME.value);
             set_message_state_from_id(msg_id, TOX_FILE_CONTROL_RESUME.value);
+
+            // if outgoing FT set "ft_accepted" to true
+            set_filetransfer_accepted_from_id(ft_id);
+            set_message_accepted_from_id(msg_id);
 
             // update_all_messages_global(true);
             try
@@ -2738,9 +2744,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_chunk_request_cb_method(long friend_number, long file_number, long position, long length)
     {
-        Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
-
-        // TODO: we must send a chunck of that file ...
+        // Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
 
         try
         {
@@ -2748,15 +2752,17 @@ public class MainActivity extends AppCompatActivity
                     directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
                     tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
                     file_numberEq(file_number).
-                    stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
                     orderByIdDesc().
-                    toList().get(0);
+                    get(0);
 
             if (ft == null)
             {
                 Log.i(TAG, "file_chunk_request:ft=NULL");
                 return;
             }
+
+            // Log.i(TAG, "file_chunk_request:ft=" + ft.kind + ":" + ft);
+
 
             if (ft.kind == TOX_FILE_KIND_AVATAR.value)
             {
@@ -2768,7 +2774,7 @@ public class MainActivity extends AppCompatActivity
 
                     ByteBuffer avatar_chunk = ByteBuffer.allocateDirect(1);
                     int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, 0);
-                    Log.i(TAG, "file_chunk_request:res(2)=" + res);
+                    // Log.i(TAG, "file_chunk_request:res(2)=" + res);
                 }
                 else
                 {
@@ -2788,14 +2794,42 @@ public class MainActivity extends AppCompatActivity
                                 ByteBuffer avatar_chunk = ByteBuffer.allocateDirect((int) avatar_chunk_length);
                                 avatar_chunk.put(bytes_chunck);
                                 int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, avatar_chunk_length);
-                                Log.i(TAG, "file_chunk_request:res(1)=" + res);
+                                // Log.i(TAG, "file_chunk_request:res(1)=" + res);
                                 // int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
                             }
                         }
                     }
                 }
             }
-            // TODO: this is really aweful and slow. FIX ME -------------
+            else // TOX_FILE_KIND_DATA.value
+            {
+                if (length == 0)
+                {
+                    // transfer finished -----------
+                    orma.deleteFromFiletransfer().idEq(ft.id);
+                    // transfer finished -----------
+
+                    ByteBuffer avatar_chunk = ByteBuffer.allocateDirect(1);
+                    int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, 0);
+                    // Log.i(TAG, "file_chunk_request:res(2)=" + res);
+                }
+                else
+                {
+                    final String fname = new File(ft.path_name + "/" + ft.file_name).getAbsolutePath();
+
+                    // Log.i(TAG, "file_chunk_request:fname=" + fname);
+
+                    long file_chunk_length = length;
+                    byte[] bytes_chunck = read_chunk_from_SD_file(fname, position, file_chunk_length);
+                    // byte[] bytes_chunck = new byte[(int) file_chunk_length];
+                    // avatar_bytes.position((int) position);
+                    // avatar_bytes.get(bytes_chunck, 0, (int) file_chunk_length);
+                    ByteBuffer file_chunk = ByteBuffer.allocateDirect((int) file_chunk_length);
+                    file_chunk.put(bytes_chunck);
+                    int res = tox_file_send_chunk(friend_number, file_number, position, file_chunk, file_chunk_length);
+                    // Log.i(TAG, "file_chunk_request:res(1)=" + res);
+                }
+            }
         }
         catch (Exception e)
         {
@@ -3789,9 +3823,8 @@ public class MainActivity extends AppCompatActivity
     static void update_filetransfer_db_full(final Filetransfer f)
     {
         orma.updateFiletransfer().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                and().
-                file_numberEq(f.file_number).
+                idEq(f.id).
+                tox_public_key_string(f.tox_public_key_string).
                 direction(f.direction).
                 file_number(f.file_number).
                 kind(f.kind).
@@ -5015,6 +5048,85 @@ public class MainActivity extends AppCompatActivity
             {
                 main_handler_s.post(myRunnable);
             }
+        }
+    }
+
+    static byte[] read_chunk_from_SD_file(String file_name_with_path, long position, long file_chunk_length)
+    {
+        byte[] out = new byte[(int) file_chunk_length];
+
+        try
+        {
+            RandomAccessFile raf = new RandomAccessFile(file_name_with_path, "r");
+            FileChannel inChannel = raf.getChannel();
+            MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, position, file_chunk_length);
+
+            // Log.i(TAG, "read_chunk_from_SD_file:" + buffer.limit() + " <-> " + file_chunk_length);
+
+            for (int i = 0; i < buffer.limit(); i++)
+            {
+                out[i] = buffer.get();
+            }
+
+            try
+            {
+                inChannel.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                raf.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return out;
+    }
+
+    static void write_chunk_to_VFS_file(String file_name_with_path, long position, long file_chunk_length, ByteBuffer data)
+    {
+        try
+        {
+            info.guardianproject.iocipher.RandomAccessFile raf = new info.guardianproject.iocipher.RandomAccessFile(file_name_with_path, "rw");
+            info.guardianproject.iocipher.IOCipherFileChannel inChannel = raf.getChannel();
+
+            // inChannel.lseek(position, OsConstants.SEEK_SET);
+            inChannel.write(data, position);
+
+            try
+            {
+                inChannel.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                raf.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 

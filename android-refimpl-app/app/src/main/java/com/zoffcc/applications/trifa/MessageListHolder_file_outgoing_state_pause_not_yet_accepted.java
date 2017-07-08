@@ -54,9 +54,8 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 
 public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
-    private static final String TAG = "trifa.MessageListHolder";
+    private static final String TAG = "trifa.MessageListHldr02";
 
-    private Message message2;
     private Context context;
 
     ImageButton button_ok;

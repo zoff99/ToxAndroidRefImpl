@@ -62,7 +62,8 @@ public class MessageListHolder_file_incoming_state_pause_has_accepted extends Re
     ViewGroup ft_preview_container;
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
-    TextView textView;
+    EmojiTextViewLinks textView;
+    ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
 
     public MessageListHolder_file_incoming_state_pause_has_accepted(View itemView, Context c)
@@ -80,8 +81,9 @@ public class MessageListHolder_file_incoming_state_pause_has_accepted extends Re
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
-        EmojiTextViewLinks textView;
-        ImageView imageView;
+        textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
+        imageView = (ImageView) itemView.findViewById(R.id.m_icon);
+        img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -118,8 +120,7 @@ public class MessageListHolder_file_incoming_state_pause_has_accepted extends Re
         button_cancel.setVisibility(View.VISIBLE);
 
         // TODO: make text better
-        textView.setText("" + message.text + "\n PAUSED");
-
+        textView.setAutoLinkText("" + message.text + "\n PAUSED");
 
         button_cancel.setOnTouchListener(new View.OnTouchListener()
         {

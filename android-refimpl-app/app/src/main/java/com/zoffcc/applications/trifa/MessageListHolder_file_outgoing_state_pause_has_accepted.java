@@ -62,17 +62,8 @@ public class MessageListHolder_file_outgoing_state_pause_has_accepted extends Re
             m = new Message();
         }
 
-        textView.setText("#" + m.id + ":" + m.text);
-        if (!m.read)
-        {
-            // not yet read
-            imageView.setImageResource(R.drawable.circle_red);
-        }
-        else
-        {
-            // msg read by other party
-            imageView.setImageResource(R.drawable.circle_green);
-        }
+        // TODO: make text better
+        textView.setText("" + m.text + "\n PAUSED");
     }
 
     @Override

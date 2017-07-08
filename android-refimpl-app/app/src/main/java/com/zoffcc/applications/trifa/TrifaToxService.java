@@ -699,10 +699,10 @@ public class TrifaToxService extends Service
                 {
                     try
                     {
-                        if (tox_iteration_interval_ms < 10)
+                        if (tox_iteration_interval_ms < 2)
                         {
                             Log.i(TAG, "tox_iterate:(tox_iteration_interval_ms < 10ms!!):" + tox_iteration_interval_ms + "ms");
-                            Thread.sleep(10);
+                            Thread.sleep(2);
                         }
                         else
                         {

@@ -67,9 +67,11 @@ import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -609,9 +611,9 @@ public class MessageListActivity extends AppCompatActivity
 
         Filetransfer f = new Filetransfer();
         f.tox_public_key_string = tox_friend_get_public_key__wrapper(friendnum);
-        f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
-        f.file_number = friendnum;
-        f.kind = ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA.value;
+        f.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
+        f.file_number = -1; // add later when we actually have the number
+        f.kind = TOX_FILE_KIND_DATA.value;
         f.state = TOX_FILE_CONTROL_PAUSE.value;
         f.path_name = filepath;
         f.file_name = filename;
@@ -621,6 +623,9 @@ public class MessageListActivity extends AppCompatActivity
         f.current_position = 0;
 
         long ft_id = insert_into_filetransfer_db(f);
+
+        // Message m_tmp = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(3)).orderByMessage_idDesc().get(0);
+        Log.i(TAG, "MM2MM:2:" + ft_id);
 
 
         // add FT message to UI
@@ -641,8 +646,16 @@ public class MessageListActivity extends AppCompatActivity
 
         long new_msg_id = insert_into_message_db(m, true);
 
+        Log.i(TAG, "MM2MM:3:" + new_msg_id);
+        Message m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
+        Log.i(TAG, "MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
+
         f.message_id = new_msg_id;
         update_filetransfer_db_full(f);
+
+        m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
+        Log.i(TAG, "MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
+
 
         // --- ??? should we do this here?
         //        try
