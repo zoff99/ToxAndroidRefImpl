@@ -724,7 +724,7 @@ public class TrifaToxService extends Service
                     if (s_time + 4000 < System.currentTimeMillis())
                     {
                         tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
-                        Log.i(TAG, "tox_iterate:--END--:took" + (long) (((float) s_time / 1000f)) + "s, new inerval=" + tox_iteration_interval_ms + "ms");
+                        Log.i(TAG, "tox_iterate:--END--:took" + (long) (((float) (s_time - System.currentTimeMillis()) / 1000f)) + "s, new inerval=" + tox_iteration_interval_ms + "ms");
                     }
                 }
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
