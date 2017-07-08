@@ -88,7 +88,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
 
         if (m == null)
         {

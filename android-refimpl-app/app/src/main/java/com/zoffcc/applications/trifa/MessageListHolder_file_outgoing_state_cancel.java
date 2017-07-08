@@ -80,7 +80,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
 
         if (m == null)
         {

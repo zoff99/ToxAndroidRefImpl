@@ -47,6 +47,6 @@ public class MessageListHolder_error extends RecyclerView.ViewHolder
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
     }
 }
