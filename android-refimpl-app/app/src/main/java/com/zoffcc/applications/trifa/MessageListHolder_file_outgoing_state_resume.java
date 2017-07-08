@@ -117,15 +117,16 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
             // Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
             ft_progressbar.setProgress(percent);
             // TODO: make text better
-            textView.setText("" + message.text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n receiving ...");
+            textView.setAutoLinkText("" + message.text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n sending ...");
         }
         else
         {
             ft_progressbar.setProgress(0);
             // TODO: make text better
-            textView.setText("" + message.text + "\n sending ...");
+            textView.setAutoLinkText("" + message.text + "\n sending ...");
         }
 
+        ft_progressbar.setVisibility(View.VISIBLE);
         ft_progressbar.setMax(100);
         ft_progressbar.setIndeterminate(false);
 
@@ -185,10 +186,6 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
         {
             e.printStackTrace();
         }
-
-
-        textView.setAutoLinkText("" + message.text + "\n\n sending ...");
-
 
         boolean is_image = false;
         try

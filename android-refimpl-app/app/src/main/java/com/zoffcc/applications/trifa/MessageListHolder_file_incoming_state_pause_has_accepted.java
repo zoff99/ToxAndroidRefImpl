@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -53,7 +52,6 @@ public class MessageListHolder_file_incoming_state_pause_has_accepted extends Re
 {
     private static final String TAG = "trifa.MessageListHolder";
 
-    private Message message2;
     private Context context;
 
     ImageButton button_ok;
@@ -155,6 +153,26 @@ public class MessageListHolder_file_incoming_state_pause_has_accepted extends Re
                 return true;
             }
         });
+
+
+        // TODO:
+        long ft_id = message.filetransfer_id;
+        // Log.i(TAG, "getView:033:STATE:RESUME:ft_id=" + ft_id);
+        if (ft_id != -1)
+        {
+            final Filetransfer ft_ = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+            final int percent = (int) (100f * (float) ft_.current_position / (float) ft_.filesize);
+            // Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
+            ft_progressbar.setProgress(percent);
+        }
+        else
+        {
+            ft_progressbar.setProgress(0);
+        }
+
+        ft_progressbar.setMax(100);
+        ft_progressbar.setIndeterminate(false);
+
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
         img_avatar.setImageDrawable(d_lock);

@@ -125,6 +125,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIF
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.UPDATE_MESSAGE_PROGRESS_AFTER_BYTES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
@@ -2828,6 +2829,27 @@ public class MainActivity extends AppCompatActivity
                     file_chunk.put(bytes_chunck);
                     int res = tox_file_send_chunk(friend_number, file_number, position, file_chunk, file_chunk_length);
                     // Log.i(TAG, "file_chunk_request:res(1)=" + res);
+
+                    if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
+                    {
+                        ft.current_position = position;
+                        update_filetransfer_db_current_position(ft);
+
+                        if (ft.kind != TOX_FILE_KIND_AVATAR.value)
+                        {
+                            // update_all_messages_global(false);
+                            try
+                            {
+                                if (ft.id != -1)
+                                {
+                                    update_single_message_from_ftid(ft.id, false);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -2945,11 +2967,12 @@ public class MainActivity extends AppCompatActivity
         try
         {
             f = orma.selectFromFiletransfer().
+                    directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
                     file_numberEq(file_number).
                     and().
                     tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().
-                    toList().get(0);
+                    get(0);
 
             // Log.i(TAG, "file_recv_chunk:filesize==" + f.filesize);
 
@@ -3150,22 +3173,25 @@ public class MainActivity extends AppCompatActivity
                     fos.write(data);
                 }
 
-                f.current_position = position;
-                // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
-                update_filetransfer_db_current_position(f);
-
-                if (f.kind != TOX_FILE_KIND_AVATAR.value)
+                if ((f.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
                 {
-                    // update_all_messages_global(false);
-                    try
+                    f.current_position = position;
+                    // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
+                    update_filetransfer_db_current_position(f);
+
+                    if (f.kind != TOX_FILE_KIND_AVATAR.value)
                     {
-                        if (f.id != -1)
+                        // update_all_messages_global(false);
+                        try
                         {
-                            update_single_message_from_ftid(f.id, false);
+                            if (f.id != -1)
+                            {
+                                update_single_message_from_ftid(f.id, false);
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
+                        catch (Exception e)
+                        {
+                        }
                     }
                 }
             }

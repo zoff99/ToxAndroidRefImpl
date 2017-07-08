@@ -31,9 +31,13 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_message_state_from_id;
@@ -47,7 +51,6 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
 {
     private static final String TAG = "trifa.MessageListHolder";
 
-    private Message message2;
     private Context context;
 
     ImageButton button_ok;
@@ -57,6 +60,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
     TextView textView;
+    de.hdodenhof.circleimageview.CircleImageView img_avatar;
 
     public MessageListHolder_file_incoming_state_resume(View itemView, Context c)
     {
@@ -73,6 +77,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
         textView = (TextView) itemView.findViewById(R.id.m_text);
+        img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -162,6 +167,54 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
                 return true;
             }
         });
+
+
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        img_avatar.setImageDrawable(d_lock);
+
+        try
+        {
+            if (VFS_ENCRYPT)
+            {
+                FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).get(0);
+
+                info.guardianproject.iocipher.File f1 = null;
+                try
+                {
+                    f1 = new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                if ((f1 != null) && (fl.avatar_pathname != null))
+                {
+                    // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+
+                    if (f1.length() > 0)
+                    {
+                        // byte[] byteArray = new byte[(int) f1.length()];
+                        // fis.read(byteArray, 0, (int) f1.length());
+                        // fis.close();
+
+                        final RequestOptions glide_options = new RequestOptions().fitCenter();
+                        GlideApp.
+                                with(context).
+                                load(f1).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(false).
+                                apply(glide_options).
+                                into(img_avatar);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
