@@ -48,7 +48,6 @@ import static com.zoffcc.applications.trifa.MainActivity.DB_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.ORMA_TRACE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
-import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class CheckPasswordActivity extends AppCompatActivity
 {
@@ -273,12 +272,22 @@ public class CheckPasswordActivity extends AppCompatActivity
             {
                 builder = builder.provider(new EncryptedDatabase.Provider(try_password_hash));
             }
-            orma = builder.name(dbs_path).
+            OrmaDatabase orma2 = builder.name(dbs_path).
                     readOnMainThread(AccessThreadConstraint.NONE).
                     writeOnMainThread(AccessThreadConstraint.NONE).
                     trace(ORMA_TRACE).
                     build();
             Log.i(TAG, "db:open=OK:path=" + dbs_path);
+
+
+            try
+            {
+                orma2.getConnection().close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
 
             // remember hash ---------------
             PREF__DB_secrect_key__user_hash = try_password_hash;
