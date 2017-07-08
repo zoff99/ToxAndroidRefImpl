@@ -19,31 +19,46 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import java.net.URLConnection;
+
+import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 
 public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
     private static final String TAG = "trifa.MessageListHolder";
 
-    private Message message2;
     private Context context;
 
     ImageButton button_ok;
@@ -104,15 +119,136 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
             ft_preview_container.setVisibility(View.GONE);
             button_ok.setVisibility(View.GONE);
             button_cancel.setVisibility(View.GONE);
-
-            final Message message2 = message;
         }
         else // file transferred OK
         {
-            // TODO: write me!
+            // TODO: show preview and "click" to open/delete file
+            textView.setAutoLinkText("" + message.text + "\n OK");
+
+            boolean is_image = false;
+            try
+            {
+                String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+                if (mimeType.startsWith("image"))
+                {
+                    is_image = true;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            if (is_image)
+            {
+                ft_preview_image.setImageResource(R.drawable.round_loading_animation);
+
+                ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event)
+                    {
+                        if (event.getAction() == MotionEvent.ACTION_UP)
+                        {
+                            try
+                            {
+                                Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                intent.putExtra("image_filename", message.filename_fullpath);
+                                v.getContext().startActivity(intent);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
+                            }
+                        }
+                        else
+                        {
+                        }
+                        return true;
+                    }
+                });
+
+
+                java.io.File f2 = new java.io.File(message.filename_fullpath);
+                try
+                {
+                    final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+
+                    GlideApp.
+                            with(context).
+                            load(f2).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(false).
+                            priority(Priority.LOW).
+                            placeholder(R.drawable.round_loading_animation).
+                            into(ft_preview_image);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+            else
+            {
+                final Drawable d3 = new IconicsDrawable(this.context).
+                        icon(GoogleMaterial.Icon.gmd_attachment).
+                        backgroundColor(Color.TRANSPARENT).
+                        color(Color.parseColor("#AA000000")).sizeDp(50);
+
+                ft_preview_image.setImageDrawable(d3);
+
+                ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event)
+                    {
+                        if (event.getAction() == MotionEvent.ACTION_UP)
+                        {
+                            try
+                            {
+                                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                                Intent newIntent = new Intent(Intent.ACTION_VIEW);
+                                String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(message.filename_fullpath));
+
+                                Uri file_uri = null;
+                                if (Build.VERSION.SDK_INT > 23)
+                                {
+                                    file_uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new java.io.File(message.filename_fullpath));
+                                    newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                }
+                                else
+                                {
+                                    file_uri = Uri.fromFile(new java.io.File(message.filename_fullpath));
+                                }
+
+                                newIntent.setDataAndType(file_uri, mimeType);
+                                newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                try
+                                {
+                                    context.startActivity(newIntent);
+                                }
+                                catch (ActivityNotFoundException e)
+                                {
+                                    Toast.makeText(context, "Can not handle this file", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        return true;
+                    }
+                });
+            }
+
+            ft_preview_container.setVisibility(View.VISIBLE);
+            ft_preview_image.setVisibility(View.VISIBLE);
+            ft_progressbar.setVisibility(View.GONE);
+            ft_buttons_container.setVisibility(View.GONE);
         }
-
-
 
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);

@@ -110,6 +110,7 @@ import info.guardianproject.netcipher.proxy.OrbotHelper;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
+import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
@@ -2739,7 +2740,6 @@ public class MainActivity extends AppCompatActivity
             catch (Exception e)
             {
             }
-
         }
     }
 
@@ -2770,12 +2770,15 @@ public class MainActivity extends AppCompatActivity
                 if (length == 0)
                 {
                     // avatar transfer finished -----------
-                    orma.deleteFromFiletransfer().idEq(ft.id);
+                    // done below // orma.deleteFromFiletransfer().idEq(ft.id);
                     // avatar transfer finished -----------
 
                     ByteBuffer avatar_chunk = ByteBuffer.allocateDirect(1);
                     int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, 0);
                     // Log.i(TAG, "file_chunk_request:res(2)=" + res);
+
+                    // remove FT from DB
+                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                 }
                 else
                 {
@@ -2806,13 +2809,65 @@ public class MainActivity extends AppCompatActivity
             {
                 if (length == 0)
                 {
+                    Log.i(TAG, "file_chunk_request:file fully sent");
+
                     // transfer finished -----------
-                    orma.deleteFromFiletransfer().idEq(ft.id);
+                    long filedb_id = -1;
+                    if (ft.kind != TOX_FILE_KIND_AVATAR.value)
+                    {
+                        // put into "FileDB" table
+                        FileDB file_ = new FileDB();
+                        file_.kind = ft.kind;
+                        file_.direction = ft.direction;
+                        file_.tox_public_key_string = ft.tox_public_key_string;
+                        file_.path_name = ft.path_name;
+                        file_.file_name = ft.file_name;
+                        file_.is_in_VFS = false;
+                        file_.filesize = ft.filesize;
+                        long row_id = orma.insertIntoFileDB(file_);
+                        Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
+                        filedb_id = orma.selectFromFileDB().
+                                tox_public_key_stringEq(ft.tox_public_key_string).
+                                and().file_nameEq(ft.file_name).
+                                and().path_nameEq(ft.path_name).
+                                and().directionEq(ft.direction).
+                                and().filesizeEq(ft.filesize).
+                                orderByIdDesc().get(0).id;
+                        Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
+                    }
+
+
+                    Log.i(TAG, "file_chunk_request:file_READY:001:f.id=" + ft.id);
+                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft.id, friend_number);
+                    Log.i(TAG, "file_chunk_request:file_READY:001a:msg_id=" + msg_id);
+
+                    update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number, ft.path_name + "/" + ft.file_name);
+                    set_message_state_from_friendnum_and_filenum(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
+                    set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
+                    set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
+
+                    try
+                    {
+                        Log.i(TAG, "file_chunk_request:file_READY:002");
+                        if (ft.id != -1)
+                        {
+                            Log.i(TAG, "file_chunk_request:file_READY:003:f.id=" + ft.id + " msg_id=" + msg_id);
+                            update_single_message_from_messge_id(msg_id, true);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.i(TAG, "file_chunk_request:file_READY:EE:" + e.getMessage());
+                    }
+
                     // transfer finished -----------
 
                     ByteBuffer avatar_chunk = ByteBuffer.allocateDirect(1);
                     int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, 0);
                     // Log.i(TAG, "file_chunk_request:res(2)=" + res);
+
+                    // remove FT from DB
+                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                 }
                 else
                 {
@@ -3818,6 +3873,42 @@ public class MainActivity extends AppCompatActivity
             }
             else // outgoing FT
             {
+                if (f.kind == TOX_FILE_KIND_DATA.value)
+                {
+                    long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+
+                    // set state for FT in message
+                    set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    // remove link to any message
+                    set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
+                    // delete FT in DB
+                    Log.i(TAG, "FTFTFT:OGFT:002");
+                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
+                    // update UI
+                    try
+                    {
+                        if (f.id != -1)
+                        {
+                            update_single_message_from_messge_id(msg_id, true);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+                else // avatar FT
+                {
+                    long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+                    set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_CANCEL.value);
+                    set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    // delete tmp file
+                    delete_filetransfer_tmpfile(friend_number, file_number);
+                    // delete FT in DB
+                    Log.i(TAG, "FTFTFT:OGFT:003");
+                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
+                }
             }
         }
         catch (Exception e)
@@ -5154,6 +5245,37 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+    }
+
+    static String fileExt(String url)
+    {
+        return getFileExtensionFromUrl(url);
+
+        //        if (url.indexOf("?") > -1)
+        //        {
+        //            url = url.substring(0, url.indexOf("?"));
+        //        }
+        //
+        //        if (url.lastIndexOf(".") == -1)
+        //        {
+        //            return null;
+        //        }
+        //        else
+        //        {
+        //            String ext = url.substring(url.lastIndexOf(".") + 1);
+        //
+        //            if (ext.indexOf("%") > -1)
+        //            {
+        //                ext = ext.substring(0, ext.indexOf("%"));
+        //            }
+        //
+        //            if (ext.indexOf("/") > -1)
+        //            {
+        //                ext = ext.substring(0, ext.indexOf("/"));
+        //            }
+        //
+        //            return ext.toLowerCase();
+        //        }
     }
 
     // --------- make app crash ---------

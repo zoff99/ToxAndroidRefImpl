@@ -146,6 +146,16 @@
             android:enabled="true"
             android:exported="false">
         </service>
+
+        <provider
+            android:name=".GenericFileProvider"
+            android:authorities="com.zoffcc.applications.trifa.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
 
 </manifest>
