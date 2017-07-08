@@ -279,7 +279,6 @@ public class CheckPasswordActivity extends AppCompatActivity
                     build();
             Log.i(TAG, "db:open=OK:path=" + dbs_path);
 
-
             try
             {
                 orma2.getConnection().close();
