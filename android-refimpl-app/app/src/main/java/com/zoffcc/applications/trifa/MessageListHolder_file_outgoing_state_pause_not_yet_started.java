@@ -215,12 +215,14 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                         // update message view
                         update_single_message_from_messge_id(message.id, true);
 
-                        Filetransfer ft = orma.selectFromFiletransfer().idEq(message.filetransfer_id).orderByIdDesc().get(0);
+                        Filetransfer ft = orma.selectFromFiletransfer().
+                                idEq(message.filetransfer_id).
+                                orderByIdDesc().get(0);
 
-                        Log.i(TAG, "MM2MM:8:ft.filesize=" + ft.filesize + " ftid=" + ft.id + " mid=" + ft.message_id);
+                        Log.i(TAG, "MM2MM:8:ft.filesize=" + ft.filesize + " ftid=" + ft.id + " ft.mid=" + ft.message_id + " mid=" + message.id);
 
                         ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
-                        byte[] sha256_buf = TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes(ft.path_name + ":" + ft.file_name + ":" + ft.filesize));
+                        byte[] sha256_buf = TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2("" + ft.path_name + ":" + ft.file_name + ":" + ft.filesize));
 
                         Log.i(TAG, "TOX_FILE_ID_LENGTH=" + TOX_FILE_ID_LENGTH + " sha_byte=" + sha256_buf.length);
 
@@ -229,7 +231,7 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                         // actually start sending the file to friend
                         long file_number = tox_file_send(tox_friend_by_public_key__wrapper(message.tox_friendpubkey), ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA.value, ft.filesize, file_id_buffer, ft.file_name, ft.file_name.length());
 
-                        Log.i(TAG, "MM2MM:8:new filenum=" + file_number);
+                        Log.i(TAG, "MM2MM:9:new filenum=" + file_number);
 
                         // update the tox file number in DB -----------
                         ft.file_number = file_number;
@@ -240,6 +242,8 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                     }
                     catch (Exception e)
                     {
+                        e.printStackTrace();
+                        Log.i(TAG, "MM2MM:EE1:" + e.getMessage());
                     }
                 }
                 else
@@ -261,7 +265,8 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                     {
                         // cancel FT
                         Log.i(TAG, "button_cancel:OnTouch:001");
-                        tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey), get_filetransfer_filenum_from_id(message.filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
+                        int res = tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey), get_filetransfer_filenum_from_id(message.filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
+                        Log.i(TAG, "button_cancel:OnTouch:res=" + res);
                         set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
                         set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
 
@@ -271,9 +276,12 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
 
                         // update message view
                         update_single_message_from_messge_id(message.id, true);
+                        Log.i(TAG, "button_cancel:OnTouch:099");
                     }
                     catch (Exception e)
                     {
+                        e.printStackTrace();
+                        Log.i(TAG, "button_cancel:OnTouch:EE:" + e.getMessage());
                     }
                 }
                 else

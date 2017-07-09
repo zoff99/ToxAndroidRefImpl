@@ -252,7 +252,7 @@ public class SetPasswordActivity extends AppCompatActivity
                 return false;
             }
 
-            String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes(mPassword1)));
+            String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(mPassword1)));
 
             // remember hash ---------------
             PREF__DB_secrect_key__user_hash = try_password_hash;

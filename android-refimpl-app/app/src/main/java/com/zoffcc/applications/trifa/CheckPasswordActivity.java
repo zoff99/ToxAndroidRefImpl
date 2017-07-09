@@ -259,7 +259,7 @@ public class CheckPasswordActivity extends AppCompatActivity
 
         try
         {
-            String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes(try_password)));
+            String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(try_password)));
 
             String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
             Log.i(TAG, "db:path=" + dbs_path);

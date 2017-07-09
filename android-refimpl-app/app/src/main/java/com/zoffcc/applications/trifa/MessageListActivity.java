@@ -19,10 +19,19 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.annotation.Px;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -63,10 +72,10 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
-import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
+import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_messageid_from_id;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FILE_PICK_METHOD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
@@ -82,6 +91,7 @@ public class MessageListActivity extends AppCompatActivity
     private static final String TAG = "trifa.MsgListActivity";
     long friendnum = -1;
     long friendnum_prev = -1;
+    static final int MEDIAPICK_ID_001 = 8002;
     //
     com.vanniktech.emoji.EmojiEditText ml_new_message = null;
     EmojiPopup emojiPopup = null;
@@ -503,49 +513,103 @@ public class MessageListActivity extends AppCompatActivity
             {
                 if (attachemnt_instead_of_send)
                 {
-                    // add attachement
-                    DialogProperties properties = new DialogProperties();
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                    properties.selection_type = DialogConfigs.FILE_SELECT;
-                    properties.root = new java.io.File("/");
-                    properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                    properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                    // TODO: hardcoded is always bad
-                    properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF", "zip", "ZIP", "avi", "AVI", "mp4", "MP4"};
-                    FilePickerDialog dialog = new FilePickerDialog(this, properties);
-                    dialog.setTitle("Select File");
-
-                    dialog.setDialogSelectionListener(new DialogSelectionListener()
+                    // add attachement ------------
+                    // add attachement ------------
+                    if (FILE_PICK_METHOD == 1)
                     {
-                        @Override
-                        public void onSelectedFilePaths(String[] files)
+                        // Method 1 ----------------
+                        // Method 1 ----------------
+                        // Method 1 ----------------
+                        DialogProperties properties = new DialogProperties();
+                        properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                        properties.selection_type = DialogConfigs.FILE_SELECT;
+                        properties.root = new java.io.File("/");
+                        properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                        properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                        properties.extensions = null;
+                        // TODO: hardcoded is always bad
+                        // properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF", "zip", "ZIP", "avi", "AVI", "mp4", "MP4"};
+                        FilePickerDialog dialog = new FilePickerDialog(this, properties);
+                        dialog.setTitle("Select File");
+
+                        dialog.setDialogSelectionListener(new DialogSelectionListener()
                         {
-                            try
+                            @Override
+                            public void onSelectedFilePaths(String[] files)
                             {
-                                Log.i(TAG, "select_file:" + files);
-                                final String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
-                                final String src_filename = new File(files[0]).getName();
-                                Log.i(TAG, "select_file:p=" + src_path + " f=" + src_filename);
-
-                                final Thread t = new Thread()
+                                try
                                 {
-                                    @Override
-                                    public void run()
-                                    {
-                                        add_outgoing_file(src_path, src_filename);
-                                    }
-                                };
-                                t.start();
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "select_file:EE1:" + e.getMessage());
-                            }
-                        }
-                    });
+                                    Log.i(TAG, "select_file:" + files);
+                                    final String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
+                                    final String src_filename = new File(files[0]).getName();
+                                    Log.i(TAG, "select_file:p=" + src_path + " f=" + src_filename);
 
-                    dialog.show();
+                                    final Thread t = new Thread()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            add_outgoing_file(src_path, src_filename);
+                                        }
+                                    };
+                                    t.start();
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    Log.i(TAG, "select_file:EE1:" + e.getMessage());
+                                }
+                            }
+                        });
+                        dialog.show();
+                        // Method 1 ----------------
+                        // Method 1 ----------------
+                        // Method 1 ----------------
+                    }
+                    else
+                    {
+                        // Method 2 ----------------
+                        // Method 2 ----------------
+                        // Method 2 ----------------
+                        //                        Log.i(TAG, "add_file:001");
+                        //                        Intent intent_file1 = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        //                        Log.i(TAG, "add_file:002");
+                        //                        try
+                        //                        {
+                        //                            startActivityForResult(intent_file1, MEDIAPICK_ID_001);
+                        //                        }
+                        //                        catch (Exception e)
+                        //                        {
+                        //                            e.printStackTrace();
+                        //                            Log.i(TAG, "add_file:EE:" + e.getMessage());
+                        //                        }
+                        //                        Log.i(TAG, "add_file:003");
+
+
+                        // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+                        // browser.
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+                        // Filter to only show results that can be "opened", such as a
+                        // file (as opposed to a list of contacts or timezones)
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                        // Filter to show only images, using the image MIME data type.
+                        // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+                        // To search for all documents available via installed storage providers,
+                        // it would be "*/*".
+                        // intent.setType("image/*");
+                        intent.setType("*/*");
+
+                        startActivityForResult(intent, MEDIAPICK_ID_001);
+
+
+                        // Method 2 ----------------
+                        // Method 2 ----------------
+                        // Method 2 ----------------
+                    }
+                    // add attachement ------------
+                    // add attachement ------------
                 }
                 else
                 {
@@ -571,7 +635,8 @@ public class MessageListActivity extends AppCompatActivity
                         if (res > -1)
                         {
                             m.message_id = res;
-                            insert_into_message_db(m, true);
+                            long row_id = insert_into_message_db(m, true);
+                            m.id = row_id;
                             ml_new_message.setText("");
                         }
                     }
@@ -585,6 +650,74 @@ public class MessageListActivity extends AppCompatActivity
         }
 
         // Log.i(TAG,"send_message_onclick:---end");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MEDIAPICK_ID_001 && resultCode == Activity.RESULT_OK)
+        {
+            if (data == null)
+            {
+                //Display an error
+                return;
+            }
+            else
+            {
+                try
+                {
+                    // -- get real path of file --
+                    Uri selectedImage = data.getData();
+                    //                    Log.i(TAG, "data_uri=" + selectedImage.toString());
+                    //                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                    //
+                    //                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                    //                    Log.i(TAG, "data_uri:" + cursor);
+                    //                    cursor.moveToFirst();
+                    //
+                    //                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    //                    Log.i(TAG, "data_uri:" + columnIndex);
+                    //                    String picturePath = cursor.getString(columnIndex);
+                    //                    cursor.close();
+
+                    String picturePath = getPath(this, selectedImage);
+                    Log.i(TAG, "data=" + data.getData() + ":" + picturePath);
+
+                    //                    Uri uri = null;
+                    //                    if (data != null)
+                    //                    {
+                    //                        uri = data.getData();
+                    //                        Log.i(TAG, "data_uri=" + uri.toString());
+                    //                    }
+                    //                    String picturePath = "/xxx.png";
+
+                    // -- get real path of file --
+
+
+                    final String src_path = new File(new File(picturePath).getAbsolutePath()).getParent();
+                    final String src_filename = new File(picturePath).getName();
+                    Log.i(TAG, "select_file:22:p=" + src_path + " f=" + src_filename);
+
+                    final Thread t = new Thread()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            add_outgoing_file(src_path, src_filename);
+                        }
+                    };
+                    t.start();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "select_file:22:EE1:" + e.getMessage());
+                }
+            }
+            // InputStream inputStream = context.getContentResolver().openInputStream(data.getData());
+            //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
+        }
     }
 
     void add_outgoing_file(String filepath, String filename)
@@ -623,9 +756,16 @@ public class MessageListActivity extends AppCompatActivity
         f.current_position = 0;
 
         long ft_id = insert_into_filetransfer_db(f);
+        f.id = ft_id;
 
         // Message m_tmp = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(3)).orderByMessage_idDesc().get(0);
         Log.i(TAG, "MM2MM:2:" + ft_id);
+
+
+        // ---------- DEBUG ----------
+        Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+        Log.i(TAG, "MM2MM:4a:" + "fid=" + ft_tmp.id + " mid=" + ft_tmp.message_id);
+        // ---------- DEBUG ----------
 
 
         // add FT message to UI
@@ -645,17 +785,26 @@ public class MessageListActivity extends AppCompatActivity
         m.text = filename + "\n" + file_size + " bytes";
 
         long new_msg_id = insert_into_message_db(m, true);
+        m.id = new_msg_id;
 
+        // ---------- DEBUG ----------
         Log.i(TAG, "MM2MM:3:" + new_msg_id);
         Message m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
         Log.i(TAG, "MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
+        // ---------- DEBUG ----------
 
         f.message_id = new_msg_id;
-        update_filetransfer_db_full(f);
+        update_filetransfer_db_messageid_from_id(f, ft_id);
 
+        // ---------- DEBUG ----------
+        Filetransfer ft_tmp2 = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+        Log.i(TAG, "MM2MM:4b:" + "fid=" + ft_tmp2.id + " mid=" + ft_tmp2.message_id);
+        // ---------- DEBUG ----------
+
+        // ---------- DEBUG ----------
         m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
         Log.i(TAG, "MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
-
+        // ---------- DEBUG ----------
 
         // --- ??? should we do this here?
         //        try
@@ -809,5 +958,150 @@ public class MessageListActivity extends AppCompatActivity
         {
             main_handler_s.post(myRunnable);
         }
+    }
+
+    /**
+     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Framework Documents, as well as the _data field for the MediaStore and
+     * other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri     The Uri to query.
+     * @author paulburke
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static String getPath(final Context context, final Uri uri)
+    {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri))
+        {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri))
+            {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type))
+                {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri))
+            {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri))
+            {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type))
+                {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                }
+                else if ("video".equals(type))
+                {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                }
+                else if ("audio".equals(type))
+                {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{split[1]};
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme()))
+        {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme()))
+        {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs)
+    {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {column};
+
+        try
+        {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst())
+            {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        }
+        finally
+        {
+            if (cursor != null)
+            {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri)
+    {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri)
+    {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri)
+    {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }

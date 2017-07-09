@@ -32,10 +32,10 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 public class Message
 {
     @PrimaryKey(autoincrement = true, auto = true)
-    long id;
+    long id; // uniqe message id!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    long message_id = -1;
+    long message_id = -1; // ID given from toxcore!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String tox_friendpubkey;

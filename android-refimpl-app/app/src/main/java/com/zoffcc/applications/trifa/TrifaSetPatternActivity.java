@@ -24,11 +24,11 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import me.zhanghai.android.patternlock.PatternUtils;
 import me.zhanghai.android.patternlock.PatternView;
 import me.zhanghai.android.patternlock.SetPatternActivity;
 
@@ -92,6 +92,25 @@ public class TrifaSetPatternActivity extends SetPatternActivity
     public static byte[] StringToBytes(String in)
     {
         return Base64.decode(in, Base64.NO_WRAP);
+    }
+
+    public static byte[] StringToBytes2(String in)
+    {
+        try
+        {
+            return in.getBytes(Charset.forName("UTF-8"));
+        }
+        catch (Exception e)
+        {
+            // TODO: fix me!!!!!
+            // TODO: fix me!!!!!
+            // TODO: fix me!!!!!
+            e.printStackTrace();
+            return null;
+            // TODO: fix me!!!!!
+            // TODO: fix me!!!!!
+            // TODO: fix me!!!!!
+        }
     }
 
     public static byte[] sha256(byte[] input)

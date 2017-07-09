@@ -2300,6 +2300,7 @@ public class MainActivity extends AppCompatActivity
                                                 ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
                                                 ft_avatar_outgoing.filesize = avatar_bytes.capacity();
                                                 long rowid = insert_into_filetransfer_db(ft_avatar_outgoing);
+                                                ft_avatar_outgoing.id = rowid;
                                             }
                                             else
                                             {
@@ -2937,7 +2938,8 @@ public class MainActivity extends AppCompatActivity
             f.filesize = file_size;
             f.current_position = 0;
 
-            insert_into_filetransfer_db(f);
+            long row_id = insert_into_filetransfer_db(f);
+            f.id = row_id;
 
             // TODO: we just accept incoming avatar, maybe make some checks first?
             tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_RESUME.value);
@@ -2960,6 +2962,7 @@ public class MainActivity extends AppCompatActivity
             f.current_position = 0;
 
             long ft_id = insert_into_filetransfer_db(f);
+            f.id = ft_id;
 
             // add FT message to UI
             Message m = new Message();
@@ -2983,16 +2986,20 @@ public class MainActivity extends AppCompatActivity
                 if (message_list_activity.get_current_friendnum() == friend_number)
                 {
                     new_msg_id = insert_into_message_db(m, true);
+                    m.id = new_msg_id;
                 }
                 else
                 {
                     new_msg_id = insert_into_message_db(m, false);
+                    m.id = new_msg_id;
                 }
             }
             else
             {
                 new_msg_id = insert_into_message_db(m, false);
+                m.id = new_msg_id;
             }
+
 
             f.message_id = new_msg_id;
             update_filetransfer_db_full(f);
@@ -3506,7 +3513,7 @@ public class MainActivity extends AppCompatActivity
             return orma.selectFromMessage().
                     filetransfer_idEq(filetransfer_id).and().
                     tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    orderByIdDesc().get(0).id;
+                    orderByIdDesc().toList().get(0).id;
         }
         catch (Exception e)
         {
@@ -3952,6 +3959,32 @@ public class MainActivity extends AppCompatActivity
                 fos_open(f.fos_open).
                 filesize(f.filesize).
                 current_position(f.current_position).
+                execute();
+    }
+
+    static void update_filetransfer_db_full_from_id(final Filetransfer f, long fid)
+    {
+        orma.updateFiletransfer().
+                idEq(fid).
+                tox_public_key_string(f.tox_public_key_string).
+                direction(f.direction).
+                file_number(f.file_number).
+                kind(f.kind).
+                state(f.state).
+                path_name(f.path_name).
+                message_id(f.message_id).
+                file_name(f.file_name).
+                fos_open(f.fos_open).
+                filesize(f.filesize).
+                current_position(f.current_position).
+                execute();
+    }
+
+    static void update_filetransfer_db_messageid_from_id(final Filetransfer f, long fid)
+    {
+        orma.updateFiletransfer().
+                idEq(fid).
+                message_id(f.message_id).
                 execute();
     }
 
