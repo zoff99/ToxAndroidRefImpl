@@ -1008,25 +1008,73 @@ public class MessageListActivity extends AppCompatActivity
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public static String getPath(final Context context, final Uri uri)
     {
-
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
         // DocumentProvider
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri))
         {
+            Log.i(TAG, "getPath:001:uri=" + uri);
+
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri))
             {
+                Log.i(TAG, "getPath:002");
                 final String docId = DocumentsContract.getDocumentId(uri);
+                Log.i(TAG, "getPath:003:docId=" + docId);
                 final String[] split = docId.split(":");
+                Log.i(TAG, "getPath:004:split=" + split[0] + " " + split[1]);
                 final String type = split[0];
+                Log.i(TAG, "getPath:005:type=" + type);
 
                 if ("primary".equalsIgnoreCase(type))
                 {
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
+                else
+                {
+                    // TODO handle non-primary volumes
+                    try
+                    {
+                        String strSDCardPath = System.getenv("SECONDARY_STORAGE");
+                        Log.i(TAG, "getPath:SECONDARY_STORAGE=" + strSDCardPath);
 
-                // TODO handle non-primary volumes
+                        if ((strSDCardPath == null) || (strSDCardPath.length() == 0))
+                        {
+                            Log.i(TAG, "getPath:006");
+                            strSDCardPath = System.getenv("EXTERNAL_SDCARD_STORAGE");
+                            Log.i(TAG, "getPath:EXTERNAL_SDCARD_STORAGE=" + strSDCardPath);
+                        }
+
+                        if (strSDCardPath == null)
+                        {
+                            // ok, last try
+                            strSDCardPath = "/storage/" + type;
+                            return strSDCardPath + "/" + split[1];
+                        }
+
+                        //If may get a full path that is not the right one, even if we don't have the SD Card there.
+                        //We just need the "/mnt/extSdCard/" i.e and check if it's writable
+                        Log.i(TAG, "getPath:007");
+                        if (strSDCardPath != null)
+                        {
+                            Log.i(TAG, "getPath:008");
+                            if (strSDCardPath.contains(":"))
+                            {
+                                Log.i(TAG, "getPath:009");
+                                strSDCardPath = strSDCardPath.substring(0, strSDCardPath.indexOf(":"));
+                            }
+                            // File externalFilePath = new File(strSDCardPath);
+                            Log.i(TAG, "getPath:strSDCardPath=" + strSDCardPath);
+
+                            return strSDCardPath + "/" + split[1];
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "getPath:EE3:" + e.getMessage());
+                    }
+                }
             }
             // DownloadsProvider
             else if (isDownloadsDocument(uri))
@@ -1088,6 +1136,7 @@ public class MessageListActivity extends AppCompatActivity
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */
+
     public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs)
     {
 
