@@ -44,6 +44,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
@@ -220,6 +221,37 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                                 orderByIdDesc().get(0);
 
                         Log.i(TAG, "MM2MM:8:ft.filesize=" + ft.filesize + " ftid=" + ft.id + " ft.mid=" + ft.message_id + " mid=" + message.id);
+
+                        // ------ DEBUG ------
+                        Log.i(TAG, "MM2MM:8a:ft full=" + ft);
+                        // ------ DEBUG ------
+
+                        // -------- DEBUG --------
+//                        List<Filetransfer> ft_res = orma.selectFromFiletransfer().
+//                                tox_public_key_stringEq(message.tox_friendpubkey).
+//                                orderByIdDesc().
+//                                limit(30).toList();
+//                        int ii;
+//                        Log.i(TAG, "file_recv_control:SQL:9:===============================================");
+//                        for (ii = 0; ii < ft_res.size(); ii++)
+//                        {
+//                            Log.i(TAG, "file_recv_control:SQL:9:" + ft_res.get(ii));
+//                        }
+//                        Log.i(TAG, "file_recv_control:SQL:9:===============================================");
+                        // -------- DEBUG --------
+
+
+                        // -------- DEBUG --------
+//                        ft_res = orma.selectFromFiletransfer().
+//                                orderByIdDesc().
+//                                limit(30).toList();
+//                        Log.i(TAG, "file_recv_control:SQL:A:===============================================");
+//                        for (ii = 0; ii < ft_res.size(); ii++)
+//                        {
+//                            Log.i(TAG, "file_recv_control:SQL:A:" + ft_res.get(ii));
+//                        }
+//                        Log.i(TAG, "file_recv_control:SQL:A:===============================================");
+                        // -------- DEBUG --------
 
                         ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
                         byte[] sha256_buf = TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2("" + ft.path_name + ":" + ft.file_name + ":" + ft.filesize));

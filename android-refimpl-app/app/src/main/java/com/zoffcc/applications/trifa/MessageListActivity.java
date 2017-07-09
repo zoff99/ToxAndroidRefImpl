@@ -722,7 +722,7 @@ public class MessageListActivity extends AppCompatActivity
 
     void add_outgoing_file(String filepath, String filename)
     {
-        Log.i(TAG, "file_recv:incoming regular file");
+        Log.i(TAG, "add_outgoing_file:regular file");
 
         long file_size = -1;
         try
@@ -742,6 +742,40 @@ public class MessageListActivity extends AppCompatActivity
             return;
         }
 
+        Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
+
+        if (friendnum == -1)
+        {
+            // ok, we need to wait for onResume to finish and give us the friendnum
+            Log.i(TAG, "add_outgoing_file:ok, we need to wait for onResume to finish and give us the friendnum");
+            long loop = 0;
+            while (loop < 20) // wait 4 sec., then give up
+            {
+                loop++;
+                try
+                {
+                    Thread.sleep(200);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+
+                if (friendnum > -1)
+                {
+                    // got friendnum
+                    break;
+                }
+            }
+        }
+
+        if (friendnum == -1)
+        {
+            // sorry, still no friendnum
+            Log.i(TAG, "add_outgoing_file:sorry, still no friendnum");
+            return;
+        }
+
         Filetransfer f = new Filetransfer();
         f.tox_public_key_string = tox_friend_get_public_key__wrapper(friendnum);
         f.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
@@ -754,6 +788,8 @@ public class MessageListActivity extends AppCompatActivity
         f.ft_accepted = false;
         f.ft_outgoing_started = false;
         f.current_position = 0;
+
+        Log.i(TAG, "add_outgoing_file:tox_public_key_string=" + f.tox_public_key_string);
 
         long ft_id = insert_into_filetransfer_db(f);
         f.id = ft_id;
