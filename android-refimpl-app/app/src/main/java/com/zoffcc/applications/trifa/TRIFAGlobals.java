@@ -65,6 +65,9 @@ public class TRIFAGlobals
     static String PREF__DB_secrect_key__user_hash = "";
 
     static long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES = 150000L; // 150 kBytes // update FT and progress bars every XX bytes
+    static long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES = 15000L; // 15 kBytes
+    static long UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES = 250000L; // less than this in bytes is a small file
+
     static int FILE_PICK_METHOD = 2;
 
     // ---- lookup cache ----
