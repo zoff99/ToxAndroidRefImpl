@@ -2372,6 +2372,116 @@ void tox_self_set_nospam(Tox *tox, uint32_t nospam);
 // -----------------------
 
 
+
+
+// ------------------- Conference -------------------
+// ------------------- Conference -------------------
+// ------------------- Conference -------------------
+
+
+/**
+ * The invitation will remain valid until the inviting friend goes offline
+ * or exits the conference.
+ *
+ * @param friend_number The friend who invited us.
+ * @param type The conference type (text only or audio/video).
+ * @param cookie A piece of data of variable length required to join the
+ *   conference.
+ * @param length The length of the cookie.
+ */
+// typedef void tox_conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie,
+//                                      size_t length, void *user_data);
+
+
+/**
+ * Set the callback for the `conference_invite` event. Pass NULL to unset.
+ *
+ * This event is triggered when the client is invited to join a conference.
+ */
+// void tox_callback_conference_invite(Tox *tox, tox_conference_invite_cb *callback);
+
+
+/**
+ * @param conference_number The conference number of the conference the message is intended for.
+ * @param peer_number The ID of the peer who sent the message.
+ * @param type The type of message (normal, action, ...).
+ * @param message The message data.
+ * @param length The length of the message.
+ */
+// typedef void tox_conference_message_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
+// TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
+
+/**
+ * Set the callback for the `conference_message` event. Pass NULL to unset.
+ *
+ * This event is triggered when the client receives a conference message.
+ */
+// void tox_callback_conference_message(Tox *tox, tox_conference_message_cb *callback);
+
+
+
+
+
+/**
+ * This function deletes a conference.
+ *
+ * @param conference_number The conference number of the conference to be deleted.
+ *
+ * @return true on success.
+ */
+// bool tox_conference_delete(Tox *tox, uint32_t conference_number, TOX_ERR_CONFERENCE_DELETE *error);
+
+/**
+ * Joins a conference that the client has been invited to.
+ *
+ * @param friend_number The friend number of the friend who sent the invite.
+ * @param cookie Received via the `conference_invite` event.
+ * @param length The size of cookie.
+ *
+ * @return conference number on success, UINT32_MAX on failure.
+ */
+// uint32_t tox_conference_join(Tox *tox, uint32_t friend_number, const uint8_t *cookie, size_t length,
+//
+
+/**
+ * Send a text chat message to the conference.
+ *
+ * This function creates a conference message packet and pushes it into the send
+ * queue.
+ *
+ * The message length may not exceed TOX_MAX_MESSAGE_LENGTH. Larger messages
+ * must be split by the client and sent as separate messages. Other clients can
+ * then reassemble the fragments.
+ *
+ * @param conference_number The conference number of the conference the message is intended for.
+ * @param type Message type (normal, action, ...).
+ * @param message A non-NULL pointer to the first element of a byte array
+ *   containing the message text.
+ * @param length Length of the message to be sent.
+ *
+ * @return true on success.
+ */
+// bool tox_conference_send_message(Tox *tox, uint32_t conference_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
+//                                 size_t length, TOX_ERR_CONFERENCE_SEND_MESSAGE *error);
+//                             TOX_ERR_CONFERENCE_JOIN *error);
+
+
+/**
+ * Returns the type of conference (TOX_CONFERENCE_TYPE) that conference_number is. Return value is
+ * unspecified on failure.
+ */
+// TOX_CONFERENCE_TYPE tox_conference_get_type(const Tox *tox, uint32_t conference_number,
+//        TOX_ERR_CONFERENCE_GET_TYPE *error);
+
+
+// ------------------- Conference -------------------
+// ------------------- Conference -------------------
+// ------------------- Conference -------------------
+
+
+
+
+
 // ------------------- AV -------------------
 // ------------------- AV -------------------
 // ------------------- AV -------------------

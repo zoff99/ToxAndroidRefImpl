@@ -1110,6 +1110,199 @@ public class ToxVars
 
     }
 
+
+    public static enum TOX_CONFERENCE_TYPE
+    {
+        /**
+         * Text-only conferences that must be accepted with the tox_conference_join function.
+         */
+        TOX_CONFERENCE_TYPE_TEXT,
+
+        /**
+         * Video conference. The function to accept these is in toxav.
+         */
+        TOX_CONFERENCE_TYPE_AV,
+
+    }
+
+    public static enum TOX_CONFERENCE_STATE_CHANGE
+    {
+
+        /**
+         * A peer has joined the conference.
+         */
+        TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN,
+
+        /**
+         * A peer has exited the conference.
+         */
+        TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT,
+
+        /**
+         * A peer has changed their name.
+         */
+        TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE,
+
+    }
+
+    public static enum TOX_ERR_CONFERENCE_PEER_QUERY
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_PEER_QUERY_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND,
+
+        /**
+         * The peer number passed did not designate a valid peer.
+         */
+        TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND,
+
+        /**
+         * The client is not connected to the conference.
+         */
+        TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION,
+
+    }
+
+    public static enum TOX_ERR_CONFERENCE_INVITE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_INVITE_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_INVITE_CONFERENCE_NOT_FOUND,
+
+        /**
+         * The invite packet failed to send.
+         */
+        TOX_ERR_CONFERENCE_INVITE_FAIL_SEND,
+
+    }
+
+    public static enum TOX_ERR_CONFERENCE_JOIN
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_JOIN_OK,
+
+        /**
+         * The cookie passed has an invalid length.
+         */
+        TOX_ERR_CONFERENCE_JOIN_INVALID_LENGTH,
+
+        /**
+         * The conference is not the expected type. This indicates an invalid cookie.
+         */
+        TOX_ERR_CONFERENCE_JOIN_WRONG_TYPE,
+
+        /**
+         * The friend number passed does not designate a valid friend.
+         */
+        TOX_ERR_CONFERENCE_JOIN_FRIEND_NOT_FOUND,
+
+        /**
+         * Client is already in this conference.
+         */
+        TOX_ERR_CONFERENCE_JOIN_DUPLICATE,
+
+        /**
+         * Conference instance failed to initialize.
+         */
+        TOX_ERR_CONFERENCE_JOIN_INIT_FAIL,
+
+        /**
+         * The join packet failed to send.
+         */
+        TOX_ERR_CONFERENCE_JOIN_FAIL_SEND,
+
+    }
+
+    public static enum TOX_ERR_CONFERENCE_SEND_MESSAGE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_CONFERENCE_NOT_FOUND,
+
+        /**
+         * The message is too long.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_TOO_LONG,
+
+        /**
+         * The client is not connected to the conference.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_NO_CONNECTION,
+
+        /**
+         * The message packet failed to send.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_FAIL_SEND,
+
+    }
+
+
+    public static enum TOX_ERR_CONFERENCE_TITLE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_TITLE_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_TITLE_CONFERENCE_NOT_FOUND,
+
+        /**
+         * The title is too long or empty.
+         */
+        TOX_ERR_CONFERENCE_TITLE_INVALID_LENGTH,
+
+        /**
+         * The title packet failed to send.
+         */
+        TOX_ERR_CONFERENCE_TITLE_FAIL_SEND,
+
+    }
+
+
+    public static enum TOX_ERR_CONFERENCE_GET_TYPE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_GET_TYPE_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_GET_TYPE_CONFERENCE_NOT_FOUND,
+
+    }
+    
+
     // ---------- TOX -------------
     // ---------- TOX -------------
     // ---------- TOX -------------
