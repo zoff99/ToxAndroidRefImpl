@@ -48,6 +48,7 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
 import static com.zoffcc.applications.trifa.MainActivity.receiver2;
+import static com.zoffcc.applications.trifa.MainActivity.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
@@ -374,6 +375,7 @@ public class TrifaToxService extends Service
                 change_notification(0); // set to offline
                 Log.i(TAG, "stop_tox_fg:008");
                 set_all_friends_offline();
+                set_all_conferences_inactive();
                 is_tox_started = false;
 
                 Log.i(TAG, "stop_tox_fg:009");
@@ -429,6 +431,7 @@ public class TrifaToxService extends Service
 
                 if (!old_is_tox_started)
                 {
+                    set_all_conferences_inactive();
                     MainActivity.init_tox_callbacks();
                     MainActivity.update_savedata_file();
                 }

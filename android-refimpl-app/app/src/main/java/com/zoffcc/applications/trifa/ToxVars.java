@@ -1116,12 +1116,19 @@ public class ToxVars
         /**
          * Text-only conferences that must be accepted with the tox_conference_join function.
          */
-        TOX_CONFERENCE_TYPE_TEXT,
+        TOX_CONFERENCE_TYPE_TEXT(0),
 
         /**
          * Video conference. The function to accept these is in toxav.
          */
-        TOX_CONFERENCE_TYPE_AV,
+        TOX_CONFERENCE_TYPE_AV(1);
+
+        public int value;
+
+        private TOX_CONFERENCE_TYPE(int value)
+        {
+            this.value = value;
+        }
 
     }
 

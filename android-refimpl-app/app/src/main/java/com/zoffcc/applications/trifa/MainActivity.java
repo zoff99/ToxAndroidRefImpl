@@ -3406,19 +3406,28 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native Conference methods --------
     static void android_tox_callback_conference_invite_cb_method(long friend_number, int a_TOX_CONFERENCE_TYPE, byte[] cookie_buffer, long cookie_length)
     {
-        Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie length=" + cookie_length);
+        Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" + cookie_length + " cookie=" + bytes_to_hex(cookie_buffer));
 
         ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
         cookie_buf2.put(cookie_buffer);
 
         long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
 
+        if (conference_num >= 0)
+        {
+            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number), bytes_to_hex(cookie_buffer), a_TOX_CONFERENCE_TYPE);
+        }
+        else
+        {
+            Log.i(TAG, "conference_invite_cb:error=" + conference_num + " joining conference");
+        }
+
         Log.i(TAG, "conference_invite_cb:res=" + conference_num);
     }
 
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
     {
-        Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + ":pnum=" + peer_number + " msg=" + message);
+        Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message);
     }
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
@@ -5473,6 +5482,52 @@ public class MainActivity extends AppCompatActivity
         //
         //            return ext.toLowerCase();
         //        }
+    }
+
+    static void set_all_conferences_inactive()
+    {
+        try
+        {
+            orma.updateConferenceDB().conference_active(false).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void new_or_updated_conference(long conference_number, String who_invited_public_key, String conference_identifier, int conference_type)
+    {
+        try
+        {
+            orma.selectFromConferenceDB().who_invited__tox_public_key_stringEq(who_invited_public_key).
+                    and().conference_identifierEq(conference_identifier).toList().get(0);
+
+            // conference already exists -> update and connect
+            orma.updateConferenceDB().who_invited__tox_public_key_stringEq(who_invited_public_key).
+                    and().conference_identifierEq(conference_identifier).
+                    conference_active(true).
+                    tox_conference_number(conference_number).execute();
+
+            Log.i(TAG, "new_or_updated_conference:*update*");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            // conference is new -> add
+
+            ConferenceDB conf_new = new ConferenceDB();
+            conf_new.conference_identifier = conference_identifier;
+            conf_new.who_invited__tox_public_key_string = who_invited_public_key;
+            conf_new.peer_count = -1;
+            conf_new.own_peer_number = -1;
+            conf_new.kind = conference_type;
+            conf_new.tox_conference_number = conference_number;
+            conf_new.conference_active = true;
+            //
+            orma.insertIntoConferenceDB(conf_new);
+            Log.i(TAG, "new_or_updated_conference:+ADD+");
+        }
     }
 
     // --------- make app crash ---------
