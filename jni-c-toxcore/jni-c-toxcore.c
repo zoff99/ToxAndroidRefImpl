@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 11
-static const char global_version_string[] = "0.99.11";
+#define VERSION_PATCH 12
+static const char global_version_string[] = "0.99.12";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -145,6 +145,8 @@ jmethodID android_tox_callback_file_recv_control_cb_method = NULL;
 jmethodID android_tox_callback_file_chunk_request_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_chunk_cb_method = NULL;
+jmethodID android_tox_callback_conference_invite_cb_method = NULL;
+jmethodID android_tox_callback_conference_message_cb_method = NULL;
 jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
@@ -173,6 +175,7 @@ typedef struct DHT_node {
 // functions -----------
 // functions -----------
 void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void *user_data);
+
 void friend_name_cb(Tox *tox, uint32_t friend_number, const uint8_t *name, size_t length, void *user_data);
 void friend_status_message_cb(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data);
 void friend_status_cb(Tox *tox, uint32_t friend_number, TOX_USER_STATUS status, void *user_data);
@@ -186,6 +189,10 @@ void file_recv_control_cb(Tox *tox, uint32_t friend_number, uint32_t file_number
 void file_chunk_request_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, size_t length, void *user_data);
 void file_recv_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint32_t kind, uint64_t file_size, const uint8_t *filename, size_t filename_length, void *user_data);
 void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data, size_t length, void *user_data);
+
+void conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie, size_t length, void *user_data);
+void conference_message_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
+
 
 void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message, void *user_data);
 
@@ -553,6 +560,7 @@ void init_tox_callbacks()
 {
 	// -------- _callbacks_ --------
 	tox_callback_self_connection_status(tox_global, self_connection_status_cb);
+
 	tox_callback_friend_name(tox_global, friend_name_cb);
 	tox_callback_friend_status_message(tox_global, friend_status_message_cb);
 	tox_callback_friend_status(tox_global, friend_status_cb);
@@ -567,12 +575,11 @@ void init_tox_callbacks()
 	tox_callback_file_recv(tox_global, file_recv_cb);
 	tox_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
 
-// tox_callback_conference_invite(tox_global, tox_conference_invite_cb *callback);
-// tox_callback_conference_message(tox_global, tox_conference_message_cb *callback);
-// tox_callback_conference_title(tox_global, tox_conference_title_cb *callback);
-// tox_callback_conference_namelist_change(tox_global, tox_conference_namelist_change_cb *callback);
-// tox_callback_friend_lossy_packet(tox_global, tox_friend_lossy_packet_cb *callback);
-// tox_callback_friend_lossless_packet(tox_global, tox_friend_lossless_packet_cb *callback);
+	tox_callback_conference_invite(tox_global, conference_invite_cb);
+	tox_callback_conference_message(tox_global, conference_message_cb);
+
+	// tox_callback_friend_lossy_packet(tox_global, friend_lossy_packet_cb);
+	// tox_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
 	// -------- _callbacks_ --------
 }
 
@@ -928,6 +935,73 @@ void file_recv_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint32
 {
 	android_tox_callback_file_recv_cb(friend_number, file_number, kind, file_size, filename, filename_length);
 }
+
+
+
+
+
+
+
+
+// ------------ Conference [2] ------------
+// ------------ Conference [2] ------------
+// ------------ Conference [2] ------------
+
+void android_tox_callback_conference_message_cb(uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+          android_tox_callback_conference_message_cb_method, (jlong)(unsigned long long)conference_number, (jlong)(unsigned long long)peer_number,
+			(jint) type, js1, (jlong)(unsigned long long)length);
+
+	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
+}
+
+void conference_message_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data)
+{
+	android_tox_callback_conference_message_cb(conference_number, peer_number, type, message, length);
+}
+
+void android_tox_callback_conference_invite_cb(uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie, size_t length)
+{
+	JNIEnv *jnienv2;
+	jnienv2 = jni_getenv();
+
+    jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)length);
+	if (data2 == NULL)
+	{
+        // return NULL; // out of memory error thrown
+    }
+
+	// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+	// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    (*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)length, (const jbyte*)cookie);
+	// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+	// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+
+	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+				android_tox_callback_conference_invite_cb_method, (jlong)(unsigned long long)friend_number, (jint)type,
+				data2, (jlong)(unsigned long long)length);
+
+}
+
+void conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie, size_t length, void *user_data)
+{
+	android_tox_callback_conference_invite_cb(friend_number, type, cookie, length);
+}
+
+// ------------ Conference [2] ------------
+// ------------ Conference [2] ------------
+// ------------ Conference [2] ------------
+
+
+
+
+
 
 void android_tox_callback_file_recv_chunk_cb(uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data, size_t length)
 {
@@ -1371,6 +1445,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	// -------- _callbacks_ --------
 	dbg(9, "linking callbacks ... START");
 	android_tox_callback_self_connection_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_self_connection_status_cb_method", "(I)V");
+
 	android_tox_callback_friend_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_name_cb_method", "(JLjava/lang/String;J)V");
 	android_tox_callback_friend_status_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_status_message_cb_method", "(JLjava/lang/String;J)V");
 	android_tox_callback_friend_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_status_cb_method", "(JI)V");
@@ -1384,6 +1459,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	android_tox_callback_file_chunk_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_file_chunk_request_cb_method", "(JJJJ)V");
 	android_tox_callback_file_recv_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_file_recv_cb_method", "(JJIJLjava/lang/String;J)V");
 	android_tox_callback_file_recv_chunk_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_file_recv_chunk_cb_method", "(JJJ[BJ)V");
+
+	android_tox_callback_conference_invite_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_invite_cb_method", "(JI[BJ)V");
+	android_tox_callback_conference_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_message_cb_method", "(JJILjava/lang/String;J)V");
 
 	android_tox_log_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_log_cb_method", "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
 	dbg(9, "linking callbacks ... READY");
@@ -2380,49 +2458,6 @@ void tox_self_set_nospam(Tox *tox, uint32_t nospam);
 
 
 /**
- * The invitation will remain valid until the inviting friend goes offline
- * or exits the conference.
- *
- * @param friend_number The friend who invited us.
- * @param type The conference type (text only or audio/video).
- * @param cookie A piece of data of variable length required to join the
- *   conference.
- * @param length The length of the cookie.
- */
-// typedef void tox_conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie,
-//                                      size_t length, void *user_data);
-
-
-/**
- * Set the callback for the `conference_invite` event. Pass NULL to unset.
- *
- * This event is triggered when the client is invited to join a conference.
- */
-// void tox_callback_conference_invite(Tox *tox, tox_conference_invite_cb *callback);
-
-
-/**
- * @param conference_number The conference number of the conference the message is intended for.
- * @param peer_number The ID of the peer who sent the message.
- * @param type The type of message (normal, action, ...).
- * @param message The message data.
- * @param length The length of the message.
- */
-// typedef void tox_conference_message_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
-// TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, void *user_data);
-
-/**
- * Set the callback for the `conference_message` event. Pass NULL to unset.
- *
- * This event is triggered when the client receives a conference message.
- */
-// void tox_callback_conference_message(Tox *tox, tox_conference_message_cb *callback);
-
-
-
-
-
-/**
  * This function deletes a conference.
  *
  * @param conference_number The conference number of the conference to be deleted.
@@ -2431,17 +2466,69 @@ void tox_self_set_nospam(Tox *tox, uint32_t nospam);
  */
 // bool tox_conference_delete(Tox *tox, uint32_t conference_number, TOX_ERR_CONFERENCE_DELETE *error);
 
-/**
- * Joins a conference that the client has been invited to.
- *
- * @param friend_number The friend number of the friend who sent the invite.
- * @param cookie Received via the `conference_invite` event.
- * @param length The size of cookie.
- *
- * @return conference number on success, UINT32_MAX on failure.
- */
-// uint32_t tox_conference_join(Tox *tox, uint32_t friend_number, const uint8_t *cookie, size_t length,
-//
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv* env, jobject thiz, jlong friend_number, jobject cookie_buffer, jlong cookie_length)
+{
+	uint8_t *cookie_buffer_c = NULL;
+	long capacity = 0;
+
+	if (cookie_buffer == NULL)
+	{
+		return -21;
+	}
+
+	cookie_buffer_c = (uint8_t*)(*env)->GetDirectBufferAddress(env, cookie_buffer);
+	capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
+
+	TOX_ERR_CONFERENCE_JOIN error;
+	uint32_t res = tox_conference_join(tox_global, (uint32_t)friend_number, cookie_buffer_c, (size_t)cookie_length, &error);
+
+	if (error != TOX_ERR_CONFERENCE_JOIN_OK)
+	{
+		if (error == TOX_ERR_CONFERENCE_JOIN_INVALID_LENGTH)
+		{
+			dbg(0, "tox_conference_join:TOX_ERR_CONFERENCE_JOIN_INVALID_LENGTH");
+			return (jlong)-1;
+		}
+		else if (error == TOX_ERR_CONFERENCE_JOIN_WRONG_TYPE)
+		{
+			dbg(0, "tox_conference_join:TOX_ERR_CONFERENCE_JOIN_WRONG_TYPE");
+			return (jlong)-2;
+		}
+		else if (error == TOX_ERR_CONFERENCE_JOIN_FRIEND_NOT_FOUND)
+		{
+			dbg(0, "tox_conference_join:TOX_ERR_CONFERENCE_JOIN_FRIEND_NOT_FOUND");
+			return (jlong)-3;
+		}
+		else if (error == TOX_ERR_CONFERENCE_JOIN_DUPLICATE)
+		{
+			dbg(0, "tox_conference_join:TOX_ERR_CONFERENCE_JOIN_DUPLICATE");
+			return (jlong)-4;
+		}
+		else if (error == TOX_ERR_CONFERENCE_JOIN_INIT_FAIL)
+		{
+			dbg(0, "tox_conference_join:TOX_ERR_CONFERENCE_JOIN_INIT_FAIL");
+			return (jlong)-5;
+		}
+		else if (error == TOX_ERR_CONFERENCE_JOIN_FAIL_SEND)
+		{
+			dbg(0, "tox_conference_join:TOX_ERR_CONFERENCE_JOIN_FAIL_SEND");
+			return (jlong)-6;
+		}
+		else
+		{
+			return (jlong)-99;
+		}
+	}
+
+	return (jlong)res;
+
+}
+
+
+
+
 
 /**
  * Send a text chat message to the conference.

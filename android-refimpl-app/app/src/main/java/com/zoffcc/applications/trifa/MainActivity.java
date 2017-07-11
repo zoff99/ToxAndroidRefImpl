@@ -1747,6 +1747,17 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_file_send_chunk(long friend_number, long file_number, long position, ByteBuffer data_buffer, long data_length);
 
+    // --------------- Conference -------------
+    // --------------- Conference -------------
+    // --------------- Conference -------------
+
+    public static native long tox_conference_join(long friend_number, ByteBuffer cookie_buffer, long cookie_length);
+
+    // --------------- Conference -------------
+    // --------------- Conference -------------
+    // --------------- Conference -------------
+
+
     // --------------- AV -------------
     // --------------- AV -------------
     // --------------- AV -------------
@@ -2704,17 +2715,17 @@ public class MainActivity extends AppCompatActivity
                 Filetransfer ft_check = orma.selectFromFiletransfer().idEq(ft_id).get(0);
 
                 // -------- DEBUG --------
-//                List<Filetransfer> ft_res = orma.selectFromFiletransfer().
-//                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-//                        orderByIdDesc().
-//                        limit(30).toList();
-//                int ii;
-//                Log.i(TAG, "file_recv_control:SQL:===============================================");
-//                for (ii = 0; ii < ft_res.size(); ii++)
-//                {
-//                    Log.i(TAG, "file_recv_control:SQL:" + ft_res.get(ii));
-//                }
-//                Log.i(TAG, "file_recv_control:SQL:===============================================");
+                //                List<Filetransfer> ft_res = orma.selectFromFiletransfer().
+                //                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                //                        orderByIdDesc().
+                //                        limit(30).toList();
+                //                int ii;
+                //                Log.i(TAG, "file_recv_control:SQL:===============================================");
+                //                for (ii = 0; ii < ft_res.size(); ii++)
+                //                {
+                //                    Log.i(TAG, "file_recv_control:SQL:" + ft_res.get(ii));
+                //                }
+                //                Log.i(TAG, "file_recv_control:SQL:===============================================");
                 // -------- DEBUG --------
 
                 if (ft_check.kind == TOX_FILE_KIND_AVATAR.value)
@@ -3390,6 +3401,30 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native methods --------
     // -------- called by native methods --------
 
+    // -------- called by native Conference methods --------
+    // -------- called by native Conference methods --------
+    // -------- called by native Conference methods --------
+    static void android_tox_callback_conference_invite_cb_method(long friend_number, int a_TOX_CONFERENCE_TYPE, byte[] cookie_buffer, long cookie_length)
+    {
+        Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie length=" + cookie_length);
+
+        ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
+        cookie_buf2.put(cookie_buffer);
+
+        long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
+
+        Log.i(TAG, "conference_invite_cb:res=" + conference_num);
+    }
+
+    static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
+    {
+        Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + ":pnum=" + peer_number + " msg=" + message);
+    }
+    // -------- called by native Conference methods --------
+    // -------- called by native Conference methods --------
+    // -------- called by native Conference methods --------
+
+
     /*
      * this is used to load the native library on
 	 * application startup. The library has already been unpacked at
@@ -3640,19 +3675,19 @@ public class MainActivity extends AppCompatActivity
             // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:ft_id=" + ft_id);
 
             // ----- DEBUG -----
-//            try
-//            {
-//                Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
-//                //if (ft_tmp.kind != TOX_FILE_KIND_AVATAR.value)
-//                //{
-//                Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:ft full=" + ft_tmp);
-//                //}
-//            }
-//            catch (Exception e)
-//            {
-//                e.printStackTrace();
-//                Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:EE2:" + e.getMessage());
-//            }
+            //            try
+            //            {
+            //                Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+            //                //if (ft_tmp.kind != TOX_FILE_KIND_AVATAR.value)
+            //                //{
+            //                Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:ft full=" + ft_tmp);
+            //                //}
+            //            }
+            //            catch (Exception e)
+            //            {
+            //                e.printStackTrace();
+            //                Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:EE2:" + e.getMessage());
+            //            }
             // ----- DEBUG -----
 
             return ft_id;
