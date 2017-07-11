@@ -1301,7 +1301,7 @@ public class ToxVars
         TOX_ERR_CONFERENCE_GET_TYPE_CONFERENCE_NOT_FOUND,
 
     }
-    
+
 
     // ---------- TOX -------------
     // ---------- TOX -------------
