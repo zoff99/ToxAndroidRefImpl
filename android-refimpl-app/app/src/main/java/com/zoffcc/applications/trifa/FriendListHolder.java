@@ -85,14 +85,14 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
     public void bindFriendList(FriendList fl)
     {
-        Log.i(TAG, "bindFriendList:" + fl.name);
-
         if (fl == null)
         {
             textView.setText("*ERROR*");
             statusText.setText("fl == null");
             return;
         }
+
+        Log.i(TAG, "bindFriendList:" + fl.name);
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 

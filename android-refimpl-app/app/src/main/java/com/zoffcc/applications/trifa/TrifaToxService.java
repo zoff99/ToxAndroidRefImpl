@@ -582,7 +582,10 @@ public class TrifaToxService extends Service
                             if (MainActivity.friend_list_fragment != null)
                             {
                                 // reload friend in friendlist
-                                MainActivity.friend_list_fragment.modify_friend(fl_check.get(0), -1);
+                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                                cc.is_friend = true;
+                                cc.friend_item = fl_check.get(0);
+                                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                             }
                         }
                         catch (Exception e)
