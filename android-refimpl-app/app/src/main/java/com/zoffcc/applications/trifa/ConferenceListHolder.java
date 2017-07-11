@@ -27,7 +27,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 public class ConferenceListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -72,14 +72,32 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             return;
         }
 
-        Log.i(TAG, "bindFriendList:" + fl.name);
+        Log.i(TAG, "bindFriendList:" + fl.tox_conference_number);
 
         this.conference = fl;
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_object_group).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_group).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         avatar.setImageDrawable(d_lock);
 
-        textView.setText(fl.name);
+        try
+        {
+            textView.setText("#" + fl.tox_conference_number + " " + fl.conference_identifier.substring(fl.conference_identifier.length() - 7, fl.conference_identifier.length()));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            textView.setText("#" + fl.tox_conference_number);
+        }
+
+        if (fl.conference_active)
+        {
+            imageView.setImageResource(R.drawable.circle_green);
+        }
+        else
+        {
+            imageView.setImageResource(R.drawable.circle_red);
+        }
+
         if (fl.conference_active)
         {
             statusText.setText("* ACTIVE *");
@@ -88,6 +106,9 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         {
             statusText.setText("_inactive_");
         }
+
+        unread_count.setVisibility(View.INVISIBLE);
+        imageView2.setVisibility(View.INVISIBLE);
     }
 
     @Override

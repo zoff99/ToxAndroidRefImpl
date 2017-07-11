@@ -190,7 +190,7 @@ public class MessageListActivity extends AppCompatActivity
                 }
 
                 // TODO bad hack!
-                Log.i(TAG, "TextWatcher:afterTextChanged");
+                // Log.i(TAG, "TextWatcher:afterTextChanged");
                 if (global_typing == 0)
                 {
                     global_typing = 1;  // typing = 1
@@ -203,7 +203,7 @@ public class MessageListActivity extends AppCompatActivity
                             try
                             {
                                 tox_self_set_typing(friendnum, global_typing);
-                                Log.i(TAG, "typing:fn#" + friendnum + ":activated");
+                                // Log.i(TAG, "typing:fn#" + friendnum + ":activated");
                             }
                             catch (Exception e)
                             {
@@ -257,7 +257,7 @@ public class MessageListActivity extends AppCompatActivity
                                         try
                                         {
                                             tox_self_set_typing(friendnum, global_typing);
-                                            Log.i(TAG, "typing:fn#" + friendnum + ":DEactivated");
+                                            // Log.i(TAG, "typing:fn#" + friendnum + ":DEactivated");
                                         }
                                         catch (Exception e)
                                         {

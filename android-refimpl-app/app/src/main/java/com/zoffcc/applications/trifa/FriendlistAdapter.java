@@ -46,7 +46,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter
     }
 
     @Override
-    public FriendListHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         Log.i(TAG, "onCreateViewHolder");
 
@@ -58,8 +58,8 @@ public class FriendlistAdapter extends RecyclerView.Adapter
                 return new FriendListHolder(view, this.context);
 
             case CombinedFriendsAndConferences_model.ITEM_IS_CONFERENCE:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_entry, parent, false);
-                return new FriendListHolder(view, this.context);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_conf_entry, parent, false);
+                return new ConferenceListHolder(view, this.context);
         }
 
         // TODO: should never get here!?
@@ -195,7 +195,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter
                         if (f.tox_public_key_string.compareTo(new_item.tox_public_key_string) == 0)
                         {
                             found_item = true;
-                            int pos = this.friendlistitems.indexOf(f);
+                            int pos = this.friendlistitems.indexOf(f_combined);
                             this.friendlistitems.set(pos, new_item_combined);
                             this.notifyItemChanged(pos);
                             break;
@@ -212,7 +212,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter
                         if (f.conference_identifier.compareTo(new_item.conference_identifier) == 0)
                         {
                             found_item = true;
-                            int pos = this.friendlistitems.indexOf(f);
+                            int pos = this.friendlistitems.indexOf(f_combined);
                             this.friendlistitems.set(pos, new_item_combined);
                             this.notifyItemChanged(pos);
                             break;

@@ -275,7 +275,7 @@ public class FriendListFragment extends Fragment
                 Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
             }
         }
-        else
+        else // is conference
         {
             final ConferenceDB cc = c.conference_item;
 
@@ -295,7 +295,7 @@ public class FriendListFragment extends Fragment
                         {
                             ConferenceDB n = ConferenceDB.deep_copy(conf2);
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                            cfac.is_friend = true;
+                            cfac.is_friend = false;
                             cfac.conference_item = n;
                             boolean found_friend = adapter.update_item(cfac, cfac.is_friend);
                             // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
@@ -359,11 +359,31 @@ public class FriendListFragment extends Fragment
                         final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                         cc.is_friend = true;
                         cc.friend_item = n;
-                        modify_friend(cc,  cc.is_friend);
+                        modify_friend(cc, cc.is_friend);
                         Log.i(TAG, "onResume:modify_friend:" + n);
                     }
                 }
             }
+
+            // reload conferences
+            List<ConferenceDB> confs = orma.selectFromConferenceDB().toList();
+            if (confs != null)
+            {
+                if (confs.size() > 0)
+                {
+                    int i = 0;
+                    for (i = 0; i < confs.size(); i++)
+                    {
+                        ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
+                        CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                        cfac.is_friend = false;
+                        cfac.conference_item = n;
+                        modify_friend(cfac, cfac.is_friend);
+                        // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                    }
+                }
+            }
+
             Log.i(TAG, "onResume:BB");
         }
         catch (Exception e)

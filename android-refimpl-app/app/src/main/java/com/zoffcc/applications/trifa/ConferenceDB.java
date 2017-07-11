@@ -38,7 +38,7 @@ public class ConferenceDB
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String name;
+    String name = "";
 
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long peer_count = -1;

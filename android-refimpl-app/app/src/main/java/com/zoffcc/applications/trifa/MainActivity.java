@@ -538,6 +538,7 @@ public class MainActivity extends AppCompatActivity
                                         PREF__orbot_enabled_to_int = 1;
                                     }
                                     init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
+                                    set_all_conferences_inactive();
                                     tox_service_fg.tox_thread_start_fg();
                                 }
                             }
@@ -1146,6 +1147,7 @@ public class MainActivity extends AppCompatActivity
                             init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
                         }
 
+                        set_all_conferences_inactive();
                         tox_service_fg.tox_thread_start_fg();
                     }
                     catch (Exception e)
@@ -2262,7 +2264,7 @@ public class MainActivity extends AppCompatActivity
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = true;
                 cc.friend_item = f;
-                friend_list_fragment.modify_friend(cc,  cc.is_friend);
+                friend_list_fragment.modify_friend(cc, cc.is_friend);
                 Log.i(TAG, "friend_status:004");
             }
             catch (Exception e)
@@ -2629,7 +2631,7 @@ public class MainActivity extends AppCompatActivity
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = true;
                     cc.friend_item = f;
-                    friend_list_fragment.modify_friend(cc,cc.is_friend);
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
             }
         }
@@ -5512,11 +5514,16 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            orma.updateConferenceDB().conference_active(false).execute();
+            orma.updateConferenceDB().
+                    conference_active(false).
+                    tox_conference_number(-1).
+                    execute();
+            Log.i(TAG, "set_all_conferences_inactive");
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "set_all_conferences_inactive:EE:" + e.getMessage());
         }
     }
 
@@ -5524,46 +5531,80 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
+            Log.i(TAG, "new_or_updated_conference:" + "conference_number=" + conference_identifier);
+
             final ConferenceDB conf2 = orma.selectFromConferenceDB().
-                    who_invited__tox_public_key_stringEq(who_invited_public_key).
-                    and().conference_identifierEq(conference_identifier).toList().get(0);
+                    conference_identifierEq(conference_identifier).toList().get(0);
 
             // conference already exists -> update and connect
-            orma.updateConferenceDB().who_invited__tox_public_key_stringEq(who_invited_public_key).
-                    and().conference_identifierEq(conference_identifier).
+            orma.updateConferenceDB().
+                    conference_identifierEq(conference_identifier).
                     conference_active(true).
                     tox_conference_number(conference_number).execute();
 
-            Log.i(TAG, "new_or_updated_conference:*update*");
+            try
+            {
+                Log.i(TAG, "new_or_updated_conference:*update*");
 
-            // update or add to "friendlist"
-            CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-            cc.is_friend = false;
-            cc.conference_item = ConferenceDB.deep_copy(conf2);
-            MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                final ConferenceDB conf3 = orma.selectFromConferenceDB().
+                        conference_identifierEq(conference_identifier).toList().get(0);
+
+                // update or add to "friendlist"
+                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                cc.is_friend = false;
+                cc.conference_item = ConferenceDB.deep_copy(conf3);
+                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+            }
+            catch (Exception e3)
+            {
+                Log.i(TAG, "new_or_updated_conference:EE3:" + e3.getMessage());
+            }
+
+            return;
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "new_or_updated_conference:EE1:" + e.getMessage());
+
+
             // conference is new -> add
+            try
+            {
+                ConferenceDB conf_new = new ConferenceDB();
+                conf_new.conference_identifier = conference_identifier;
+                conf_new.who_invited__tox_public_key_string = who_invited_public_key;
+                conf_new.peer_count = -1;
+                conf_new.own_peer_number = -1;
+                conf_new.kind = conference_type;
+                conf_new.tox_conference_number = conference_number;
+                conf_new.conference_active = true;
+                //
+                orma.insertIntoConferenceDB(conf_new);
+                Log.i(TAG, "new_or_updated_conference:+ADD+");
 
-            ConferenceDB conf_new = new ConferenceDB();
-            conf_new.conference_identifier = conference_identifier;
-            conf_new.who_invited__tox_public_key_string = who_invited_public_key;
-            conf_new.peer_count = -1;
-            conf_new.own_peer_number = -1;
-            conf_new.kind = conference_type;
-            conf_new.tox_conference_number = conference_number;
-            conf_new.conference_active = true;
-            //
-            orma.insertIntoConferenceDB(conf_new);
-            Log.i(TAG, "new_or_updated_conference:+ADD+");
+                try
+                {
+                    // update or add to "friendlist"
+                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                    cc.is_friend = false;
+                    cc.conference_item = ConferenceDB.deep_copy(conf_new);
+                    MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
 
-            // update or add to "friendlist"
-            CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-            cc.is_friend = false;
-            cc.conference_item = ConferenceDB.deep_copy(conf_new);
-            MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
+                catch (Exception e4)
+                {
+                    Log.i(TAG, "new_or_updated_conference:EE4:" + e4.getMessage());
+                }
+
+                return;
+
+            }
+            catch (Exception e1)
+            {
+                e1.printStackTrace();
+                Log.i(TAG, "new_or_updated_conference:EE2:" + e1.getMessage());
+            }
         }
     }
 
