@@ -254,6 +254,7 @@ public class MainActivity extends AppCompatActivity
     // ---- lookup cache ----
     static Map<String, Long> cache_pubkey_fnum = new HashMap<String, Long>();
     static Map<Long, String> cache_fnum_pubkey = new HashMap<Long, String>();
+    static Map<Long, String> cache_peernum_pubkey = new HashMap<Long, String>();
     // ---- lookup cache ----
 
     // main drawer ----------
@@ -1754,6 +1755,8 @@ public class MainActivity extends AppCompatActivity
     // --------------- Conference -------------
 
     public static native long tox_conference_join(long friend_number, ByteBuffer cookie_buffer, long cookie_length);
+
+    public static native String tox_conference_peer_get_public_key(long conference_number, long peer_number);
 
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -3451,6 +3454,36 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
     {
         Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message);
+
+        ConferenceMessage m = new ConferenceMessage();
+        m.is_new = true;
+
+        // m.tox_friendnum = friend_number;
+        m.tox_peerpubkey = tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
+        m.direction = 0; // msg received
+        m.TOX_MESSAGE_TYPE = 0;
+        m.read = false;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.rcvd_timestamp = System.currentTimeMillis();
+        m.text = message;
+
+
+        //        if (message_list_activity != null)
+        //        {
+        //            if (message_list_activity.get_current_friendnum() == peer_number)
+        //            {
+        //                insert_into_conference_message_db(m, true);
+        //            }
+        //            else
+        //            {
+        //                insert_into_conference_message_db(m, false);
+        //            }
+        //        }
+        //        else
+        //        {
+        long new_msg_id = insert_into_conference_message_db(m, false);
+        Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
+        //        }
     }
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
@@ -4005,6 +4038,26 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static String tox_conference_peer_get_public_key__wrapper(long conference_number, long peer_number)
+    {
+        if (cache_peernum_pubkey.containsKey(peer_number))
+        {
+            // Log.i(TAG, "cache hit:2");
+            return cache_peernum_pubkey.get(peer_number);
+        }
+        else
+        {
+            if (cache_peernum_pubkey.size() >= 20)
+            {
+                // TODO: bad!
+                cache_peernum_pubkey.clear();
+            }
+            String result = tox_conference_peer_get_public_key(conference_number, peer_number);
+            cache_peernum_pubkey.put(peer_number, result);
+            return result;
+        }
+    }
+
     public void show_add_friend(View view)
     {
         Intent intent = new Intent(this, AddFriendActivity.class);
@@ -4545,6 +4598,32 @@ public class MainActivity extends AppCompatActivity
         //    }
         //};
         //t.start();
+    }
+
+    static long insert_into_conference_message_db(final ConferenceMessage m, final boolean update_conference_view_flag)
+    {
+        long row_id = orma.insertIntoConferenceMessage(m);
+
+        try
+        {
+            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
+            cursor.moveToFirst();
+            Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
+            long msg_id = cursor.getLong(0);
+            cursor.close();
+
+            if (update_conference_view_flag)
+            {
+                // add_single_message_from_messge_id(msg_id, true);
+            }
+
+            return msg_id;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     static String get_vfs_image_filename_own_avatar()

@@ -2561,6 +2561,35 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv* en
 //        TOX_ERR_CONFERENCE_GET_TYPE *error);
 
 
+
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1public_1key(JNIEnv* env, jobject thiz, jlong conference_number, jlong peer_number)
+{
+	jstring result;
+
+	uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
+	TOX_ERR_CONFERENCE_PEER_QUERY error;
+	bool res = tox_conference_peer_get_public_key(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, public_key, &error);
+
+	if (res == false)
+	{
+		result = (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+	}
+	else
+	{
+		char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1]; // need this wrong size for next call
+		CLEAR(tox_id_hex);
+		toxid_bin_to_hex(public_key, tox_id_hex);
+		tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+		result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
+	}
+
+	return result;
+}
+
+
+
 // ------------------- Conference -------------------
 // ------------------- Conference -------------------
 // ------------------- Conference -------------------

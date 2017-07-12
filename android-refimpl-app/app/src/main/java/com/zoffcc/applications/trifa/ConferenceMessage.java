@@ -26,19 +26,15 @@ import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 
 @Table
-public class Message
+public class ConferenceMessage
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id; // uniqe message id!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    long message_id = -1; // ID given from toxcore!!
-
-    @Column(indexed = true, helpers = Column.Helpers.ALL)
-    String tox_friendpubkey;
+    String tox_peerpubkey;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     int direction = 0; // 0 -> msg received, 1 -> msg sent
@@ -48,21 +44,6 @@ public class Message
 
     @Column(indexed = true, defaultExpr = "0")
     int TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
-
-    @Column(indexed = true, defaultExpr = "1", helpers = Column.Helpers.ALL)
-    int state = TOX_FILE_CONTROL_PAUSE.value;
-
-    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
-    boolean ft_accepted = false;
-
-    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
-    boolean ft_outgoing_started = false;
-
-    @Column(indexed = true, defaultExpr = "-1")
-    long filedb_id; // f_key -> FileDB.id
-
-    @Column(indexed = true, defaultExpr = "-1")
-    long filetransfer_id; // f_key -> Filetransfer.id
 
     @Column(helpers = Column.Helpers.ALL)
     @Nullable
@@ -82,30 +63,19 @@ public class Message
     @Nullable
     String text = null;
 
-    @Column(helpers = Column.Helpers.ALL)
-    @Nullable
-    String filename_fullpath = null;
-
-    static Message deep_copy(Message in)
+    static ConferenceMessage deep_copy(ConferenceMessage in)
     {
-        Message out = new Message();
+        ConferenceMessage out = new ConferenceMessage();
         out.id = in.id; // TODO: is this a good idea???
-        out.message_id = in.message_id;
-        out.tox_friendpubkey = in.tox_friendpubkey;
+        out.tox_peerpubkey = in.tox_peerpubkey;
         out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
         out.TRIFA_MESSAGE_TYPE = in.TRIFA_MESSAGE_TYPE;
-        out.state = in.state;
-        out.ft_accepted = in.ft_accepted;
-        out.ft_outgoing_started = in.ft_outgoing_started;
-        out.filedb_id = in.filedb_id;
-        out.filetransfer_id = in.filetransfer_id;
         out.sent_timestamp = in.sent_timestamp;
         out.rcvd_timestamp = in.rcvd_timestamp;
         out.read = in.read;
         out.is_new = in.is_new;
         out.text = in.text;
-        out.filename_fullpath = in.filename_fullpath;
 
         return out;
     }
@@ -113,6 +83,6 @@ public class Message
     @Override
     public String toString()
     {
-        return "id=" + id + ", message_id=" + message_id + ", filetransfer_id=" + filetransfer_id + ", filedb_id=" + filedb_id + ", tox_friendpubkey=" + tox_friendpubkey + ", direction=" + direction + ", state=" + state + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new;
+        return "id=" + id + ", tox_peerpubkey=" + tox_peerpubkey + ", direction=" + direction + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", is_new=" + is_new;
     }
 }
