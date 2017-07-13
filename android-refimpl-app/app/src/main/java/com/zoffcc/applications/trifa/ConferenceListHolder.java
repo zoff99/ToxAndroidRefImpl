@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -29,6 +30,8 @@ import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 
 public class ConferenceListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -117,6 +120,9 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         Log.i(TAG, "onClick");
         try
         {
+            Intent intent = new Intent(v.getContext(), ConferenceMessageListActivity.class);
+            intent.putExtra("conf_id", this.conference.conference_identifier);
+            v.getContext().startActivity(intent);
         }
         catch (Exception e)
         {

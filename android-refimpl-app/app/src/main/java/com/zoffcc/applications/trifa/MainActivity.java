@@ -189,6 +189,8 @@ public class MainActivity extends AppCompatActivity
     static FriendListFragment friend_list_fragment = null;
     static MessageListFragment message_list_fragment = null;
     static MessageListActivity message_list_activity = null;
+    static ConferenceMessageListFragment conference_message_list_fragment = null;
+    static ConferenceMessageListActivity conference_message_list_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
     static String SD_CARD_TMP_DIR = "";
@@ -3455,6 +3457,19 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message);
 
+        String conf_id = "-1";
+
+        try
+        {
+            // TODO: cache me!!
+            ConferenceDB conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).get(0);
+            conf_id = conf_temp.conference_identifier;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         ConferenceMessage m = new ConferenceMessage();
         m.is_new = true;
 
@@ -3463,27 +3478,28 @@ public class MainActivity extends AppCompatActivity
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.read = false;
+        m.conference_identifier = conf_id;
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = message;
 
 
-        //        if (message_list_activity != null)
-        //        {
-        //            if (message_list_activity.get_current_friendnum() == peer_number)
-        //            {
-        //                insert_into_conference_message_db(m, true);
-        //            }
-        //            else
-        //            {
-        //                insert_into_conference_message_db(m, false);
-        //            }
-        //        }
-        //        else
-        //        {
-        long new_msg_id = insert_into_conference_message_db(m, false);
-        Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
-        //        }
+        if (message_list_activity != null)
+        {
+            if (conference_message_list_activity.get_current_conf_id().equals(conf_id))
+            {
+                insert_into_conference_message_db(m, true);
+            }
+            else
+            {
+                insert_into_conference_message_db(m, false);
+            }
+        }
+        else
+        {
+            long new_msg_id = insert_into_conference_message_db(m, false);
+            Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
+        }
     }
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
@@ -3508,6 +3524,46 @@ public class MainActivity extends AppCompatActivity
             native_lib_loaded = false;
             Log.i(TAG, "loadLibrary jni-c-toxcore failed!");
             e.printStackTrace();
+        }
+    }
+
+    public static void add_single_conference_message_from_messge_id(final long message_id, final boolean force)
+    {
+        try
+        {
+            if (conference_message_list_fragment != null)
+            {
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (message_id != -1)
+                        {
+                            try
+                            {
+                                ConferenceMessage m = orma.selectFromConferenceMessage().idEq(message_id).orderByIdDesc().get(0);
+                                if (m.id != -1)
+                                {
+                                    if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
+                                    {
+                                        update_all_messages_global_timestamp = System.currentTimeMillis();
+                                        MainActivity.conference_message_list_fragment.add_message(m);
+                                    }
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                            }
+                        }
+                    }
+                };
+                t.start();
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
         }
     }
 
@@ -3549,7 +3605,6 @@ public class MainActivity extends AppCompatActivity
         {
             // e.printStackTrace();
         }
-
     }
 
     public static void update_single_message_from_messge_id(final long message_id, final boolean force)
@@ -4614,7 +4669,7 @@ public class MainActivity extends AppCompatActivity
 
             if (update_conference_view_flag)
             {
-                // add_single_message_from_messge_id(msg_id, true);
+                add_single_conference_message_from_messge_id(msg_id, true);
             }
 
             return msg_id;
@@ -5004,6 +5059,20 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "add_friend_real:friend already added, or request already sent");
         }
         // add friend ---------------
+    }
+
+    static String get_peer_name_from_conf_id(String conference_id)
+    {
+        String result = "Unknown Conference";
+
+        return result;
+    }
+
+    static String get_peer_name_from_num(long peernum)
+    {
+        String result = "Unknown";
+
+        return result;
     }
 
     static String get_friend_name_from_num(long friendnum)

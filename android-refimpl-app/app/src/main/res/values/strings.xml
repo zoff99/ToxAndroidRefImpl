@@ -2,6 +2,7 @@
     <string name="app_name">TRIfA</string>
     <string name="add_friend_activity_name">add Friend</string>
     <string name="message_list_activity_name">Chat</string>
+    <string name="conference_message_list_activity_name">Conference</string>
 
     <string name="title_activity_calling">Call</string>
     <string name="title_activity_profile">Profile</string>

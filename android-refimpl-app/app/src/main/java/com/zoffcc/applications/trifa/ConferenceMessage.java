@@ -33,6 +33,9 @@ public class ConferenceMessage
     @PrimaryKey(autoincrement = true, auto = true)
     long id; // uniqe message id!!
 
+    @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
+    String conference_identifier = "-1"; // f_key -> ConferenceDB.conference_identifier
+
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String tox_peerpubkey;
 
