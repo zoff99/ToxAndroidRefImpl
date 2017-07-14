@@ -3499,18 +3499,19 @@ public class MainActivity extends AppCompatActivity
 
         Log.i(TAG, "conference_message_cb:peer_number=" + peer_number + " own?=" + res);
 
-        if (tox_conference_peer_number_is_ours(conference_number, peer_number) == 0) // HINT: 0 (zero) ist false in "C"-language!
+        if (tox_conference_peer_number_is_ours(conference_number, peer_number) == 1)
         {
             // HINT: do not add our own messages, they are already in the DB!
             return;
         }
 
         String conf_id = "-1";
+        ConferenceDB conf_temp = null;
 
         try
         {
             // TODO: cache me!!
-            ConferenceDB conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).get(0);
+            conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).get(0);
             conf_id = conf_temp.conference_identifier;
         }
         catch (Exception e)
@@ -3557,6 +3558,26 @@ public class MainActivity extends AppCompatActivity
         {
             long new_msg_id = insert_into_conference_message_db(m, false);
             Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
+        }
+
+        try
+        {
+            // update "new" status on friendlist fragment (for this conference)
+            if (friend_list_fragment != null)
+            {
+                if (conf_temp != null)
+                {
+                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                    cc.is_friend = false;
+                    cc.conference_item = conf_temp;
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
         }
     }
 

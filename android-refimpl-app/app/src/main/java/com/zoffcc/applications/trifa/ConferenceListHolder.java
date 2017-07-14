@@ -33,6 +33,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.get_conference_title_from_confid;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -127,8 +128,41 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         // use this field as "conference title"
         statusText.setText(get_conference_title_from_confid(fl.conference_identifier));
 
-        unread_count.setVisibility(View.INVISIBLE);
         imageView2.setVisibility(View.INVISIBLE);
+
+        try
+        {
+            int new_messages_count = orma.selectFromConferenceMessage().
+                    conference_identifierEq(fl.conference_identifier).and()
+                    .is_newEq(true).count();
+
+            if (new_messages_count > 0)
+            {
+                if (new_messages_count > 300)
+                {
+                    unread_count.setText("+");
+                }
+                else
+                {
+                    unread_count.setText("" + new_messages_count);
+                }
+                unread_count.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                unread_count.setText("");
+                unread_count.setVisibility(View.INVISIBLE);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+
+            unread_count.setText("");
+            unread_count.setVisibility(View.INVISIBLE);
+        }
+
+
     }
 
     @Override
