@@ -958,7 +958,7 @@ void android_tox_callback_conference_namelist_change_cb(uint32_t conference_numb
 	jnienv2 = jni_getenv();
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-          android_tox_callback_conference_namelist_change_cb, (jlong)(unsigned long long)conference_number, (jlong)(unsigned long long)peer_number,
+          android_tox_callback_conference_namelist_change_cb_method, (jlong)(unsigned long long)conference_number, (jlong)(unsigned long long)peer_number,
 			(jint)change);
 }
 
@@ -976,7 +976,7 @@ void android_tox_callback_conference_title_cb(uint32_t conference_number, uint32
 	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)title);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-          android_tox_callback_conference_title_cb, (jlong)(unsigned long long)conference_number, (jlong)(unsigned long long)peer_number,
+          android_tox_callback_conference_title_cb_method, (jlong)(unsigned long long)conference_number, (jlong)(unsigned long long)peer_number,
 			js1, (jlong)(unsigned long long)length);
 
 	(*jnienv2)->DeleteLocalRef(jnienv2, js1);
