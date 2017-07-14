@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
@@ -41,6 +42,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -114,9 +116,21 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         });
 
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_smile_o).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
-        img_avatar.setImageDrawable(d_lock);
+        int peer_color = context.getResources().getColor(R.color.colorPrimaryDark);
 
+        try
+        {
+            peer_color = hash_to_bucket(this.message.tox_peerpubkey, ChatColors.get_size());
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        final Drawable d_lock = new IconicsDrawable(context).
+                icon(FontAwesome.Icon.faw_smile_o).
+                color(peer_color).sizeDp(50);
+        img_avatar.setImageDrawable(d_lock);
     }
 
     @Override
