@@ -1760,6 +1760,21 @@ public class MainActivity extends AppCompatActivity
 
     public static native String tox_conference_peer_get_public_key(long conference_number, long peer_number);
 
+    public static native long tox_conference_peer_count(long conference_number);
+
+    public static native long tox_conference_peer_get_name_size(long conference_number, long peer_number);
+
+    public static native String tox_conference_peer_get_name(long conference_number, long peer_number);
+
+    public static native int tox_conference_peer_number_is_ours(long conference_number, long peer_number);
+
+    public static native long tox_conference_get_title_size(long conference_number);
+
+    public static native String tox_conference_get_title(long conference_number);
+
+    public static native int tox_conference_get_type(long conference_number);
+
+    public static native int tox_conference_send_message(long conference_number, int a_TOX_MESSAGE_TYPE, @NonNull String message);
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------
