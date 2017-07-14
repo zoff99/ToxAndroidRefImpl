@@ -42,7 +42,9 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
+import static com.zoffcc.applications.trifa.MainActivity.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 
 public class ConferenceMessageListActivity extends AppCompatActivity
 {
@@ -93,7 +95,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         ml_phone_icon.setVisibility(View.GONE);
         ml_status_icon.setVisibility(View.INVISIBLE);
 
-        final ImageButton button01_ = ml_button_01;
+        // final ImageButton button01_ = ml_button_01;
 
         ml_icon.setImageResource(R.drawable.circle_red);
 
@@ -131,14 +133,31 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             public void run()
             {
                 final String f_name = MainActivity.get_conference_title_from_confid(conf_id);
+                final long conference_num = get_conference_num_from_confid(conf_id);
 
                 Runnable myRunnable = new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        ml_maintext.setText(f_name);
-                        // ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                        try
+                        {
+                            long peer_count = tox_conference_peer_count(conference_num);
+
+                            if (peer_count > -1)
+                            {
+                                ml_maintext.setText(f_name + "\n" + "Users: " + peer_count);
+                            }
+                            else
+                            {
+                                ml_maintext.setText(f_name);
+                                // ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
                 };
 

@@ -31,7 +31,8 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.get_conference_title_from_confid;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 
 public class ConferenceListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -84,7 +85,22 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
 
         try
         {
-            textView.setText("#" + fl.tox_conference_number + " " + fl.conference_identifier.substring(fl.conference_identifier.length() - 7, fl.conference_identifier.length()));
+            if (fl.conference_active)
+            {
+                textView.setText("#" + fl.tox_conference_number + " "
+                        //
+                        + fl.conference_identifier.substring(fl.conference_identifier.length() - 7, fl.conference_identifier.length())
+                        //
+                        + " Users: " + tox_conference_peer_count(fl.tox_conference_number));
+            }
+            else
+            {
+                textView.setText("#" + fl.tox_conference_number + " "
+                                //
+                                + fl.conference_identifier.substring(fl.conference_identifier.length() - 7, fl.conference_identifier.length())
+                        //
+                );
+            }
         }
         catch (Exception e)
         {
@@ -101,14 +117,8 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             imageView.setImageResource(R.drawable.circle_red);
         }
 
-        if (fl.conference_active)
-        {
-            statusText.setText("* ACTIVE *");
-        }
-        else
-        {
-            statusText.setText("_inactive_");
-        }
+        // use this field as "conference title"
+        statusText.setText(get_conference_title_from_confid(fl.conference_identifier));
 
         unread_count.setVisibility(View.INVISIBLE);
         imageView2.setVisibility(View.INVISIBLE);

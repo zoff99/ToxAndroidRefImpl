@@ -257,7 +257,9 @@ public class MainActivity extends AppCompatActivity
     // ---- lookup cache ----
     static Map<String, Long> cache_pubkey_fnum = new HashMap<String, Long>();
     static Map<Long, String> cache_fnum_pubkey = new HashMap<Long, String>();
-    static Map<Long, String> cache_peernum_pubkey = new HashMap<Long, String>();
+    static Map<String, String> cache_peernum_pubkey = new HashMap<String, String>();
+    static Map<String, String> cache_peername_pubkey = new HashMap<String, String>();
+    static Map<String, String> cache_peername_pubkey2 = new HashMap<String, String>();
     // ---- lookup cache ----
 
     // main drawer ----------
@@ -4127,10 +4129,10 @@ public class MainActivity extends AppCompatActivity
 
     public static String tox_conference_peer_get_public_key__wrapper(long conference_number, long peer_number)
     {
-        if (cache_peernum_pubkey.containsKey(peer_number))
+        if (cache_peernum_pubkey.containsKey("" + conference_number + ":" + peer_number))
         {
             // Log.i(TAG, "cache hit:2");
-            return cache_peernum_pubkey.get(peer_number);
+            return cache_peernum_pubkey.get("" + conference_number + ":" + peer_number);
         }
         else
         {
@@ -4140,10 +4142,62 @@ public class MainActivity extends AppCompatActivity
                 cache_peernum_pubkey.clear();
             }
             String result = tox_conference_peer_get_public_key(conference_number, peer_number);
-            cache_peernum_pubkey.put(peer_number, result);
+            cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
             return result;
         }
     }
+
+    public static String tox_conference_peer_get_name__wrapper(String conference_identifier, String peer_pubkey)
+    {
+        if (cache_peername_pubkey2.containsKey("" + conference_identifier + ":" + peer_pubkey))
+        {
+            // Log.i(TAG, "cache hit:2");
+            return cache_peername_pubkey2.get("" + conference_identifier + ":" + peer_pubkey);
+        }
+        else
+        {
+            if (cache_peername_pubkey2.size() >= 100)
+            {
+                // TODO: bad!
+                cache_peername_pubkey2.clear();
+            }
+
+            long conf_num = get_conference_num_from_confid(conference_identifier);
+            long peer_num = get_peernum_from_peer_pubkey(conference_identifier, peer_pubkey);
+
+            if ((conf_num > -1) && (peer_num > -1))
+            {
+                String result = tox_conference_peer_get_name(conf_num, peer_num);
+                cache_peername_pubkey2.put("" + conference_identifier + ":" + peer_pubkey, result);
+                return result;
+            }
+            else
+            {
+                return "Unknown";
+            }
+        }
+    }
+
+    public static String tox_conference_peer_get_name__wrapper(long conference_number, long peer_number)
+    {
+        if (cache_peername_pubkey.containsKey("" + conference_number + ":" + peer_number))
+        {
+            // Log.i(TAG, "cache hit:2");
+            return cache_peernum_pubkey.get("" + conference_number + ":" + peer_number);
+        }
+        else
+        {
+            if (cache_peernum_pubkey.size() >= 20)
+            {
+                // TODO: bad!
+                cache_peernum_pubkey.clear();
+            }
+            String result = tox_conference_peer_get_name(conference_number, peer_number);
+            cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
+            return result;
+        }
+    }
+
 
     public void show_add_friend(View view)
     {
@@ -5093,6 +5147,38 @@ public class MainActivity extends AppCompatActivity
         // add friend ---------------
     }
 
+    static long get_peernum_from_peer_pubkey(String conference_id, String peer_pubkey)
+    {
+        try
+        {
+            long conf_num = get_conference_num_from_confid(conference_id);
+            long num_peers = tox_conference_peer_count(conf_num);
+
+            if (num_peers > 0)
+            {
+                int i = 0;
+                for (i = 0; i < num_peers; i++)
+                {
+                    String pubkey_try = tox_conference_peer_get_public_key(conf_num, i);
+                    if (pubkey_try != null)
+                    {
+                        if (pubkey_try.equals(peer_pubkey))
+                        {
+                            // we found the peer number
+                            return i;
+                        }
+                    }
+                }
+            }
+
+            return -1;
+        }
+        catch (Exception e)
+        {
+            return -1;
+        }
+    }
+
     static String get_peer_name_from_conf_id(String conference_id, String peer_pubkey)
     {
         String result = "Unknown Peer";
@@ -5105,6 +5191,20 @@ public class MainActivity extends AppCompatActivity
         String result = "Unknown Peer";
 
         return result;
+    }
+
+    static long get_conference_num_from_confid(String conference_id)
+    {
+        try
+        {
+            return orma.selectFromConferenceDB().
+                    conference_activeEq(true).and().
+                    conference_identifierEq(conference_id).get(0).tox_conference_number;
+        }
+        catch (Exception e)
+        {
+            return -1;
+        }
     }
 
     static String get_conference_title_from_confid(String conference_id)

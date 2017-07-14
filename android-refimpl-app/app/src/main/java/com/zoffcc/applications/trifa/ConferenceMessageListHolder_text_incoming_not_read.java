@@ -41,6 +41,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 
 public class ConferenceMessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -54,6 +55,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
     TextView date_time;
     ViewGroup textView_container;
+    ViewGroup layout_peer_name_container;
+    TextView peer_name_text;
 
     public ConferenceMessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -68,6 +71,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         date_time = (TextView) itemView.findViewById(R.id.date_time);
+        layout_peer_name_container = (ViewGroup) itemView.findViewById(R.id.layout_peer_name_container);
+        peer_name_text = (TextView) itemView.findViewById(R.id.peer_name_text);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -80,7 +85,25 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         // textView.setText("#" + m.id + ":" + m.text);
         textView.setCustomRegex(TOXURL_PATTERN);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
-        textView.setAutoLinkText("" + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6), m.tox_peerpubkey.length()) + ":" + m.text);
+
+        try
+        {
+            String peer_name = tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+            layout_peer_name_container.setVisibility(View.VISIBLE);
+            peer_name_text.setText(peer_name);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        //        textView.setAutoLinkText("" + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
+        //                //
+        //                m.tox_peerpubkey.length())
+        //                //
+        //                + ":" + m.text);
+
+        textView.setAutoLinkText(m.text);
 
         date_time.setText(long_date_time_format(m.rcvd_timestamp));
 
