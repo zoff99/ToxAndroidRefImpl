@@ -1502,7 +1502,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 
 	android_tox_callback_conference_invite_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_invite_cb_method", "(JI[BJ)V");
 	android_tox_callback_conference_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_message_cb_method", "(JJILjava/lang/String;J)V");
-	// ******zzz
 	android_tox_callback_conference_title_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_title_cb_method", "(JJLjava/lang/String;J)V");
 	android_tox_callback_conference_namelist_change_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_namelist_change_cb_method", "(JJI)V");
 	
@@ -2592,18 +2591,68 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv* en
  *
  * @return true on success.
  */
-// bool tox_conference_send_message(Tox *tox, uint32_t conference_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
-//                                 size_t length, TOX_ERR_CONFERENCE_SEND_MESSAGE *error);
-//                             TOX_ERR_CONFERENCE_JOIN *error);
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1send_1message(JNIEnv* env, jobject thiz, jlong conference_number, jint type, jobject message)
+{
+	const char *message_str = NULL;
+	message_str = (*env)->GetStringUTFChars(env, message, NULL);
+
+	TOX_ERR_CONFERENCE_SEND_MESSAGE error;
+	bool res = tox_conference_send_message(tox_global, (uint32_t)conference_number, (int)type, (uint8_t *)message_str, (size_t)strlen(message_str), &error);
+
+	(*env)->ReleaseStringUTFChars(env, message, message_str);
+
+	if (res == false)
+	{
+		if (error == _ERR_CONFERENCE_SEND_MESSAGE_CONFERENCE_NOT_FOUND)
+		{
+			dbg(9, "tox_conference_send_message:ERROR:_ERR_CONFERENCE_SEND_MESSAGE_CONFERENCE_NOT_FOUND");
+			return (jint)-1;
+		}
+		else if (error == TOX_ERR_CONFERENCE_SEND_MESSAGE_TOO_LONG)
+		{
+			dbg(9, "tox_conference_send_message:ERROR:TOX_ERR_CONFERENCE_SEND_MESSAGE_TOO_LONG");
+			return (jint)-2;
+		}
+		else if (error == TOX_ERR_CONFERENCE_SEND_MESSAGE_NO_CONNECTION)
+		{
+			dbg(9, "tox_conference_send_message:ERROR:TOX_ERR_CONFERENCE_SEND_MESSAGE_NO_CONNECTION");
+			return (jint)-3;
+		}
+		else if (error == TOX_ERR_CONFERENCE_SEND_MESSAGE_FAIL_SEND)
+		{
+			dbg(9, "tox_conference_send_message:ERROR:TOX_ERR_CONFERENCE_SEND_MESSAGE_FAIL_SEND");
+			return (jint)-4;
+		}
+		else
+		{
+			dbg(9, "tox_conference_send_message:ERROR:%d", (int)error);
+			return (jint)-99;
+		}
+	}
+	else
+	{
+		return (jint)res;
+	}
+}
 
 
 /**
  * Returns the type of conference (TOX_CONFERENCE_TYPE) that conference_number is. Return value is
  * unspecified on failure.
  */
-// TOX_CONFERENCE_TYPE tox_conference_get_type(const Tox *tox, uint32_t conference_number,
-//        TOX_ERR_CONFERENCE_GET_TYPE *error);
-
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1type(JNIEnv* env, jobject thiz, jlong conference_number)
+{
+	TOX_ERR_CONFERENCE_GET_TYPE error;
+	TOX_CONFERENCE_TYPE type = tox_conference_get_type(tox_global, (uint32_t)conference_number, &error);
+	if (error != TOX_ERR_CONFERENCE_GET_TYPE_OK)
+	{
+		dbg(0, "tox_conference_get_type:ERROR=%d", (int)error);
+		return (jint)-1;
+	}
+	return (jint)type;
+}
 
 
 
@@ -2630,6 +2679,204 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1publ
 	}
 
 	return result;
+}
+
+/**
+ * Return the number of peers in the conference. Return value is unspecified on failure.
+ */
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1count(JNIEnv* env, jobject thiz, jlong conference_number)
+{
+	TOX_ERR_CONFERENCE_PEER_QUERY error;
+	uint32_t res = tox_conference_peer_count(tox_global, (uint32_t)conference_number, &error);
+
+	if (error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+	{
+		if (error == TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND)
+		{
+			dbg(0, "tox_conference_peer_count:TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND");
+			return (jlong)-1;
+		}
+		else if (error == TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND)
+		{
+			dbg(0, "tox_conference_peer_count:TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND");
+			return (jlong)-2;
+		}
+		else if (error == TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION)
+		{
+			dbg(0, "tox_conference_peer_count:TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION");
+			return (jlong)-3;
+		}
+		else
+		{
+			return (jlong)-99;
+		}
+	}
+
+	return (jlong)res;
+}
+
+/**
+ * Return the length of the peer's name. Return value is unspecified on failure.
+ */
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name_1size(JNIEnv* env, jobject thiz, jlong conference_number, jlong peer_number)
+{
+	TOX_ERR_CONFERENCE_PEER_QUERY error;
+	size_t res = tox_conference_peer_get_name_size(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, &error);
+
+	if (error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+	{
+		if (error == TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND)
+		{
+			dbg(0, "tox_conference_peer_get_name_size:TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND");
+			return (jlong)-1;
+		}
+		else if (error == TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND)
+		{
+			dbg(0, "tox_conference_peer_get_name_size:TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND");
+			return (jlong)-2;
+		}
+		else if (error == TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION)
+		{
+			dbg(0, "tox_conference_peer_get_name_size:TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION");
+			return (jlong)-3;
+		}
+		else
+		{
+			return (jlong)-99;
+		}
+	}
+
+	return (jlong)(unsigned long long)res;
+}
+
+
+/**
+ * Copy the name of peer_number who is in conference_number to name.
+ * name must be at least TOX_MAX_NAME_LENGTH long.
+ *
+ * @return true on success.
+ */
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name(JNIEnv* env, jobject thiz, jlong conference_number, jlong peer_number)
+{
+	TOX_ERR_CONFERENCE_PEER_QUERY error;
+	size_t length = tox_conference_peer_get_name_size(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, &error);
+
+	if (error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+	{
+		return NULL;
+	}
+	else
+	{
+		char name[length + 1];
+		CLEAR(name);
+		bool res = tox_conference_peer_get_name(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, name, &error);
+		if (res == false)
+		{
+			return (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+		}
+		else
+		{
+			return (*env)->NewStringUTF(env, (uint8_t *)name);
+		}
+	}
+}
+
+/**
+ * Return true if passed peer_number corresponds to our own.
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1number_1is_1ours(JNIEnv* env, jobject thiz, jlong conference_number, jlong peer_number)
+{
+	TOX_ERR_CONFERENCE_PEER_QUERY error;
+	bool res = tox_conference_peer_number_is_ours(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, &error);
+	if (error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+	{
+		dbg(0, "tox_conference_peer_number_is_ours:ERROR=%d", (int)error);
+		return (jint)-1;
+	}
+	return (jint)res;
+}
+
+
+/**
+ * Return the length of the conference title. Return value is unspecified on failure.
+ *
+ * The return value is equal to the `length` argument received by the last
+ * `conference_title` callback.
+ */
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title_1size(JNIEnv* env, jobject thiz, jlong conference_number)
+{
+	TOX_ERR_CONFERENCE_TITLE error;
+	size_t res = tox_conference_get_title_size(tox_global, (uint32_t)conference_number, &error);
+
+	if (error != TOX_ERR_CONFERENCE_TITLE_OK)
+	{
+		if (error == TOX_ERR_CONFERENCE_TITLE_CONFERENCE_NOT_FOUND)
+		{
+			dbg(0, "tox_conference_get_title_size:TOX_ERR_CONFERENCE_TITLE_CONFERENCE_NOT_FOUND");
+			return (jlong)-1;
+		}
+		else if (error == TOX_ERR_CONFERENCE_TITLE_INVALID_LENGTH)
+		{
+			dbg(0, "tox_conference_get_title_size:TOX_ERR_CONFERENCE_TITLE_INVALID_LENGTH");
+			return (jlong)-2;
+		}
+		else if (error == TOX_ERR_CONFERENCE_TITLE_FAIL_SEND)
+		{
+			dbg(0, "tox_conference_get_title_size:TOX_ERR_CONFERENCE_TITLE_FAIL_SEND");
+			return (jlong)-3;
+		}
+		else
+		{
+			return (jlong)-99;
+		}
+	}
+
+	return (jlong)(unsigned long long)res;
+}
+
+
+/**
+ * Write the title designated by the given conference number to a byte array.
+ *
+ * Call tox_conference_get_title_size to determine the allocation size for the `title` parameter.
+ *
+ * The data written to `title` is equal to the data received by the last
+ * `conference_title` callback.
+ *
+ * @param title A valid memory region large enough to store the title.
+ *   If this parameter is NULL, this function has no effect.
+ *
+ * @return true on success.
+ */
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_conference_get_title(JNIEnv* env, jobject thiz, jlong conference_number)
+{
+	TOX_ERR_CONFERENCE_TITLE error;
+	size_t length = tox_conference_get_title_size(tox_global, (uint32_t)conference_number, &error);
+
+	if (error != TOX_ERR_CONFERENCE_TITLE_OK)
+	{
+		return NULL;
+	}
+	else
+	{
+		char title[length + 1];
+		CLEAR(title);
+		bool res = tox_conference_get_title(tox_global, (uint32_t)conference_number, title, &error);
+		if (res == false)
+		{
+			return (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+		}
+		else
+		{
+			return (*env)->NewStringUTF(env, (uint8_t *)title);
+		}
+	}
 }
 
 
