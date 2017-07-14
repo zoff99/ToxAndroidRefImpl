@@ -1,4 +1,4 @@
-/**
+﻿/**
  * [TRIfA], JNI part of Tox Reference Implementation for Android
  * Copyright (C) 2017 Zoff <zoff@zoff.cc>
  *
@@ -705,7 +705,8 @@ void android_tox_callback_friend_name_cb(uint32_t friend_number, const uint8_t *
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)name);
+	// jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)name);
+	jstring js1 = c_safe_string_from_java((char *)name, length);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
           android_tox_callback_friend_name_cb_method, (jlong)(unsigned long long)friend_number, js1, (jlong)(unsigned long long)length);
@@ -723,7 +724,8 @@ void android_tox_callback_friend_status_message_cb(uint32_t friend_number, const
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+	// jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+	jstring js1 = c_safe_string_from_java((char *)message, length);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
           android_tox_callback_friend_status_message_cb_method, (jlong)(unsigned long long)friend_number, js1, (jlong)(unsigned long long)length);
@@ -821,7 +823,8 @@ void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uin
 	dbg(9, "pubkey string=%s", tox_id_hex);
 
 	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, tox_id_hex);
-	jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, message);
+	// jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, message);
+	jstring js2 = c_safe_string_from_java((char *)message, length);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
 		android_tox_callback_friend_request_cb_method, js1, js2, (jlong)(unsigned long long)length);
@@ -841,7 +844,8 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+	// jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+	jstring js1 = c_safe_string_from_java((char *)message, length);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
           android_tox_callback_friend_message_cb_method, (jlong)(unsigned long long)friend_number, (jint) type, js1, (jlong)(unsigned long long)length);
@@ -973,7 +977,7 @@ void android_tox_callback_conference_title_cb(uint32_t conference_number, uint32
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)title);
+	jstring js1 = c_safe_string_from_java((char *)title, length);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
           android_tox_callback_conference_title_cb_method, (jlong)(unsigned long long)conference_number, (jlong)(unsigned long long)peer_number,
@@ -992,7 +996,8 @@ void android_tox_callback_conference_message_cb(uint32_t conference_number, uint
 	JNIEnv *jnienv2;
 	jnienv2 = jni_getenv();
 
-	jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+	// jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+	jstring js1 = c_safe_string_from_java((char *)message, length);
 
 	(*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
           android_tox_callback_conference_message_cb_method, (jlong)(unsigned long long)conference_number, (jlong)(unsigned long long)peer_number,
@@ -2191,7 +2196,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv* env
 	// dbg(9, "name len=%d", (int)length);
 	tox_self_get_name(tox_global, name);
 	// dbg(9, "name=%s", (char *)name);
-	return (*env)->NewStringUTF(env, (uint8_t *)name);
+
+	// return (*env)->NewStringUTF(env, (uint8_t *)name);
+	jstring js1 = c_safe_string_from_java((char *)name, length);
+	return js1;
 }
 
 JNIEXPORT jlong JNICALL
@@ -2215,7 +2223,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(
     char message[length + 1];
 	CLEAR(message);
 	tox_self_get_status_message(tox_global, message);
-	return (*env)->NewStringUTF(env, (uint8_t *)message);
+
+	//return (*env)->NewStringUTF(env, (uint8_t *)message);
+	jstring js1 = c_safe_string_from_java((char *)message, length);
+	return js1;
 }
 
 JNIEXPORT jint JNICALL
@@ -2779,7 +2790,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name
 		}
 		else
 		{
-			return (*env)->NewStringUTF(env, (uint8_t *)name);
+			// return (*env)->NewStringUTF(env, (uint8_t *)name);
+			jstring js1 = c_safe_string_from_java((char *)name, length);
+			return js1;
 		}
 	}
 }
@@ -2854,7 +2867,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title_1siz
  * @return true on success.
  */
 JNIEXPORT jstring JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_conference_get_title(JNIEnv* env, jobject thiz, jlong conference_number)
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIEnv* env, jobject thiz, jlong conference_number)
 {
 	TOX_ERR_CONFERENCE_TITLE error;
 	size_t length = tox_conference_get_title_size(tox_global, (uint32_t)conference_number, &error);
@@ -2874,7 +2887,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_conference_get_title(JNIEnv*
 		}
 		else
 		{
-			return (*env)->NewStringUTF(env, (uint8_t *)title);
+			// return (*env)->NewStringUTF(env, (uint8_t *)title);
+			jstring js1 = c_safe_string_from_java((char *)title, length);
+			return js1;
 		}
 	}
 }

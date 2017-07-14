@@ -41,6 +41,7 @@ public class TRIFAGlobals
     final static String GROUPBOT_TOXID = "56A1ADE4B65B86BCD51CC73E2CD4E542179F47959FE3E0E21B4B0ACDADE51855D34D34D37CB5";
 
     final static boolean ADD_BOTS_ON_STARTUP = true;
+    final static boolean DELETE_SQL_AND_VFS_ON_ERROR = false; // true -> will delete all data on any ERROR with SQL and VFS !!!
 
     final static String VFS_TMP_FILE_DIR = "/tempdir/files/";
     final static String VFS_FILE_DIR = "/datadir/files/";

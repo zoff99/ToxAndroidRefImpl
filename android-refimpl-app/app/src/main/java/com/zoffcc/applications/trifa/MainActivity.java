@@ -117,6 +117,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_threa
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
@@ -688,15 +689,18 @@ public class MainActivity extends AppCompatActivity
 
                 String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
 
-                try
+                if (DELETE_SQL_AND_VFS_ON_ERROR)
                 {
-                    Log.i(TAG, "db:deleting database:" + dbs_path);
-                    new File(dbs_path).delete();
-                }
-                catch (Exception e3)
-                {
-                    e3.printStackTrace();
-                    Log.i(TAG, "db:EE3:" + e3.getMessage());
+                    try
+                    {
+                        Log.i(TAG, "db:deleting database:" + dbs_path);
+                        new File(dbs_path).delete();
+                    }
+                    catch (Exception e3)
+                    {
+                        e3.printStackTrace();
+                        Log.i(TAG, "db:EE3:" + e3.getMessage());
+                    }
                 }
 
                 Log.i(TAG, "db:path(2)=" + dbs_path);
@@ -759,26 +763,29 @@ public class MainActivity extends AppCompatActivity
 
                     String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
 
-                    try
+                    if (DELETE_SQL_AND_VFS_ON_ERROR)
                     {
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
-                        new File(dbFile).delete();
-                        Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                        Log.i(TAG, "vfs:**deleting database**:" + dbFile);
-                    }
-                    catch (Exception e3)
-                    {
-                        e3.printStackTrace();
-                        Log.i(TAG, "vfs:EE3:" + e3.getMessage());
+                        try
+                        {
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
+                            new File(dbFile).delete();
+                            Log.i(TAG, "vfs:**deleting database**--------:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                            Log.i(TAG, "vfs:**deleting database**:" + dbFile);
+                        }
+                        catch (Exception e3)
+                        {
+                            e3.printStackTrace();
+                            Log.i(TAG, "vfs:EE3:" + e3.getMessage());
+                        }
                     }
 
                     try
@@ -3517,14 +3524,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void android_tox_callback_conference_title_cb_method(long conference_number, long peer_number, String title,long title_length)
+    static void android_tox_callback_conference_title_cb_method(long conference_number, long peer_number, String title, long title_length)
     {
-        Log.i(TAG,"conference_title_cb:"+"confnum="+conference_number+" peernum="+peer_number+" new_title="+title+" title_length="+title_length);
+        Log.i(TAG, "conference_title_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " new_title=" + title + " title_length=" + title_length);
     }
 
     static void android_tox_callback_conference_namelist_change_cb_method(long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
     {
-        Log.i(TAG,"namelist_change_cb:"+"confnum="+conference_number+" peernum="+peer_number+" state="+a_TOX_CONFERENCE_STATE_CHANGE);
+        Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
     }
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
@@ -5093,7 +5100,7 @@ public class MainActivity extends AppCompatActivity
         return result;
     }
 
-    static String get_peer_name_from_num(String conference_id,String peer_pubkey)
+    static String get_peer_name_from_num(String conference_id, String peer_pubkey)
     {
         String result = "Unknown Peer";
 
@@ -5104,11 +5111,11 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-           return tox_conference_get_title(orma.selectFromConferenceDB().
+            return tox_conference_get_title(orma.selectFromConferenceDB().
                     conference_activeEq(true).and().
                     conference_identifierEq(conference_id).get(0).tox_conference_number);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return "Unknown Conference";
         }
@@ -5120,7 +5127,7 @@ public class MainActivity extends AppCompatActivity
         {
             return tox_conference_get_title(conference_number);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return "Unknown Conference";
         }
@@ -5812,11 +5819,14 @@ public class MainActivity extends AppCompatActivity
         try
         {
             BigInteger bigInt = new BigInteger(1, hash_value.getBytes());
-            return (int) (bigInt.longValue() % (long)number_of_buckets);
+            int ret = (int) (bigInt.longValue() % (long) number_of_buckets);
+            Log.i(TAG, "hash_to_bucket:" + "ret=" + ret + " hash_as_int=" + bigInt + " hash=" + hash_value);
+            return ret;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "hash_to_bucket:EE:" + e.getMessage());
             return 0;
         }
     }

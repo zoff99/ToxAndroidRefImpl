@@ -51,7 +51,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 {
     private static final String TAG = "trifa.MessageListHolder";
 
-    private ConferenceMessage message;
     private Context context;
 
     EmojiTextViewLinks textView;
@@ -120,7 +119,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         try
         {
-            peer_color = hash_to_bucket(this.message.tox_peerpubkey, ChatColors.get_size());
+            peer_color = hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size());
         }
         catch(Exception e)
         {
@@ -152,7 +151,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     {
         Log.i(TAG, "onLongClick");
 
-        final ConferenceMessage m2 = this.message;
+        // final ConferenceMessage m2 = this.message;
 
         //        PopupMenu menu = new PopupMenu(v.getContext(), v);
         //        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()

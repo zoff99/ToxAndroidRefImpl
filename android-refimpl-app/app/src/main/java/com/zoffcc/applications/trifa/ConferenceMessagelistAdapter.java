@@ -21,7 +21,6 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.telecom.Conference;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,10 +30,6 @@ import com.l4digital.fastscroll.FastScroller;
 
 import java.util.Iterator;
 import java.util.List;
-
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 
 public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
