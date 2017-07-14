@@ -5820,7 +5820,7 @@ public class MainActivity extends AppCompatActivity
         {
             BigInteger bigInt = new BigInteger(1, hash_value.getBytes());
             int ret = (int) (bigInt.longValue() % (long) number_of_buckets);
-            Log.i(TAG, "hash_to_bucket:" + "ret=" + ret + " hash_as_int=" + bigInt + " hash=" + hash_value);
+            // Log.i(TAG, "hash_to_bucket:" + "ret=" + ret + " hash_as_int=" + bigInt + " hash=" + hash_value);
             return ret;
         }
         catch (Exception e)

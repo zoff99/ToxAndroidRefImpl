@@ -22,30 +22,26 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
-import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceMessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -57,6 +53,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
     TextView date_time;
+    ViewGroup textView_container;
 
     public ConferenceMessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -66,6 +63,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         this.context = c;
 
+        textView_container = (ViewGroup) itemView.findViewById(R.id.m_container);
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
@@ -115,21 +113,29 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         });
 
 
-        int peer_color = context.getResources().getColor(R.color.colorPrimaryDark);
+        int peer_color_fg = context.getResources().getColor(R.color.colorPrimaryDark);
+        int peer_color_bg = context.getResources().getColor(R.color.material_drawer_background);
+        int alpha_value = 160;
+        int peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
 
         try
         {
-            peer_color = hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size());
+            peer_color_bg = ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())];
+            peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
 
         final Drawable d_lock = new IconicsDrawable(context).
                 icon(FontAwesome.Icon.faw_smile_o).
-                color(peer_color).sizeDp(50);
+                backgroundColor(peer_color_bg).
+                color(peer_color_fg).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
+
+        // textView.setBackgroundColor(peer_color_bg_with_alpha);
+        textView_container.setBackgroundColor(peer_color_bg_with_alpha);
     }
 
     @Override
