@@ -132,7 +132,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                final String f_name = MainActivity.get_peer_name_from_conf_id(conf_id);
+                final String f_name = MainActivity.get_conference_title_from_confid(conf_id);
 
                 Runnable myRunnable = new Runnable()
                 {
