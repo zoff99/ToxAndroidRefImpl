@@ -106,8 +106,6 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 sizeDp(80);
 
         insert_emoji.setImageDrawable(d1);
-        // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
-
 
         insert_emoji.setOnClickListener(new View.OnClickListener()
         {
@@ -118,11 +116,11 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             }
         });
 
-        final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         attachemnt_instead_of_send = true;
-        ml_button_01.setImageDrawable(add_attachement_icon);
+        ml_button_01.setImageDrawable(send_message_icon);
 
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
@@ -140,6 +138,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     public void run()
                     {
                         ml_maintext.setText(f_name);
+                        // ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                     }
                 };
 
