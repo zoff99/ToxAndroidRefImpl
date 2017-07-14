@@ -67,9 +67,11 @@ public class ConferenceMessageListFragment extends Fragment
         {
             if (orma != null)
             {
-                // TODO: sort?
+                // TODO: sort by ID ?
                 data_values = orma.selectFromConferenceMessage().
-                        conference_identifierEq(current_conf_id).toList();
+                        conference_identifierEq(current_conf_id).
+                        orderByIdAsc().
+                        toList();
             }
         }
         catch (Exception e)
