@@ -5086,18 +5086,44 @@ public class MainActivity extends AppCompatActivity
         // add friend ---------------
     }
 
-    static String get_peer_name_from_conf_id(String conference_id)
+    static String get_peer_name_from_conf_id(String conference_id, String peer_pubkey)
     {
-        String result = "Unknown Conference";
+        String result = "Unknown Peer";
 
         return result;
     }
 
-    static String get_peer_name_from_num(long peernum)
+    static String get_peer_name_from_num(String conference_id,String peer_pubkey)
     {
-        String result = "Unknown";
+        String result = "Unknown Peer";
 
         return result;
+    }
+
+    static String get_conference_title_from_confid(String conference_id)
+    {
+        try
+        {
+           return tox_conference_get_title(orma.selectFromConferenceDB().
+                    conference_activeEq(true).and().
+                    conference_identifierEq(conference_id).get(0).tox_conference_number);
+        }
+        catch(Exception e)
+        {
+            return "Unknown Conference";
+        }
+    }
+
+    static String get_conference_title_from_num(long conference_number)
+    {
+        try
+        {
+            return tox_conference_get_title(conference_number);
+        }
+        catch(Exception e)
+        {
+            return "Unknown Conference";
+        }
     }
 
     static String get_friend_name_from_num(long friendnum)
