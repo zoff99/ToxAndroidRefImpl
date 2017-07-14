@@ -121,6 +121,13 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         try
         {
             peer_color_bg = ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())];
+            //            Log.i(TAG, "bindMessageList:avatar_color:" + "pubkey=" +
+            //                    //
+            //                    m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
+            //                            //
+            //                            m.tox_peerpubkey.length()) + " bucket#=" + hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())
+            //                    //
+            //                    + " color=" + peer_color_bg);
             peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
         }
         catch (Exception e)
@@ -134,8 +141,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 color(peer_color_fg).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
-        // textView.setBackgroundColor(peer_color_bg_with_alpha);
-        textView_container.setBackgroundColor(peer_color_bg_with_alpha);
+        // textView.setBackgroundColor(peer_color_bg);
+        textView_container.setBackgroundColor(peer_color_bg);
     }
 
     @Override
