@@ -5807,6 +5807,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static int hash_to_bucket(String hash_value, int number_of_buckets)
+    {
+        try
+        {
+            BigInteger bigInt = new BigInteger(1, hash_value.getBytes());
+            return (int) (bigInt.longValue() % (long)number_of_buckets);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     // --------- make app crash ---------
     // --------- make app crash ---------
     // --------- make app crash ---------
