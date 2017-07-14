@@ -36,9 +36,9 @@ public class ConferenceDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String who_invited__tox_public_key_string = "";
 
-    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
     @Nullable
-    String name = "";
+    String name = ""; // saved for backup, when conference is offline!
 
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long peer_count = -1;

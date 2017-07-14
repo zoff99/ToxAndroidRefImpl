@@ -1366,7 +1366,21 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             return 0;
         }
+    }
 
+    static boolean is_conference_active(String conference_identifier)
+    {
+        try
+        {
+            return (orma.selectFromConferenceDB().
+                    conference_identifierEq(conference_identifier).
+                    toList().get(0).conference_active);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     synchronized static void set_all_friends_offline()
@@ -3481,6 +3495,16 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message);
 
+        int res = tox_conference_peer_number_is_ours(conference_number, peer_number);
+
+        Log.i(TAG, "conference_message_cb:peer_number=" + peer_number + " own?=" + res);
+
+        if (tox_conference_peer_number_is_ours(conference_number, peer_number) == 0) // HINT: 0 (zero) ist false in "C"-language!
+        {
+            // HINT: do not add our own messages, they are already in the DB!
+            return;
+        }
+
         String conf_id = "-1";
 
         try
@@ -3502,13 +3526,23 @@ public class MainActivity extends AppCompatActivity
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.read = false;
+        m.tox_peername = null;
         m.conference_identifier = conf_id;
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = message;
 
 
-        if (message_list_activity != null)
+        try
+        {
+            m.tox_peername = tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (conference_message_list_activity != null)
         {
             if (conference_message_list_activity.get_current_conf_id().equals(conf_id))
             {
@@ -3534,6 +3568,8 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_conference_namelist_change_cb_method(long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
     {
         Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
+
+        // TODO: update "peer names" and "number of peers"
     }
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
@@ -4151,7 +4187,7 @@ public class MainActivity extends AppCompatActivity
     {
         if (cache_peername_pubkey2.containsKey("" + conference_identifier + ":" + peer_pubkey))
         {
-            // Log.i(TAG, "cache hit:2");
+            // Log.i(TAG, "cache hit:2b");
             return cache_peername_pubkey2.get("" + conference_identifier + ":" + peer_pubkey);
         }
         else
@@ -4168,21 +4204,29 @@ public class MainActivity extends AppCompatActivity
             if ((conf_num > -1) && (peer_num > -1))
             {
                 String result = tox_conference_peer_get_name(conf_num, peer_num);
-                cache_peername_pubkey2.put("" + conference_identifier + ":" + peer_pubkey, result);
-                return result;
+
+                if (result.equals("-1"))
+                {
+                    return null;
+                }
+                else
+                {
+                    cache_peername_pubkey2.put("" + conference_identifier + ":" + peer_pubkey, result);
+                    return result;
+                }
             }
             else
             {
-                return "Unknown";
+                return null;
             }
         }
     }
 
-    public static String tox_conference_peer_get_name__wrapper(long conference_number, long peer_number)
+    public static String XXXXXXXtox_conference_peer_get_name__wrapperXXXXXX(long conference_number, long peer_number)
     {
         if (cache_peername_pubkey.containsKey("" + conference_number + ":" + peer_number))
         {
-            // Log.i(TAG, "cache hit:2");
+            // Log.i(TAG, "cache hit:2a");
             return cache_peernum_pubkey.get("" + conference_number + ":" + peer_number);
         }
         else
@@ -4192,9 +4236,17 @@ public class MainActivity extends AppCompatActivity
                 // TODO: bad!
                 cache_peernum_pubkey.clear();
             }
+
             String result = tox_conference_peer_get_name(conference_number, peer_number);
-            cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
-            return result;
+            if (result.equals("-1"))
+            {
+                return null;
+            }
+            else
+            {
+                cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
+                return result;
+            }
         }
     }
 
@@ -5211,26 +5263,60 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            return tox_conference_get_title(orma.selectFromConferenceDB().
-                    conference_activeEq(true).and().
-                    conference_identifierEq(conference_id).get(0).tox_conference_number);
+            // try in the database
+            String name = orma.selectFromConferenceDB().
+                    conference_identifierEq(conference_id).get(0).name;
+
+            if ((name == null) || (name.equals("-1")))
+            {
+                Log.i(TAG, "get_conference_title_from_confid:EE:1");
+            }
+            else
+            {
+                return name;
+            }
         }
         catch (Exception e)
         {
-            return "Unknown Conference";
+            e.printStackTrace();
+            Log.i(TAG, "get_conference_title_from_confid:EE:2:" + e.getMessage());
         }
-    }
 
-    static String get_conference_title_from_num(long conference_number)
-    {
         try
         {
-            return tox_conference_get_title(conference_number);
+            String name = tox_conference_get_title(orma.selectFromConferenceDB().
+                    conference_activeEq(true).and().
+                    conference_identifierEq(conference_id).get(0).tox_conference_number);
+
+            if ((name == null) || (name.equals("-1")))
+            {
+                Log.i(TAG, "get_conference_title_from_confid:Unknown Conference:1");
+                name = "Unknown Conference";
+            }
+
+            try
+            {
+                // remember it in the Database
+                orma.updateConferenceDB().
+                        conference_identifierEq(conference_id).
+                        name(name).execute();
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+                Log.i(TAG, "get_conference_title_from_confid:EE:3:" + e2.getMessage());
+            }
+
+            return name;
         }
-        catch (Exception e)
+        catch (Exception e2)
         {
-            return "Unknown Conference";
+            e2.printStackTrace();
+            Log.i(TAG, "get_conference_title_from_confid:EE:4:" + e2.getMessage());
         }
+
+        Log.i(TAG, "get_conference_title_from_confid:Unknown Conference:2");
+        return "Unknown Conference";
     }
 
     static String get_friend_name_from_num(long friendnum)

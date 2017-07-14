@@ -43,8 +43,15 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import static com.zoffcc.applications.trifa.MainActivity.get_conference_num_from_confid;
+import static com.zoffcc.applications.trifa.MainActivity.insert_into_conference_message_db;
+import static com.zoffcc.applications.trifa.MainActivity.is_conference_active;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_send_message;
+import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 
 public class ConferenceMessageListActivity extends AppCompatActivity
 {
@@ -300,15 +307,51 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized public void send_message_onclick(View view)
     {
-        // TODO
+        // Log.i(TAG,"send_message_onclick:---start");
 
         String msg = "";
         try
         {
+            if (is_conference_active(conf_id))
+            {
+                // send typed message to friend
+                msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
+
+                try
+                {
+                    ConferenceMessage m = new ConferenceMessage();
+                    m.is_new = false; // own messages are always "not new"
+                    m.tox_peerpubkey = global_my_toxid.substring(0, (TOX_PUBLIC_KEY_SIZE * 2));
+                    m.direction = 1; // msg sent
+                    m.TOX_MESSAGE_TYPE = 0;
+                    m.read = true; // !!!! there is not "read status" with conferences in Tox !!!!
+                    m.tox_peername = null;
+                    m.conference_identifier = conf_id;
+                    m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                    m.sent_timestamp = System.currentTimeMillis();
+                    m.text = msg;
+
+                    if ((msg != null) && (!msg.equalsIgnoreCase("")))
+                    {
+                        int res = tox_conference_send_message(1, 0, msg);
+                        Log.i(TAG, "tox_conference_send_message:result=" + res + " m=" + m);
+
+                        if (res > -1)
+                        {
+                            // message was sent OK
+                            insert_into_conference_message_db(m, true);
+                            ml_new_message.setText("");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
         catch (Exception e)
         {
-            msg = "";
             e.printStackTrace();
         }
     }

@@ -89,8 +89,33 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         try
         {
             String peer_name = tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+
+            if (peer_name == null)
+            {
+                peer_name = m.tox_peername;
+
+                if ((peer_name == null) || (m.tox_peername.equals("")) || (peer_name.equals("-1")))
+                {
+                    peer_name = "Unknown";
+                }
+            }
+            else
+            {
+                if (peer_name.equals("-1"))
+                {
+                    if ((m.tox_peername == null) || (m.tox_peername.equals("")))
+                    {
+                        peer_name = "Unknown";
+                    }
+                    else
+                    {
+                        peer_name = m.tox_peername;
+                    }
+                }
+            }
+
             layout_peer_name_container.setVisibility(View.VISIBLE);
-            peer_name_text.setText(peer_name);
+            peer_name_text.setText(peer_name + " / " + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6), m.tox_peerpubkey.length()));
         }
         catch (Exception e)
         {

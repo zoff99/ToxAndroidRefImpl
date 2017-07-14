@@ -39,6 +39,10 @@ public class ConferenceMessage
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String tox_peerpubkey;
 
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
+    @Nullable
+    String tox_peername = ""; // saved for backup, when conference is offline!
+
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     int direction = 0; // 0 -> msg received, 1 -> msg sent
 
@@ -79,6 +83,7 @@ public class ConferenceMessage
         out.read = in.read;
         out.is_new = in.is_new;
         out.text = in.text;
+        out.tox_peername = in.tox_peername;
 
         return out;
     }
@@ -86,6 +91,6 @@ public class ConferenceMessage
     @Override
     public String toString()
     {
-        return "id=" + id + ", tox_peerpubkey=" + tox_peerpubkey + ", direction=" + direction + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", is_new=" + is_new;
+        return "id=" + id + ", tox_peername" + tox_peername + ", tox_peerpubkey=" + tox_peerpubkey + ", direction=" + direction + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", is_new=" + is_new;
     }
 }

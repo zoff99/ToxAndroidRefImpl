@@ -87,11 +87,18 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         {
             if (fl.conference_active)
             {
+                long user_count = tox_conference_peer_count(fl.tox_conference_number);
+
+                if (user_count < 0)
+                {
+                    user_count = 0;
+                }
+
                 textView.setText("#" + fl.tox_conference_number + " "
                         //
                         + fl.conference_identifier.substring(fl.conference_identifier.length() - 7, fl.conference_identifier.length())
                         //
-                        + " Users: " + tox_conference_peer_count(fl.tox_conference_number));
+                        + " Users: " + user_count);
             }
             else
             {
