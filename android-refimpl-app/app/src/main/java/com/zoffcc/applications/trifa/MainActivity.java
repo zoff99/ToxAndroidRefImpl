@@ -3501,6 +3501,16 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
         }
     }
+
+    static void android_tox_callback_conference_title_cb_method(long conference_number, long peer_number, String title,long title_length)
+    {
+        Log.i(TAG,"conference_title_cb:"+"confnum="+conference_number+" peernum="+peer_number+" new_title="+title+" title_length="+title_length);
+    }
+
+    static void android_tox_callback_conference_namelist_change_cb_method(long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
+    {
+        Log.i(TAG,"namelist_change_cb:"+"confnum="+conference_number+" peernum="+peer_number+" state="+a_TOX_CONFERENCE_STATE_CHANGE);
+    }
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
