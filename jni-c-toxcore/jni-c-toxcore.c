@@ -2604,9 +2604,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1send_1message(J
 
 	if (res == false)
 	{
-		if (error == _ERR_CONFERENCE_SEND_MESSAGE_CONFERENCE_NOT_FOUND)
+		if (error == TOX_ERR_CONFERENCE_SEND_MESSAGE_CONFERENCE_NOT_FOUND)
 		{
-			dbg(9, "tox_conference_send_message:ERROR:_ERR_CONFERENCE_SEND_MESSAGE_CONFERENCE_NOT_FOUND");
+			dbg(9, "tox_conference_send_message:ERROR:TOX_ERR_CONFERENCE_SEND_MESSAGE_CONFERENCE_NOT_FOUND");
 			return (jint)-1;
 		}
 		else if (error == TOX_ERR_CONFERENCE_SEND_MESSAGE_TOO_LONG)
