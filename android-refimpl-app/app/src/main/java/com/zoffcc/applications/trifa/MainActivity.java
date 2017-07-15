@@ -1798,6 +1798,8 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_conference_get_type(long conference_number);
 
     public static native int tox_conference_send_message(long conference_number, int a_TOX_MESSAGE_TYPE, @NonNull String message);
+
+    public static native int tox_conference_delete(long conference_number);
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -5923,6 +5925,26 @@ public class MainActivity extends AppCompatActivity
         //        }
     }
 
+    static String conference_identifiere_short(String conference_identifier)
+    {
+        try
+        {
+            //            return conference_identifier.substring(0, 2) +
+            //                    //
+            //                    ".." +
+            //                    //
+            //                    conference_identifier.substring(conference_identifier.length() - 5, conference_identifier.length());
+
+            return conference_identifier.substring(conference_identifier.length() - 8, conference_identifier.length());
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return conference_identifier;
+        }
+    }
+
     static void set_all_conferences_inactive()
     {
         try
@@ -5937,6 +5959,23 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             Log.i(TAG, "set_all_conferences_inactive:EE:" + e.getMessage());
+        }
+    }
+
+    static void set_conference_inactive(String conference_identifier)
+    {
+        try
+        {
+            orma.updateConferenceDB().
+                    conference_identifierEq(conference_identifier).
+                    conference_active(false).
+                    tox_conference_number(-1).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "set_conference_inactive:EE:" + e.getMessage());
         }
     }
 

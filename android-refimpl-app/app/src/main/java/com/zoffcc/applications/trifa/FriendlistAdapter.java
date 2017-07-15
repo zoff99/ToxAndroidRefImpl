@@ -129,25 +129,6 @@ public class FriendlistAdapter extends RecyclerView.Adapter
         }
     }
 
-    //    public void add_list_clear(List<CombinedFriendsAndConferences> new_items, boolean is_friend)
-    //    {
-    //        // Log.i(TAG, "add_list_clear:" + new_items);
-    //
-    //        try
-    //        {
-    //            // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
-    //            this.friendlistitems.clear();
-    //            this.friendlistitems.addAll(new_items);
-    //            this.notifyDataSetChanged();
-    //            // Log.i(TAG, "add_list_clear:002");
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            e.printStackTrace();
-    //            Log.i(TAG, "add_list_clear:EE:" + e.getMessage());
-    //        }
-    //    }
-
     public void add_item(CombinedFriendsAndConferences new_item)
     {
         // Log.i(TAG, "add_item:" + new_item + ":" + this.friendlistitems.size());

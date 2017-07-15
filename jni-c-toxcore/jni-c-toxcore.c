@@ -2518,7 +2518,19 @@ void tox_self_set_nospam(Tox *tox, uint32_t nospam);
  *
  * @return true on success.
  */
-// bool tox_conference_delete(Tox *tox, uint32_t conference_number, TOX_ERR_CONFERENCE_DELETE *error);
+// !! this actually means -> leave conference !!
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1delete(JNIEnv* env, jobject thiz, jlong conference_number)
+{
+	TOX_ERR_CONFERENCE_DELETE error;
+	bool res = tox_conference_delete(tox_global, (uint32_t)conference_number, &error);
+	if (error != TOX_ERR_CONFERENCE_DELETE_OK)
+	{
+		dbg(0, "tox_conference_delete:ERROR=%d", (int)error);
+		return (jint)-1;
+	}
+	return (jint)res;
+}
 
 
 JNIEXPORT jlong JNICALL
