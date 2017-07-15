@@ -183,7 +183,7 @@ dependencies {
     }
     //
     //
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.4@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.5@aar'
     compile 'com.android.support:support-vector-drawable:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
@@ -206,7 +206,7 @@ dependencies {
 
 dependencyVerification {
     verify = [
-            'com.zoffcc.applications.trifajni:trifa-jni-lib:dbce06111d805f5629a8cc8f9f6d8d0e61b03e61259e95ec21b17402967fc90b',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:6b24baf38295f6552f307fcbc7f679b8ec83fa146042fd196c1c1cd2568b7d76',
             'com.mikepenz:materialdrawer:e126b6bb3f362e23875710d4bb3c3c9e6e0c0fbda62376218b454f1604e90251',
             'com.mikepenz:google-material-typeface:72f56673dd5f646193cfe7b7513a4689869365069d27ac60faf4c4fdfb330054',
             'com.mikepenz:fontawesome-typeface:ea35952a9126ddf01ad9c804c24fa97fad577ab4eb2af74e364d198040eabcd4',
