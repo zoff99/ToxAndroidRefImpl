@@ -276,6 +276,9 @@ public class MainActivity extends AppCompatActivity
         EmojiManager.install(new IosEmojiProvider());
         // EmojiManager.install(new EmojiOneProvider());
 
+        resources = this.getResources();
+        metrics = resources.getDisplayMetrics();
+
         super.onCreate(savedInstanceState);
 
         main_handler = new Handler(getMainLooper());
@@ -315,9 +318,6 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         bootstrapping = false;
-
-        resources = this.getResources();
-        metrics = resources.getDisplayMetrics();
 
         waiting_view = (TextView) findViewById(R.id.waiting_view);
         waiting_image = (ProgressBar) findViewById(R.id.waiting_image);

@@ -22,6 +22,8 @@ package com.zoffcc.applications.trifa;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.zoffcc.applications.trifa.MainActivity.dp2px;
+
 public class TRIFAGlobals
 {
     static String global_my_toxid = "";
@@ -75,6 +77,8 @@ public class TRIFAGlobals
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
     // ---- lookup cache ----
+
+    static int CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) dp2px(10);
 
     public static enum TRIFA_FT_DIRECTION
     {

@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -42,6 +43,7 @@ import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name__wrapper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 
 public class ConferenceMessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -190,7 +192,16 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         img_avatar.setImageDrawable(d_lock);
 
         // textView.setBackgroundColor(peer_color_bg);
-        textView_container.setBackgroundColor(peer_color_bg);
+        // textView_container.setBackgroundColor(peer_color_bg);
+
+        // we need to do the rounded corner background manually here, to change the color ---------------
+        GradientDrawable shape = new GradientDrawable();
+        shape.setShape(GradientDrawable.RECTANGLE);
+        shape.setCornerRadii(new float[]{CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX});
+        shape.setColor(peer_color_bg);
+        // shape.setStroke(3, borderColor);
+        textView_container.setBackground(shape);
+        // we need to do the rounded corner background manually here, to change the color ---------------
     }
 
     @Override
