@@ -103,7 +103,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
 
                 textView.setText("#" + fl.tox_conference_number + " "
                         //
-                        + conference_identifiere_short(fl.conference_identifier)
+                        + conference_identifiere_short(fl.conference_identifier, true)
                         //
                         + " Users: " + user_count);
             }
@@ -111,7 +111,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             {
                 textView.setText("#" + fl.tox_conference_number + " "
                                 //
-                                + conference_identifiere_short(fl.conference_identifier)
+                                + conference_identifiere_short(fl.conference_identifier, true)
                         //
                 );
             }

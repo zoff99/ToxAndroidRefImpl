@@ -102,6 +102,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -2260,7 +2261,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_status_message_cb_method(long friend_number, String status_message, long length)
     {
-        Log.i(TAG, "friend_status_message:friend:" + friend_number + " status message:" + status_message);
+        // Log.i(TAG, "friend_status_message:friend:" + friend_number + " status message:" + status_message);
 
         FriendList f = main_get_friend(friend_number);
         if (f != null)
@@ -2609,7 +2610,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
     {
-        Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
+        // Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
 
         // if message list for this friend is open, then don't do notification and "new" badge
         boolean do_notification = true;
@@ -3481,13 +3482,30 @@ public class MainActivity extends AppCompatActivity
 
         long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
 
+        String conference_identifier = bytes_to_hex(cookie_buffer);
+
         if (conference_num >= 0)
         {
-            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number), bytes_to_hex(cookie_buffer), a_TOX_CONFERENCE_TYPE);
+            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number), conference_identifier, a_TOX_CONFERENCE_TYPE);
         }
         else
         {
             Log.i(TAG, "conference_invite_cb:error=" + conference_num + " joining conference");
+        }
+
+        try
+        {
+            if (conference_message_list_activity != null)
+            {
+                if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
+                {
+                    conference_message_list_activity.set_conference_connection_status_icon();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
 
         Log.i(TAG, "conference_invite_cb:res=" + conference_num);
@@ -3495,13 +3513,11 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
     {
-        Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message);
+        // Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message);
 
         int res = tox_conference_peer_number_is_ours(conference_number, peer_number);
 
-        Log.i(TAG, "conference_message_cb:peer_number=" + peer_number + " own?=" + res);
-
-        if (tox_conference_peer_number_is_ours(conference_number, peer_number) == 1)
+        if (res == 1)
         {
             // HINT: do not add our own messages, they are already in the DB!
             return;
@@ -3513,7 +3529,11 @@ public class MainActivity extends AppCompatActivity
         try
         {
             // TODO: cache me!!
-            conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).get(0);
+            conf_temp = orma.selectFromConferenceDB().
+                    tox_conference_numberEq(conference_number).
+                    and().
+                    conference_activeEq(true).toList().get(0);
+
             conf_id = conf_temp.conference_identifier;
         }
         catch (Exception e)
@@ -3586,6 +3606,41 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_conference_title_cb_method(long conference_number, long peer_number, String title, long title_length)
     {
         Log.i(TAG, "conference_title_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " new_title=" + title + " title_length=" + title_length);
+
+        try
+        {
+            // update friendlist fragment (for this conference)
+            if (friend_list_fragment != null)
+            {
+                ConferenceDB conf_temp = null;
+
+                try
+                {
+                    // TODO: cache me!!
+                    conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
+                            and().
+                            conference_activeEq(true).
+                            get(0);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                if (conf_temp != null)
+                {
+                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                    cc.is_friend = false;
+                    cc.conference_item = conf_temp;
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "android_tox_callback_conference_title_cb_method:EE1:" + e.getMessage());
+        }
     }
 
     static void android_tox_callback_conference_namelist_change_cb_method(long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
@@ -3593,6 +3648,42 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
 
         // TODO: update "peer names" and "number of peers"
+
+        try
+        {
+            // update friendlist fragment (for this conference)
+            if (friend_list_fragment != null)
+            {
+                ConferenceDB conf_temp = null;
+
+                try
+                {
+                    // TODO: cache me!!
+                    conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
+                            and().
+                            conference_activeEq(true).
+                            get(0);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                if (conf_temp != null)
+                {
+                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                    cc.is_friend = false;
+                    cc.conference_item = conf_temp;
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "android_tox_callback_conference_title_cb_method:EE1:" + e.getMessage());
+        }
+
     }
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
@@ -5925,7 +6016,7 @@ public class MainActivity extends AppCompatActivity
         //        }
     }
 
-    static String conference_identifiere_short(String conference_identifier)
+    static String conference_identifiere_short(String conference_identifier, boolean uppercase_result)
     {
         try
         {
@@ -5934,8 +6025,14 @@ public class MainActivity extends AppCompatActivity
             //                    ".." +
             //                    //
             //                    conference_identifier.substring(conference_identifier.length() - 5, conference_identifier.length());
-
-            return conference_identifier.substring(conference_identifier.length() - 8, conference_identifier.length());
+            if (uppercase_result)
+            {
+                return (conference_identifier.substring(conference_identifier.length() - 6, conference_identifier.length())).toUpperCase(Locale.ENGLISH);
+            }
+            else
+            {
+                return conference_identifier.substring(conference_identifier.length() - 6, conference_identifier.length());
+            }
 
         }
         catch (Exception e)

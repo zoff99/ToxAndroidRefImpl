@@ -45,6 +45,7 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 import static com.zoffcc.applications.trifa.MainActivity.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_conference_active;
+import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_send_message;
@@ -102,9 +103,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         ml_phone_icon.setVisibility(View.GONE);
         ml_status_icon.setVisibility(View.INVISIBLE);
 
-        // final ImageButton button01_ = ml_button_01;
-
         ml_icon.setImageResource(R.drawable.circle_red);
+        set_conference_connection_status_icon();
 
         setUpEmojiPopup();
 
@@ -289,8 +289,14 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             {
                 try
                 {
-                    // TODO
-                    ml_icon.setImageResource(R.drawable.circle_green);
+                    if (is_conference_active(conf_id))
+                    {
+                        ml_icon.setImageResource(R.drawable.circle_green);
+                    }
+                    else
+                    {
+                        ml_icon.setImageResource(R.drawable.circle_red);
+                    }
                 }
                 catch (Exception e)
                 {
