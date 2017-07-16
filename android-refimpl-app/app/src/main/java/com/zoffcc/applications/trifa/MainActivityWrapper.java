@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
@@ -40,6 +39,13 @@ public class MainActivityWrapper extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        // need this for "dp2px" to work !! -------
+        // need this for "dp2px" to work !! -------
+        MainActivity.resources = this.getResources();
+        MainActivity.metrics = MainActivity.resources.getDisplayMetrics();
+        // need this for "dp2px" to work !! -------
+        // need this for "dp2px" to work !! -------
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         String DB_secrect_key__tmp = settings.getString("DB_secrect_key", "");

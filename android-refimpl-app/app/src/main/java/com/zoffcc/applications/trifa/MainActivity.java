@@ -5636,8 +5636,17 @@ public class MainActivity extends AppCompatActivity
      */
     public static float dp2px(float dp)
     {
-        float px = dp * ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-        return px;
+        try
+        {
+            float px = dp * ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+            return px;
+        }
+        catch(Exception e)
+        {
+            // if there is an error, just return the input value!!
+            e.printStackTrace();
+            return dp;
+        }
     }
 
     /**
