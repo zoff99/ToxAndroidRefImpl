@@ -58,7 +58,7 @@
         <!-- android:value="GlideModule"/> -->
 
         <activity
-            android:name=".MainActivityWrapper"
+            android:name=".StartMainActivityWrapper"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:launchMode="singleTask">
             <intent-filter>

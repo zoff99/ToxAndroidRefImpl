@@ -2710,7 +2710,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
 
-                                Intent notificationIntent = new Intent(context_s, MainActivity.class);
+                                Intent notificationIntent = new Intent(context_s, StartMainActivityWrapper.class);
                                 notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent, 0);
 

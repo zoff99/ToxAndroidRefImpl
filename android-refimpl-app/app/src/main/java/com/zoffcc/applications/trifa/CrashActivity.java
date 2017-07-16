@@ -120,7 +120,7 @@ public class CrashActivity extends AppCompatActivity
 
     public void restart_app()
     {
-        PendingIntent intent = PendingIntent.getActivity(getBaseContext(), 0, new Intent(getApplicationContext(), com.zoffcc.applications.trifa.MainActivityWrapper.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent intent = PendingIntent.getActivity(getBaseContext(), 0, new Intent(getApplicationContext(), com.zoffcc.applications.trifa.StartMainActivityWrapper.class), PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 300, intent); // restart app after n seconds delay
     }

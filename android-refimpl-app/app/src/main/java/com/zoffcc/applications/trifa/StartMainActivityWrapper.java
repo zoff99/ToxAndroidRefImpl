@@ -30,7 +30,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__u
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 
-public class MainActivityWrapper extends AppCompatActivity
+public class StartMainActivityWrapper extends AppCompatActivity
 {
     private static final String TAG = "trifa.MainActivityWrpr";
     boolean set_pattern = true;

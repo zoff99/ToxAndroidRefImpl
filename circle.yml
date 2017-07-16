@@ -50,7 +50,7 @@ machine:
     JAVA_OPTS: "-Xms512m -Xmx1024m"
     GRADLE_OPTS: '-Xmx512m -Dorg.gradle.jvmargs="-Xmx1700m -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=1700m"'
     CLASS_P: com.zoffcc.applications.trifa
-    START_INTENT_P: com.zoffcc.applications.trifa.MainActivity
+    START_INTENT_P: com.zoffcc.applications.trifa.StartMainActivityWrapper
 
     ZEMU_: "appemu23"
     EMU_: "appemu21"
