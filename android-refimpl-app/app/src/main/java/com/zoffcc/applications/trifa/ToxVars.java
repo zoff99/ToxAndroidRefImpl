@@ -1138,18 +1138,24 @@ public class ToxVars
         /**
          * A peer has joined the conference.
          */
-        TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN,
+        TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN(0),
 
         /**
          * A peer has exited the conference.
          */
-        TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT,
+        TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT(1),
 
         /**
          * A peer has changed their name.
          */
-        TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE,
+        TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE(2);
 
+        public int value;
+
+        private TOX_CONFERENCE_STATE_CHANGE(int value)
+        {
+            this.value = value;
+        }
     }
 
     public static enum TOX_ERR_CONFERENCE_PEER_QUERY

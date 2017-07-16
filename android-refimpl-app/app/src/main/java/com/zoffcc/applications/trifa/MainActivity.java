@@ -128,6 +128,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIF
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UPDATE_MESSAGE_PROGRESS_AFTER_BYTES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES;
@@ -138,6 +139,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
@@ -3654,31 +3657,112 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            // update friendlist fragment (for this conference)
-            if (friend_list_fragment != null)
-            {
-                ConferenceDB conf_temp = null;
+            ConferenceDB conf_temp = null;
 
+            try
+            {
+                // TODO: cache me!!
+                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
+                        and().
+                        conference_activeEq(true).
+                        get(0);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            if (conf_temp != null)
+            {
+
+                Log.i(TAG, "namelist_change_cb:002");
+
+                // a_TOX_CONFERENCE_STATE_CHANGE:
+                // 0 -> join
+                // 1 -> leave
+                // 2 -> name change
+
+
+                ConferenceMessage m = new ConferenceMessage();
+                m.is_new = false;
+
+                // m.tox_friendnum = friend_number;
+                m.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+                m.direction = 0; // msg received
+                m.TOX_MESSAGE_TYPE = 0;
+                m.read = false;
+                m.tox_peername = "* System Message *";
+                m.conference_identifier = conf_temp.conference_identifier;
+                m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                m.rcvd_timestamp = System.currentTimeMillis();
+
+                String peer_name_temp = "Unknown";
                 try
                 {
-                    // TODO: cache me!!
-                    conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                            and().
-                            conference_activeEq(true).
-                            get(0);
+                    // don't use the wrapper here!
+                    String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_number, peer_number);
+                    Log.i(TAG, "namelist_change_cb:003:peer_pubkey_temp=" + peer_pubkey_temp);
+                    // don't use the wrapper here!
+                    peer_name_temp = tox_conference_peer_get_name(conference_number, peer_number);
+                    Log.i(TAG, "namelist_change_cb:004:peer_name_temp=" + peer_name_temp);
+
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                    Log.i(TAG, "namelist_change_cb:005:EE1:" + e.getMessage());
                 }
 
-                if (conf_temp != null)
+
+                if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN.value)
+                {
+                    m.text = "" + peer_name_temp + " joined.";
+                    Log.i(TAG, "namelist_change_cb:006");
+                    // TODO: here it's always "Tox User" !! bad!
+                    return;
+                }
+                else if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE.value)
+                {
+                    m.text = "" + peer_name_temp + " changed name or joined.";
+                    // TODO: this happend also after each peer joins. so disable for now!
+                    Log.i(TAG, "namelist_change_cb:007");
+                }
+                else // if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT)
+                {
+                    m.text = "" + peer_name_temp + "peer_name_temp left.";
+                    Log.i(TAG, "namelist_change_cb:008");
+                }
+
+                if (conference_message_list_activity != null)
+                {
+                    if (conference_message_list_activity.get_current_conf_id().equals(conf_temp.conference_identifier))
+                    {
+                        Log.i(TAG, "namelist_change_cb:009");
+
+                        insert_into_conference_message_db(m, true);
+                    }
+                    else
+                    {
+                        Log.i(TAG, "namelist_change_cb:010");
+
+                        insert_into_conference_message_db(m, false);
+                    }
+                }
+                else
+                {
+                    long new_msg_id = insert_into_conference_message_db(m, false);
+                    Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
+                }
+
+                // update conferenc item -------
+                if (friend_list_fragment != null)
                 {
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = false;
                     cc.conference_item = conf_temp;
                     friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
+                // update conferenc item -------
             }
         }
         catch (Exception e)
@@ -3686,7 +3770,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             Log.i(TAG, "android_tox_callback_conference_title_cb_method:EE1:" + e.getMessage());
         }
-
     }
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------

@@ -117,11 +117,22 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             }
 
             layout_peer_name_container.setVisibility(View.VISIBLE);
-            peer_name_text.setText(peer_name + " / " + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6), m.tox_peerpubkey.length()));
+            try
+            {
+                peer_name_text.setText(peer_name + " / " + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6), m.tox_peerpubkey.length()));
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+                Log.i(TAG, "bindMessageList:EE2:" + e2.getMessage());
+
+                peer_name_text.setText(peer_name);
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "bindMessageList:EE:" + e.getMessage());
         }
 
         //        textView.setAutoLinkText("" + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
