@@ -139,6 +139,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
@@ -3651,9 +3652,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_namelist_change_cb_method(long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
     {
-        Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
-
-        // TODO: update "peer names" and "number of peers"
+        // Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
+        // TODO: update peer status
 
         try
         {
@@ -3674,9 +3674,6 @@ public class MainActivity extends AppCompatActivity
 
             if (conf_temp != null)
             {
-
-                Log.i(TAG, "namelist_change_cb:002");
-
                 // a_TOX_CONFERENCE_STATE_CHANGE:
                 // 0 -> join
                 // 1 -> leave
@@ -3717,20 +3714,25 @@ public class MainActivity extends AppCompatActivity
                 if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN.value)
                 {
                     m.text = "" + peer_name_temp + " joined.";
-                    Log.i(TAG, "namelist_change_cb:006");
+                    Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " joined.");
                     // TODO: here it's always "Tox User" !! bad!
                     return;
                 }
                 else if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE.value)
                 {
                     m.text = "" + peer_name_temp + " changed name or joined.";
-                    // TODO: this happend also after each peer joins. so disable for now!
-                    Log.i(TAG, "namelist_change_cb:007");
+                    Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " changed name or joined.");
+                    // HINT: this happend also after each peer joins
                 }
-                else // if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT)
+                else if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT.value)
                 {
-                    m.text = "" + peer_name_temp + "peer_name_temp left.";
-                    Log.i(TAG, "namelist_change_cb:008");
+                    m.text = "" + peer_name_temp + " left.";
+                    Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " left.");
+                }
+                else
+                {
+                    // unknown status
+                    return;
                 }
 
                 if (conference_message_list_activity != null)
