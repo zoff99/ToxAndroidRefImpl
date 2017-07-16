@@ -481,7 +481,7 @@ public class MainActivity extends AppCompatActivity
                 withActivity(this).
                 withInnerShadow(false).
                 withRootView(R.id.drawer_container).
-                withShowDrawerOnFirstLaunch(true).
+                withShowDrawerOnFirstLaunch(false).
                 withActionBarDrawerToggleAnimated(true).
                 withActionBarDrawerToggle(true).
                 withToolbar(toolbar).
