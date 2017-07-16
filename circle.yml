@@ -252,9 +252,9 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
-  # --------- we use gradle witness, so we need to use the maven artefact ---------
-  # - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
-  # --------- we use gradle witness, so we need to use the maven artefact ---------
+  # --------- use current jni code on this branch ---------
+  - if [ "$CIRCLE_BRANCH""x" == "zoff99/dev003x" ]; then cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/ ; fi
+  # --------- use current jni code on this branch ---------
 # --- Android build ---
 
 
@@ -365,9 +365,9 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/"$TOOLCHAIN_ARCH"/
 
-  # --------- we use gradle witness, so we need to use the maven artefact ---------
-  # - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
-  # --------- we use gradle witness, so we need to use the maven artefact ---------
+  # --------- use current jni code on this branch ---------
+  - if [ "$CIRCLE_BRANCH""x" == "zoff99/dev003x" ]; then cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/ ; fi
+  # --------- use current jni code on this branch ---------
 # --- Android x86 build ---
 
 

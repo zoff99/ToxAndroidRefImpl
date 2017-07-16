@@ -175,9 +175,6 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    //
-    //
-    //
     compile('com.vanniktech:emoji-ios:0.5.1') {
         exclude group: 'com.android.support'
     }

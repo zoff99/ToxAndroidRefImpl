@@ -651,6 +651,9 @@ public class MainActivity extends AppCompatActivity
         mt.setText(mt.getText() + "\n" + "c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
         mt.setText(mt.getText() + "\n" + "jni-c-toxcore:v" + jnictoxcore_version());
 
+        Log.i(TAG, "loaded:c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
+        Log.i(TAG, "loaded:jni-c-toxcore:v" + jnictoxcore_version());
+
         // --- forground service ---
         // --- forground service ---
         // --- forground service ---
