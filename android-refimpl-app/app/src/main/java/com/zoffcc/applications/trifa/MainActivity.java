@@ -3703,6 +3703,10 @@ public class MainActivity extends AppCompatActivity
                     peer_name_temp = tox_conference_peer_get_name(conference_number, peer_number);
                     Log.i(TAG, "namelist_change_cb:004:peer_name_temp=" + peer_name_temp);
 
+                    if (peer_name_temp == null)
+                    {
+                        peer_name_temp = "Unknown";
+                    }
                 }
                 catch (Exception e)
                 {
