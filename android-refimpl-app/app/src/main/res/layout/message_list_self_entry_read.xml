@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/message_text_date"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -31,9 +31,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColorLink="@color/textblock_link_color_for_blue"
                 android:paddingLeft="10dp"
                 android:text="..."
+                android:textColorLink="@color/textblock_link_color_for_blue"
                 android:textSize="20sp"/>
 
             <ImageView
@@ -69,6 +69,25 @@
             app:civ_border_width="2dp"
             app:civ_fill_color="@color/md_grey_400"/>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/message_text_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/rounded_date_bg"
+        android:paddingBottom="2dp"
+        android:paddingEnd="@dimen/padding_small"
+        android:paddingLeft="@dimen/padding_small"
+        android:paddingRight="@dimen/padding_small"
+        android:paddingStart="@dimen/padding_small"
+        android:paddingTop="2dp"
+        android:text="2017-05-14"
+        android:textColor="@color/md_white_1000"
+        android:textSize="@dimen/text_small"/>
 
 </RelativeLayout>
 

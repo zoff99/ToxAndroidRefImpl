@@ -5,9 +5,10 @@
                 android:padding="6dip">
 
     <LinearLayout
+        android:id="@+id/layout_message_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_below="@+id/message_text_date"
         android:orientation="vertical"
         android:padding="0dp">
 
@@ -15,18 +16,18 @@
             android:id="@+id/layout_peer_name_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/peer_name_text"
-                android:layout_marginLeft="65dp"
-                android:textColor="#EFEFEF"
-                android:layout_gravity="center"
-                android:gravity="left"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="65dp"
+                android:gravity="left"
                 android:text="peer name"
+                android:textColor="#EFEFEF"
                 android:textSize="13sp"/>
 
         </LinearLayout>
@@ -129,6 +130,25 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/message_text_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/rounded_date_bg"
+        android:paddingEnd="@dimen/padding_small"
+        android:paddingLeft="@dimen/padding_small"
+        android:paddingRight="@dimen/padding_small"
+        android:paddingStart="@dimen/padding_small"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:text="2017-05-14"
+        android:textColor="@color/md_white_1000"
+        android:textSize="@dimen/text_small"/>
 
 </RelativeLayout>
 

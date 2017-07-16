@@ -17,12 +17,12 @@
         android:layout_marginRight="5dp"
         android:divider="@null"
         android:dividerHeight="2dp"
-        app:bubbleColor="?attr/colorPrimary"
+        app:bubbleColor="@color/fast_scroller_color"
         app:bubbleTextColor="#ffffff"
-        app:handleColor="?attr/colorPrimary"
+        app:handleColor="@color/fast_scroller_color"
         app:hideScrollbar="true"
         app:showTrack="false"
-        app:trackColor="?attr/colorPrimary">
+        app:trackColor="@color/fast_scroller_color">
     </com.l4digital.fastscroll.FastScrollRecyclerView>
 
     <TextView
@@ -33,7 +33,7 @@
         android:layout_centerInParent="true"
         android:layout_gravity="center_horizontal|top"
         android:layout_marginTop="3dp"
-        android:background="#FF0288D1"
+        android:background="@drawable/rounded_date_bg"
         android:gravity="center"
         android:paddingBottom="3dp"
         android:paddingLeft="6dp"

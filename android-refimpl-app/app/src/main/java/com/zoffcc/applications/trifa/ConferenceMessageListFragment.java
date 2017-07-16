@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -44,6 +45,8 @@ public class ConferenceMessageListFragment extends Fragment
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     ConferenceMessagelistAdapter adapter = null;
     static boolean is_at_bottom = true;
+    TextView scrollDateHeader = null;
+    ConversationDateHeader conversationDateHeader = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -102,6 +105,10 @@ public class ConferenceMessageListFragment extends Fragment
         adapter = new ConferenceMessagelistAdapter(view.getContext(), data_values);
         listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view.findViewById(R.id.msg_rv_list);
 
+        scrollDateHeader = (TextView) view.findViewById(R.id.scroll_date_header);
+        scrollDateHeader.setVisibility(View.INVISIBLE);
+        conversationDateHeader = new ConversationDateHeader(view.getContext(), scrollDateHeader);
+
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setStackFromEnd(true); // pin to bottom element
         listingsView.setLayoutManager(linearLayoutManager);
@@ -110,6 +117,21 @@ public class ConferenceMessageListFragment extends Fragment
 
         RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener()
         {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING)
+                {
+                    conversationDateHeader.show();
+                }
+                else if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    conversationDateHeader.hide();
+                }
+            }
+
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy)
             {

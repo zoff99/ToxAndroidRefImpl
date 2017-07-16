@@ -847,7 +847,7 @@ public class TrifaToxService extends Service
 
     static String safe_string(byte[] in)
     {
-        Log.i(TAG, "safe_string:in=" + in);
+        // Log.i(TAG, "safe_string:in=" + in);
         String out = "";
 
         try
@@ -869,7 +869,7 @@ public class TrifaToxService extends Service
             }
         }
 
-        Log.i(TAG, "safe_string:out=" + out);
+        // Log.i(TAG, "safe_string:out=" + out);
         return out;
     }
     // --------------- JNI ---------------

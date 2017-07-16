@@ -10,4 +10,7 @@
     <color name="textblock_link_color_for_orange">@android:color/holo_blue_dark</color>
     <color name="textblock_link_color_for_red">@android:color/holo_blue_bright</color>
 
+    <color name="date_bg_color">#EE3F51B5</color>
+    <color name="fast_scroller_color">#3F51B5</color>
+
 </resources>
