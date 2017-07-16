@@ -366,7 +366,7 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/"$TOOLCHAIN_ARCH"/
 
   # --------- use current jni code on this branch ---------
-  - if [ "$CIRCLE_BRANCH""x" == "zoff99/dev003x" ]; then cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/ ; fi
+  - if [ "$CIRCLE_BRANCH""x" == "zoff99/dev003x" ]; then cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/x86/ ; fi
   # --------- use current jni code on this branch ---------
 # --- Android x86 build ---
 
