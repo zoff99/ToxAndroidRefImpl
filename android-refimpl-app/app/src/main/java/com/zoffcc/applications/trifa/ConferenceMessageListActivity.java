@@ -45,7 +45,6 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 import static com.zoffcc.applications.trifa.MainActivity.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_conference_active;
-import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_send_message;
@@ -339,7 +338,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
                     if ((msg != null) && (!msg.equalsIgnoreCase("")))
                     {
-                        int res = tox_conference_send_message(1, 0, msg);
+                        int res = tox_conference_send_message(get_conference_num_from_confid(conf_id), 0, msg);
                         Log.i(TAG, "tox_conference_send_message:result=" + res + " m=" + m);
 
                         if (res > -1)

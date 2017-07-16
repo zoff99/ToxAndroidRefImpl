@@ -178,9 +178,10 @@ public class FriendListFragment extends Fragment
                 {
                     try
                     {
+                        // who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
+                        // and().
                         final ConferenceDB conf2 = orma.selectFromConferenceDB().
-                                who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
-                                and().conference_identifierEq(cc.conference_identifier).toList().get(0);
+                                conference_identifierEq(cc.conference_identifier).toList().get(0);
 
                         if (conf2 != null)
                         {

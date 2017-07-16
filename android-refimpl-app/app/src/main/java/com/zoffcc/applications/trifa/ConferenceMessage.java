@@ -91,6 +91,6 @@ public class ConferenceMessage
     @Override
     public String toString()
     {
-        return "id=" + id + ", tox_peername" + tox_peername + ", tox_peerpubkey=" + tox_peerpubkey + ", direction=" + direction + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", is_new=" + is_new;
+        return "id=" + id + ", tox_peername=" + tox_peername + ", tox_peerpubkey=" + tox_peerpubkey + ", direction=" + direction + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", is_new=" + is_new;
     }
 }

@@ -5641,7 +5641,7 @@ public class MainActivity extends AppCompatActivity
             float px = dp * ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
             return px;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             // if there is an error, just return the input value!!
             e.printStackTrace();
@@ -6028,7 +6028,7 @@ public class MainActivity extends AppCompatActivity
         //        }
     }
 
-    static String conference_identifiere_short(String conference_identifier, boolean uppercase_result)
+    static String conference_identifier_short(String conference_identifier, boolean uppercase_result)
     {
         try
         {
