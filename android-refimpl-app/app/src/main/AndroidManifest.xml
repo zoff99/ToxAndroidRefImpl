@@ -39,11 +39,6 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY"/>
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.READ_PROFILE"/>
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
-
     <application
         android:name=".MainApplication"
         android:allowBackup="false"
@@ -52,10 +47,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label,android:icon">
-
-        <!-- <meta-data -->
-        <!-- android:name="com.zoffcc.applications.trifa.MyGlideModule" -->
-        <!-- android:value="GlideModule"/> -->
 
         <activity
             android:name=".StartMainActivityWrapper"
