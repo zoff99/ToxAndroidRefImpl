@@ -24,6 +24,12 @@
         android:summary="@string/pref_description_orbot_enabled"
         android:title="@string/pref_title_orbot_enabled"/>
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="higher_video_quality"
+        android:summary="@string/pref_description_higher_video_quality"
+        android:title="@string/pref_title_higher_video_quality"/>
+
     <ListPreference
         android:defaultValue="48000"
         android:entries="@array/pref_min_audio_samplingrate_out_titles"

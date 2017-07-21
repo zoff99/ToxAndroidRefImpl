@@ -27,6 +27,9 @@
     <string name="pref_title_software_echo_cancel">Echo Cancellation</string>
     <string name="pref_description_software_echo_cancel">Use Software Echo Cancellation</string>
 
+    <string name="pref_title_higher_video_quality">Video Quality</string>
+    <string name="pref_description_higher_video_quality">Use better Video quality.\nChange needs RESTART!</string>
+
     <string name="pref_title_udp_enabled">enable UDP</string>
     <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
 
