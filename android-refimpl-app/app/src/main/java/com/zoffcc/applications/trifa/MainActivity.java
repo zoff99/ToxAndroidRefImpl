@@ -2496,7 +2496,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
     {
-        Log.i(TAG, "friend_read_receipt:friend:" + friend_number + " message_id:" + message_id);
+        // Log.i(TAG, "friend_read_receipt:friend:" + friend_number + " message_id:" + message_id);
 
         try
         {
@@ -2510,7 +2510,7 @@ public class MainActivity extends AppCompatActivity
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
 
             // Log.i(TAG, "friend_read_receipt:m=" + m);
-            Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendpubkey=" + m.tox_friendpubkey + " read=" + m.read + " direction=" + m.direction);
+            // Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendpubkey=" + m.tox_friendpubkey + " read=" + m.read + " direction=" + m.direction);
 
             if (m != null)
             {
@@ -3741,16 +3741,18 @@ public class MainActivity extends AppCompatActivity
                     m.text = "" + peer_name_temp + " changed name or joined.";
                     Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " changed name or joined.");
                     // HINT: this happend also after each peer joins
+                    return;
                 }
                 else if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT.value)
                 {
                     m.text = "" + peer_name_temp + " left.";
                     Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " left.");
+                    return;
                 }
                 else
                 {
                     // unknown status
-                    return;
+                    // return;
                 }
 
                 if (conference_message_list_activity != null)
