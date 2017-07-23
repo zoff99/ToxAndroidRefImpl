@@ -292,7 +292,15 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         {
             Log.i(TAG, "onBindViewHolder:EE1:" + e.getMessage());
             e.printStackTrace();
-            ((MessageListHolder_error) holder).bindMessageList(null);
+            try
+            {
+                ((MessageListHolder_error) holder).bindMessageList(null);
+            }
+            catch (Exception e22)
+            {
+                e22.printStackTrace();
+                Log.i(TAG, "onBindViewHolder:EE22:" + e.getMessage());
+            }
         }
     }
 
