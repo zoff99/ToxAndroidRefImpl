@@ -68,6 +68,7 @@ import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -115,6 +116,8 @@ public class MessageListActivity extends AppCompatActivity
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
+
+        selected_messages.clear();
 
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);

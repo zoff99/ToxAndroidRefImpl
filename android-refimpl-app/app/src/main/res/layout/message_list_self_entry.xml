@@ -56,7 +56,8 @@
         android:paddingTop="2dp"
         android:text="2017-05-14"
         android:textColor="@color/md_white_1000"
-        android:textSize="@dimen/text_small"/>
+        android:textSize="@dimen/text_small"
+        android:visibility="gone"/>
 
 
 </RelativeLayout>

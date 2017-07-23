@@ -24,6 +24,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -254,6 +256,9 @@ public class MainActivity extends AppCompatActivity
     static TextView waiting_view = null;
     static ProgressBar waiting_image = null;
     static ViewGroup normal_container = null;
+    private ClipboardManager clipboard;
+    private ClipData clip;
+    static List<Long> selected_messages= new ArrayList<Long>();
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -370,6 +375,10 @@ public class MainActivity extends AppCompatActivity
         {
             GLOBAL_VIDEO_BITRATE = LOWER_GLOBAL_VIDEO_BITRATE;
         }
+
+        // ------- access the clipboard -------
+        clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        // ------- access the clipboard -------
 
         PREF__orbot_enabled = false;
         boolean PREF__orbot_enabled__temp = settings.getBoolean("orbot_enabled", false);

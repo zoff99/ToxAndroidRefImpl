@@ -6,6 +6,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="patternViewStyle">@style/PatternView</item>
+        <!--<item name="android:actionModeBackground">@color/md_orange_400</item>-->
     </style>
 
     <style name="FullscreenTheme" parent="AppTheme">
