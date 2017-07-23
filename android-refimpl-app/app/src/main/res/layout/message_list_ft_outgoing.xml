@@ -3,7 +3,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="6dip">
+                android:padding="@dimen/message_entry_padding">
 
 
     <LinearLayout

@@ -540,7 +540,15 @@ public class MessagelistArrayAdapter extends ArrayAdapter<Message>
                     }
                     else
                     {
-                        rowView = inflater.inflate(R.layout.message_list_entry, parent, false);
+                        // ------ it should never get here ------
+                        // ------ it should never get here ------
+                        // ------ it should never get here ------
+                        // ------ incoming messages do not have a "read" status ! ------
+                        rowView = inflater.inflate(R.layout.message_list_entry__unused__, parent, false);
+                        // ------ incoming messages do not have a "read" status ! ------
+                        // ------ it should never get here ------
+                        // ------ it should never get here ------
+                        // ------ it should never get here ------
                     }
                 }
                 else

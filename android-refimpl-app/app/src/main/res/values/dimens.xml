@@ -20,4 +20,8 @@
     <dimen name="text_larger">26sp</dimen>
     <dimen name="text_largest">30sp</dimen>
     <!-- copied from Antox -->
+
+    <dimen name="message_entry_padding">0dp</dimen>
+    <dimen name="message_entry_datetime_bottom_padding">10dp</dimen>
+
 </resources>

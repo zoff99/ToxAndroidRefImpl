@@ -1,20 +1,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:padding="6dip">
+                android:padding="@dimen/message_entry_padding">
 
     <LinearLayout
+        android:id="@+id/layout_message_container"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/message_text_date"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="0dp">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:background="@drawable/rounded_blue_dark_bg"
-            android:minHeight="45dp">
+            android:minHeight="50dp">
 
             <com.luseen.autolinklibrary.EmojiTextViewLinks
                 android:id="@+id/m_text"
@@ -35,6 +37,37 @@
                 android:padding="2dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/circle_red"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:orientation="horizontal"
+            android:padding="0dp">
+
+            <TextView
+                android:id="@+id/date_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginBottom="@dimen/message_entry_datetime_bottom_padding"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="-2dp"
+                android:gravity="top"
+                android:padding="0dp"
+                android:text="2017-06-20 14:00:12"
+                android:textAlignment="gravity"
+                android:textColor="#EFEFEF"
+                android:textSize="13sp"/>
+
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="10"
+                android:visibility="invisible"/>
+
         </LinearLayout>
 
     </LinearLayout>

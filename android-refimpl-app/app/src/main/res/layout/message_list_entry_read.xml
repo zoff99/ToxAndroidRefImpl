@@ -2,7 +2,7 @@
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:padding="6dip">
+                android:padding="@dimen/message_entry_padding">
 
     <LinearLayout
         android:id="@+id/layout_message_container"
@@ -68,7 +68,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_weight="6"
                 android:background="@drawable/rounded_orange_bg"
-                android:minHeight="45dp"
+                android:minHeight="50dp"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -103,23 +103,25 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="16dp"
+            android:layout_height="wrap_content"
             android:layout_margin="0dp"
             android:orientation="horizontal"
             android:padding="0dp">
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="2dp"
+                android:layout_height="1dp"
                 android:layout_weight="10"
                 android:visibility="invisible"/>
 
             <TextView
                 android:id="@+id/date_time"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="top"
+                android:layout_marginBottom="@dimen/message_entry_datetime_bottom_padding"
                 android:layout_marginRight="20dp"
+                android:layout_marginTop="-2dp"
                 android:gravity="top"
                 android:padding="0dp"
                 android:text="2017-06-20 14:00:12"
@@ -140,16 +142,16 @@
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
         android:background="@drawable/rounded_date_bg"
+        android:paddingBottom="2dp"
         android:paddingEnd="@dimen/padding_small"
         android:paddingLeft="@dimen/padding_small"
         android:paddingRight="@dimen/padding_small"
         android:paddingStart="@dimen/padding_small"
         android:paddingTop="2dp"
-        android:paddingBottom="2dp"
         android:text="2017-05-14"
         android:textColor="@color/md_white_1000"
-        android:visibility="gone"
-        android:textSize="@dimen/text_small"/>
+        android:textSize="@dimen/text_small"
+        android:visibility="gone"/>
 
 </RelativeLayout>
 

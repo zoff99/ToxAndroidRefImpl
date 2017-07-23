@@ -2,14 +2,14 @@
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:padding="6dip">
+                android:padding="@dimen/message_entry_padding">
 
 
     <LinearLayout
         android:id="@+id/layout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="0dp"
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
