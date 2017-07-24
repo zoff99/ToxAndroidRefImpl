@@ -23,11 +23,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -35,7 +38,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.only_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -50,6 +52,7 @@ public class MessageListFragment extends Fragment
     static boolean is_at_bottom = true;
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
+    MessageListActivity mla = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -58,7 +61,7 @@ public class MessageListFragment extends Fragment
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
 
 
-        MessageListActivity mla = (MessageListActivity) (getActivity());
+        mla = (MessageListActivity) (getActivity());
         if (mla != null)
         {
             current_friendnum = mla.get_current_friendnum();

@@ -34,6 +34,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Px;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -109,6 +110,7 @@ public class MessageListActivity extends AppCompatActivity
     Thread typing_flag_thread = null;
     final static int TYPING_FLAG_DEACTIVATE_DELAY_IN_MILLIS = 1000; // 1 second
     static boolean attachemnt_instead_of_send = true;
+    static ActionMode amode = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -117,6 +119,7 @@ public class MessageListActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
 
+        amode = null;
         selected_messages.clear();
 
         Intent intent = getIntent();

@@ -33,7 +33,7 @@ import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 
-public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
+public class MessageListHolder_text_incoming_read___unused___ extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
 
     /*
@@ -59,7 +59,7 @@ public class MessageListHolder_text_incoming_read extends RecyclerView.ViewHolde
     EmojiTextViewLinks textView;
     ImageView imageView;
 
-    public MessageListHolder_text_incoming_read(View itemView, Context c)
+    public MessageListHolder_text_incoming_read___unused___(View itemView, Context c)
     {
         super(itemView);
 

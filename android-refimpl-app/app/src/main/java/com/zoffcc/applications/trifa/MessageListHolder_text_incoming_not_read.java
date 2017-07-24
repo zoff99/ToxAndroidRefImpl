@@ -45,6 +45,7 @@ import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MessageListActivity.amode;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -349,6 +350,18 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                 v.setBackgroundColor(Color.TRANSPARENT);
                 is_selected = false;
                 selected_messages.remove(message_.id);
+                if (selected_messages.isEmpty())
+                {
+                    // last item was de-selected
+                    amode.finish();
+                }
+                else
+                {
+                    if (amode != null)
+                    {
+                        amode.setTitle("" + selected_messages.size() + " selected");
+                    }
+                }
             }
             else
             {
@@ -357,6 +370,10 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                     v.setBackgroundColor(Color.GRAY);
                     is_selected = true;
                     selected_messages.add(message_.id);
+                    if (amode != null)
+                    {
+                        amode.setTitle("" + selected_messages.size() + " selected");
+                    }
                 }
             }
         }
@@ -374,15 +391,26 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
             {
                 if (selected_messages.isEmpty())
                 {
-                    v.setBackgroundColor(Color.GRAY);
-                    is_selected = true;
-                    selected_messages.add(message_.id);
-                    return true;
+                    try
+                    {
+                        amode = MainActivity.message_list_activity.startSupportActionMode(new ToolbarActionMode(context));
+                        v.setBackgroundColor(Color.GRAY);
+                        is_selected = true;
+                        selected_messages.add(message_.id);
+                        if (amode != null)
+                        {
+                            amode.setTitle("" + selected_messages.size() + " selected");
+                        }
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
 
             return false;
         }
     };
-
 }
