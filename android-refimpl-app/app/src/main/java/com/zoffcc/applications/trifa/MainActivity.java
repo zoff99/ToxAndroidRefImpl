@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity
     static TrifaToxService tox_service_fg = null;
     static long update_all_messages_global_timestamp = -1;
     final static SimpleDateFormat df_date_time_long = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final static SimpleDateFormat df_date_only = new SimpleDateFormat("yyyy-MM-dd");
     //
     static boolean PREF__UV_reversed = true; // TODO: on older phones this needs to be "false"
     static boolean PREF__notification_sound = true;
@@ -258,7 +259,7 @@ public class MainActivity extends AppCompatActivity
     static ViewGroup normal_container = null;
     private ClipboardManager clipboard;
     private ClipData clip;
-    static List<Long> selected_messages= new ArrayList<Long>();
+    static List<Long> selected_messages = new ArrayList<Long>();
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -5976,6 +5977,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static String only_date_time_format(long timestamp_in_millis)
+    {
+        try
+        {
+            return df_date_only.format(new Date(timestamp_in_millis));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "*Datetime ERROR*";
+        }
+    }
+
     static void waiting_for_orbot_info(final boolean enable)
     {
         if (enable)
@@ -6298,6 +6312,32 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "hash_to_bucket:EE:" + e.getMessage());
             return 0;
         }
+    }
+
+    public static boolean isColorLight(int color)
+    {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        // System.out.println("HSV="+hsv[0]+" "+hsv[1]+" "+hsv[2]);
+
+        if (hsv[2] < 0.5)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public static int lightenColor(int inColor, float inAmount)
+    {
+        return Color.argb(Color.alpha(inColor), (int) Math.min(255, Color.red(inColor) + 255 * inAmount), (int) Math.min(255, Color.green(inColor) + 255 * inAmount), (int) Math.min(255, Color.blue(inColor) + 255 * inAmount));
+    }
+
+    public static int darkenColor(int inColor, float inAmount)
+    {
+        return Color.argb(Color.alpha(inColor), (int) Math.max(0, Color.red(inColor) - 255 * inAmount), (int) Math.max(0, Color.green(inColor) - 255 * inAmount), (int) Math.max(0, Color.blue(inColor) - 255 * inAmount));
     }
 
     // --------- make app crash ---------

@@ -35,6 +35,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.only_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -106,6 +107,7 @@ public class MessageListFragment extends Fragment
         // Log.i(TAG, "onCreateView:listingsView=" + listingsView);
 
         scrollDateHeader = (TextView) view.findViewById(R.id.scroll_date_header);
+        scrollDateHeader.setText("");
         scrollDateHeader.setVisibility(View.INVISIBLE);
         conversationDateHeader = new ConversationDateHeader(view.getContext(), scrollDateHeader);
 
@@ -138,6 +140,9 @@ public class MessageListFragment extends Fragment
                 int visibleItemCount = linearLayoutManager.getChildCount();
                 int totalItemCount = linearLayoutManager.getItemCount();
                 int pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
+
+                scrollDateHeader.setText(adapter.getDateHeaderText(pastVisibleItems));
+
                 if (pastVisibleItems + visibleItemCount >= totalItemCount)
                 {
                     // Bottom of the list

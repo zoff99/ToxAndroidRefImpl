@@ -21,6 +21,14 @@
     <dimen name="text_largest">30sp</dimen>
     <!-- copied from Antox -->
 
+    <!-- overwrite bubble text size from fast scroller -->
+    <!-- https://github.com/L4Digital/FastScroll/blob/master/fastscroll/src/main/res/layout/fastscroller.xml -->
+    <dimen name="fastscroll_bubble_textsize">@dimen/text_large</dimen>
+    <dimen name="fastscroll_bubble_size">70dp</dimen>
+    <dimen name="fastscroll_bubble_radius">50dp</dimen>
+    <!-- overwrite bubble text size from fast scroller -->
+
+
     <dimen name="message_entry_padding">0dp</dimen>
     <dimen name="message_entry_datetime_bottom_padding">10dp</dimen>
 

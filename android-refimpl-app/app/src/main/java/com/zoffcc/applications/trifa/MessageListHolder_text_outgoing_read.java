@@ -22,14 +22,16 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -42,13 +44,15 @@ import com.mikepenz.iconics.IconicsDrawable;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 
 public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
     private static final String TAG = "trifa.MessageListHolder";
 
-    private Message message;
+    private Message message_;
     private Context context;
 
     EmojiTextViewLinks textView;
@@ -56,6 +60,9 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
     ImageView img_corner;
     LinearLayout text_block_group;
+    TextView date_time;
+    ViewGroup layout_message_container;
+    boolean is_selected = false;
 
     public MessageListHolder_text_outgoing_read(View itemView, Context c)
     {
@@ -70,13 +77,48 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         img_corner = (ImageView) itemView.findViewById(R.id.img_corner);
         text_block_group = (LinearLayout) itemView.findViewById(R.id.text_block_group);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
+        layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
     }
 
     public void bindMessageList(Message m)
     {
+        message_ = m;
+
+        is_selected = false;
+        if (selected_messages.isEmpty())
+        {
+            is_selected = false;
+        }
+        else
+        {
+            if (selected_messages.contains(m.id))
+            {
+                is_selected = true;
+            }
+            else
+            {
+                is_selected = false;
+            }
+        }
+
+        if (is_selected)
+        {
+            layout_message_container.setBackgroundColor(Color.GRAY);
+        }
+        else
+        {
+            layout_message_container.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+        itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
+
+        layout_message_container.setOnClickListener(onclick_listener);
+        layout_message_container.setOnLongClickListener(onlongclick_listener);
+
+        date_time.setText(long_date_time_format(m.sent_timestamp));
+
         textView.setCustomRegex(TOXURL_PATTERN);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
         textView.setAutoLinkText(m.text);
@@ -175,37 +217,13 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
     @Override
     public void onClick(View v)
     {
-        Log.i(TAG, "onClick");
-        try
-        {
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "onClick:EE:" + e.getMessage());
-        }
+        // Log.i(TAG, "onClick");
     }
 
     @Override
     public boolean onLongClick(final View v)
     {
-        Log.i(TAG, "onLongClick");
-
-        final Message m2 = this.message;
-
-        //        PopupMenu menu = new PopupMenu(v.getContext(), v);
-        //        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-        //        {
-        //            @Override
-        //            public boolean onMenuItemClick(MenuItem item)
-        //            {
-        //                int id = item.getItemId();
-        //                return true;
-        //            }
-        //        });
-        //        menu.inflate(R.menu.menu_friendlist_item);
-        //        menu.show();
-
+        // Log.i(TAG, "onLongClick");
         return true;
     }
 
@@ -313,4 +331,50 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         final AlertDialog alert = builder.create();
         alert.show();
     }
+
+    private View.OnClickListener onclick_listener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            if (is_selected)
+            {
+                v.setBackgroundColor(Color.TRANSPARENT);
+                is_selected = false;
+                selected_messages.remove(message_.id);
+            }
+            else
+            {
+                if (!selected_messages.isEmpty())
+                {
+                    v.setBackgroundColor(Color.GRAY);
+                    is_selected = true;
+                    selected_messages.add(message_.id);
+                }
+            }
+        }
+    };
+
+    private View.OnLongClickListener onlongclick_listener = new View.OnLongClickListener()
+    {
+        @Override
+        public boolean onLongClick(final View v)
+        {
+            if (is_selected)
+            {
+            }
+            else
+            {
+                if (selected_messages.isEmpty())
+                {
+                    v.setBackgroundColor(Color.GRAY);
+                    is_selected = true;
+                    selected_messages.add(message_.id);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    };
 }
