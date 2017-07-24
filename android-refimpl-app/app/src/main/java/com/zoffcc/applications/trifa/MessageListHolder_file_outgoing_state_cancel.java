@@ -36,6 +36,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Priority;
@@ -54,11 +55,14 @@ import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 
 public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
     private static final String TAG = "trifa.MessageListHolder";
 
+    private Message message_;
     private Context context;
 
     ImageButton button_ok;
@@ -70,6 +74,9 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    TextView date_time;
+    ViewGroup layout_message_container;
+    boolean is_selected = false;
 
     public MessageListHolder_file_outgoing_state_cancel(View itemView, Context c)
     {
@@ -88,9 +95,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
+        layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
     }
 
     public void bindMessageList(Message m)
@@ -103,6 +109,42 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
             // only afer a crash
             m = new Message();
         }
+
+        message_ = m;
+
+        is_selected = false;
+        if (selected_messages.isEmpty())
+        {
+            is_selected = false;
+        }
+        else
+        {
+            if (selected_messages.contains(m.id))
+            {
+                is_selected = true;
+            }
+            else
+            {
+                is_selected = false;
+            }
+        }
+
+        if (is_selected)
+        {
+            layout_message_container.setBackgroundColor(Color.GRAY);
+        }
+        else
+        {
+            layout_message_container.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+        itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
+
+        layout_message_container.setOnClickListener(onclick_listener);
+        layout_message_container.setOnLongClickListener(onlongclick_listener);
+
+        date_time.setText(long_date_time_format(m.sent_timestamp));
 
         final Message message = m;
 
@@ -296,37 +338,59 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
     @Override
     public void onClick(View v)
     {
-        Log.i(TAG, "onClick");
-        try
-        {
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "onClick:EE:" + e.getMessage());
-        }
+        // Log.i(TAG, "onClick");
     }
 
     @Override
     public boolean onLongClick(final View v)
     {
-        Log.i(TAG, "onLongClick");
-
-        // final Message m2 = this.message;
-
-        //        PopupMenu menu = new PopupMenu(v.getContext(), v);
-        //        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-        //        {
-        //            @Override
-        //            public boolean onMenuItemClick(MenuItem item)
-        //            {
-        //                int id = item.getItemId();
-        //                return true;
-        //            }
-        //        });
-        //        menu.inflate(R.menu.menu_friendlist_item);
-        //        menu.show();
-
+        // Log.i(TAG, "onLongClick");
         return true;
     }
+
+    private View.OnClickListener onclick_listener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            if (is_selected)
+            {
+                v.setBackgroundColor(Color.TRANSPARENT);
+                is_selected = false;
+                selected_messages.remove(message_.id);
+            }
+            else
+            {
+                if (!selected_messages.isEmpty())
+                {
+                    v.setBackgroundColor(Color.GRAY);
+                    is_selected = true;
+                    selected_messages.add(message_.id);
+                }
+            }
+        }
+    };
+
+    private View.OnLongClickListener onlongclick_listener = new View.OnLongClickListener()
+    {
+        @Override
+        public boolean onLongClick(final View v)
+        {
+            if (is_selected)
+            {
+            }
+            else
+            {
+                if (selected_messages.isEmpty())
+                {
+                    v.setBackgroundColor(Color.GRAY);
+                    is_selected = true;
+                    selected_messages.add(message_.id);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    };
 }

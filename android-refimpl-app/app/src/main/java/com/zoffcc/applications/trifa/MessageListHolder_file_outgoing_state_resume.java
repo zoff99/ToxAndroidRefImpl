@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -47,6 +48,7 @@ import java.net.URLConnection;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.update_single_message_from_messge_id;
@@ -68,6 +70,7 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    TextView date_time;
 
     public MessageListHolder_file_outgoing_state_resume(View itemView, Context c)
     {
@@ -86,9 +89,7 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
     }
 
     public void bindMessageList(Message m)
@@ -101,6 +102,8 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
             // only afer a crash
             m = new Message();
         }
+
+        date_time.setText(long_date_time_format(m.sent_timestamp));
 
         final Message message = m;
 

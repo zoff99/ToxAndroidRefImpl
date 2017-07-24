@@ -39,6 +39,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.get_filetransfer_filenum_from_id;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_accepted_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_message_accepted_from_id;
@@ -64,6 +65,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
     ImageButton ft_preview_image;
     TextView textView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    TextView date_time;
 
     public MessageListHolder_file_incoming_state_pause_not_yet_accepted(View itemView, Context c)
     {
@@ -81,9 +83,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
         textView = (TextView) itemView.findViewById(R.id.m_text);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
     }
 
     public void bindMessageList(Message m)
@@ -96,6 +96,8 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
             // only afer a crash
             m = new Message();
         }
+
+        date_time.setText(long_date_time_format(m.rcvd_timestamp));
 
         final Message message = m;
 

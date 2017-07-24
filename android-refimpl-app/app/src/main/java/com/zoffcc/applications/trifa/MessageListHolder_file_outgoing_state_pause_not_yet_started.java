@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -44,12 +45,12 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_start_sending_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.set_message_start_sending_from_id;
@@ -78,6 +79,7 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    TextView date_time;
 
     public MessageListHolder_file_outgoing_state_pause_not_yet_started(View itemView, Context c)
     {
@@ -96,9 +98,7 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
     }
 
     public void bindMessageList(Message m)
@@ -111,6 +111,8 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
             // only afer a crash
             m = new Message();
         }
+
+        date_time.setText(long_date_time_format(m.sent_timestamp));
 
         final Message message = m;
 
@@ -227,30 +229,30 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                         // ------ DEBUG ------
 
                         // -------- DEBUG --------
-//                        List<Filetransfer> ft_res = orma.selectFromFiletransfer().
-//                                tox_public_key_stringEq(message.tox_friendpubkey).
-//                                orderByIdDesc().
-//                                limit(30).toList();
-//                        int ii;
-//                        Log.i(TAG, "file_recv_control:SQL:9:===============================================");
-//                        for (ii = 0; ii < ft_res.size(); ii++)
-//                        {
-//                            Log.i(TAG, "file_recv_control:SQL:9:" + ft_res.get(ii));
-//                        }
-//                        Log.i(TAG, "file_recv_control:SQL:9:===============================================");
+                        //                        List<Filetransfer> ft_res = orma.selectFromFiletransfer().
+                        //                                tox_public_key_stringEq(message.tox_friendpubkey).
+                        //                                orderByIdDesc().
+                        //                                limit(30).toList();
+                        //                        int ii;
+                        //                        Log.i(TAG, "file_recv_control:SQL:9:===============================================");
+                        //                        for (ii = 0; ii < ft_res.size(); ii++)
+                        //                        {
+                        //                            Log.i(TAG, "file_recv_control:SQL:9:" + ft_res.get(ii));
+                        //                        }
+                        //                        Log.i(TAG, "file_recv_control:SQL:9:===============================================");
                         // -------- DEBUG --------
 
 
                         // -------- DEBUG --------
-//                        ft_res = orma.selectFromFiletransfer().
-//                                orderByIdDesc().
-//                                limit(30).toList();
-//                        Log.i(TAG, "file_recv_control:SQL:A:===============================================");
-//                        for (ii = 0; ii < ft_res.size(); ii++)
-//                        {
-//                            Log.i(TAG, "file_recv_control:SQL:A:" + ft_res.get(ii));
-//                        }
-//                        Log.i(TAG, "file_recv_control:SQL:A:===============================================");
+                        //                        ft_res = orma.selectFromFiletransfer().
+                        //                                orderByIdDesc().
+                        //                                limit(30).toList();
+                        //                        Log.i(TAG, "file_recv_control:SQL:A:===============================================");
+                        //                        for (ii = 0; ii < ft_res.size(); ii++)
+                        //                        {
+                        //                            Log.i(TAG, "file_recv_control:SQL:A:" + ft_res.get(ii));
+                        //                        }
+                        //                        Log.i(TAG, "file_recv_control:SQL:A:===============================================");
                         // -------- DEBUG --------
 
                         ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
