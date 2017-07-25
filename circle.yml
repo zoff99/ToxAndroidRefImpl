@@ -48,7 +48,7 @@ machine:
     # ---------------------------------------------------
 
     # c-toxcore v0.1.9
-    AND_CTOXCORE_VERSION: "e943446e0c6144948a9b9e6476ff7106744eeea9"
+    AND_CTOXCORE_VERSION: "f22aaebbb5079b2924d46c6a9a20821e28479253"
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
 
