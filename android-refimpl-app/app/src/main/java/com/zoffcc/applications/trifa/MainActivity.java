@@ -260,6 +260,8 @@ public class MainActivity extends AppCompatActivity
     private ClipboardManager clipboard;
     private ClipData clip;
     static List<Long> selected_messages = new ArrayList<Long>();
+    static List<Long> selected_messages_text_only = new ArrayList<Long>();
+    static List<Long> selected_messages_incoming_file = new ArrayList<Long>();
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;

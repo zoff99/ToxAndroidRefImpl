@@ -27,7 +27,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -45,8 +44,12 @@ import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -62,6 +65,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     TextView date_time;
     ViewGroup layout_message_container;
     boolean is_selected = false;
+    TextView message_text_date;
 
     public MessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -76,6 +80,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         date_time = (TextView) itemView.findViewById(R.id.date_time);
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
+        message_text_date = (TextView) itemView.findViewById(R.id.message_text_date);
     }
 
     public void bindMessageList(Message m)
@@ -203,35 +208,13 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     @Override
     public void onClick(View v)
     {
-        Log.i(TAG, "onClick");
-        try
-        {
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "onClick:EE:" + e.getMessage());
-        }
+        // Log.i(TAG, "onClick");
     }
 
     @Override
     public boolean onLongClick(final View v)
     {
-        Log.i(TAG, "onLongClick");
-
-        //        PopupMenu menu = new PopupMenu(v.getContext(), v);
-        //        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-        //        {
-        //            @Override
-        //            public boolean onMenuItemClick(MenuItem item)
-        //            {
-        //                int id = item.getItemId();
-        //                return true;
-        //            }
-        //        });
-        //        menu.inflate(R.menu.menu_friendlist_item);
-        //        menu.show();
-
+        // Log.i(TAG, "onLongClick");
         return true;
     }
 
@@ -350,6 +333,8 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                 v.setBackgroundColor(Color.TRANSPARENT);
                 is_selected = false;
                 selected_messages.remove(message_.id);
+                selected_messages_text_only.remove(message_.id);
+                selected_messages_incoming_file.remove(message_.id);
                 if (selected_messages.isEmpty())
                 {
                     // last item was de-selected
@@ -370,6 +355,20 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                     v.setBackgroundColor(Color.GRAY);
                     is_selected = true;
                     selected_messages.add(message_.id);
+                    if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_TYPE_TEXT.value)
+                    {
+                        selected_messages_text_only.add(message_.id);
+                    }
+                    else if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                    {
+                        if (message_.direction == 0)
+                        {
+                            if (message_.filedb_id != -1)
+                            {
+                                selected_messages_incoming_file.add(message_.id);
+                            }
+                        }
+                    }
                     if (amode != null)
                     {
                         amode.setTitle("" + selected_messages.size() + " selected");
@@ -397,6 +396,20 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                         v.setBackgroundColor(Color.GRAY);
                         is_selected = true;
                         selected_messages.add(message_.id);
+                        if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_TYPE_TEXT.value)
+                        {
+                            selected_messages_text_only.add(message_.id);
+                        }
+                        else if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                        {
+                            if (message_.direction == 0)
+                            {
+                                if (message_.filedb_id != -1)
+                                {
+                                    selected_messages_incoming_file.add(message_.id);
+                                }
+                            }
+                        }
                         if (amode != null)
                         {
                             amode.setTitle("" + selected_messages.size() + " selected");
