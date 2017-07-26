@@ -31,6 +31,8 @@ machine:
 # --- Android build ---
 
     # ---------------------------------------------------
+    # VP8 0.14  lag    b8ad9e88c18c683beb46a8f62a0e88ee647698ff
+    # VP8 0.13targetbr 7dcef8c5b97adb70445ea68d9c31f9c458317232
     # VP9 0.12         ed6ad27e2e997b249e6c7a896fbc140eb7779a37
     # VP8 0.11         bc5d40a621b62b3db25dcccbcdbcbcd72992c5df
     # VP8 0.10 threads 04a5ad10f14587a838728e32a2a9b3714fb8e8bf
@@ -56,7 +58,7 @@ machine:
     # ---------------------------------------------------
 
     # c-toxcore version
-    AND_CTOXCORE_VERSION: "bc5d40a621b62b3db25dcccbcdbcbcd72992c5df"
+    AND_CTOXCORE_VERSION: "7dcef8c5b97adb70445ea68d9c31f9c458317232"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
