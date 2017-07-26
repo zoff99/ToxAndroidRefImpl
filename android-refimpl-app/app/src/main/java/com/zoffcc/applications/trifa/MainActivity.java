@@ -121,11 +121,15 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
@@ -141,9 +145,15 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.UPDATE_MESSAGE_PROGRESS
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN;
@@ -232,6 +242,8 @@ public class MainActivity extends AppCompatActivity
     static long update_all_messages_global_timestamp = -1;
     final static SimpleDateFormat df_date_time_long = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     final static SimpleDateFormat df_date_only = new SimpleDateFormat("yyyy-MM-dd");
+    static long last_updated_fps = -1;
+    final static long update_fps_every_ms = 1500L; // update every 1.5 seconds
     //
     static boolean PREF__UV_reversed = true; // TODO: on older phones this needs to be "false"
     static boolean PREF__notification_sound = true;
@@ -243,6 +255,7 @@ public class MainActivity extends AppCompatActivity
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
     static int PREF__higher_video_quality = 1;
+    static int PREF__higher_audio_quality = 1;
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
@@ -379,7 +392,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             PREF__higher_video_quality = 1;
             // -------- convert old boolean value to String, otherwise -> crash --------
-            settings.edit().putString("higher_video_quality",""+PREF__higher_video_quality).commit();
+            settings.edit().putString("higher_video_quality", "" + PREF__higher_video_quality).commit();
             // -------- convert old boolean value to String, otherwise -> crash --------
         }
 
@@ -395,6 +408,30 @@ public class MainActivity extends AppCompatActivity
         {
             GLOBAL_VIDEO_BITRATE = LOWER_GLOBAL_VIDEO_BITRATE;
         }
+
+        try
+        {
+            PREF__higher_audio_quality = Integer.parseInt(settings.getString("higher_audio_quality", "1"));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__higher_audio_quality = 1;
+        }
+
+        if (PREF__higher_audio_quality == 2)
+        {
+            GLOBAL_AUDIO_BITRATE = HIGHER_GLOBAL_AUDIO_BITRATE;
+        }
+        else if (PREF__higher_audio_quality == 1)
+        {
+            GLOBAL_AUDIO_BITRATE = NORMAL_GLOBAL_AUDIO_BITRATE;
+        }
+        else
+        {
+            GLOBAL_AUDIO_BITRATE = LOWER_GLOBAL_AUDIO_BITRATE;
+        }
+
 
         // ------- access the clipboard -------
         clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -677,6 +714,12 @@ public class MainActivity extends AppCompatActivity
         Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
         Callstate.call_first_video_frame_received = -1;
         Callstate.call_first_audio_frame_received = -1;
+        VIDEO_FRAME_RATE_OUTGOING = 0;
+        last_video_frame_sent = -1;
+        VIDEO_FRAME_RATE_INCOMING = 0;
+        last_video_frame_received = -1;
+        count_video_frame_received = 0;
+        count_video_frame_sent = 0;
         Callstate.friend_pubkey = "-1";
         Callstate.audio_speaker = true;
         Callstate.other_audio_enabled = 1;
@@ -1947,6 +1990,12 @@ public class MainActivity extends AppCompatActivity
                         Callstate.other_video_enabled = 1;
                         Callstate.my_audio_enabled = 1;
                         Callstate.my_video_enabled = 1;
+                        VIDEO_FRAME_RATE_OUTGOING = 0;
+                        last_video_frame_sent = -1;
+                        count_video_frame_received = 0;
+                        count_video_frame_sent = 0;
+                        VIDEO_FRAME_RATE_INCOMING = 0;
+                        last_video_frame_received = -1;
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         try
@@ -1997,12 +2046,26 @@ public class MainActivity extends AppCompatActivity
         if (Callstate.call_first_video_frame_received == -1)
         {
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
+            last_video_frame_received = System.currentTimeMillis();
+            count_video_frame_received++;
 
             // allocate new video buffer on 1 frame
             allocate_video_buffer_1((int) frame_width_px, (int) frame_height_px, ystride, ustride, vstride);
 
             temp_string_a = "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a, 3);
+        }
+        else
+        {
+            if ((count_video_frame_received > 20) || ((last_video_frame_sent + 2000) < System.currentTimeMillis()))
+            {
+                VIDEO_FRAME_RATE_INCOMING = (int) ((((float) count_video_frame_received / ((float) ((System.currentTimeMillis() - last_video_frame_received) / 1000.0f))) / 1.0f) + 0.5);
+                // Log.i(TAG, "VIDEO_FRAME_RATE_INCOMING=" + VIDEO_FRAME_RATE_INCOMING + " fps");
+                update_fps();
+                last_video_frame_received = System.currentTimeMillis();
+                count_video_frame_received = -1;
+            }
+            count_video_frame_received++;
         }
 
         try
@@ -5806,6 +5869,51 @@ public class MainActivity extends AppCompatActivity
         catch (PackageManager.NameNotFoundException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    public static void update_fps()
+    {
+        if ((last_updated_fps + update_fps_every_ms) < System.currentTimeMillis())
+        {
+            last_updated_fps = System.currentTimeMillis();
+
+            // these were updated: VIDEO_FRAME_RATE_INCOMING, VIDEO_FRAME_RATE_OUTGOING
+            try
+            {
+                if (CallingActivity.ca != null)
+                {
+                    if (CallingActivity.ca.callactivity_handler != null)
+                    {
+                        final Runnable myRunnable = new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    CallingActivity.ca.right_top_text_3.setText("IN   " + VIDEO_FRAME_RATE_INCOMING + " fps");
+                                    CallingActivity.ca.right_top_text_4.setText("Out " + VIDEO_FRAME_RATE_OUTGOING + " fps");
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+                        };
+
+                        if (CallingActivity.ca.callactivity_handler != null)
+                        {
+                            CallingActivity.ca.callactivity_handler.post(myRunnable);
+                        }
+
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 

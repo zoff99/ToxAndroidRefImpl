@@ -83,6 +83,12 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
@@ -973,6 +979,12 @@ public class MessageListActivity extends AppCompatActivity
 
                                     Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
                                     Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
+                                    VIDEO_FRAME_RATE_OUTGOING = 0;
+                                    last_video_frame_sent = -1;
+                                    VIDEO_FRAME_RATE_INCOMING = 0;
+                                    last_video_frame_received = -1;
+                                    count_video_frame_received = 0;
+                                    count_video_frame_sent = 0;
 
                                     MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
                                     Log.i(TAG, "CALL_OUT:002");

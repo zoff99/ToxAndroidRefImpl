@@ -100,6 +100,26 @@
                         android:textSize="15sp"
                         android:textStyle="bold"/>
 
+                    <TextView
+                        android:id="@+id/right_top_text_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="IN   0 fps"
+                        android:textColor="@color/md_green_700"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/right_top_text_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="Out 0 fps"
+                        android:textColor="@color/md_red_700"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
                     <ImageView
                         android:id="@+id/audio_device_icon"
                         android:layout_width="30dp"

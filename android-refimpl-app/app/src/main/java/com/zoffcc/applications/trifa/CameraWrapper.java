@@ -35,7 +35,11 @@ import java.util.List;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hint;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 
 public class CameraWrapper
 {
@@ -503,6 +507,24 @@ public class CameraWrapper
                             {
                                 MainActivity.toxav_video_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), camera_preview_size2.width, camera_preview_size2.height);
                             }
+                        }
+
+                        if (last_video_frame_sent == -1)
+                        {
+                            last_video_frame_sent = System.currentTimeMillis();
+                            count_video_frame_sent++;
+                        }
+                        else
+                        {
+                            if ((count_video_frame_sent > 20) || ((last_video_frame_sent + 2000) < System.currentTimeMillis()))
+                            {
+                                VIDEO_FRAME_RATE_OUTGOING = (int) ((((float) count_video_frame_sent / ((float) ((System.currentTimeMillis() - last_video_frame_sent) / 1000.0f))) / 1.0f) + 0.5);
+                                // Log.i(TAG, "VIDEO_FRAME_RATE_OUTGOING=" + VIDEO_FRAME_RATE_OUTGOING + " fps");
+                                update_fps();
+                                last_video_frame_sent = System.currentTimeMillis();
+                                count_video_frame_sent = -1;
+                            }
+                            count_video_frame_sent++;
                         }
                     }
                     else

@@ -40,6 +40,18 @@
         <item>2</item>
     </string-array>
 
+    <string name="pref_title_higher_audio_quality">Audio Quality</string>
+    <string name="pref_description_higher_audio_quality">Use better Audio quality.\nChange needs RESTART!</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>low</item>
+        <item>normal</item>
+        <item>high</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 
     <string name="pref_title_udp_enabled">enable UDP</string>
     <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>

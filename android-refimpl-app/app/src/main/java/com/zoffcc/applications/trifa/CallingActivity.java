@@ -54,6 +54,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
+import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 
@@ -96,6 +97,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     PowerManager.WakeLock wl2 = null;
     TextView right_top_text_1 = null;
     TextView right_top_text_2 = null;
+    TextView right_top_text_3 = null;
+    TextView right_top_text_4 = null;
     TextView right_left_text_1 = null;
     static int activity_state = 0;
 
@@ -128,9 +131,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         right_top_text_1 = (TextView) findViewById(R.id.right_top_text_1);
         right_top_text_2 = (TextView) findViewById(R.id.right_top_text_2);
+        right_top_text_3 = (TextView) findViewById(R.id.right_top_text_3);
+        right_top_text_4 = (TextView) findViewById(R.id.right_top_text_4);
         right_left_text_1 = (TextView) findViewById(R.id.right_left_text_1);
 
         update_bitrates();
+        update_fps();
         update_call_time();
 
         top_text_line = (TextView) findViewById(R.id.top_text_line);

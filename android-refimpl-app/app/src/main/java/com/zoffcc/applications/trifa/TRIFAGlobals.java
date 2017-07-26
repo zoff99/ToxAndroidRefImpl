@@ -55,10 +55,21 @@ public class TRIFAGlobals
 
     final static int HIGHER_GLOBAL_VIDEO_BITRATE = 3500;
     final static int NORMAL_GLOBAL_VIDEO_BITRATE = 2500;
-    final static int LOWER_GLOBAL_VIDEO_BITRATE = 1700;
+    final static int LOWER_GLOBAL_VIDEO_BITRATE = 250;
 
-    static int GLOBAL_VIDEO_BITRATE = HIGHER_GLOBAL_VIDEO_BITRATE; // this works nice: 2500;
-    static int GLOBAL_AUDIO_BITRATE = 64; // allowed values: (xx>=6) && (xx<=510)
+    final static int HIGHER_GLOBAL_AUDIO_BITRATE = 64;
+    final static int NORMAL_GLOBAL_AUDIO_BITRATE = 32;
+    final static int LOWER_GLOBAL_AUDIO_BITRATE = 8;
+
+    static int GLOBAL_VIDEO_BITRATE = NORMAL_GLOBAL_VIDEO_BITRATE; // this works nice: 2500;
+    static int GLOBAL_AUDIO_BITRATE = NORMAL_GLOBAL_AUDIO_BITRATE; // allowed values: (xx>=6) && (xx<=510)
+
+    static int VIDEO_FRAME_RATE_OUTGOING = 0;
+    static long last_video_frame_sent = -1;
+    static int count_video_frame_sent = 0;
+    static int VIDEO_FRAME_RATE_INCOMING = 0;
+    static long last_video_frame_received = -1;
+    static int count_video_frame_received = 0;
 
     final static int GLOBAL_MIN_VIDEO_BITRATE = 64;
     final static int GLOBAL_MIN_AUDIO_BITRATE = 8; // allowed values: (xx>=6) && (xx<=510)
