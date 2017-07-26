@@ -69,6 +69,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -101,8 +102,11 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -271,7 +275,7 @@ public class MainActivity extends AppCompatActivity
     static TextView waiting_view = null;
     static ProgressBar waiting_image = null;
     static ViewGroup normal_container = null;
-    private ClipboardManager clipboard;
+    static ClipboardManager clipboard;
     private ClipData clip;
     static List<Long> selected_messages = new ArrayList<Long>();
     static List<Long> selected_messages_text_only = new ArrayList<Long>();
@@ -6465,6 +6469,121 @@ public class MainActivity extends AppCompatActivity
     public static int darkenColor(int inColor, float inAmount)
     {
         return Color.argb(Color.alpha(inColor), (int) Math.max(0, Color.red(inColor) - 255 * inAmount), (int) Math.max(0, Color.green(inColor) - 255 * inAmount), (int) Math.max(0, Color.blue(inColor) - 255 * inAmount));
+    }
+
+    static void delete_selected_messages(Context c)
+    {
+        try
+        {
+            if (!selected_messages_text_only.isEmpty())
+            {
+                // sort ascending (lowest ID on top)
+                Collections.sort(selected_messages_text_only, new Comparator<Long>()
+                {
+                    public int compare(Long o1, Long o2)
+                    {
+                        return o1.compareTo(o2);
+                    }
+                });
+
+                Iterator i = selected_messages_text_only.iterator();
+                while (i.hasNext())
+                {
+                    try
+                    {
+                        Message m_to_delete = orma.selectFromMessage().idEq((Long) i.next()).get(0);
+                        long message_id_to_delete = m_to_delete.id;
+                        try
+                        {
+                            MainActivity.message_list_fragment.adapter.remove_item(m_to_delete);
+                            orma.deleteFromMessage().idEq(message_id_to_delete).execute();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "delete_selected_messages:EE1:" + e.getMessage());
+                        }
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                        Log.i(TAG, "delete_selected_messages:EE2:" + e2.getMessage());
+                    }
+                }
+
+                Toast.makeText(c, "Messages deleted", Toast.LENGTH_SHORT).show();
+
+                selected_messages.clear();
+                selected_messages_incoming_file.clear();
+                selected_messages_text_only.clear();
+            }
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
+    }
+
+    static void copy_selected_messages(Context c)
+    {
+        try
+        {
+            if (!selected_messages_text_only.isEmpty())
+            {
+                // sort ascending (lowest ID on top)
+                Collections.sort(selected_messages_text_only, new Comparator<Long>()
+                {
+                    public int compare(Long o1, Long o2)
+                    {
+                        return o1.compareTo(o2);
+                    }
+                });
+
+                String copy_text = "";
+                boolean first = true;
+                Iterator i = selected_messages_text_only.iterator();
+                while (i.hasNext())
+                {
+                    try
+                    {
+                        if (first)
+                        {
+                            first = false;
+                            copy_text = "" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text;
+                        }
+                        else
+                        {
+                            copy_text = copy_text + "\n" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text));
+                Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
+
+                selected_messages.clear();
+                selected_messages_incoming_file.clear();
+                selected_messages_text_only.clear();
+
+                try
+                {
+                    // need to redraw all items again here, to remove the selections
+                    MainActivity.message_list_fragment.adapter.redraw_all_items();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
     }
 
     // --------- make app crash ---------

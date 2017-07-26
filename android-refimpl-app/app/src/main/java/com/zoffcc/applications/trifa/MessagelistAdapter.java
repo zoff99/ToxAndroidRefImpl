@@ -408,6 +408,35 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         return found_item;
     }
 
+    synchronized public void remove_item(final Message del_item)
+    {
+        boolean found_item = false;
+
+        try
+        {
+            Iterator it = this.messagelistitems.iterator();
+            while (it.hasNext())
+            {
+                Message m2 = (Message) it.next();
+
+                if (m2.id == del_item.id)
+                {
+                    found_item = true;
+                    int pos = this.messagelistitems.indexOf(m2);
+                    // Log.i(TAG, "update_item:003:" + pos);
+                    this.messagelistitems.remove(pos);
+                    this.notifyItemRemoved(pos);
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update_item:EE:" + e.getMessage());
+        }
+    }
+
     @Override
     public String getSectionText(int position)
     {

@@ -27,9 +27,12 @@ import android.support.v7.view.ActionMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
+import static com.zoffcc.applications.trifa.MainActivity.copy_selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.delete_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode;
 
 public class ToolbarActionMode implements ActionMode.Callback
@@ -78,18 +81,19 @@ public class ToolbarActionMode implements ActionMode.Callback
         switch (item.getItemId())
         {
             case R.id.action_delete:
-                Toast.makeText(context, "You selected Delete menu.", Toast.LENGTH_SHORT).show();//Show toast
+                // Toast.makeText(context, "You selected Delete menu.", Toast.LENGTH_SHORT).show(); // Show toast
+                delete_selected_messages(context);
                 mode.finish(); // Finish action mode
                 break;
 
             case R.id.action_copy:
-                Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show();//Show toast
+                // Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show(); // Show toast
+                copy_selected_messages(context);
                 mode.finish(); // Finish action mode
                 break;
         }
         return false;
     }
-
 
     @Override
     public void onDestroyActionMode(ActionMode mode)
@@ -104,6 +108,8 @@ public class ToolbarActionMode implements ActionMode.Callback
             if (!selected_messages.isEmpty())
             {
                 selected_messages.clear();
+                selected_messages_incoming_file.clear();
+                selected_messages_text_only.clear();
                 try
                 {
                     MainActivity.message_list_fragment.adapter.redraw_all_items();
@@ -118,13 +124,5 @@ public class ToolbarActionMode implements ActionMode.Callback
         {
             e.printStackTrace();
         }
-        //When action mode destroyed remove selected selections and set action mode to null
-        //First check current fragment action mode
-        //        recyclerView_adapter.removeSelection();  // remove selection
-        //        Fragment recyclerFragment = new MainActivity().getFragment(1);//Get recycler fragment
-        //        if (recyclerFragment != null)
-        //        {
-        //            ((RecyclerView_Fragment) recyclerFragment).setNullToActionMode();//Set action mode null
-        //        }
     }
 }
