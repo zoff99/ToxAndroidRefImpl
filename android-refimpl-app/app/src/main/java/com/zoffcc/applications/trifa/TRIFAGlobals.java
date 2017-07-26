@@ -54,10 +54,10 @@ public class TRIFAGlobals
     static boolean orbot_is_really_running = false;
 
     final static int HIGHER_GLOBAL_VIDEO_BITRATE = 3500;
-    final static int LOWER_GLOBAL_VIDEO_BITRATE = 1200;
+    final static int LOWER_GLOBAL_VIDEO_BITRATE = 2500;
 
     static int GLOBAL_VIDEO_BITRATE = HIGHER_GLOBAL_VIDEO_BITRATE; // this works nice: 2500;
-    static int GLOBAL_AUDIO_BITRATE = 32; // allowed values: (xx>=6) && (xx<=510)
+    static int GLOBAL_AUDIO_BITRATE = 64; // allowed values: (xx>=6) && (xx<=510)
 
     final static int GLOBAL_MIN_VIDEO_BITRATE = 64;
     final static int GLOBAL_MIN_AUDIO_BITRATE = 8; // allowed values: (xx>=6) && (xx<=510)
