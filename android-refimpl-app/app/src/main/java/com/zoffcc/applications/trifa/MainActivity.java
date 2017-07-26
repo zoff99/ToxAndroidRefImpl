@@ -126,6 +126,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRAT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
@@ -241,7 +242,7 @@ public class MainActivity extends AppCompatActivity
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
-    static boolean PREF__higher_video_quality = false;
+    static int PREF__higher_video_quality = 1;
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
@@ -369,10 +370,26 @@ public class MainActivity extends AppCompatActivity
             PREF__udp_enabled = 0;
         }
 
-        PREF__higher_video_quality = settings.getBoolean("higher_video_quality", false);
-        if (PREF__higher_video_quality)
+        try
+        {
+            PREF__higher_video_quality = Integer.parseInt(settings.getString("higher_video_quality", "1"));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__higher_video_quality = 1;
+            // -------- convert old boolean value to String, otherwise -> crash --------
+            settings.edit().putString("higher_video_quality",""+PREF__higher_video_quality).commit();
+            // -------- convert old boolean value to String, otherwise -> crash --------
+        }
+
+        if (PREF__higher_video_quality == 2)
         {
             GLOBAL_VIDEO_BITRATE = HIGHER_GLOBAL_VIDEO_BITRATE;
+        }
+        else if (PREF__higher_video_quality == 1)
+        {
+            GLOBAL_VIDEO_BITRATE = NORMAL_GLOBAL_VIDEO_BITRATE;
         }
         else
         {
