@@ -28,10 +28,15 @@ machine:
     AND_CXX_X86: "$_toolchain_/x86/bin/i686-linux-android-clang++"
     AND_READELF_X86: "$_toolchain_/x86/bin/i686-linux-android-readelf"
     AND_ARTEFACT_DIR_X86: "x86"
-
 # --- Android build ---
 
     # ---------------------------------------------------
+    # VP8 0.10 threads 04a5ad10f14587a838728e32a2a9b3714fb8e8bf
+    # VP8 0.9 thresh   0bc98333a2108f31dab0c6938c3a3bb00327f0c1
+    # VP8 0.8 VPX_CQ   478c902611ff1ce28fb64ce1c18b9c70a0d51be3
+    # VP8 0.7 maxdist  b9623f86a4a5b2da3e540fa117f57b05785622b6
+    # VP8 revert       44e77e4b7f369681ef17024db6f5bcded3a79129
+    #
     # VP8 0.6          08f0ea119c57c1596e899ae454b82534797873f8
     # VP8 0.5          f22aaebbb5079b2924d46c6a9a20821e28479253
     # VP8 0.4          e943446e0c6144948a9b9e6476ff7106744eeea9
@@ -48,8 +53,9 @@ machine:
     # c-toxcore v0.1.2 a096c71db867ac83fc3e01e0fbe98573d20f9286
     # ---------------------------------------------------
 
-    # c-toxcore v0.1.9
-    AND_CTOXCORE_VERSION: "f22aaebbb5079b2924d46c6a9a20821e28479253"
+    # c-toxcore version
+    AND_CTOXCORE_VERSION: "44e77e4b7f369681ef17024db6f5bcded3a79129"
+    # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
 
