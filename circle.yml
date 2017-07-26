@@ -54,7 +54,7 @@ machine:
     # ---------------------------------------------------
 
     # c-toxcore version
-    AND_CTOXCORE_VERSION: "44e77e4b7f369681ef17024db6f5bcded3a79129"
+    AND_CTOXCORE_VERSION: "b9623f86a4a5b2da3e540fa117f57b05785622b6"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
