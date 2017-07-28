@@ -174,7 +174,7 @@ compile:
 # --- generic build ---
 
 
-  - if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then exit 0 ; else echo "full build" ; fi > ~/_fullb1 ; chmod a+rx ~/_fullb1
+  - echo 'if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then exit 0 ; else echo "full build" ; fi' > ~/_fullb1 ; chmod a+rx ~/_fullb1
 
 
 # --- Android build ---
