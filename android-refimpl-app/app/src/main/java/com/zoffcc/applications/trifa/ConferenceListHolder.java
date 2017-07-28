@@ -34,6 +34,8 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.conference_identifier_short;
+import static com.zoffcc.applications.trifa.MainActivity.delete_conference;
+import static com.zoffcc.applications.trifa.MainActivity.delete_conference_all_messages;
 import static com.zoffcc.applications.trifa.MainActivity.get_conference_title_from_confid;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_conference_inactive;
@@ -264,6 +266,11 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                         {
                             tox_conference_delete(f2.tox_conference_number);
                         }
+
+                        Log.i(TAG, "onMenuItemClick:info:33");
+                        delete_conference_all_messages(f2.conference_identifier);
+                        delete_conference(f2.conference_identifier);
+                        Log.i(TAG, "onMenuItemClick:info:34");
 
                         set_conference_inactive(f2.conference_identifier);
 
