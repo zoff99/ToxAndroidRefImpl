@@ -301,16 +301,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                                     Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
 
-                                    // delete friend -------
-                                    Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + f2.tox_public_key_string);
-                                    delete_friend(f2.tox_public_key_string);
-                                    // delete friend -------
-
-                                    // delete friends messages -------
-                                    Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
-                                    delete_friend_all_messages(friend_num_temp);
-                                    // delete friend  messages -------
-
                                     // delete friends files -------
                                     Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
                                     delete_friend_all_files(friend_num_temp);
@@ -321,6 +311,15 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     delete_friend_all_filetransfers(friend_num_temp);
                                     // delete friend  FTs -------
 
+                                    // delete friends messages -------
+                                    Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
+                                    delete_friend_all_messages(friend_num_temp);
+                                    // delete friend  messages -------
+
+                                    // delete friend -------
+                                    Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + f2.tox_public_key_string);
+                                    delete_friend(f2.tox_public_key_string);
+                                    // delete friend -------
 
                                     // delete friend - tox ----
                                     Log.i(TAG, "onMenuItemClick:4");

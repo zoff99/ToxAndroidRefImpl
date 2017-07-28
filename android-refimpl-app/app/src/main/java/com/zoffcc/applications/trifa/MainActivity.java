@@ -5379,6 +5379,38 @@ public class MainActivity extends AppCompatActivity
 
     static void delete_friend_all_files(final long friendnum)
     {
+
+        try
+        {
+            Iterator<FileDB> i1 = orma.selectFromFileDB().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
+                    is_in_VFSEq(true).
+                    toList().iterator();
+            selected_messages.clear();
+            selected_messages_text_only.clear();
+            selected_messages_incoming_file.clear();
+            while (i1.hasNext())
+            {
+                try
+                {
+                    long file_id = i1.next().id;
+                    long msg_id = orma.selectFromMessage().filedb_idEq(file_id).directionEq(0).
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).get(0).id;
+                    selected_messages.add(msg_id);
+                    selected_messages_incoming_file.add(msg_id);
+                }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                }
+            }
+            delete_selected_messages(context_s, false, false, "deleting Messages ...");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         try
         {
             orma.deleteFromFileDB().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
@@ -6521,11 +6553,17 @@ public class MainActivity extends AppCompatActivity
     {
         ProgressDialog progressDialog2;
         private WeakReference<Context> weakContext;
+        boolean update_message_list = false;
+        boolean update_friend_list = false;
+        String dialog_text = "";
 
-        delete_selected_messages_asynchtask(Context c, ProgressDialog progressDialog2)
+        delete_selected_messages_asynchtask(Context c, ProgressDialog progressDialog2, boolean update_message_list, boolean update_friend_list, String dialog_text)
         {
             this.weakContext = new WeakReference<>(c);
             this.progressDialog2 = progressDialog2;
+            this.update_message_list = update_message_list;
+            this.update_friend_list = update_friend_list;
+            this.dialog_text = dialog_text;
         }
 
         @Override
@@ -6605,31 +6643,37 @@ public class MainActivity extends AppCompatActivity
                         long message_id_to_delete = m_to_delete.id;
                         try
                         {
-                            Runnable myRunnable = new Runnable()
+                            if (update_message_list)
                             {
-                                @Override
-                                public void run()
+                                Runnable myRunnable = new Runnable()
                                 {
-                                    try
+                                    @Override
+                                    public void run()
                                     {
-                                        MainActivity.message_list_fragment.adapter.remove_item(m_to_delete);
+                                        try
+                                        {
+                                            MainActivity.message_list_fragment.adapter.remove_item(m_to_delete);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }
                                     }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            };
+                                };
 
-                            if (main_handler_s != null)
-                            {
-                                main_handler_s.post(myRunnable);
+                                if (main_handler_s != null)
+                                {
+                                    main_handler_s.post(myRunnable);
+                                }
                             }
 
                             // let message delete animation finish (maybe use yet another asynctask here?) ------------
                             try
                             {
-                                Thread.sleep(50);
+                                if (update_message_list)
+                                {
+                                    Thread.sleep(50);
+                                }
                             }
                             catch (Exception sleep_ex)
                             {
@@ -6685,32 +6729,75 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPreExecute()
         {
+            super.onPreExecute();
+
+            if (this.progressDialog2 == null)
+            {
+                try
+                {
+                    Context c = weakContext.get();
+                    progressDialog2 = ProgressDialog.show(main_activity_s, "", dialog_text);
+                    progressDialog2.setCanceledOnTouchOutside(false);
+                    progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
+                    {
+                        @Override
+                        public void onCancel(DialogInterface dialog)
+                        {
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "onPreExecute:start:EE:" + e.getMessage());
+                }
+            }
         }
     }
 
-    static void delete_selected_messages(Context c)
+    static void delete_selected_messages(final Context c, final boolean update_message_list, final boolean update_friend_list, final String dialog_text)
     {
         ProgressDialog progressDialog2 = null;
         try
         {
             try
             {
-                progressDialog2 = ProgressDialog.show(c, "", "deleting Messages ...");
-                progressDialog2.setCanceledOnTouchOutside(false);
-                progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
-                {
-                    @Override
-                    public void onCancel(DialogInterface dialog)
-                    {
-                    }
-                });
+                //                main_activity_s.runOnUiThread(new Runnable()
+                //                {
+                //                    @Override
+                //                    public void run()
+                //                    {
+                //                        try
+                //                        {
+                //                            progressDialog2 = ProgressDialog.show(c, "", "deleting Messages ...");
+                //                            progressDialog2.setCanceledOnTouchOutside(false);
+                //                            progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
+                //                            {
+                //                                @Override
+                //                                public void onCancel(DialogInterface dialog)
+                //                                {
+                //                                }
+                //                            });
+                //                        }
+                //                        catch (Exception e)
+                //                        {
+                //                            e.printStackTrace();
+                //                            Log.i(TAG, "CALL:start:EE:" + e.getMessage());
+                //                        }
+                //                    }
+                //                });
+
+                //                if (main_handler_s != null)
+                //                {
+                //                    main_handler_s.post(myRunnable);
+                //                }
             }
             catch (Exception e3)
             {
                 e3.printStackTrace();
                 Log.i(TAG, "delete_selected_messages:EE1:" + e3.getMessage());
             }
-            new delete_selected_messages_asynchtask(c, progressDialog2).execute();
+            new delete_selected_messages_asynchtask(c, progressDialog2, update_message_list, update_friend_list, dialog_text).execute();
         }
         catch (Exception e)
         {

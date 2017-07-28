@@ -81,7 +81,7 @@ public class ToolbarActionMode implements ActionMode.Callback
         {
             case R.id.action_delete:
                 // Toast.makeText(context, "You selected Delete menu.", Toast.LENGTH_SHORT).show(); // Show toast
-                delete_selected_messages(context);
+                delete_selected_messages(context, true, false, "deleting Messages ...");
                 mode.finish(); // Finish action mode
                 break;
 
