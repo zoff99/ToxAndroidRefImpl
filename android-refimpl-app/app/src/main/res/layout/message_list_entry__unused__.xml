@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:padding="@dimen/message_entry_padding">
 
     <!-- NOT USED NOW -->
@@ -46,6 +47,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:emojiSize="@dimen/emoji_size_in_textview"
             android:textColorLink="@color/textblock_link_color_for_orange"
             android:text="..."
             android:textSize="20sp"/>

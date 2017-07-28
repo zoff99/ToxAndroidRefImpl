@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:padding="@dimen/message_entry_padding">
 
     <LinearLayout
@@ -36,6 +37,7 @@
                 android:ellipsize="marquee"
                 android:textColorLink="@color/textblock_link_color_for_red"
                 android:text="** ERROR **"
+                app:emojiSize="@dimen/emoji_size_in_textview"
                 android:textColor="@color/md_black_1000"
                 android:textSize="20sp"/>
 

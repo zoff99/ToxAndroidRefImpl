@@ -28,6 +28,9 @@
     <dimen name="fastscroll_bubble_radius">50dp</dimen>
     <!-- overwrite bubble text size from fast scroller -->
 
+    <!-- size of emoji in the TextViews -->
+    <dimen name="emoji_size_in_textview">40dp</dimen>
+    <!-- size of emoji in the TextViews -->
 
     <dimen name="message_entry_padding">0dp</dimen>
     <dimen name="message_entry_datetime_bottom_padding">10dp</dimen>

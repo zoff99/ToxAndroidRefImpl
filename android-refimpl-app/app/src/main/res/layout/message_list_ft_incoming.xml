@@ -77,7 +77,8 @@
                         android:layout_toRightOf="@id/m_icon"
                         android:text="..."
                         android:textColorLink="@color/textblock_link_color_for_orange"
-                        android:textSize="20sp"/>
+                        android:textSize="20sp"
+                        app:emojiSize="@dimen/emoji_size_in_textview"/>
 
                 </LinearLayout>
 
