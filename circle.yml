@@ -28,10 +28,26 @@ machine:
     AND_CXX_X86: "$_toolchain_/x86/bin/i686-linux-android-clang++"
     AND_READELF_X86: "$_toolchain_/x86/bin/i686-linux-android-readelf"
     AND_ARTEFACT_DIR_X86: "x86"
-
 # --- Android build ---
 
     # ---------------------------------------------------
+    # VP8 0.15 rsiliet 3bd08f62c4b3947bf7441e1d7f79fd48cc02521d
+    # VP8 0.14  lag    b8ad9e88c18c683beb46a8f62a0e88ee647698ff
+    # VP8 0.13targetbr 7dcef8c5b97adb70445ea68d9c31f9c458317232
+    # VP9 0.12         ed6ad27e2e997b249e6c7a896fbc140eb7779a37
+    # VP8 0.11         bc5d40a621b62b3db25dcccbcdbcbcd72992c5df
+    # VP8 0.10 threads 04a5ad10f14587a838728e32a2a9b3714fb8e8bf
+    # VP8 0.9 thresh   0bc98333a2108f31dab0c6938c3a3bb00327f0c1
+    # VP8 0.8 VPX_CQ   478c902611ff1ce28fb64ce1c18b9c70a0d51be3
+    # VP8 0.7 maxdist  b9623f86a4a5b2da3e540fa117f57b05785622b6
+    # VP8 revert       44e77e4b7f369681ef17024db6f5bcded3a79129
+    #
+    # VP8 0.6          08f0ea119c57c1596e899ae454b82534797873f8
+    # VP8 0.5          f22aaebbb5079b2924d46c6a9a20821e28479253
+    # VP8 0.4          e943446e0c6144948a9b9e6476ff7106744eeea9
+    # VP8 0.3          30f2a5917f71a2b1f7296a7e556ff1a5af84f8af
+    # VP9 0.2          c67afc441da958a9006a5938327cef929e1e9cb9
+    # VP9 0.1          b1753a6388b0571cbdd561eb6e533cf597074247
     # c-toxcore v0.1.9 a429ef4a28a5e5e0ad010efffb76d2abc3ada0af
     # c-toxcore v0.1.8 f6db9333e2d1262e7ba3846563c30f63c98ffa38
     # c-toxcore v0.1.7 48c86e942d487a8856cbd25797b320bfb1879ddc
@@ -42,15 +58,18 @@ machine:
     # c-toxcore v0.1.2 a096c71db867ac83fc3e01e0fbe98573d20f9286
     # ---------------------------------------------------
 
-    # c-toxcore v0.1.9
-    AND_CTOXCORE_VERSION: "a429ef4a28a5e5e0ad010efffb76d2abc3ada0af"
+    # c-toxcore version
+    AND_CTOXCORE_VERSION: "bc5d40a621b62b3db25dcccbcdbcbcd72992c5df"
+    # c-toxcore repo url
+    # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
+    AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
 
     _SDK_: /usr/local/android-sdk-linux/
     _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
     JAVA_OPTS: "-Xms512m -Xmx1024m"
     GRADLE_OPTS: '-Xmx512m -Dorg.gradle.jvmargs="-Xmx1700m -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=1700m"'
     CLASS_P: com.zoffcc.applications.trifa
-    START_INTENT_P: com.zoffcc.applications.trifa.MainActivity
+    START_INTENT_P: com.zoffcc.applications.trifa.StartMainActivityWrapper
 
     ZEMU_: "appemu23"
     EMU_: "appemu21"
@@ -218,7 +237,7 @@ compile:
 
   # --- get wanted c-toxcore version ---
   # ---- git does not clone into existing dir. why? --> so use workaround here ---
-  - cd ~/ ; git clone https://github.com/TokTok/c-toxcore ~/tmp111
+  - cd ~/ ; git clone "$AND_CTOXCORE_URL" ~/tmp111
   - cd ~/ ; ls -al c-toxcore/
   - cd ~/ ; mv -v ~/tmp111/.??* c-toxcore/
   - cd ~/ ; mv -v ~/tmp111/* c-toxcore/
@@ -252,9 +271,9 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
-  # --------- we use gradle witness, so we need to use the maven artefact ---------
-  # - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
-  # --------- we use gradle witness, so we need to use the maven artefact ---------
+  # --------- use current jni code on this branch ---------
+  - if [ "$CIRCLE_BRANCH""x" == "zoff99/dev003x" ]; then cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/ ; fi
+  # --------- use current jni code on this branch ---------
 # --- Android build ---
 
 
@@ -327,7 +346,7 @@ compile:
 
   # --- get wanted c-toxcore version ---
   # ---- git does not clone into existing dir. why? --> so use workaround here ---
-  - cd ~/ ; git clone https://github.com/TokTok/c-toxcore ~/tmp111
+  - cd ~/ ; git clone "$AND_CTOXCORE_URL" ~/tmp111
   - cd ~/ ; ls -al c-toxcore/
   - mkdir -p ~/tc_save
   - cd ~/ ; mv -v c-toxcore/toolchains ~/tc_save/
@@ -365,9 +384,9 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/"$TOOLCHAIN_ARCH"/
 
-  # --------- we use gradle witness, so we need to use the maven artefact ---------
-  # - cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/
-  # --------- we use gradle witness, so we need to use the maven artefact ---------
+  # --------- use current jni code on this branch ---------
+  - if [ "$CIRCLE_BRANCH""x" == "zoff99/dev003x" ]; then cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/x86/ ; fi
+  # --------- use current jni code on this branch ---------
 # --- Android x86 build ---
 
 
