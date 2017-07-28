@@ -6517,56 +6517,205 @@ public class MainActivity extends AppCompatActivity
         return Color.argb(Color.alpha(inColor), (int) Math.max(0, Color.red(inColor) - 255 * inAmount), (int) Math.max(0, Color.green(inColor) - 255 * inAmount), (int) Math.max(0, Color.blue(inColor) - 255 * inAmount));
     }
 
-    static void delete_selected_messages(Context c)
+    private static class delete_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
     {
-        try
-        {
-            if (!selected_messages_text_only.isEmpty())
-            {
-                // sort ascending (lowest ID on top)
-                Collections.sort(selected_messages_text_only, new Comparator<Long>()
-                {
-                    public int compare(Long o1, Long o2)
-                    {
-                        return o1.compareTo(o2);
-                    }
-                });
+        ProgressDialog progressDialog2;
+        private WeakReference<Context> weakContext;
 
-                Iterator i = selected_messages_text_only.iterator();
-                while (i.hasNext())
+        delete_selected_messages_asynchtask(Context c, ProgressDialog progressDialog2)
+        {
+            this.weakContext = new WeakReference<>(c);
+            this.progressDialog2 = progressDialog2;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids)
+        {
+            // sort ascending (lowest ID on top)
+            Collections.sort(selected_messages, new Comparator<Long>()
+            {
+                public int compare(Long o1, Long o2)
                 {
+                    return o1.compareTo(o2);
+                }
+            });
+
+            Iterator i = selected_messages.iterator();
+            while (i.hasNext())
+            {
+                try
+                {
+                    long mid = (Long) i.next();
+                    final Message m_to_delete = orma.selectFromMessage().idEq(mid).get(0);
+
+                    // ---------- delete fileDB if this message is an outgoing file ----------
+                    if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                    {
+                        if (m_to_delete.direction == 1)
+                        {
+                            try
+                            {
+                                // FileDB file_ = orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
+                                orma.deleteFromFileDB().idEq(m_to_delete.filedb_id).execute();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "delete_selected_messages_asynchtask:EE4:" + e.getMessage());
+                            }
+                        }
+                    }
+                    // ---------- delete fileDB if this message is an outgoing file ----------
+
+                    // ---------- delete fileDB and VFS file if this message is an incoming file ----------
+                    if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                    {
+                        if (m_to_delete.direction == 0)
+                        {
+                            try
+                            {
+                                FileDB file_ = orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
+                                try
+                                {
+                                    info.guardianproject.iocipher.File f_vfs = new info.guardianproject.iocipher.File(file_.path_name + "/" + file_.file_name);
+                                    if (f_vfs.exists())
+                                    {
+                                        f_vfs.delete();
+                                    }
+                                }
+                                catch (Exception e6)
+                                {
+                                    e6.printStackTrace();
+                                    Log.i(TAG, "delete_selected_messages_asynchtask:EE5:" + e6.getMessage());
+                                }
+                                orma.deleteFromFileDB().idEq(m_to_delete.filedb_id).execute();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "delete_selected_messages_asynchtask:EE4:" + e.getMessage());
+                            }
+                        }
+                    }
+                    // ---------- delete fileDB and VFS file if this message is an incoming file ----------
+
+                    // ---------- delete the message itself ----------
                     try
                     {
-                        Message m_to_delete = orma.selectFromMessage().idEq((Long) i.next()).get(0);
                         long message_id_to_delete = m_to_delete.id;
                         try
                         {
-                            MainActivity.message_list_fragment.adapter.remove_item(m_to_delete);
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        MainActivity.message_list_fragment.adapter.remove_item(m_to_delete);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+
+                            if (main_handler_s != null)
+                            {
+                                main_handler_s.post(myRunnable);
+                            }
+
+                            // let message delete animation finish (maybe use yet another asynctask here?) ------------
+                            try
+                            {
+                                Thread.sleep(50);
+                            }
+                            catch (Exception sleep_ex)
+                            {
+                                sleep_ex.printStackTrace();
+                            }
+                            // let message delete animation finish (maybe use yet another asynctask here?) ------------
+
                             orma.deleteFromMessage().idEq(message_id_to_delete).execute();
                         }
                         catch (Exception e)
                         {
                             e.printStackTrace();
-                            Log.i(TAG, "delete_selected_messages:EE1:" + e.getMessage());
+                            Log.i(TAG, "delete_selected_messages_asynchtask:EE1:" + e.getMessage());
                         }
                     }
                     catch (Exception e2)
                     {
                         e2.printStackTrace();
-                        Log.i(TAG, "delete_selected_messages:EE2:" + e2.getMessage());
+                        Log.i(TAG, "delete_selected_messages_asynchtask:EE2:" + e2.getMessage());
                     }
+                    // ---------- delete the message itself ----------
                 }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                    Log.i(TAG, "delete_selected_messages_asynchtask:EE3:" + e2.getMessage());
+                }
+            }
 
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            selected_messages.clear();
+            selected_messages_incoming_file.clear();
+            selected_messages_text_only.clear();
+
+            try
+            {
+                progressDialog2.dismiss();
+                Context c = weakContext.get();
                 Toast.makeText(c, "Messages deleted", Toast.LENGTH_SHORT).show();
-
-                selected_messages.clear();
-                selected_messages_incoming_file.clear();
-                selected_messages_text_only.clear();
+            }
+            catch (Exception e4)
+            {
+                e4.printStackTrace();
+                Log.i(TAG, "save_selected_messages_asynchtask:EE3:" + e4.getMessage());
             }
         }
-        catch (Exception e2)
+
+        @Override
+        protected void onPreExecute()
         {
-            e2.printStackTrace();
+        }
+    }
+
+    static void delete_selected_messages(Context c)
+    {
+        ProgressDialog progressDialog2 = null;
+        try
+        {
+            try
+            {
+                progressDialog2 = ProgressDialog.show(c, "", "deleting Messages ...");
+                progressDialog2.setCanceledOnTouchOutside(false);
+                progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
+                {
+                    @Override
+                    public void onCancel(DialogInterface dialog)
+                    {
+                    }
+                });
+            }
+            catch (Exception e3)
+            {
+                e3.printStackTrace();
+                Log.i(TAG, "delete_selected_messages:EE1:" + e3.getMessage());
+            }
+            new delete_selected_messages_asynchtask(c, progressDialog2).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "delete_selected_messages:EE2:" + e.getMessage());
         }
     }
 
@@ -6631,7 +6780,6 @@ public class MainActivity extends AppCompatActivity
             e2.printStackTrace();
         }
     }
-
 
     private static class save_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
     {
@@ -6703,7 +6851,6 @@ public class MainActivity extends AppCompatActivity
         {
         }
     }
-
 
     static void save_selected_messages(Context c)
     {
