@@ -60,6 +60,9 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode;
+import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
+import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
+import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 
@@ -353,58 +356,14 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         return true;
     }
 
+
+
     private View.OnClickListener onclick_listener = new View.OnClickListener()
     {
         @Override
         public void onClick(final View v)
         {
-            if (is_selected)
-            {
-                v.setBackgroundColor(Color.TRANSPARENT);
-                is_selected = false;
-                selected_messages.remove(message_.id);
-                selected_messages_text_only.remove(message_.id);
-                selected_messages_incoming_file.remove(message_.id);
-                if (selected_messages.isEmpty())
-                {
-                    // last item was de-selected
-                    amode.finish();
-                }
-                else
-                {
-                    if (amode != null)
-                    {
-                        amode.setTitle("" + selected_messages.size() + " selected");
-                    }
-                }
-            }
-            else
-            {
-                if (!selected_messages.isEmpty())
-                {
-                    v.setBackgroundColor(Color.GRAY);
-                    is_selected = true;
-                    selected_messages.add(message_.id);
-                    if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_TYPE_TEXT.value)
-                    {
-                        selected_messages_text_only.add(message_.id);
-                    }
-                    else if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
-                    {
-                        if (message_.direction == 0)
-                        {
-                            if (message_.filedb_id!=-1)
-                            {
-                                selected_messages_incoming_file.add(message_.id);
-                            }
-                        }
-                    }
-                    if (amode != null)
-                    {
-                        amode.setTitle("" + selected_messages.size() + " selected");
-                    }
-                }
-            }
+            is_selected = onClick_message_helper(v, is_selected, message_);
         }
     };
 
@@ -413,46 +372,10 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         @Override
         public boolean onLongClick(final View v)
         {
-            if (is_selected)
-            {
-            }
-            else
-            {
-                if (selected_messages.isEmpty())
-                {
-                    try
-                    {
-                        amode = MainActivity.message_list_activity.startSupportActionMode(new ToolbarActionMode(context));
-                        v.setBackgroundColor(Color.GRAY);
-                        is_selected = true;
-                        selected_messages.add(message_.id);
-                        if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_TYPE_TEXT.value)
-                        {
-                            selected_messages_text_only.add(message_.id);
-                        }
-                        else if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
-                        {
-                            if (message_.direction == 0)
-                            {
-                                if (message_.filedb_id!=-1)
-                                {
-                                    selected_messages_incoming_file.add(message_.id);
-                                }
-                            }
-                        }
-                        if (amode != null)
-                        {
-                            amode.setTitle("" + selected_messages.size() + " selected");
-                        }
-                        return true;
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            return false;
+            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected, message_);
+            is_selected = res.is_selected;
+            return res.ret_value;
         }
-    };}
+    };
+
+}

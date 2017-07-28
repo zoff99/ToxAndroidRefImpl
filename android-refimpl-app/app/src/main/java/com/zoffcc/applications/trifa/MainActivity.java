@@ -6586,6 +6586,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static void save_selected_messages(Context c)
+    {
+    }
+
     // --------- make app crash ---------
     // --------- make app crash ---------
     // --------- make app crash ---------

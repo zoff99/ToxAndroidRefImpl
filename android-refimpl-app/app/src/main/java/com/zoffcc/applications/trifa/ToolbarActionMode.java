@@ -30,10 +30,12 @@ import android.view.MenuItem;
 
 import static com.zoffcc.applications.trifa.MainActivity.copy_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.delete_selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.save_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode;
+import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
 
 public class ToolbarActionMode implements ActionMode.Callback
 {
@@ -91,6 +93,12 @@ public class ToolbarActionMode implements ActionMode.Callback
                 copy_selected_messages(context);
                 mode.finish(); // Finish action mode
                 break;
+
+            case R.id.action_save:
+                // Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show(); // Show toast
+                save_selected_messages(context);
+                mode.finish(); // Finish action mode
+                break;
         }
         return false;
     }
@@ -103,6 +111,7 @@ public class ToolbarActionMode implements ActionMode.Callback
             if (amode != null)
             {
                 amode = null;
+                amode_save_menu_item = null;
             }
 
             if (!selected_messages.isEmpty())
