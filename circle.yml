@@ -174,6 +174,7 @@ compile:
 # --- generic build ---
 
 
+  - if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then exit 0 ; else echo "full build" ; fi > ~/_fullb1 ; chmod a+rx ~/_fullb1
 
 
 # --- Android build ---
@@ -514,44 +515,44 @@ test:
   override:
     - ls -alR "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/
 
-    - emulator -avd "$EMU_" -sdcard sdcard.img -no-audio:
+    - . ~/_fullb1;emulator -avd "$EMU_" -sdcard sdcard.img -no-audio:
         background: true
         parallel: true
-    - circle-android wait-for-boot
+    - . ~/_fullb1;circle-android wait-for-boot
 
-    - sleep 210 # let the emulator settle down first
+    - . ~/_fullb1;sleep 210 # let the emulator settle down first
 
-    - adb shell input keyevent 82 # remove lock screen on emulator
-    - sleep 10
-    - import -window root $CIRCLE_ARTIFACTS/capture_emulator_running.png
+    - . ~/_fullb1;adb shell input keyevent 82 # remove lock screen on emulator
+    - . ~/_fullb1;sleep 10
+    - . ~/_fullb1;import -window root $CIRCLE_ARTIFACTS/capture_emulator_running.png
 
-    - adb shell "cat /proc/meminfo" ; exit 0
+    - . ~/_fullb1;adb shell "cat /proc/meminfo" ; exit 0
 
-    - adb shell ls -al / ; exit 0
-    - adb shell ls -al /storage/ ; exit 0
-    - adb shell ls -al /sdcard/ ; exit 0
+    - . ~/_fullb1;adb shell ls -al / ; exit 0
+    - . ~/_fullb1;adb shell ls -al /storage/ ; exit 0
+    - . ~/_fullb1;adb shell ls -al /sdcard/ ; exit 0
 
-    - adb install ~/app-signed-aligned.apk
+    - . ~/_fullb1;adb install ~/app-signed-aligned.apk
 
-    - adb logcat -v time > $CIRCLE_ARTIFACTS/adb_out.txt 2>&1 :
+    - . ~/_fullb1;adb logcat -v time > $CIRCLE_ARTIFACTS/adb_out.txt 2>&1 :
         background: true
-    - sleep 60 # let the emulator settle down first
+    - . ~/_fullb1;sleep 60 # let the emulator settle down first
 
-    - adb shell am start -n $CLASS_P/$START_INTENT_P
-    - sleep 60
-    - sleep 120 # wait to be sure the app has started fully
-    - sleep 120 # wait a bit more
+    - . ~/_fullb1;adb shell am start -n $CLASS_P/$START_INTENT_P
+    - . ~/_fullb1;sleep 60
+    - . ~/_fullb1;sleep 120 # wait to be sure the app has started fully
+    - . ~/_fullb1;sleep 120 # wait a bit more
 
-    - died_count=`cat $CIRCLE_ARTIFACTS/adb_out.txt|grep 'Process. '"$CLASS_P"', PID.'|wc -l|tr -d ' '` ; if [ $died_count -gt 0 ]; then echo "app crashed"; exit 1; fi
+    - . ~/_fullb1;died_count=`cat $CIRCLE_ARTIFACTS/adb_out.txt|grep 'Process. '"$CLASS_P"', PID.'|wc -l|tr -d ' '` ; if [ $died_count -gt 0 ]; then echo "app crashed"; exit 1; fi
 
-    - import -window root $CIRCLE_ARTIFACTS/capture_app_running.png # get proof that the app is running
-    - adb shell screencap -p | sed 's/\r$//' > $CIRCLE_ARTIFACTS/capture_app_running_2.png
+    - . ~/_fullb1;import -window root $CIRCLE_ARTIFACTS/capture_app_running.png # get proof that the app is running
+    - . ~/_fullb1;adb shell screencap -p | sed 's/\r$//' > $CIRCLE_ARTIFACTS/capture_app_running_2.png
 
 # ----- CI artifact cleanup -----
-    - mkdir -p $CIRCLE_ARTIFACTS/other/
-    - mv -v $CIRCLE_ARTIFACTS/adb_out.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
-    - mv -v $CIRCLE_ARTIFACTS/stderr*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
-    - mv -v $CIRCLE_ARTIFACTS/stdout*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
+    - . ~/_fullb1;mkdir -p $CIRCLE_ARTIFACTS/other/
+    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/adb_out.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
+    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/stderr*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
+    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/stdout*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
 # ----- CI artifact cleanup -----
 
 
