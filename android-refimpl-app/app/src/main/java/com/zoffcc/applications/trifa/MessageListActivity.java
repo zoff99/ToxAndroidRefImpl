@@ -1264,10 +1264,7 @@ public class MessageListActivity extends AppCompatActivity
                     {
                         if (message_.direction == 0)
                         {
-                            if (message_.filedb_id != -1)
-                            {
                                 selected_messages_incoming_file.add(message_.id);
-                            }
                         }
                     }
 
@@ -1328,10 +1325,7 @@ public class MessageListActivity extends AppCompatActivity
                         {
                             if (message_.direction == 0)
                             {
-                                if (message_.filedb_id != -1)
-                                {
                                     selected_messages_incoming_file.add(message_.id);
-                                }
                             }
                         }
 
