@@ -5404,7 +5404,7 @@ public class MainActivity extends AppCompatActivity
                     e2.printStackTrace();
                 }
             }
-            delete_selected_messages(context_s, false, false, "deleting Messages ...");
+            delete_selected_messages(main_activity_s, false, false, "deleting Messages ...");
         }
         catch (Exception e)
         {
@@ -6736,7 +6736,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     Context c = weakContext.get();
-                    progressDialog2 = ProgressDialog.show(main_activity_s, "", dialog_text);
+                    progressDialog2 = ProgressDialog.show(c, "", dialog_text);
                     progressDialog2.setCanceledOnTouchOutside(false);
                     progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
                     {
