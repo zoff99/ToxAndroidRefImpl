@@ -23,11 +23,13 @@ import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -47,6 +49,7 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -96,6 +99,7 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -6628,27 +6632,44 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void save_selected_messages(Context c)
+
+    private static class save_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
     {
-        try
+        ProgressDialog progressDialog2;
+        private WeakReference<Context> weakContext;
+
+        save_selected_messages_asynchtask(Context c, ProgressDialog progressDialog2)
+        {
+            this.weakContext = new WeakReference<>(c);
+            this.progressDialog2 = progressDialog2;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids)
         {
             Iterator i = selected_messages_incoming_file.iterator();
             while (i.hasNext())
             {
                 try
                 {
-                    Message m = orma.selectFromMessage().idEq((Long) i.next()).get(0);
+                    long mid = (Long) i.next();
+                    Message m = orma.selectFromMessage().idEq(mid).get(0);
                     FileDB file_ = orma.selectFromFileDB().idEq(m.filedb_id).get(0);
                     export_vfs_file_to_real_file(file_.path_name, file_.file_name, SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey + "/", file_.file_name);
                 }
                 catch (Exception e2)
                 {
                     e2.printStackTrace();
+                    Log.i(TAG, "save_selected_messages_asynchtask:EE1:" + e2.getMessage());
                 }
             }
 
-            Toast.makeText(c, "Messages exported", Toast.LENGTH_SHORT).show();
+            return null;
+        }
 
+        @Override
+        protected void onPostExecute(String result)
+        {
             selected_messages.clear();
             selected_messages_incoming_file.clear();
             selected_messages_text_only.clear();
@@ -6661,11 +6682,57 @@ public class MainActivity extends AppCompatActivity
             catch (Exception e)
             {
                 e.printStackTrace();
+                Log.i(TAG, "save_selected_messages_asynchtask:EE2:" + e.getMessage());
             }
+
+            try
+            {
+                progressDialog2.dismiss();
+                Context c = weakContext.get();
+                Toast.makeText(c, "Messages exported", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e4)
+            {
+                e4.printStackTrace();
+                Log.i(TAG, "save_selected_messages_asynchtask:EE3:" + e4.getMessage());
+            }
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+        }
+    }
+
+
+    static void save_selected_messages(Context c)
+    {
+        ProgressDialog progressDialog2 = null;
+        try
+        {
+            try
+            {
+                progressDialog2 = ProgressDialog.show(c, "", "exporting Messages ...");
+                progressDialog2.setCanceledOnTouchOutside(false);
+                progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
+                {
+                    @Override
+                    public void onCancel(DialogInterface dialog)
+                    {
+                    }
+                });
+            }
+            catch (Exception e3)
+            {
+                e3.printStackTrace();
+                Log.i(TAG, "save_selected_messages:EE1:" + e3.getMessage());
+            }
+            new save_selected_messages_asynchtask(c, progressDialog2).execute();
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "save_selected_messages:EE2:" + e.getMessage());
         }
     }
 

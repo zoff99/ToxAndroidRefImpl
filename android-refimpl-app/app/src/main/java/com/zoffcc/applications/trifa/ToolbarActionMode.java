@@ -31,9 +31,6 @@ import android.view.MenuItem;
 import static com.zoffcc.applications.trifa.MainActivity.copy_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.delete_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.save_selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
 
@@ -114,20 +111,20 @@ public class ToolbarActionMode implements ActionMode.Callback
                 amode_save_menu_item = null;
             }
 
-            if (!selected_messages.isEmpty())
-            {
-                selected_messages.clear();
-                selected_messages_incoming_file.clear();
-                selected_messages_text_only.clear();
-                try
-                {
-                    MainActivity.message_list_fragment.adapter.redraw_all_items();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
+            //            if (!selected_messages.isEmpty())
+            //            {
+            //                selected_messages.clear();
+            //                selected_messages_incoming_file.clear();
+            //                selected_messages_text_only.clear();
+            //                try
+            //                {
+            //                    MainActivity.message_list_fragment.adapter.redraw_all_items();
+            //                }
+            //                catch (Exception e)
+            //                {
+            //                    e.printStackTrace();
+            //                }
+            //            }
         }
         catch (Exception e)
         {
