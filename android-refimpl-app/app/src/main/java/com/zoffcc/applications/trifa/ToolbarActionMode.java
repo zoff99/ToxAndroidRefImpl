@@ -34,6 +34,9 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_selected_confere
 import static com.zoffcc.applications.trifa.MainActivity.delete_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.save_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
 
@@ -42,6 +45,7 @@ public class ToolbarActionMode implements ActionMode.Callback
     private static final String TAG = "trifa.ToolbarActionMode";
 
     private Context context;
+    private boolean action_active = false;
 
     public ToolbarActionMode(Context context)
     {
@@ -53,6 +57,7 @@ public class ToolbarActionMode implements ActionMode.Callback
     {
         Log.i(TAG, "onCreateActionMode");
         mode.getMenuInflater().inflate(R.menu.toolbar_message_activity, menu); // Inflate the menu over action mode
+        action_active = false;
         return true;
     }
 
@@ -74,6 +79,7 @@ public class ToolbarActionMode implements ActionMode.Callback
             menu.findItem(R.id.action_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
+        action_active = false;
         return true;
     }
 
@@ -83,6 +89,7 @@ public class ToolbarActionMode implements ActionMode.Callback
         switch (item.getItemId())
         {
             case R.id.action_delete:
+                action_active = true;
                 // Toast.makeText(context, "You selected Delete menu.", Toast.LENGTH_SHORT).show(); // Show toast
                 if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
                 {
@@ -99,6 +106,7 @@ public class ToolbarActionMode implements ActionMode.Callback
                 break;
 
             case R.id.action_copy:
+                action_active = true;
                 // Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show(); // Show toast
                 if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
                 {
@@ -114,6 +122,7 @@ public class ToolbarActionMode implements ActionMode.Callback
                 break;
 
             case R.id.action_save:
+                action_active = true;
                 // Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show(); // Show toast
                 save_selected_messages(context);
                 mode.finish(); // Finish action mode
@@ -127,6 +136,41 @@ public class ToolbarActionMode implements ActionMode.Callback
     {
         try
         {
+            if (action_active == false)
+            {
+                selected_conference_messages.clear();
+
+                selected_messages.clear();
+                selected_messages_incoming_file.clear();
+                selected_messages_text_only.clear();
+
+                try
+                {
+                    if (MainActivity.conference_message_list_fragment != null)
+                    {
+                        // need to redraw all items again here, to remove the selections
+                        MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    if (MainActivity.message_list_fragment != null)
+                    {
+                        // need to redraw all items again here, to remove the selections
+                        MainActivity.message_list_fragment.adapter.redraw_all_items();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
             if (amode != null)
             {
                 amode = null;
