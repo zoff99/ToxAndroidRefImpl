@@ -195,6 +195,11 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
         }
     }
 
+    synchronized public void redraw_all_items()
+    {
+        this.notifyDataSetChanged();
+    }
+
     public void add_item(ConferenceMessage new_item)
     {
         // Log.i(TAG, "add_item:" + new_item + ":" + this.messagelistitems.size());

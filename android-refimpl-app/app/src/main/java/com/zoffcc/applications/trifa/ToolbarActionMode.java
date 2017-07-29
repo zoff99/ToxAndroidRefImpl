@@ -28,9 +28,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import static com.zoffcc.applications.trifa.MainActivity.copy_selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.copy_selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.delete_selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.delete_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.save_selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
 
@@ -81,13 +84,32 @@ public class ToolbarActionMode implements ActionMode.Callback
         {
             case R.id.action_delete:
                 // Toast.makeText(context, "You selected Delete menu.", Toast.LENGTH_SHORT).show(); // Show toast
-                delete_selected_messages(context, true, false, "deleting Messages ...");
+                if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
+                {
+                    // normal chat view
+                    delete_selected_messages(context, true, false, "deleting Messages ...");
+                }
+                else
+                {
+                    // conference view
+                    delete_selected_conference_messages(context);
+                    // TODO: write me
+                }
                 mode.finish(); // Finish action mode
                 break;
 
             case R.id.action_copy:
                 // Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show(); // Show toast
-                copy_selected_messages(context);
+                if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
+                {
+                    // normal chat view
+                    copy_selected_messages(context);
+                }
+                else
+                {
+                    // conference view
+                    copy_selected_conference_messages(context);
+                }
                 mode.finish(); // Finish action mode
                 break;
 
@@ -110,21 +132,6 @@ public class ToolbarActionMode implements ActionMode.Callback
                 amode = null;
                 amode_save_menu_item = null;
             }
-
-            //            if (!selected_messages.isEmpty())
-            //            {
-            //                selected_messages.clear();
-            //                selected_messages_incoming_file.clear();
-            //                selected_messages_text_only.clear();
-            //                try
-            //                {
-            //                    MainActivity.message_list_fragment.adapter.redraw_all_items();
-            //                }
-            //                catch (Exception e)
-            //                {
-            //                    e.printStackTrace();
-            //                }
-            //            }
         }
         catch (Exception e)
         {

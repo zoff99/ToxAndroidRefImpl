@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -42,6 +43,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
@@ -50,6 +52,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 {
     private static final String TAG = "trifa.MessageListHolder";
 
+    private ConferenceMessage message_;
     private Context context;
 
     EmojiTextViewLinks textView;
@@ -59,6 +62,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     ViewGroup textView_container;
     ViewGroup layout_peer_name_container;
     TextView peer_name_text;
+    ViewGroup layout_message_container;
+    boolean is_selected = false;
 
     public ConferenceMessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -75,13 +80,42 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         date_time = (TextView) itemView.findViewById(R.id.date_time);
         layout_peer_name_container = (ViewGroup) itemView.findViewById(R.id.layout_peer_name_container);
         peer_name_text = (TextView) itemView.findViewById(R.id.peer_name_text);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
     }
 
     public void bindMessageList(ConferenceMessage m)
     {
+        message_ = m;
+
+        is_selected = false;
+        if (selected_messages.isEmpty())
+        {
+            is_selected = false;
+        }
+        else
+        {
+            if (selected_messages.contains(m.id))
+            {
+                is_selected = true;
+            }
+            else
+            {
+                is_selected = false;
+            }
+        }
+
+        if (is_selected)
+        {
+            layout_message_container.setBackgroundColor(Color.GRAY);
+        }
+        else
+        {
+            layout_message_container.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+        layout_message_container.setOnClickListener(onclick_listener);
+        layout_message_container.setOnLongClickListener(onlongclick_listener);
+
         // Log.i(TAG, "bindMessageList");
 
         // textView.setText("#" + m.id + ":" + m.text);
@@ -218,37 +252,13 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     @Override
     public void onClick(View v)
     {
-        Log.i(TAG, "onClick");
-        try
-        {
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "onClick:EE:" + e.getMessage());
-        }
+        // Log.i(TAG, "onClick");
     }
 
     @Override
     public boolean onLongClick(final View v)
     {
-        Log.i(TAG, "onLongClick");
-
-        // final ConferenceMessage m2 = this.message;
-
-        //        PopupMenu menu = new PopupMenu(v.getContext(), v);
-        //        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-        //        {
-        //            @Override
-        //            public boolean onMenuItemClick(MenuItem item)
-        //            {
-        //                int id = item.getItemId();
-        //                return true;
-        //            }
-        //        });
-        //        menu.inflate(R.menu.menu_friendlist_item);
-        //        menu.show();
-
+        // Log.i(TAG, "onLongClick");
         return true;
     }
 
@@ -356,4 +366,24 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         final AlertDialog alert = builder.create();
         alert.show();
     }
+
+    private View.OnClickListener onclick_listener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            is_selected = ConferenceMessageListActivity.onClick_message_helper(v, is_selected, message_);
+        }
+    };
+
+    private View.OnLongClickListener onlongclick_listener = new View.OnLongClickListener()
+    {
+        @Override
+        public boolean onLongClick(final View v)
+        {
+            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(context, v, is_selected, message_);
+            is_selected = res.is_selected;
+            return res.ret_value;
+        }
+    };
 }

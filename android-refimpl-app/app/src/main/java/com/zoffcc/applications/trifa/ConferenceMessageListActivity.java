@@ -19,13 +19,17 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Px;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -46,6 +50,8 @@ import static com.zoffcc.applications.trifa.MainActivity.get_conference_num_from
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_conference_active;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -70,6 +76,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     ImageButton ml_phone_icon = null;
     ImageButton ml_button_01 = null;
     static boolean attachemnt_instead_of_send = true;
+    static ActionMode amode = null;
+    static MenuItem amode_save_menu_item = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,6 +85,10 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
+
+        amode = null;
+        amode_save_menu_item = null;
+        selected_conference_messages.clear();
 
         Intent intent = getIntent();
         conf_id = intent.getStringExtra("conf_id");
@@ -359,5 +371,103 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+    }
+
+    static boolean onClick_message_helper(final View v, boolean is_selected, final ConferenceMessage message_)
+    {
+        try
+        {
+            if (is_selected)
+            {
+                v.setBackgroundColor(Color.TRANSPARENT);
+                is_selected = false;
+                selected_conference_messages.remove(message_.id);
+                amode_save_menu_item.setVisible(false);
+
+                if (selected_conference_messages.isEmpty())
+                {
+                    // last item was de-selected
+                    amode.finish();
+                }
+                else
+                {
+                    if (amode != null)
+                    {
+                        amode.setTitle("" + selected_conference_messages.size() + " selected");
+                    }
+                }
+            }
+            else
+            {
+                if (!selected_conference_messages.isEmpty())
+                {
+                    v.setBackgroundColor(Color.GRAY);
+                    is_selected = true;
+                    selected_conference_messages.add(message_.id);
+                    amode_save_menu_item.setVisible(false);
+
+                    if (amode != null)
+                    {
+                        amode.setTitle("" + selected_conference_messages.size() + " selected");
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return is_selected;
+    }
+
+    static class long_click_message_return
+    {
+        boolean is_selected;
+        boolean ret_value;
+    }
+
+    static long_click_message_return onLongClick_message_helper(Context context, final View v, boolean is_selected, final ConferenceMessage message_)
+    {
+        long_click_message_return ret = new long_click_message_return();
+
+        try
+        {
+            if (is_selected)
+            {
+            }
+            else
+            {
+                if (selected_conference_messages.isEmpty())
+                {
+                    try
+                    {
+                        amode = MainActivity.conference_message_list_activity.startSupportActionMode(new ToolbarActionMode(context));
+                        amode_save_menu_item = amode.getMenu().findItem(R.id.action_save);
+                        v.setBackgroundColor(Color.GRAY);
+                        ret.is_selected = true;
+                        selected_conference_messages.add(message_.id);
+                        amode_save_menu_item.setVisible(false);
+
+                        if (amode != null)
+                        {
+                            amode.setTitle("" + selected_conference_messages.size() + " selected");
+                        }
+                        ret.ret_value = true;
+                        return ret;
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        ret.ret_value = false;
+        return ret;
     }
 }

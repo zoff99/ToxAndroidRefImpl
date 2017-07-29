@@ -285,6 +285,7 @@ public class MainActivity extends AppCompatActivity
     static List<Long> selected_messages = new ArrayList<Long>();
     static List<Long> selected_messages_text_only = new ArrayList<Long>();
     static List<Long> selected_messages_incoming_file = new ArrayList<Long>();
+    static List<Long> selected_conference_messages = new ArrayList<Long>();
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -6891,6 +6892,116 @@ public class MainActivity extends AppCompatActivity
                 {
                     // need to redraw all items again here, to remove the selections
                     MainActivity.message_list_fragment.adapter.redraw_all_items();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
+    }
+
+    static void copy_selected_conference_messages(Context c)
+    {
+        try
+        {
+            if (!selected_conference_messages.isEmpty())
+            {
+                // sort ascending (lowest ID on top)
+                Collections.sort(selected_conference_messages, new Comparator<Long>()
+                {
+                    public int compare(Long o1, Long o2)
+                    {
+                        return o1.compareTo(o2);
+                    }
+                });
+
+                String copy_text = "";
+                boolean first = true;
+                Iterator i = selected_conference_messages.iterator();
+                while (i.hasNext())
+                {
+                    try
+                    {
+                        if (first)
+                        {
+                            first = false;
+                            copy_text = "" + orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text;
+                        }
+                        else
+                        {
+                            copy_text = copy_text + "\n" + orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text));
+                Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
+
+                selected_conference_messages.clear();
+
+                try
+                {
+                    // need to redraw all items again here, to remove the selections
+                    MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
+    }
+
+    static void delete_selected_conference_messages(Context c)
+    {
+        // TODO: write me!
+        try
+        {
+            if (!selected_conference_messages.isEmpty())
+            {
+                // sort ascending (lowest ID on top)
+                Collections.sort(selected_conference_messages, new Comparator<Long>()
+                {
+                    public int compare(Long o1, Long o2)
+                    {
+                        return o1.compareTo(o2);
+                    }
+                });
+
+                String copy_text = "";
+                boolean first = true;
+                Iterator i = selected_conference_messages.iterator();
+                while (i.hasNext())
+                {
+                    try
+                    {
+                        // TODO: write me
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                selected_conference_messages.clear();
+
+                try
+                {
+                    // need to redraw all items again here, to remove the selections
+                    MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
                 }
                 catch (Exception e)
                 {
