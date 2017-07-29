@@ -6989,6 +6989,7 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         // TODO: write me
+                        i.next();
                     }
                     catch (Exception e)
                     {
