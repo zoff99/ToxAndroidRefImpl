@@ -48,7 +48,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        Log.i(TAG, "onCreateViewHolder");
+        // Log.i(TAG, "onCreateViewHolder");
 
         View view = null;
         switch (viewType)

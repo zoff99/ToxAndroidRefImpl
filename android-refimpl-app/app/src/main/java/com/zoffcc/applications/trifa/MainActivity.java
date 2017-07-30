@@ -270,6 +270,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__orbot_enabled = false;
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = true;
+    static boolean PREF__fps_half = false;
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
@@ -385,6 +386,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
+        PREF__fps_half = settings.getBoolean("fps_half", false);
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {

@@ -12,6 +12,7 @@
     <string name="title_activity_aboutpage">About</string>
     <string name="title_activity_set_password">Set Password</string>
     <string name="title_activity_check_password">Enter Password</string>
+    <string name="title_activity_share">open with TRIfA</string>
 
 
     <string name="settings_toolbar_title">Settings</string>
@@ -58,6 +59,9 @@
 
     <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
     <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
+
+    <string name="pref_title_fps_half">lower fps</string>
+    <string name="pref_description_fps_half">Video Framerate 7fps instead of 15fps</string>
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
