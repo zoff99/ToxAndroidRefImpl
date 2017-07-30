@@ -202,8 +202,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-        final Drawable d5 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        camera_toggle_button.setImageDrawable(d5);
+        if (active_camera_type == FRONT_CAMERA_USED)
+        {
+            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            camera_toggle_button.setImageDrawable(d5);
+        }
+        else
+        {
+            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            camera_toggle_button.setImageDrawable(d5);
+        }
 
         final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
         decline_button.setImageDrawable(d3);
@@ -233,13 +241,29 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (event.getAction() != MotionEvent.ACTION_UP)
                 {
-                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
-                    camera_toggle_button.setImageDrawable(d2a);
+                    if (active_camera_type == FRONT_CAMERA_USED)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        camera_toggle_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        camera_toggle_button.setImageDrawable(d2a);
+                    }
                 }
                 else
                 {
-                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
-                    camera_toggle_button.setImageDrawable(d2a);
+                    if (active_camera_type == FRONT_CAMERA_USED)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        camera_toggle_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        camera_toggle_button.setImageDrawable(d2a);
+                    }
 
                     final Thread toggle_thread = new Thread()
                     {

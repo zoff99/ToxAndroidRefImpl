@@ -196,8 +196,8 @@
 
         <ImageButton
             android:id="@+id/camera_toggle_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
@@ -215,8 +215,8 @@
 
         <ImageButton
             android:id="@+id/mute_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
