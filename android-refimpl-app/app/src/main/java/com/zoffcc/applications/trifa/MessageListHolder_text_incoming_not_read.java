@@ -44,15 +44,9 @@ import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
-import static com.zoffcc.applications.trifa.MessageListActivity.amode;
-import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -68,7 +62,8 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     TextView date_time;
     ViewGroup layout_message_container;
     boolean is_selected = false;
-    TextView message_text_date;
+    TextView message_text_date_string;
+    ViewGroup message_text_date;
 
     public MessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -83,7 +78,8 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         date_time = (TextView) itemView.findViewById(R.id.date_time);
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
-        message_text_date = (TextView) itemView.findViewById(R.id.message_text_date);
+        message_text_date_string = (TextView) itemView.findViewById(R.id.message_text_date_string);
+        message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
     }
 
     public void bindMessageList(Message m)
@@ -117,6 +113,37 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         {
             layout_message_container.setBackgroundColor(Color.TRANSPARENT);
         }
+
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        message_text_date.setVisibility(View.GONE);
+        int my_position = this.getAdapterPosition();
+        if (my_position != RecyclerView.NO_POSITION)
+        {
+            if (MainActivity.message_list_fragment != null)
+            {
+                if (MainActivity.message_list_fragment.adapter != null)
+                {
+                    if (my_position < 1)
+                    {
+                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        {
+                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+        }
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);

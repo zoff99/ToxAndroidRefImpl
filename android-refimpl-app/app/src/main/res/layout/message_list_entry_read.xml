@@ -134,25 +134,52 @@
 
     </LinearLayout>
 
-    <TextView
+    <LinearLayout
         android:id="@+id/message_text_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/rounded_date_bg"
-        android:paddingBottom="2dp"
-        android:paddingEnd="@dimen/padding_small"
-        android:paddingLeft="@dimen/padding_small"
-        android:paddingRight="@dimen/padding_small"
-        android:paddingStart="@dimen/padding_small"
-        android:paddingTop="2dp"
-        android:text="2017-05-14"
-        android:textColor="@color/md_white_1000"
-        android:textSize="@dimen/text_small"
-        android:visibility="gone"/>
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="100"
+            android:background="@color/md_white_1000"/>
+
+        <TextView
+            android:id="@+id/message_text_date_string"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_date_bg"
+            android:paddingBottom="2dp"
+            android:paddingEnd="@dimen/padding_small"
+            android:paddingLeft="@dimen/padding_small"
+            android:paddingRight="@dimen/padding_small"
+            android:paddingStart="@dimen/padding_small"
+            android:paddingTop="2dp"
+            android:text="2017-05-14"
+            android:textColor="@color/md_white_1000"
+            android:textSize="@dimen/text_small"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="100"
+            android:background="@color/md_white_1000"/>
+
+    </LinearLayout>
 
 </RelativeLayout>
 

@@ -85,6 +85,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
     TextView date_time;
     ViewGroup layout_message_container;
     boolean is_selected = false;
+    TextView message_text_date_string;
+    ViewGroup message_text_date;
 
     public MessageListHolder_file_outgoing_state_cancel(View itemView, Context c)
     {
@@ -105,6 +107,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         date_time = (TextView) itemView.findViewById(R.id.date_time);
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
+        message_text_date_string = (TextView) itemView.findViewById(R.id.message_text_date_string);
+        message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
     }
 
     public void bindMessageList(Message m)
@@ -145,6 +149,38 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         {
             layout_message_container.setBackgroundColor(Color.TRANSPARENT);
         }
+
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        message_text_date.setVisibility(View.GONE);
+        int my_position = this.getAdapterPosition();
+        if (my_position != RecyclerView.NO_POSITION)
+        {
+            if (MainActivity.message_list_fragment != null)
+            {
+                if (MainActivity.message_list_fragment.adapter != null)
+                {
+                    if (my_position < 1)
+                    {
+                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        {
+                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+        }
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
