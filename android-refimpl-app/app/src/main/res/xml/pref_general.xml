@@ -25,13 +25,13 @@
         android:title="@string/pref_title_orbot_enabled"/>
 
     <SwitchPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="fps_half"
         android:summary="@string/pref_description_fps_half"
         android:title="@string/pref_title_fps_half"/>
 
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="0"
         android:entries="@array/pref_higher_video_quality_titles"
         android:entryValues="@array/pref_higher_video_quality_values"
         android:key="higher_video_quality"
