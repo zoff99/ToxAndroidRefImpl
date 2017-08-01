@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
     static boolean PREF__audiorec_asynctask = true;
-    static boolean PREF__cam_recording_hint = true;
+    static boolean PREF__cam_recording_hint = false;
     static boolean PREF__fps_half = true;
     static String versionName = "";
     static int versionCode = -1;
