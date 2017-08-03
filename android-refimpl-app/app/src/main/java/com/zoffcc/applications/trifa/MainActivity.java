@@ -1895,6 +1895,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_self_get_friend_list_size();
 
+    public static native void tox_self_set_nospam(long nospam); // this actually needs an "uint32_t" which is an unsigned 32bit integer value
+
+    public static native long tox_self_get_nospam(); // this actually returns an "uint32_t" which is an unsigned 32bit integer value
+
     public static native long tox_friend_by_public_key(@NonNull String friend_public_key_string);
 
     public static native String tox_friend_get_public_key(long friend_number);
