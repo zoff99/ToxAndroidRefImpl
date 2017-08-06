@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.ClipData;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -28,9 +29,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -44,9 +47,11 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.File;
+import java.util.Random;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
@@ -69,6 +74,8 @@ public class ProfileActivity extends AppCompatActivity
     TextView mytoxid_textview = null;
     EditText mynick_edittext = null;
     EditText mystatus_message_edittext = null;
+    Button new_nospam_button = null;
+    Button copy_toxid_button = null;
 
 
     @Override
@@ -83,6 +90,54 @@ public class ProfileActivity extends AppCompatActivity
         mynick_edittext = (EditText) findViewById(R.id.mynick_edittext);
         mystatus_message_edittext = (EditText) findViewById(R.id.mystatus_message_edittext);
 
+        new_nospam_button = (Button) findViewById(R.id.new_nospam_button);
+        copy_toxid_button = (Button) findViewById(R.id.copy_toxid_button);
+
+        new_nospam_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    // Log.i(TAG, "old ToxID=" + MainActivity.get_my_toxid());
+                    // Log.i(TAG, "old NOSPAM=" + MainActivity.tox_self_get_nospam());
+                    Random random = new Random();
+                    long new_nospam = (long) random.nextInt() + (1L << 31);
+                    // Log.i(TAG, "generated NOSPAM=" + new_nospam);
+                    MainActivity.tox_self_set_nospam(new_nospam);
+                    // Log.i(TAG, "new ToxID=" + MainActivity.get_my_toxid());
+                    // Log.i(TAG, "new NOSPAM=" + MainActivity.tox_self_get_nospam());
+                    Toast.makeText(v.getContext(), "generated new Random NOSPAM value", Toast.LENGTH_SHORT).show();
+
+                    // ---- change display to the new ToxID ----
+                    update_toxid_display();
+                    // ---- change display to the new ToxID ----
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        copy_toxid_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    clipboard.setPrimaryClip(ClipData.newPlainText("", "tox:" + MainActivity.get_my_toxid()));
+                    Toast.makeText(v.getContext(), "ToxID copied to Clipboard", Toast.LENGTH_SHORT).show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -93,26 +148,7 @@ public class ProfileActivity extends AppCompatActivity
         mynick_edittext.setText(global_my_name);
         mystatus_message_edittext.setText(global_my_status_message);
 
-        try
-        {
-            mytoxid_imageview.setImageBitmap(encodeAsBitmap("tox:" + MainActivity.get_my_toxid()));
-            mytoxid_textview.setText(MainActivity.get_my_toxid());
-        }
-        catch (WriterException e)
-        {
-            e.printStackTrace();
-
-            try
-            {
-                mytoxid_imageview.setImageBitmap(encodeAsBitmap("123")); // in case something goes wrong
-                mytoxid_textview.setText(MainActivity.get_my_toxid());
-            }
-            catch (WriterException e2)
-            {
-                e2.printStackTrace();
-            }
-
-        }
+        update_toxid_display();
 
         profile_icon.setOnTouchListener(new View.OnTouchListener()
         {
@@ -177,6 +213,30 @@ public class ProfileActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    void update_toxid_display()
+    {
+        try
+        {
+            mytoxid_imageview.setImageBitmap(encodeAsBitmap("tox:" + MainActivity.get_my_toxid()));
+            mytoxid_textview.setText(MainActivity.get_my_toxid());
+        }
+        catch (WriterException e)
+        {
+            e.printStackTrace();
+
+            try
+            {
+                mytoxid_imageview.setImageBitmap(encodeAsBitmap("123")); // in case something goes wrong
+                mytoxid_textview.setText(MainActivity.get_my_toxid());
+            }
+            catch (WriterException e2)
+            {
+                e2.printStackTrace();
+            }
+
         }
     }
 
