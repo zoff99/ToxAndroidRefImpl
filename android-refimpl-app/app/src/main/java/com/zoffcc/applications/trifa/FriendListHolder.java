@@ -133,6 +133,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 with(avatar.getContext()).
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
                                 placeholder(d_lock).
                                 priority(Priority.HIGH).
                                 skipMemoryCache(false).
