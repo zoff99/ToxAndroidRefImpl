@@ -3790,29 +3790,61 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            // update friendlist fragment (for this conference)
-            if (friend_list_fragment != null)
-            {
-                ConferenceDB conf_temp = null;
+            ConferenceDB conf_temp2 = null;
 
+            try
+            {
                 try
                 {
                     // TODO: cache me!!
-                    conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
+                    conf_temp2 = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
                             and().
                             conference_activeEq(true).
                             get(0);
+
+                    if (conf_temp2 != null)
+                    {
+                        // update it in the Database
+                        orma.updateConferenceDB().
+                                conference_identifierEq(conf_temp2.conference_identifier).
+                                name(title).execute();
+                    }
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+                Log.i(TAG, "get_conference_title_from_confid:EE:3:" + e2.getMessage());
+            }
 
-                if (conf_temp != null)
+
+            // update friendlist fragment (for this conference)
+            if (friend_list_fragment != null)
+            {
+                // ConferenceDB conf_temp = null;
+                //
+                //                try
+                //                {
+                //                    // TODO: cache me!!
+                //                    conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
+                //                            and().
+                //                            conference_activeEq(true).
+                //                            get(0);
+                //                }
+                //                catch (Exception e)
+                //                {
+                //                    e.printStackTrace();
+                //                }
+
+                if (conf_temp2 != null)
                 {
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = false;
-                    cc.conference_item = conf_temp;
+                    cc.conference_item = conf_temp2;
                     friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
             }
