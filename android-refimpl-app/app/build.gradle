@@ -142,7 +142,7 @@ dependencies {
     compile project(':library')
     //
     //
-    compile('com.mikepenz:materialdrawer:5.9.4@aar') {
+    compile('com.mikepenz:materialdrawer:5.9.5@aar') {
         transitive = true
         exclude group: 'com.android.support'
         exclude group: 'com.github.bumptech.glide'
@@ -194,16 +194,16 @@ dependencies {
     compile 'me.zhanghai.android.patternlock:library:2.1.2'
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
-    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+    compile 'com.github.bumptech.glide:glide:4.0.0'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
 }
 
 dependencyVerification {
     verify = [
             'com.zoffcc.applications.trifajni:trifa-jni-lib:9172079dcc7f63ed99eb0b21f998fad4bc40eec80be7a50877a4d42ead84140c',
-            'com.mikepenz:materialdrawer:e126b6bb3f362e23875710d4bb3c3c9e6e0c0fbda62376218b454f1604e90251',
+            'com.mikepenz:materialdrawer:f7b380cd85ae55bcd3111855bd9104ba86b5c1160e8a31ae89fe1725c5f3c587',
             'com.mikepenz:google-material-typeface:72f56673dd5f646193cfe7b7513a4689869365069d27ac60faf4c4fdfb330054',
             'com.mikepenz:fontawesome-typeface:ea35952a9126ddf01ad9c804c24fa97fad577ab4eb2af74e364d198040eabcd4',
             'com.google.zxing:core:bba7724e02a997cec38213af77133ee8e24b0d5cf5fa7ecbc16a4fa93f11ee0d',
@@ -225,10 +225,10 @@ dependencyVerification {
             'com.github.armcha:AutoLinkTextView:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
             'info.guardianproject.netcipher:netcipher:611ec5bde9d799fd57e1efec5c375f9f460de2cdda98918541decc9a7d02f2ad',
             'com.github.chrisbanes:PhotoView:458cfff9421cc28b608139fd9dffba6399d7f654b688e3f105a3a03a9b82cc7d',
-            'com.github.bumptech.glide:glide:72bbcdb2087c4f0baf36ff6488fd5b36d35d602d60dc5826da724597bf0504ba',
-            'com.mikepenz:materialize:7add9fff9ccc20e4bbc508b7d2727594369def95d9ca58c620503cf0d1ee67f1',
-            'com.mikepenz:iconics-core:aa05fe57f493b0b4639b1ace5979ae5287cc09fcaf7496fbc281fc0ce3cf5254',
-            'com.mikepenz:fastadapter:aaf090fa286bf9cfae7031faf80370f01a605e49f3ec18a9276b178b7d71281d',
+            'com.github.bumptech.glide:glide:9df2e191be41003afa18fed357c656cd1c5bbdb84e08e55ee427741358b146fa',
+            'com.mikepenz:materialize:f215825cf9215af4c2807e3df25228b87d7b8f28fc8ccf122c9c5a93dfa13b8a',
+            'com.mikepenz:iconics-core:998967c7e422c87bac3436d889912c07735ce814e88aa250ca2d018ba046b7c1',
+            'com.mikepenz:fastadapter:abd501599a7fd983127791cff50cf1595d360eba95a336479bce37e7953ca560',
             'com.github.gfx.android.orma:orma-migration:be4f09f3e89a93ff68c5a2af65c8e8c9b3cea4acb4bc2bf2ffd86c1a8fc38229',
             'com.github.gfx.android.orma:orma-annotations:288b71aace681a9320284f74ce56b184c16979048e22b8021fe0da7ce06f0682',
             'io.reactivex.rxjava2:rxjava:dc612f6887f8a4ff1ae33f55eeef59d8028e53f0cea9b40c7ddba1d8fee51736',
@@ -245,9 +245,9 @@ dependencyVerification {
             'com.android.support:transition:36c688825a8c0e6e879e18886de83dc90673322822d5b606ee302f70fb558e16',
             'com.android.support.constraint:constraint-layout-solver:8c62525a9bc5cff5633a96cb9b32fffeccaf41b8841aa87fc22607070dea9b8d',
             'com.vanniktech:emoji:d55f44e04e31895647d62c33c34a8d501995e9e1b5c5f5cee6cbb8630eeb37f7',
-            'com.github.bumptech.glide:gifdecoder:0ab61481061c1237711f70652c4abf83d461e5ca0fd2e55af0fe3f9fdcf73c6e',
-            'com.github.bumptech.glide:disklrucache:da55fe28ae8b8003f4fe963fec67b7620ad6c545b58cec01f599fb788c419a18',
-            'com.github.bumptech.glide:annotations:36efd480cbd30ef29a461621776592427e50e072614d29bd006f5f3fa6f18127',
+            'com.github.bumptech.glide:gifdecoder:f8c3b95c5250454456cd3ad8ab02eb8ed3dee81f9fba2a6f785a4725870023df',
+            'com.github.bumptech.glide:disklrucache:efcac57f8229b119b991ae2de0e628fb49f4c1b912afb8699e662c641382b69f',
+            'com.github.bumptech.glide:annotations:2a9784850aae0571bcc12b279ee4acbe25e152c923766f693e56b1adbf83ef92',
             'org.antlr:antlr4-runtime:08b519ce8883f9e0c92d5e16b911dbbb3d29faa434efc4c3c62435341ec4b332',
             'org.reactivestreams:reactive-streams:ef867702a614b96eb6c64fb65a8f5e14bdfcabbc1ae056f78a1643f7b79ca0eb',
     ]

@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.Registry;
 import com.bumptech.glide.annotation.GlideModule;
@@ -40,8 +41,9 @@ public class MyGlideModule extends AppGlideModule
     }
 
     @Override
-    public void registerComponents(Context context, Registry registry)
+    public void registerComponents(Context context, Glide glide, Registry registry)
     {
+        super.registerComponents(context, glide, registry);
         Log.i(TAG, "registerComponents");
         registry.prepend(info.guardianproject.iocipher.File.class, java.io.FileInputStream.class, new com.zoffcc.applications.trifa.FileLoader2.StreamFactory());
     }
