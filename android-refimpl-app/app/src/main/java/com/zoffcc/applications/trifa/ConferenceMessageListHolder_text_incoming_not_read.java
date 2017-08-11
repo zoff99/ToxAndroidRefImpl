@@ -29,9 +29,11 @@ import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.luseen.autolinklibrary.AutoLinkMode;
@@ -41,12 +43,14 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 
 public class ConferenceMessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -64,6 +68,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     TextView peer_name_text;
     ViewGroup layout_message_container;
     boolean is_selected = false;
+    boolean is_system_message = false;
+    ImageView img_corner;
 
     public ConferenceMessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -81,11 +87,19 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         layout_peer_name_container = (ViewGroup) itemView.findViewById(R.id.layout_peer_name_container);
         peer_name_text = (TextView) itemView.findViewById(R.id.peer_name_text);
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
+        img_corner = (ImageView) itemView.findViewById(R.id.img_corner);
     }
 
     public void bindMessageList(ConferenceMessage m)
     {
         message_ = m;
+
+        is_system_message = false;
+        if (m.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY))
+        {
+            is_system_message = true;
+        }
+        Log.i(TAG, "is_system_message=" + is_system_message + " m.tox_peerpubkey=" + m.tox_peerpubkey);
 
         is_selected = false;
         if (selected_messages.isEmpty())
@@ -230,12 +244,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             e.printStackTrace();
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).
-                icon(FontAwesome.Icon.faw_smile_o).
-                backgroundColor(peer_color_bg).
-                color(peer_color_fg).sizeDp(50);
-        img_avatar.setImageDrawable(d_lock);
-
         // textView.setBackgroundColor(peer_color_bg);
         // textView_container.setBackgroundColor(peer_color_bg);
 
@@ -247,6 +255,42 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         // shape.setStroke(3, borderColor);
         textView_container.setBackground(shape);
         // we need to do the rounded corner background manually here, to change the color ---------------
+
+        if (is_system_message)
+        {
+            img_avatar.setVisibility(View.GONE);
+            img_corner.setVisibility(View.GONE);
+            imageView.setVisibility(View.GONE);
+            textView_container.setMinimumHeight(4);
+            textView_container.setPadding((int) dp2px(4), textView_container.getPaddingTop(), (int) dp2px(4), textView_container.getPaddingBottom()); // left, top, right, bottom
+            LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
+            parameter.setMargins((int) dp2px(20), parameter.topMargin, parameter.rightMargin, parameter.bottomMargin); // left, top, right, bottom
+            textView_container.setLayoutParams(parameter);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            peer_name_text.setVisibility(View.GONE);
+        }
+        else
+        {
+            // TODO: do we need to reset here? -> yes
+            img_avatar.setVisibility(View.VISIBLE);
+            img_corner.setVisibility(View.VISIBLE);
+            imageView.setVisibility(View.INVISIBLE);
+            textView_container.setMinimumHeight((int) dp2px(50));
+            textView_container.setPadding(0, textView_container.getPaddingTop(), 0, textView_container.getPaddingBottom()); // left, top, right, bottom
+            LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
+            parameter.setMargins(0, parameter.topMargin, parameter.rightMargin, parameter.bottomMargin); // left, top, right, bottom
+            textView_container.setLayoutParams(parameter);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            peer_name_text.setVisibility(View.VISIBLE);
+
+            final Drawable d_lock = new IconicsDrawable(context).
+                    icon(FontAwesome.Icon.faw_smile_o).
+                    backgroundColor(peer_color_bg).
+                    color(peer_color_fg).sizeDp(50);
+            img_avatar.setImageDrawable(d_lock);
+        }
     }
 
     @Override
