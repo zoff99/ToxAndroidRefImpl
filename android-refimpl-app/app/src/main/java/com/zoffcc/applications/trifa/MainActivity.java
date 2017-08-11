@@ -186,10 +186,10 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false;
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
-    final static boolean DB_ENCRYPT = true;
-    final static boolean VFS_ENCRYPT = true;
+    final static boolean DB_ENCRYPT = true; // set "true" always!
+    final static boolean VFS_ENCRYPT = true; // set "true" always!
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
@@ -3901,18 +3901,18 @@ public class MainActivity extends AppCompatActivity
                     m.text = "" + peer_name_temp + " changed name or joined.";
                     Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " changed name or joined.");
                     // HINT: this happend also after each peer joins
-                    return;
+                    // return;
                 }
                 else if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT.value)
                 {
                     m.text = "" + peer_name_temp + " left.";
                     Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " left.");
-                    return;
+                    // return;
                 }
                 else
                 {
                     // unknown status
-                    // return;
+                    return;
                 }
 
                 if (conference_message_list_activity != null)
