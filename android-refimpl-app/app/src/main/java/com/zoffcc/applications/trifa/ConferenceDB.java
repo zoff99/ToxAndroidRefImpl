@@ -55,6 +55,10 @@ public class ConferenceDB
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     boolean conference_active = false; // is this conference active now? are we invited?
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    @Nullable
+    boolean notification_silent = false; // show notifications for this conference?
+
     static ConferenceDB deep_copy(ConferenceDB in)
     {
         ConferenceDB out = new ConferenceDB();
@@ -66,6 +70,7 @@ public class ConferenceDB
         out.who_invited__tox_public_key_string = in.who_invited__tox_public_key_string;
         out.tox_conference_number = in.tox_conference_number;
         out.conference_active = in.conference_active;
+        out.notification_silent = in.notification_silent;
 
         return out;
     }
@@ -73,6 +78,6 @@ public class ConferenceDB
     @Override
     public String toString()
     {
-        return "tox_conference_number=" + tox_conference_number + ", conference_active=" + conference_active + ", conference_identifier=" + conference_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", kind=" + kind + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number;
+        return "tox_conference_number=" + tox_conference_number + ", conference_active=" + conference_active + ", conference_identifier=" + conference_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", kind=" + kind + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number + ", notification_silent=" + notification_silent;
     }
 }

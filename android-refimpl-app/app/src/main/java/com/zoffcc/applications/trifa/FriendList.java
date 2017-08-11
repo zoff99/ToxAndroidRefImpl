@@ -53,6 +53,10 @@ public class FriendList
     @Nullable
     String avatar_filename = null;
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    @Nullable
+    boolean notification_silent = false; // show notifications for this friend?
+
     static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();
@@ -63,6 +67,7 @@ public class FriendList
         out.TOX_USER_STATUS = in.TOX_USER_STATUS;
         out.avatar_filename = in.avatar_filename;
         out.avatar_pathname = in.avatar_pathname;
+        out.notification_silent = in.notification_silent;
 
         return out;
     }
@@ -70,6 +75,6 @@ public class FriendList
     @Override
     public String toString()
     {
-        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename;
+        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent;
     }
 }

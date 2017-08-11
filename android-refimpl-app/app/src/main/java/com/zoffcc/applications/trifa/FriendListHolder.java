@@ -34,6 +34,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
@@ -63,6 +64,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private de.hdodenhof.circleimageview.CircleImageView avatar;
     private ImageView imageView;
     private ImageView imageView2;
+    private ImageView f_notification;
 
     public FriendListHolder(View itemView, Context c)
     {
@@ -78,9 +80,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.f_avatar_icon);
         imageView = (ImageView) itemView.findViewById(R.id.f_status_icon);
         imageView2 = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        f_notification = (ImageView) itemView.findViewById(R.id.f_notification);
     }
 
     public void bindFriendList(FriendList fl)
@@ -93,6 +93,28 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
 
         Log.i(TAG, "bindFriendList:" + fl.name);
+
+        itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
+
+        if (fl.notification_silent)
+        {
+            final Drawable d_notification = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_notifications_off).
+                    color(context.getResources().
+                            getColor(R.color.colorPrimaryDark)).sizeDp(90);
+            f_notification.setImageDrawable(d_notification);
+            f_notification.setOnClickListener(this);
+        }
+        else
+        {
+            final Drawable d_notification = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_notifications_active).
+                    color(context.getResources().
+                            getColor(R.color.colorPrimaryDark)).sizeDp(90);
+            f_notification.setImageDrawable(d_notification);
+            f_notification.setOnClickListener(this);
+        }
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
@@ -251,9 +273,16 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         Log.i(TAG, "onClick");
         try
         {
-            Intent intent = new Intent(v.getContext(), MessageListActivity.class);
-            intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(this.friendlist.tox_public_key_string));
-            v.getContext().startActivity(intent);
+            if (v.equals(f_notification))
+            {
+                // TODO: change notification toggle
+            }
+            else
+            {
+                Intent intent = new Intent(v.getContext(), MessageListActivity.class);
+                intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(this.friendlist.tox_public_key_string));
+                v.getContext().startActivity(intent);
+            }
         }
         catch (Exception e)
         {

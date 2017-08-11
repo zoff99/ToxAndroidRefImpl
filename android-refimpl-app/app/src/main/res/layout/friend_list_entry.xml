@@ -1,10 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="fill_parent"
               android:layout_height="?android:attr/listPreferredItemHeight"
-              android:elevation="0dp"
-              android:padding="0dip"
               android:layout_margin="0dp"
-              android:orientation="horizontal">
+              android:elevation="0dp"
+              android:orientation="horizontal"
+              android:padding="0dip">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="fill_parent"
@@ -14,14 +15,25 @@
                     android:elevation="3dp"
                     android:padding="2dip">
 
+        <ImageView
+            android:id="@+id/f_notification"
+            android:layout_width="33dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="6dip"
+            android:padding="6dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/circle_red"/>
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/f_avatar_icon"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="35dp"
             android:layout_height="fill_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
             android:layout_marginRight="6dip"
+            android:layout_toRightOf="@id/f_notification"
             android:src="@drawable/circle_blue"
             app:civ_border_color="#40000000"
             app:civ_border_width="2dp"/>

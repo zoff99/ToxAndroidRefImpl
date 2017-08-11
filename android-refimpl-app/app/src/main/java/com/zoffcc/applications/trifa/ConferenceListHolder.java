@@ -56,6 +56,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
     private de.hdodenhof.circleimageview.CircleImageView avatar;
     private ImageView imageView;
     private ImageView imageView2;
+    private ImageView f_notification;
 
     public ConferenceListHolder(View itemView, Context c)
     {
@@ -71,9 +72,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.f_avatar_icon);
         imageView = (ImageView) itemView.findViewById(R.id.f_status_icon);
         imageView2 = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        f_notification = (ImageView) itemView.findViewById(R.id.f_notification);
     }
 
     public void bindFriendList(ConferenceDB fl)
@@ -86,6 +85,28 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         }
 
         Log.i(TAG, "bindFriendList:" + fl.tox_conference_number);
+
+        itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
+
+        if (fl.notification_silent)
+        {
+            final Drawable d_notification = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_notifications_off).
+                    color(context.getResources().
+                            getColor(R.color.colorPrimaryDark)).sizeDp(90);
+            f_notification.setImageDrawable(d_notification);
+            f_notification.setOnClickListener(this);
+        }
+        else
+        {
+            final Drawable d_notification = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_notifications_active).
+                    color(context.getResources().
+                            getColor(R.color.colorPrimaryDark)).sizeDp(90);
+            f_notification.setImageDrawable(d_notification);
+            f_notification.setOnClickListener(this);
+        }
 
         this.conference = fl;
 
@@ -176,9 +197,16 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         Log.i(TAG, "onClick");
         try
         {
-            Intent intent = new Intent(v.getContext(), ConferenceMessageListActivity.class);
-            intent.putExtra("conf_id", this.conference.conference_identifier);
-            v.getContext().startActivity(intent);
+            if (v.equals(f_notification))
+            {
+                // TODO: change notification toggle
+            }
+            else
+            {
+                Intent intent = new Intent(v.getContext(), ConferenceMessageListActivity.class);
+                intent.putExtra("conf_id", this.conference.conference_identifier);
+                v.getContext().startActivity(intent);
+            }
         }
         catch (Exception e)
         {
