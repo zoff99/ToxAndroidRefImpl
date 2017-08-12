@@ -643,6 +643,7 @@ public class MainActivity extends AppCompatActivity
                                         PREF__orbot_enabled_to_int = 1;
                                     }
                                     init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
+                                    Log.i(TAG,"set_all_conferences_inactive:001");
                                     set_all_conferences_inactive();
                                     tox_service_fg.tox_thread_start_fg();
                                 }
@@ -1267,6 +1268,7 @@ public class MainActivity extends AppCompatActivity
                             init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
                         }
 
+                        Log.i(TAG,"set_all_conferences_inactive:002");
                         set_all_conferences_inactive();
                         tox_service_fg.tox_thread_start_fg();
                     }

@@ -375,6 +375,7 @@ public class TrifaToxService extends Service
                 change_notification(0); // set to offline
                 Log.i(TAG, "stop_tox_fg:008");
                 set_all_friends_offline();
+                Log.i(TAG,"set_all_conferences_inactive:003");
                 set_all_conferences_inactive();
                 is_tox_started = false;
 
@@ -431,6 +432,7 @@ public class TrifaToxService extends Service
 
                 if (!old_is_tox_started)
                 {
+                    Log.i(TAG,"set_all_conferences_inactive:004");
                     set_all_conferences_inactive();
                     MainActivity.init_tox_callbacks();
                     MainActivity.update_savedata_file();

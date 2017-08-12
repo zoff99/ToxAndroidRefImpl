@@ -252,7 +252,7 @@ public class FriendListFragment extends Fragment
                         cc.is_friend = true;
                         cc.friend_item = n;
                         modify_friend(cc, cc.is_friend);
-                        Log.i(TAG, "onResume:modify_friend:" + n);
+                        // Log.i(TAG, "onResume:modify_friend:" + n);
                     }
                 }
             }
@@ -271,7 +271,7 @@ public class FriendListFragment extends Fragment
                         cfac.is_friend = false;
                         cfac.conference_item = n;
                         modify_friend(cfac, cfac.is_friend);
-                        // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                        // Log.i(TAG, "onResume:modify_friend:" + n);
                     }
                 }
             }
