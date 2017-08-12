@@ -114,7 +114,8 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             f_notification.setOnClickListener(this);
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_group).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_group).
+                color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         avatar.setImageDrawable(d_lock);
 
         try
