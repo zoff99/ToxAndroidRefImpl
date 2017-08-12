@@ -3925,7 +3925,6 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "namelist_change_cb:005:EE1:" + e.getMessage());
                 }
 
-
                 if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN.value)
                 {
                     m.text = "" + peer_name_temp + " joined.";
