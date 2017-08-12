@@ -41,6 +41,8 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_conference_inactive;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -86,6 +88,8 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
 
         Log.i(TAG, "bindFriendList:" + fl.tox_conference_number);
 
+        this.conference = fl;
+
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
 
@@ -94,7 +98,8 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             final Drawable d_notification = new IconicsDrawable(context).
                     icon(GoogleMaterial.Icon.gmd_notifications_off).
                     color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).sizeDp(90);
+                            getColor(R.color.colorPrimaryDark)).
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(90);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
         }
@@ -103,12 +108,11 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             final Drawable d_notification = new IconicsDrawable(context).
                     icon(GoogleMaterial.Icon.gmd_notifications_active).
                     color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).sizeDp(90);
+                            getColor(R.color.colorPrimaryDark)).
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(90);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
         }
-
-        this.conference = fl;
 
         final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_group).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         avatar.setImageDrawable(d_lock);
@@ -199,7 +203,32 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         {
             if (v.equals(f_notification))
             {
-                // TODO: change notification toggle
+                if (!this.conference.notification_silent)
+                {
+                    this.conference.notification_silent = true;
+                    orma.updateConferenceDB().conference_identifierEq(this.conference.conference_identifier).
+                            notification_silent(this.conference.notification_silent).execute();
+
+                    final Drawable d_notification = new IconicsDrawable(context).
+                            icon(GoogleMaterial.Icon.gmd_notifications_off).
+                            color(context.getResources().
+                                    getColor(R.color.colorPrimaryDark)).
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(90);
+                    f_notification.setImageDrawable(d_notification);
+                }
+                else
+                {
+                    this.conference.notification_silent = false;
+                    orma.updateConferenceDB().conference_identifierEq(this.conference.conference_identifier).
+                            notification_silent(this.conference.notification_silent).execute();
+
+                    final Drawable d_notification = new IconicsDrawable(context).
+                            icon(GoogleMaterial.Icon.gmd_notifications_active).
+                            color(context.getResources().
+                                    getColor(R.color.colorPrimaryDark)).
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(90);
+                    f_notification.setImageDrawable(d_notification);
+                }
             }
             else
             {
