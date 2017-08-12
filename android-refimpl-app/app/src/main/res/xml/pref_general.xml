@@ -60,4 +60,10 @@
         android:summary="@string/pref_description_min_audio_samplingrate_out"
         android:title="@string/pref_title_min_audio_samplingrate_out"/>
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="conference_show_system_messages"
+        android:summary="@string/pref_description_conference_show_system_messages"
+        android:title="@string/pref_title_conference_show_system_messages"/>
+
 </PreferenceScreen>

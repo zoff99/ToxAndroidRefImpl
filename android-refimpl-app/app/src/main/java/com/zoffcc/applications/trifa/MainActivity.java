@@ -271,6 +271,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview buffer size!!
     static boolean PREF__fps_half = true;
+    static boolean PREF__conference_show_system_messages = false;
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
@@ -387,6 +388,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         PREF__fps_half = settings.getBoolean("fps_half", true);
+        PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {
@@ -643,7 +645,7 @@ public class MainActivity extends AppCompatActivity
                                         PREF__orbot_enabled_to_int = 1;
                                     }
                                     init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
-                                    Log.i(TAG,"set_all_conferences_inactive:001");
+                                    Log.i(TAG, "set_all_conferences_inactive:001");
                                     set_all_conferences_inactive();
                                     tox_service_fg.tox_thread_start_fg();
                                 }
@@ -1268,7 +1270,7 @@ public class MainActivity extends AppCompatActivity
                             init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
                         }
 
-                        Log.i(TAG,"set_all_conferences_inactive:002");
+                        Log.i(TAG, "set_all_conferences_inactive:002");
                         set_all_conferences_inactive();
                         tox_service_fg.tox_thread_start_fg();
                     }
@@ -1375,6 +1377,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         PREF__fps_half = settings.getBoolean("fps_half", true);
+        PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {
@@ -3955,18 +3958,18 @@ public class MainActivity extends AppCompatActivity
                     {
                         Log.i(TAG, "namelist_change_cb:009");
 
-                        insert_into_conference_message_db(m, true);
+                        insert_into_conference_message_db_system_message(m, true);
                     }
                     else
                     {
                         Log.i(TAG, "namelist_change_cb:010");
 
-                        insert_into_conference_message_db(m, false);
+                        insert_into_conference_message_db_system_message(m, false);
                     }
                 }
                 else
                 {
-                    long new_msg_id = insert_into_conference_message_db(m, false);
+                    long new_msg_id = insert_into_conference_message_db_system_message(m, false);
                     Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
                 }
 
@@ -5246,6 +5249,35 @@ public class MainActivity extends AppCompatActivity
         //    }
         //};
         //t.start();
+    }
+
+    static long insert_into_conference_message_db_system_message(final ConferenceMessage m, final boolean update_conference_view_flag)
+    {
+        long row_id = orma.insertIntoConferenceMessage(m);
+
+        try
+        {
+            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
+            cursor.moveToFirst();
+            Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
+            long msg_id = cursor.getLong(0);
+            cursor.close();
+
+            if (update_conference_view_flag)
+            {
+                if (PREF__conference_show_system_messages)
+                {
+                    add_single_conference_message_from_messge_id(msg_id, true);
+                }
+            }
+
+            return msg_id;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     static long insert_into_conference_message_db(final ConferenceMessage m, final boolean update_conference_view_flag)

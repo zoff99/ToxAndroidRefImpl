@@ -34,7 +34,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceMessageListFragment extends Fragment
@@ -86,11 +88,24 @@ public class ConferenceMessageListFragment extends Fragment
         {
             if (orma != null)
             {
-                // TODO: sort by ID ?
-                data_values = orma.selectFromConferenceMessage().
-                        conference_identifierEq(current_conf_id).
-                        orderByIdAsc().
-                        toList();
+                if (PREF__conference_show_system_messages)
+                {
+                    // TODO: sort by ID ?
+                    data_values = orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).
+                            orderByIdAsc().
+                            toList();
+                }
+                else
+                {
+                    // TODO: sort by ID ?
+                    data_values = orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).
+                            and().
+                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                            orderByIdAsc().
+                            toList();
+                }
             }
         }
         catch (Exception e)

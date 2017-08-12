@@ -66,6 +66,9 @@
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
 
+    <string name="pref_title_conference_show_system_messages">System Messages</string>
+    <string name="pref_description_conference_show_system_messages">show System Messages in Conferences</string>
+
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
