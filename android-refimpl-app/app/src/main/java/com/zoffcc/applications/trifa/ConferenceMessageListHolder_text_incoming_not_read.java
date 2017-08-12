@@ -36,12 +36,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
@@ -51,6 +54,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceMessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -70,6 +74,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     boolean is_selected = false;
     boolean is_system_message = false;
     ImageView img_corner;
+    private boolean have_avatar_for_pubkey = false;
 
     public ConferenceMessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -94,12 +99,14 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     {
         message_ = m;
 
+        // Log.i(TAG, "have_avatar_for_pubkey:0000:==========================");
+
         is_system_message = false;
         if (m.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY))
         {
             is_system_message = true;
         }
-        Log.i(TAG, "is_system_message=" + is_system_message + " m.tox_peerpubkey=" + m.tox_peerpubkey);
+        // Log.i(TAG, "is_system_message=" + is_system_message + " m.tox_peerpubkey=" + m.tox_peerpubkey);
 
         is_selected = false;
         if (selected_messages.isEmpty())
@@ -221,31 +228,64 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             }
         });
 
-
         int peer_color_fg = context.getResources().getColor(R.color.colorPrimaryDark);
         int peer_color_bg = context.getResources().getColor(R.color.material_drawer_background);
         int alpha_value = 160;
-        int peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
+        // int peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
+
+
+        have_avatar_for_pubkey = false;
+        // Log.i(TAG, "have_avatar_for_pubkey:00a01:" + have_avatar_for_pubkey);
+
+        FriendList fl_temp = null;
+        try
+        {
+            // Log.i(TAG, "have_avatar_for_pubkey:00a01x:" + m.tox_peername + ":" + m.tox_peerpubkey);
+
+            fl_temp = orma.selectFromFriendList().
+                    tox_public_key_stringEq(m.tox_peerpubkey).get(0);
+
+            if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
+            {
+                info.guardianproject.iocipher.File f1 = null;
+                try
+                {
+                    f1 = new info.guardianproject.iocipher.File(fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                    if (f1.length() > 0)
+                    {
+                        have_avatar_for_pubkey = true;
+                        // Log.i(TAG, "have_avatar_for_pubkey:00a02:" + have_avatar_for_pubkey + ":" + fl_temp.avatar_pathname + ":" + fl_temp.avatar_filename);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                have_avatar_for_pubkey = false;
+                // Log.i(TAG, "have_avatar_for_pubkey:00a03:" + have_avatar_for_pubkey);
+                fl_temp = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            have_avatar_for_pubkey = false;
+            // Log.i(TAG, "have_avatar_for_pubkey:00a04:" + have_avatar_for_pubkey);
+            fl_temp = null;
+        }
 
         try
         {
             peer_color_bg = ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())];
-            //            Log.i(TAG, "bindMessageList:avatar_color:" + "pubkey=" +
-            //                    //
-            //                    m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
-            //                            //
-            //                            m.tox_peerpubkey.length()) + " bucket#=" + hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())
-            //                    //
-            //                    + " color=" + peer_color_bg);
-            peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
+            // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-
-        // textView.setBackgroundColor(peer_color_bg);
-        // textView_container.setBackgroundColor(peer_color_bg);
 
         // we need to do the rounded corner background manually here, to change the color ---------------
         GradientDrawable shape = new GradientDrawable();
@@ -255,6 +295,58 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         // shape.setStroke(3, borderColor);
         textView_container.setBackground(shape);
         // we need to do the rounded corner background manually here, to change the color ---------------
+
+        final Drawable smiley_face = new IconicsDrawable(context).
+                icon(FontAwesome.Icon.faw_smile_o).
+                backgroundColor(peer_color_bg).
+                color(peer_color_fg).sizeDp(70);
+
+        try
+        {
+            if (have_avatar_for_pubkey)
+            {
+                // Log.i(TAG, "have_avatar_for_pubkey:00a05");
+
+                if (VFS_ENCRYPT)
+                {
+                    info.guardianproject.iocipher.File f1 = null;
+                    try
+                    {
+                        f1 = new info.guardianproject.iocipher.File(fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    if ((f1 != null) && (fl_temp.avatar_pathname != null))
+                    {
+                        if (f1.length() > 0)
+                        {
+                            // img_avatar.setVisibility(View.VISIBLE);
+                            // Log.i(TAG, "have_avatar_for_pubkey:001");
+                            final RequestOptions glide_options = new RequestOptions().fitCenter();
+                            GlideApp.
+                                    with(context).
+                                    load(f1).
+                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                    skipMemoryCache(false).
+                                    apply(glide_options).
+                                    into(img_avatar);
+                            // Log.i(TAG, "have_avatar_for_pubkey:002");
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception a01)
+        {
+            a01.printStackTrace();
+            // Log.i(TAG, "have_avatar_for_pubkey:EE1:" + a01.getMessage());
+            // Log.i(TAG, "have_avatar_for_pubkey:003");
+            have_avatar_for_pubkey = false;
+            // Log.i(TAG, "have_avatar_for_pubkey:00a07:" + have_avatar_for_pubkey);
+        }
 
         if (is_system_message)
         {
@@ -285,12 +377,13 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             peer_name_text.setVisibility(View.VISIBLE);
 
-            final Drawable d_lock = new IconicsDrawable(context).
-                    icon(FontAwesome.Icon.faw_smile_o).
-                    backgroundColor(peer_color_bg).
-                    color(peer_color_fg).sizeDp(50);
-            img_avatar.setImageDrawable(d_lock);
+            if (!have_avatar_for_pubkey)
+            {
+                // Log.i(TAG, "have_avatar_for_pubkey:005+" + have_avatar_for_pubkey);
+                img_avatar.setImageDrawable(smiley_face);
+            }
         }
+
     }
 
     @Override

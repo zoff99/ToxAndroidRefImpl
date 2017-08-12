@@ -4883,12 +4883,37 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
+            boolean avatar_filesize_non_zero = false;
+            info.guardianproject.iocipher.File f1 = null;
+            try
+            {
+                f1 = new info.guardianproject.iocipher.File(avatar_path_name + "/" + avatar_file_name);
+                if (f1.length() > 0)
+                {
+                    avatar_filesize_non_zero = true;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
             Log.i(TAG, "set_friend_avatar:update:pubkey=" + friend_pubkey + " path=" + avatar_path_name + " file=" + avatar_file_name);
 
-            orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
-                    avatar_pathname(avatar_path_name).
-                    avatar_filename(avatar_file_name).
-                    execute();
+            if (avatar_filesize_non_zero)
+            {
+                orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
+                        avatar_pathname(avatar_path_name).
+                        avatar_filename(avatar_file_name).
+                        execute();
+            }
+            else
+            {
+                orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
+                        avatar_pathname(null).
+                        avatar_filename(null).
+                        execute();
+            }
 
             update_display_friend_avatar(friend_pubkey, avatar_path_name, avatar_file_name);
         }

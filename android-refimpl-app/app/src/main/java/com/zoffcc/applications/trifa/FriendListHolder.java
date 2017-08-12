@@ -122,7 +122,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             f_notification.setOnClickListener(this);
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable d_lock = new IconicsDrawable(context).
+                icon(FontAwesome.Icon.faw_lock).color(context.getResources().
+                getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         textView.setText(fl.name);
         statusText.setText(fl.status_message);
@@ -175,6 +177,10 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         //                                    skipMemoryCache(false).
                         //                                    apply(glide_options).
                         //                                    into(avatar);
+                    }
+                    else
+                    {
+                        avatar.setImageDrawable(d_lock);
                     }
                 }
             }
