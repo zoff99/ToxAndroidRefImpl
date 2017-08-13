@@ -43,6 +43,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_SELECTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -99,7 +101,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                     icon(GoogleMaterial.Icon.gmd_notifications_off).
                     color(context.getResources().
                             getColor(R.color.colorPrimaryDark)).
-                    alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(90);
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
         }
@@ -109,7 +111,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                     icon(GoogleMaterial.Icon.gmd_notifications_active).
                     color(context.getResources().
                             getColor(R.color.colorPrimaryDark)).
-                    alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(90);
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
         }
@@ -214,7 +216,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                             icon(GoogleMaterial.Icon.gmd_notifications_off).
                             color(context.getResources().
                                     getColor(R.color.colorPrimaryDark)).
-                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(90);
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
                     f_notification.setImageDrawable(d_notification);
                 }
                 else
@@ -227,7 +229,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                             icon(GoogleMaterial.Icon.gmd_notifications_active).
                             color(context.getResources().
                                     getColor(R.color.colorPrimaryDark)).
-                            alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(90);
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
                     f_notification.setImageDrawable(d_notification);
                 }
             }

@@ -90,8 +90,10 @@ public class TRIFAGlobals
     static final int FILE_PICK_METHOD = 2;
     static final String TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY = "-1";
 
-    static final int FL_NOTIFICATION_ICON_ALPHA_SELECTED = 140;
+    static final int FL_NOTIFICATION_ICON_ALPHA_SELECTED = 135;
     static final int FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED = 50;
+    static final int FL_NOTIFICATION_ICON_SIZE_DP_SELECTED = 90;
+    static final int FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED = 15;
 
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
