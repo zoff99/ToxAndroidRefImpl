@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -56,6 +57,7 @@ import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_f
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
+import static com.zoffcc.applications.trifa.MainActivity.set_new_random_nospam_value;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
@@ -100,14 +102,7 @@ public class ProfileActivity extends AppCompatActivity
             {
                 try
                 {
-                    // Log.i(TAG, "old ToxID=" + MainActivity.get_my_toxid());
-                    // Log.i(TAG, "old NOSPAM=" + MainActivity.tox_self_get_nospam());
-                    Random random = new Random();
-                    long new_nospam = (long) random.nextInt() + (1L << 31);
-                    // Log.i(TAG, "generated NOSPAM=" + new_nospam);
-                    MainActivity.tox_self_set_nospam(new_nospam);
-                    // Log.i(TAG, "new ToxID=" + MainActivity.get_my_toxid());
-                    // Log.i(TAG, "new NOSPAM=" + MainActivity.tox_self_get_nospam());
+                    set_new_random_nospam_value();
                     Toast.makeText(v.getContext(), "generated new Random NOSPAM value", Toast.LENGTH_SHORT).show();
 
                     // ---- change display to the new ToxID ----
@@ -221,7 +216,19 @@ public class ProfileActivity extends AppCompatActivity
         try
         {
             mytoxid_imageview.setImageBitmap(encodeAsBitmap("tox:" + MainActivity.get_my_toxid()));
-            mytoxid_textview.setText(MainActivity.get_my_toxid());
+            // HINT: https://toktok.ltd/spec.html#messenger -> "Tox ID:"
+            // 32 	long term public key
+            // 4 	nospam
+            // 2 	checksum
+            String my_tox_id_temp = MainActivity.get_my_toxid();
+            String my_pk_key_temp = my_tox_id_temp.substring(0, 64);
+            String my_nospam_temp = my_tox_id_temp.substring(64, 72);
+            String my_chksum_temp = my_tox_id_temp.substring(72, my_tox_id_temp.length());
+            String color_pkey = "<font color=\"#331bc5\">";
+            String color_nospam = "<font color=\"#990d45\">";
+            String color_chksum = "<font color=\"#006600\">";
+            String ec = "</font>";
+            mytoxid_textview.setText(Html.fromHtml(color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum + my_chksum_temp + ec));
         }
         catch (WriterException e)
         {

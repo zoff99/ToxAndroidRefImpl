@@ -2789,6 +2789,23 @@ public class MainActivity extends AppCompatActivity
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
+
+                try
+                {
+                    Thread.sleep(100);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                // ---- set new random nospam value after each added friend ----
+                // ---- set new random nospam value after each added friend ----
+                // ---- set new random nospam value after each added friend ----
+                set_new_random_nospam_value();
+                // ---- set new random nospam value after each added friend ----
+                // ---- set new random nospam value after each added friend ----
+                // ---- set new random nospam value after each added friend ----
             }
         };
         t.start();
@@ -7262,6 +7279,18 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             Log.i(TAG, "save_selected_messages:EE2:" + e.getMessage());
         }
+    }
+
+    static void set_new_random_nospam_value()
+    {
+        // Log.i(TAG, "old ToxID=" + MainActivity.get_my_toxid());
+        // Log.i(TAG, "old NOSPAM=" + MainActivity.tox_self_get_nospam());
+        Random random = new Random();
+        long new_nospam = (long) random.nextInt() + (1L << 31);
+        // Log.i(TAG, "generated NOSPAM=" + new_nospam);
+        tox_self_set_nospam(new_nospam);
+        // Log.i(TAG, "new ToxID=" + MainActivity.get_my_toxid());
+        // Log.i(TAG, "new NOSPAM=" + MainActivity.tox_self_get_nospam());
     }
 
     // --------- make app crash ---------
