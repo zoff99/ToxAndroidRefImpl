@@ -196,11 +196,11 @@ test:
       -o libjni-c-toxcore.so
       -std=gnu99 -D_FILE_OFFSET_BITS=64
       -D__USE_GNU=1
-      -I$JAVADIR/ \
-      -L/usr/local/lib \
-      -I/usr/local/include/ \
-      jni-c-toxcore.c \
-      -lsodium -ltoxcore -ltoxav -lpthread -lvpx -lopus \
+      -I$JAVADIR/
+      -L/usr/local/lib
+      -I/usr/local/include/
+      jni-c-toxcore.c
+      -lsodium -ltoxcore -ltoxav -lpthread -lvpx -lopus
       -lm
     - cd jni-c-toxcore ; ls -al libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; file libjni-c-toxcore.so ; exit 0
