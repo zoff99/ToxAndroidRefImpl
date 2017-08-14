@@ -70,7 +70,7 @@ dependencies:
 
     ### ------- compile and install libsodium -------
     - cd libsodium/ ; ./autogen.sh
-    - cd libsodium/ ; ./configure && make check
+    - cd libsodium/ ; export CFLAGS="$CFLAGS -fPIC";./configure && make check
     - cd libsodium/ ; sudo bash -c "printf 'y\naa\n\n' | checkinstall --install --pkgname libsodium --pkgversion 1.0.0 --nodoc --deldesc=no --pkglicense='GPL2'"
     - cd libsodium/ ; sudo ldconfig
     - cd libsodium ; sudo ldconfig -v 2>/dev/null | grep sodium
@@ -84,7 +84,7 @@ dependencies:
     ### ------- compile and install libsodium -------
 
     ### ------------ compile and install c-toxcore ------------
-    - cd c-toxcore ; ./autogen.sh ; ./configure --enable-logging --disable-soname-versions
+    - cd c-toxcore ; ./autogen.sh ; export CFLAGS="$CFLAGS -fPIC";./configure --enable-logging --disable-soname-versions
     #- cd c-toxcore ; cmake -DWARNINGS=OFF -DTRACE=ON .
     #- cd c-toxcore ; cmake -DWARNINGS=OFF -DMIN_LOGGER_LEVEL=DEBUG .
     - cd c-toxcore ; make -j4
