@@ -190,14 +190,15 @@ dependencies:
 test:
   override:
     - cd jni-c-toxcore ; rm -fv libjni-c-toxcore.so
-    - dirname $(find /usr -name 'jni.h' 2>/dev/null|tail -1) > /tmp/xx
-    - cd jni-c-toxcore ; cp -v $(find /usr -name 'jni_md.h' 2>/dev/null|tail -1) ./
-    - cd jni-c-toxcore ; export JAVADIR=$(cat /tmp/xx); gcc -fPIC -O2 -g
+    - dirname $(find /usr -name 'jni.h' 2>/dev/null|tail -1) > /tmp/xx1
+    - dirname $(find /usr -name 'jni_md.h' 2>/dev/null|tail -1) > /tmp/xx2
+    - cd jni-c-toxcore ; export JAVADIR1=$(cat /tmp/xx1); export JAVADIR2=$(cat /tmp/xx2); gcc -fPIC -O2 -g
       -shared -funwind-tables -Wl,-soname,libjni-c-toxcore.so
       -o libjni-c-toxcore.so
       -std=gnu99 -D_FILE_OFFSET_BITS=64
       -D__USE_GNU=1
-      -I$JAVADIR/
+      -I$JAVADIR1/
+      -I$JAVADIR2/
       -L/usr/local/lib
       -I/usr/local/include/
       jni-c-toxcore.c
