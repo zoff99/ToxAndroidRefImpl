@@ -191,6 +191,7 @@ test:
   override:
     - cd jni-c-toxcore ; rm -fv libjni-c-toxcore.so
     - dirname $(find /usr -name 'jni.h' 2>/dev/null|tail -1) > /tmp/xx
+    - cd jni-c-toxcore ; cp -v $(find /usr -name 'jni_md.h' 2>/dev/null|tail -1) ./
     - cd jni-c-toxcore ; export JAVADIR=$(cat /tmp/xx); gcc -fPIC -O2 -g
       -shared -funwind-tables -Wl,-soname,libjni-c-toxcore.so
       -o libjni-c-toxcore.so
