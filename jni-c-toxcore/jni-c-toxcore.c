@@ -49,8 +49,8 @@
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
 #include <jni.h>
-#include "coffeecatch.h"
-#include "coffeejni.h"
+// #include "coffeecatch.h"
+// #include "coffeejni.h"
 // ------- Android/JNI stuff -------
 
 
