@@ -1,53 +1,25 @@
 machine:
   timezone:
     Europe/Berlin
-  java:
-    version: oraclejdk8
   environment:
-    MAKEFLAGS: "j4"
-# --- Android build ---
-    _toolchain_: "/home/ubuntu/c-toxcore/toolchains/"
-    _s_: "/home/ubuntu/c-toxcore/src/"
-    # ---- arm -----
-    AND_TOOLCHAIN_ARCH: "arm"
-    AND_TOOLCHAIN_ARCH2: "arm-linux-androideabi"
-    AND_PATH: "$_toolchain_/arm-linux-androideabi/bin:$PATH"
-    AND_PKG_CONFIG_PATH: "$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
-    AND_CC: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
-    AND_GCC: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-gcc"
-    AND_CXX: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang++"
-    AND_READELF: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-readelf"
-    AND_ARTEFACT_DIR: "arm"
-    # ---- x86 -----
-    AND_TOOLCHAIN_ARCH_X86: "x86"
-    AND_TOOLCHAIN_ARCH2_X86: "x86"
-    AND_PATH_X86: "$_toolchain_/x86/bin:$PATH"
-    AND_PKG_CONFIG_PATH_X86: "$_toolchain_/x86/sysroot/usr/lib/pkgconfig"
-    AND_CC_X86: "$_toolchain_/x86/bin/i686-linux-android-clang"
-    AND_GCC_X86: "$_toolchain_/x86/bin/i686-linux-android-gcc"
-    AND_CXX_X86: "$_toolchain_/x86/bin/i686-linux-android-clang++"
-    AND_READELF_X86: "$_toolchain_/x86/bin/i686-linux-android-readelf"
-    AND_ARTEFACT_DIR_X86: "x86"
-# --- Android build ---
-
+    MAKEFLAGS: ""
+## ----------- RASPI cross compile ----------------
+    RASPI_PATH: "/home/ubuntu/cc/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin:$PATH"
+    RASPI_SYSROOT_: "/home/ubuntu/cc/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/arm-linux-gnueabihf/sysroot"
+    RASPI_TOOL_PREFIX: arm-linux-gnueabihf
+    RASPI_INSTALL_DEST: "/home/ubuntu/installdest/"
+    RASPI_TARGET_: arm-linux-gnueabi
+    RASPI_HOST_: arm-linux-gnueabi
+    RASPI_CXX: $RASPI_TOOL_PREFIX-g++
+    RASPI_AR: $RASPI_TOOL_PREFIX-ar
+    RASPI_RANLIB: $RASPI_TOOL_PREFIX-ranlib
+    RASPI_CC: $RASPI_TOOL_PREFIX-gcc
+    RASPI_LD: $RASPI_TOOL_PREFIX-ld
+    RASPI_PKG_CONFIG_PATH: "/home/ubuntu/cc/tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/arm-linux-gnueabihf/sysroot/usr/lib/pkgconfig"
+    RASPI_s_: "/home/ubuntu/src/"
+    RASPI_PKGSDIR: "/home/ubuntu/pkgs/"
+## ----------- RASPI cross compile ----------------
     # ---------------------------------------------------
-    # VP8 0.15 rsiliet 3bd08f62c4b3947bf7441e1d7f79fd48cc02521d
-    # VP8 0.14  lag    b8ad9e88c18c683beb46a8f62a0e88ee647698ff
-    # VP8 0.13targetbr 7dcef8c5b97adb70445ea68d9c31f9c458317232
-    # VP9 0.12         ed6ad27e2e997b249e6c7a896fbc140eb7779a37
-    # VP8 0.11         bc5d40a621b62b3db25dcccbcdbcbcd72992c5df
-    # VP8 0.10 threads 04a5ad10f14587a838728e32a2a9b3714fb8e8bf
-    # VP8 0.9 thresh   0bc98333a2108f31dab0c6938c3a3bb00327f0c1
-    # VP8 0.8 VPX_CQ   478c902611ff1ce28fb64ce1c18b9c70a0d51be3
-    # VP8 0.7 maxdist  b9623f86a4a5b2da3e540fa117f57b05785622b6
-    # VP8 revert       44e77e4b7f369681ef17024db6f5bcded3a79129
-    #
-    # VP8 0.6          08f0ea119c57c1596e899ae454b82534797873f8
-    # VP8 0.5          f22aaebbb5079b2924d46c6a9a20821e28479253
-    # VP8 0.4          e943446e0c6144948a9b9e6476ff7106744eeea9
-    # VP8 0.3          30f2a5917f71a2b1f7296a7e556ff1a5af84f8af
-    # VP9 0.2          c67afc441da958a9006a5938327cef929e1e9cb9
-    # VP9 0.1          b1753a6388b0571cbdd561eb6e533cf597074247
     # c-toxcore v0.1.9 a429ef4a28a5e5e0ad010efffb76d2abc3ada0af
     # c-toxcore v0.1.8 f6db9333e2d1262e7ba3846563c30f63c98ffa38
     # c-toxcore v0.1.7 48c86e942d487a8856cbd25797b320bfb1879ddc
@@ -55,504 +27,174 @@ machine:
     # c-toxcore v0.1.5 995578f1038842288c1ff552fd796ab2377db6e1
     # c-toxcore v0.1.4 27a97a8280813ec05a5209811c40ab23203bb292
     # c-toxcore v0.1.3 fdb46f6cf216a866d29402ae991be9c43282dde6
-    # c-toxcore v0.1.2 a096c71db867ac83fc3e01e0fbe98573d20f9286
     # ---------------------------------------------------
-
-    # c-toxcore version
-    AND_CTOXCORE_VERSION: "bc5d40a621b62b3db25dcccbcdbcbcd72992c5df"
-    # c-toxcore repo url
-    # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
-    AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
-
-    _SDK_: /usr/local/android-sdk-linux/
-    _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
-    JAVA_OPTS: "-Xms512m -Xmx1024m"
-    GRADLE_OPTS: '-Xmx512m -Dorg.gradle.jvmargs="-Xmx1700m -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=1700m"'
-    CLASS_P: com.zoffcc.applications.trifa
-    START_INTENT_P: com.zoffcc.applications.trifa.StartMainActivityWrapper
-
-    ZEMU_: "appemu23"
-    EMU_: "appemu21"
-    XEMU_: "appemu10"
-    Zsdpath: "/sdcard"
-    sdpath: "/storage/sdcard"
-    Xsdpath: "/mnt/sdcard"
-
-###### custom 2 ######
-    GRADLE_HOME: ~/g/gradle-custom
-    PATH: ~/g/gradle-custom/bin:$PATH
-#
-#   GRADLE_CUSTOM_VERSION -> [0, 1]
-#   GRADLE_CUSTOM_VNUM -> what version?
-#
-    GRADLE_CUSTOM_VERSION: 0
-    GRADLE_CUSTOM_VNUM: 3.1
-    # ANDROID_DAILY_OVERRIDE: "d349fb0bfb70be0d783e6c79454a5ceb276095ed"
-###### custom 2 ######
-
+    # c-toxcore v0.1.9
+    CTOXCORE_VERSION_HASH: a429ef4a28a5e5e0ad010efffb76d2abc3ada0af
+    LIBSODIUM_VERSION: "tags/1.0.12"
+    LIBSODIUM_BRANCH: "1.0.12"
+    RASPBERRRY_TOOLS_HASH: d820ab9c21969013b4e56c7e9cba25518afcdd44
+    
 dependencies:
   pre:
-  - sudo apt-get update
-  - sudo apt-get install clang
-  - sudo apt-get install build-essential libtool autotools-dev automake checkinstall check yasm
-  - sudo apt-get install pkg-config
-
-# ------------ network_test requires that "localhost" resolves to ::1 ------------
-  - sudo bash -c "echo '::1             localhost ipv6-localhost ipv6-loopback' >> /etc/hosts" # ipv6 localhost entry
-# ------------ network_test requires that "localhost" resolves to ::1 ------------
-
-  - java -version ; exit 0
-  - gcc --version ; exit 0
-  - clang --version ; exit 0
-
-  - mkdir -p /home/ubuntu/c-toxcore # workaround :-)
-
-
-  - sudo apt-get install xdotool > /dev/null 2> /dev/null
-  - sudo apt-get install telnet > /dev/null 2> /dev/null
-  - sudo apt-get install x11-utils > /dev/null 2> /dev/null
-  - sudo apt-get install xvkbd > /dev/null 2> /dev/null
-  - sudo apt-get install qrencode > /dev/null 2> /dev/null
-  - sudo apt-get install p7zip-full
-
-  - echo y | android update sdk --no-ui --all --filter "tools"
-  - android list sdk --all | grep -i tools
-  - android list sdk --all --extended
-  - echo y | android update sdk --no-ui --all --filter "tools"
-
-  - echo y | android update sdk --no-ui --all --filter build-tools-23.0.3
-  - echo y | android update sdk --no-ui --all --filter build-tools-24.0.2
-  - echo y | android update sdk --no-ui --all --filter build-tools-24.0.3
-  - echo y | android update sdk --no-ui --all --filter build-tools-25.0.0
-  - echo y | android update sdk --no-ui --all --filter build-tools-25.0.2
-  - echo y | android update sdk --no-ui --all --filter build-tools-25.0.3
-  - echo y | android update sdk --no-ui --all --filter android-16 ; exit 0
-  - echo y | android update sdk --no-ui --all --filter android-21
-  - echo y | android update sdk --no-ui --all --filter android-23
-  - echo y | android update sdk --no-ui --all --filter android-24
-  - echo y | android update sdk --no-ui --all --filter android-25
-  - echo y | android update sdk --no-ui --all --filter platform-tools
-
-  - echo y | android update sdk --no-ui --all --filter extra-android-m2repository > /dev/null 2> /dev/null
-  - echo y | android update sdk --no-ui --all --filter extra-google-m2repository > /dev/null 2> /dev/null
-  - echo y | android update sdk --no-ui --all --filter extra-android-support > /dev/null 2> /dev/null
-
-  - echo y | android update sdk --no-ui --all --filter platform-tools-preview > /dev/null 2> /dev/null
-  - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-21
-  - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-23 > /dev/null 2> /dev/null
-  - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-addon-google_apis-google-23 > /dev/null 2> /dev/null
-  - echo y | android update sdk --no-ui --all --filter addon-google_apis-google-23 > /dev/null 2> /dev/null
-
-  - echo ${ANDROID_HOME} ; exit 0
-  - ls -al "${ANDROID_HOME}/licenses" ; exit 0
-
-  - mkdir -p "${ANDROID_HOME}/licenses" ;
-    echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "${ANDROID_HOME}/licenses/android-sdk-license" ;
-    echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "${ANDROID_HOME}/licenses/android-sdk-preview-license" ;
-    echo -e "\nd975f751698a77b662f1254ddbeed3901e976f5a" > "${ANDROID_HOME}/licenses/intel-android-extra-license"
-
-  - gradle -v # display gradle version
-  - if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then cd ~ ; wget 'https://services.gradle.org/distributions/gradle-'"$GRADLE_CUSTOM_VNUM"'-bin.zip' ; fi
-  - if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then mkdir ~/g ; cd ~/g ; unzip ~/gradle-"$GRADLE_CUSTOM_VNUM"-bin.zip ; fi
-  - if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then cd ~/g ; mv -v ./gradle-"$GRADLE_CUSTOM_VNUM" ./gradle-custom ; fi
-  - gradle -v # display gradle version
-
-compile:
-  override:
-
-# --- generic build ---
-  - curl -s http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
-# --- verfiy NDK package ---
-  - echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' > android-ndk-r13b-linux-x86_64.zip.sha256
-  - sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256
-# --- verfiy NDK package ---
-  - unzip android-ndk-r13b-linux-x86_64.zip
-  - mv -v /home/ubuntu/ToxAndroidRefImpl/android-ndk-r13b /home/ubuntu/android-ndk
-
-  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
-  - mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
-# --- generic build ---
-
-
-  - echo 'if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then exit 0 ; else echo "full build" ; fi' > ~/_fullb1 ; chmod a+rx ~/_fullb1
-
-
-# --- Android build ---
-  - echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > ~/pp
-  - chmod u+x ~/pp
-  - rm -Rf "$_s_"
-  - mkdir -p "$_s_"
-
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - mkdir -p $CIRCLE_ARTIFACTS/android/$ARTEFACT_DIR
-
-  - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
-  - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
-
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
-  - . ~/pp;cd $_s_/yasm/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/yasm/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
-
-
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=armv7-android-gcc
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
-  - . ~/pp;cd ~/build/;make clean
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
-  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
-
-
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
-  - . ~/pp;cd $_s_/opus/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
-  - . ~/pp;cd ~/build/;make clean
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
-  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
-    
-    
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
-  - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --enable-minimal --disable-pie
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
-  - . ~/pp;cd ~/build/;make clean
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
-  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libsodium.zip *
-
-
-  # --- get wanted c-toxcore version ---
-  # ---- git does not clone into existing dir. why? --> so use workaround here ---
-  - cd ~/ ; git clone "$AND_CTOXCORE_URL" ~/tmp111
-  - cd ~/ ; ls -al c-toxcore/
-  - cd ~/ ; mv -v ~/tmp111/.??* c-toxcore/
-  - cd ~/ ; mv -v ~/tmp111/* c-toxcore/
-  - cd ~/ ; ls -al ~/tmp111/
-  - cd ~/ ; rm -Rf ~/tmp111
-  # ---- git does not clone into existing dir. why? --> so use workaround here ---
-  - cd ~/c-toxcore/ ; git checkout "$AND_CTOXCORE_VERSION"
-  - ls -al ~
-  - ls -al ~/c-toxcore/
-  # --- get wanted c-toxcore version ---
-
-  - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
-  - . ~/pp;cd ~/build/;export V=2;make -j4
-  - . ~/pp;cd ~/build/;make install
-  - . ~/pp;cd ~/build/;make clean
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
-  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/c-toxcore.zip *
-
-  - find / -name 'cpu-features*' 2>/dev/null ; exit 0
-  - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
-
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
-  - . ~/pp;cd jni-c-toxcore/; ls -al
-  #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; $READELF -a libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
-
-  # --------- use current jni code on this branch ---------
-  - if [ "$CIRCLE_BRANCH""x" == "zoff99/dev003x" ]; then cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/armeabi-v7a/ ; fi
-  # --------- use current jni code on this branch ---------
-# --- Android build ---
-
-
-
-
-
-
-
-
-# --- Android x86 build ---
-  - echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR_X86";export PATH="$AND_PATH_X86";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH_X86";export READELF="$AND_READELF_X86";export GCC="$AND_GCC_X86";export CC="$AND_CC_X86";export CXX="$AND_CXX_X86";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH_X86";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2_X86"' > ~/pp
-  - chmod u+x ~/pp
-  - rm -Rf "$_s_"
-  - mkdir -p "$_s_"
-
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - mkdir -p $CIRCLE_ARTIFACTS/android/"$ARTEFACT_DIR"
-
-  - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
-  - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/"$TOOLCHAIN_ARCH2" --api 12 --force   
-
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
-  - . ~/pp;cd $_s_/yasm/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/yasm/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
-
-
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-
-  # --force-target=x86-android-gcc --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --sdk-path=/Downloads/android-ndk-r9d/
-  - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=x86-android-gcc
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
-  - . ~/pp;cd ~/build/;make clean
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
-  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
-
-
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
-  - . ~/pp;cd $_s_/opus/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/opus/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
-  - . ~/pp;cd ~/build/;make clean
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
-  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
-    
-    
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
-  - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --enable-minimal --disable-pie
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
-  - . ~/pp;cd ~/build/;make clean
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
-  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libsodium.zip *
-
-
-  # --- get wanted c-toxcore version ---
-  # ---- git does not clone into existing dir. why? --> so use workaround here ---
-  - cd ~/ ; git clone "$AND_CTOXCORE_URL" ~/tmp111
-  - cd ~/ ; ls -al c-toxcore/
-  - mkdir -p ~/tc_save
-  - cd ~/ ; mv -v c-toxcore/toolchains ~/tc_save/
-  - cd ~/ ; rm -Rf c-toxcore/ ; mkdir c-toxcore/
-  - cd ~/ ; mv -v ~/tc_save/toolchains c-toxcore/
-  - cd ~/ ; mv -v ~/tmp111/.??* c-toxcore/
-  - cd ~/ ; mv -v ~/tmp111/* c-toxcore/
-  - cd ~/ ; ls -al ~/tmp111/
-  - cd ~/ ; rm -Rf ~/tmp111
-  # ---- git does not clone into existing dir. why? --> so use workaround here ---
-  - cd ~/c-toxcore/ ; git checkout "$AND_CTOXCORE_VERSION"
-  - ls -al ~
-  - ls -al ~/c-toxcore/
-  # --- get wanted c-toxcore version ---
-
-  - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --enable-logging --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --disable-testing --disable-rt
-  - . ~/pp;cd ~/build/;export V=2;make -j4
-  - . ~/pp;cd ~/build/;make install
-  - . ~/pp;cd ~/build/;make clean
-  - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
-  - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
-  - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/c-toxcore.zip *
-
-  - find / -name 'cpu-features*' 2>/dev/null ; exit 0
-  - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
-
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxav.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libvpx.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libopus.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
-  - . ~/pp;cd jni-c-toxcore/; ls -al
-  #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; $READELF -a libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; $READELF -A libjni-c-toxcore.so
-  - . ~/pp;cd jni-c-toxcore/; cp -av libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/"$TOOLCHAIN_ARCH"/
-
-  # --------- use current jni code on this branch ---------
-  - if [ "$CIRCLE_BRANCH""x" == "zoff99/dev003x" ]; then cd jni-c-toxcore/; cp -av libjni-c-toxcore.so ../android-refimpl-app/app/nativelibs/x86/ ; fi
-  # --------- use current jni code on this branch ---------
-# --- Android x86 build ---
-
-
-
-
-
-
-
-
-
-
-
-
-# --------- GRADLE -------------
-# - cd android-refimpl-app/ ; if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then gradle wrapper --no-daemon --gradle-version "$GRADLE_CUSTOM_VNUM" --info ; else gradle wrapper --no-daemon --info ; fi ; exit 0
-  - cd android-refimpl-app/ ; chmod a+rx ./gradlew
-  - cd android-refimpl-app/gwitness ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; rm -Rf gwit ; ../gradlew build --info
-  - ls -al /home/ubuntu/android-ndk
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:dependencies
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:'
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:' > $CIRCLE_ARTIFACTS/android/calculateChecksums.txt
-# --------- GRADLE -------------
-
-
-# --------- bintray artefact -------------
-  - cd jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
-  - cd jni-c-toxcore/; cp -av $CIRCLE_ARTIFACTS/android/libs/armeabi/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
-  - cd jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
-  - cd jni-c-toxcore/; cp -av $CIRCLE_ARTIFACTS/android/libs/x86/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
-
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ./gradlew :jnilib:dependencies
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ./gradlew :jnilib:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :jnilib:build --stacktrace --no-daemon # first build may FAIL
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ./gradlew :jnilib:install --info; exit 0
-  - if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; ./gradlew :jnilib:bintrayUpload --info; exit 0 ; fi
-  - find ~/.m2/repository -type f -exec ls -al {} \; ; exit 0
-# --------- bintray artefact -------------
-# --------- show generated aar file -----------
-  - cd android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/ ; exit 0
-  - cd android-refimpl-app/ ; find ./ -name '*.aar' ; exit 0
-
-  - unzip -t /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar ; exit 0
-  - sha256sum /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar ; exit 0
-  - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.pom ; exit 0
-  - cat /home/ubuntu/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/maven-metadata-local.xml ; exit 0
-
-  - cd android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar ; exit 0
-  - cd android-refimpl-app/ ; sha256sum ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar ; exit 0
-  - cd android-refimpl-app/ ; cp -av ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar $CIRCLE_ARTIFACTS/
-# --------- show generated aar file -----------
-
-
-
-# --- save lint output ---
-  - cd android-refimpl-app/ ; find . -name '*lint-report*' -exec ls -al {} \; ; exit 0
-  - cd android-refimpl-app/ ; cp -av ./app/lint-report.html $CIRCLE_ARTIFACTS/ ; exit 0
-  - cd android-refimpl-app/ ; cp -av ./app/lint-report.xml $CIRCLE_ARTIFACTS/ ; exit 0
-  - cd android-refimpl-app/ ; cp -av ./lint-report.txt $CIRCLE_ARTIFACTS/ ; exit 0
-# --- save lint output ---
-
-# ----------- show generated apk file -----------
-  - cd android-refimpl-app/ ; ls -al app/build/outputs/apk/ ; exit 0
-  - cd android-refimpl-app/ ; find ./ -name '*.apk' ; exit 0
-  - mkdir -p app/build/outputs/apk/
-  - cd android-refimpl-app/ ; cp -av ./app/build/outputs/apk/app-release-unsigned.apk ../app/build/outputs/apk/
-# ----------- show generated apk file -----------
-
-
-
-
-# ----------- make zipfile for builds [for download-dependencies.sh] -----------
-    #- . f;mkdir -p ~/and_stud_prj/app/libs/
-    #- . f;cp -av app/libs/tox*jar ~/and_stud_prj/app/libs/
-    #- . f;mkdir -p ~/and_stud_prj/app/src/main/jniLibs/
-    #- . f;cp -av app/src/main/jniLibs/* ~/and_stud_prj/app/src/main/jniLibs/
-    #- . f;cd ~/and_stud_prj/ ; zip -r $CIRCLE_ARTIFACTS/supplement.zip *
-# ----------- make zipfile for builds [for download-dependencies.sh] -----------
-
-  - zip -d app/build/outputs/apk/app-release-unsigned.apk META-INF/\*     # remove signature !!
-  - cp -av app/build/outputs/apk/app-release-unsigned.apk ~/app.apk ;
-    cd ~/ ;
-    echo xxxxxxrm -f ~/.android/debug.keystore ;
-    ls -al ~/.android/debug.keystore ;
-    if [ ! -f ~/.android/debug.keystore ]; then echo "*** generating new signer key ***" ;
-    echo "*** generating new signer key ***";
-    echo "*** generating new signer key ***";
-    keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US" ;
-    fi ;
-    ls -al ~/ ;
-    jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androiddebugkey ;
-    ls -al ~/ ;
-    $_SDK_/build-tools/23.0.3/zipalign -v 4 app-signed.apk app-signed-aligned.apk ;
-    ls -al ~/ ;
-    pwd ;
-    ls -al ;
-    cp -av app-signed-aligned.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk || exit 1
-
-##   also make apk files with different names for each build (for individual downloads)
-  - cp -av $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk
-##   qr code to scan with your phone to directly download the apk file (for convenience)
-  - qrencode -o $CIRCLE_ARTIFACTS/QR_apk.png 'https://circle-artifacts.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'/artifacts/'${CIRCLE_NODE_INDEX}'/tmp/'`basename $CIRCLE_ARTIFACTS`'/'"${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk" ; exit 0
-##   qr code to go directly to the aritfacts (to scan with phone)
-  - qrencode -o $CIRCLE_ARTIFACTS/QR_artifacts.png 'https://circleci.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'#artifacts' ; exit 0
-
-
-
-  pre:
-    - mksdcard -l e 180M sdcard.img
-    - echo 'mtools_skip_check=1' > ~/.mtoolsrc
-    - android list targets
-#
-    - if [ "$EMU_" == "appemu23" ]; then echo "no" | android create avd -n appemu23 -f -t android-23 --abi default/armeabi-v7a --skin "WXGA720" ; fi
-    - if [ "$EMU_" == "appemu23" ]; then cat ~/.android/avd/appemu23.avd/config.ini ; fi
-#
-    - if [ "$EMU_" == "appemu21" ]; then echo "no" | android create avd -n appemu21 -f -t android-21 --abi default/armeabi-v7a --skin "WXGA720" ; fi
-    - if [ "$EMU_" == "appemu21" ]; then cat ~/.android/avd/appemu21.avd/config.ini ; fi
-#
-    - if [ "$EMU_" == "appemu10" ]; then echo "no" | android create avd -n appemu10 -f -t android-10 --abi default/armeabi --skin "WQVGA432" ; fi
-    - if [ "$EMU_" == "appemu10" ]; then cat ~/.android/avd/appemu10.avd/config.ini ; fi
-#
-    - echo "$EMU_"
-    - echo "$sdpath"
+    # -----------------------------------
+    - sudo /etc/init.d/mysql stop ; exit 0
+    - sudo /etc/init.d/postgresql stop ; exit 0
+    # -----------------------------------
+    - sudo apt-get update
+    - sudo apt-get install cmake
+    - aptitude search 4l|grep -i convert ; exit 0
+    - aptitude search 4l|grep -i v4l ; exit 0
+    - sudo apt-get install build-essential libtool autotools-dev automake checkinstall check git yasm libv4lconvert0 libv4l-dev
+    - sudo apt-get install libopus-dev libvpx-dev pkg-config
+    - sudo apt-get install libasound2-dev
+    - sudo apt-get install linux-generic
+    - sudo apt-get install libjpeg-dev
+    - sudo apt-get install libpulse-dev
+    - sudo apt-get install libconfig-dev
+
+    - sudo bash -c "echo '::1             localhost ipv6-localhost ipv6-loopback' >> /etc/hosts" # ipv6 localhost entry
+
+    - gcc --version ; exit 0
+    - clang --version ; exit 0
+
+    ### submodules ----------------
+    - git submodule add --force https://github.com/TokTok/c-toxcore c-toxcore ; echo ok
+    - git submodule add --force https://github.com/jedisct1/libsodium libsodium ; echo ok
+    - git submodule init ; git submodule update ; echo ok
+    # -- sometimes submodule can't find commit hash, whatever ------
+    - rm -Rf c-toxcore ; git clone https://github.com/TokTok/c-toxcore
+    # -- sometimes submodule can't find commit hash, whatever ------
+    - cd c-toxcore/ ; git checkout $CTOXCORE_VERSION_HASH
+    - cd libsodium/ ; git checkout $LIBSODIUM_VERSION
+    ### submodules ----------------
+
+    ### ------- compile and install libsodium -------
+    - cd libsodium/ ; ./autogen.sh
+    - cd libsodium/ ; ./configure && make check
+    - cd libsodium/ ; sudo bash -c "printf 'y\naa\n\n' | checkinstall --install --pkgname libsodium --pkgversion 1.0.0 --nodoc --deldesc=no --pkglicense='GPL2'"
+    - cd libsodium/ ; sudo ldconfig
+    - cd libsodium ; sudo ldconfig -v 2>/dev/null | grep sodium
+    ## --- now again to save the artefact ---
+    - cd libsodium ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; rm -Rf "$INSTALL_DEST"
+    - cd libsodium ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; mkdir -p  "$INSTALL_DEST"/usr ; ./configure --prefix="$INSTALL_DEST"/usr
+    - cd libsodium ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; make install ; ls -alR "$INSTALL_DEST"/usr
+    - mkdir -p $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries
+    - export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; cd "$INSTALL_DEST" ; tar -czvf $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/pkg_libsodium.tar.gz *
+    ## --- now again to save the artefact ---
+    ### ------- compile and install libsodium -------
+
+    ### ------------ compile and install c-toxcore ------------
+    - cd c-toxcore ; ./autogen.sh ; ./configure --enable-logging --disable-soname-versions
+    #- cd c-toxcore ; cmake -DWARNINGS=OFF -DTRACE=ON .
+    #- cd c-toxcore ; cmake -DWARNINGS=OFF -DMIN_LOGGER_LEVEL=DEBUG .
+    - cd c-toxcore ; make -j4
+    - cd c-toxcore ; sudo make install
+    - cd c-toxcore ; sudo ldconfig -v 2>/dev/null | grep toxcore
+    - ls -al /usr/local/lib/
+    ## --- now again to save the artefact ---
+    - cd c-toxcore ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; rm -Rf "$INSTALL_DEST"
+    - cd c-toxcore ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; mkdir -p  "$INSTALL_DEST"/usr ; ./autogen.sh ; ./configure --enable-logging --disable-soname-versions --prefix="$INSTALL_DEST"/usr
+    - cd c-toxcore ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; make install ; ls -alR "$INSTALL_DEST"/usr
+    - mkdir -p $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries
+    - export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; cd "$INSTALL_DEST" ; tar -czvf $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/pkg_c-toxcore.tar.gz *
+    ## --- now again to save the artefact ---
+    ### ------------ run tests
+    # - cd c-toxcore ; make test ARGS="-V" ; ex1=$? ; if [ $ex1 -ne 0 ]; then sleep 60; make test ARGS="-V" ; exit $? ; fi
+    ### ------------ compile and install c-toxcore ------------
+
+
+
+## ----------- RASPI cross compile ----------------
+    ## ----------- set architecture -------------------
+    ## ----------- set architecture -------------------
+    - ARCH="RASPI";printf '#! /bin/bash\nexport CUR_ARCH_="'"$ARCH"'"\n' > ~/glo
+    - chmod a+rx ~/glo
+    - cat ~/glo
+    ## ----------- set architecture -------------------
+    ## ----------- set architecture -------------------
+
+    - mkdir ~/cc/
+    - cd ~/cc ; git clone https://github.com/raspberrypi/tools
+    - cd ~/cc/tools/ ; git checkout $RASPBERRRY_TOOLS_HASH
+
+    - . ~/glo;a=${CUR_ARCH_}_PKG_CONFIG_PATH;mkdir -p "${!a}"
+    - . ~/glo;a=${CUR_ARCH_}_PKGSDIR;mkdir -p "${!a}"
+    - . ~/glo;a=${CUR_ARCH_}_SYSROOT_;ls -al "${!a}"
+    - . ~/glo;a=${CUR_ARCH_}_s_;mkdir -p "${!a}"
+    - . ~/glo;a=${CUR_ARCH_}_PKGSDIR;mkdir -p "${!a}"
+
+    - . ~/glo;echo 'export PKGSDIR="$'"${CUR_ARCH_}"'_PKGSDIR";export INSTALL_DEST="$'"${CUR_ARCH_}"'_INSTALL_DEST";export PKG_CONFIG_PATH="$'"${CUR_ARCH_}"'_PKG_CONFIG_PATH";export PATH="$'"${CUR_ARCH_}"'_PATH";export CC="$'"${CUR_ARCH_}"'_CC";export CXX="$'"${CUR_ARCH_}"'_CXX";export AR="$'"${CUR_ARCH_}"'_AR";export RANLIB="$'"${CUR_ARCH_}"'_RANLIB";export _s_="$'"${CUR_ARCH_}"'_s_";export _SYSROOT_="$'"${CUR_ARCH_}"'_SYSROOT_";export _HOST_="$'"${CUR_ARCH_}"'_HOST_";export _TARGET_="$'"${CUR_ARCH_}"'_TARGET_";export _TOOL_PREFIX="$'"${CUR_ARCH_}"'_TOOL_PREFIX";export CUR_ARCH_="'"${CUR_ARCH_}"'";export LD="$'"${CUR_ARCH_}"'_LD"' > ~/pp
+    - chmod u+x ~/pp
+    - cat ~/pp
+
+    - . ~/glo;printf '#! /bin/bash\n. ~/pp;rm -Rf ~/build/\nmkdir -p ~/build/\narg1_="$1";shift;cd ~/build/;$'"${CUR_ARCH_}"'_s_/"$arg1_"/configure $* && make && make install\n' > ~/do_compile.sh
+    - chmod a+rx ~/do_compile.sh
+    - cat ~/do_compile.sh
+
+    - . ~/glo;printf '#! /bin/bash\n. ~/pp;rm -Rf ~/build/\nmkdir -p ~/build/\nrm -Rf "$INSTALL_DEST"\narg1_="$1";shift;cd ~/build/;$_s_/"$arg1_"/configure $* && make && make install && cd "$INSTALL_DEST" && tar -czvf "$PKGSDIR""/"pkg_"$arg1_".tar.gz * && rm -Rf "$INSTALL_DEST" \n' > ~/do_package.sh
+    - chmod a+rx ~/do_package.sh
+    - cat ~/do_package.sh
+
+
+    - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
+    - . ~/pp;cd $_s_/yasm/;autoreconf -fi
+    - . ~/pp;~/do_compile.sh "yasm" --prefix="$_SYSROOT_"/usr --disable-shared --disable-soname-versions --with-sysroot="$_SYSROOT_" --host="$_HOST_" --target="$_TARGET_"
+
+    - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
+    - . ~/pp;export CROSS="arm-linux-gnueabihf-" ; ~/do_compile.sh "libvpx" --prefix="$_SYSROOT_"/usr --disable-examples --disable-unit-tests --target=generic-gnu --extra-cflags="--sysroot=$_SYSROOT_"
+    - . ~/pp;export CROSS="arm-linux-gnueabihf-" ; ~/do_package.sh "libvpx" --prefix="$INSTALL_DEST"/usr --disable-examples --disable-unit-tests --target=generic-gnu --extra-cflags="--sysroot=$_SYSROOT_"
+
+    - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
+    - . ~/pp;cd $_s_/opus/;autoreconf -fi
+    - . ~/pp;~/do_compile.sh "opus" --prefix="$_SYSROOT_"/usr --disable-shared --disable-soname-versions --target="$_TOOL_PREFIX" --with-sysroot="$_SYSROOT_" --host="$_TOOL_PREFIX"
+    - . ~/pp;~/do_package.sh "opus" --prefix="$INSTALL_DEST"/usr --disable-shared --disable-soname-versions --target="$_TOOL_PREFIX" --with-sysroot="$_SYSROOT_" --host="$_TOOL_PREFIX"
+
+    - . ~/pp;cd $_s_;git clone --depth=1 --branch=$LIBSODIUM_BRANCH https://github.com/jedisct1/libsodium.git
+    - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
+    - . ~/pp;~/do_compile.sh "libsodium" --prefix="$_SYSROOT_"/usr --disable-shared --disable-soname-versions --target="$_TOOL_PREFIX" --with-sysroot="$_SYSROOT_" --host="$_TOOL_PREFIX" --enable-minimal --disable-pie
+    - . ~/pp;~/do_package.sh "libsodium" --prefix="$INSTALL_DEST"/usr --disable-shared --disable-soname-versions --target="$_TOOL_PREFIX" --with-sysroot="$_SYSROOT_" --host="$_TOOL_PREFIX" --enable-minimal --disable-pie
+
+    # install raspi binary pkgs -------------------------
+    - wget 'https://github.com/zoff99/raspi_cross_compile/raw/master/bin_packages/libv4l-dev.tgz' -O ~/pkg2.tgz
+    - . ~/pp;cd "$_SYSROOT_" ; tar -xzvf ~/pkg2.tgz
+    - wget 'https://github.com/zoff99/raspi_cross_compile/raw/master/bin_packages/libv4lconvert0.tgz' -O ~/pkg3.tgz
+    - . ~/pp;cd "$_SYSROOT_" ; tar -xzvf ~/pkg3.tgz
+    - wget 'https://github.com/zoff99/raspi_cross_compile/raw/master/bin_packages/libjpeg62-turbo.tgz' -O ~/pkg4.tgz
+    - . ~/pp;cd "$_SYSROOT_" ; tar -xzvf ~/pkg4.tgz
+    - wget 'https://github.com/zoff99/raspi_cross_compile/raw/master/bin_packages/libjpeg62-turbo-dev.tgz' -O ~/pkg1.tgz
+    - . ~/pp;cd "$_SYSROOT_" ; tar -xzvf ~/pkg1.tgz
+    - wget 'https://github.com/zoff99/raspi_cross_compile/raw/master/bin_packages/libconfig-dev.tgz' -O ~/pkg1.tgz
+    - . ~/pp;cd "$_SYSROOT_" ; tar -xzvf ~/pkg1.tgz
+    # install raspi binary pkgs -------------------------
+
+    - . ~/pp;cd $_s_;git clone https://github.com/TokTok/c-toxcore
+    - . ~/pp;cd $_s_/c-toxcore/;git checkout $CTOXCORE_VERSION_HASH
+    - . ~/pp;cd $_s_/c-toxcore/;./autogen.sh
+    - . ~/pp;~/do_compile.sh "c-toxcore" --prefix="$_SYSROOT_"/usr --enable-logging --disable-soname-versions --host="$_TOOL_PREFIX" --with-sysroot="$_SYSROOT_" --disable-testing --disable-rt
+    - . ~/pp;~/do_package.sh "c-toxcore" --prefix="$INSTALL_DEST"/usr --enable-logging --disable-soname-versions --host="$_TOOL_PREFIX" --with-sysroot="$_SYSROOT_" --disable-testing --disable-rt
+
+    - . ~/pp;mkdir -p $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
+    - . ~/pp;cp -av "$PKGSDIR"/* $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
+
+    - cd src ; rm -fv toxbot toxbot_static
+    - cd src ; . ~/pp ; $CC -O2 -Wall -fPIC -o toxbot toxbot.c misc.c commands.c groupchats.c -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -I"$_SYSROOT_"/usr/local/include/ -L"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -lsodium -ltoxcore -ltoxav -lpthread -lvpx -ljpeg
+    - cd src ; ldd toxbot ; exit 0
+    - cd src ; . ~/pp ; $CC -O2 -Wall -Wextra -Wpedantic -o toxbot_static toxbot.c misc.c commands.c groupchats.c -static -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -L"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -I"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -lsodium -ltoxcore -ltoxav -lsodium -lpthread -static-libgcc -static-libstdc++ -lopus -lvpx -lm -lpthread -ljpeg -lm -lrt
+    - cd src ; ls -al toxbot toxbot_static
+    - cd src ;. ~/pp ; cp -av ./toxbot $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
+    - cd src ;. ~/pp ; cp -av ./toxbot_static $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
+
+## ----------- RASPI cross compile ----------------
+
 
 test:
   override:
-    - ls -alR "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/
-
-    - . ~/_fullb1;emulator -avd "$EMU_" -sdcard sdcard.img -no-audio:
-        background: true
-        parallel: true
-    - . ~/_fullb1;circle-android wait-for-boot
-
-    - . ~/_fullb1;sleep 210 # let the emulator settle down first
-
-    - . ~/_fullb1;adb shell input keyevent 82 # remove lock screen on emulator
-    - . ~/_fullb1;sleep 10
-    - . ~/_fullb1;import -window root $CIRCLE_ARTIFACTS/capture_emulator_running.png
-
-    - . ~/_fullb1;adb shell "cat /proc/meminfo" ; exit 0
-
-    - . ~/_fullb1;adb shell ls -al / ; exit 0
-    - . ~/_fullb1;adb shell ls -al /storage/ ; exit 0
-    - . ~/_fullb1;adb shell ls -al /sdcard/ ; exit 0
-
-    - . ~/_fullb1;adb install ~/app-signed-aligned.apk
-
-    - . ~/_fullb1;adb logcat -v time > $CIRCLE_ARTIFACTS/adb_out.txt 2>&1 :
-        background: true
-    - . ~/_fullb1;sleep 60 # let the emulator settle down first
-
-    - . ~/_fullb1;adb shell am start -n $CLASS_P/$START_INTENT_P
-    - . ~/_fullb1;sleep 60
-    - . ~/_fullb1;sleep 120 # wait to be sure the app has started fully
-    - . ~/_fullb1;sleep 120 # wait a bit more
-
-    - . ~/_fullb1;died_count=`cat $CIRCLE_ARTIFACTS/adb_out.txt|grep 'Process. '"$CLASS_P"', PID.'|wc -l|tr -d ' '` ; if [ $died_count -gt 0 ]; then echo "app crashed"; exit 1; fi
-
-    - . ~/_fullb1;import -window root $CIRCLE_ARTIFACTS/capture_app_running.png # get proof that the app is running
-    - . ~/_fullb1;adb shell screencap -p | sed 's/\r$//' > $CIRCLE_ARTIFACTS/capture_app_running_2.png
-
-# ----- CI artifact cleanup -----
-    - . ~/_fullb1;mkdir -p $CIRCLE_ARTIFACTS/other/
-    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/adb_out.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
-    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/stderr*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
-    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/stdout*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
-# ----- CI artifact cleanup -----
-
+    - cd src ; rm -fv toxbot toxbot_static
+    - cd src ; gcc -O2 -Wall -fPIC -o toxbot toxbot.c misc.c commands.c groupchats.c -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -lsodium -I/usr/local/include/ -ltoxcore -ltoxav -lpthread
+    - cd src ; ldd toxbot ; exit 0
+    - cd src ; gcc -O2 -Wall -o toxbot_static toxbot.c misc.c commands.c groupchats.c -static -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -L/usr/local/lib -I/usr/local/include/ -lsodium -ltoxcore -ltoxav -lsodium -lpthread -static-libgcc -static-libstdc++ -lopus -lvpx -lm -lpthread -ljpeg -lm -lrt
+    - cd src ; ls -al toxbot toxbot_static
+    - mkdir -p $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
+    - cp -av src/toxbot $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
+    - cp -av src/toxbot_static $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
 
