@@ -87,7 +87,7 @@ dependencies:
     - cd c-toxcore ; ./autogen.sh ; ./configure CFLAGS='-fPIC' --enable-logging --disable-soname-versions
     #- cd c-toxcore ; cmake -DWARNINGS=OFF -DTRACE=ON .
     #- cd c-toxcore ; cmake -DWARNINGS=OFF -DMIN_LOGGER_LEVEL=DEBUG .
-    - cd c-toxcore ; make -j4
+    - cd c-toxcore ; make V=2 -j4
     - cd c-toxcore ; sudo make install
     - cd c-toxcore ; sudo ldconfig -v 2>/dev/null | grep toxcore
     - ls -al /usr/local/lib/
@@ -191,7 +191,7 @@ test:
   override:
     - cd jni-c-toxcore ; rm -fv libjni-c-toxcore.so
     - dirname $(find /usr -name 'jni.h' 2>/dev/null|tail -1) > /tmp/xx
-    - cd jni-c-toxcore ; export JAVADIR=$(cat /tmp/xx); export V=2; gcc -fPIC -O2 -g
+    - cd jni-c-toxcore ; export JAVADIR=$(cat /tmp/xx); gcc -fPIC -O2 -g
       -shared -funwind-tables -Wl,-soname,libjni-c-toxcore.so
       -o libjni-c-toxcore.so
       -std=gnu99 -D_FILE_OFFSET_BITS=64
