@@ -94,7 +94,7 @@ dependencies:
     ## --- now again to save the artefact ---
     - cd c-toxcore ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; rm -Rf "$INSTALL_DEST"
     - cd c-toxcore ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; mkdir -p  "$INSTALL_DEST"/usr ; ./autogen.sh ; ./configure --enable-logging --disable-soname-versions --prefix="$INSTALL_DEST"/usr
-    - cd c-toxcore ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; make install ; ls -alR "$INSTALL_DEST"/usr
+    - cd c-toxcore ; export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; make clean ; make install ; ls -alR "$INSTALL_DEST"/usr
     - mkdir -p $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries
     - export INSTALL_DEST=/home/ubuntu/installdest_linux/ ; cd "$INSTALL_DEST" ; tar -czvf $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/pkg_c-toxcore.tar.gz *
     ## --- now again to save the artefact ---
@@ -190,18 +190,22 @@ dependencies:
 test:
   override:
     - cd jni-c-toxcore ; rm -fv libjni-c-toxcore.so
-    - cd jni-c-toxcore ; export V=2; gcc -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
-      jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -D_FILE_OFFSET_BITS=64
-      -L/usr/local/lib -I/usr/local/include/
-      /usr/local/lib/libtoxcore.a
-      /usr/local/lib/libtoxav.a
-      /usr/local/lib/libvpx.a
-      /usr/local/lib/libopus.a
-      /usr/local/lib/libsodium.a
-      coffeecatch.c coffeejni.c -lm
+    - dirname $(find /usr -name 'jni.h' 2>/dev/null|tail -1) > /tmp/xx
+    - cd jni-c-toxcore ; export JAVADIR=$(cat /tmp/xx); export V=2; gcc -fPIC -O2 -g
+      -shared -funwind-tables -Wl,-soname,libjni-c-toxcore.so
+      -o libjni-c-toxcore.so
+      -std=gnu99 -D_FILE_OFFSET_BITS=64
+      -D__USE_GNU=1
+      -I$JAVADIR/ \
+      -L/usr/local/lib \
+      -I/usr/local/include/ \
+      jni-c-toxcore.c \
+      -lsodium -ltoxcore -ltoxav -lpthread -lvpx -lopus \
+      -lm
     - cd jni-c-toxcore ; ls -al libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; file libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; ldd libjni-c-toxcore.so ; exit 0
+
     #- cd jni-c-toxcore ; gcc -O2 -Wall -fPIC -o toxbot toxbot.c misc.c commands.c groupchats.c -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -lsodium -I/usr/local/include/ -ltoxcore -ltoxav -lpthread
     #- cd jni-c-toxcore ; ldd toxbot ; exit 0
     #- cd jni-c-toxcore ; gcc -O2 -Wall -o toxbot_static toxbot.c misc.c commands.c groupchats.c -static -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -L/usr/local/lib -I/usr/local/include/ -lsodium -ltoxcore -ltoxav -lsodium -lpthread -static-libgcc -static-libstdc++ -lopus -lvpx -lm -lpthread -ljpeg -lm -lrt
