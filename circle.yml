@@ -176,25 +176,37 @@ dependencies:
     - . ~/pp;mkdir -p $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
     - . ~/pp;cp -av "$PKGSDIR"/* $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
 
-    - cd src ; rm -fv toxbot toxbot_static
-    - cd src ; . ~/pp ; $CC -O2 -Wall -fPIC -o toxbot toxbot.c misc.c commands.c groupchats.c -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -I"$_SYSROOT_"/usr/local/include/ -L"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -lsodium -ltoxcore -ltoxav -lpthread -lvpx -ljpeg
-    - cd src ; ldd toxbot ; exit 0
-    - cd src ; . ~/pp ; $CC -O2 -Wall -Wextra -Wpedantic -o toxbot_static toxbot.c misc.c commands.c groupchats.c -static -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -L"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -I"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -lsodium -ltoxcore -ltoxav -lsodium -lpthread -static-libgcc -static-libstdc++ -lopus -lvpx -lm -lpthread -ljpeg -lm -lrt
-    - cd src ; ls -al toxbot toxbot_static
-    - cd src ;. ~/pp ; cp -av ./toxbot $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
-    - cd src ;. ~/pp ; cp -av ./toxbot_static $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
+    - cd jni-c-toxcore ; rm -fv libjni-c-toxcore.so
+    #- cd jni-c-toxcore ; . ~/pp ; $CC -O2 -Wall -fPIC -o toxbot toxbot.c misc.c commands.c groupchats.c -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -I"$_SYSROOT_"/usr/local/include/ -L"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -lsodium -ltoxcore -ltoxav -lpthread -lvpx -ljpeg
+    #- cd jni-c-toxcore ; ldd toxbot ; exit 0
+    #- cd jni-c-toxcore ; . ~/pp ; $CC -O2 -Wall -Wextra -Wpedantic -o toxbot_static toxbot.c misc.c commands.c groupchats.c -static -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -L"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -I"$_SYSROOT_"/usr/lib/arm-linux-gnueabihf/ -lsodium -ltoxcore -ltoxav -lsodium -lpthread -static-libgcc -static-libstdc++ -lopus -lvpx -lm -lpthread -ljpeg -lm -lrt
+    #- cd jni-c-toxcore ; ls -al toxbot toxbot_static
+    #- cd jni-c-toxcore ;. ~/pp ; cp -av ./toxbot $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
+    #- cd jni-c-toxcore ;. ~/pp ; cp -av ./toxbot_static $CIRCLE_ARTIFACTS/"${CUR_ARCH_}"/
 
 ## ----------- RASPI cross compile ----------------
 
 
 test:
   override:
-    - cd src ; rm -fv toxbot toxbot_static
-    - cd src ; gcc -O2 -Wall -fPIC -o toxbot toxbot.c misc.c commands.c groupchats.c -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -lsodium -I/usr/local/include/ -ltoxcore -ltoxav -lpthread
-    - cd src ; ldd toxbot ; exit 0
-    - cd src ; gcc -O2 -Wall -o toxbot_static toxbot.c misc.c commands.c groupchats.c -static -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -L/usr/local/lib -I/usr/local/include/ -lsodium -ltoxcore -ltoxav -lsodium -lpthread -static-libgcc -static-libstdc++ -lopus -lvpx -lm -lpthread -ljpeg -lm -lrt
-    - cd src ; ls -al toxbot toxbot_static
-    - mkdir -p $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
-    - cp -av src/toxbot $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
-    - cp -av src/toxbot_static $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
+    - cd jni-c-toxcore ; rm -fv libjni-c-toxcore.so
+    - cd jni-c-toxcore ; export V=2; gcc -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
+      jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -D_FILE_OFFSET_BITS=64
+      -L/usr/local/lib -I/usr/local/include/
+      /usr/local/lib/libtoxcore.a
+      /usr/local/lib/libtoxav.a
+      /usr/local/lib/libvpx.a
+      /usr/local/lib/libopus.a
+      /usr/local/lib/libsodium.a
+      coffeecatch.c coffeejni.c -lm
+    - cd jni-c-toxcore ; ls -al libjni-c-toxcore.so ; exit 0
+    - cd jni-c-toxcore ; file libjni-c-toxcore.so ; exit 0
+    - cd jni-c-toxcore ; ldd libjni-c-toxcore.so ; exit 0
+    #- cd jni-c-toxcore ; gcc -O2 -Wall -fPIC -o toxbot toxbot.c misc.c commands.c groupchats.c -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -lsodium -I/usr/local/include/ -ltoxcore -ltoxav -lpthread
+    #- cd jni-c-toxcore ; ldd toxbot ; exit 0
+    #- cd jni-c-toxcore ; gcc -O2 -Wall -o toxbot_static toxbot.c misc.c commands.c groupchats.c -static -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -L/usr/local/lib -I/usr/local/include/ -lsodium -ltoxcore -ltoxav -lsodium -lpthread -static-libgcc -static-libstdc++ -lopus -lvpx -lm -lpthread -ljpeg -lm -lrt
+    #- cd jni-c-toxcore ; ls -al toxbot toxbot_static
+    #- mkdir -p $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
+    #- cp -av jni-c-toxcore/toxbot $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
+    #- cp -av jni-c-toxcore/toxbot_static $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
 
