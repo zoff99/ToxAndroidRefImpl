@@ -22,7 +22,6 @@ package com.zoffcc.applications.trifa;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 
 public class TRIFAGlobals
 {
@@ -43,15 +42,6 @@ public class TRIFAGlobals
     final static String GROUPBOT_TOXID = "56A1ADE4B65B86BCD51CC73E2CD4E542179F47959FE3E0E21B4B0ACDADE51855D34D34D37CB5";
 
     final static boolean ADD_BOTS_ON_STARTUP = true;
-    final static boolean DELETE_SQL_AND_VFS_ON_ERROR = false; // true -> will delete all data on any ERROR with SQL and VFS !!!
-
-    final static String VFS_TMP_FILE_DIR = "/tempdir/files/";
-    // final static String VFS_TMP_AVATAR_DIR = "/avatar_tempdir/files/"; // TODO: avatar should get their own directory!
-    final static String VFS_FILE_DIR = "/datadir/files/";
-    final static String VFS_OWN_AVATAR_DIR = "/datadir/myavatar/";
-    static String VFS_PREFIX = ""; // only set for normal (unencrypted) storage
-
-    static boolean orbot_is_really_running = false;
 
     final static int HIGHER_GLOBAL_VIDEO_BITRATE = 3500;
     final static int NORMAL_GLOBAL_VIDEO_BITRATE = 2100;
@@ -76,31 +66,7 @@ public class TRIFAGlobals
 
     static final int CAMPREVIEW_NUM_BUFFERS = 3;
 
-    static final String ORBOT_PROXY_HOST = "127.0.0.1";
-    static final long ORBOT_PROXY_PORT = 9050;
-
-    static final String TOXURL_PATTERN = "(?:^|\\s|$)[Tt][Oo][Xx]:[a-fA-F0-9]*";
-
-    static String PREF__DB_secrect_key__user_hash = "";
-
-    static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES = 150000L; // 150 kBytes // update FT and progress bars every XX bytes
-    static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES = 15000L; // 15 kBytes
-    static final long UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES = 250000L; // less than this in bytes is a small file
-
-    static final int FILE_PICK_METHOD = 2;
     static final String TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY = "-1";
-
-    static final int FL_NOTIFICATION_ICON_ALPHA_SELECTED = 135;
-    static final int FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED = 50;
-    static final int FL_NOTIFICATION_ICON_SIZE_DP_SELECTED = 90;
-    static final int FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED = 15;
-
-    // ---- lookup cache ----
-    static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
-    static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
-    // ---- lookup cache ----
-
-    static int CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) dp2px(10);
 
     public static enum TRIFA_FT_DIRECTION
     {
