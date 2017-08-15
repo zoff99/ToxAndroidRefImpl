@@ -1468,8 +1468,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 
 	dbg(9, "Logging test ---***---");
 
-	int thread_id = gettid();
-	dbg(9, "THREAD ID=%d", thread_id);
+	pthread_id_np_t tid;
+	tid = pthread_getthreadid_np();
+	// int thread_id = gettid();
+	dbg(9, "THREAD ID=%d", (int)tid);
 
 	s =  (*env)->GetStringUTFChars(env, datadir, NULL);
 	app_data_dir = strdup(s);
