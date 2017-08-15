@@ -601,11 +601,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 	cachedJVM = jvm;
 	if ((*jvm)->GetEnv(jvm, (void**) &env_this, JNI_VERSION_1_6))
 	{
-		// dbg(0,"Could not get JVM");
+		dbg(0,"Could not get JVM");
 		return JNI_ERR;
 	}
 
-	// dbg(0,"++ Found JVM ++");
+	dbg(0,"++ Found JVM ++");
 	return JNI_VERSION_1_6;
 }
 
