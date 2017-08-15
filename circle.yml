@@ -70,7 +70,8 @@ dependencies:
 
     ### ------- compile and install libsodium -------
     - cd libsodium/ ; ./autogen.sh
-    - cd libsodium/ ; ./configure CFLAGS='-fPIC' && make check
+    #- cd libsodium/ ; ./configure CFLAGS='-fPIC' && make check
+    - cd libsodium/ ; ./configure LDFLAGS='-static --static' CFLAGS=' -static --static -fPIC' --disable-shared && make check
     - cd libsodium/ ; sudo bash -c "printf 'y\naa\n\n' | checkinstall --install --pkgname libsodium --pkgversion 1.0.0 --nodoc --deldesc=no --pkglicense='GPL2'"
     - cd libsodium/ ; sudo ldconfig
     - cd libsodium ; sudo ldconfig -v 2>/dev/null | grep sodium
@@ -192,18 +193,20 @@ test:
     - cd jni-c-toxcore ; rm -fv libjni-c-toxcore.so
     - dirname $(find /usr -name 'jni.h' 2>/dev/null|head -1) > /tmp/xx1
     - dirname $(find /usr -name 'jni_md.h' 2>/dev/null|head -1) > /tmp/xx2
-    - cd jni-c-toxcore ; export JAVADIR1=$(cat /tmp/xx1); export JAVADIR2=$(cat /tmp/xx2); gcc -fPIC -O2 -g
-      -shared -funwind-tables -Wl,-soname,libjni-c-toxcore.so
-      -o libjni-c-toxcore.so
-      -std=gnu99 -D_FILE_OFFSET_BITS=64
-      -D__USE_GNU=1
+    - cd ; jni-c-toxcore ; export JAVADIR1=$(cat /tmp/xx1); export JAVADIR2=$(cat /tmp/xx2); gcc -fPIC -O2 -g
+      -funwind-tables -Wl,-soname,libjni-c-toxcore.so -o libjni-c-toxcore.so -std=gnu99
+      -D_FILE_OFFSET_BITS=64 -D__USE_GNU=1
       -I$JAVADIR1/
       -I$JAVADIR2/
       -L/usr/local/lib
       -I/usr/local/include/
       jni-c-toxcore.c
-      -lsodium -ltoxcore -ltoxav -lpthread -lvpx -lopus
-      -lm
+      -Wl,-whole-archive
+      ../libsodium/src/libsodium/.libs/libsodium.a
+      /usr/local/lib/libtoxcore.a
+      /usr/local/lib/libtoxav.a
+      -Wl,-no-whole-archive
+      -lpthread -shared
     - cd jni-c-toxcore ; ls -al libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; file libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; ldd libjni-c-toxcore.so ; exit 0
