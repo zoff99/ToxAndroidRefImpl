@@ -210,12 +210,9 @@ test:
     - cd jni-c-toxcore ; ls -al libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; file libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; ldd libjni-c-toxcore.so ; exit 0
-
-    #- cd jni-c-toxcore ; gcc -O2 -Wall -fPIC -o toxbot toxbot.c misc.c commands.c groupchats.c -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -lsodium -I/usr/local/include/ -ltoxcore -ltoxav -lpthread
-    #- cd jni-c-toxcore ; ldd toxbot ; exit 0
-    #- cd jni-c-toxcore ; gcc -O2 -Wall -o toxbot_static toxbot.c misc.c commands.c groupchats.c -static -std=gnu99 -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_FILE_OFFSET_BITS=64 -L/usr/local/lib -I/usr/local/include/ -lsodium -ltoxcore -ltoxav -lsodium -lpthread -static-libgcc -static-libstdc++ -lopus -lvpx -lm -lpthread -ljpeg -lm -lrt
-    #- cd jni-c-toxcore ; ls -al toxbot toxbot_static
-    #- mkdir -p $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
-    #- cp -av jni-c-toxcore/toxbot $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
-    #- cp -av jni-c-toxcore/toxbot_static $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/
+    - cd jni-c-toxcore ; cp -av libjni-c-toxcore.so ../java_ref_client/app/src/main/java/
+    - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/MainActivity.java
+# --------- run test java application ---------
+    - cd java_ref_client/app/src/main/java/ ; java -Djava.library.path="." com.zoffcc.applications.trifa.MainActivity
+# --------- run test java application ---------
 
