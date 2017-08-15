@@ -21,15 +21,11 @@ package com.zoffcc.applications.trifa;
 
 //  ==================================================
 //  compile with:
-//  javac MainActivity.java TrifaToxService.java  TRIFAGlobals.java ToxVars.java
+//   javac com/zoffcc/applications/trifa/MainActivity.java
+//   javac com/zoffcc/applications/trifa/ToxVars.java
+//   javac com/zoffcc/applications/trifa/TRIFAGlobals.java
+//   javac com/zoffcc/applications/trifa/TrifaToxService.java
 //  ==================================================
-
-/*
-   javac com/zoffcc/applications/trifa/MainActivity.java
-   javac com/zoffcc/applications/trifa/ToxVars.java
-   javac com/zoffcc/applications/trifa/TRIFAGlobals.java
-   javac com/zoffcc/applications/trifa/TrifaToxService.java
-*/
 
 
 
@@ -53,6 +49,7 @@ public class MainActivity
     static TrifaToxService tox_service_fg = null;
     static boolean native_lib_loaded = false;
     static long[] friends = null;
+	static String app_files_directory = "./";
 
     static class Log
     {
@@ -79,6 +76,12 @@ public class MainActivity
 
         if (!TrifaToxService.TOX_SERVICE_STARTED)
         {
+			int PREF__udp_enabled = 1;
+			int PREF__orbot_enabled_to_int = 0;
+			String ORBOT_PROXY_HOST = "";
+			long ORBOT_PROXY_PORT = 0;
+			app_files_directory = "./";
+			init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
             tox_service_fg.tox_thread_start_fg();
         }
 
