@@ -169,9 +169,10 @@ public class TrifaToxService
                 MainActivity.tox_iterate();
 
 				// --- add echobot and groupbot ---
-				long friendnum = tox_friend_add(ECHOBOT_TOXID, "please add me");
+				long friendnum;
+				friendnum = tox_friend_add(ECHOBOT_TOXID, "please add me");
 				Log.i(TAG, "tox_friend_add:add friend #:" + friendnum);
-				long friendnum = tox_friend_add(GROUPBOT_TOXID, "please add me");
+				friendnum = tox_friend_add(GROUPBOT_TOXID, "please add me");
 				Log.i(TAG, "tox_friend_add:add friend #:" + friendnum);
 				// --- add echobot and groupbot ---
 
