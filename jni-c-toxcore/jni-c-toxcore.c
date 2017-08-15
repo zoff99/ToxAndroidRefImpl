@@ -1461,17 +1461,19 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 
 
 	jclass cls_local = (*env)->GetObjectClass(env, thiz);
-	MainActivity = (*env)->NewGlobalRef(env, cls_local);
+	// MainActivity = (*env)->NewGlobalRef(env, cls_local);
+	android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &MainActivity);
+
 	// logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
 	dbg(9, "cls_local=%p", cls_local);
 	dbg(9, "MainActivity=%p", MainActivity);
 
 	dbg(9, "Logging test ---***---");
 
-	pthread_id_np_t tid;
-	tid = pthread_getthreadid_np();
+	// pthread_id_np_t tid_temp;
+	// tid_temp = pthread_getthreadid_np();
 	// int thread_id = gettid();
-	dbg(9, "THREAD ID=%d", (int)tid);
+	// dbg(9, "THREAD ID=%d", (int)tid_temp);
 
 	s =  (*env)->GetStringUTFChars(env, datadir, NULL);
 	app_data_dir = strdup(s);
@@ -1492,6 +1494,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	// -------- _callbacks_ --------
 	dbg(9, "linking callbacks ... START");
 	android_tox_callback_self_connection_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_self_connection_status_cb_method", "(I)V");
+	dbg(2, "method:001:%p", android_tox_callback_self_connection_status_cb_method);
 
 	android_tox_callback_friend_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_name_cb_method", "(JLjava/lang/String;J)V");
 	android_tox_callback_friend_status_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_friend_status_message_cb_method", "(JLjava/lang/String;J)V");
@@ -1511,9 +1514,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 	android_tox_callback_conference_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_message_cb_method", "(JJILjava/lang/String;J)V");
 	android_tox_callback_conference_title_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_title_cb_method", "(JJLjava/lang/String;J)V");
 	android_tox_callback_conference_namelist_change_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_callback_conference_namelist_change_cb_method", "(JJI)V");
+	dbg(2, "method:022:%p", android_tox_callback_conference_namelist_change_cb_method);
 	
 
 	android_tox_log_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_log_cb_method", "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
+	dbg(2, "method:099:%p", android_tox_log_cb_method);
 	dbg(9, "linking callbacks ... READY");
 	// -------- _callbacks_ --------
 
