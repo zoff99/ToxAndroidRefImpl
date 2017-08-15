@@ -109,9 +109,7 @@ public class MainActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(String data_dir, int udp_enabled, int orbot_enabled, String orbot_host, long orbot_port);
-
-    public native String getNativeLibAPI();
+    public static native void init(String data_dir, int udp_enabled, int orbot_enabled, String orbot_host, long orbot_port);
 
     public static native void update_savedata_file();
 
