@@ -211,7 +211,11 @@ test:
     - cd jni-c-toxcore ; file libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; ldd libjni-c-toxcore.so ; exit 0
     - cd jni-c-toxcore ; cp -av libjni-c-toxcore.so ../java_ref_client/app/src/main/java/
+# --------- compile java example ---------
+    - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/ToxVars.java
+    - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/TRIFAGlobals.java
     - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/MainActivity.java
+    - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/TrifaToxService.java
 # --------- run test java application ---------
     - cd java_ref_client/app/src/main/java/ ; java -Djava.library.path="." com.zoffcc.applications.trifa.MainActivity
 # --------- run test java application ---------
