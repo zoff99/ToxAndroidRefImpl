@@ -1,4 +1,4 @@
-?/**
+/**
  * [TRIfA], JNI part of Tox Reference Implementation for Android
  * Copyright (C) 2017 Zoff <zoff@zoff.cc>
  *
