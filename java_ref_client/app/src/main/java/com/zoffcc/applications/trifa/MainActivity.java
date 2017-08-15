@@ -31,6 +31,7 @@ package com.zoffcc.applications.trifa;
 
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 
 public class MainActivity
 {
@@ -342,10 +343,16 @@ public class MainActivity
 
     static void android_tox_callback_friend_request_cb_method(String friend_public_key, String friend_request_message, long length)
     {
+		Log.i(TAG, "friend_request:friend:" + friend_public_key + " friend request message:" + friend_request_message);
+        Log.i(TAG, "friend_request:friend:" + friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2) + " friend request message:" + friend_request_message);
+
+        final String friend_public_key__final = friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2);
+		long friendnum = tox_friend_add_norequest(friend_public_key__final);
     }
 
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
     {
+		Log.i(TAG, "friend_message:friendnum:" + friend_number + " message:" + friend_message);
     }
 
     static void android_tox_callback_file_recv_control_cb_method(long friend_number, long file_number, int a_TOX_FILE_CONTROL)
