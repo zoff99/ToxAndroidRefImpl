@@ -217,6 +217,12 @@ test:
     - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/MainActivity.java
     - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/TrifaToxService.java
 # --------- run test java application ---------
-    - cd java_ref_client/app/src/main/java/ ; java -Djava.library.path="." com.zoffcc.applications.trifa.MainActivity
+    - cd java_ref_client/app/src/main/java/ ; java -Djava.library.path="." com.zoffcc.applications.trifa.MainActivity > trifa.log 2>&1 :
+        background: true
 # --------- run test java application ---------
-
+    - sleep 10
+    - cd java_ref_client/app/src/main/java/ ; cat ./trifa.log
+    - cd java_ref_client/app/src/main/java/ ; cat ./trifa.log | grep 'MyToxID:' | cut -d':' -f 4
+    - sleep 10
+    - sleep 240
+    - cd java_ref_client/app/src/main/java/ ; cat ./trifa.log
