@@ -26,10 +26,13 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_add;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOXID;
 
 // import static com.zoffcc.applications.trifa.TRIFAGlobals.*;
 // import static com.zoffcc.applications.trifa.MainActivity.*;
@@ -164,6 +167,13 @@ public class TrifaToxService
                 Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
 
                 MainActivity.tox_iterate();
+
+				// --- add echobot and groupbot ---
+				long friendnum = tox_friend_add(ECHOBOT_TOXID, "please add me");
+				Log.i(TAG, "tox_friend_add:add friend #:" + friendnum);
+				long friendnum = tox_friend_add(GROUPBOT_TOXID, "please add me");
+				Log.i(TAG, "tox_friend_add:add friend #:" + friendnum);
+				// --- add echobot and groupbot ---
 
 
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
