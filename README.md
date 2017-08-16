@@ -8,7 +8,9 @@ Installation (Linux) method 1
 =
 ```
 git clone https://github.com/zoff99/ToxAndroidRefImpl
-cd ToxAndroidRefImpl/java_ref_client/app/src/main/java/
+cd ToxAndroidRefImpl
+git checkout zoff99/java_toxclient_stub
+cd java_ref_client/app/src/main/java/
 chmod u+rx *.sh
 ./do_run.sh
 ```
