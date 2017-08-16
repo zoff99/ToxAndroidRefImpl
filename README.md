@@ -23,7 +23,8 @@ tar -xf install_linux.tar
 chmod u+rx *.sh
 ./do_run.sh
 ```
-HINT: if you get this error *Unsupported major.minor version 52.0*
+**HINT:** if you get this error **Unsupported major.minor version 52.0**
+
 you need to install java 8 runtime to run the example client
 
 Development Snapshot Version (Linux)
