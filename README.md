@@ -4,7 +4,16 @@ Build Status
 =
 **CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fjava_toxclient_stub.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fjava_toxclient_stub)
 
-Installation (Linux)
+Installation (Linux) method 1
+=
+```
+git clone https://github.com/zoff99/ToxAndroidRefImpl
+cd ToxAndroidRefImpl/java_ref_client/app/src/main/java/
+chmod u+rx *.sh
+./do_run.sh
+```
+
+Installation (Linux) method 2
 =
 ```
 wget 'https://circleci.com/api/v1/project/zoff99/ToxAndroidRefImpl/latest/artifacts/0/$CIRCLE_ARTIFACTS/install_linux.tar?filter=successful&branch=zoff99%2Fjava_toxclient_stub' -O install_linux.tar
