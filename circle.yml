@@ -216,6 +216,8 @@ test:
     - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/TRIFAGlobals.java
     - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/MainActivity.java
     - cd java_ref_client/app/src/main/java/ ; javac com/zoffcc/applications/trifa/TrifaToxService.java
+# --------- package java example ---------
+    - cd java_ref_client/app/src/main/java/ ; tar -cvf $CIRCLE_ARTIFACTS/ubuntu_14_04_binaries/install_linux.tar com *.sh
 # --------- run test java application ---------
     - cd java_ref_client/app/src/main/java/ ; java -Djava.library.path="." com.zoffcc.applications.trifa.MainActivity > trifa.log 2>&1 :
         background: true
@@ -226,3 +228,4 @@ test:
     - sleep 10
     - sleep 240
     - cd java_ref_client/app/src/main/java/ ; cat ./trifa.log
+    - cd java_ref_client/app/src/main/java/ ; cp -v ./trifa.log $CIRCLE_ARTIFACTS/ ; exit 0
