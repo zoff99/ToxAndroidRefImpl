@@ -58,8 +58,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 15
-static const char global_version_string[] = "0.99.15";
+#define VERSION_PATCH 17
+static const char global_version_string[] = "0.99.17";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -2486,23 +2486,32 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv* e
 	return (jint)0;
 }
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1nospam(JNIEnv* env, jobject thiz, jlong nospam)
+{
+	tox_self_set_nospam(tox_global, (uint32_t)nospam);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1nospam(JNIEnv* env, jobject thiz)
+{
+	uint32_t nospam = tox_self_get_nospam(tox_global);
+	return (jlong)nospam;
+}
+
 // -----------------------
 // TODO
 // -----------------------
 /*
 void tox_self_get_public_key(const Tox *tox, uint8_t *public_key);
 void tox_self_get_secret_key(const Tox *tox, uint8_t *secret_key);
-uint32_t tox_self_get_nospam(const Tox *tox);
 bool tox_friend_exists(const Tox *tox, uint32_t friend_number);
 uint64_t tox_friend_get_last_online(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_GET_LAST_ONLINE *error);
 TOX_USER_STATUS tox_friend_get_status(const Tox *tox, uint32_t friend_number, TOX_ERR_FRIEND_QUERY *error);
-
-void tox_self_set_nospam(Tox *tox, uint32_t nospam);
 */
 // -----------------------
 // TODO
 // -----------------------
-
 
 
 
