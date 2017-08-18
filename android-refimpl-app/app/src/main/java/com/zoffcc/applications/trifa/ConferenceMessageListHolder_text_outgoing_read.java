@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
@@ -43,6 +44,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 
@@ -56,6 +58,7 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    TextView date_time;
     ImageView img_corner;
     LinearLayout text_block_group;
     ViewGroup layout_message_container;
@@ -72,6 +75,7 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
         img_corner = (ImageView) itemView.findViewById(R.id.img_corner);
         text_block_group = (LinearLayout) itemView.findViewById(R.id.text_block_group);
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
@@ -113,6 +117,8 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         textView.setCustomRegex(TOXURL_PATTERN);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
         textView.setAutoLinkText(m.text);
+
+        date_time.setText(long_date_time_format(m.sent_timestamp));
 
         if (!m.read)
         {
