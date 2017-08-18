@@ -121,6 +121,7 @@ public class ConferenceMessageListFragment extends Fragment
         listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view.findViewById(R.id.msg_rv_list);
 
         scrollDateHeader = (TextView) view.findViewById(R.id.scroll_date_header);
+        scrollDateHeader.setText("");
         scrollDateHeader.setVisibility(View.INVISIBLE);
         conversationDateHeader = new ConversationDateHeader(view.getContext(), scrollDateHeader);
 
@@ -153,6 +154,9 @@ public class ConferenceMessageListFragment extends Fragment
                 int visibleItemCount = linearLayoutManager.getChildCount();
                 int totalItemCount = linearLayoutManager.getItemCount();
                 int pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
+
+                scrollDateHeader.setText(adapter.getDateHeaderText(pastVisibleItems));
+
                 if (pastVisibleItems + visibleItemCount >= totalItemCount)
                 {
                     // Bottom of the list

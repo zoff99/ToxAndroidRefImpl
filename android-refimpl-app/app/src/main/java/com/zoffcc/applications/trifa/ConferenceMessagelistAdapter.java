@@ -31,12 +31,21 @@ import com.l4digital.fastscroll.FastScroller;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.only_date_time_format;
+
 public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
     private static final String TAG = "trifa.CnfMesgelistAdptr";
 
     private final List<ConferenceMessage> messagelistitems;
     private Context context;
+
+    private ConferenceMessage getSectionText_message_object = null;
+    private ConferenceMessage getSectionText_message_object2 = null;
+    long getSectionText_message_object_ts = -1L;
+    long getSectionText_message_object_ts2 = -1L;
+    String getSectionText_message_object_ts_string = " ";
+    String getSectionText_message_object_ts_string2 = " ";
 
 
     public ConferenceMessagelistAdapter(Context context, List<ConferenceMessage> items)
@@ -263,5 +272,47 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
     public String getSectionText(int position)
     {
         return " ";
+    }
+
+    public String getDateHeaderText(int position)
+    {
+        try
+        {
+            getSectionText_message_object2 = messagelistitems.get(position);
+
+            if (getSectionText_message_object2.direction == 0)
+            {
+                // incoming msg
+                if (getSectionText_message_object2.rcvd_timestamp == getSectionText_message_object_ts2)
+                {
+                    return getSectionText_message_object_ts_string2;
+                }
+                else
+                {
+                    getSectionText_message_object_ts2 = getSectionText_message_object2.rcvd_timestamp;
+                    getSectionText_message_object_ts_string2 = "" + only_date_time_format(getSectionText_message_object2.rcvd_timestamp);
+                    return getSectionText_message_object_ts_string2;
+                }
+            }
+            else
+            {
+                // outgoing msg
+                if (getSectionText_message_object2.sent_timestamp == getSectionText_message_object_ts2)
+                {
+                    return getSectionText_message_object_ts_string2;
+                }
+                else
+                {
+                    getSectionText_message_object_ts2 = getSectionText_message_object2.sent_timestamp;
+                    getSectionText_message_object_ts_string2 = "" + only_date_time_format(getSectionText_message_object2.sent_timestamp);
+                    return getSectionText_message_object_ts_string2;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return " ";
+        }
     }
 }
