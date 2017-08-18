@@ -41,6 +41,33 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 
 public class ConferenceMessageListHolder_text_outgoing_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+    // ******** NOT USED ******** //
+
+
     private static final String TAG = "trifa.MessageListHolder";
 
     private ConferenceMessage message_;

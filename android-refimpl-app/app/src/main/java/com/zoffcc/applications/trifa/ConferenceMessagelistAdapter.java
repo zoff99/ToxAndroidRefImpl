@@ -64,6 +64,9 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 return new ConferenceMessageListHolder_text_incoming_read(view, this.context);
 
             case Message_model.TEXT_OUTGOING_NOT_READ:
+                // ******** NOT USED ******** //
+                // ******** NOT USED ******** //
+                // ******** NOT USED ******** //
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent, false);
                 return new ConferenceMessageListHolder_text_outgoing_not_read(view, this.context);
             case Message_model.TEXT_OUTGOING_HAVE_READ:
@@ -143,6 +146,9 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                     // NOT USED ----------
                     break;
                 case Message_model.TEXT_OUTGOING_NOT_READ:
+                    // ******** NOT USED ******** //
+                    // ******** NOT USED ******** //
+                    // ******** NOT USED ******** //
                     ((ConferenceMessageListHolder_text_outgoing_not_read) holder).bindMessageList(m2);
                     break;
                 case Message_model.TEXT_OUTGOING_HAVE_READ:
