@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -88,7 +89,11 @@ public class FriendInfoActivity extends AppCompatActivity
                             {
                                 try
                                 {
-                                    mytoxid.setText(f.tox_public_key_string);
+                                    String pubkey_temp = f.tox_public_key_string;
+                                    String color_pkey = "<font color=\"#331bc5\">";
+                                    String ec = "</font>";
+                                    mytoxid.setText(Html.fromHtml(color_pkey + pubkey_temp + ec));
+
                                     mynick.setText(f.name);
                                     mystatus_message.setText(f.status_message);
                                 }
