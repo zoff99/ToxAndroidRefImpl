@@ -42,10 +42,10 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profile_icon"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="8dp"
                 android:layout_marginTop="0dp"
                 android:paddingBottom="2dp"
                 android:paddingTop="0dp"
@@ -61,27 +61,31 @@
 
                 <TextView
                     android:id="@+id/mynick_textview"
-                    android:layout_width="30dp"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:layout_weight="4"
+                    android:layout_weight="0"
                     android:paddingBottom="15dp"
                     android:paddingRight="2dp"
                     android:paddingTop="12dp"
-                    android:text="My Nick:"
+                    android:text="Nick:"
                     android:textAlignment="textEnd"
                     android:textIsSelectable="true"
-                    android:textSize="12sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
 
                 <EditText
                     android:id="@+id/mynick_edittext"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_marginRight="5dp"
                     android:layout_marginTop="20dp"
                     android:layout_weight="8"
-                    android:text="my nick"
-                    android:textSize="12sp"/>
+                    android:fontFamily="monospace"
+                    android:text="my nick tl ,top,4tokotko4k tpoerkpotl reltrwr ülü"
+                    android:textSize="16sp"
+                    android:typeface="monospace"/>
             </LinearLayout>
 
             <LinearLayout
@@ -91,27 +95,31 @@
 
                 <TextView
                     android:id="@+id/mystatus_message_textview"
-                    android:layout_width="30dp"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:layout_weight="4"
+                    android:layout_weight="0"
                     android:paddingBottom="15dp"
                     android:paddingRight="2dp"
                     android:paddingTop="12dp"
-                    android:text="MyStatusmessage:"
+                    android:text="Status:"
                     android:textAlignment="textEnd"
                     android:textIsSelectable="true"
-                    android:textSize="12sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"/>
 
                 <EditText
                     android:id="@+id/mystatus_message_edittext"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="fill_horizontal"
+                    android:layout_marginRight="5dp"
                     android:layout_marginTop="20dp"
                     android:layout_weight="8"
-                    android:text="my nick"
-                    android:textSize="12sp"/>
+                    android:fontFamily="monospace"
+                    android:text="my status kedmrlsejoriwejk irkwioprjkwepor kpowekrpowek orkweor pkweoprkpoekröosekr öeskr op"
+                    android:textSize="16sp"
+                    android:typeface="monospace"/>
             </LinearLayout>
 
 
@@ -134,9 +142,9 @@
                 android:fontFamily="monospace"
                 android:gravity="fill_horizontal"
                 android:paddingBottom="15dp"
-                android:textAlignment="gravity"
                 android:paddingTop="12dp"
                 android:text="TOXID94583458340958309458093850934805830583085389053095DUMMY"
+                android:textAlignment="gravity"
                 android:textIsSelectable="true"
                 android:textSize="16sp"
                 android:textStyle="bold"
