@@ -555,4 +555,3 @@ test:
     - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/stdout*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
 # ----- CI artifact cleanup -----
 
-
