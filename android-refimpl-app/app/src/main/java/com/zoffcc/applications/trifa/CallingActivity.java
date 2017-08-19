@@ -44,7 +44,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -202,16 +201,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-        if (active_camera_type == FRONT_CAMERA_USED)
-        {
-            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-            camera_toggle_button.setImageDrawable(d5);
-        }
-        else
-        {
-            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-            camera_toggle_button.setImageDrawable(d5);
-        }
+        // on startup always use front camera
+        active_camera_type = FRONT_CAMERA_USED;
 
         final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
         decline_button.setImageDrawable(d3);
@@ -233,6 +224,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             mute_button.setVisibility(View.GONE);
         }
 
+        if (active_camera_type == FRONT_CAMERA_USED)
+        {
+            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            camera_toggle_button.setImageDrawable(d5);
+            Log.i(TAG, "active_camera_type(5)=" + active_camera_type);
+        }
+        else
+        {
+            final Drawable d6 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            camera_toggle_button.setImageDrawable(d6);
+            Log.i(TAG, "active_camera_type(6)=" + active_camera_type);
+        }
 
         camera_toggle_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -241,6 +244,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (event.getAction() != MotionEvent.ACTION_UP)
                 {
+                    Log.i(TAG, "active_camera_type(7)=" + active_camera_type);
+
                     if (active_camera_type == FRONT_CAMERA_USED)
                     {
                         Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
@@ -254,6 +259,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 }
                 else
                 {
+                    Log.i(TAG, "active_camera_type(8)=" + active_camera_type);
+
                     if (active_camera_type == FRONT_CAMERA_USED)
                     {
                         Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
@@ -602,12 +609,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         CameraWrapper.camera_preview_size2 = null;
                         active_camera_type = BACK_CAMERA_USED;
+                        Log.i(TAG, "active_camera_type(8a)=" + active_camera_type);
                         CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, false);
                     }
                     else
                     {
                         CameraWrapper.camera_preview_size2 = null;
                         active_camera_type = FRONT_CAMERA_USED;
+                        Log.i(TAG, "active_camera_type(8b)=" + active_camera_type);
                         CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
                     }
                 }
@@ -717,6 +726,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             public void run()
             {
                 active_camera_type = FRONT_CAMERA_USED;
+                Log.i(TAG, "active_camera_type(01)=" + active_camera_type);
                 CameraWrapper.camera_preview_size2 = null;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
             }
