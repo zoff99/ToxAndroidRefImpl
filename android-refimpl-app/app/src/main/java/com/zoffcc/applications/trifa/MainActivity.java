@@ -2471,8 +2471,11 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
 
         FriendList f = main_get_friend(friend_number);
-        Log.i(TAG, "friend_status:f=" + f);
-        Log.i(TAG, "friend_status:1:f.TOX_USER_STATUS=" + f.TOX_USER_STATUS);
+        if (f != null)
+        {
+            Log.i(TAG, "friend_status:f=" + f);
+            Log.i(TAG, "friend_status:1:f.TOX_USER_STATUS=" + f.TOX_USER_STATUS);
+        }
 
         if (f != null)
         {
