@@ -2751,7 +2751,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     e.printStackTrace();
                 }
-                update_savedata_file(); // save toxcore datafile (new friend added)
+                update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
 
                 final FriendList f = new FriendList();
                 f.tox_public_key_string = friend_public_key__final;
@@ -5849,7 +5849,7 @@ public class MainActivity extends AppCompatActivity
         // add friend ---------------
         long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
         Log.i(TAG, "add_friend_real:add friend  #:" + friendnum);
-        update_savedata_file(); // save toxcore datafile (new friend added)
+        update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
 
         if (friendnum > -1)
         {
@@ -7407,8 +7407,17 @@ public class MainActivity extends AppCompatActivity
         long new_nospam = (long) random.nextInt() + (1L << 31);
         // Log.i(TAG, "generated NOSPAM=" + new_nospam);
         tox_self_set_nospam(new_nospam);
+        update_savedata_file_wrapper();
         // Log.i(TAG, "new ToxID=" + MainActivity.get_my_toxid());
         // Log.i(TAG, "new NOSPAM=" + MainActivity.tox_self_get_nospam());
+    }
+
+    static void update_savedata_file_wrapper()
+    {
+        long start_timestamp = System.currentTimeMillis();
+        update_savedata_file();
+        long end_timestamp = System.currentTimeMillis();
+        Log.i(TAG, "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
     }
 
     // --------- make app crash ---------

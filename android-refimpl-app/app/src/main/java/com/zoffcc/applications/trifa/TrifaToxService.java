@@ -435,7 +435,7 @@ public class TrifaToxService extends Service
                     Log.i(TAG,"set_all_conferences_inactive:004");
                     set_all_conferences_inactive();
                     MainActivity.init_tox_callbacks();
-                    MainActivity.update_savedata_file();
+                    MainActivity.update_savedata_file_wrapper();
                 }
                 // ------ correct startup order ------
 
@@ -470,7 +470,7 @@ public class TrifaToxService extends Service
                 }
                 Log.i(TAG, "AAA:011");
 
-                MainActivity.update_savedata_file();
+                MainActivity.update_savedata_file_wrapper();
 
                 // TODO --------
 

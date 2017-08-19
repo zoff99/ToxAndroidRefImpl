@@ -61,6 +61,7 @@ import static com.zoffcc.applications.trifa.MainActivity.set_new_random_nospam_v
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
+import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
@@ -259,7 +260,7 @@ public class ProfileActivity extends AppCompatActivity
             global_my_status_message = mystatus_message_edittext.getText().toString().substring(0, Math.min(mystatus_message_edittext.getText().toString().length(), OX_MAX_STATUS_MESSAGE_LENGTH));
             tox_self_set_name(global_my_name);
             tox_self_set_status_message(global_my_status_message);
-            update_savedata_file();
+            update_savedata_file_wrapper();
         }
         catch (Exception e)
         {

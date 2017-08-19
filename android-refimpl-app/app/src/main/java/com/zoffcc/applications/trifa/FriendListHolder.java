@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
+import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
@@ -395,7 +396,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                         int res = tox_friend_delete(friend_num_temp);
                                         cache_pubkey_fnum.clear();
                                         cache_fnum_pubkey.clear();
-                                        update_savedata_file(); // save toxcore datafile (friend removed)
+                                        update_savedata_file_wrapper(); // save toxcore datafile (friend removed)
                                         Log.i(TAG, "onMenuItemClick:5:res=" + res);
                                     }
                                     // delete friend - tox ----
