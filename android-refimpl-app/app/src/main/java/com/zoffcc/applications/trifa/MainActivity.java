@@ -761,18 +761,6 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "loaded:c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
         Log.i(TAG, "loaded:jni-c-toxcore:v" + jnictoxcore_version());
 
-        // --- forground service ---
-        // --- forground service ---
-        // --- forground service ---
-        Intent i = new Intent(this, TrifaToxService.class);
-        if (!TOX_SERVICE_STARTED)
-        {
-            startService(i);
-        }
-        // --- forground service ---
-        // --- forground service ---
-        // --- forground service ---
-
         if ((!TOX_SERVICE_STARTED) || (orma == null))
         {
             try
@@ -951,6 +939,20 @@ public class MainActivity extends AppCompatActivity
         //        // ---------- DEBUG, just a test ----------
 
         app_files_directory = getFilesDir().getAbsolutePath();
+
+        // --- forground service ---
+        // --- forground service ---
+        // --- forground service ---
+        Intent i = new Intent(this, TrifaToxService.class);
+        if (!TOX_SERVICE_STARTED)
+        {
+            Log.i(TAG, "set_all_conferences_inactive:005");
+            set_all_conferences_inactive();
+            startService(i);
+        }
+        // --- forground service ---
+        // --- forground service ---
+        // --- forground service ---
 
         if (!TOX_SERVICE_STARTED)
         {
