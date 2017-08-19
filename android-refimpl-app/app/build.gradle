@@ -108,7 +108,7 @@ android {
     }
 
     dexOptions {
-        javaMaxHeapSize "2500m"
+        javaMaxHeapSize "2g"
     }
 
     defaultConfig {
