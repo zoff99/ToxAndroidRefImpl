@@ -202,7 +202,7 @@ dependencies {
 
 dependencyVerification {
     verify = [
-            // 'com.zoffcc.applications.trifajni:trifa-jni-lib:9172079dcc7f63ed99eb0b21f998fad4bc40eec80be7a50877a4d42ead84140c',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:01640a64103d7071fdd99d51acdae809376c38baa8e99c814538fb05bce213c0',
             'com.mikepenz:materialdrawer:f7b380cd85ae55bcd3111855bd9104ba86b5c1160e8a31ae89fe1725c5f3c587',
             'com.mikepenz:google-material-typeface:72f56673dd5f646193cfe7b7513a4689869365069d27ac60faf4c4fdfb330054',
             'com.mikepenz:fontawesome-typeface:ea35952a9126ddf01ad9c804c24fa97fad577ab4eb2af74e364d198040eabcd4',
