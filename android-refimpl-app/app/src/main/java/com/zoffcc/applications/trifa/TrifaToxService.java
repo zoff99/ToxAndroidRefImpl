@@ -420,7 +420,7 @@ public class TrifaToxService extends Service
                         if (!global_toxid_text_set)
                         {
                             global_toxid_text_set = true;
-                            MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + get_my_toxid());
+                            // MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + get_my_toxid());
                         }
                     }
                 };

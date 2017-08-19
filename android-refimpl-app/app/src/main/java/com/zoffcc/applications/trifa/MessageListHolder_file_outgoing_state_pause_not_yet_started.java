@@ -176,7 +176,7 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
         button_ok.setVisibility(View.VISIBLE);
         button_cancel.setVisibility(View.VISIBLE);
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try

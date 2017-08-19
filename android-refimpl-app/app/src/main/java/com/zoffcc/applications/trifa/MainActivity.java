@@ -68,6 +68,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RemoteViews;
@@ -195,6 +198,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
 
     static TextView mt = null;
+    ImageView top_imageview = null;
     static boolean native_lib_loaded = false;
     static String app_files_directory = "";
     // static boolean stop_me = false;
@@ -538,6 +542,13 @@ public class MainActivity extends AppCompatActivity
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
+        mt.setVisibility(View.VISIBLE);
+
+        top_imageview = (ImageView) this.findViewById(R.id.main_maintopimage);
+        top_imageview.setImageResource(R.drawable.web_hi_res_512);
+        top_imageview.setVisibility(View.GONE);
+        fadeInAndShowImage(top_imageview, 5000);
+        fadeOutAndHideImage(mt, 4000);
 
         nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
 
@@ -556,7 +567,7 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
         final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
-                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         profile_d_item = new ProfileDrawerItem().
                 withName("me").
@@ -756,7 +767,7 @@ public class MainActivity extends AppCompatActivity
         String native_api = getNativeLibAPI();
         mt.setText(mt.getText() + "\n" + native_api);
         mt.setText(mt.getText() + "\n" + "c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
-        mt.setText(mt.getText() + "\n" + "jni-c-toxcore:v" + jnictoxcore_version());
+        mt.setText(mt.getText() + ", " + "jni-c-toxcore:v" + jnictoxcore_version());
 
         Log.i(TAG, "loaded:c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
         Log.i(TAG, "loaded:jni-c-toxcore:v" + jnictoxcore_version());
@@ -1470,7 +1481,7 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "onResume:EE1:" + e.getMessage());
             try
             {
-                final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+                final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                 profile_d_item.withIcon(d1);
                 main_drawer_header.updateProfile(profile_d_item);
             }
@@ -7421,6 +7432,58 @@ public class MainActivity extends AppCompatActivity
         update_savedata_file();
         long end_timestamp = System.currentTimeMillis();
         Log.i(TAG, "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
+    }
+
+    private void fadeInAndShowImage(final View img, long start_after_millis)
+    {
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new AccelerateInterpolator());
+        fadeIn.setDuration(1000);
+        fadeIn.setStartOffset(start_after_millis);
+
+        fadeIn.setAnimationListener(new Animation.AnimationListener()
+        {
+            public void onAnimationEnd(Animation animation)
+            {
+            }
+
+            public void onAnimationRepeat(Animation animation)
+            {
+            }
+
+            public void onAnimationStart(Animation animation)
+            {
+                img.setVisibility(View.VISIBLE);
+            }
+        });
+
+        img.startAnimation(fadeIn);
+    }
+
+    private void fadeOutAndHideImage(final View img, long start_after_millis)
+    {
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateInterpolator());
+        fadeOut.setDuration(1000);
+        fadeOut.setStartOffset(start_after_millis);
+
+        fadeOut.setAnimationListener(new Animation.AnimationListener()
+        {
+            public void onAnimationEnd(Animation animation)
+            {
+                img.setVisibility(View.GONE);
+            }
+
+            public void onAnimationRepeat(Animation animation)
+            {
+            }
+
+            public void onAnimationStart(Animation animation)
+            {
+            }
+        });
+
+        img.startAnimation(fadeOut);
     }
 
     // --------- make app crash ---------
