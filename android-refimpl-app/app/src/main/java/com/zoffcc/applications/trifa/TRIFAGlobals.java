@@ -54,7 +54,7 @@ public class TRIFAGlobals
     static boolean orbot_is_really_running = false;
 
     final static int HIGHER_GLOBAL_VIDEO_BITRATE = 3500;
-    final static int NORMAL_GLOBAL_VIDEO_BITRATE = 2100;
+    final static int NORMAL_GLOBAL_VIDEO_BITRATE = 2500;
     final static int LOWER_GLOBAL_VIDEO_BITRATE = 250;
 
     final static int HIGHER_GLOBAL_AUDIO_BITRATE = 64;
@@ -62,7 +62,7 @@ public class TRIFAGlobals
     final static int LOWER_GLOBAL_AUDIO_BITRATE = 8;
 
     static int GLOBAL_VIDEO_BITRATE = NORMAL_GLOBAL_VIDEO_BITRATE; // this works nice: 2500;
-    static int GLOBAL_AUDIO_BITRATE = NORMAL_GLOBAL_AUDIO_BITRATE; // allowed values: (xx>=6) && (xx<=510)
+    static int GLOBAL_AUDIO_BITRATE = LOWER_GLOBAL_AUDIO_BITRATE; // allowed values: (xx>=6) && (xx<=510)
 
     static int VIDEO_FRAME_RATE_OUTGOING = 0;
     static long last_video_frame_sent = -1;
@@ -71,7 +71,7 @@ public class TRIFAGlobals
     static long last_video_frame_received = -1;
     static int count_video_frame_received = 0;
 
-    final static int GLOBAL_MIN_VIDEO_BITRATE = 64;
+    final static int GLOBAL_MIN_VIDEO_BITRATE = 190;
     final static int GLOBAL_MIN_AUDIO_BITRATE = 8; // allowed values: (xx>=6) && (xx<=510)
 
     static final int CAMPREVIEW_NUM_BUFFERS = 3;

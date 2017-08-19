@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
-    static int PREF__higher_video_quality = 0;
+    static int PREF__higher_video_quality = 1;
     static int PREF__higher_audio_quality = 0;
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__higher_video_quality = Integer.parseInt(settings.getString("higher_video_quality", "0"));
+            PREF__higher_video_quality = Integer.parseInt(settings.getString("higher_video_quality", "1"));
         }
         catch (Exception e)
         {
@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__higher_audio_quality = 1;
+            PREF__higher_audio_quality = 0;
         }
 
         if (PREF__higher_audio_quality == 2)
@@ -1390,7 +1390,7 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__higher_video_quality = Integer.parseInt(settings.getString("higher_video_quality", "0"));
+            PREF__higher_video_quality = Integer.parseInt(settings.getString("higher_video_quality", "1"));
         }
         catch (Exception e)
         {
@@ -1421,7 +1421,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__higher_audio_quality = 1;
+            PREF__higher_audio_quality = 0;
         }
 
         if (PREF__higher_audio_quality == 2)
