@@ -163,6 +163,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
@@ -2417,6 +2418,8 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_self_connection_status_cb_method(int a_TOX_CONNECTION)
     {
         Log.i(TAG, "self_connection_status:" + a_TOX_CONNECTION);
+
+        global_self_connection_status = a_TOX_CONNECTION;
 
         if (bootstrapping)
         {

@@ -30,6 +30,7 @@ public class TRIFAGlobals
     static String global_my_name = "";
     static String global_my_status_message = "";
     static boolean bootstrapping = false;
+    static int global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
 
