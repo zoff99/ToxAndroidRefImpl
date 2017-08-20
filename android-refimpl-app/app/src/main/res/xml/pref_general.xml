@@ -64,14 +64,14 @@
         android:summary="@string/pref_description_conference_show_system_messages"
         android:title="@string/pref_title_conference_show_system_messages"/>
 
-    <PreferenceCategory
-        android:title="! eXperimental !">
+    <!--<PreferenceCategory-->
+    <!--android:title="! eXperimental !">-->
 
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="X_battery_saving_mode"
-            android:summary="@string/pref_description_X_battery_saving_mode"
-            android:title="@string/pref_title_X_battery_saving_mode"/>
+    <!--<SwitchPreference-->
+    <!--android:defaultValue="false"-->
+    <!--android:key="X_battery_saving_mode"-->
+    <!--android:summary="@string/pref_description_X_battery_saving_mode"-->
+    <!--android:title="@string/pref_title_X_battery_saving_mode"/>-->
 
-    </PreferenceCategory>
+    <!--</PreferenceCategory>-->
 </PreferenceScreen>

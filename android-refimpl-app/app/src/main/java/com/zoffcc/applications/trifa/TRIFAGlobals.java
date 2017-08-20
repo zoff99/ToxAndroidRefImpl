@@ -34,7 +34,7 @@ public class TRIFAGlobals
     static long global_self_last_went_online_timstamp = -1;
 
     static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 30;
-    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 6000;
+    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 5000;
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
 
