@@ -5,21 +5,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--android:background="@android:color/transparent"-->
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="2dp"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginTop="2dp"
-        android:background="@android:color/transparent"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
         android:divider="@null"
-        android:dividerHeight="8dp"
-        android:paddingBottom="2dp"
-        android:paddingLeft="2dp"
-        android:paddingRight="2dp"
-        android:paddingTop="2dp">
+        android:dividerHeight="0dp"
+        android:paddingBottom="0dp"
+        android:background="#ffffff"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:paddingTop="0dp">
     </android.support.v7.widget.RecyclerView>
 
     <include layout="@layout/floating_action_button"/>

@@ -3,6 +3,7 @@
               android:layout_width="fill_parent"
               android:layout_height="75dp"
               android:layout_margin="0dp"
+              android:background="@null"
               android:elevation="0dp"
               android:orientation="horizontal"
               android:padding="0dip">
@@ -10,12 +11,12 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/md_grey_100"
-                    android:elevation="3dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@drawable/friend_list_round_bg"
+                    android:elevation="2dp"
                     android:padding="2dip">
 
         <ImageView
@@ -122,9 +123,9 @@
                 android:text="120"
                 android:textAlignment="center"
                 android:textColor="#ffffff"
-                android:textSize="10dp"
+                android:textSize="10sp"
                 android:textStyle="bold"
-                android:visibility="visible">
+                android:visibility="invisible">
             </TextView>
 
         </FrameLayout>

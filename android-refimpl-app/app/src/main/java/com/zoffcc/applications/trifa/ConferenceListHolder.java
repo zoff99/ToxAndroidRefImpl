@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -131,11 +132,11 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                     user_count = 0;
                 }
 
-                statusText.setText("#" + fl.tox_conference_number + " "
+                statusText.setText(Html.fromHtml("#" + fl.tox_conference_number + " "
                         //
                         + conference_identifier_short(fl.conference_identifier, true)
                         //
-                        + " Users: " + user_count);
+                        + " " + "<b><font color=\"#000000\">Users:" + user_count + "</font></b>"));
             }
             else
             {

@@ -3,6 +3,7 @@
               android:layout_width="fill_parent"
               android:layout_height="75dp"
               android:layout_margin="0dp"
+              android:background="@null"
               android:elevation="0dp"
               android:orientation="horizontal"
               android:padding="0dip">
@@ -10,9 +11,12 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_margin="2dp"
-                    android:background="@color/md_light_blue_100"
-                    android:elevation="3dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@drawable/friend_list_conf_round_bg"
+                    android:elevation="2dp"
                     android:padding="2dip">
 
         <ImageView
@@ -64,7 +68,7 @@
         <TextView
             android:id="@+id/f_status_message"
             android:layout_width="fill_parent"
-            android:layout_height="24dp"
+            android:layout_height="20dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
@@ -80,7 +84,7 @@
         <TextView
             android:id="@+id/f_name"
             android:layout_width="fill_parent"
-            android:layout_height="22dip"
+            android:layout_height="24dip"
             android:layout_above="@id/f_status_message"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
@@ -92,7 +96,6 @@
             android:text="example name long name long name long name long name long name"
             android:textSize="16sp"
             android:textStyle="bold"/>
-
 
 
         <FrameLayout
@@ -120,9 +123,9 @@
                 android:text="120"
                 android:textAlignment="center"
                 android:textColor="#ffffff"
-                android:textSize="10dp"
+                android:textSize="10sp"
                 android:textStyle="bold"
-                android:visibility="visible">
+                android:visibility="invisible">
             </TextView>
 
         </FrameLayout>
