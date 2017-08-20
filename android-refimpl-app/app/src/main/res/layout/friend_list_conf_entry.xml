@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="fill_parent"
-              android:layout_height="?android:attr/listPreferredItemHeight"
+              android:layout_height="75dp"
               android:layout_margin="0dp"
               android:elevation="0dp"
               android:orientation="horizontal"
@@ -64,14 +64,18 @@
         <TextView
             android:id="@+id/f_status_message"
             android:layout_width="fill_parent"
-            android:layout_height="18dp"
+            android:layout_height="24dp"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@id/f_user_status_icon"
             android:ellipsize="marquee"
+            android:fontFamily="monospace"
             android:maxLines="1"
-            android:text="this is my status message"
-            android:textSize="10sp"/>
+            android:paddingRight="5dp"
+            android:text="this is my status message long line this is my status message long line this is my status message long line"
+            android:textSize="11sp"
+            android:typeface="monospace"/>
 
         <TextView
             android:id="@+id/f_name"
@@ -83,9 +87,12 @@
             android:layout_alignWithParentIfMissing="true"
             android:layout_toRightOf="@id/f_user_status_icon"
             android:gravity="center_vertical"
-            android:maxLines="1"
-            android:text="example name"
-            android:textSize="14sp"/>
+            android:maxLines="2"
+            android:paddingRight="5dp"
+            android:text="example name long name long name long name long name long name"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
 
 
         <FrameLayout

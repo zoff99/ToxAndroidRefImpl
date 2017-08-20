@@ -131,7 +131,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                     user_count = 0;
                 }
 
-                textView.setText("#" + fl.tox_conference_number + " "
+                statusText.setText("#" + fl.tox_conference_number + " "
                         //
                         + conference_identifier_short(fl.conference_identifier, true)
                         //
@@ -139,7 +139,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             }
             else
             {
-                textView.setText("#" + fl.tox_conference_number + " "
+                statusText.setText("#" + fl.tox_conference_number + " "
                                 //
                                 + conference_identifier_short(fl.conference_identifier, true)
                         //
@@ -149,7 +149,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         catch (Exception e)
         {
             e.printStackTrace();
-            textView.setText("#" + fl.tox_conference_number);
+            statusText.setText("#" + fl.tox_conference_number);
         }
 
         if (fl.conference_active)
@@ -162,7 +162,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         }
 
         // use this field as "conference title"
-        statusText.setText(get_conference_title_from_confid(fl.conference_identifier));
+        textView.setText(get_conference_title_from_confid(fl.conference_identifier));
 
         imageView2.setVisibility(View.INVISIBLE);
 
