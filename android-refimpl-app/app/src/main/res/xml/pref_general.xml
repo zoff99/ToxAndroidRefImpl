@@ -23,13 +23,6 @@
         android:key="orbot_enabled"
         android:summary="@string/pref_description_orbot_enabled"
         android:title="@string/pref_title_orbot_enabled"/>
-
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="fps_half"
-        android:summary="@string/pref_description_fps_half"
-        android:title="@string/pref_title_fps_half"/>
-
     <ListPreference
         android:defaultValue="0"
         android:entries="@array/pref_higher_video_quality_titles"
@@ -40,6 +33,12 @@
         android:summary="@string/pref_description_higher_video_quality"
         android:title="@string/pref_title_higher_video_quality"/>
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="fps_half"
+        android:summary="@string/pref_description_fps_half"
+        android:title="@string/pref_title_fps_half"/>
+
     <ListPreference
         android:defaultValue="1"
         android:entries="@array/pref_higher_audio_quality_titles"
@@ -49,7 +48,6 @@
         android:positiveButtonText="@null"
         android:summary="@string/pref_description_higher_audio_quality"
         android:title="@string/pref_title_higher_audio_quality"/>
-
     <ListPreference
         android:defaultValue="48000"
         android:entries="@array/pref_min_audio_samplingrate_out_titles"
@@ -66,4 +64,14 @@
         android:summary="@string/pref_description_conference_show_system_messages"
         android:title="@string/pref_title_conference_show_system_messages"/>
 
+    <PreferenceCategory
+        android:title="! eXperimental !">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_battery_saving_mode"
+            android:summary="@string/pref_description_X_battery_saving_mode"
+            android:title="@string/pref_title_X_battery_saving_mode"/>
+
+    </PreferenceCategory>
 </PreferenceScreen>

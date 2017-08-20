@@ -36,6 +36,7 @@ import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
@@ -62,11 +63,15 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FULL_SPEED_SECONDS_AFTER_WENT_ONLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timstamp;
 
 public class TrifaToxService extends Service
 {
@@ -375,7 +380,7 @@ public class TrifaToxService extends Service
                 change_notification(0); // set to offline
                 Log.i(TAG, "stop_tox_fg:008");
                 set_all_friends_offline();
-                Log.i(TAG,"set_all_conferences_inactive:003");
+                Log.i(TAG, "set_all_conferences_inactive:003");
                 set_all_conferences_inactive();
                 is_tox_started = false;
 
@@ -432,7 +437,7 @@ public class TrifaToxService extends Service
 
                 if (!old_is_tox_started)
                 {
-                    Log.i(TAG,"set_all_conferences_inactive:004");
+                    Log.i(TAG, "set_all_conferences_inactive:004");
                     set_all_conferences_inactive();
                     MainActivity.init_tox_callbacks();
                     MainActivity.update_savedata_file_wrapper();
@@ -714,8 +719,29 @@ public class TrifaToxService extends Service
                         }
                         else
                         {
-                            // Log.i(TAG, "(tox_iteration_interval_ms):" + tox_iteration_interval_ms + "ms");
-                            Thread.sleep(tox_iteration_interval_ms);
+                            if (PREF__X_battery_saving_mode)
+                            {
+                                if ((global_self_connection_status != ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value) && (Callstate.state == 0))
+                                {
+                                    if ((global_self_last_went_online_timstamp + FULL_SPEED_SECONDS_AFTER_WENT_ONLINE * 1000) < System.currentTimeMillis())
+                                    {
+                                        Thread.sleep(TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE); // sleep longer!!
+                                    }
+                                    else
+                                    {
+                                        Thread.sleep(tox_iteration_interval_ms);
+                                    }
+                                }
+                                else
+                                {
+                                    Thread.sleep(tox_iteration_interval_ms);
+                                }
+                            }
+                            else
+                            {
+                                // Log.i(TAG, "(tox_iteration_interval_ms):" + tox_iteration_interval_ms + "ms");
+                                Thread.sleep(tox_iteration_interval_ms);
+                            }
                         }
                     }
                     catch (InterruptedException e)

@@ -164,6 +164,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timstamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
@@ -277,6 +278,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview buffer size!!
     static boolean PREF__fps_half = true;
     static boolean PREF__conference_show_system_messages = false;
+    static boolean PREF__X_battery_saving_mode = false;
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
@@ -394,6 +396,7 @@ public class MainActivity extends AppCompatActivity
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         PREF__fps_half = settings.getBoolean("fps_half", true);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
+        PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {
@@ -1392,6 +1395,7 @@ public class MainActivity extends AppCompatActivity
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         PREF__fps_half = settings.getBoolean("fps_half", true);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
+        PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {
@@ -2429,6 +2433,7 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "self_connection_status:bootstrapping set to false");
                 bootstrapping = false;
+                global_self_last_went_online_timstamp = System.currentTimeMillis();
             }
         }
 
