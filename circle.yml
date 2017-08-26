@@ -31,6 +31,7 @@ machine:
 # --- Android build ---
 
     # ---------------------------------------------------
+    # v0.1.10 mobtweaks f73b345c21fae0e0e56fae86dc82f63188a00aca
     # v0.1.10 vp8tweaks cb5686de37e2b2d705ca4bd25f3a3beeef8bc152
     # VP8 0.15 rsiliet  3bd08f62c4b3947bf7441e1d7f79fd48cc02521d
     # VP8 0.14  lag     b8ad9e88c18c683beb46a8f62a0e88ee647698ff
@@ -60,7 +61,7 @@ machine:
     # ---------------------------------------------------
 
     # c-toxcore version
-    AND_CTOXCORE_VERSION: "cb5686de37e2b2d705ca4bd25f3a3beeef8bc152"
+    AND_CTOXCORE_VERSION: "f73b345c21fae0e0e56fae86dc82f63188a00aca"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
