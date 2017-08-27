@@ -33,8 +33,8 @@ public class TRIFAGlobals
     static int global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
     static long global_self_last_went_online_timstamp = -1;
 
-    static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 30;
-    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 5000;
+    static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 60;
+    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 2000;
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
 
