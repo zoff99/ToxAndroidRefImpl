@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Px;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -39,6 +40,15 @@ import android.widget.TextView;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.StringHolder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiPopup;
 import com.vanniktech.emoji.listeners.OnEmojiBackspaceClickListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
@@ -49,10 +59,12 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 import static com.zoffcc.applications.trifa.MainActivity.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_conference_active;
+import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
@@ -79,6 +91,16 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
 
+    // main drawer ----------
+    Drawer conference_message_drawer = null;
+    AccountHeader conference_message_drawer_header = null;
+    ProfileDrawerItem conference_message_profile_item = null;
+    // long peers_in_list_next_num = 0;
+    // main drawer ----------
+
+    Handler conferences_handler = null;
+    static Handler conferences_handler_s = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -89,6 +111,9 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         amode = null;
         amode_save_menu_item = null;
         selected_conference_messages.clear();
+
+        conferences_handler = new Handler(getMainLooper());
+        conferences_handler_s = conferences_handler;
 
         Intent intent = getIntent();
         conf_id = intent.getStringExtra("conf_id");
@@ -101,6 +126,71 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).
+                color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
+
+        conference_message_profile_item = new ProfileDrawerItem().
+                withName("Userlist").
+                withIcon(drawer_header_icon);
+
+        // Create the AccountHeader
+        conference_message_drawer_header = new AccountHeaderBuilder().
+                withActivity(this).
+                withSelectionListEnabledForSingleProfile(false).
+                withTextColor(getResources().getColor(R.color.md_dark_primary_text)).
+                withHeaderBackground(R.color.colorHeader).
+                addProfiles(conference_message_profile_item).
+                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
+                {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                    {
+                        return false;
+                    }
+                }).build();
+
+        //        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).
+        //                withIdentifier(1L).
+        //                withName("User1").
+        //                withIcon(GoogleMaterial.Icon.gmd_face);
+
+
+        // peers_in_list_next_num = 1;
+        lookup_peer_listnum_pubkey.clear();
+
+        // create the drawer and remember the `Drawer` result object
+        conference_message_drawer = new DrawerBuilder().
+                withActivity(this).
+                withAccountHeader(conference_message_drawer_header).
+                withInnerShadow(false).
+                withRootView(R.id.drawer_container).
+                withShowDrawerOnFirstLaunch(false).
+                withActionBarDrawerToggleAnimated(true).
+                withActionBarDrawerToggle(true).
+                withToolbar(toolbar).
+                withTranslucentStatusBar(false).
+                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                    {
+                        Log.i(TAG, "drawer:item=" + position);
+                        if (position == 1)
+                        {
+                            // profile
+                            try
+                            {
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        return true;
+                    }
+                }).build();
+
 
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
         ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
@@ -186,6 +276,26 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             }
         };
         t.start();
+
+        if (is_conference_active(conf_id))
+        {
+            final long conference_num = get_conference_num_from_confid(conf_id);
+            long num_peers = tox_conference_peer_count(conference_num);
+            if (num_peers > 0)
+            {
+                long i = 0;
+                for (i = 0; i < num_peers; i++)
+                {
+                    String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_num, i);
+                    String peer_name_temp = tox_conference_peer_get_name(conference_num, i);
+                    if (peer_name_temp.equals(""))
+                    {
+                        peer_name_temp = null;
+                    }
+                    add_group_user(peer_pubkey_temp, i, peer_name_temp);
+                }
+            }
+        }
 
         Log.i(TAG, "onCreate:099");
     }
@@ -470,4 +580,215 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         ret.ret_value = false;
         return ret;
     }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (conference_message_drawer.isDrawerOpen())
+        {
+            conference_message_drawer.closeDrawer();
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
+
+    long peer_pubkey_to_long_in_list(String peer_pubkey)
+    {
+        long ret = -1L;
+
+        if (lookup_peer_listnum_pubkey.containsKey(peer_pubkey))
+        {
+            ret = lookup_peer_listnum_pubkey.get(peer_pubkey);
+        }
+
+        return ret;
+    }
+
+    void remove_group_user(String peer_pubkey)
+    {
+        try
+        {
+            final long peer_num_in_list = peer_pubkey_to_long_in_list(peer_pubkey);
+            if (peer_num_in_list != -1)
+            {
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        conference_message_drawer.removeItem(peer_num_in_list);
+                                    }
+                                    catch (Exception e2)
+                                    {
+                                        e2.printStackTrace();
+                                    }
+                                }
+                            };
+
+                            if (conferences_handler_s != null)
+                            {
+                                conferences_handler_s.post(myRunnable);
+                            }
+
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                t.start();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "remove_group_user:EE:" + e.getMessage());
+        }
+    }
+
+    synchronized void add_group_user(String peer_pubkey, final long peernum, String name)
+    {
+        try
+        {
+            long peer_num_in_list = peer_pubkey_to_long_in_list(peer_pubkey);
+            if (peer_num_in_list == -1)
+            {
+                // -- ADD --
+                String name2 = "";
+                if (name != null)
+                {
+                    name2 = name;
+                }
+                else
+                {
+                    name2 = peer_pubkey.substring(peer_pubkey.length() - 5, peer_pubkey.length());
+                }
+
+                final String name3 = name2;
+
+                lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);
+
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        PrimaryDrawerItem new_item = new PrimaryDrawerItem().
+                                                withIdentifier(peernum).
+                                                withName(name3).
+                                                withIcon(GoogleMaterial.Icon.gmd_face);
+
+                                        Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
+                                        conference_message_drawer.addItem(new_item);
+                                    }
+                                    catch (Exception e2)
+                                    {
+                                        e2.printStackTrace();
+                                        Log.i(TAG, "add_group_user:EE2:" + e2.getMessage());
+                                    }
+                                }
+                            };
+
+                            if (conferences_handler_s != null)
+                            {
+                                conferences_handler_s.post(myRunnable);
+                            }
+
+                        }
+                        catch (Exception e3)
+                        {
+                            e3.printStackTrace();
+                            Log.i(TAG, "add_group_user:EE3:" + e3.getMessage());
+                        }
+                    }
+                };
+                t.start();
+            }
+            else
+            {
+                // -- UPDATE --
+                String name2 = "";
+                if (name != null)
+                {
+                    name2 = name;
+                }
+                else
+                {
+                    name2 = peer_pubkey.substring(peer_pubkey.length() - 5, peer_pubkey.length());
+                }
+
+                final String name3 = name2;
+
+                lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);
+
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        StringHolder sh = new StringHolder(name3);
+                                        Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
+                                        conference_message_drawer.updateName(peernum, sh);
+                                    }
+                                    catch (Exception e2)
+                                    {
+                                        e2.printStackTrace();
+                                        Log.i(TAG, "add_group_user:EE2:" + e2.getMessage());
+                                    }
+                                }
+                            };
+
+                            if (conferences_handler_s != null)
+                            {
+                                conferences_handler_s.post(myRunnable);
+                            }
+
+                        }
+                        catch (Exception e3)
+                        {
+                            e3.printStackTrace();
+                            Log.i(TAG, "add_group_user:EE3:" + e3.getMessage());
+                        }
+                    }
+                };
+                t.start();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "add_group_user:EE:" + e.getMessage());
+        }
+    }
+
 }

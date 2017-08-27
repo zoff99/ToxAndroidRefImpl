@@ -312,6 +312,10 @@ public class MainActivity extends AppCompatActivity
     static Map<String, String> cache_peername_pubkey2 = new HashMap<String, String>();
     // ---- lookup cache ----
 
+    // ---- lookup cache for conference drawer ----
+    static Map<String, Long> lookup_peer_listnum_pubkey = new HashMap<String, Long>();
+    // ---- lookup cache for conference drawer ----
+
     // main drawer ----------
     Drawer main_drawer = null;
     AccountHeader main_drawer_header = null;
@@ -571,7 +575,7 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
         final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
-                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
 
         profile_d_item = new ProfileDrawerItem().
                 withName("me").
@@ -4062,6 +4066,7 @@ public class MainActivity extends AppCompatActivity
                 m.rcvd_timestamp = System.currentTimeMillis();
 
                 String peer_name_temp = "Unknown";
+                String peer_name_temp2 = null;
                 try
                 {
                     // don't use the wrapper here!
@@ -4070,6 +4075,18 @@ public class MainActivity extends AppCompatActivity
                     // don't use the wrapper here!
                     peer_name_temp = tox_conference_peer_get_name(conference_number, peer_number);
                     Log.i(TAG, "namelist_change_cb:004:peer_name_temp=" + peer_name_temp);
+
+                    try
+                    {
+                        if ((peer_name_temp != null) && (!peer_name_temp.equals("")))
+                        {
+                            peer_name_temp2 = peer_name_temp;
+                        }
+                    }
+                    catch (Exception e5)
+                    {
+                        e5.printStackTrace();
+                    }
 
                     if (peer_name_temp == null)
                     {
@@ -4087,10 +4104,51 @@ public class MainActivity extends AppCompatActivity
                     m.text = "" + peer_name_temp + " joined.";
                     Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " joined.");
                     // TODO: here it's always "Tox User" !! bad!
+
+                    try
+                    {
+                        if (conference_message_list_activity != null)
+                        {
+                            Log.i(TAG, "namelist_change_cb:INFO:" + " 001.1");
+                            if (conference_message_list_activity.get_current_conf_id().equals(conf_temp.conference_identifier))
+                            {
+                                String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number, peer_number);
+                                Log.i(TAG, "namelist_change_cb:INFO:" + " 002.1 " + conference_number + ":" + peer_number + ":" + peer_pubkey_temp2);
+
+                                conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number, null);
+                                // TODO: because here the name is always "Tox User" !!
+                            }
+                        }
+                    }
+                    catch (Exception e3)
+                    {
+                        e3.printStackTrace();
+                    }
+
                     return;
                 }
                 else if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE.value)
                 {
+                    try
+                    {
+                        if (conference_message_list_activity != null)
+                        {
+                            Log.i(TAG, "namelist_change_cb:INFO:" + " 001");
+                            if (conference_message_list_activity.get_current_conf_id().equals(conf_temp.conference_identifier))
+                            {
+                                String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number, peer_number);
+                                Log.i(TAG, "namelist_change_cb:INFO:" + " 002 " + conference_number + ":" + peer_number + ":" + peer_pubkey_temp2);
+                                conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number, peer_name_temp2);
+                                Log.i(TAG, "namelist_change_cb:INFO:" + " 003");
+                            }
+                        }
+                    }
+                    catch (Exception e3)
+                    {
+                        e3.printStackTrace();
+                    }
+
+
                     m.text = "" + peer_name_temp + " changed name or joined.";
                     Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " changed name or joined.");
                     // HINT: this happend also after each peer joins
@@ -4098,6 +4156,22 @@ public class MainActivity extends AppCompatActivity
                 }
                 else if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT.value)
                 {
+                    try
+                    {
+                        if (conference_message_list_activity != null)
+                        {
+                            if (conference_message_list_activity.get_current_conf_id().equals(conf_temp.conference_identifier))
+                            {
+                                String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number, peer_number);
+                                conference_message_list_activity.remove_group_user(peer_pubkey_temp2);
+                            }
+                        }
+                    }
+                    catch (Exception e3)
+                    {
+                        e3.printStackTrace();
+                    }
+
                     m.text = "" + peer_name_temp + " left.";
                     Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " left.");
                     // return;
