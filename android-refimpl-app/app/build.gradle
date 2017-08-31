@@ -126,13 +126,16 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
-                          'proguard-glide.pro',
-                          'proguard-rules.pro'
+                    'proguard-glide.pro',
+                    'proguard-mikepenz-android-iconics.pro',
+                    'proguard-rounded-image-view.pro',
+                    'proguard-support-v7-appcompat.pro',
+                    'proguard-rules.pro'
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles = buildTypes.debug.proguardFiles
             testProguardFile 'proguard-project-test.pro'
         }
