@@ -134,6 +134,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles = buildTypes.debug.proguardFiles
+            testProguardFile 'proguard-project-test.pro'
         }
     }
 }
