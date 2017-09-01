@@ -213,7 +213,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.2.1 https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -226,7 +226,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
     
     
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -322,7 +322,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.2.1 https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -335,7 +335,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
     
     
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
