@@ -310,7 +310,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 	{
 		options.udp_enabled = false; // set TCP as default mode for android !!
 	}
-	options.local_discovery_enabled = true;
+	options.local_discovery_enabled = false; // TODO: make this an option!!
 	options.hole_punching_enabled = true;
 	// options.tcp_port = tcp_port;
     options.tcp_port = 0; // TCP relay is disabled !!
