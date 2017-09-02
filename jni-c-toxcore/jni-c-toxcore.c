@@ -354,7 +354,15 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 
 		uint8_t *savedata = NULL;
 
-		bool res1 = tox_is_data_encrypted(savedata_enc);
+
+		bool res1 = false;
+		if (fsize < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
+		{
+		}
+		else
+		{
+			res1 = tox_is_data_encrypted(savedata_enc);
+		}
 		dbg(9, "create_tox:tox_is_data_encrypted=%d", (int)res1);
 
 		if (res1 == true)
@@ -436,7 +444,14 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 
 	dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
 
-	bool res = tox_is_data_encrypted(savedata_enc);
+	bool res = false;
+	if (fsize < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
+	{
+	}
+	else
+	{
+		res = tox_is_data_encrypted(savedata_enc);
+	}
 	dbg(9, "update_savedata_file:tox_is_data_encrypted=%d", (int)res);
 
     FILE *f = fopen(full_path_filename_tmp, "wb");
