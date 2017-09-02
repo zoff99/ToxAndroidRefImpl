@@ -1547,7 +1547,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 
 	s =  (*env)->GetStringUTFChars(env, passphrase_j, NULL);
 	char *passphrase = strdup(s);
-	dbg(9, "passphrase=%s", passphrase);
+	// WARNING // dbg(9, "passphrase=%s", passphraseXX);
 	(*env)->ReleaseStringUTFChars(env, passphrase_j, s);
 
 	size_t passphrase_len = (size_t)strlen(passphrase);
@@ -1682,9 +1682,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 // --------------- _toxfuncs_ ---------------
 void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(JNIEnv* env, jobject thiz, jstring passphrase_j)
 {
-	const char *s =  (*env)->GetStringUTFChars(env, passphrase_j, NULL);
+	const char *s = (*env)->GetStringUTFChars(env, passphrase_j, NULL);
 	char *passphrase = strdup(s);
-	dbg(9, "passphrase=%s", passphrase);
+	// WARNING // dbg(9, "passphrase=%s", passphraseXX);
 	(*env)->ReleaseStringUTFChars(env, passphrase_j, s);
 
 	size_t passphrase_len = (size_t)strlen(passphrase);
