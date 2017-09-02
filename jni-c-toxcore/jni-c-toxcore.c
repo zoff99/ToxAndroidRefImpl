@@ -445,7 +445,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 	dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
 
 	bool res = false;
-	if (fsize < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
+	if (size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
 	{
 	}
 	else
