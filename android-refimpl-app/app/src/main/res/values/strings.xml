@@ -69,6 +69,9 @@
     <string name="pref_title_conference_show_system_messages">System Messages</string>
     <string name="pref_description_conference_show_system_messages">show System Messages in Conferences</string>
 
+    <string name="pref_title_local_discovery_enabled">LAN discovery</string>
+    <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
+
     <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
     <string name="pref_description_X_battery_saving_mode">!! Expermimental !! this will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
 

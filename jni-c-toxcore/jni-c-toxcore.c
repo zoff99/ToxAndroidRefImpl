@@ -277,7 +277,7 @@ void dbg(int level, const char *fmt, ...)
 }
 
 
-Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port)
+Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port, int local_discovery_enabled_)
 {
 	Tox *tox = NULL;
 	TOX_ERR_NEW error;
@@ -310,7 +310,16 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 	{
 		options.udp_enabled = false; // set TCP as default mode for android !!
 	}
-	options.local_discovery_enabled = false; // TODO: make this an option!!
+
+	if (local_discovery_enabled_ == 1)
+	{
+		options.local_discovery_enabled = true;
+	}
+	else
+	{
+		options.local_discovery_enabled = false;
+	}
+
 	options.hole_punching_enabled = true;
 	// options.tcp_port = tcp_port;
     options.tcp_port = 0; // TCP relay is disabled !!
@@ -1431,7 +1440,7 @@ void *thread_video_av(void *data)
 }
 
 
-void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port)
+void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port)
 {
 	const char *s = NULL;
 
@@ -1518,7 +1527,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 
 	// ----------- create Tox instance -----------
 	const char *proxy_host_str =  (*env)->GetStringUTFChars(env, proxy_host, NULL);
-	tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port);
+	tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port, (int)local_discovery_enabled);
 	(*env)->ReleaseStringUTFChars(env, proxy_host, proxy_host_str);
 	dbg(9, "tox_global=%p", tox_global);
 	// ----------- create Tox instance -----------
@@ -1585,9 +1594,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port)
+Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port)
 {
-	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled, orbot_enabled, proxy_host, proxy_port));
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled, local_discovery_enabled, orbot_enabled, proxy_host, proxy_port));
 }
 
 

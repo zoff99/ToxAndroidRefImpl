@@ -64,6 +64,12 @@
         android:summary="@string/pref_description_conference_show_system_messages"
         android:title="@string/pref_title_conference_show_system_messages"/>
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="local_discovery_enabled"
+        android:summary="@string/pref_description_local_discovery_enabled"
+        android:title="@string/pref_title_local_discovery_enabled"/>
+
     <PreferenceCategory
         android:title="! eXperimental !">
 

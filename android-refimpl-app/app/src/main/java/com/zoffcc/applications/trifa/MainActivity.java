@@ -274,6 +274,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
+    static boolean PREF__local_discovery_enabled = false;
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview buffer size!!
     static boolean PREF__fps_half = true;
@@ -401,6 +402,7 @@ public class MainActivity extends AppCompatActivity
         PREF__fps_half = settings.getBoolean("fps_half", true);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
+        PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {
@@ -663,7 +665,12 @@ public class MainActivity extends AppCompatActivity
                                     {
                                         PREF__orbot_enabled_to_int = 1;
                                     }
-                                    init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
+                                    int PREF__local_discovery_enabled_to_int = 0;
+                                    if (PREF__local_discovery_enabled)
+                                    {
+                                        PREF__local_discovery_enabled_to_int = 1;
+                                    }
+                                    init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
                                     Log.i(TAG, "set_all_conferences_inactive:001");
                                     set_all_conferences_inactive();
                                     tox_service_fg.tox_thread_start_fg();
@@ -1288,7 +1295,12 @@ public class MainActivity extends AppCompatActivity
                                 orbot_is_really_running = true;
                                 waiting_for_orbot_info(false);
                             }
-                            init(app_files_directory, PREF__udp_enabled, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
+                            int PREF__local_discovery_enabled_to_int = 0;
+                            if (PREF__local_discovery_enabled)
+                            {
+                                PREF__local_discovery_enabled_to_int = 1;
+                            }
+                            init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT);
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
@@ -1400,6 +1412,7 @@ public class MainActivity extends AppCompatActivity
         PREF__fps_half = settings.getBoolean("fps_half", true);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
+        PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {
@@ -1876,7 +1889,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir, int udp_enabled, int orbot_enabled, String orbot_host, long orbot_port);
+    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port);
 
     public native String getNativeLibAPI();
 
