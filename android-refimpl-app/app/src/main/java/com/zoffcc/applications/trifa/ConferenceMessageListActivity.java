@@ -140,6 +140,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 withSelectionListEnabledForSingleProfile(false).
                 withTextColor(getResources().getColor(R.color.md_dark_primary_text)).
                 withHeaderBackground(R.color.colorHeader).
+                withCompactStyle(true).
                 addProfiles(conference_message_profile_item).
                 withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
                 {
