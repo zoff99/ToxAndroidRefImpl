@@ -40,6 +40,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import static com.zoffcc.applications.trifa.MainActivity.getRandomString;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LEN_TRIFA_AUTOGEN_PASSWORD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 
 public class SetPasswordActivity extends AppCompatActivity
@@ -114,7 +115,7 @@ public class SetPasswordActivity extends AppCompatActivity
     {
         // TODO: bad, make better
         // create new key -------------
-        String key = getRandomString(20);
+        String key = getRandomString(LEN_TRIFA_AUTOGEN_PASSWORD);
         settings.edit().putString("DB_secrect_key", key).commit();
         // create new key -------------
     }

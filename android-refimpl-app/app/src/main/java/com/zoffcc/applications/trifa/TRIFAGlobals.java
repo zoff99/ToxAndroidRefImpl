@@ -101,6 +101,7 @@ public class TRIFAGlobals
     static final int FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED = 15;
 
     static final int MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE = 256;
+    static final int LEN_TRIFA_AUTOGEN_PASSWORD = 32;
 
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
