@@ -1487,7 +1487,7 @@ void *thread_video_av(void *data)
 
 void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j)
 {
-	char *s = NULL;
+	const char *s = NULL;
 
 	// SET GLOBAL JNIENV here, this is bad!!
 	// SET GLOBAL JNIENV here, this is bad!!
@@ -1667,7 +1667,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, 
 // --------------- _toxfuncs_ ---------------
 void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(JNIEnv* env, jobject thiz, jstring passphrase_j)
 {
-	char *s =  (*env)->GetStringUTFChars(env, passphrase_j, NULL);
+	const char *s =  (*env)->GetStringUTFChars(env, passphrase_j, NULL);
 	char *passphrase = strdup(s);
 	dbg(9, "passphrase=%s", passphrase);
 	(*env)->ReleaseStringUTFChars(env, passphrase_j, s);
