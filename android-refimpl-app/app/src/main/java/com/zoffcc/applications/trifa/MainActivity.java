@@ -671,7 +671,18 @@ public class MainActivity extends AppCompatActivity
                                     {
                                         PREF__local_discovery_enabled_to_int = 1;
                                     }
-                                    init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT, PREF__DB_secrect_key.substring(0, Math.min(PREF__DB_secrect_key.length(), MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE)));
+                                    init(app_files_directory, PREF__udp_enabled,
+                                            PREF__local_discovery_enabled_to_int,
+                                            PREF__orbot_enabled_to_int,
+                                            ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
+                                            TrifaSetPatternActivity.bytesToString(
+                                                    TrifaSetPatternActivity.sha256(
+                                                        TrifaSetPatternActivity.StringToBytes2(
+                                                                PREF__DB_secrect_key
+                                                        )
+                                                    )
+                                            )
+                                    );
                                     Log.i(TAG, "set_all_conferences_inactive:001");
                                     set_all_conferences_inactive();
                                     tox_service_fg.tox_thread_start_fg();
@@ -1301,7 +1312,18 @@ public class MainActivity extends AppCompatActivity
                             {
                                 PREF__local_discovery_enabled_to_int = 1;
                             }
-                            init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT, PREF__DB_secrect_key.substring(0, Math.min(PREF__DB_secrect_key.length(), MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE)));
+                            init(app_files_directory, PREF__udp_enabled,
+                                    PREF__local_discovery_enabled_to_int,
+                                    PREF__orbot_enabled_to_int,
+                                    ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
+                                    TrifaSetPatternActivity.bytesToString(
+                                            TrifaSetPatternActivity.sha256(
+                                                    TrifaSetPatternActivity.StringToBytes2(
+                                                            PREF__DB_secrect_key
+                                                    )
+                                            )
+                                    )
+                            );
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
@@ -1890,11 +1912,11 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase);
+    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase_hash);
 
     public native String getNativeLibAPI();
 
-    public static native void update_savedata_file();
+    public static native void update_savedata_file(String tox_encrypt_passphrase_hash);
 
     public static native String get_my_toxid();
 
@@ -7525,7 +7547,16 @@ public class MainActivity extends AppCompatActivity
     static void update_savedata_file_wrapper()
     {
         long start_timestamp = System.currentTimeMillis();
-        update_savedata_file();
+        update_savedata_file(
+                TrifaSetPatternActivity.bytesToString(
+                        TrifaSetPatternActivity.sha256(
+                                TrifaSetPatternActivity.StringToBytes2(
+                                        PREF__DB_secrect_key
+                                )
+                        )
+                )
+        );
+
         long end_timestamp = System.currentTimeMillis();
         Log.i(TAG, "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
     }
