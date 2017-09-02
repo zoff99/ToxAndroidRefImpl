@@ -1681,6 +1681,11 @@ void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__rea
 	{
 		free(passphrase);
 	}
+
+	if (s)
+	{
+		free(s);
+	}
 }
 
 JNIEXPORT void JNICALL
