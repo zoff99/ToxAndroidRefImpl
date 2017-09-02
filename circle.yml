@@ -267,7 +267,21 @@ compile:
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared
+    -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
+    jni-c-toxcore.c -o libjni-c-toxcore.so
+    -std=gnu99 -I/usr/local/include/
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxencryptsave.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a
+    coffeecatch.c coffeejni.c
+    -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+
+
   - . ~/pp;cd jni-c-toxcore/; ls -al
   #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
@@ -388,7 +402,7 @@ compile:
     jni-c-toxcore.c -o libjni-c-toxcore.so
     -std=gnu99 -I/usr/local/include/
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxcore.a
-    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxencryptsave.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxencryptsave.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxav.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libvpx.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libopus.a
