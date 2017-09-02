@@ -37,6 +37,7 @@
 
 #include <tox/tox.h>
 #include <tox/toxav.h>
+#include <tox/toxencryptsave.h>
 
 #include <sodium/utils.h>
 
@@ -58,8 +59,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 17
-static const char global_version_string[] = "0.99.17";
+#define VERSION_PATCH 18
+static const char global_version_string[] = "0.99.18";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -277,7 +278,7 @@ void dbg(int level, const char *fmt, ...)
 }
 
 
-Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port)
+Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port, int local_discovery_enabled_, const uint8_t *passphrase, size_t passphrase_len)
 {
 	Tox *tox = NULL;
 	TOX_ERR_NEW error;
@@ -310,7 +311,16 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 	{
 		options.udp_enabled = false; // set TCP as default mode for android !!
 	}
-	options.local_discovery_enabled = true;
+
+	if (local_discovery_enabled_ == 1)
+	{
+		options.local_discovery_enabled = true;
+	}
+	else
+	{
+		options.local_discovery_enabled = false;
+	}
+
 	options.hole_punching_enabled = true;
 	// options.tcp_port = tcp_port;
     options.tcp_port = 0; // TCP relay is disabled !!
@@ -333,16 +343,48 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
         long fsize = ftell(f);
         fseek(f, 0, SEEK_SET);
 
-        uint8_t *savedata = malloc(fsize);
+        uint8_t *savedata_enc = malloc(fsize);
 
-        size_t dummy = fread(savedata, fsize, 1, f);
+        size_t dummy = fread(savedata_enc, fsize, 1, f);
 		if (dummy < 1)
 		{
-			dbg(0, "reading savedata failed");
+			dbg(0, "reading savedata_enc failed");
 		}
         fclose(f);
 
-        options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
+		uint8_t *savedata = NULL;
+
+
+		bool res1 = false;
+		if (fsize < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
+		{
+		}
+		else
+		{
+			res1 = tox_is_data_encrypted(savedata_enc);
+		}
+		dbg(9, "create_tox:tox_is_data_encrypted=%d", (int)res1);
+
+		if (res1 == true)
+		{
+			size_t savedata_len = (size_t)(fsize - TOX_PASS_ENCRYPTION_EXTRA_LENGTH);
+			savedata = malloc(savedata_len);
+
+			TOX_ERR_DECRYPTION error2;
+			bool res2 = tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
+
+			if (savedata_enc)
+			{
+				free(savedata_enc);
+			}
+		}
+		else
+		{
+			// save data is not encrypted (yet) !
+			savedata = savedata_enc;
+		}
+
+		options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
         options.savedata_data = savedata;
         options.savedata_length = fsize;
 
@@ -382,7 +424,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 }
 
 
-void update_savedata_file(const Tox *tox)
+void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len)
 {
     size_t size = tox_get_savedata_size(tox);
     char *savedata = malloc(size);
@@ -394,15 +436,42 @@ void update_savedata_file(const Tox *tox)
 	char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
 	snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
 
+	size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
+	char *savedata_enc = malloc(size_enc);
+
+	TOX_ERR_ENCRYPTION error;
+	tox_pass_encrypt(savedata, size, passphrase, passphrase_len, savedata_enc, &error);
+
+	dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
+
+	bool res = false;
+	if (size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
+	{
+	}
+	else
+	{
+		res = tox_is_data_encrypted(savedata_enc);
+	}
+	dbg(9, "update_savedata_file:tox_is_data_encrypted=%d", (int)res);
+
     FILE *f = fopen(full_path_filename_tmp, "wb");
-    fwrite(savedata, size, 1, f);
+    fwrite(savedata_enc, size_enc, 1, f);
     fclose(f);
 
     rename(full_path_filename_tmp, full_path_filename);
 
 	free(full_path_filename);
 	free(full_path_filename_tmp);
-    free(savedata);
+
+	if (savedata)
+	{
+		free(savedata);
+	}
+
+	if (savedata_enc)
+	{
+		free(savedata_enc);
+	}
 }
 
 
@@ -1431,7 +1500,7 @@ void *thread_video_av(void *data)
 }
 
 
-void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port)
+void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j)
 {
 	const char *s = NULL;
 
@@ -1476,6 +1545,13 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 	dbg(9, "app_data_dir=%s", app_data_dir);
 	(*env)->ReleaseStringUTFChars(env, datadir, s);
 
+	s =  (*env)->GetStringUTFChars(env, passphrase_j, NULL);
+	char *passphrase = strdup(s);
+	// WARNING // dbg(9, "passphrase=%s", passphraseXX);
+	(*env)->ReleaseStringUTFChars(env, passphrase_j, s);
+
+	size_t passphrase_len = (size_t)strlen(passphrase);
+
 	// jclass class2 = NULL;
 	// android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &class2);
 	// dbg(9, "class2=%p", class2);
@@ -1518,7 +1594,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 
 	// ----------- create Tox instance -----------
 	const char *proxy_host_str =  (*env)->GetStringUTFChars(env, proxy_host, NULL);
-	tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port);
+	tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port, (int)local_discovery_enabled, (const uint8_t *)passphrase, (size_t)passphrase_len);
 	(*env)->ReleaseStringUTFChars(env, proxy_host, proxy_host_str);
 	dbg(9, "tox_global=%p", tox_global);
 	// ----------- create Tox instance -----------
@@ -1582,28 +1658,55 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
         dbg(2, "AV video Thread successfully created");
 	}
 	// start toxav thread ------------------------------
+
+	if (passphrase)
+	{
+		free(passphrase);
+	}
+
+	// if (s)
+	//{
+	//	free((void*)s);
+	//}
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port)
+Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv* env, jobject thiz, jobject datadir, jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j)
 {
-	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled, orbot_enabled, proxy_host, proxy_port));
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled, local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j));
 }
 
 
 // --------------- _toxfuncs_ ---------------
 // --------------- _toxfuncs_ ---------------
 // --------------- _toxfuncs_ ---------------
-void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(JNIEnv* env, jobject thiz)
+void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(JNIEnv* env, jobject thiz, jstring passphrase_j)
 {
+	const char *s = (*env)->GetStringUTFChars(env, passphrase_j, NULL);
+	char *passphrase = strdup(s);
+	// WARNING // dbg(9, "passphrase=%s", passphraseXX);
+	(*env)->ReleaseStringUTFChars(env, passphrase_j, s);
+
+	size_t passphrase_len = (size_t)strlen(passphrase);
+
 	dbg(9, "update_savedata_file");
-	update_savedata_file(tox_global);
+	update_savedata_file(tox_global, (const uint8_t *)passphrase, (size_t)passphrase_len);
+
+	if (passphrase)
+	{
+		free(passphrase);
+	}
+
+	//if (s)
+	//{
+	//	free((void*)s);
+	//}
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv* env, jobject thiz)
+Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv* env, jobject thiz, jstring passphrase_j)
 {
-	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz));
+	COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz, passphrase_j));
 }
 
 // -----------------
