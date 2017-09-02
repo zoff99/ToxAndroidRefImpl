@@ -671,7 +671,7 @@ public class MainActivity extends AppCompatActivity
                                     {
                                         PREF__local_discovery_enabled_to_int = 1;
                                     }
-                                    init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT, PREF__DB_secrect_key.substring(0, MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE));
+                                    init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT, PREF__DB_secrect_key.substring(0, Math.min(PREF__DB_secrect_key.length(), MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE)));
                                     Log.i(TAG, "set_all_conferences_inactive:001");
                                     set_all_conferences_inactive();
                                     tox_service_fg.tox_thread_start_fg();
@@ -1301,7 +1301,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 PREF__local_discovery_enabled_to_int = 1;
                             }
-                            init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT, PREF__DB_secrect_key.substring(0, MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE));
+                            init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int, PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT, PREF__DB_secrect_key.substring(0, Math.min(PREF__DB_secrect_key.length(), MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE)));
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
