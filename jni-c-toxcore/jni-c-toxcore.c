@@ -1664,10 +1664,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv* env, job
 		free(passphrase);
 	}
 
-	if (s)
-	{
-		free((void*)s);
-	}
+	// if (s)
+	//{
+	//	free((void*)s);
+	//}
 }
 
 JNIEXPORT void JNICALL
@@ -1697,10 +1697,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__rea
 		free(passphrase);
 	}
 
-	if (s)
-	{
-		free((void*)s);
-	}
+	//if (s)
+	//{
+	//	free((void*)s);
+	//}
 }
 
 JNIEXPORT void JNICALL
