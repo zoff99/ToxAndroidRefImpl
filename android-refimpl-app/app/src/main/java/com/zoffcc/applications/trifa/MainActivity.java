@@ -4044,6 +4044,8 @@ public class MainActivity extends AppCompatActivity
         {
             ConferenceDB conf_temp = null;
 
+            String pubkey_save = "";
+
             try
             {
                 // TODO: cache me!!
@@ -4161,6 +4163,21 @@ public class MainActivity extends AppCompatActivity
                         e3.printStackTrace();
                     }
 
+                    try
+                    {
+                        ConferencePeerCacheDB cpcdb = new ConferencePeerCacheDB();
+                        cpcdb.conference_identifier = conf_temp.conference_identifier;
+                        String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number, peer_number);
+                        cpcdb.peer_pubkey = peer_pubkey_temp2;
+                        cpcdb.peer_name = peer_name_temp2;
+                        cpcdb.last_update_timestamp = System.currentTimeMillis();
+                        orma.insertIntoConferencePeerCacheDB(cpcdb);
+                        Log.i(TAG, "namelist_change_cb:insertIntoConferencePeerCacheDB:" + cpcdb);
+                    }
+                    catch (Exception e4)
+                    {
+                        e4.printStackTrace();
+                    }
 
                     m.text = "" + peer_name_temp + " changed name or joined.";
                     Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " changed name or joined.");
@@ -4183,6 +4200,27 @@ public class MainActivity extends AppCompatActivity
                     catch (Exception e3)
                     {
                         e3.printStackTrace();
+                    }
+
+                    try
+                    {
+                        String name_from_cacheDB = orma.selectFromConferencePeerCacheDB().
+                                conference_identifierEq(conf_temp.conference_identifier).
+                                peer_pubkeyEq(tox_conference_peer_get_public_key(conference_number, peer_number)).
+                                orderByLast_update_timestampAsc().get(0).peer_name;
+
+                        if (name_from_cacheDB != null)
+                        {
+                            if (name_from_cacheDB.length() > 0)
+                            {
+                                peer_name_temp = name_from_cacheDB;
+                                Log.i(TAG, "namelist_change_cb:peer_name_temp from DB=" + name_from_cacheDB);
+                            }
+                        }
+                    }
+                    catch (Exception e4)
+                    {
+                        e4.printStackTrace();
                     }
 
                     m.text = "" + peer_name_temp + " left.";
@@ -4225,6 +4263,42 @@ public class MainActivity extends AppCompatActivity
                     friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
                 // update conferenc item -------
+
+
+                if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT.value)
+                {
+                    try
+                    {
+                        orma.deleteFromConferencePeerCacheDB().
+                                conference_identifierEq(conf_temp.conference_identifier).
+                                peer_pubkeyEq(pubkey_save).execute();
+                        Log.i(TAG, "namelist_change_cb:deleteFromConferencePeerCacheDB");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    try
+                    {
+                        // TODO: make better? clean up -> if more than 300 entries, delete oldest 50 entries
+                        long count_cache_entries = (long) orma.selectFromConferencePeerCacheDB().count();
+                        if (count_cache_entries > 300)
+                        {
+                            Log.i(TAG, "namelist_change_cb:selectFromConferencePeerCacheDB().count=" + count_cache_entries);
+                            for (ConferencePeerCacheDB entry : orma.selectFromConferencePeerCacheDB().offset(0).limit(50))
+                            {
+                                Log.i(TAG, "namelist_change_cb:delete peer cache entry ID=" + entry.id);
+                                orma.deleteFromConferencePeerCacheDB().idEq(entry.id).execute();
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
             }
         }
         catch (Exception e)
