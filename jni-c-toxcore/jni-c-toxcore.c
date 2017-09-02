@@ -367,7 +367,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 
 		if (res1 == true)
 		{
-			savedata_len = fsize - TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
+			size_t savedata_len = (size_t)(fsize - TOX_PASS_ENCRYPTION_EXTRA_LENGTH);
 			savedata = malloc(savedata_len);
 
 			TOX_ERR_DECRYPTION error2;
