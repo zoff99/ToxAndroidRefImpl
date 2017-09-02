@@ -31,6 +31,8 @@ machine:
 # --- Android build ---
 
     # ---------------------------------------------------
+    # v0.1.10 mtweaks2  d4c11ecbc45faf0e66fbe8c4df59b8087d22f409
+    # v0.1.10 mobtweaks f73b345c21fae0e0e56fae86dc82f63188a00aca
     # v0.1.10 vp8tweaks cb5686de37e2b2d705ca4bd25f3a3beeef8bc152
     # VP8 0.15 rsiliet  3bd08f62c4b3947bf7441e1d7f79fd48cc02521d
     # VP8 0.14  lag     b8ad9e88c18c683beb46a8f62a0e88ee647698ff
@@ -211,7 +213,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.2.1 https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -224,11 +226,11 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
     
     
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --enable-minimal --disable-pie
+  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-pie
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -265,7 +267,21 @@ compile:
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared
+    -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
+    jni-c-toxcore.c -o libjni-c-toxcore.so
+    -std=gnu99 -I/usr/local/include/
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxcore.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxencryptsave.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a
+    coffeecatch.c coffeejni.c
+    -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+
+
   - . ~/pp;cd jni-c-toxcore/; ls -al
   #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
@@ -320,7 +336,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.1.5 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.2.1 https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -333,11 +349,11 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
     
     
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.12 https://github.com/jedisct1/libsodium.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --enable-minimal --disable-pie
+  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --disable-pie
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -367,7 +383,9 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --enable-logging --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --disable-testing --disable-rt
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr
+    --enable-logging --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
+    --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;export V=2;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -378,7 +396,21 @@ compile:
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so jni-c-toxcore.c -o libjni-c-toxcore.so -std=gnu99 -I/usr/local/include/ "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxcore.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxav.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libvpx.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libopus.a "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libsodium.a coffeecatch.c coffeejni.c -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared
+    -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
+    jni-c-toxcore.c -o libjni-c-toxcore.so
+    -std=gnu99 -I/usr/local/include/
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxcore.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxencryptsave.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxav.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libvpx.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libopus.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libsodium.a
+    coffeecatch.c coffeejni.c
+    -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
+
+
   - . ~/pp;cd jni-c-toxcore/; ls -al
   #- . ~/pp;cd jni-c-toxcore/; $STRIP -d libjni-c-toxcore.so
   - . ~/pp;cd jni-c-toxcore/; $READELF -d libjni-c-toxcore.so
