@@ -24,6 +24,6 @@
         android:paddingTop="0dp">
     </android.support.v7.widget.RecyclerView>
 
-    <include layout="@layout/floating_action_button"/>
+    <!--<include layout="@layout/floating_action_button"/>-->
 
 </RelativeLayout>

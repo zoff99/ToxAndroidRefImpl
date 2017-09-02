@@ -100,12 +100,15 @@
                     android:id="@+id/fl_fragment"
                     android:name="com.zoffcc.applications.trifa.FriendListFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    tools:layout="@layout/friend_list_layout"/>
 
             </LinearLayout>
 
         </FrameLayout>
     </FrameLayout>
+
+    <include layout="@layout/floating_action_button"/>
 
 </RelativeLayout>
 
