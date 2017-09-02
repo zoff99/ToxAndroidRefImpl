@@ -431,7 +431,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 	size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
 	char *savedata_enc = malloc(size_enc);
 
-	TOX_ERR_ENCRYPTION *error;
+	TOX_ERR_ENCRYPTION error;
 	tox_pass_encrypt(savedata, size, passphrase, passphrase_len, savedata_enc, &error);
 
 	dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
