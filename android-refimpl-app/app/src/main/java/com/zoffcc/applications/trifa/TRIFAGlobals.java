@@ -100,6 +100,8 @@ public class TRIFAGlobals
     static final int FL_NOTIFICATION_ICON_SIZE_DP_SELECTED = 90;
     static final int FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED = 15;
 
+    static final int MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE = 32;
+
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
