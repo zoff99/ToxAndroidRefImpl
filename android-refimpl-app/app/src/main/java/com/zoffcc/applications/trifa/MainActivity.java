@@ -5725,14 +5725,26 @@ public class MainActivity extends AppCompatActivity
                 //byte[] byteArray = new byte[(int) f1.length()];
                 // fis.read(byteArray, 0, (int) f1.length());
 
-                GlideApp.
-                        with(c).
-                        load(f1).
-                        placeholder(placholder).
-                        placeholder(R.drawable.round_loading_animation).
-                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                        skipMemoryCache(false).
-                        into(v);
+                if (placholder == null)
+                {
+                    GlideApp.
+                            with(c).
+                            load(f1).
+                            placeholder(R.drawable.round_loading_animation).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(false).
+                            into(v);
+                }
+                else
+                {
+                    GlideApp.
+                            with(c).
+                            load(f1).
+                            placeholder(placholder).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(false).
+                            into(v);
+                }
             }
             else
             {
