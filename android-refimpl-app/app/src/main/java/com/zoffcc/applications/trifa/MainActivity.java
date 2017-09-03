@@ -5729,6 +5729,7 @@ public class MainActivity extends AppCompatActivity
                         with(c).
                         load(f1).
                         placeholder(placholder).
+                        placeholder(R.drawable.round_loading_animation).
                         diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                         skipMemoryCache(false).
                         into(v);

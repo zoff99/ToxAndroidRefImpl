@@ -109,6 +109,7 @@ public class TRIFAGlobals
     // ---- lookup cache ----
 
     static int CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) dp2px(10);
+    static int CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = (int) dp2px(20);
 
     public static enum TRIFA_FT_DIRECTION
     {

@@ -48,7 +48,6 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messa
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
-import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
@@ -164,7 +163,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 with(avatar.getContext()).
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
+                                signature(StringSignature2("_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
                                 placeholder(d_lock).
                                 priority(Priority.HIGH).
                                 skipMemoryCache(false).
@@ -213,7 +212,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             load(byteArray).
                             placeholder(d_lock).
                             diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
+                            signature(StringSignature2("_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
                             skipMemoryCache(false).
                             apply(glide_options).
                             into(avatar);

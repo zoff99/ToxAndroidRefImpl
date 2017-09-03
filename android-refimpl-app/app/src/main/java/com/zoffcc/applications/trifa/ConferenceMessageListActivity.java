@@ -45,7 +45,6 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.holder.StringHolder;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
@@ -70,6 +69,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceMessageListActivity extends AppCompatActivity
 {
@@ -659,7 +659,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         }
     }
 
-    synchronized void add_group_user(String peer_pubkey, final long peernum, String name)
+    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name)
     {
         try
         {
@@ -695,12 +695,61 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                 {
                                     try
                                     {
-                                        PrimaryDrawerItem new_item = new PrimaryDrawerItem().
-                                                withIdentifier(peernum).
-                                                withName(name3).
-                                                withIcon(GoogleMaterial.Icon.gmd_face);
+                                        ConferenceCustomDrawerPeerItem new_item = null;
+                                        FriendList fl_temp = null;
+                                        boolean have_avatar_for_pubkey = false;
 
-                                        Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
+                                        try
+                                        {
+                                            fl_temp = orma.selectFromFriendList().
+                                                    tox_public_key_stringEq(peer_pubkey).get(0);
+
+                                            if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
+                                            {
+                                                info.guardianproject.iocipher.File f1 = null;
+                                                try
+                                                {
+                                                    f1 = new info.guardianproject.iocipher.File(fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                                                    if (f1.length() > 0)
+                                                    {
+                                                        have_avatar_for_pubkey = true;
+                                                    }
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            else
+                                            {
+                                                have_avatar_for_pubkey = false;
+                                                fl_temp = null;
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                            have_avatar_for_pubkey = false;
+                                            // Log.i(TAG, "have_avatar_for_pubkey:00a04:" + have_avatar_for_pubkey);
+                                            fl_temp = null;
+                                        }
+
+                                        try
+                                        {
+                                            new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey, peer_pubkey).
+                                                    withIdentifier(peernum).
+                                                    withName(name3);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                            new_item = new ConferenceCustomDrawerPeerItem(false, null).
+                                                    withIdentifier(peernum).
+                                                    withName(name3).
+                                                    withIcon(GoogleMaterial.Icon.gmd_face);
+                                        }
+
+                                        // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
                                         conference_message_drawer.addItem(new_item);
                                     }
                                     catch (Exception e2)
