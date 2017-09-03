@@ -587,6 +587,7 @@ public class MainActivity extends AppCompatActivity
         main_drawer_header = new AccountHeaderBuilder().
                 withSelectionListEnabledForSingleProfile(false).
                 withActivity(this).
+                withCompactStyle(true).
                 addProfiles(profile_d_item).
                 withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
                 {
