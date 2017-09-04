@@ -2868,6 +2868,9 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
+    // --- incoming message ---
+    // --- incoming message ---
+    // --- incoming message ---
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
     {
         // Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
@@ -3027,6 +3030,9 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+    // --- incoming message ---
+    // --- incoming message ---
+    // --- incoming message ---
 
     static void android_tox_callback_file_recv_control_cb_method(long friend_number, long file_number, int a_TOX_FILE_CONTROL)
     {
