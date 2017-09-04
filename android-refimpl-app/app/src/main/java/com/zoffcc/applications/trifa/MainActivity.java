@@ -2417,7 +2417,14 @@ public class MainActivity extends AppCompatActivity
             {
                 if (!audio_receiver_thread.stopped)
                 {
-                    audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2));
+		    if (android.os.Build.VERSION.SDK_INT >= 21)
+		    {
+                    	audio_receiver_thread.track.write(audio_buffer_2[0], (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
+		    }
+		    else
+		    {
+                    	audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2));
+		    }
                 }
             }
         }
