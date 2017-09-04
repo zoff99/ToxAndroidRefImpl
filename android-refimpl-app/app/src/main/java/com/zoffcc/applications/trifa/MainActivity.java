@@ -247,8 +247,8 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 4; // how many out play buffers?
-    final static int audio_out_buffer_mult = 3;
+    final static int audio_in_buffer_max_count = 15; // how many out play buffers?
+    final static int audio_out_buffer_mult = 15;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
