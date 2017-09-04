@@ -346,7 +346,7 @@ public class MessageListActivity extends AppCompatActivity
         Log.i(TAG, "onPause");
         super.onPause();
 
-        MainActivity.message_list_fragment = null;
+        // ** // MainActivity.message_list_fragment = null;
         MainActivity.message_list_activity = null;
         Log.i(TAG, "onPause:001:friendnum=" + friendnum);
         friendnum = -1;
