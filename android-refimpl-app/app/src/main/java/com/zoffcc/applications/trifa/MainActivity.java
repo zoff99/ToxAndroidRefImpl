@@ -47,6 +47,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -2417,14 +2418,21 @@ public class MainActivity extends AppCompatActivity
             {
                 if (!audio_receiver_thread.stopped)
                 {
-		    if (android.os.Build.VERSION.SDK_INT >= 21)
-		    {
-                    	audio_receiver_thread.track.write(audio_buffer_2[0], (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
-		    }
-		    else
-		    {
-                    	audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2));
-		    }
+                    //                    if (android.os.Build.VERSION.SDK_INT >= 23)
+                    //                    {
+                    //                        // AudioTrack.write() called with invalid size (3840) value
+                    //                        audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
+                    //                    }
+                    if (android.os.Build.VERSION.SDK_INT >= 21)
+                    {
+                        // AudioTrack.write() called with invalid size (3840) value
+                        audio_buffer_2[0].position(0);
+                        audio_receiver_thread.track.write(audio_buffer_2[0], (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
+                    }
+                    else
+                    {
+                        audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2));
+                    }
                 }
             }
         }
