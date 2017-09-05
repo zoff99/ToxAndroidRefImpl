@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
+import static com.zoffcc.applications.trifa.FriendListHolder.remove_progress_dialog;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -231,6 +232,15 @@ public class FriendListFragment extends Fragment
     @Override
     public void onResume()
     {
+        try
+        {
+            remove_progress_dialog();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         Log.i(TAG, "onResume");
         super.onResume();
 

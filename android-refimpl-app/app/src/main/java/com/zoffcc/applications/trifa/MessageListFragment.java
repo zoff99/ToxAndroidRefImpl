@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -54,7 +55,7 @@ public class MessageListFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        // Log.i(TAG, "onCreateView");
+        Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
 
 
@@ -68,35 +69,8 @@ public class MessageListFragment extends Fragment
         // default is: at bottom
         is_at_bottom = true;
 
-        try
-        {
-            // reset "new" flags for messages -------
-            if (orma != null)
-            {
-                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
-            }
-            // reset "new" flags for messages -------
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (orma != null)
-            {
-                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
-                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
-                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            // data_values is NULL here!!
-        }
+        // data_values = null;
+        data_values = new ArrayList<Message>();
 
         // --------------
         // --------------
@@ -172,7 +146,7 @@ public class MessageListFragment extends Fragment
         // a = new MessagelistArrayAdapter(context, data_values);
         // setListAdapter(a);
 
-        MainActivity.message_list_fragment = this;
+        // MainActivity.message_list_fragment = this;
 
         return view;
     }
@@ -203,6 +177,41 @@ public class MessageListFragment extends Fragment
         Log.i(TAG, "onResume");
         super.onResume();
 
+        try
+        {
+            // reset "new" flags for messages -------
+            if (orma != null)
+            {
+                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            }
+            // reset "new" flags for messages -------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        update_all_messages(true);
+
+        // default is: at bottom
+        is_at_bottom = true;
+
+        //        try
+        //        {
+        //            if (orma != null)
+        //            {
+        //                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+        //                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+        //                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+        //                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+        //            }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //            // data_values is NULL here!!
+        //        }
+
         MainActivity.message_list_fragment = this;
     }
 
@@ -215,7 +224,7 @@ public class MessageListFragment extends Fragment
         MainActivity.message_list_fragment = null;
     }
 
-    void update_all_messages()
+    void update_all_messages(boolean always)
     {
         Log.i(TAG, "update_all_messages");
 
@@ -232,16 +241,23 @@ public class MessageListFragment extends Fragment
 
         try
         {
-            if (data_values != null)
+            if ((always) || (data_values != null))
             {
-                data_values.clear();
+                Log.i(TAG, "data_values:005a");
+                if (data_values != null)
+                {
+                    data_values.clear();
+                }
+                Log.i(TAG, "data_values:005b");
                 adapter.add_list_clear(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
+                Log.i(TAG, "data_values:005c");
             }
-            Log.i(TAG, "data_values:005");
+            Log.i(TAG, "data_values:005d");
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
 
     }

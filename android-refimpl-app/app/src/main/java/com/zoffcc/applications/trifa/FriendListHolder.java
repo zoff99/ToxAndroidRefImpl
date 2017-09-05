@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -69,6 +70,22 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private ImageView imageView;
     private ImageView imageView2;
     private ImageView f_notification;
+    static ProgressDialog progressDialog = null;
+
+    synchronized static void remove_progress_dialog()
+    {
+        try
+        {
+            if (progressDialog != null)
+            {
+                progressDialog.dismiss();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     public FriendListHolder(View itemView, Context c)
     {
@@ -316,6 +333,34 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else
             {
+                try
+                {
+                    if (progressDialog != null)
+                    {
+                        progressDialog.dismiss();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    if (progressDialog == null)
+                    {
+                        progressDialog = new ProgressDialog(this.context);
+                    }
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.setMessage("");
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progressDialog.show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 Intent intent = new Intent(v.getContext(), MessageListActivity.class);
                 intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(this.friendlist.tox_public_key_string));
                 v.getContext().startActivity(intent);

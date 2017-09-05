@@ -327,11 +327,11 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     public void add_list_clear(List<Message> new_items)
     {
-        Log.i(TAG, "add_list_clear:" + new_items);
+        // Log.i(TAG, "add_list_clear:" + new_items);
 
         try
         {
-            Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
+            // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
             this.notifyDataSetChanged();

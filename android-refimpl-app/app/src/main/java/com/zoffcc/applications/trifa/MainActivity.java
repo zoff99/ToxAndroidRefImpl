@@ -6018,26 +6018,26 @@ public class MainActivity extends AppCompatActivity
     //        main_handler_s.post(myRunnable);
     //    }
 
-    static void update_message_view()
-    {
-        try
-        {
-            // Log.i(TAG, "update_message_view:001 " + message_list_fragment);
-            // Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " + message_list_fragment.isVisible());
-            // update the message view (if possbile)
-            if (message_list_fragment != null)
-            {
-                Log.i(TAG, "update_message_view:005");
-                MainActivity.message_list_fragment.update_all_messages();
-                Log.i(TAG, "update_message_view:006");
-            }
-        }
-        catch (Exception e)
-        {
-            // e.printStackTrace();
-            Log.i(TAG, "update_message_view:EE:" + e.getMessage());
-        }
-    }
+    //    static void update_message_view()
+    //    {
+    //        try
+    //        {
+    //            // Log.i(TAG, "update_message_view:001 " + message_list_fragment);
+    //            // Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " + message_list_fragment.isVisible());
+    //            // update the message view (if possbile)
+    //            if (message_list_fragment != null)
+    //            {
+    //                Log.i(TAG, "update_message_view:005");
+    //                MainActivity.message_list_fragment.update_all_messages(false);
+    //                Log.i(TAG, "update_message_view:006");
+    //            }
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            // e.printStackTrace();
+    //            Log.i(TAG, "update_message_view:EE:" + e.getMessage());
+    //        }
+    //    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
