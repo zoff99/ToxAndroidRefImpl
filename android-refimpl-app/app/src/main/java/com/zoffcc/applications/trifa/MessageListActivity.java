@@ -31,6 +31,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Px;
@@ -71,6 +73,7 @@ import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
@@ -116,12 +119,15 @@ public class MessageListActivity extends AppCompatActivity
     ImageView ml_status_icon = null;
     ImageButton ml_phone_icon = null;
     ImageButton ml_button_01 = null;
-    int global_typing = 0;
+    static int global_typing = 0;
     Thread typing_flag_thread = null;
     final static int TYPING_FLAG_DEACTIVATE_DELAY_IN_MILLIS = 1000; // 1 second
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
+
+    Handler mla_handler = null;
+    static Handler mla_handler_s = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -136,6 +142,32 @@ public class MessageListActivity extends AppCompatActivity
         selected_messages_text_only.clear();
         selected_messages_incoming_file.clear();
 
+        mla_handler = new Handler(Looper.getMainLooper())
+        {
+            @Override
+            public void handleMessage(android.os.Message m)
+            {
+                try
+                {
+                    switch (m.what)
+                    {
+                        case 1:
+                            stop_self_typing_indicator();
+                            break;
+                        default:
+                            super.handleMessage(m);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    super.handleMessage(m);
+                }
+            }
+        };
+
+        mla_handler_s = mla_handler;
+
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
         Log.i(TAG, "onCreate:003:friendnum=" + friendnum + " friendnum_prev=" + friendnum_prev);
@@ -143,7 +175,7 @@ public class MessageListActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_message_list);
 
-        MainActivity.message_list_activity = this;
+        message_list_activity = this;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -157,9 +189,7 @@ public class MessageListActivity extends AppCompatActivity
         ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
         ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
-
         final ImageButton button01_ = ml_button_01;
-
         ml_icon.setImageResource(R.drawable.circle_red);
         set_friend_connection_status_icon();
         ml_status_icon.setImageResource(R.drawable.circle_green);
@@ -178,6 +208,7 @@ public class MessageListActivity extends AppCompatActivity
 
 
         insert_emoji.setOnClickListener(new View.OnClickListener()
+
         {
             @Override
             public void onClick(final View v)
@@ -195,7 +226,6 @@ public class MessageListActivity extends AppCompatActivity
 
         ml_new_message.addTextChangedListener(new TextWatcher()
         {
-
             public void afterTextChanged(Editable s)
             {
                 if (s.length() > 0)
@@ -347,7 +377,7 @@ public class MessageListActivity extends AppCompatActivity
         super.onPause();
 
         // ** // MainActivity.message_list_fragment = null;
-        MainActivity.message_list_activity = null;
+        message_list_activity = null;
         Log.i(TAG, "onPause:001:friendnum=" + friendnum);
         friendnum = -1;
         Log.i(TAG, "onPause:002:friendnum=" + friendnum);
@@ -360,6 +390,8 @@ public class MessageListActivity extends AppCompatActivity
         {
             emojiPopup.dismiss();
         }
+
+        stop_self_typing_indicator_s();
 
         super.onStop();
     }
@@ -378,7 +410,67 @@ public class MessageListActivity extends AppCompatActivity
             Log.i(TAG, "onResume:001:friendnum=" + friendnum);
         }
 
-        MainActivity.message_list_activity = this;
+        message_list_activity = this;
+    }
+
+    static void stop_friend_typing_indicator_s()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (message_list_activity != null)
+                    {
+                        if (ml_friend_typing != null)
+                        {
+                            ml_friend_typing.setText("");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "friend_typing_cb:EE.b:" + e.getMessage());
+                }
+            }
+        };
+
+        if (mla_handler_s != null)
+        {
+            mla_handler_s.post(myRunnable);
+        }
+    }
+
+    static void stop_self_typing_indicator_s()
+    {
+        try
+        {
+            android.os.Message m = new android.os.Message();
+            m.what = 1;
+            mla_handler_s.handleMessage(m);
+        }
+        catch (Exception e)
+        {
+            e.getMessage();
+        }
+    }
+
+    void stop_self_typing_indicator()
+    {
+        if (global_typing == 1)
+        {
+            global_typing = 0;  // typing = 0
+            try
+            {
+                tox_self_set_typing(get_current_friendnum(), global_typing);
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "typing:fn#" + get_current_friendnum() + ":EE2.b" + e.getMessage());
+            }
+        }
     }
 
     private void setUpEmojiPopup()
@@ -535,6 +627,9 @@ public class MessageListActivity extends AppCompatActivity
                 {
                     // add attachement ------------
                     // add attachement ------------
+
+                    stop_self_typing_indicator_s();
+
                     if (FILE_PICK_METHOD == 1)
                     {
                         // Method 1 ----------------
@@ -658,6 +753,8 @@ public class MessageListActivity extends AppCompatActivity
                             long row_id = insert_into_message_db(m, true);
                             m.id = row_id;
                             ml_new_message.setText("");
+
+                            stop_self_typing_indicator_s();
                         }
                     }
                 }
@@ -1264,7 +1361,7 @@ public class MessageListActivity extends AppCompatActivity
                     {
                         if (message_.direction == 0)
                         {
-                                selected_messages_incoming_file.add(message_.id);
+                            selected_messages_incoming_file.add(message_.id);
                         }
                     }
 
@@ -1312,7 +1409,7 @@ public class MessageListActivity extends AppCompatActivity
                 {
                     try
                     {
-                        amode = MainActivity.message_list_activity.startSupportActionMode(new ToolbarActionMode(context));
+                        amode = message_list_activity.startSupportActionMode(new ToolbarActionMode(context));
                         amode_save_menu_item = amode.getMenu().findItem(R.id.action_save);
                         v.setBackgroundColor(Color.GRAY);
                         ret.is_selected = true;
@@ -1325,7 +1422,7 @@ public class MessageListActivity extends AppCompatActivity
                         {
                             if (message_.direction == 0)
                             {
-                                    selected_messages_incoming_file.add(message_.id);
+                                selected_messages_incoming_file.add(message_.id);
                             }
                         }
 
@@ -1352,7 +1449,7 @@ public class MessageListActivity extends AppCompatActivity
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
