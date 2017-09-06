@@ -342,6 +342,31 @@ public class MainActivity extends AppCompatActivity
         context_s = this.getBaseContext();
         main_activity_s = this;
 
+
+        try
+        {
+            if (FriendListHolder.progressDialog != null)
+            {
+                FriendListHolder.progressDialog.dismiss();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (FriendListHolder.progressDialog != null)
+            {
+                FriendListHolder.progressDialog = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         setContentView(R.layout.activity_main);
 
         //        try
