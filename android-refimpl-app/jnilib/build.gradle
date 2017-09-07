@@ -21,19 +21,35 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-// If your directory matches the name, you do not need to set archivesBaseName.
+/*
+ *
+ *
+ * set Version here --------------------------
+ *
+ *
+ */
+def maven_artefact_version = '1.0.9'
+project.ext.set("maven_artefact_int_version", 10009)
+/*
+ *
+ *
+ * set Version here --------------------------
+ *
+ *
+ */
+
+// If your directory matches the name, you do not need to set archivesBaseName
 archivesBaseName = 'trifa-jni-lib'
 group = 'com.zoffcc.applications.trifajni'
-// libraryName = 'trifa-jni-lib'
-// artifact = 'trifa-jni-lib'
-version = '1.0.8'
+
+version = "${maven_artefact_version}"
 
 install {
     repositories.mavenInstaller {
         pom.project {
             groupId 'com.zoffcc.applications.trifajni'
             artifactId 'trifa-jni-lib'
-            version '1.0.8'
+            version "${maven_artefact_version}"
             name 'trifa-jni-lib'
             description 'trifa-jni-lib'
         }
@@ -52,7 +68,7 @@ bintray {
         licenses = ['GPL-2.0']
         vcsUrl = 'https://github.com/zoff99/ToxAndroidRefImpl'
         version {
-            name = '1.0.8'
+            name = "${maven_artefact_version}"
             desc = 'trifa-jni'
             released = new Date()
             attributes = ['gradle-plugin': 'com.zoffcc.applications.trifajni:trifa-jni-lib']
@@ -64,6 +80,11 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
     compileOptions.encoding = 'UTF-8'
+
+    defaultConfig {
+        versionCode project.maven_artefact_int_version
+        versionName "${maven_artefact_version}"
+    }
 
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
