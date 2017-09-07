@@ -78,7 +78,10 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         {
             if (progressDialog != null)
             {
-                progressDialog.dismiss();
+                if (FriendListHolder.progressDialog.isShowing())
+                {
+                    progressDialog.dismiss();
+                }
             }
         }
         catch (Exception e)
@@ -335,25 +338,13 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             {
                 try
                 {
-                    if (progressDialog != null)
-                    {
-                        progressDialog.dismiss();
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
                     if (progressDialog == null)
                     {
                         progressDialog = new ProgressDialog(this.context);
+                        progressDialog.setIndeterminate(true);
+                        progressDialog.setMessage("");
+                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     }
-                    progressDialog.setIndeterminate(true);
-                    progressDialog.setMessage("");
-                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     progressDialog.show();
                 }
                 catch (Exception e)

@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -51,6 +50,7 @@ public class MessageListFragment extends Fragment
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
     MessageListActivity mla = null;
+    boolean is_data_loaded = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -69,8 +69,36 @@ public class MessageListFragment extends Fragment
         // default is: at bottom
         is_at_bottom = true;
 
-        // data_values = null;
-        data_values = new ArrayList<Message>();
+        try
+        {
+            // reset "new" flags for messages -------
+            if (orma != null)
+            {
+                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            }
+            // reset "new" flags for messages -------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (orma != null)
+            {
+                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+                Log.i(TAG, "loading data:001");
+                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            // data_values is NULL here!!
+        }
 
         // --------------
         // --------------
@@ -148,6 +176,8 @@ public class MessageListFragment extends Fragment
 
         // MainActivity.message_list_fragment = this;
 
+        is_data_loaded = true;
+
         return view;
     }
 
@@ -177,41 +207,47 @@ public class MessageListFragment extends Fragment
         Log.i(TAG, "onResume");
         super.onResume();
 
-        try
+        if (!is_data_loaded)
         {
-            // reset "new" flags for messages -------
-            if (orma != null)
+            try
             {
-                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                // reset "new" flags for messages -------
+                if (orma != null)
+                {
+                    orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                    Log.i(TAG, "loading data:002");
+                }
+                // reset "new" flags for messages -------
             }
-            // reset "new" flags for messages -------
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            update_all_messages(true);
+
+            // default is: at bottom
+            is_at_bottom = true;
+
+            //        try
+            //        {
+            //            if (orma != null)
+            //            {
+            //                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+            //                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+            //                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+            //                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            //            }
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            e.printStackTrace();
+            //            // data_values is NULL here!!
+            //        }
+
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
 
-        update_all_messages(true);
-
-        // default is: at bottom
-        is_at_bottom = true;
-
-        //        try
-        //        {
-        //            if (orma != null)
-        //            {
-        //                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-        //                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
-        //                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
-        //                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
-        //            }
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            e.printStackTrace();
-        //            // data_values is NULL here!!
-        //        }
-
+        is_data_loaded = false;
         MainActivity.message_list_fragment = this;
     }
 

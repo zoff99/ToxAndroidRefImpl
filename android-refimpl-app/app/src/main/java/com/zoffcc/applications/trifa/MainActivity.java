@@ -347,7 +347,10 @@ public class MainActivity extends AppCompatActivity
         {
             if (FriendListHolder.progressDialog != null)
             {
-                FriendListHolder.progressDialog.dismiss();
+                if (FriendListHolder.progressDialog.isShowing())
+                {
+                    FriendListHolder.progressDialog.dismiss();
+                }
             }
         }
         catch (Exception e)
