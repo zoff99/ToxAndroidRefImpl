@@ -140,7 +140,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
@@ -2753,10 +2752,19 @@ public class MainActivity extends AppCompatActivity
             {
                 if (friend_list_fragment != null)
                 {
-                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = true;
-                    cc.friend_item = f;
-                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    // TODO: dirty hack, make better
+                    final boolean sorted_reload = true;
+                    if (!sorted_reload)
+                    {
+                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                        cc.is_friend = true;
+                        cc.friend_item = f;
+                        friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    }
+                    else
+                    {
+                        friend_list_fragment.add_all_friends_clear(0);
+                    }
                 }
             }
             catch (Exception e)

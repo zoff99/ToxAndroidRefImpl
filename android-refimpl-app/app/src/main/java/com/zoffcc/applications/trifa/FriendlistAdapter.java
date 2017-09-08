@@ -36,7 +36,6 @@ public class FriendlistAdapter extends RecyclerView.Adapter
     private final List<CombinedFriendsAndConferences> friendlistitems;
     private Context context;
 
-
     public FriendlistAdapter(Context context, List<CombinedFriendsAndConferences> items)
     {
         Log.i(TAG, "FriendlistAdapter");
@@ -66,7 +65,6 @@ public class FriendlistAdapter extends RecyclerView.Adapter
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_entry, parent, false);
         return new FriendListHolder(view, this.context);
     }
-
 
     @Override
     public int getItemViewType(int position)
@@ -156,7 +154,6 @@ public class FriendlistAdapter extends RecyclerView.Adapter
     public boolean update_item(CombinedFriendsAndConferences new_item_combined, boolean is_friend)
     {
         // Log.i(TAG, "update_item:" + new_item);
-
         boolean found_item = false;
 
         try

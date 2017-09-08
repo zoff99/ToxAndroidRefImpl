@@ -129,7 +129,10 @@ public class FriendListFragment extends Fragment
                 {
                     try
                     {
-                        final FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).toList().get(0);
+                        final FriendList f2 = orma.selectFromFriendList().
+                                tox_public_key_stringEq(f.tox_public_key_string).
+                                toList().get(0);
+
                         if (f2 != null)
                         {
                             FriendList n = deep_copy(f2);
@@ -181,7 +184,8 @@ public class FriendListFragment extends Fragment
                         // who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
                         // and().
                         final ConferenceDB conf2 = orma.selectFromConferenceDB().
-                                conference_identifierEq(cc.conference_identifier).toList().get(0);
+                                conference_identifierEq(cc.conference_identifier).
+                                toList().get(0);
 
                         if (conf2 != null)
                         {
@@ -328,7 +332,12 @@ public class FriendListFragment extends Fragment
                             Thread.sleep(delay);
 
                             adapter.clear_items(); // clears friends AND conferences!!
-                            List<FriendList> fl = orma.selectFromFriendList().toList();
+                            List<FriendList> fl = orma.selectFromFriendList().
+                                    orderByTOX_CONNECTIONDesc().
+                                    orderByNotification_silentAsc().
+                                    orderByLast_online_timestampDesc().
+                                    toList();
+
                             if (fl != null)
                             {
                                 // Log.i(TAG, "add_all_friends_clear:fl.size=" + fl.size());
@@ -347,7 +356,11 @@ public class FriendListFragment extends Fragment
                                 }
                             }
 
-                            List<ConferenceDB> confs = orma.selectFromConferenceDB().toList();
+                            List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                                    orderByConference_activeDesc().
+                                    orderByNotification_silentAsc().
+                                    toList();
+
                             if (confs != null)
                             {
                                 if (confs.size() > 0)
