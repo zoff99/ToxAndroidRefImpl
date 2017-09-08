@@ -139,6 +139,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRAT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
@@ -1613,7 +1615,6 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void set_all_friends_offline()
     {
-
         Thread t = new Thread()
         {
             @Override
@@ -1628,6 +1629,34 @@ public class MainActivity extends AppCompatActivity
                 catch (Exception e)
                 {
                 }
+
+                try
+                {
+                    orma.updateFriendList().
+                            last_online_timestampEq(LAST_ONLINE_TIMSTAMP_ONLINE_NOW).
+                            last_online_timestamp(System.currentTimeMillis()).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                }
+
+                // ------ DEBUG ------
+                // ------ set all friends to "never" seen online ------
+                // ------ DEBUG ------
+                // try
+                // {
+                //     orma.updateFriendList().
+                //             last_online_timestamp(LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE).
+                //             execute();
+                // }
+                // catch (Exception e)
+                // {
+                // }
+                // ------ DEBUG ------
+                // ------ set all friends to "never" seen online ------
+                // ------ DEBUG ------
+
 
                 try
                 {
@@ -1679,6 +1708,22 @@ public class MainActivity extends AppCompatActivity
                 tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_CONNECTION(f.TOX_CONNECTION).
                 execute();
+    }
+
+    synchronized static void update_friend_in_db_last_online_timestamp(FriendList f)
+    {
+        // Log.i(TAG, "update_friend_in_db_last_online_timestamp");
+        try
+        {
+            orma.updateFriendList().
+                    tox_public_key_stringEq(f.tox_public_key_string).
+                    last_online_timestamp(f.last_online_timestamp).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     synchronized static void update_friend_in_db_name(FriendList f)
@@ -2662,6 +2707,27 @@ public class MainActivity extends AppCompatActivity
                         }
                     };
                     main_handler_s.post(myRunnable);
+                }
+            }
+
+            if (f != null)
+            {
+                if (f.TOX_CONNECTION != a_TOX_CONNECTION)
+                {
+                    if (a_TOX_CONNECTION == TOX_CONNECTION_NONE.value)
+                    {
+                        // friend going offline
+                        Log.i(TAG, "friend going offline:" + System.currentTimeMillis());
+                        f.last_online_timestamp = System.currentTimeMillis();
+                        update_friend_in_db_last_online_timestamp(f);
+                    }
+                    else
+                    {
+                        // friend coming online
+                        Log.i(TAG, "friend coming online:" + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
+                        f.last_online_timestamp = LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+                        update_friend_in_db_last_online_timestamp(f);
+                    }
                 }
             }
 

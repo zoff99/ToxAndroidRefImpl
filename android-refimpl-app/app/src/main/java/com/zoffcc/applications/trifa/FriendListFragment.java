@@ -247,7 +247,12 @@ public class FriendListFragment extends Fragment
         {
             // reload friendlist
             Log.i(TAG, "onResume:AA");
-            List<FriendList> fl = orma.selectFromFriendList().toList();
+            List<FriendList> fl = orma.selectFromFriendList().
+                    orderByTOX_CONNECTIONDesc().
+                    orderByNotification_silentAsc().
+                    orderByLast_online_timestampDesc().
+                    toList();
+
             if (fl != null)
             {
                 Log.i(TAG, "onResume:fl.size=" + fl.size());
@@ -267,7 +272,11 @@ public class FriendListFragment extends Fragment
             }
 
             // reload conferences
-            List<ConferenceDB> confs = orma.selectFromConferenceDB().toList();
+            List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                    orderByConference_activeDesc().
+                    orderByNotification_silentAsc().
+                    toList();
+
             if (confs != null)
             {
                 if (confs.size() > 0)

@@ -46,6 +46,7 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
@@ -54,6 +55,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_AL
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -70,6 +73,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private ImageView imageView;
     private ImageView imageView2;
     private ImageView f_notification;
+    private TextView f_last_online_timestamp;
     static ProgressDialog progressDialog = null;
 
     synchronized static void remove_progress_dialog()
@@ -105,6 +109,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         imageView = (ImageView) itemView.findViewById(R.id.f_status_icon);
         imageView2 = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
         f_notification = (ImageView) itemView.findViewById(R.id.f_notification);
+        f_last_online_timestamp = (TextView) itemView.findViewById(R.id.f_last_online_timestamp);
     }
 
     public void bindFriendList(FriendList fl)
@@ -122,6 +127,25 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
+
+        // Log.i(TAG, "lot=" + fl.last_online_timestamp + " -> " + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
+        if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_NOW)
+        {
+            f_last_online_timestamp.setText("now");
+        }
+        else if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
+        {
+            f_last_online_timestamp.setText("never");
+        }
+        else if (fl.last_online_timestamp > LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
+        {
+            f_last_online_timestamp.setText("" + long_date_time_format(fl.last_online_timestamp));
+        }
+        else
+        {
+            f_last_online_timestamp.setText("");
+        }
+
 
         if (fl.notification_silent)
         {

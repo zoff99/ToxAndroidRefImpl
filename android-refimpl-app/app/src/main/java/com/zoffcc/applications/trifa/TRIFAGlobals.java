@@ -108,6 +108,9 @@ public class TRIFAGlobals
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
     // ---- lookup cache ----
 
+    static long LAST_ONLINE_TIMSTAMP_ONLINE_NOW = Long.MAX_VALUE - 1;
+    static long LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE = -1;
+
     static int CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) dp2px(10);
     static int CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = (int) dp2px(20);
 

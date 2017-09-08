@@ -39,10 +39,10 @@ public class FriendList
     @Nullable
     String status_message;
 
-    @Column
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_CONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
-    @Column
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_USER_STATUS; // 0 --> NONE, 1 --> online AWAY, 2 --> online BUSY
 
     @Column
