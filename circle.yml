@@ -31,6 +31,7 @@ machine:
 # --- Android build ---
 
     # ---------------------------------------------------
+    # v0.1.10 tweaks3   25d1fce22ddc87089cf53e9b3c5bcf9d56a57374
     # v0.1.10 mtweaks2  d4c11ecbc45faf0e66fbe8c4df59b8087d22f409
     # v0.1.10 mobtweaks f73b345c21fae0e0e56fae86dc82f63188a00aca
     # v0.1.10 vp8tweaks cb5686de37e2b2d705ca4bd25f3a3beeef8bc152
@@ -62,7 +63,7 @@ machine:
     # ---------------------------------------------------
 
     # c-toxcore version
-    AND_CTOXCORE_VERSION: "cb5686de37e2b2d705ca4bd25f3a3beeef8bc152"
+    AND_CTOXCORE_VERSION: "25d1fce22ddc87089cf53e9b3c5bcf9d56a57374"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
