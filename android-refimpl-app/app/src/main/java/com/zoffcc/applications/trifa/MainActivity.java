@@ -593,7 +593,7 @@ public class MainActivity extends AppCompatActivity
         nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
 
         // get permission ----------
-        MainActivityPermissionsDispatcher.dummyForPermissions001WithCheck(this);
+        MainActivityPermissionsDispatcher.dummyForPermissions001WithPermissionCheck(this);
         // get permission ----------
 
         // -------- drawer ------------
@@ -602,7 +602,7 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("Profile").withIcon(GoogleMaterial.Icon.gmd_face);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName("Settings").withIcon(GoogleMaterial.Icon.gmd_settings);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Logout/Login").withIcon(GoogleMaterial.Icon.gmd_refresh);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("Clear Cache").withIcon(GoogleMaterial.Icon.gmd_delete_sweep);
+        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("Maintenance").withIcon(GoogleMaterial.Icon.gmd_build);
         PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName("About").withIcon(GoogleMaterial.Icon.gmd_info);
         PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName("Exit").withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
@@ -728,9 +728,11 @@ public class MainActivity extends AppCompatActivity
                         }
                         else if (position == 5)
                         {
+                            // Maintenance
+
                             // -- clear Glide cache --
                             // -- clear Glide cache --
-                            clearCache();
+                            // clearCache();
                             // -- clear Glide cache --
                             // -- clear Glide cache --
 

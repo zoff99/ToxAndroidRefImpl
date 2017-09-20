@@ -115,8 +115,8 @@ android {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 10008
-        versionName "1.0.8"
+        versionCode 10009
+        versionName "1.0.9"
 
         renderscriptTargetApi 25
         renderscriptSupportModeEnabled true
@@ -170,7 +170,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.github.hotchemi:permissionsdispatcher:2.4.0') {
+    compile('com.github.hotchemi:permissionsdispatcher:3.0.1') {
         exclude group: 'com.android.support'
     }
     //
@@ -208,7 +208,7 @@ dependencies {
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
-    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.0.1'
 }
 
 dependencyVerification {
@@ -220,7 +220,7 @@ dependencyVerification {
             'com.google.zxing:core:bba7724e02a997cec38213af77133ee8e24b0d5cf5fa7ecbc16a4fa93f11ee0d',
             'com.github.gfx.android.orma:orma:a639113c84239b52f7c58641b86b4ce3e13a395567bf7b1f3d04069939abce53',
             'com.github.gfx.android.orma:orma-encryption:9971a52bcadebebb53662ba0a0eb26836af6d9919c7fe2e43a54167b9a45d82d',
-            'com.github.hotchemi:permissionsdispatcher:f7344982c92d26a1e0bc0ea2b02d4311b543d560e57f42131467e60a3bcdcf6a',
+            'com.github.hotchemi:permissionsdispatcher:91de78329bc3b946815dccd0aac75585888c4801bb81cc151440dfd428037d58',
             'com.github.angads25:filepicker:8582d3a57d590945c05a00af265f63258da85523a61bd14556f545ad54da228b',
             'com.android.support:support-vector-drawable:13728f337f36d1c02d52198a6c20724edb447a0875454d829f95cb9eb4aa293b',
             'com.android.support:support-v4:07d389154bcf73b47e514964df1578136b26cba78257b8a577a3ccb54beff0ae',
