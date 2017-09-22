@@ -23,8 +23,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -59,6 +61,9 @@ public class MaintenanceActivity extends AppCompatActivity
         button_sql_vacuum = (Button) findViewById(R.id.button_sql_vacuum);
         button_sql_analyze = (Button) findViewById(R.id.button_sql_analyze);
         button_fav_emoji_reset = (Button) findViewById(R.id.button_fav_emoji_reset);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         button_clear_glide_cache.setOnClickListener(new View.OnClickListener()
         {
