@@ -22,11 +22,12 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -39,6 +40,7 @@ public class MaintenanceActivity extends AppCompatActivity
     Button button_sql_vacuum;
     Button button_sql_analyze;
     Button button_fav_emoji_reset;
+    Handler maint_handler_s = null;
 
     // ----------------------------------------------------
     // TODO: this is copied over from:
@@ -173,5 +175,16 @@ public class MaintenanceActivity extends AppCompatActivity
             }
         });
 
+        maint_handler_s = maint_handler;
     }
+
+    Handler maint_handler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            super.handleMessage(msg);
+            int id = msg.what;
+        }
+    };
 }

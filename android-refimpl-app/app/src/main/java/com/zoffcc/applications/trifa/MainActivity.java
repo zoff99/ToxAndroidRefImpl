@@ -132,6 +132,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_threa
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
+import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
@@ -7772,6 +7773,14 @@ public class MainActivity extends AppCompatActivity
         // Log.i(TAG, "generated NOSPAM=" + new_nospam);
         tox_self_set_nospam(new_nospam);
         update_savedata_file_wrapper();
+        try
+        {
+            update_toxid_display_s();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         // Log.i(TAG, "new ToxID=" + MainActivity.get_my_toxid());
         // Log.i(TAG, "new NOSPAM=" + MainActivity.tox_self_get_nospam());
     }

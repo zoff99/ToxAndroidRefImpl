@@ -24,6 +24,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -79,6 +80,7 @@ public class ProfileActivity extends AppCompatActivity
     Button new_nospam_button = null;
     Button copy_toxid_button = null;
 
+    static Handler profile_handler_s = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -212,6 +214,24 @@ public class ProfileActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        profile_handler_s = profile_handler;
+    }
+
+    static void update_toxid_display_s()
+    {
+        try
+        {
+            android.os.Message msg2 = new android.os.Message();
+            Bundle b2 = new Bundle();
+            msg2.what = 1;
+            msg2.setData(b2);
+            profile_handler_s.sendMessage(msg2);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     void update_toxid_display()
@@ -297,4 +317,28 @@ public class ProfileActivity extends AppCompatActivity
         bitmap.setPixels(pixels, 0, 200, 0, 0, w, h);
         return bitmap;
     }
+
+    Handler profile_handler = new Handler()
+    {
+        @Override
+        public void handleMessage(android.os.Message msg)
+        {
+            super.handleMessage(msg);
+
+            try
+            {
+                int id = msg.what;
+
+                if (id == 1)
+                {
+                    update_toxid_display();
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    };
+
 }
