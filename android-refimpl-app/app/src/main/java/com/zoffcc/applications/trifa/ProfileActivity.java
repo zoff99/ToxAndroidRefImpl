@@ -30,6 +30,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,7 +49,6 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.File;
-import java.util.Random;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
@@ -60,7 +60,6 @@ import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.set_new_random_nospam_value;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
-import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
@@ -136,6 +135,9 @@ public class ProfileActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // don't show keyboard when activity starts
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
         profile_icon.setImageDrawable(d1);
