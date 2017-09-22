@@ -240,6 +240,7 @@ public class MainActivity extends AppCompatActivity
     final static int ProfileActivity_ID = 10003;
     final static int SettingsActivity_ID = 10004;
     final static int AboutpageActivity_ID = 10005;
+    final static int MaintenanceActivity_ID = 10006;
     final static int Notification_new_message_ID = 10023;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
@@ -729,6 +730,17 @@ public class MainActivity extends AppCompatActivity
                         else if (position == 5)
                         {
                             // Maintenance
+                            try
+                            {
+                                Log.i(TAG, "start Maintenance activity");
+                                Intent intent = new Intent(context_s, MaintenanceActivity.class);
+                                startActivityForResult(intent, MaintenanceActivity_ID);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
 
                             // -- clear Glide cache --
                             // -- clear Glide cache --
@@ -1027,13 +1039,43 @@ public class MainActivity extends AppCompatActivity
         registerReceiver(receiver2, receiverFilter2);
     }
 
-    public void clearCache()
+    public static void clearCache_s()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    MainActivity.clearCache(context_s);
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+
+        try
+        {
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void clearCache(final Context c)
     {
         Log.i(TAG, "clearCache");
 
         try
         {
-            Glide.get(MainActivity.this).clearMemory();
+            Glide.get(c).clearMemory();
         }
         catch (Exception e)
         {
@@ -1051,7 +1093,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     Log.i(TAG, "clearCache:bg:start");
 
-                    File cacheDir = Glide.getPhotoCacheDir(MainActivity.this);
+                    File cacheDir = Glide.getPhotoCacheDir(c);
                     if (cacheDir.isDirectory())
                     {
                         for (File child : cacheDir.listFiles())
@@ -1066,7 +1108,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
 
-                    Glide.get(MainActivity.this).clearDiskCache();
+                    Glide.get(c).clearDiskCache();
                     Log.i(TAG, "clearCache:bg:end");
                 }
                 catch (Exception e)

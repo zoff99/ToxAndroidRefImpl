@@ -137,6 +137,10 @@
             android:label="@string/title_activity_aboutpage">
         </activity>
         <activity
+            android:name=".MaintenanceActivity"
+            android:label="@string/title_activity_maintenance">
+        </activity>
+        <activity
             android:name=".ShareActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:excludeFromRecents="true"
