@@ -16,6 +16,12 @@
     <string name="title_activity_maintenance">Maintenance</string>
 
 
+    <string-array name="spinner_own_status_array">
+        <item>Online</item>
+        <item>Away</item>
+        <item>Busy</item>
+    </string-array>
+
     <string name="settings_toolbar_title">Settings</string>
 
     <!-- Strings related to Settings -->

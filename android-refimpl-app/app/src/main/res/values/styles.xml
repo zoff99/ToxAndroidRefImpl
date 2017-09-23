@@ -22,4 +22,12 @@
         <item name="color">@android:color/white</item>
     </style>
 
+
+    <!--<style name="MainActyActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">-->
+    <!--<item name="contentInsetStart">0dp</item>-->
+    <!--<item name="contentInsetStartWithNavigation">0dp</item>-->
+    <!--<item name="android:contentInsetStart" tools:targetApi="lollipop">0dp</item>-->
+    <!--<item name="contentInsetEnd">0dp</item>-->
+    <!--</style>-->
+
 </resources>

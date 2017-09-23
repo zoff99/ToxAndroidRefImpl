@@ -439,20 +439,26 @@ public class ToxVars
         /**
          * User is online and available.
          */
-        TOX_USER_STATUS_NONE,
+        TOX_USER_STATUS_NONE(0),
 
         /**
          * User is away. Clients can set this e.g. after a user defined
          * inactivity time.
          */
-        TOX_USER_STATUS_AWAY,
+        TOX_USER_STATUS_AWAY(1),
 
         /**
          * User is busy. Signals to other clients that this client does not
          * currently wish to communicate.
          */
-        TOX_USER_STATUS_BUSY,
+        TOX_USER_STATUS_BUSY(2);
 
+        public int value;
+
+        private TOX_USER_STATUS(int value)
+        {
+            this.value = value;
+        }
     }
 
     public static enum TOX_MESSAGE_TYPE

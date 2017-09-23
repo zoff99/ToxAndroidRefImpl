@@ -32,6 +32,7 @@ public class TRIFAGlobals
     static boolean bootstrapping = false;
     static int global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
     static long global_self_last_went_online_timstamp = -1;
+    static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
     static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 60;
     static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 2000;

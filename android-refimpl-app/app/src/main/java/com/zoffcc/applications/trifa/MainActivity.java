@@ -72,9 +72,12 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RemoteViews;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -110,6 +113,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -168,6 +172,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_recei
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timstamp;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_tox_self_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
@@ -182,6 +187,9 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_AWAY;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_BUSY;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE;
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -327,6 +335,8 @@ public class MainActivity extends AppCompatActivity
     ProfileDrawerItem profile_d_item = null;
     // main drawer ----------
 
+    Spinner spinner_own_status = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -403,6 +413,16 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        //        try
+        //        {
+        //            ((Toolbar) getSupportActionBar().getCustomView().getParent()).setContentInsetsAbsolute(0, 0);
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //        }
 
         bootstrapping = false;
 
@@ -586,11 +606,69 @@ public class MainActivity extends AppCompatActivity
         mt.setText("...");
         mt.setVisibility(View.VISIBLE);
 
+        // TODO: remake this into something nicer ----------
         top_imageview = (ImageView) this.findViewById(R.id.main_maintopimage);
         top_imageview.setImageResource(R.drawable.web_hi_res_512);
         top_imageview.setVisibility(View.GONE);
         fadeInAndShowImage(top_imageview, 5000);
         fadeOutAndHideImage(mt, 4000);
+        // TODO: remake this into something nicer ----------
+
+        // --------- status spinner ---------
+        spinner_own_status = (Spinner) findViewById(R.id.spinner_own_status);
+        ArrayList<String> own_online_status_string_values = new ArrayList<String>(Arrays.asList("Available", "Busy", "Away"));
+        ArrayAdapter<String> myAdapter = new OwnStatusSpinnerAdapter(this, R.layout.own_status_spinner_item, own_online_status_string_values);
+
+        if (spinner_own_status != null)
+        {
+            spinner_own_status.setAdapter(myAdapter);
+            spinner_own_status.setSelection(global_tox_self_status);
+
+            spinner_own_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+            {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View v, int position, long id)
+                {
+                    if (is_tox_started)
+                    {
+                        try
+                        {
+                            if (id == 0)
+                            {
+                                // status: available
+                                tox_self_set_status(TOX_USER_STATUS_NONE.value);
+                                global_tox_self_status = TOX_USER_STATUS_NONE.value;
+                            }
+                            else if (id == 1)
+                            {
+                                // status: away
+                                tox_self_set_status(TOX_USER_STATUS_AWAY.value);
+                                global_tox_self_status = TOX_USER_STATUS_AWAY.value;
+                            }
+                            else if (id == 2)
+                            {
+                                // status: busy
+                                tox_self_set_status(TOX_USER_STATUS_BUSY.value);
+                                global_tox_self_status = TOX_USER_STATUS_BUSY.value;
+                            }
+                        }
+                        catch (Exception e2)
+                        {
+                            e2.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView)
+                {
+                    // your code here
+                }
+            });
+
+        }
+        // --------- status spinner ---------
+
 
         nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
 
@@ -1589,6 +1667,8 @@ public class MainActivity extends AppCompatActivity
                 e2.printStackTrace();
             }
         }
+
+        spinner_own_status.setSelection(global_tox_self_status);
 
         // just in case, update own activity pointer!
         main_activity_s = this;
