@@ -376,6 +376,13 @@ public class MessageListActivity extends AppCompatActivity
         Log.i(TAG, "onPause");
         super.onPause();
 
+        stop_self_typing_indicator_s();
+
+        if (emojiPopup != null)
+        {
+            emojiPopup.dismiss();
+        }
+
         // ** // MainActivity.message_list_fragment = null;
         message_list_activity = null;
         Log.i(TAG, "onPause:001:friendnum=" + friendnum);
@@ -386,13 +393,6 @@ public class MessageListActivity extends AppCompatActivity
     @Override
     protected void onStop()
     {
-        if (emojiPopup != null)
-        {
-            emojiPopup.dismiss();
-        }
-
-        stop_self_typing_indicator_s();
-
         super.onStop();
     }
 
@@ -447,6 +447,7 @@ public class MessageListActivity extends AppCompatActivity
     {
         try
         {
+            Log.i(TAG, "stop_self_typing_indicator_s");
             android.os.Message m = new android.os.Message();
             m.what = 1;
             mla_handler_s.handleMessage(m);
@@ -464,6 +465,7 @@ public class MessageListActivity extends AppCompatActivity
             global_typing = 0;  // typing = 0
             try
             {
+                Log.i(TAG, "typing:fn#" + get_current_friendnum() + ":stop_self_typing_indicator");
                 tox_self_set_typing(get_current_friendnum(), global_typing);
             }
             catch (Exception e)
