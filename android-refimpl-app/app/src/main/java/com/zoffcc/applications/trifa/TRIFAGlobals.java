@@ -19,7 +19,9 @@
 
 package com.zoffcc.applications.trifa;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
@@ -108,6 +110,10 @@ public class TRIFAGlobals
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
     // ---- lookup cache ----
+
+    static List<TrifaToxService.bootstrap_node_entry> bootstrap_node_list = new ArrayList<TrifaToxService.bootstrap_node_entry>();
+    static List<TrifaToxService.bootstrap_node_entry> tcprelay_node_list = new ArrayList<TrifaToxService.bootstrap_node_entry>();
+
 
     static long LAST_ONLINE_TIMSTAMP_ONLINE_NOW = Long.MAX_VALUE - 1;
     static long LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE = -1;
