@@ -111,8 +111,8 @@ public class TRIFAGlobals
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
     // ---- lookup cache ----
 
-    static List<TrifaToxService.bootstrap_node_entry> bootstrap_node_list = new ArrayList<TrifaToxService.bootstrap_node_entry>();
-    static List<TrifaToxService.bootstrap_node_entry> tcprelay_node_list = new ArrayList<TrifaToxService.bootstrap_node_entry>();
+    static List<BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<>();
+    static List<BootstrapNodeEntryDB> tcprelay_node_list = new ArrayList<>();
 
 
     static long LAST_ONLINE_TIMSTAMP_ONLINE_NOW = Long.MAX_VALUE - 1;

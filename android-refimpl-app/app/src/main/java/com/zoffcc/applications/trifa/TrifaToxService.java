@@ -38,6 +38,8 @@ import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
 
+import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
+import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
@@ -91,30 +93,6 @@ public class TrifaToxService extends Service
     static boolean is_tox_started = false;
     static boolean global_toxid_text_set = false;
     static boolean TOX_SERVICE_STARTED = false;
-
-    static class bootstrap_node_entry
-    {
-        long num;
-        String ip;
-        long port;
-        String key_hex;
-        static long num_ = 0;
-
-        bootstrap_node_entry(String ip_, long port_, String key_hex_)
-        {
-            num = num_;
-            num_++;
-            ip = ip_;
-            port = port_;
-            key_hex = key_hex_;
-        }
-
-        @Override
-        public String toString()
-        {
-            return "" + num + ":" + ip;
-        }
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -667,18 +645,7 @@ public class TrifaToxService extends Service
                     }
 
                     // ----- UDP ------
-                    bootstrap_node_list.clear();
-                    bootstrap_node_entry.num_ = 0;
-                    bootstrap_node_list.add(new bootstrap_node_entry("178.62.250.138", 33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("nodes.tox.chat", 33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("130.133.110.14", 33445, "461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("tox.zodiaclabs.org", 33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("163.172.136.118", 33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("217.182.143.254", 443, "7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("185.14.30.213", 443, "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("136.243.141.187", 443, "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("128.199.199.197", 33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09"));
-                    bootstrap_node_list.add(new bootstrap_node_entry("biribiri.org", 33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67"));
+                    get_udp_nodelist_from_db();
                     Log.i(TAG, "bootstrap_node_list[sort]=" + bootstrap_node_list);
                     try
                     {
@@ -694,10 +661,10 @@ public class TrifaToxService extends Service
                     try
                     {
                         Iterator i2 = bootstrap_node_list.iterator();
-                        TrifaToxService.bootstrap_node_entry ee;
+                        BootstrapNodeEntryDB ee;
                         while (i2.hasNext())
                         {
-                            ee = (TrifaToxService.bootstrap_node_entry) i2.next();
+                            ee = (BootstrapNodeEntryDB) i2.next();
                             Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper(ee.ip, ee.port, ee.key_hex));
                         }
                     }
@@ -708,18 +675,7 @@ public class TrifaToxService extends Service
                     // ----- UDP ------
                     //
                     // ----- TCP ------
-                    tcprelay_node_list.clear();
-                    bootstrap_node_entry.num_ = 0;
-                    tcprelay_node_list.add(new bootstrap_node_entry("178.62.250.138", 33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("nodes.tox.chat", 33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("130.133.110.14", 33445, "461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("tox.zodiaclabs.org", 33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("163.172.136.118", 33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("217.182.143.254", 443, "7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("185.14.30.213", 443, "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("136.243.141.187", 443, "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("128.199.199.197", 33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09"));
-                    tcprelay_node_list.add(new bootstrap_node_entry("biribiri.org", 33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67"));
+                    get_tcprelay_nodelist_from_db();
                     Log.i(TAG, "tcprelay_node_list[sort]=" + tcprelay_node_list);
                     try
                     {
@@ -735,10 +691,10 @@ public class TrifaToxService extends Service
                     try
                     {
                         Iterator i2 = tcprelay_node_list.iterator();
-                        TrifaToxService.bootstrap_node_entry ee;
+                        BootstrapNodeEntryDB ee;
                         while (i2.hasNext())
                         {
-                            ee = (TrifaToxService.bootstrap_node_entry) i2.next();
+                            ee = (BootstrapNodeEntryDB) i2.next();
                             Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex));
                         }
                     }

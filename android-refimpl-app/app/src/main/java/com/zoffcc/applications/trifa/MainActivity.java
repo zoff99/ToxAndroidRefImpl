@@ -616,7 +616,7 @@ public class MainActivity extends AppCompatActivity
 
         // --------- status spinner ---------
         spinner_own_status = (Spinner) findViewById(R.id.spinner_own_status);
-        ArrayList<String> own_online_status_string_values = new ArrayList<String>(Arrays.asList("Available", "Busy", "Away"));
+        ArrayList<String> own_online_status_string_values = new ArrayList<String>(Arrays.asList("Available", "Away", "Busy"));
         ArrayAdapter<String> myAdapter = new OwnStatusSpinnerAdapter(this, R.layout.own_status_spinner_item, own_online_status_string_values);
 
         if (spinner_own_status != null)
