@@ -154,6 +154,12 @@ public class BootstrapNodeEntryDB
         return n;
     }
 
+    public static void update_nodelist_from_internet()
+    {
+        // TODO: write me
+        // this should be using TOR proxy, if tor is enabled in options!
+    }
+
     public static void get_tcprelay_nodelist_from_db()
     {
         tcprelay_node_list.clear();
