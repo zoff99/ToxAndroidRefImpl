@@ -109,6 +109,8 @@ public class TRIFAGlobals
     static final int MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE = 256;
     static final int LEN_TRIFA_AUTOGEN_PASSWORD = 32;
 
+    static final int USE_MAX_NUMBER_OF_BOOTSTRAP_NODES = 3;
+
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
     static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();

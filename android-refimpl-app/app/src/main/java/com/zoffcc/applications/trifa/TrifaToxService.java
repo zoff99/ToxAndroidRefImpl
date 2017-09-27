@@ -40,7 +40,6 @@ import info.guardianproject.iocipher.VirtualFileSystem;
 
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
-import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.update_nodelist_from_internet;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
@@ -71,6 +70,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FULL_SPEED_SECONDS_AFTER_WENT_ONLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_NODES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
@@ -645,20 +645,9 @@ public class TrifaToxService extends Service
                         e.printStackTrace();
                     }
 
-                    // ----- DEBUG -----
-                    // ----- DEBUG -----
-                    // ----- DEBUG -----
-                    // ****** // ****** // orma.deleteFromBootstrapNodeEntryDB().execute();
-                    // ----- DEBUG -----
-                    // ----- DEBUG -----
-                    // ----- DEBUG -----
-
-
-                    update_nodelist_from_internet();
-
                     // ----- UDP ------
                     get_udp_nodelist_from_db();
-                    Log.i(TAG, "bootstrap_node_list[sort]=" + bootstrap_node_list);
+                    Log.i(TAG, "bootstrap_node_list[sort]=" + bootstrap_node_list.toString());
                     try
                     {
                         Collections.shuffle(bootstrap_node_list);
@@ -668,16 +657,22 @@ public class TrifaToxService extends Service
                     {
                         e.printStackTrace();
                     }
-                    Log.i(TAG, "bootstrap_node_list[rand]=" + bootstrap_node_list);
+                    Log.i(TAG, "bootstrap_node_list[rand]=" + bootstrap_node_list.toString());
 
                     try
                     {
                         Iterator i2 = bootstrap_node_list.iterator();
                         BootstrapNodeEntryDB ee;
+                        int used = 0;
                         while (i2.hasNext())
                         {
                             ee = (BootstrapNodeEntryDB) i2.next();
                             Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper(ee.ip, ee.port, ee.key_hex));
+                            used++;
+                            if (used > USE_MAX_NUMBER_OF_BOOTSTRAP_NODES)
+                            {
+                                break;
+                            }
                         }
                     }
                     catch (Exception e)
@@ -688,7 +683,7 @@ public class TrifaToxService extends Service
                     //
                     // ----- TCP ------
                     get_tcprelay_nodelist_from_db();
-                    Log.i(TAG, "tcprelay_node_list[sort]=" + tcprelay_node_list);
+                    Log.i(TAG, "tcprelay_node_list[sort]=" + tcprelay_node_list.toString());
                     try
                     {
                         Collections.shuffle(tcprelay_node_list);
@@ -698,16 +693,22 @@ public class TrifaToxService extends Service
                     {
                         e.printStackTrace();
                     }
-                    Log.i(TAG, "tcprelay_node_list[rand]=" + tcprelay_node_list);
+                    Log.i(TAG, "tcprelay_node_list[rand]=" + tcprelay_node_list.toString());
 
                     try
                     {
                         Iterator i2 = tcprelay_node_list.iterator();
                         BootstrapNodeEntryDB ee;
+                        int used = 0;
                         while (i2.hasNext())
                         {
                             ee = (BootstrapNodeEntryDB) i2.next();
                             Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex));
+                            used++;
+                            if (used > USE_MAX_NUMBER_OF_BOOTSTRAP_NODES)
+                            {
+                                break;
+                            }
                         }
                     }
                     catch (Exception e)

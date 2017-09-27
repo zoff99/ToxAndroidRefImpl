@@ -65,7 +65,9 @@ public class BootstrapNodeEntryDB
     @Override
     public String toString()
     {
-        return "" + num + ":" + ip + " port=" + port + " udp_node=" + udp_node + " key_hex=" + key_hex;
+        // return "" + num + ":" + ip + " port=" + port + " udp_node=" + udp_node + " key_hex=" + key_hex;
+        // return "" + num + ":" + ip + " port=" + port + " udp_node="+  udp_node;
+        return "" + num + ":" + ip + " port=" + port + " udp_node=" + udp_node + "\n";
     }
 
     static void insert_node_into_db_real(BootstrapNodeEntryDB n)
@@ -191,13 +193,7 @@ public class BootstrapNodeEntryDB
         }
     }
 
-    public static void update_nodelist_from_internet()
-    {
-        // TODO: write me
-        // this should be using TOR proxy, if tor is enabled in options!
-    }
-
-    public static void update_nodelist_from_internet_https_dummy()
+    public static void update_nodelist_from_internet_https_dummy_XXXX()
     {
         // this should be using TOR proxy, if tor is enabled in options!
         String IP_address = TorResolve(TOX_NODELIST_HOST);

@@ -126,6 +126,7 @@ import java.util.Random;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
+import info.guardianproject.netcipher.proxy.StatusCallback;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
@@ -533,6 +534,46 @@ public class MainActivity extends AppCompatActivity
                     PREF__orbot_enabled = true;
                     Log.i(TAG, "waiting_for_orbot_info:F1");
                     waiting_for_orbot_info(false);
+
+                    OrbotHelper.get(this).statusTimeout(120 * 1000).
+                            addStatusCallback(new StatusCallback()
+                            {
+                                @Override
+                                public void onEnabled(Intent statusIntent)
+                                {
+                                }
+
+                                @Override
+                                public void onStarting()
+                                {
+
+                                }
+
+                                @Override
+                                public void onStopping()
+                                {
+
+                                }
+
+                                @Override
+                                public void onDisabled()
+                                {
+                                    // we got a broadcast with a status of off, so keep waiting
+                                }
+
+                                @Override
+                                public void onStatusTimeout()
+                                {
+                                    // throw new RuntimeException("Orbot status request timed out");
+                                    Log.i(TAG, "waiting_for_orbot_info:EEO1:" + "Orbot status request timed out");
+                                }
+
+                                @Override
+                                public void onNotYetInstalled()
+                                {
+                                }
+                            }).
+                            init(); // allow 60 seconds to connect to Orbot
                 }
                 else
                 {
@@ -550,6 +591,46 @@ public class MainActivity extends AppCompatActivity
                         Log.i(TAG, "waiting_for_orbot_info:F3");
                         waiting_for_orbot_info(false);
                     }
+
+                    OrbotHelper.get(this).statusTimeout(120 * 1000).
+                            addStatusCallback(new StatusCallback()
+                            {
+                                @Override
+                                public void onEnabled(Intent statusIntent)
+                                {
+                                }
+
+                                @Override
+                                public void onStarting()
+                                {
+
+                                }
+
+                                @Override
+                                public void onStopping()
+                                {
+
+                                }
+
+                                @Override
+                                public void onDisabled()
+                                {
+                                    // we got a broadcast with a status of off, so keep waiting
+                                }
+
+                                @Override
+                                public void onStatusTimeout()
+                                {
+                                    // throw new RuntimeException("Orbot status request timed out");
+                                    Log.i(TAG, "waiting_for_orbot_info:EEO1:" + "Orbot status request timed out");
+                                }
+
+                                @Override
+                                public void onNotYetInstalled()
+                                {
+                                }
+                            }).
+                            init(); // allow 60 seconds to connect to Orbot
                 }
             }
             else
@@ -1442,6 +1523,15 @@ public class MainActivity extends AppCompatActivity
                                         // giving up
                                         break;
                                     }
+                                }
+
+                                try
+                                {
+                                    Thread.sleep(1000);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
                                 }
 
                                 // remove "waiting for orbot view"

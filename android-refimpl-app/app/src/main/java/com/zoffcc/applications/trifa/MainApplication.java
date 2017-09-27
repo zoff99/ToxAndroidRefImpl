@@ -30,6 +30,7 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -121,6 +122,7 @@ public class MainApplication extends Application
     protected void attachBaseContext(Context base)
     {
         super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
     public static String run_adb_command()

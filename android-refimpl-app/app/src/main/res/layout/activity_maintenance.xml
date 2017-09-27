@@ -55,4 +55,25 @@
         android:text="reset favorite Emoji List"
         android:textSize="14sp"/>
 
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/button_update_nodelist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:text="update Bootstrapnodes from Internet"
+        android:textSize="14sp"/>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/button_reset_nodelist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:text="reset Bootstrapnodes to default"
+        android:textSize="14sp"/>
+
 </LinearLayout>

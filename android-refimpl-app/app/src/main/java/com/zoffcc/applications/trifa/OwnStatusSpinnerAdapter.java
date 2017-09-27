@@ -92,7 +92,7 @@ public class OwnStatusSpinnerAdapter extends ArrayAdapter<String>
         else if (position == 1)
         {
             // label.setTextColor(Color.parseColor("#F7FE2E"));
-            icon.setImageResource(R.drawable.circle_yellow);
+            icon.setImageResource(R.drawable.circle_orange);
         }
         else if (position == 2)
         {
