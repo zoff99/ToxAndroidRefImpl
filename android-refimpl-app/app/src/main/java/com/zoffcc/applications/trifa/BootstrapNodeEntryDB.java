@@ -25,8 +25,18 @@ import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
+import java.io.DataInputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.util.Iterator;
+
+import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
+import static com.zoffcc.applications.trifa.TorHelper.TorResolve;
+import static com.zoffcc.applications.trifa.TorHelper.TorSocket;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 @Table
@@ -154,10 +164,98 @@ public class BootstrapNodeEntryDB
         return n;
     }
 
+    public static String dns_lookup_via_tor(String host_or_ip)
+    {
+        try
+        {
+            String IP_address = TorResolve(host_or_ip);
+            Log.i(TAG, "dns_lookup_via_tor:TorResolve:" + host_or_ip + " -> " + IP_address);
+
+            if ((IP_address == null) || (IP_address.equals("")))
+            {
+                // if there is some error, use localhost -> which kind of disables this host
+                Log.i(TAG, "dns_lookup_via_tor:EE2:IP_address=" + IP_address);
+                return "127.0.0.1";
+            }
+            else
+            {
+                return IP_address;
+            }
+        }
+        catch (Exception e)
+        {
+            // if there is some error, use localhost -> which kind of disables this host
+            e.printStackTrace();
+            Log.i(TAG, "dns_lookup_via_tor:EE1:" + e.getMessage());
+            return "127.0.0.1";
+        }
+    }
+
     public static void update_nodelist_from_internet()
     {
         // TODO: write me
         // this should be using TOR proxy, if tor is enabled in options!
+    }
+
+    public static void update_nodelist_from_internet_https_dummy()
+    {
+        // this should be using TOR proxy, if tor is enabled in options!
+        String IP_address = TorResolve(TOX_NODELIST_HOST);
+        Log.i(TAG, "update_nodelist_from_internet:TorResolve:" + TOX_NODELIST_HOST + " -> " + IP_address);
+
+
+        try
+        {
+            Socket s = TorSocket(TOX_NODELIST_HOST, 443);
+            DataInputStream is = new DataInputStream(s.getInputStream());
+            PrintStream out = new java.io.PrintStream(s.getOutputStream());
+
+            //Construct an HTTP request
+            out.print("GET  /" + "json" + " HTTP/1.0\r\n");
+            out.print("Host: " + TOX_NODELIST_HOST + ":" + "443" + "\r\n");
+            out.print("Accept: */*\r\n");
+            out.print("Connection: Keep-Aliv\r\n");
+            out.print("Pragma: no-cache\r\n");
+            out.print("\r\n");
+            out.flush();
+
+            // this is from Java Examples In a Nutshell
+            final InputStreamReader from_server = new InputStreamReader(is);
+            char[] buffer = new char[1024];
+            int chars_read;
+
+            String response_text = "";
+
+            // read until stream closes
+            while ((chars_read = from_server.read(buffer)) != -1)
+            {
+                // loop through array of chars
+                // change \n to local platform terminator
+                // this is a nieve implementation
+                for (int j = 0; j < chars_read; j++)
+                {
+                    if (buffer[j] == '\n')
+                    {
+                        // System.out.println();
+                        response_text = response_text + "\n";
+                    }
+                    else
+                    {
+                        // System.out.print(buffer[j]);
+                        response_text = response_text + buffer[j];
+                    }
+                }
+                // System.out.flush();
+            }
+            s.close();
+
+            Log.i(TAG, "" + response_text);
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public static void get_tcprelay_nodelist_from_db()
@@ -188,6 +286,18 @@ public class BootstrapNodeEntryDB
         {
             tcprelay_node_list.addAll(orma.selectFromBootstrapNodeEntryDB().udp_nodeEq(false).orderByNumAsc().toList());
             Log.i(TAG, "get_tcprelay_nodelist_from_db:tcprelay_node_list.addAll");
+
+            if (PREF__orbot_enabled)
+            {
+                Iterator i = bootstrap_node_list.iterator();
+                BootstrapNodeEntryDB e2;
+                while (i.hasNext())
+                {
+                    e2 = (BootstrapNodeEntryDB) i.next();
+                    e2.ip = dns_lookup_via_tor(e2.ip);
+
+                }
+            }
         }
         catch (Exception e)
         {
@@ -223,6 +333,17 @@ public class BootstrapNodeEntryDB
         {
             bootstrap_node_list.addAll(orma.selectFromBootstrapNodeEntryDB().udp_nodeEq(true).orderByNumAsc().toList());
             Log.i(TAG, "get_udp_nodelist_from_db:bootstrap_node_list.addAll");
+
+            if (PREF__orbot_enabled)
+            {
+                Iterator i = bootstrap_node_list.iterator();
+                BootstrapNodeEntryDB e2;
+                while (i.hasNext())
+                {
+                    e2 = (BootstrapNodeEntryDB) i.next();
+                    e2.ip = dns_lookup_via_tor(e2.ip);
+                }
+            }
         }
         catch (Exception e)
         {

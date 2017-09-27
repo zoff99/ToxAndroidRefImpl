@@ -87,6 +87,9 @@ public class TRIFAGlobals
     static final String ORBOT_PROXY_HOST = "127.0.0.1";
     static final long ORBOT_PROXY_PORT = 9050;
 
+    static final String TOX_NODELIST_HOST = "nodes.tox.chat";
+    static final String TOX_NODELIST_URL = "https://" + TOX_NODELIST_HOST + "/json";
+
     static final String TOXURL_PATTERN = "(?:^|\\s|$)[Tt][Oo][Xx]:[a-fA-F0-9]*";
 
     static String PREF__DB_secrect_key__user_hash = "";

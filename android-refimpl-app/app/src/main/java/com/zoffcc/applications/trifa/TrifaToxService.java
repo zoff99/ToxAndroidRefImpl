@@ -40,6 +40,7 @@ import info.guardianproject.iocipher.VirtualFileSystem;
 
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
+import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.update_nodelist_from_internet;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
@@ -643,6 +644,17 @@ public class TrifaToxService extends Service
                     {
                         e.printStackTrace();
                     }
+
+                    // ----- DEBUG -----
+                    // ----- DEBUG -----
+                    // ----- DEBUG -----
+                    // ****** // ****** // orma.deleteFromBootstrapNodeEntryDB().execute();
+                    // ----- DEBUG -----
+                    // ----- DEBUG -----
+                    // ----- DEBUG -----
+
+
+                    update_nodelist_from_internet();
 
                     // ----- UDP ------
                     get_udp_nodelist_from_db();
