@@ -135,6 +135,7 @@ android {
                     //'proguard-mikepenz-android-iconics.pro',
                     //'proguard-rounded-image-view.pro',
                     //'proguard-support-v7-appcompat.pro',
+                    'proguard-gson.pro',
                     'proguard-rules.pro'
         }
         release {
