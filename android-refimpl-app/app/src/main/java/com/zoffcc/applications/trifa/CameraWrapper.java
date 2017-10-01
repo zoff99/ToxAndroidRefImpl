@@ -35,6 +35,7 @@ import java.util.List;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hint;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__fps_half;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__set_fps;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
@@ -320,7 +321,17 @@ public class CameraWrapper
                     }
                 }
 
-                this.mCameraParamters.setPreviewFpsRange(15000, 15000);
+                // HINT: this crashes some devices
+                if (PREF__set_fps)
+                {
+                    Log.i(TAG, "preview_framerates2:SET:setting FPS to 15:START");
+                    this.mCameraParamters.setPreviewFpsRange(15000, 15000);
+                    Log.i(TAG, "preview_framerates2:SET:setting FPS to 15:Ready");
+                }
+                else
+                {
+                    Log.i(TAG, "preview_framerates2:SET:not setting FPS");
+                }
             }
             catch (Exception e)
             {

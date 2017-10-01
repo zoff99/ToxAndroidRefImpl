@@ -14,12 +14,6 @@
 
     <SwitchPreference
         android:defaultValue="false"
-        android:key="udp_enabled"
-        android:summary="@string/pref_description_udp_enabled"
-        android:title="@string/pref_title_udp_enabled"/>
-
-    <SwitchPreference
-        android:defaultValue="false"
         android:key="orbot_enabled"
         android:summary="@string/pref_description_orbot_enabled"
         android:title="@string/pref_title_orbot_enabled"/>
@@ -38,6 +32,12 @@
         android:key="fps_half"
         android:summary="@string/pref_description_fps_half"
         android:title="@string/pref_title_fps_half"/>
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="set_fps"
+        android:summary="@string/pref_description_set_fps"
+        android:title="@string/pref_title_set_fps"/>
 
     <ListPreference
         android:defaultValue="0"
@@ -80,4 +80,9 @@
             android:title="@string/pref_title_X_battery_saving_mode"/>
 
     </PreferenceCategory>
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="udp_enabled"
+        android:summary="@string/pref_description_udp_enabled"
+        android:title="@string/pref_title_udp_enabled"/>
 </PreferenceScreen>
