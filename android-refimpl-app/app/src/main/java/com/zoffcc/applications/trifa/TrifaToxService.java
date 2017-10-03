@@ -391,6 +391,10 @@ public class TrifaToxService extends Service
                 set_all_friends_offline();
                 Log.i(TAG, "set_all_conferences_inactive:003");
                 set_all_conferences_inactive();
+
+                // so that the app knows we went offline
+                global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+
                 is_tox_started = false;
 
                 Log.i(TAG, "stop_tox_fg:009");
@@ -639,7 +643,7 @@ public class TrifaToxService extends Service
                 {
                     bootstrapping = true;
                     global_self_last_went_offline_timestamp = System.currentTimeMillis();
-
+                    Log.i(TAG, "global_self_last_went_offline_timestamp[1]=" + global_self_last_went_offline_timestamp + " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
                     Log.i(TAG, "bootrapping:set to true[1]");
                     try
                     {
@@ -696,6 +700,9 @@ public class TrifaToxService extends Service
                         Log.i(TAG, "need_add_bots=true (INSERT)");
                     }
                 }
+
+                global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp + " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
 
 
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
