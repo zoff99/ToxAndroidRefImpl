@@ -172,7 +172,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timstamp;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_offline_timestamp;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_tox_self_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
@@ -2756,7 +2757,24 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "self_connection_status:bootstrapping set to false");
                 bootstrapping = false;
-                global_self_last_went_online_timstamp = System.currentTimeMillis();
+                global_self_last_went_online_timestamp = System.currentTimeMillis();
+                global_self_last_went_offline_timestamp = -1;
+            }
+            else
+            {
+                global_self_last_went_offline_timestamp = System.currentTimeMillis();
+            }
+        }
+        else
+        {
+            if (a_TOX_CONNECTION != 0)
+            {
+                global_self_last_went_online_timestamp = System.currentTimeMillis();
+                global_self_last_went_offline_timestamp = -1;
+            }
+            else
+            {
+                global_self_last_went_offline_timestamp = System.currentTimeMillis();
             }
         }
 

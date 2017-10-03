@@ -33,11 +33,15 @@ public class TRIFAGlobals
     static String global_my_status_message = "";
     static boolean bootstrapping = false;
     static int global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
-    static long global_self_last_went_online_timstamp = -1;
+    static long global_self_last_went_online_timestamp = -1;
+    static long global_self_last_went_offline_timestamp = -1;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
-    static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 60;
-    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 2000;
+    static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 60; // 60 secs.
+    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 2000; // 2 secs.
+
+    static boolean HAVE_INTERNET_CONNECTIVITY = true;
+    static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS = 1000 * 60 * 2; // bootstrap again after 2 minutes offline
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
 
@@ -109,7 +113,7 @@ public class TRIFAGlobals
     static final int MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE = 256;
     static final int LEN_TRIFA_AUTOGEN_PASSWORD = 32;
 
-    static final int USE_MAX_NUMBER_OF_BOOTSTRAP_NODES = 3;
+    static final int USE_MAX_NUMBER_OF_BOOTSTRAP_NODES = 8;
 
     // ---- lookup cache ----
     static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
