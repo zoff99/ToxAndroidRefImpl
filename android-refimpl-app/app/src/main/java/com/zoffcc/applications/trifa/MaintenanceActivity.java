@@ -29,9 +29,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,8 @@ import okhttp3.Response;
 
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_tcprelay_nodes_into_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_udp_nodes_into_db;
+import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
+import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -58,6 +62,9 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_fav_emoji_reset;
     Button button_update_nodelist;
     Button button_reset_nodelist;
+
+    TextView text_sqlstats = null;
+
     Handler maint_handler_s = null;
 
     // ----------------------------------------------------
@@ -83,6 +90,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_fav_emoji_reset = (Button) findViewById(R.id.button_fav_emoji_reset);
         button_update_nodelist = (Button) findViewById(R.id.button_update_nodelist);
         button_reset_nodelist = (Button) findViewById(R.id.button_reset_nodelist);
+        text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -249,6 +257,72 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+        String num_msgs = "*ERROR*";
+        try
+        {
+            num_msgs = "" + orma.selectFromMessage().count();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String num_confmsgs = "*ERROR*";
+        try
+        {
+            num_confmsgs = "" + orma.selectFromConferenceMessage().count();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String num_dbfriends = "*ERROR*";
+        try
+        {
+            num_dbfriends = "" + orma.selectFromFriendList().count();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String num_dbconfs = "*ERROR*";
+        try
+        {
+            num_dbconfs = "" + orma.selectFromConferenceDB().count();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String vfs_size = "*ERROR*";
+        try
+        {
+            String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+            File database_dir = new File(new File(dbFile).getParent());
+            vfs_size = files_and_sizes_in_dir(database_dir);
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String dbmain_size = "*ERROR*";
+        try
+        {
+            String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+            File database_dir = new File(new File(dbs_path).getParent());
+            dbmain_size = files_and_sizes_in_dir(database_dir);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        text_sqlstats.setText("Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " + num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
 
         maint_handler_s = maint_handler;
     }
@@ -418,5 +492,63 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     public void onInvalid()
     {
 
+    }
+
+    public static String files_and_sizes_in_dir(File directory)
+    {
+        String ret = "Files:";
+        long size_sum = 0L;
+
+        Log.i(TAG, "files_and_sizes_in_dir:" + directory);
+
+        try
+        {
+            for (File file : directory.listFiles())
+            {
+                Log.i(TAG, "files_and_sizes_in_dir:file=" + file);
+
+                try
+                {
+                    if (file.isFile())
+                    {
+                        Log.i(TAG, "files_and_sizes_in_dir:file name=" + file.getName());
+                        Log.i(TAG, "files_and_sizes_in_dir:file len=" + file.length());
+                        if ((file.length() / 1024 / 1024) < 1)
+                        {
+                            ret = ret + "\n" + file.getName() + "\t" + (file.length()) + " Bytes";
+                        }
+                        else
+                        {
+                            ret = ret + "\n" + file.getName() + "\t" + (file.length() / 1024 / 1024) + " MBytes";
+                        }
+                        size_sum = size_sum + file.length();
+                        Log.i(TAG, "files_and_sizes_in_dir:size_sum=" + size_sum);
+                    }
+                    else
+                    {
+                        Log.i(TAG, "files_and_sizes_in_dir:file? " + file);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if ((size_sum / 1024 / 1024) < 1)
+        {
+            ret = ret + "\nSize: " + (size_sum) + " Bytes";
+        }
+        else
+        {
+            ret = ret + "\nSize: " + (size_sum / 1024 / 1024) + " MBytes";
+        }
+
+        return ret;
     }
 }
