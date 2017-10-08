@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.zoffcc.applications.trifa.MainActivity.dp2px;
-
 public class TRIFAGlobals
 {
     static String global_my_toxid = "";
@@ -127,8 +125,8 @@ public class TRIFAGlobals
     static long LAST_ONLINE_TIMSTAMP_ONLINE_NOW = Long.MAX_VALUE - 1;
     static long LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE = -1;
 
-    static int CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) dp2px(10);
-    static int CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = (int) dp2px(20);
+    static int CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = 10;
+    static int CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = 20;
 
     public static enum TRIFA_FT_DIRECTION
     {

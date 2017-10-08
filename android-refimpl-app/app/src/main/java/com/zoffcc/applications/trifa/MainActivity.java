@@ -358,6 +358,8 @@ public class MainActivity extends AppCompatActivity
         context_s = this.getBaseContext();
         main_activity_s = this;
 
+        TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) dp2px(10);
+        TRIFAGlobals.CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = (int) dp2px(20);
 
         try
         {
@@ -6704,6 +6706,11 @@ public class MainActivity extends AppCompatActivity
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
             ArrayList<Uri> uris = new ArrayList<>();
             uris.add(Uri.parse("file://" + full_file_name));
+
+            Log.i(TAG, "email:full_file_name=" + full_file_name);
+            File ff = new File(full_file_name);
+            Log.i(TAG, "email:full_file_name exists:" + ff.exists());
+
             try
             {
                 if (new File(full_file_name_suppl).length() > 0)
@@ -6714,6 +6721,7 @@ public class MainActivity extends AppCompatActivity
             catch (Exception e)
             {
                 e.printStackTrace();
+                Log.i(TAG, "email:EE1:" + e.getMessage());
             }
             List<ResolveInfo> resolveInfos = getPackageManager().queryIntentActivities(emailIntent, 0);
             List<LabeledIntent> intents = new ArrayList<>();
@@ -6723,7 +6731,7 @@ public class MainActivity extends AppCompatActivity
                 for (ResolveInfo info : resolveInfos)
                 {
                     Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-                    System.out.println("email:" + "comp=" + info.activityInfo.packageName + " " + info.activityInfo.name);
+                    Log.i(TAG, "email:" + "comp=" + info.activityInfo.packageName + " " + info.activityInfo.name);
                     intent.setComponent(new ComponentName(info.activityInfo.packageName, info.activityInfo.name));
                     intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipient});
                     if (subject != null)
@@ -6733,23 +6741,40 @@ public class MainActivity extends AppCompatActivity
                     if (message != null)
                     {
                         intent.putExtra(Intent.EXTRA_TEXT, message);
+                        // ArrayList<String> extra_text = new ArrayList<String>();
+                        // extra_text.add(message);
+                        // intent.putStringArrayListExtra(android.content.Intent.EXTRA_TEXT, extra_text);
+                        // Log.i(TAG, "email:" + "message=" + message);
+                        // Log.i(TAG, "email:" + "intent extra_text=" + extra_text);
                     }
                     intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
                     intents.add(new LabeledIntent(intent, info.activityInfo.packageName, info.loadLabel(getPackageManager()), info.icon));
                 }
-                Intent chooser = Intent.createChooser(intents.remove(intents.size() - 1), "Send email with attachments");
-                chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intents.toArray(new LabeledIntent[intents.size()]));
-                startActivity(chooser);
+
+                try
+                {
+                    Intent chooser = Intent.createChooser(intents.remove(intents.size() - 1), "Send email with attachments");
+                    chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intents.toArray(new LabeledIntent[intents.size()]));
+                    startActivity(chooser);
+                }
+                catch (Exception email_app)
+                {
+                    email_app.printStackTrace();
+                    Log.i(TAG, "email:" + "Error starting Email App");
+                    new AlertDialog.Builder(c).setMessage("Error starting Email App").setPositiveButton("Ok", null).show();
+                }
             }
             else
             {
-                System.out.println("email:" + "No Email App found");
+                Log.i(TAG, "email:" + "No Email App found");
                 new AlertDialog.Builder(c).setMessage("No Email App found").setPositiveButton("Ok", null).show();
             }
         }
         catch (ActivityNotFoundException e)
         {
             // cannot send email for some reason
+            e.printStackTrace();
+            Log.i(TAG, "email:EE2:" + e.getMessage());
         }
     }
 

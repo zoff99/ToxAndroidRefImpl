@@ -230,7 +230,9 @@ public class MainApplication extends Application
             Calendar c = Calendar.getInstance();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
             String formattedDate = df.format(c.getTime());
+            // File myDir = new File(getExternalFilesDir(null).getAbsolutePath() + "/crashes");
             File myDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes");
+
             myDir.mkdirs();
             File myFile = new File(myDir.getAbsolutePath() + "/crash_" + formattedDate + ".txt");
             Log.i(TAG, "MainApplication:" + randnum + ":" + "crash file=" + myFile.getAbsolutePath());

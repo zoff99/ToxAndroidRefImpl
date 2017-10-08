@@ -898,8 +898,14 @@ public class TrifaToxService extends Service
             while (i2.hasNext())
             {
                 ee = (BootstrapNodeEntryDB) i2.next();
-                Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper(ee.ip, ee.port, ee.key_hex));
-                used++;
+                int bootstrap_result = MainActivity.bootstrap_single_wrapper(ee.ip, ee.port, ee.key_hex);
+                Log.i(TAG, "bootstrap_single:res=" + bootstrap_result);
+
+                if (bootstrap_result == 0)
+                {
+                    used++;
+                }
+
                 if (used > USE_MAX_NUMBER_OF_BOOTSTRAP_NODES)
                 {
                     break;
@@ -934,8 +940,14 @@ public class TrifaToxService extends Service
             while (i2.hasNext())
             {
                 ee = (BootstrapNodeEntryDB) i2.next();
-                Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex));
-                used++;
+                int bootstrap_result = MainActivity.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex);
+                Log.i(TAG, "add_tcp_relay_single:res=" + bootstrap_result);
+
+                if (bootstrap_result == 0)
+                {
+                    used++;
+                }
+
                 if (used > USE_MAX_NUMBER_OF_BOOTSTRAP_NODES)
                 {
                     break;
