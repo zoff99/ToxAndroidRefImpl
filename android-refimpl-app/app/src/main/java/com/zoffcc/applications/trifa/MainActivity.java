@@ -6598,6 +6598,26 @@ public class MainActivity extends AppCompatActivity
         {
             if (orma != null)
             {
+                try
+                {
+                    String result_alias = orma.selectFromFriendList().
+                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                            toList().get(0).alias_name;
+
+                    if (result_alias != null)
+                    {
+                        if (result_alias.length() > 0)
+                        {
+                            result = result_alias;
+                            return result;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 result = orma.selectFromFriendList().
                         tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                         toList().get(0).name;

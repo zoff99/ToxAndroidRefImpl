@@ -26,6 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -44,6 +45,7 @@ public class FriendInfoActivity extends AppCompatActivity
     TextView mytoxid = null;
     TextView mynick = null;
     TextView mystatus_message = null;
+    EditText alias_text = null;
     long friendnum = -1;
 
     @Override
@@ -59,6 +61,7 @@ public class FriendInfoActivity extends AppCompatActivity
         mytoxid = (TextView) findViewById(R.id.fi_toxprvkey_textview);
         mynick = (TextView) findViewById(R.id.fi_nick_text);
         mystatus_message = (TextView) findViewById(R.id.fi_status_message_text);
+        alias_text = (EditText) findViewById(R.id.fi_alias_text);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,6 +69,19 @@ public class FriendInfoActivity extends AppCompatActivity
         mytoxid.setText("*error*");
         mynick.setText("*error*");
         mystatus_message.setText("*error*");
+
+        alias_text.setText("");
+
+        try
+        {
+            alias_text.setText(orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0).alias_name);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
         profile_icon.setImageDrawable(d1);
@@ -133,5 +149,52 @@ public class FriendInfoActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        // TODO dirty hack, just write "alias"
+
+        try
+        {
+            String alias_name = alias_text.getText().toString();
+            if (alias_name != null)
+            {
+                if (alias_name.length() > 0)
+                {
+                    orma.updateFriendList().
+                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                            alias_name(alias_name).execute();
+                }
+                else
+                {
+                    orma.updateFriendList().
+                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                            alias_name("").execute();
+                }
+            }
+            else
+            {
+                orma.updateFriendList().
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        alias_name("").execute();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            try
+            {
+            }
+            catch (Exception e1)
+            {
+                e1.printStackTrace();
+                orma.updateFriendList().
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        alias_name("").execute();
+            }
+        }
     }
 }

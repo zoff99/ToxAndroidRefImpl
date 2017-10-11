@@ -35,6 +35,10 @@ public class FriendList
     @Nullable
     String name;
 
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
+    @Nullable
+    String alias_name;
+
     @Column
     @Nullable
     String status_message;
@@ -76,6 +80,7 @@ public class FriendList
         out.notification_silent = in.notification_silent;
         out.sort = in.sort;
         out.last_online_timestamp = in.last_online_timestamp;
+        out.alias_name = in.alias_name;
 
         return out;
     }
@@ -83,6 +88,6 @@ public class FriendList
     @Override
     public String toString()
     {
-        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" + sort + ", last_online_timestamp=" + last_online_timestamp;
+        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" + sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name;
     }
 }

@@ -23,10 +23,10 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="10dp"
         android:paddingBottom="2dp"
         android:paddingTop="2dp"
         android:src="@mipmap/ic_launcher_round"
@@ -49,7 +49,6 @@
             android:paddingRight="2dp"
             android:text="Nick:"
             android:textAlignment="textEnd"
-            android:textIsSelectable="true"
             android:textSize="16sp"
             android:textStyle="bold"/>
 
@@ -62,9 +61,11 @@
             android:fontFamily="monospace"
             android:paddingBottom="15dp"
             android:text="my nick er werwer werwer"
+            android:textIsSelectable="true"
             android:textSize="16sp"
             android:typeface="monospace"/>
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -82,7 +83,6 @@
             android:paddingRight="2dp"
             android:text="Status:"
             android:textAlignment="textEnd"
-            android:textIsSelectable="true"
             android:textSize="16sp"
             android:textStyle="bold"/>
 
@@ -95,10 +95,37 @@
             android:fontFamily="monospace"
             android:paddingBottom="15dp"
             android:text="my status er werwer werwer"
+            android:textIsSelectable="true"
             android:textSize="16sp"
             android:typeface="monospace"/>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp">
+
+            <EditText
+                android:id="@+id/fi_alias_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:hint="Alias"
+                android:imeOptions="actionUnspecified"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"/>
+
+        </android.support.design.widget.TextInputLayout>
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/fi_toxprvkey_textview"

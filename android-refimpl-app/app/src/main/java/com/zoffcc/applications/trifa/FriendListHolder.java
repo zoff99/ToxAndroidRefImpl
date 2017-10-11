@@ -121,7 +121,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             return;
         }
 
-        Log.i(TAG, "bindFriendList:" + fl.name);
+        Log.i(TAG, "bindFriendList:" + fl.name + "alias=" + fl.alias_name);
 
         this.friendlist = fl;
 
@@ -173,6 +173,21 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         textView.setText(fl.name);
+        try
+        {
+            if (fl.alias_name != null)
+            {
+                if (fl.alias_name.length() > 0)
+                {
+                    textView.setText(fl.alias_name);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         statusText.setText(fl.status_message);
 
         avatar.setImageDrawable(d_lock);
