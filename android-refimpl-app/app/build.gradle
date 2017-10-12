@@ -182,6 +182,10 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
+    compile('com.l4digital.fastscroll:fastscroll:1.0.4') {
+        exclude group: 'com.android.support'
+    }
+    //
     compile('com.vanniktech:emoji-ios:0.5.1') {
         exclude group: 'com.android.support'
     }
@@ -211,7 +215,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.github.medyo:android-about-page:1.2.1'
     compile 'de.hdodenhof:circleimageview:2.2.0'
-    compile 'com.l4digital.fastscroll:fastscroll:1.0.4'
     compile 'me.zhanghai.android.patternlock:library:2.1.2'
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
