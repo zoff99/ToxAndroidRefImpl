@@ -111,8 +111,7 @@ dependencies:
 
   - mkdir -p /home/ubuntu/c-toxcore # workaround :-)
 
-
-  - find / -name sdkmanager
+  #- find / -name sdkmanager
 
   - sudo apt-get install xdotool > /dev/null 2> /dev/null
   - sudo apt-get install telnet > /dev/null 2> /dev/null
