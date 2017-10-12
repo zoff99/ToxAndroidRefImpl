@@ -150,6 +150,10 @@ dependencies:
   - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-addon-google_apis-google-23 > /dev/null 2> /dev/null
   - echo y | android update sdk --no-ui --all --filter addon-google_apis-google-23 > /dev/null 2> /dev/null
 
+  - echo y | android update sdk --no-ui --all --filter "tools"
+  - echo y | android update sdk --no-ui
+  - $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
+
   - echo ${ANDROID_HOME} ; exit 0
   - ls -al "${ANDROID_HOME}/licenses" ; exit 0
 
