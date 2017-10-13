@@ -60,6 +60,7 @@ import static com.zoffcc.applications.trifa.MainActivity.insert_into_conference_
 import static com.zoffcc.applications.trifa.MainActivity.is_conference_active;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name;
@@ -677,6 +678,14 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     name2 = peer_pubkey.substring(peer_pubkey.length() - 5, peer_pubkey.length());
                 }
 
+                try
+                {
+                    name2 = resolve_name_for_pubkey(peer_pubkey, name2);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 final String name3 = name2;
 
                 lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);
@@ -788,6 +797,14 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     name2 = peer_pubkey.substring(peer_pubkey.length() - 5, peer_pubkey.length());
                 }
 
+                try
+                {
+                    name2 = resolve_name_for_pubkey(peer_pubkey, name2);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 final String name3 = name2;
 
                 lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);

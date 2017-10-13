@@ -171,6 +171,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_offline_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
@@ -8080,6 +8082,55 @@ public class MainActivity extends AppCompatActivity
         });
 
         img.startAnimation(fadeOut);
+    }
+
+    static String resolve_name_for_pubkey(String pub_key, String default_name)
+    {
+        String ret = default_name;
+
+        try
+        {
+            try
+            {
+                if (pub_key.equals(global_my_toxid.substring(0, (TOX_PUBLIC_KEY_SIZE * 2))))
+                {
+                    // its our own key
+                    ret = global_my_name;
+                    return ret;
+                }
+            }
+            catch (Exception e1)
+            {
+                e1.printStackTrace();
+            }
+
+            FriendList fl = orma.selectFromFriendList().
+                    tox_public_key_stringEq(pub_key).
+                    toList().get(0);
+
+            if (fl.name != null)
+            {
+                if (fl.name.length() > 0)
+                {
+                    ret = fl.name;
+                }
+            }
+
+            if (fl.alias_name != null)
+            {
+                if (fl.alias_name.length() > 0)
+                {
+                    ret = fl.alias_name;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            ret = default_name;
+        }
+
+        return ret;
     }
 
     // --------- make app crash ---------

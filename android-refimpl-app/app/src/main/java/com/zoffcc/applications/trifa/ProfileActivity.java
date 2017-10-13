@@ -66,7 +66,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
-import static com.zoffcc.applications.trifa.ToxVars.OX_MAX_STATUS_MESSAGE_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_STATUS_MESSAGE_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NAME_LENGTH;
 
 public class ProfileActivity extends AppCompatActivity
@@ -279,7 +279,7 @@ public class ProfileActivity extends AppCompatActivity
         try
         {
             global_my_name = mynick_edittext.getText().toString().substring(0, Math.min(mynick_edittext.getText().toString().length(), TOX_MAX_NAME_LENGTH));
-            global_my_status_message = mystatus_message_edittext.getText().toString().substring(0, Math.min(mystatus_message_edittext.getText().toString().length(), OX_MAX_STATUS_MESSAGE_LENGTH));
+            global_my_status_message = mystatus_message_edittext.getText().toString().substring(0, Math.min(mystatus_message_edittext.getText().toString().length(), TOX_MAX_STATUS_MESSAGE_LENGTH));
             tox_self_set_name(global_my_name);
             tox_self_set_status_message(global_my_status_message);
             update_savedata_file_wrapper();
