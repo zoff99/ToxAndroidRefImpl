@@ -83,7 +83,10 @@
     <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
 
     <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
-    <string name="pref_description_X_battery_saving_mode">!! Expermimental !! this will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
+    <string name="pref_description_X_battery_saving_mode">!! Expermimental !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
+
+    <string name="pref_title_X_misc_button_enabled">Misc. Button</string>
+    <string name="pref_description_X_misc_button_enabled">!! Expermimental !!\nadd a Button on Calling Screen to send a fixed Message</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">

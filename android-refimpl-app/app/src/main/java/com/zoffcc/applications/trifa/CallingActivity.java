@@ -47,9 +47,12 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
@@ -71,6 +74,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     ImageButton decline_button = null;
     static ImageButton camera_toggle_button = null;
     static ImageButton mute_button = null;
+    ImageButton misc_button = null;
+    TextView misc_button_pad = null;
     static ImageView audio_device_icon = null;
     static TextView top_text_line = null;
     static CallingActivity ca = null;
@@ -144,8 +149,72 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
         mute_button = (ImageButton) findViewById(R.id.mute_button);
         audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
+        misc_button = (ImageButton) findViewById(R.id.misc_button);
+        misc_button_pad = (TextView) findViewById(R.id.misc_button_pad);
 
-        Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        if (PREF__X_misc_button_enabled)
+        {
+            misc_button.setVisibility(View.VISIBLE);
+            misc_button_pad.setVisibility(View.VISIBLE);
+
+            Drawable d8 = new IconicsDrawable(this).
+                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                    getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            misc_button.setImageDrawable(d8);
+
+            misc_button.setOnTouchListener(new View.OnTouchListener()
+            {
+                @Override
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    if (event.getAction() != MotionEvent.ACTION_UP)
+                    {
+                        try
+                        {
+                            Drawable d1a = new IconicsDrawable(v.getContext()).
+                                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                                    getColor(R.color.md_green_600)).sizeDp(50);
+                            misc_button.setImageDrawable(d1a);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            Drawable d2a = new IconicsDrawable(v.getContext()).
+                                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                                    getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                            misc_button.setImageDrawable(d2a);
+
+                            // send misc. message to friend
+                            long res = tox_friend_send_message(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0, PREF__X_misc_button_msg);
+                            Log.i(TAG, "tox_friend_send_message:result=" + res);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    return true;
+                }
+            });
+
+
+        }
+        else
+        {
+            misc_button.setVisibility(View.GONE);
+            misc_button_pad.setVisibility(View.GONE);
+        }
+
+        // Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         audio_device_icon.setImageDrawable(null);
 
         final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);

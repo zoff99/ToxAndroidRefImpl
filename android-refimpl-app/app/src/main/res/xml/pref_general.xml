@@ -70,6 +70,12 @@
         android:summary="@string/pref_description_local_discovery_enabled"
         android:title="@string/pref_title_local_discovery_enabled"/>
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="udp_enabled"
+        android:summary="@string/pref_description_udp_enabled"
+        android:title="@string/pref_title_udp_enabled"/>
+
     <PreferenceCategory
         android:title="! eXperimental !">
 
@@ -79,10 +85,11 @@
             android:summary="@string/pref_description_X_battery_saving_mode"
             android:title="@string/pref_title_X_battery_saving_mode"/>
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_misc_button_enabled"
+            android:summary="@string/pref_description_X_misc_button_enabled"
+            android:title="@string/pref_title_X_misc_button_enabled"/>
+
     </PreferenceCategory>
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="udp_enabled"
-        android:summary="@string/pref_description_udp_enabled"
-        android:title="@string/pref_title_udp_enabled"/>
 </PreferenceScreen>
