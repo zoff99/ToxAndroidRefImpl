@@ -2452,7 +2452,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
-        if (Callstate.call_first_video_frame_received == -1)
+        if ((Callstate.call_first_video_frame_received == -1) || (Callstate.frame_width_px != frame_width_px) || (Callstate.frame_height_px != frame_height_px) || (Callstate.ystride != ystride))
         {
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
             last_video_frame_received = System.currentTimeMillis();
@@ -2463,6 +2463,12 @@ public class MainActivity extends AppCompatActivity
 
             temp_string_a = "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a, 3);
+
+            Callstate.frame_width_px = frame_width_px;
+            Callstate.frame_height_px = frame_height_px;
+            Callstate.ystride = ystride;
+            Callstate.ustride = ustride;
+            Callstate.vstride = vstride;
         }
         else
         {
