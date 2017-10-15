@@ -197,7 +197,7 @@ dependencies {
     //
     //
     //
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.8@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.10@aar'
     //
     //
     //
@@ -236,7 +236,7 @@ dependencyVerification {
             'com.github.angads25:filepicker:8582d3a57d590945c05a00af265f63258da85523a61bd14556f545ad54da228b',
             'com.vanniktech:emoji-ios:f30f5ad996b81d3a1a5987055d22b2e1bcecc5067c1524addabb271366452e80',
             'com.github.bumptech.glide:glide:555350c4b9d163f1d3772a64a92119086073ed88340eb284391b1acc1bb5dd6c',
-            'com.zoffcc.applications.trifajni:trifa-jni-lib:323ab68ad33fab1435e8dfe010028a263b3f21f5afd5c1ee73848b776425760a',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:451b48c7273a4a74b25f10e85439e4870ce9b0a6094f9992e59392c291b2982e',
             'com.android.support:support-vector-drawable:13728f337f36d1c02d52198a6c20724edb447a0875454d829f95cb9eb4aa293b',
             'com.android.support:support-v4:07d389154bcf73b47e514964df1578136b26cba78257b8a577a3ccb54beff0ae',
             'com.android.support:appcompat-v7:ac1ebbc46589195dda3e0b1becfe410bafd75bdf3edd1cd9acf04850f3895830',
