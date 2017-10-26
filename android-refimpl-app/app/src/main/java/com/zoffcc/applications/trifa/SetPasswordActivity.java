@@ -148,12 +148,12 @@ public class SetPasswordActivity extends AppCompatActivity
             cancel = true;
         }
 
-		if (!isPasswordValid(password1))
-		{
+        if (!isPasswordValid(password1))
+        {
             mPasswordView1.setError(this.getString(R.string.set_password_message_password_invalid));
             focusView = mPasswordView1;
             cancel = true;
-		}
+        }
 
         if (!TextUtils.isEmpty(password2))
         {
@@ -162,12 +162,12 @@ public class SetPasswordActivity extends AppCompatActivity
             cancel = true;
         }
 
-		if (!isPasswordValid(password2))
-		{
+        if (!isPasswordValid(password2))
+        {
             mPasswordView2.setError(this.getString(R.string.set_password_message_password_invalid));
             focusView = mPasswordView2;
             cancel = true;
-		}
+        }
 
         if (!TextUtils.isEmpty(password1) && !TextUtils.isEmpty(password2) && !TextUtils.equals(password1, password2))
         {
