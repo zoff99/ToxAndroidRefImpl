@@ -31,6 +31,7 @@ machine:
 # --- Android build ---
 
     # ---------------------------------------------------
+    # v0.1.10 more vpx tweaks        eab6e81ec9ed5b88aa712093ea53c802ff81d611
     # v0.1.10 cfg_dec2               3921fd04ee233a21befa960cf26214410e1b6582
     # v0.1.10 cfg_dec                94bf0a32adac079b7739c6d32cfc0e504993f962
     # v0.1.10 tweaks3   25d1fce22ddc87089cf53e9b3c5bcf9d56a57374
@@ -65,7 +66,7 @@ machine:
     # ---------------------------------------------------
 
     # c-toxcore version
-    AND_CTOXCORE_VERSION: "3921fd04ee233a21befa960cf26214410e1b6582"
+    AND_CTOXCORE_VERSION: "eab6e81ec9ed5b88aa712093ea53c802ff81d611"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
