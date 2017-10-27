@@ -53,22 +53,7 @@ public class AddFriendActivity extends AppCompatActivity
         b_qr = (ImageButton) findViewById(R.id.friend_qrbutton);
 
         t.setText("");
-        t.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
         t.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable editable) {
