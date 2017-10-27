@@ -25,16 +25,19 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 public class AddFriendActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.AddFrdActivity";
     EditText t = null;
     Button b_add = null;
-    Button b_qr = null;
+    ImageButton b_qr = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -47,9 +50,40 @@ public class AddFriendActivity extends AppCompatActivity
 
         t = (EditText) findViewById(R.id.friend_toxid);
         b_add = (Button) findViewById(R.id.friend_addbutton);
-        b_qr = (Button) findViewById(R.id.friend_qrbutton);
+        b_qr = (ImageButton) findViewById(R.id.friend_qrbutton);
 
         t.setText("");
+        t.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        t.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(editable.length() >= 76) {
+                    b_add.setEnabled(true);
+                } else {
+                    b_add.setEnabled(false);
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        });
     }
 
     public void read_qr_code(View v)
@@ -97,6 +131,11 @@ public class AddFriendActivity extends AppCompatActivity
         {
             setResult(RESULT_CANCELED, intent);
         }
+        finish();
+    }
+
+    public void cancel_clicked(View v)
+    {
         finish();
     }
 
