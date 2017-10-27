@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -34,6 +35,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
@@ -44,10 +46,17 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
-import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file;
+import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -63,6 +72,27 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private de.hdodenhof.circleimageview.CircleImageView avatar;
     private ImageView imageView;
     private ImageView imageView2;
+    private ImageView f_notification;
+    private TextView f_last_online_timestamp;
+    static ProgressDialog progressDialog = null;
+
+    synchronized static void remove_progress_dialog()
+    {
+        try
+        {
+            if (progressDialog != null)
+            {
+                if (FriendListHolder.progressDialog.isShowing())
+                {
+                    progressDialog.dismiss();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     public FriendListHolder(View itemView, Context c)
     {
@@ -78,15 +108,12 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.f_avatar_icon);
         imageView = (ImageView) itemView.findViewById(R.id.f_status_icon);
         imageView2 = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        f_notification = (ImageView) itemView.findViewById(R.id.f_notification);
+        f_last_online_timestamp = (TextView) itemView.findViewById(R.id.f_last_online_timestamp);
     }
 
     public void bindFriendList(FriendList fl)
     {
-        Log.i(TAG, "bindFriendList:" + fl.name);
-
         if (fl == null)
         {
             textView.setText("*ERROR*");
@@ -94,11 +121,73 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             return;
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        Log.i(TAG, "bindFriendList:" + fl.name + "alias=" + fl.alias_name);
 
         this.friendlist = fl;
 
+        itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
+
+        // Log.i(TAG, "lot=" + fl.last_online_timestamp + " -> " + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
+        if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_NOW)
+        {
+            f_last_online_timestamp.setText("now");
+        }
+        else if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
+        {
+            f_last_online_timestamp.setText("never");
+        }
+        else if (fl.last_online_timestamp > LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
+        {
+            f_last_online_timestamp.setText("" + long_date_time_format(fl.last_online_timestamp));
+        }
+        else
+        {
+            f_last_online_timestamp.setText("");
+        }
+
+
+        if (fl.notification_silent)
+        {
+            final Drawable d_notification = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_notifications_off).
+                    color(context.getResources().
+                            getColor(R.color.colorPrimaryDark)).
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+            f_notification.setImageDrawable(d_notification);
+            f_notification.setOnClickListener(this);
+        }
+        else
+        {
+            final Drawable d_notification = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_notifications_active).
+                    color(context.getResources().
+                            getColor(R.color.colorPrimaryDark)).
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
+            f_notification.setImageDrawable(d_notification);
+            f_notification.setOnClickListener(this);
+        }
+
+        final Drawable d_lock = new IconicsDrawable(context).
+                icon(FontAwesome.Icon.faw_lock).color(context.getResources().
+                getColor(R.color.colorPrimaryDark)).sizeDp(80);
+
         textView.setText(fl.name);
+        try
+        {
+            if (fl.alias_name != null)
+            {
+                if (fl.alias_name.length() > 0)
+                {
+                    textView.setText(fl.alias_name);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         statusText.setText(fl.status_message);
 
         avatar.setImageDrawable(d_lock);
@@ -133,6 +222,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 with(avatar.getContext()).
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(StringSignature2("_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
                                 placeholder(d_lock).
                                 priority(Priority.HIGH).
                                 skipMemoryCache(false).
@@ -148,6 +238,10 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         //                                    skipMemoryCache(false).
                         //                                    apply(glide_options).
                         //                                    into(avatar);
+                    }
+                    else
+                    {
+                        avatar.setImageDrawable(d_lock);
                     }
                 }
             }
@@ -177,7 +271,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             load(byteArray).
                             placeholder(d_lock).
                             diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
+                            signature(StringSignature2("_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
                             skipMemoryCache(false).
                             apply(glide_options).
                             into(avatar);
@@ -250,9 +344,57 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         Log.i(TAG, "onClick");
         try
         {
-            Intent intent = new Intent(v.getContext(), MessageListActivity.class);
-            intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(this.friendlist.tox_public_key_string));
-            v.getContext().startActivity(intent);
+            if (v.equals(f_notification))
+            {
+                if (!this.friendlist.notification_silent)
+                {
+                    this.friendlist.notification_silent = true;
+                    orma.updateFriendList().tox_public_key_stringEq(this.friendlist.tox_public_key_string).
+                            notification_silent(this.friendlist.notification_silent).execute();
+
+                    final Drawable d_notification = new IconicsDrawable(context).
+                            icon(GoogleMaterial.Icon.gmd_notifications_off).
+                            color(context.getResources().
+                                    getColor(R.color.colorPrimaryDark)).
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+                    f_notification.setImageDrawable(d_notification);
+                }
+                else
+                {
+                    this.friendlist.notification_silent = false;
+                    orma.updateFriendList().tox_public_key_stringEq(this.friendlist.tox_public_key_string).
+                            notification_silent(this.friendlist.notification_silent).execute();
+
+                    final Drawable d_notification = new IconicsDrawable(context).
+                            icon(GoogleMaterial.Icon.gmd_notifications_active).
+                            color(context.getResources().
+                                    getColor(R.color.colorPrimaryDark)).
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
+                    f_notification.setImageDrawable(d_notification);
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (progressDialog == null)
+                    {
+                        progressDialog = new ProgressDialog(this.context);
+                        progressDialog.setIndeterminate(true);
+                        progressDialog.setMessage("");
+                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    }
+                    progressDialog.show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                Intent intent = new Intent(v.getContext(), MessageListActivity.class);
+                intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(this.friendlist.tox_public_key_string));
+                v.getContext().startActivity(intent);
+            }
         }
         catch (Exception e)
         {
@@ -301,16 +443,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                                     Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
 
-                                    // delete friend -------
-                                    Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + f2.tox_public_key_string);
-                                    delete_friend(f2.tox_public_key_string);
-                                    // delete friend -------
-
-                                    // delete friends messages -------
-                                    Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
-                                    delete_friend_all_messages(friend_num_temp);
-                                    // delete friend  messages -------
-
                                     // delete friends files -------
                                     Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
                                     delete_friend_all_files(friend_num_temp);
@@ -321,6 +453,15 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     delete_friend_all_filetransfers(friend_num_temp);
                                     // delete friend  FTs -------
 
+                                    // delete friends messages -------
+                                    Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
+                                    delete_friend_all_messages(friend_num_temp);
+                                    // delete friend  messages -------
+
+                                    // delete friend -------
+                                    Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + f2.tox_public_key_string);
+                                    delete_friend(f2.tox_public_key_string);
+                                    // delete friend -------
 
                                     // delete friend - tox ----
                                     Log.i(TAG, "onMenuItemClick:4");
@@ -329,7 +470,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                         int res = tox_friend_delete(friend_num_temp);
                                         cache_pubkey_fnum.clear();
                                         cache_fnum_pubkey.clear();
-                                        update_savedata_file(); // save toxcore datafile (friend removed)
+                                        update_savedata_file_wrapper(); // save toxcore datafile (friend removed)
                                         Log.i(TAG, "onMenuItemClick:5:res=" + res);
                                     }
                                     // delete friend - tox ----

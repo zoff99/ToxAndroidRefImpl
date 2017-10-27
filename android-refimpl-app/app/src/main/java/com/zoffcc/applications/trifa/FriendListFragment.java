@@ -59,7 +59,7 @@ public class FriendListFragment extends Fragment
         // -------------------------------------------
         // -------------------------------------------
         // -------------------------------------------
-        List<FriendList> data_values = new ArrayList<FriendList>();
+        List<CombinedFriendsAndConferences> data_values = new ArrayList<CombinedFriendsAndConferences>();
         data_values.clear();
 
         listingsView = (RecyclerView) view1.findViewById(R.id.rv_list);
@@ -67,12 +67,12 @@ public class FriendListFragment extends Fragment
         listingsView.setHasFixedSize(true);
         listingsView.setLayoutManager(new LinearLayoutManager(view1.getContext()));
 
-        adapter = new FriendlistAdapter(view1.getContext(), R.layout.friend_list_entry, data_values);
+        adapter = new FriendlistAdapter(view1.getContext(), data_values);
         Log.i(TAG, "onCreateView:adapter=" + adapter);
         Log.i(TAG, "onCreateView:listingsView=" + listingsView);
         listingsView.setAdapter(adapter);
         listingsView.getRecycledViewPool().clear();
-        adapter.clear_items();
+        adapter.clear_items(); // clears friends AND conferences!!
         adapter.notifyDataSetChanged();
 
         MainActivity.friend_list_fragment = this;
@@ -88,115 +88,6 @@ public class FriendListFragment extends Fragment
     {
         Log.i(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-
-        try
-        {
-            //            RecyclerView lv = getListView();
-            //            lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
-            //            {
-            //                @Override
-            //                public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id)
-            //                {
-            //                    final int position_ = position;
-            //                    PopupMenu menu = new PopupMenu(v.getContext(), v);
-            //                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-            //                    {
-            //                        @Override
-            //                        public boolean onMenuItemClick(MenuItem item)
-            //                        {
-            //                            int id = item.getItemId();
-            //                            switch (id)
-            //                            {
-            //                                case R.id.item_info:
-            //                                    // show friend info page -----------------
-            //                                    long friend_num_temp = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
-            //                                    long friend_num_temp_safety = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
-            //
-            //                                    Log.i(TAG, "onMenuItemClick:info:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp_safety);
-            //
-            //                                    Intent intent = new Intent(main_activity_s, FriendInfoActivity.class);
-            //                                    intent.putExtra("friendnum", friend_num_temp_safety);
-            //                                    startActivityForResult(intent, FriendInfoActivity_ID);
-            //                                    // show friend info page -----------------
-            //                                    break;
-            //                                case R.id.item_delete:
-            //                                    // delete friend -----------------
-            //                                    Runnable myRunnable = new Runnable()
-            //                                    {
-            //                                        @Override
-            //                                        public void run()
-            //                                        {
-            //                                            try
-            //                                            {
-            //                                                long friend_num_temp = tox_friend_by_public_key__wrapper(data_values.get(position_).tox_public_key_string);
-            //
-            //                                                Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
-            //
-            //                                                // delete friend -------
-            //                                                Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + data_values.get(position_).tox_public_key_string);
-            //                                                delete_friend(data_values.get(position_).tox_public_key_string);
-            //                                                // delete friend -------
-            //
-            //                                                // delete friends messages -------
-            //                                                Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
-            //                                                delete_friend_all_messages(friend_num_temp);
-            //                                                // delete friend  messages -------
-            //
-            //                                                // delete friends files -------
-            //                                                Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
-            //                                                delete_friend_all_files(friend_num_temp);
-            //                                                // delete friend  files -------
-            //
-            //                                                // delete friends FTs -------
-            //                                                Log.i(TAG, "onMenuItemClick:1.d:fnum=" + friend_num_temp);
-            //                                                delete_friend_all_filetransfers(friend_num_temp);
-            //                                                // delete friend  FTs -------
-            //
-            //
-            //                                                // delete friend - tox ----
-            //                                                Log.i(TAG, "onMenuItemClick:4");
-            //                                                if (friend_num_temp > -1)
-            //                                                {
-            //                                                    int res = tox_friend_delete(friend_num_temp);
-            //                                                    cache_pubkey_fnum.clear();
-            //                                                    cache_fnum_pubkey.clear();
-            //                                                    update_savedata_file(); // save toxcore datafile (friend removed)
-            //                                                    Log.i(TAG, "onMenuItemClick:5:res=" + res);
-            //                                                }
-            //                                                // delete friend - tox ----
-            //
-            //                                                // load all friends into data list ---
-            //                                                Log.i(TAG, "onMenuItemClick:6");
-            //                                                add_all_friends_clear(200);
-            //                                                Log.i(TAG, "onMenuItemClick:7");
-            //                                                // load all friends into data list ---
-            //                                            }
-            //                                            catch (Exception e)
-            //                                            {
-            //                                                e.printStackTrace();
-            //                                                Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
-            //                                            }
-            //                                        }
-            //                                    };
-            //                                    main_handler_s.post(myRunnable);
-            //                                    // delete friend -----------------
-            //                                    break;
-            //                            }
-            //                            return true;
-            //                        }
-            //                    });
-            //                    menu.inflate(R.menu.menu_friendlist_item);
-            //                    menu.show();
-            //
-            //                    return true;
-            //                }
-            //            });
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "onCreateView:2:EE:" + e.getMessage());
-        }
 
         MainActivity.friend_list_fragment = this;
     }
@@ -224,51 +115,113 @@ public class FriendListFragment extends Fragment
         super.onAttach(activity);
     }
 
-    // -----------------
-    // actually "friendnum" is ignored here, only "f.tox_public_key_string" is used as key!!
-    // -----------------
-    synchronized void modify_friend(final FriendList f, final long friendnum)
+    synchronized void modify_friend(final CombinedFriendsAndConferences c, boolean is_friend)
     {
-        // Log.i(TAG, "modify_friend:start");
-        Runnable myRunnable = new Runnable()
+        if (is_friend)
         {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    final FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).toList().get(0);
-                    if (f2 != null)
-                    {
-                        FriendList n = deep_copy(f2);
-                        boolean found_friend = adapter.update_item(n);
-                        // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
+            final FriendList f = c.friend_item;
 
-                        if (!found_friend)
+            // Log.i(TAG, "modify_friend:start");
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        final FriendList f2 = orma.selectFromFriendList().
+                                tox_public_key_stringEq(f.tox_public_key_string).
+                                toList().get(0);
+
+                        if (f2 != null)
                         {
-                            adapter.add_item(n);
-                            // Log.i(TAG, "modify_friend:add_item");
+                            FriendList n = deep_copy(f2);
+                            CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                            cfac.is_friend = true;
+                            cfac.friend_item = n;
+                            boolean found_friend = adapter.update_item(cfac, cfac.is_friend);
+                            // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
+
+                            if (!found_friend)
+                            {
+                                adapter.add_item(cfac);
+                                // Log.i(TAG, "modify_friend:add_item");
+                            }
                         }
                     }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
-                catch (Exception e)
+            };
+
+            try
+            {
+                if (main_handler_s != null)
                 {
-                    e.printStackTrace();
+                    main_handler_s.post(myRunnable);
                 }
             }
-        };
-
-        try
-        {
-            if (main_handler_s != null)
+            catch (Exception e)
             {
-                main_handler_s.post(myRunnable);
+                e.printStackTrace();
+                Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
             }
         }
-        catch (Exception e)
+        else // is conference
         {
-            e.printStackTrace();
-            Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
+            final ConferenceDB cc = c.conference_item;
+
+            // Log.i(TAG, "modify_friend:start");
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
+                        // and().
+                        final ConferenceDB conf2 = orma.selectFromConferenceDB().
+                                conference_identifierEq(cc.conference_identifier).
+                                toList().get(0);
+
+                        if (conf2 != null)
+                        {
+                            ConferenceDB n = ConferenceDB.deep_copy(conf2);
+                            CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                            cfac.is_friend = false;
+                            cfac.conference_item = n;
+                            boolean found_friend = adapter.update_item(cfac, cfac.is_friend);
+                            // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
+
+                            if (!found_friend)
+                            {
+                                adapter.add_item(cfac);
+                                // Log.i(TAG, "modify_friend:add_item");
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            try
+            {
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
+            }
         }
     }
 
@@ -282,6 +235,15 @@ public class FriendListFragment extends Fragment
     @Override
     public void onResume()
     {
+        try
+        {
+            FriendListHolder.remove_progress_dialog();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         Log.i(TAG, "onResume");
         super.onResume();
 
@@ -289,7 +251,12 @@ public class FriendListFragment extends Fragment
         {
             // reload friendlist
             Log.i(TAG, "onResume:AA");
-            List<FriendList> fl = orma.selectFromFriendList().toList();
+            List<FriendList> fl = orma.selectFromFriendList().
+                    orderByTOX_CONNECTIONDesc().
+                    orderByNotification_silentAsc().
+                    orderByLast_online_timestampDesc().
+                    toList();
+
             if (fl != null)
             {
                 Log.i(TAG, "onResume:fl.size=" + fl.size());
@@ -299,11 +266,38 @@ public class FriendListFragment extends Fragment
                     for (i = 0; i < fl.size(); i++)
                     {
                         FriendList n = deep_copy(fl.get(i));
-                        modify_friend(n, -1);
-                        Log.i(TAG, "onResume:modify_friend:" + n);
+                        final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                        cc.is_friend = true;
+                        cc.friend_item = n;
+                        modify_friend(cc, cc.is_friend);
+                        // Log.i(TAG, "onResume:modify_friend:" + n);
                     }
                 }
             }
+
+            // reload conferences
+            List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                    orderByConference_activeDesc().
+                    orderByNotification_silentAsc().
+                    toList();
+
+            if (confs != null)
+            {
+                if (confs.size() > 0)
+                {
+                    int i = 0;
+                    for (i = 0; i < confs.size(); i++)
+                    {
+                        ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
+                        CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                        cfac.is_friend = false;
+                        cfac.conference_item = n;
+                        modify_friend(cfac, cfac.is_friend);
+                        // Log.i(TAG, "onResume:modify_friend:" + n);
+                    }
+                }
+            }
+
             Log.i(TAG, "onResume:BB");
         }
         catch (Exception e)
@@ -312,19 +306,6 @@ public class FriendListFragment extends Fragment
         }
 
         MainActivity.friend_list_fragment = this;
-    }
-
-    void clear_friends()
-    {
-        // Log.i(TAG, "clear_friends");
-        adapter.clear_items();
-    }
-
-    void add_friends_clear(final FriendList f)
-    {
-        // Log.i(TAG, "add_friends_clear");
-        adapter.clear_items();
-        adapter.add_item(f);
     }
 
     synchronized void add_all_friends_clear(final int delay)
@@ -350,8 +331,13 @@ public class FriendListFragment extends Fragment
 
                             Thread.sleep(delay);
 
-                            adapter.clear_items();
-                            List<FriendList> fl = orma.selectFromFriendList().toList();
+                            adapter.clear_items(); // clears friends AND conferences!!
+                            List<FriendList> fl = orma.selectFromFriendList().
+                                    orderByTOX_CONNECTIONDesc().
+                                    orderByNotification_silentAsc().
+                                    orderByLast_online_timestampDesc().
+                                    toList();
+
                             if (fl != null)
                             {
                                 // Log.i(TAG, "add_all_friends_clear:fl.size=" + fl.size());
@@ -360,12 +346,38 @@ public class FriendListFragment extends Fragment
                                     int i = 0;
                                     for (i = 0; i < fl.size(); i++)
                                     {
-                                        FriendList n = deep_copy(fl.get(i));
-                                        adapter.add_item(n);
+                                        FriendList n = FriendList.deep_copy(fl.get(i));
+                                        CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                        cfac.is_friend = true;
+                                        cfac.friend_item = n;
+                                        adapter.add_item(cfac);
                                         // Log.i(TAG, "add_all_friends_clear:add:" + n);
                                     }
                                 }
                             }
+
+                            List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                                    orderByConference_activeDesc().
+                                    orderByNotification_silentAsc().
+                                    toList();
+
+                            if (confs != null)
+                            {
+                                if (confs.size() > 0)
+                                {
+                                    int i = 0;
+                                    for (i = 0; i < confs.size(); i++)
+                                    {
+                                        ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
+                                        CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                        cfac.is_friend = false;
+                                        cfac.conference_item = n;
+                                        adapter.add_item(cfac);
+                                        // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                    }
+                                }
+                            }
+
                         }
                     }
                 }
@@ -386,33 +398,6 @@ public class FriendListFragment extends Fragment
             main_handler_s.post(myRunnable);
         }
         // Log.i(TAG, "add_all_friends_clear:B:");
-    }
-
-    void add_friends(final FriendList f)
-    {
-        // Log.i(TAG, "add_friends");
-        Runnable myRunnable = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    FriendList n = deep_copy(f);
-                    adapter.add_item(n);
-                    // adapter.notifyDataSetChanged();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        if (main_handler_s != null)
-        {
-            main_handler_s.post(myRunnable);
-        }
     }
 
     // name is confusing, just update all friends!! already set to offline in DB

@@ -47,7 +47,7 @@ public class FileDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String file_name = "";
 
-    @Column(defaultExpr = "-1")
+    @Column(defaultExpr = "-1", indexed = true, helpers = Column.Helpers.ALL)
     long filesize = -1;
 
     @Column(indexed = true, defaultExpr = "true", helpers = Column.Helpers.ALL)

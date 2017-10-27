@@ -31,6 +31,7 @@ import com.l4digital.fastscroll.FastScroller;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.only_date_time_format;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
@@ -41,6 +42,12 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     private final List<Message> messagelistitems;
     private Context context;
+    private Message getSectionText_message_object = null;
+    private Message getSectionText_message_object2 = null;
+    long getSectionText_message_object_ts = -1L;
+    long getSectionText_message_object_ts2 = -1L;
+    String getSectionText_message_object_ts_string = " ";
+    String getSectionText_message_object_ts_string2 = " ";
 
 
     public MessagelistAdapter(Context context, List<Message> items)
@@ -65,7 +72,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 return new MessageListHolder_text_incoming_not_read(view, this.context);
             case Message_model.TEXT_INCOMING_HAVE_READ:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
-                return new MessageListHolder_text_incoming_read(view, this.context);
+                return new MessageListHolder_text_incoming_read___unused___(view, this.context);
 
             case Message_model.TEXT_OUTGOING_NOT_READ:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent, false);
@@ -245,7 +252,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                     ((MessageListHolder_text_incoming_not_read) holder).bindMessageList(m2);
                     break;
                 case Message_model.TEXT_INCOMING_HAVE_READ:
-                    ((MessageListHolder_text_incoming_read) holder).bindMessageList(m2);
+                    ((MessageListHolder_text_incoming_read___unused___) holder).bindMessageList(m2);
                     break;
                 case Message_model.TEXT_OUTGOING_NOT_READ:
                     ((MessageListHolder_text_outgoing_not_read) holder).bindMessageList(m2);
@@ -292,7 +299,15 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         {
             Log.i(TAG, "onBindViewHolder:EE1:" + e.getMessage());
             e.printStackTrace();
-            ((MessageListHolder_error) holder).bindMessageList(null);
+            try
+            {
+                ((MessageListHolder_error) holder).bindMessageList(null);
+            }
+            catch (Exception e22)
+            {
+                e22.printStackTrace();
+                Log.i(TAG, "onBindViewHolder:EE22:" + e.getMessage());
+            }
         }
     }
 
@@ -312,11 +327,11 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     public void add_list_clear(List<Message> new_items)
     {
-        Log.i(TAG, "add_list_clear:" + new_items);
+        // Log.i(TAG, "add_list_clear:" + new_items);
 
         try
         {
-            Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
+            // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
             this.notifyDataSetChanged();
@@ -353,6 +368,11 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     //        this.notifyDataSetChanged();
     //    }
 
+    synchronized public void redraw_all_items()
+    {
+        this.notifyDataSetChanged();
+    }
+
     synchronized public boolean update_item(final Message new_item)
     {
         // Log.i(TAG, "update_item:" + new_item);
@@ -388,9 +408,118 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         return found_item;
     }
 
+    synchronized public void remove_item(final Message del_item)
+    {
+        boolean found_item = false;
+
+        try
+        {
+            Iterator it = this.messagelistitems.iterator();
+            while (it.hasNext())
+            {
+                Message m2 = (Message) it.next();
+
+                if (m2.id == del_item.id)
+                {
+                    found_item = true;
+                    int pos = this.messagelistitems.indexOf(m2);
+                    // Log.i(TAG, "update_item:003:" + pos);
+                    this.messagelistitems.remove(pos);
+                    this.notifyItemRemoved(pos);
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update_item:EE:" + e.getMessage());
+        }
+    }
+
     @Override
     public String getSectionText(int position)
     {
-        return " ";
+        try
+        {
+            getSectionText_message_object = messagelistitems.get(position);
+
+            if (getSectionText_message_object.direction == 0)
+            {
+                // incoming msg
+                if (getSectionText_message_object.rcvd_timestamp == getSectionText_message_object_ts)
+                {
+                    return getSectionText_message_object_ts_string;
+                }
+                else
+                {
+                    getSectionText_message_object_ts = getSectionText_message_object.rcvd_timestamp;
+                    getSectionText_message_object_ts_string = "  " + only_date_time_format(getSectionText_message_object.rcvd_timestamp) + "          ";
+                    return getSectionText_message_object_ts_string;
+                }
+            }
+            else
+            {
+                // outgoing msg
+                if (getSectionText_message_object.sent_timestamp == getSectionText_message_object_ts)
+                {
+                    return getSectionText_message_object_ts_string;
+                }
+                else
+                {
+                    getSectionText_message_object_ts = getSectionText_message_object.sent_timestamp;
+                    getSectionText_message_object_ts_string = "  " + only_date_time_format(getSectionText_message_object.sent_timestamp) + "          ";
+                    return getSectionText_message_object_ts_string;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return " ";
+        }
     }
+
+    public String getDateHeaderText(int position)
+    {
+        try
+        {
+            getSectionText_message_object2 = messagelistitems.get(position);
+
+            if (getSectionText_message_object2.direction == 0)
+            {
+                // incoming msg
+                if (getSectionText_message_object2.rcvd_timestamp == getSectionText_message_object_ts2)
+                {
+                    return getSectionText_message_object_ts_string2;
+                }
+                else
+                {
+                    getSectionText_message_object_ts2 = getSectionText_message_object2.rcvd_timestamp;
+                    getSectionText_message_object_ts_string2 = "" + only_date_time_format(getSectionText_message_object2.rcvd_timestamp);
+                    return getSectionText_message_object_ts_string2;
+                }
+            }
+            else
+            {
+                // outgoing msg
+                if (getSectionText_message_object2.sent_timestamp == getSectionText_message_object_ts2)
+                {
+                    return getSectionText_message_object_ts_string2;
+                }
+                else
+                {
+                    getSectionText_message_object_ts2 = getSectionText_message_object2.sent_timestamp;
+                    getSectionText_message_object_ts_string2 = "" + only_date_time_format(getSectionText_message_object2.sent_timestamp);
+                    return getSectionText_message_object_ts_string2;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return " ";
+        }
+    }
+
 }
