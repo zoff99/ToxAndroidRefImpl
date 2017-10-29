@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -30,14 +31,15 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+
+import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
 
 public class AddFriendActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.AddFrdActivity";
     EditText toxid_text = null;
     Button button_add = null;
-    ImageButton button_scan_qr = null;
+    TextInputLayout friend_toxid_inputlayout = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -50,22 +52,39 @@ public class AddFriendActivity extends AppCompatActivity
 
         toxid_text = (EditText) findViewById(R.id.friend_toxid);
         button_add = (Button) findViewById(R.id.friend_addbutton);
-        button_scan_qr = (ImageButton) findViewById(R.id.friend_qrbutton);
+        friend_toxid_inputlayout = (TextInputLayout) findViewById(R.id.friend_toxid_inputlayout);
 
         toxid_text.setText("");
+        // friend_toxid_inputlayout.setError("No ToxID");
+        friend_toxid_inputlayout.setError(null);
 
         toxid_text.addTextChangedListener(new TextWatcher()
         {
             @Override
             public void afterTextChanged(Editable editable)
             {
-                if (editable.length() >= 76)
+                if (editable.length() == (TOX_ADDRESS_SIZE * 2))
                 {
                     button_add.setEnabled(true);
+                    friend_toxid_inputlayout.setErrorEnabled(false);
+                }
+                else if (editable.length() == ((TOX_ADDRESS_SIZE * 2) + "tox:".length()))
+                {
+                    // TODO: acutally see if editable starts with "tox:", but it can be in any case (ToX: or toX: or TOX: ....)
+                    button_add.setEnabled(true);
+                    friend_toxid_inputlayout.setErrorEnabled(false);
                 }
                 else
                 {
                     button_add.setEnabled(false);
+                    if (editable.length() > 0)
+                    {
+                        friend_toxid_inputlayout.setError("incorrect ToxID");
+                    }
+                    else
+                    {
+                        friend_toxid_inputlayout.setError("No ToxID");
+                    }
                 }
             }
 
