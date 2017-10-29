@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        android:layout_alignParentTop="true"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <TextView
         android:id="@+id/ToxIDTextView"
@@ -22,13 +19,13 @@
         android:layout_height="wrap_content"
 
         android:layout_below="@+id/toolbar"
-        android:text="Tox ID" />
+        android:text="Tox ID"/>
 
     <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/ToxIDTextView"
-        android:id="@+id/relativeLayout">
+        android:layout_below="@+id/ToxIDTextView">
 
         <EditText
             android:id="@+id/friend_toxid"
@@ -38,7 +35,7 @@
             android:layout_marginTop="20dp"
             android:layout_toLeftOf="@+id/friend_qrbutton"
             android:contentDescription="Tox ID"
-            android:textSize="12sp" />
+            android:textSize="12sp"/>
 
         <ImageButton
             android:id="@+id/friend_qrbutton"
@@ -50,7 +47,7 @@
             android:onClick="read_qr_code"
             android:padding="0dp"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/qr" />
+            app:srcCompat="@drawable/friend_add_qr_icon"/>
 
         <TextView
             android:id="@+id/textView"
@@ -60,7 +57,7 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/friend_qrbutton"
             android:layout_marginTop="66dp"
-            android:text="@string/add_friend_activity_help" />
+            android:text="@string/add_friend_activity_help"/>
 
     </RelativeLayout>
 
@@ -82,14 +79,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="cancel_clicked"
-            android:text="@string/cancel" />
+            android:text="@string/cancel"/>
 
         <View
             android:layout_width="1dp"
             android:layout_height="fill_parent"
             android:layout_marginBottom="7dp"
             android:layout_marginTop="7dp"
-            android:background="#1f000000" />
+            android:background="#1f000000"/>
 
         <Button
             android:id="@+id/friend_addbutton"
@@ -99,7 +96,7 @@
             android:layout_weight="1"
             android:enabled="false"
             android:onClick="add_friend_clicked"
-            android:text="@string/add_friend_activity_add" />
+            android:text="@string/add_friend_activity_add"/>
     </LinearLayout>
 
 </RelativeLayout>
