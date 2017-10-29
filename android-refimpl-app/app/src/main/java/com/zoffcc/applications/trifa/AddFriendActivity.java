@@ -35,9 +35,9 @@ import android.widget.ImageButton;
 public class AddFriendActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.AddFrdActivity";
-    EditText t = null;
-    Button b_add = null;
-    ImageButton b_qr = null;
+    EditText toxid_text = null;
+    Button button_add = null;
+    ImageButton button_scan_qr = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -48,26 +48,36 @@ public class AddFriendActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        t = (EditText) findViewById(R.id.friend_toxid);
-        b_add = (Button) findViewById(R.id.friend_addbutton);
-        b_qr = (ImageButton) findViewById(R.id.friend_qrbutton);
+        toxid_text = (EditText) findViewById(R.id.friend_toxid);
+        button_add = (Button) findViewById(R.id.friend_addbutton);
+        button_scan_qr = (ImageButton) findViewById(R.id.friend_qrbutton);
 
-        t.setText("");
+        toxid_text.setText("");
 
-        t.addTextChangedListener(new TextWatcher() {
+        toxid_text.addTextChangedListener(new TextWatcher()
+        {
             @Override
-            public void afterTextChanged(Editable editable) {
-                if(editable.length() >= 76) {
-                    b_add.setEnabled(true);
-                } else {
-                    b_add.setEnabled(false);
+            public void afterTextChanged(Editable editable)
+            {
+                if (editable.length() >= 76)
+                {
+                    button_add.setEnabled(true);
+                }
+                else
+                {
+                    button_add.setEnabled(false);
                 }
             }
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+            }
         });
     }
 
@@ -99,9 +109,9 @@ public class AddFriendActivity extends AppCompatActivity
     {
         Intent intent = new Intent();
         boolean toxid_ok = false;
-        if (t.getText() != null)
+        if (toxid_text.getText() != null)
         {
-            if (t.getText().length() > 0)
+            if (toxid_text.getText().length() > 0)
             {
                 toxid_ok = true;
             }
@@ -109,7 +119,7 @@ public class AddFriendActivity extends AppCompatActivity
 
         if (toxid_ok == true)
         {
-            intent.putExtra("toxid", t.getText().toString());
+            intent.putExtra("toxid", toxid_text.getText().toString());
             setResult(RESULT_OK, intent);
         }
         else
@@ -134,7 +144,7 @@ public class AddFriendActivity extends AppCompatActivity
             {
                 String contents = data.getStringExtra("SCAN_RESULT");
                 String format = data.getStringExtra("SCAN_RESULT_FORMAT");
-                t.setText(contents);
+                toxid_text.setText(contents);
             }
         }
     }
