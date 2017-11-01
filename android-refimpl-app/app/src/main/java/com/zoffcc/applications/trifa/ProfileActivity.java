@@ -21,6 +21,8 @@ package com.zoffcc.applications.trifa;
 
 import android.content.ClipData;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -53,6 +55,7 @@ import java.io.File;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
@@ -66,8 +69,10 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_STATUS_MESSAGE_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NAME_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_STATUS_MESSAGE_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 
 public class ProfileActivity extends AppCompatActivity
 {
@@ -79,8 +84,10 @@ public class ProfileActivity extends AppCompatActivity
     EditText mystatus_message_edittext = null;
     Button new_nospam_button = null;
     Button copy_toxid_button = null;
+    ImageView my_identicon_imageview = null;
 
     static Handler profile_handler_s = null;
+    Identicon.Identicon_data id_data = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -93,6 +100,7 @@ public class ProfileActivity extends AppCompatActivity
         mytoxid_textview = (TextView) findViewById(R.id.mytoxid_textview);
         mynick_edittext = (EditText) findViewById(R.id.mynick_edittext);
         mystatus_message_edittext = (EditText) findViewById(R.id.mystatus_message_edittext);
+        my_identicon_imageview = (ImageView) findViewById(R.id.my_identicon_imageview);
 
         new_nospam_button = (Button) findViewById(R.id.new_nospam_button);
         copy_toxid_button = (Button) findViewById(R.id.copy_toxid_button);
@@ -267,6 +275,81 @@ public class ProfileActivity extends AppCompatActivity
                 e2.printStackTrace();
             }
 
+        }
+
+        try
+        {
+            // id_data = Identicon.create_identicon(MainActivity.get_my_toxid().substring(0, (TOX_PUBLIC_KEY_SIZE * 2)));
+            // id_data = Identicon.create_identicon(MainActivity.get_my_toxid().substring(1, (TOX_ADDRESS_SIZE * 2)));
+            id_data = Identicon.create_identicon(MainActivity.get_my_toxid());
+
+            int w = my_identicon_imageview.getWidth();
+            int h = my_identicon_imageview.getHeight();
+
+            if ((w == 0) || (h == 0))
+            {
+                w = 400;
+                h = 400;
+            }
+
+            Log.i(TAG, "update_toxid_display:w=" + w);
+            Log.i(TAG, "update_toxid_display:h=" + w);
+
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+            Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+            Canvas canvas = new Canvas(bmp);
+
+            Paint p0 = new Paint();
+            p0.setColor(id_data.color_a);
+            p0.setStyle(Paint.Style.FILL);
+
+            Paint p1 = new Paint();
+            p1.setColor(id_data.color_b);
+            p1.setStyle(Paint.Style.FILL);
+
+            int x1 = 0;
+            int y1 = 0;
+            int x2 = 0;
+            int y2 = 0;
+            int dot_width = w / IDENTICON_ROWS;
+            int dot_height = h / IDENTICON_ROWS;
+            int columnIdx;
+
+            Log.i(TAG, "update_toxid_display:dot_width=" + dot_width + " ACTIVE_COLS=" + IDENTICON_ROWS);
+            Log.i(TAG, "update_toxid_display:dot_height=" + dot_height + " IDENTICON_ROWS=" + IDENTICON_ROWS);
+
+            for (int row = 0; row < IDENTICON_ROWS; ++row)
+            {
+                for (int col = 0; col < IDENTICON_ROWS; ++col)
+                {
+                    columnIdx = Math.abs((col * 2 - (IDENTICON_ROWS - 1)) / 2);
+                    Log.i(TAG, "update_toxid_display:col=" + col + " columnIdx=" + columnIdx + " row=" + row);
+
+                    x1 = col * dot_width;
+                    x2 = (col + 1) * dot_width;
+                    y1 = row * dot_height;
+                    y2 = (row + 1) * dot_height;
+
+                    Log.i(TAG, "update_toxid_display:x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2=" + y2);
+
+                    if (id_data.dot_color[row][columnIdx] == true)
+                    {
+                        canvas.drawRect(x1, y1, x2, y2, p1);
+                    }
+                    else
+                    {
+                        canvas.drawRect(x1, y1, x2, y2, p0);
+                    }
+                }
+            }
+
+            my_identicon_imageview.setImageBitmap(bmp);
+            my_identicon_imageview.invalidate();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update_toxid_display:EE:" + e.getMessage());
         }
     }
 

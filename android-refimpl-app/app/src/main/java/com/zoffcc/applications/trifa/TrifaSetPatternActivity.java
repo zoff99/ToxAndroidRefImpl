@@ -124,4 +124,16 @@ public class TrifaSetPatternActivity extends SetPatternActivity
             throw new RuntimeException(e);
         }
     }
+
+    public static byte[] md5(byte[] input)
+    {
+        try
+        {
+            return MessageDigest.getInstance("MD5").digest(input);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 }

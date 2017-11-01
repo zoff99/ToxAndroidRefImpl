@@ -169,6 +169,15 @@
                 android:paddingTop="15dp"
                 android:src="@mipmap/ic_launcher_round"/>
 
+            <ImageView
+                android:id="@+id/my_identicon_imageview"
+                android:layout_width="190dp"
+                android:layout_height="190dp"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="15dp"
+                android:paddingTop="15dp"
+                android:src="@mipmap/ic_launcher_round"/>
+
 
         </LinearLayout>
 
