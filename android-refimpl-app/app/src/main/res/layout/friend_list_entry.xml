@@ -32,7 +32,7 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/f_avatar_icon"
-            android:layout_width="35dp"
+            android:layout_width="65dp"
             android:layout_height="fill_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
@@ -40,29 +40,19 @@
             android:layout_toRightOf="@id/f_notification"
             android:src="@drawable/circle_blue"
             app:civ_border_color="#40000000"
-            app:civ_border_width="2dp"/>
-
-        <ImageView
-            android:id="@+id/f_status_icon"
-            android:layout_width="18dp"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="6dip"
-            android:layout_toRightOf="@id/f_avatar_icon"
-            android:scaleType="centerInside"
-            android:src="@drawable/circle_red"/>
+            app:civ_border_width="2dp" />
 
         <ImageView
             android:id="@+id/f_user_status_icon"
-            android:layout_width="10dp"
+            android:layout_width="15dp"
             android:layout_height="fill_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
+            android:layout_marginLeft="-23dip"
             android:layout_marginRight="6dip"
-            android:layout_toRightOf="@id/f_status_icon"
-            android:scaleType="centerInside"
-            android:src="@drawable/circle_green"/>
+            android:layout_toRightOf="@id/f_avatar_icon"
+            android:scaleType="fitEnd"
+            android:src="@drawable/circle_green" />
 
 
         <TextView

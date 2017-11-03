@@ -70,7 +70,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private TextView statusText;
     private TextView unread_count;
     private de.hdodenhof.circleimageview.CircleImageView avatar;
-    private ImageView imageViewConnectionStatus;
     private ImageView imageViewUserStatus;
     private ImageView f_notification;
     private TextView f_last_online_timestamp;
@@ -106,7 +105,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         statusText = (TextView) itemView.findViewById(R.id.f_status_message);
         unread_count = (TextView) itemView.findViewById(R.id.f_unread_count);
         avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.f_avatar_icon);
-        imageViewConnectionStatus = (ImageView) itemView.findViewById(R.id.f_status_icon);
         imageViewUserStatus = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
         f_notification = (ImageView) itemView.findViewById(R.id.f_notification);
         f_last_online_timestamp = (TextView) itemView.findViewById(R.id.f_last_online_timestamp);
@@ -286,11 +284,11 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         if (fl.TOX_CONNECTION == 0)
         {
-            imageViewConnectionStatus.setImageResource(R.drawable.circle_red);
+            imageViewUserStatus.setVisibility(View.INVISIBLE);
         }
         else
         {
-            imageViewConnectionStatus.setImageResource(R.drawable.circle_green);
+            imageViewUserStatus.setVisibility(View.VISIBLE);
         }
 
         if (fl.TOX_USER_STATUS == 0)
