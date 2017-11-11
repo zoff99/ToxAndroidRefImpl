@@ -58,7 +58,9 @@ now draw those dots on a raster like:
 | row4/col0 | * | * | * | row4/col4 |
 
 
+
 ### example:
+
 Echobot ***Tox ID*** 76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C48A39218F515C39A6
 
 #### steps to create the needed color values
@@ -80,6 +82,7 @@ Echobot ***Tox ID*** 76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C
 12) ***sat_color_2*** = [0.0 .. 1.0] 0.5 [50 %]
 13) ***color2_rbg*** = [r, g, b] 214, 178, 229
 <br>
+
 ### example:
 
 ```
