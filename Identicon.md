@@ -48,14 +48,13 @@ for (row = 0; row < 5; ++row)
 
 now draw those dots on a raster like:
 
-| Component   |            |     |
-| ----------- | ----------:| ---:|
-| VirtualBox  | [https://www.virtualbox.org/] ||
-| Vagrant     | [https://www.vagrantup.com/] ||
-| git         | [https://en.wikipedia.org/wiki/Git_%28software%29] ||
-| circle.yml  | inside the source repository (for build commands) ||
-| Diskspace   | minimum 20GByte free ||
-| RAM         | minimum 8GByte ||
+|    |            |     | ||
+| ----------- | ----------:| ---:|---:|---:|
+| row0/col0  | * | * | * | * |
+| * | * | * | * | * |
+| * | * | * | * | * |
+| * | * | * | * | * |
+| * | * | * | * | * |
 
 
 ### example:
