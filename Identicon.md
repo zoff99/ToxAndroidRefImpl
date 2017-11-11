@@ -13,7 +13,7 @@
 7) convert ***[]_color1*** to RGB = ***color1_rbg***
 <br>
 
-8) last 12 bytes of ***hash_01*** and then last 6 bytes of that = ***hashpart_02***
+8) last 12 bytes of ***hash_01*** and then the first 6 bytes of that = ***hashpart_02***
 9) convert ***hashpart_02*** to number (unsigned) = ***hue_02***
 10) ***hue_color_2*** = ***hue_02*** / 281474976710655.0
 11) ***lig_color_2*** = 0.8
