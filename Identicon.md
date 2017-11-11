@@ -28,15 +28,15 @@ Echobot ***Tox ID*** 76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C
 2) ***hashpart_01*** = 0dfd3529e5b7
 3) ***hue_01*** = 15381169825207
 3) ***hue_color_1*** = [0.0 .. 1.0] 0.054644894 [~ 19.6175 °]
-5) ***lig_color_1*** = [0 .. 100 %] 0.3 [30 %]
-6) ***sat_color_1*** = [0 .. 100 %] 0.5 [50 %]
+5) ***lig_color_1*** = [0.0 .. 1.0] 0.3 [30 %]
+6) ***sat_color_1*** = [0.0 .. 1.0] 0.5 [50 %]
 7) ***color1_rbg*** = [r, g, b] 114, 63, 38
 
 8) ***hashpart_02*** = c8ec3bd778f9
 9) ***hue_02*** = 220916941814009
 10) ***hue_color_2*** = [0.0 .. 1.0] 0.78485465 [~ 281.7628 °]
-11) ***lig_color_2*** = [0 .. 100 %] 0.8 [80 %]
-12) ***sat_color_2*** = [0 .. 100 %] 0.5 [50 %]
+11) ***lig_color_2*** = [0.0 .. 1.0] 0.8 [80 %]
+12) ***sat_color_2*** = [0.0 .. 1.0] 0.5 [50 %]
 13) ***color2_rbg*** = [r, g, b] 214, 178, 229
 
 
@@ -46,6 +46,10 @@ Echobot ***Tox ID*** 76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C
 
 http://www.rapidtables.com/convert/color/hsl-to-rgb.htm
 
+Resulting Identicon for square images:
+
 <img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/Identicon_spec_dra/echobot_identicon_sqaure.png" width="200">
 
+Resulting Identicon for round images:
+*fill background with ***color1_rbg*** *
 <img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/Identicon_spec_dra/echobot_identicon_round.png" width="200">
