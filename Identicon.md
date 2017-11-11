@@ -96,10 +96,11 @@ for (row = 0; row < 5; ++row)
     // byte_used = 0x37
 
     color_used = byte_used % 2
-    // color_used = 1
+    // color_used = 1 // lighter color
 
     if (color_used == 0)
     {
+       // left upper dot has the ligher color
        dot has color **color1_rbg**
     }
     else
