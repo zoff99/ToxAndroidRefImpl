@@ -1,7 +1,10 @@
 ## Tox Default Avatar ( = Identicon)
 
 
-### aa
+### steps to create the needed values
+
+* use the ***Tox-Public-key*** as start input
+* calculate the SHA-256 of ***Tox-Public-key*** = ***hash_01***
 
 
 example Echobot:
