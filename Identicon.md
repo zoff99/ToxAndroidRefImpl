@@ -1,3 +1,3 @@
-Tox Default Avatar ( = Identicon)
-=
+## Tox Default Avatar ( = Identicon)
+
 
