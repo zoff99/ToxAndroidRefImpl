@@ -47,25 +47,18 @@ public class Identicon
 
         Log.i(TAG, "create_identicon:in=" + input);
         byte[] hash = TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(input));
-        Log.i(TAG, "create_identicon:hash=" + hash.toString() + " len=" + hash.length);
+        Log.i(TAG, "create_identicon:hash=" + bytesToHex(hash).toLowerCase() + " len=" + hash.length);
+        Log.i(TAG, "create_identicon:    =43252927de957f70158794c0d919be2ba2b4c0583edc675d354379d2cb856b57");
 
         int c[] = new int[COLORS];
 
-        byte[] hashPart = new byte[IDENTICON_COLOR_BYTES];
-
-        for (int j = 0; j < IDENTICON_COLOR_BYTES; j++)
+        for (int colorIndex = 0; colorIndex < COLORS; colorIndex++)
         {
-            Log.i(TAG, "create_identicon:loop:j=" + j + " hash.length=" + hash.length + " val=" + (hash.length - IDENTICON_COLOR_BYTES + j));
-            // hashPart[j] = hash[hash.length - IDENTICON_COLOR_BYTES + j];
-            hashPart[j] = hash[j];
-        }
-        Log.i(TAG, "create_identicon:hashPart=" + hashPart);
+            // 79d2cb856b57
+            String hashpart_as_hex_string = bytesToHex(hash).toLowerCase().
+                    substring(bytesToHex(hash).length() - (12 * (colorIndex + 1)), bytesToHex(hash).length() - (12 * colorIndex));
 
-
-        for (int colorIndex = 0; colorIndex < COLORS; ++colorIndex)
-        {
-
-            float hue = bytesToColor(hashPart, hashPart.length);
+            float hue = bytesToColor(hashpart_as_hex_string);
             Log.i(TAG, "create_identicon:hue=" + hue);
 
             // change offset when COLORS != 2
@@ -83,6 +76,10 @@ public class Identicon
 
         ret.dot_color = new boolean[IDENTICON_ROWS][ACTIVE_COLS];
 
+        // 43252927de957f70158794c0d919be2ba2b4c058
+        String first_20_hex_bytes = bytesToHex(hash).toLowerCase().substring(0, 40);
+        Log.i(TAG, "create_identicon:20bytes=" + first_20_hex_bytes);
+
         // compute the block colors from the hash
         for (int row = 0; row < IDENTICON_ROWS; ++row)
         {
@@ -90,22 +87,19 @@ public class Identicon
             {
                 Log.i(TAG, "create_identicon:col=" + col + " row=" + row);
                 int hashIdx = row * ACTIVE_COLS + col;
+
                 Log.i(TAG, "create_identicon:hashIdx=" + hashIdx);
-                if (hashIdx >= IDENTICON_COLOR_BYTES)
-                {
-                    hashIdx = hashIdx - IDENTICON_COLOR_BYTES;
-                }
-                if (hashIdx >= IDENTICON_COLOR_BYTES)
-                {
-                    hashIdx = hashIdx - IDENTICON_COLOR_BYTES;
-                }
-                Log.i(TAG, "create_identicon:hashIdx=" + hashIdx);
-                Log.i(TAG, "create_identicon:hashPart[hashIdx]=" + hashPart[hashIdx]);
-                Log.i(TAG, "create_identicon:hashPart[hashIdx]=" + bytesChr(hashPart[hashIdx]));
-                int colorIndex = (hashPart[hashIdx]) % COLORS;
+                String cur_hex_byte = first_20_hex_bytes.substring(hashIdx * 2, (hashIdx * 2) + 2);
+                Log.i(TAG, "create_identicon:cur_hex_byte=" + cur_hex_byte);
+
+                int right_most_bit = Integer.decode("0x" + cur_hex_byte);
+                Log.i(TAG, "create_identicon:bin=" + right_most_bit);
+
+                int colorIndex = right_most_bit % COLORS;
+
                 Log.i(TAG, "create_identicon:colorIndex=" + colorIndex);
 
-                if (colorIndex == 0)
+                if (colorIndex == 1)
                 {
                     ret.dot_color[row][col] = false;
                 }
@@ -119,46 +113,71 @@ public class Identicon
         return ret;
     }
 
-    public static long getUnsignedInt(int x)
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+    public static String bytesToHex(byte[] bytes)
     {
-        return x & 0x00000000ffffffffL;
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++)
+        {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 
     static int bytesChr(byte data)
     {
-        Byte b = new Byte(data);
-        int reta = b.intValue() + 128;
+        int reta = data;
+        if (reta < 0)
+        {
+            // convert to unsigned int
+            reta = 256 + data;
+        }
         Log.i(TAG, "bytesChr:ret[a]=" + reta);
-        // long retb = getUnsignedInt(reta);
-        // long retb = reta;
-        // Log.i(TAG, "bytesChr:ret[b]=" + retb);
-
         return reta;
     }
 
+    //    static String integerToBinary(int in)
+    //    {
+    //        return Integer.toBinaryString(in);
+    //    }
+    //
+    //    static int binaryToInteger(String binary)
+    //    {
+    //        char[] numbers = binary.toCharArray();
+    //        int result = 0;
+    //        for (int i = numbers.length - 1; i >= 0; i--)
+    //        {
+    //            if (numbers[i] == '1')
+    //            {
+    //                result += Math.pow(2, (numbers.length - i - 1));
+    //            }
+    //        }
+    //        return result;
+    //    }
+
     /**
-     * @param data_bytes Bytes to convert to a color
-     * @param len        how many input bytes
      * @return Value in the range of 0.0..1.0
      * @brief Converts a series of IDENTICON_COLOR_BYTES bytes to a value in the range 0.0..1.0
      */
-    static float bytesToColor(byte[] data_bytes, int len)
+    static float bytesToColor(String as_hex_string)
     {
+        // 79d2cb856b57
+        // 3edc675d3543
+        Log.i(TAG, "bytesToColor:as_hex_string=" + as_hex_string);
 
-        // get foreground color
-        long hue = (data_bytes[0]);
+        long maximum = Long.decode("0x" + "ffffffffffff"); // 281474976710655L;
+        long hue = Long.decode("0x" + as_hex_string);
 
-        // convert the last bytes to an uint
-        for (int i = 1; i < IDENTICON_COLOR_BYTES; ++i)
-        {
-            hue = hue << 8;
-            hue += (data_bytes[i]);
-        }
+        Log.i(TAG, "bytesToColor:3:" + hue);
+        Log.i(TAG, "bytesToColor:3 max:" + maximum);
 
         // normalize to 0.0 ... 1.0
         // return (static_cast<float>(hue)) / (((static_cast<uint64_t>(1)) << (8 * IDENTICON_COLOR_BYTES)) - 1);
-
-        float ret = (float) hue / ((long) 1 << (8 * IDENTICON_COLOR_BYTES) - 1);
+        float ret = (float) ((double) hue / (double) maximum);
+        Log.i(TAG, "bytesToColor:4:" + ret + " ," + maximum);
 
         return ret;
     }

@@ -69,7 +69,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NAME_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_STATUS_MESSAGE_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -279,9 +278,9 @@ public class ProfileActivity extends AppCompatActivity
 
         try
         {
-            // id_data = Identicon.create_identicon(MainActivity.get_my_toxid().substring(0, (TOX_PUBLIC_KEY_SIZE * 2)));
-            // id_data = Identicon.create_identicon(MainActivity.get_my_toxid().substring(1, (TOX_ADDRESS_SIZE * 2)));
-            id_data = Identicon.create_identicon(MainActivity.get_my_toxid());
+            id_data = Identicon.create_identicon(MainActivity.get_my_toxid().substring(0, (TOX_PUBLIC_KEY_SIZE * 2)));
+            // id_data = Identicon.create_identicon(MainActivity.get_my_toxid());
+            // id_data = Identicon.create_identicon("7FA177896407DACE01A1C1E5A56445E839280AE1B2520146C9473B4DA04B7742"); // MainActivity.get_my_toxid());
 
             int w = my_identicon_imageview.getWidth();
             int h = my_identicon_imageview.getHeight();
