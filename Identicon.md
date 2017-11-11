@@ -46,10 +46,11 @@ Echobot ***Tox ID*** 76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C
 
 http://www.rapidtables.com/convert/color/hsl-to-rgb.htm
 
-Resulting Identicon for square images:
+### Resulting Identicon for square images:
 
 <img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/Identicon_spec_dra/echobot_identicon_sqaure.png" width="200">
 
-Resulting Identicon for round images:
+### Resulting Identicon for round images:
 *fill background with ***color1_rbg*** *
+
 <img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/Identicon_spec_dra/echobot_identicon_round.png" width="200">
