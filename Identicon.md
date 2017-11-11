@@ -12,6 +12,13 @@
 6) ***sat_color_1*** = 0.5
 7) convert ***[]_color1*** to RGB = ***color1_rbg***
 
+8) last 12 bytes of ***hash_01*** and then last 6 bytes of that = ***hashpart_02***
+9) convert ***hashpart_02*** to number (unsigned) = ***hue_02***
+10) ***hue_color_2*** = ***hue_02*** / 281474976710655.0
+11) ***lig_color_2*** = 0.8
+12) ***sat_color_2*** = 0.5
+13) convert ***[]_color2*** to RGB = ***color2_rbg***
+
 
 ### example:
 Echobot ***Tox ID*** 76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C48A39218F515C39A6
@@ -24,6 +31,17 @@ Echobot ***Tox ID*** 76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C
 5) ***lig_color_1*** = [0 .. 100 %] 0.3 [30 %]
 6) ***sat_color_1*** = [0 .. 100 %] 0.5 [50 %]
 7) ***color1_rbg*** = [r, g, b] 114, 63, 38
+
+8) ***hashpart_02*** = c8ec3bd778f9
+9) ***hue_02*** = 220916941814009
+10) ***hue_color_2*** = [0.0 .. 1.0] 0.78485465 [~ 281.7628 °]
+11) ***lig_color_2*** = [0 .. 100 %] 0.8 [80 %]
+12) ***sat_color_2*** = [0 .. 100 %] 0.5 [50 %]
+13) ***color2_rbg*** = [r, g, b] 214, 178, 229
+
+
+
+
 
 
 http://www.rapidtables.com/convert/color/hsl-to-rgb.htm
