@@ -29,7 +29,6 @@ for (row = 0; row < 5; ++row)
   for (col = 0; col < 5; ++col)
   {
     columnIdx = abs( ((col*2)-4) / 2 )
-
     pos = row * 3 + columnIdx
     byte_used = byte **pos** of **hash_01**
     color_used = byte_used % 2
@@ -78,7 +77,38 @@ Echobot ***Tox ID*** 76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C
 12) ***sat_color_2*** = [0.0 .. 1.0] 0.5 [50 %]
 13) ***color2_rbg*** = [r, g, b] 214, 178, 229
 
+### example:
 
+```
+**hash_01** = ecac3754ece2a229dc40f0adff6e3041b8ce4a44c8ec3bd778f90dfd3529e5b7
+
+for (row = 0; row < 5; ++row)
+{
+  for (col = 0; col < 5; ++col)
+  {
+    columnIdx = abs( ((col*2)-4) / 2 )
+    // example: col=0 row=0 columnIdx=2
+
+    pos = row * 3 + columnIdx
+    // pos = 2 // in **has_01**
+
+    byte_used = byte **pos** of **hash_01**
+    // byte_used = 0x37
+
+    color_used = byte_used % 2
+    // color_used = 1
+
+    if (color_used == 0)
+    {
+       dot has color **color1_rbg**
+    }
+    else
+    {
+       dot has color **color2_rbg**
+    }
+  }
+}
+```
 
 
 
