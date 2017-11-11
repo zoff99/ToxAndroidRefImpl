@@ -21,14 +21,41 @@
 
 ### steps to create the create the Dots in a square grid
 
+*pseudo code*:
+
 ```
-for (int row = 0; row < IDENTICON_ROWS; ++row)
+for (row = 0; row < 5; ++row)
 {
-  for (int col = 0; col < ACTIVE_COLS; ++col)
+  for (col = 0; col < 5; ++col)
   {
+    columnIdx = abs( ((col*2)-4) / 2 )
+
+    pos = row * 3 + columnIdx
+    byte_used = byte **pos** of **hash_01**
+    color_used = byte_used % 2
+
+    if (color_used == 0)
+    {
+       dot has color **color1_rbg**
+    }
+    else
+    {
+       dot has color **color2_rbg**
+    }
   }
 }
 ```
+
+now draw those dots on a raster like:
+
+| Component   |            |     |
+| ----------- | ----------:| ---:|
+| VirtualBox  | [https://www.virtualbox.org/] ||
+| Vagrant     | [https://www.vagrantup.com/] ||
+| git         | [https://en.wikipedia.org/wiki/Git_%28software%29] ||
+| circle.yml  | inside the source repository (for build commands) ||
+| Diskspace   | minimum 20GByte free ||
+| RAM         | minimum 8GByte ||
 
 
 ### example:
