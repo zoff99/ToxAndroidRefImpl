@@ -38,6 +38,7 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
@@ -55,8 +56,11 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_AL
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_SELECTED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -196,6 +200,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         {
             if (VFS_ENCRYPT)
             {
+                boolean need_create_identicon = true;
+
                 info.guardianproject.iocipher.File f1 = null;
                 try
                 {
@@ -208,13 +214,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                 if ((f1 != null) && (fl.avatar_pathname != null))
                 {
-                    // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
-
                     if (f1.length() > 0)
                     {
-                        //                        byte[] byteArray = new byte[(int) f1.length()];
-                        //                        fis.read(byteArray, 0, (int) f1.length());
-                        //                        fis.close();
                         Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + fl.avatar_filename);
 
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
@@ -229,22 +230,67 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 apply(glide_options).
                                 into(avatar);
 
-                        //                            GlideApp.
-                        //                                    with(context).
-                        //                                    load(byteArray).
-                        //                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                        //                                    signature(StringSignature2(fl.avatar_pathname + "/" + fl.avatar_filename)).
-                        //                                    placeholder(d_lock).
-                        //                                    skipMemoryCache(false).
-                        //                                    apply(glide_options).
-                        //                                    into(avatar);
+                        need_create_identicon = false;
                     }
                     else
                     {
                         avatar.setImageDrawable(d_lock);
                     }
                 }
-            }
+
+                if (need_create_identicon)
+                {
+                    // no avatar icon? create and use Identicon ------------
+                    Log.i(TAG, "indenticon:002");
+
+                    create_avatar_identicon_for_pubkey(fl.tox_public_key_string);
+
+
+                    // -- ok, now try to show the avtar icon again --
+
+                    String new_avatar_pathname = VFS_PREFIX + VFS_FILE_DIR + "/" + fl.tox_public_key_string + "/";
+                    String new_avatar_filename = FRIEND_AVATAR_FILENAME;
+                    f1 = null;
+                    try
+                    {
+                        f1 = new info.guardianproject.iocipher.File(new_avatar_pathname + "/" + new_avatar_filename);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    if ((f1 != null) && (new_avatar_pathname != null))
+                    {
+                        if (f1.length() > 0)
+                        {
+                            Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + new_avatar_filename);
+
+                            final RequestOptions glide_options = new RequestOptions().fitCenter();
+                            GlideApp.
+                                    with(avatar.getContext()).
+                                    load(f1).
+                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                    signature(StringSignature2("_friendlist_avatar_" + new_avatar_pathname + "/" + new_avatar_filename)).
+                                    placeholder(d_lock).
+                                    priority(Priority.HIGH).
+                                    skipMemoryCache(false).
+                                    apply(glide_options).
+                                    into(avatar);
+                        }
+                        else
+                        {
+                            // ok still nothing, show that default "lock" icon
+                            avatar.setImageDrawable(d_lock);
+                        }
+                    }
+                    // -- ok, now try to show the avtar icon again --
+
+                    // no avatar icon? create and use Identicon ------------
+                }
+
+
+            } // VFS_ENCRYPT -- END --
             else
             {
                 java.io.File f1 = null;

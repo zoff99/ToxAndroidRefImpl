@@ -38,6 +38,8 @@ public class TRIFAGlobals
     static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 60; // 60 secs.
     static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 2000; // 2 secs.
 
+    final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
+
     static boolean HAVE_INTERNET_CONNECTIVITY = true;
     static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS = 1000 * 60 * 2; // bootstrap again after 2 minutes offline
 

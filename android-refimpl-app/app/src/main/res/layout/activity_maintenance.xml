@@ -65,6 +65,17 @@
 
 
             <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_avatar_icons_delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="delete all Avatar Icons"
+                android:textSize="14sp"/>
+
+
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/button_update_nodelist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

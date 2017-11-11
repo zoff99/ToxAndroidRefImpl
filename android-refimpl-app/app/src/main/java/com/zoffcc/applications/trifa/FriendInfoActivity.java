@@ -32,10 +32,14 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendInfoActivity extends AppCompatActivity
@@ -139,14 +143,32 @@ public class FriendInfoActivity extends AppCompatActivity
         try
         {
             String fname = get_vfs_image_filename_friend_avatar(friendnum);
+            Log.i(TAG, "fname=" + fname);
             if (fname != null)
             {
                 put_vfs_image_on_imageview(this, profile_icon, d1, fname);
+            }
+            else
+            {
+                Log.i(TAG, "indenticon:001");
+
+                final FriendList f = orma.selectFromFriendList().
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        toList().get(0);
+
+                create_avatar_identicon_for_pubkey(f.tox_public_key_string);
+
+                String fname3 = get_vfs_image_filename_friend_avatar(friendnum);
+                if (fname3 != null)
+                {
+                    put_vfs_image_on_imageview(this, profile_icon, d1, fname3);
+                }
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "EE2:" + e.getMessage());
         }
 
     }

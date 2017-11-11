@@ -20,8 +20,16 @@
 package com.zoffcc.applications.trifa;
 
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
+
+import static com.zoffcc.applications.trifa.MainActivity.set_friend_avatar;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 
 public class Identicon
 {
@@ -190,5 +198,117 @@ public class Identicon
         Log.i(TAG, "bytesToColor:4:" + ret + " ," + maximum);
 
         return ret;
+    }
+
+
+    public static void save_bitmap_to_vfs_file(Bitmap bitmap, String vfs_path, String vfs_filename, String pubkey)
+    {
+        info.guardianproject.iocipher.File path = new info.guardianproject.iocipher.File(vfs_path);
+        path.mkdirs();
+        info.guardianproject.iocipher.File imageFile = new info.guardianproject.iocipher.File(path, vfs_filename);
+        info.guardianproject.iocipher.FileOutputStream out = null;
+        try
+        {
+            out = new info.guardianproject.iocipher.FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            out.flush();
+            out.close();
+
+            set_friend_avatar(pubkey, vfs_path, vfs_filename);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void create_avatar_identicon_for_pubkey(String pubkey)
+    {
+        try
+        {
+            if (pubkey.length() >= ToxVars.TOX_PUBLIC_KEY_SIZE * 2)
+            {
+
+                Identicon.Identicon_data id_data = Identicon.create_identicon(pubkey.substring(0, (ToxVars.TOX_PUBLIC_KEY_SIZE * 2)));
+                int w = 275;
+                int h = 275;
+                int w_icon = 200;
+                int h_icon = 200;
+                int w_offset = (w - w_icon) / 2;
+                int h_offset = (h - h_icon) / 2;
+
+                Log.i(TAG, "create_avatar_identicon_for_pubkey:w=" + w);
+                Log.i(TAG, "create_avatar_identicon_for_pubkey:h=" + w);
+
+                Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+                Canvas canvas = new Canvas(bmp);
+
+                Paint p0 = new Paint();
+                p0.setColor(id_data.color_a);
+                p0.setStyle(Paint.Style.FILL);
+
+                Paint p1 = new Paint();
+                p1.setColor(id_data.color_b);
+                p1.setStyle(Paint.Style.FILL);
+
+                canvas.drawColor(Color.BLACK);
+
+                int x1 = 0;
+                int y1 = 0;
+                int x2 = 0;
+                int y2 = 0;
+                int dot_width = w_icon / IDENTICON_ROWS;
+                int dot_height = h_icon / IDENTICON_ROWS;
+                int columnIdx;
+
+                Log.i(TAG, "create_avatar_identicon_for_pubkey:dot_width=" + dot_width + " ACTIVE_COLS=" + IDENTICON_ROWS);
+                Log.i(TAG, "create_avatar_identicon_for_pubkey:dot_height=" + dot_height + " IDENTICON_ROWS=" + IDENTICON_ROWS);
+
+                for (int row = 0; row < IDENTICON_ROWS; ++row)
+                {
+                    for (int col = 0; col < IDENTICON_ROWS; ++col)
+                    {
+                        columnIdx = Math.abs((col * 2 - (IDENTICON_ROWS - 1)) / 2);
+                        Log.i(TAG, "create_avatar_identicon_for_pubkey:col=" + col + " columnIdx=" + columnIdx + " row=" + row);
+
+                        x1 = col * dot_width;
+                        x2 = (col + 1) * dot_width;
+                        y1 = row * dot_height;
+                        y2 = (row + 1) * dot_height;
+
+                        Log.i(TAG, "create_avatar_identicon_for_pubkey:x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2=" + y2);
+
+                        if (id_data.dot_color[row][columnIdx] == true)
+                        {
+                            canvas.drawRect(x1 + w_offset, y1 + h_offset, x2 + w_offset, y2 + h_offset, p1);
+                        }
+                        else
+                        {
+                            canvas.drawRect(x1 + w_offset, y1 + h_offset, x2 + w_offset, y2 + h_offset, p0);
+                        }
+                    }
+                }
+
+                try
+                {
+                    String path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + pubkey + "/";
+                    String file_name = FRIEND_AVATAR_FILENAME;
+                    save_bitmap_to_vfs_file(bmp, path_name, file_name, pubkey);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "create_avatar_identicon_for_pubkey:EE:" + e.getMessage());
+        }
+
     }
 }

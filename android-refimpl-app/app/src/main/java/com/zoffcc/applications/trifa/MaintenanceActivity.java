@@ -36,6 +36,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import info.guardianproject.netcipher.client.StrongBuilder;
@@ -49,6 +50,7 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.delete_vfs_file;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -60,6 +62,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_sql_vacuum;
     Button button_sql_analyze;
     Button button_fav_emoji_reset;
+    Button button_avatar_icons_delete;
     Button button_update_nodelist;
     Button button_reset_nodelist;
 
@@ -88,6 +91,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_sql_vacuum = (Button) findViewById(R.id.button_sql_vacuum);
         button_sql_analyze = (Button) findViewById(R.id.button_sql_analyze);
         button_fav_emoji_reset = (Button) findViewById(R.id.button_fav_emoji_reset);
+        button_avatar_icons_delete = (Button) findViewById(R.id.button_avatar_icons_delete);
         button_update_nodelist = (Button) findViewById(R.id.button_update_nodelist);
         button_reset_nodelist = (Button) findViewById(R.id.button_reset_nodelist);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
@@ -203,6 +207,30 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+
+        button_avatar_icons_delete.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    Iterator it = orma.selectFromFriendList().toList().iterator();
+                    while (it.hasNext())
+                    {
+                        FriendList f = (FriendList) it.next();
+                        if ((f.avatar_pathname != null) && (f.avatar_filename != null))
+                        {
+                            delete_vfs_file(f.avatar_pathname, f.avatar_filename);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         button_update_nodelist.setOnClickListener(new View.OnClickListener()
         {

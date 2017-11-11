@@ -139,6 +139,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activi
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
@@ -3700,7 +3701,7 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "file_recv:incoming avatar");
 
-            String file_name_avatar = "_____xyz____avatar.png";
+            String file_name_avatar = FRIEND_AVATAR_FILENAME;
 
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
@@ -5571,6 +5572,23 @@ public class MainActivity extends AppCompatActivity
         //t.start();
     }
 
+    static void delete_vfs_file(String vfs_path_name, String vfs_file_name)
+    {
+        info.guardianproject.iocipher.File f1 = null;
+        try
+        {
+            f1 = new info.guardianproject.iocipher.File(vfs_path_name + "/" + vfs_file_name);
+            if (f1.length() > 0)
+            {
+                f1.delete();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     static void set_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
     {
         try
@@ -6045,6 +6063,17 @@ public class MainActivity extends AppCompatActivity
         try
         {
             FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
+
+            if (f.avatar_pathname == null)
+            {
+                return null;
+            }
+
+            if (f.avatar_filename == null)
+            {
+                return null;
+            }
+
             return f.avatar_pathname + "/" + f.avatar_filename;
         }
         catch (Exception e)
