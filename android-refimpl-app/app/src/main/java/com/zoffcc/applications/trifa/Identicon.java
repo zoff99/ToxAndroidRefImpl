@@ -253,7 +253,7 @@ public class Identicon
                 p1.setColor(id_data.color_b);
                 p1.setStyle(Paint.Style.FILL);
 
-                canvas.drawColor(Color.BLACK);
+                canvas.drawColor(id_data.color_a);
 
                 int x1 = 0;
                 int y1 = 0;
