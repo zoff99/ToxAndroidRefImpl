@@ -48,13 +48,13 @@ for (row = 0; row < 5; ++row)
 
 now draw those dots on a raster like:
 
-|    |            |     | ||
+|  **Raster**  |            |     | ||
 | ----------- | ----------:| ---:|---:|---:|
-| row0/col0  | * | * | * | * |
+| row0/col0  | * | * | * | row0/col4 |
 | * | * | * | * | * |
 | * | * | * | * | * |
 | * | * | * | * | * |
-| * | * | * | * | * |
+| row4/col0 | * | * | * | row4/col4 |
 
 
 ### example:
