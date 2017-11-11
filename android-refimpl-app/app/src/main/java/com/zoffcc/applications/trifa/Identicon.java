@@ -40,15 +40,25 @@ public class Identicon
         boolean[][] dot_color;
     }
 
-
     static Identicon_data create_identicon(String input)
     {
         Identicon_data ret = new Identicon_data();
 
         Log.i(TAG, "create_identicon:in=" + input);
-        byte[] hash = TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(input));
+
+        byte[] pubkey_as_unsigned_bytes = new byte[input.length() / 2];
+
+        int jj;
+        for (jj = 0; jj < (input.length() / 2); jj++)
+        {
+            String hex_ = "0x" + input.substring(jj * 2, (jj * 2) + 2).toLowerCase();
+            int cur_byte = Integer.decode(hex_);
+            Log.i(TAG, "create_identicon:loop:byte=" + cur_byte + " hex=" + hex_);
+            pubkey_as_unsigned_bytes[jj] = (byte) cur_byte;
+        }
+
+        byte[] hash = TrifaSetPatternActivity.sha256(pubkey_as_unsigned_bytes);
         Log.i(TAG, "create_identicon:hash=" + bytesToHex(hash).toLowerCase() + " len=" + hash.length);
-        Log.i(TAG, "create_identicon:    =43252927de957f70158794c0d919be2ba2b4c0583edc675d354379d2cb856b57");
 
         int c[] = new int[COLORS];
 
@@ -99,7 +109,7 @@ public class Identicon
 
                 Log.i(TAG, "create_identicon:colorIndex=" + colorIndex);
 
-                if (colorIndex == 1)
+                if (colorIndex == 0)
                 {
                     ret.dot_color[row][col] = false;
                 }
