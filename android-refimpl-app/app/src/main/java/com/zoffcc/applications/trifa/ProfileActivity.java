@@ -278,10 +278,6 @@ public class ProfileActivity extends AppCompatActivity
         try
         {
             id_data = Identicon.create_identicon(MainActivity.get_my_toxid().substring(0, (ToxVars.TOX_PUBLIC_KEY_SIZE * 2))); // Pubkey
-            // id_data = Identicon.create_identicon(MainActivity.get_my_toxid()); // ToxID
-            // id_data = Identicon.create_identicon("7FA177896407DACE01A1C1E5A56445E839280AE1B2520146C9473B4DA04B7742"); // sudden6
-            // id_data = Identicon.create_identicon("27E39C05C4AE571DF973F0E10D050150E06AC3E797A63D061FC1CFD546BA452E"); // diadlo
-            // id_data = Identicon.create_identicon("27E39C05C4AE571DF973F0E10D050150E06AC3E797A63D061FC1CFD546BA452EB88725D7EA6F");  // diadlo
 
             int w = my_identicon_imageview.getWidth();
             int h = my_identicon_imageview.getHeight();

@@ -169,6 +169,21 @@
                 android:paddingTop="15dp"
                 android:src="@mipmap/ic_launcher_round"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="7dp"
+                android:gravity="center_horizontal"
+                android:paddingBottom="0dp"
+                android:paddingTop="14dp"
+                android:text="Your ToxIdenticon"
+                android:textColor="@color/md_black_1000"
+                android:textSize="18sp"
+                android:textStyle="normal"/>
+
+
             <ImageView
                 android:id="@+id/my_identicon_imageview"
                 android:layout_width="190dp"

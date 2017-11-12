@@ -79,9 +79,12 @@ public class Identicon
             float hue = bytesToColor(hashpart_as_hex_string);
             Log.i(TAG, "create_identicon:hue=" + hue);
 
-            // change offset when COLORS != 2
-            float lig = (float) colorIndex / (float) COLORS + 0.3f;
+            float lig = (float) colorIndex / (float) COLORS + 0.3f; // 0.5 and 0.8
             float sat = 0.5f;
+
+            Log.i(TAG, "create_identicon:sat=" + sat);
+            Log.i(TAG, "create_identicon:lig=" + lig);
+
             int[] c2 = HSL_RGB.hslToRgb(hue, sat, lig);
             c[colorIndex] = Color.rgb(c2[0], c2[1], c2[2]);
 
