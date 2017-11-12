@@ -8,16 +8,16 @@
 2) last 6 bytes of ***hash_01*** = ***hashpart_01***
 3) convert ***hashpart_01*** to number (unsigned) = ***hue_01***
 4) ***hue_color_1*** = ***hue_01*** / 281474976710655.0 // decimal (0xff ff ff ff ff ff in Hex) ** *see image below!
-5) ***lig_color_1*** = 0.3
-6) ***sat_color_1*** = 0.5
+5) ***sat_color_1*** = 0.5
+6) ***lig_color_1*** = 0.3
 7) convert ***[]_color1*** to RGB = ***color1_rbg*** // convert HSL -> RGB ** *see https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
 <br>
 
 8) last 12 bytes of ***hash_01*** and then the first 6 bytes of that = ***hashpart_02***
 9) convert ***hashpart_02*** to number (unsigned) = ***hue_02***
 10) ***hue_color_2*** = ***hue_02*** / 281474976710655.0 // decimal (0xff ff ff ff ff ff in Hex) ** *see image below!
-11) ***lig_color_2*** = 0.8
-12) ***sat_color_2*** = 0.5
+11) ***sat_color_2*** = 0.5
+12) ***lig_color_2*** = 0.8
 13) convert ***[]_color2*** to RGB = ***color2_rbg*** // convert HSL -> RGB ** *see https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
 <br>
 
@@ -72,17 +72,17 @@ Echobot ***Tox ID*** 0x76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A23534
 1) ***hash_01*** = 0xecac3754ece2a229dc40f0adff6e3041b8ce4a44c8ec3bd778f90dfd3529e5b7 // in Hex
 2) ***hashpart_01*** = 0x0dfd3529e5b7 // in Hex
 3) ***hue_01*** = 15381169825207 // decimal
-3) ***hue_color_1*** = [0.0 .. 1.0] 0.054644894 [~ 19.6175 °]
-5) ***lig_color_1*** = [0.0 .. 1.0] 0.3 [30 %]
-6) ***sat_color_1*** = [0.0 .. 1.0] 0.5 [50 %]
+4) ***hue_color_1*** = [0.0 .. 1.0] 0.054644894 [~ 19.6175 °]
+5) ***sat_color_1*** = [0.0 .. 1.0] 0.5 [50 %]
+6) ***lig_color_1*** = [0.0 .. 1.0] 0.3 [30 %]
 7) ***color1_rbg*** = [r, g, b] 114, 63, 38
 <br>
 
 8) ***hashpart_02*** = 0xc8ec3bd778f9 // in Hex
 9) ***hue_02*** = 220916941814009 // decimal
 10) ***hue_color_2*** = [0.0 .. 1.0] 0.78485465 [~ 281.7628 °]
-11) ***lig_color_2*** = [0.0 .. 1.0] 0.8 [80 %]
-12) ***sat_color_2*** = [0.0 .. 1.0] 0.5 [50 %]
+11) ***sat_color_2*** = [0.0 .. 1.0] 0.5 [50 %]
+12) ***lig_color_2*** = [0.0 .. 1.0] 0.8 [80 %]
 13) ***color2_rbg*** = [r, g, b] 214, 178, 229
 <br>
 
