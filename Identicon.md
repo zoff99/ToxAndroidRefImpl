@@ -130,6 +130,6 @@ http://www.rapidtables.com/convert/color/hsl-to-rgb.htm
 <img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/Identicon_spec_dra/echobot_identicon_sqaure.png" width="200">
 
 ### Resulting Identicon for round images:
-*fill extra space on background with ***color1_rbg*** *
+fill extra space on background with ***color1_rbg***
 
 <img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/Identicon_spec_dra/echobot_identicon_round.png" width="200">
