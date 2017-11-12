@@ -329,7 +329,7 @@ public class MainActivity extends AppCompatActivity
     static Map<String, Long> cache_pubkey_fnum = new HashMap<String, Long>();
     static Map<Long, String> cache_fnum_pubkey = new HashMap<Long, String>();
     static Map<String, String> cache_peernum_pubkey = new HashMap<String, String>();
-    static Map<String, String> cache_peername_pubkey = new HashMap<String, String>();
+    // static Map<String, String> cache_peername_pubkey = new HashMap<String, String>();
     static Map<String, String> cache_peername_pubkey2 = new HashMap<String, String>();
     // ---- lookup cache ----
 
@@ -4442,6 +4442,20 @@ public class MainActivity extends AppCompatActivity
                 // 2 -> name change
 
 
+                // --------------- BAD !! ---------------
+                // --------------- BAD !! ---------------
+                // --------------- BAD !! ---------------
+                // workaround to fix a bug, where messages would appear to be from the wrong user in a conference
+                // because toxcore changes all "peer numbers" when somebody leaves the confrence
+                // but this can happen very often. so for now, clear cache every time
+                cache_peernum_pubkey.clear();
+                cache_peername_pubkey2.clear();
+                // --------------- BAD !! ---------------
+                // --------------- BAD !! ---------------
+                // --------------- BAD !! ---------------
+
+
+
                 ConferenceMessage m = new ConferenceMessage();
                 m.is_new = false;
 
@@ -5283,7 +5297,7 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            if (cache_peernum_pubkey.size() >= 20)
+            if (cache_peernum_pubkey.size() >= 100)
             {
                 // TODO: bad!
                 cache_peernum_pubkey.clear();
@@ -5333,33 +5347,33 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public static String XXXXXXXtox_conference_peer_get_name__wrapperXXXXXX(long conference_number, long peer_number)
-    {
-        if (cache_peername_pubkey.containsKey("" + conference_number + ":" + peer_number))
-        {
-            // Log.i(TAG, "cache hit:2a");
-            return cache_peernum_pubkey.get("" + conference_number + ":" + peer_number);
-        }
-        else
-        {
-            if (cache_peernum_pubkey.size() >= 20)
-            {
-                // TODO: bad!
-                cache_peernum_pubkey.clear();
-            }
-
-            String result = tox_conference_peer_get_name(conference_number, peer_number);
-            if (result.equals("-1"))
-            {
-                return null;
-            }
-            else
-            {
-                cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
-                return result;
-            }
-        }
-    }
+    //    public static String XXXXXXXtox_conference_peer_get_name__wrapperXXXXXX(long conference_number, long peer_number)
+    //    {
+    //        if (cache_peername_pubkey.containsKey("" + conference_number + ":" + peer_number))
+    //        {
+    //            // Log.i(TAG, "cache hit:2a");
+    //            return cache_peernum_pubkey.get("" + conference_number + ":" + peer_number);
+    //        }
+    //        else
+    //        {
+    //            if (cache_peernum_pubkey.size() >= 100)
+    //            {
+    //                // TODO: bad!
+    //                cache_peernum_pubkey.clear();
+    //            }
+    //
+    //            String result = tox_conference_peer_get_name(conference_number, peer_number);
+    //            if (result.equals("-1"))
+    //            {
+    //                return null;
+    //            }
+    //            else
+    //            {
+    //                cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
+    //                return result;
+    //            }
+    //        }
+    //    }
 
 
     public void show_add_friend(View view)
