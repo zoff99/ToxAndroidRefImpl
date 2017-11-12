@@ -21,7 +21,7 @@
 13) convert ***[]_color2*** to RGB = ***color2_rbg***
 <br>
 
-### steps to create the create the Dots in a square grid
+### steps to create the the Dots on a square grid (5 x 5)
 
 *pseudo code*:
 
