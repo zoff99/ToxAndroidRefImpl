@@ -7,7 +7,8 @@
 1) calculate the SHA-256 of ***Tox-Public-key*** = ***hash_01***
 2) last 6 bytes of ***hash_01*** = ***hashpart_01***
 3) convert ***hashpart_01*** to number (unsigned) = ***hue_01***
-4) ***hue_color_1*** = (***hue_01*** / 281474976710655.0) // decimal (0xff ff ff ff ff ff in Hex) ** *see image below!
+4) ***hue_color_1*** = (***hue_01*** / 281474976710655.0) <br>
+    // decimal (0xff ff ff ff ff ff in Hex) ** *see image below!
 5) ***sat_color_1*** = 0.5
 6) ***lig_color_1*** = 0.3
 7) convert ***[hue, sat, lig]_color1*** to RGB = ***color1_rbg*** <br>
@@ -16,7 +17,8 @@
 
 8) last 12 bytes of ***hash_01*** and then the first 6 bytes of that = ***hashpart_02***
 9) convert ***hashpart_02*** to number (unsigned) = ***hue_02***
-10) ***hue_color_2*** = (***hue_02*** / 281474976710655.0) // decimal (0xff ff ff ff ff ff in Hex) ** *see image below!
+10) ***hue_color_2*** = (***hue_02*** / 281474976710655.0) <br>
+    // decimal (0xff ff ff ff ff ff in Hex) ** *see image below!
 11) ***sat_color_2*** = 0.5
 12) ***lig_color_2*** = 0.8
 13) convert ***[hue, sat, lig]_color2*** to RGB = ***color2_rbg*** <br>
