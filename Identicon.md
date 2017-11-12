@@ -1,4 +1,4 @@
-## Tox Default Avatar ( = Identicon)
+## ToxIdenticon (= Tox Default Avatar)
 
 
 ### steps to create the needed color values
