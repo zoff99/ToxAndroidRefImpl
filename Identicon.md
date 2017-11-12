@@ -13,16 +13,15 @@
 7) convert ***[]_color1*** to RGB = ***color1_rbg***
 <br>
 
-<img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/Identicon_spec_dra/hex_2_dec_fixed001.png" height="80">
-
-<br>
-
 8) last 12 bytes of ***hash_01*** and then the first 6 bytes of that = ***hashpart_02***
 9) convert ***hashpart_02*** to number (unsigned) = ***hue_02***
-10) ***hue_color_2*** = ***hue_02*** / 281474976710655.0 // decimal (0xff ff ff ff ff ff in Hex)
+10) ***hue_color_2*** = ***hue_02*** / 281474976710655.0 // decimal (0xff ff ff ff ff ff in Hex) ** *see image below!
 11) ***lig_color_2*** = 0.8
 12) ***sat_color_2*** = 0.5
 13) convert ***[]_color2*** to RGB = ***color2_rbg***
+<br>
+
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/Identicon_spec_dra/hex_2_dec_fixed001.png" height="80">
 <br>
 
 ### steps to create the the Dots on a square grid (5 x 5)
