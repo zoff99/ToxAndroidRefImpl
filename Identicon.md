@@ -103,10 +103,10 @@ for (row = 0; row < 5; ++row)
     // example: col=0 row=0 columnIdx=2
 
     pos = row * 3 + columnIdx
-    // pos = 2 // in **has_01**
+    // pos = 2 // in **hash_01**
 
     byte_used = byte **pos** of **hash_01**
-    // byte_used = 0x37 // in Hex
+    // byte_used = 0x37 // in Hex (= 55 in decimal)
 
     color_used = byte_used % 2
     // color_used = 1 // lighter color
