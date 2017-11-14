@@ -1,9 +1,13 @@
 # ToxIdenticon (= Tox Default Avatar)
 
+This is the specification of an Identicon generation algorithm, tailored to the use
+in the Tox network. For the reference implementation see
+https://github.com/qTox/qTox/blob/master/src/widget/tool/identicon.cpp
 
 ## steps to create the needed color values
 
-0) use the 32 bytes of the **Tox Public Key** as input, see https://github.com/TokTok/spec/blob/master/spec.md#messenger
+0) use the 32 bytes of the **Tox Public Key** as input, see
+https://github.com/TokTok/spec/blob/master/spec.md#messenger
 
 1) calculate the SHA-256 of the **Tox Public Key**
 
@@ -110,6 +114,9 @@ Echobot ***Tox ID*** 0x76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A23534
     -***sat_color_2*** = 0.5 // is [50 %], range [0.0 .. 1.0]  
     -***lig_color_2*** = 0.8 // is [30 %], range [0.0 .. 1.0]  
 10) ***color2_rbg*** =  214, 178, 229 // [r, g, b] color values for 8bit per color
+
+*Note:* The color values can slightly differ, because of different HSV2RGB conversion formulas
+and the use of `float`. In practice this should not be noticeable by the human eye.
 
 
 ###  color the dots
