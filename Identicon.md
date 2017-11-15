@@ -48,7 +48,7 @@ see https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
 
 ***7)*** take the next last 6 bytes of `PkHash` and store them as `hashpart2` (zero based index 20 - 25)
 
-***8)*** reinterpret and normalize the bytes as in steps 3) and 4) and store as `hue_color_2`
+***8)*** reinterpret and normalize the bytes as in steps ***3)*** and ***4)*** and store as `hue_color_2`
 
 ***9)*** `sat_color_2 = 0.5`,  `lig_color_2 = 0.8` these are constants choosen to look good
 
