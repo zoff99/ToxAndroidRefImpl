@@ -43,7 +43,7 @@ hue_color1 = hue_bytes1 / 281474976710655.0;
 see https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
 
 7) take the next last 6 bytes of `PkHash` and store them as `hashpart2` (zero based index 20 - 25)
-8) reinterpret and normalize the bytes as in steps 3) and 4) and store as `sat_color_2`
+8) reinterpret and normalize the bytes as in steps 3) and 4) and store as `hue_color_2`
 9) `sat_color_2 = 0.5`,  `lig_color_2 = 0.8` these are constants choosen to look good
 10) convert `[hue, sat, lig]_color_2` from HSL to RGB and store as `color2_rbg` as in step 6)
 
