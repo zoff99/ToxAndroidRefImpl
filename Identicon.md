@@ -6,17 +6,17 @@ https://github.com/qTox/qTox/blob/master/src/widget/tool/identicon.cpp
 
 ## steps to create the needed color values
 
-0) use the 32 bytes of the **Tox Public Key** as input, see
+***0)*** use the 32 bytes of the **Tox Public Key** as input, see
 https://github.com/TokTok/spec/blob/master/spec.md#messenger
 
-1) calculate the SHA-256 of the **Tox Public Key**
+***1)*** calculate the SHA-256 of the **Tox Public Key**
 
 ```
 pk_hash = SHA256(Tox Public Key);
 ```
 
-2) take the last 6 bytes of `pk_hash` and store them as `hashpart_1` (zero based index 26 - 31)
-3) reinterpret `hashpart_1` as unsigned integer, MSB first and store as `hue_uint_1`
+***2)*** take the last 6 bytes of `pk_hash` and store them as `hashpart_1` (zero based index 26 - 31)
+***3)*** reinterpret `hashpart_1` as unsigned integer, MSB first and store as `hue_uint_1`
 
 ```
 // example for C99 and C++
@@ -30,22 +30,22 @@ for (int i = 1; i < 6; ++i) {
 }
 ```
 
-4) normalize `hue_uint_1` to a float of the range 0.0 - 1.0 and store as `hue_color_1`
+***4)*** normalize `hue_uint_1` to a float of the range 0.0 - 1.0 and store as `hue_color_1`
 ```
 // be careful to do the division as float!
 // 0xFFFF FFFF FFFF = 281474976710655, the maximum with 48 bits
 // '.0' is appended to ensure float division (C and similar languages)
 hue_color1 = hue_bytes1 / 281474976710655.0;
 ```
-5) `sat_color_1 = 0.5`,  `lig_color_1 = 0.3` these are constants choosen to look good
-6) convert `[hue, sat, lig]_color_1` from HSL to RGB and store as `color1_rbg`
+***5)*** `sat_color_1 = 0.5`,  `lig_color_1 = 0.3` these are constants choosen to look good
+***6)*** convert `[hue, sat, lig]_color_1` from HSL to RGB and store as `color1_rbg`
 
 see https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
 
-7) take the next last 6 bytes of `PkHash` and store them as `hashpart2` (zero based index 20 - 25)
-8) reinterpret and normalize the bytes as in steps 3) and 4) and store as `hue_color_2`
-9) `sat_color_2 = 0.5`,  `lig_color_2 = 0.8` these are constants choosen to look good
-10) convert `[hue, sat, lig]_color_2` from HSL to RGB and store as `color2_rbg` as in step 6)
+***7)*** take the next last 6 bytes of `PkHash` and store them as `hashpart2` (zero based index 20 - 25)
+***8)*** reinterpret and normalize the bytes as in steps 3) and 4) and store as `hue_color_2`
+***9)*** `sat_color_2 = 0.5`,  `lig_color_2 = 0.8` these are constants choosen to look good
+***10)*** convert `[hue, sat, lig]_color_2` from HSL to RGB and store as `color2_rbg` as in step 6)
 
 ## steps to create the the Dots on a square grid (5 x 5)
 
