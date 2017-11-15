@@ -111,8 +111,8 @@ Echobot ***Tox ID*** 0x76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A23534
     - ***hue_uint_2*** = 220916941814009 // decimal
     - ***hue_color_2*** = 0.78485465 // is [~ 281.7628 °] on a color wheel, range [0.0 .. 1.0]
 9)
-    -***sat_color_2*** = 0.5 // is [50 %], range [0.0 .. 1.0]  
-    -***lig_color_2*** = 0.8 // is [30 %], range [0.0 .. 1.0]  
+    - ***sat_color_2*** = 0.5 // is [50 %], range [0.0 .. 1.0]  
+    - ***lig_color_2*** = 0.8 // is [30 %], range [0.0 .. 1.0]  
 10) ***color2_rbg*** =  214, 178, 229 // [r, g, b] color values for 8bit per color
 
 *Note:* The color values can slightly differ, because of different HSV2RGB conversion formulas
