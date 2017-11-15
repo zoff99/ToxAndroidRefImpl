@@ -21,7 +21,7 @@ pk_hash = SHA256(Tox Public Key);
 ***3)*** reinterpret `hashpart_1` as unsigned integer, MSB first and store as `hue_uint_1`
 
 ```
-// example for C99 and C++
+// example for C99 and C++ (do NOT use this in Java!!)
 // hashpart_1 is an array of type uint8_t
 uint64_t hue_uint_1 = hashpart_1[0];
 
