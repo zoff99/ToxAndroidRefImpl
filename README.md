@@ -14,12 +14,13 @@ Build Status
 
 Compile in Android Studio
 =
-Open an existing Project:
+**Open an existing Project:**<br>
 <img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/image.png" width="400">
 
-and select the "android-refimpl-app" subdir:
+**and select the "android-refimpl-app" subdir:**<br>
 <img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/image1.png" width="400">
 
+<br><br>
 
 Development Snapshot Version (Android)
 =
