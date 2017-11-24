@@ -12,6 +12,12 @@ Build Status
 **CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003)
 **Bintray:** [![Download](https://api.bintray.com/packages/zoff99/maven/trifajni/images/download.svg)](https://bintray.com/zoff99/maven/trifajni/_latestVersion)
 
+Compile in Android Studio
+=
+
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/image.png" width="200">
+
+"android-refimpl-app"
 
 Development Snapshot Version (Android)
 =
