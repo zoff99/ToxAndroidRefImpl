@@ -15,7 +15,9 @@ Build Status
 Compile in Android Studio
 =
 
-<img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/image.png" width="200">
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/image.png" width="600">
+
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/image1.png" width="600">
 
 "android-refimpl-app"
 
