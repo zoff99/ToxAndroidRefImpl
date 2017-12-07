@@ -40,7 +40,7 @@
         android:title="@string/pref_title_set_fps"/>
 
     <ListPreference
-        android:defaultValue="0"
+        android:defaultValue="1"
         android:entries="@array/pref_higher_audio_quality_titles"
         android:entryValues="@array/pref_higher_audio_quality_values"
         android:key="higher_audio_quality"
