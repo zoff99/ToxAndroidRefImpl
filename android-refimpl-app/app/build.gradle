@@ -115,8 +115,8 @@ android {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 10011
-        versionName "1.0.11"
+        versionCode 10012
+        versionName "1.0.12"
 
         renderscriptTargetApi 25
         renderscriptSupportModeEnabled true
@@ -190,10 +190,10 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.github.bumptech.glide:glide:4.2.0') {
+    compile('com.github.bumptech.glide:glide:4.4.0') {
         exclude group: 'com.android.support'
     }
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.2.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
     //
     //
     //
@@ -218,7 +218,7 @@ dependencies {
     compile 'me.zhanghai.android.patternlock:library:2.1.2'
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.0.1'
 }
@@ -237,7 +237,7 @@ dependencyVerification {
             'com.github.angads25:filepicker:8582d3a57d590945c05a00af265f63258da85523a61bd14556f545ad54da228b',
             'com.l4digital.fastscroll:fastscroll:54886e21c76ca3fbad958c0c21d8f8cc83f24cf41f83e0138bd7a3d6f2b5bbe5',
             'com.vanniktech:emoji-ios:f30f5ad996b81d3a1a5987055d22b2e1bcecc5067c1524addabb271366452e80',
-            'com.github.bumptech.glide:glide:555350c4b9d163f1d3772a64a92119086073ed88340eb284391b1acc1bb5dd6c',
+            'com.github.bumptech.glide:glide:7e98549bb0b59f2ee35c61bae0fb4926d35850edbc784e62743d7f86468285bf',
             'com.zoffcc.applications.trifajni:trifa-jni-lib:c0012258183ab63395118fbf1c2f10f4635a5228db04a0ddcb4d3a3651cbaaf9',
             'com.android.support:support-vector-drawable:13728f337f36d1c02d52198a6c20724edb447a0875454d829f95cb9eb4aa293b',
             'com.android.support:support-v4:07d389154bcf73b47e514964df1578136b26cba78257b8a577a3ccb54beff0ae',
@@ -255,7 +255,7 @@ dependencyVerification {
             'me.zhanghai.android.patternlock:library:3b35da8f0ae09ce462d8ba9c896820d3bb0806151552b0af9caf349fb02dcb70',
             'com.github.armcha:AutoLinkTextView:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
             'com.github.chrisbanes:PhotoView:458cfff9421cc28b608139fd9dffba6399d7f654b688e3f105a3a03a9b82cc7d',
-            'com.squareup.okhttp3:okhttp:7265adbd6f028aade307f58569d814835cd02bc9beffb70c25f72c9de50d61c4',
+            'com.squareup.okhttp3:okhttp:a0d01017a42bba26e507fc6d448bb36e536f4b6e612f7c42de30bbdac2b7785e',
             'com.mikepenz:materialize:f215825cf9215af4c2807e3df25228b87d7b8f28fc8ccf122c9c5a93dfa13b8a',
             'com.mikepenz:iconics-core:998967c7e422c87bac3436d889912c07735ce814e88aa250ca2d018ba046b7c1',
             'com.mikepenz:fastadapter:abd501599a7fd983127791cff50cf1595d360eba95a336479bce37e7953ca560',
@@ -266,9 +266,9 @@ dependencyVerification {
             'com.github.gfx.android.orma:orma-core:0929c79c3a6e96042fa8dcbba8dc91ff9047ca35b09a3fedaf015c1c27cc3c8a',
             'net.zetetic:android-database-sqlcipher:20e9276aacd18f0fffe62221545046696460775af56736ddd33b8a04a78bc756',
             'com.vanniktech:emoji:d55f44e04e31895647d62c33c34a8d501995e9e1b5c5f5cee6cbb8630eeb37f7',
-            'com.github.bumptech.glide:gifdecoder:217da4520c568a93aea9c7ce3b3cac2c61fabed5113b07ae38698054f6d2d8b6',
-            'com.github.bumptech.glide:disklrucache:795c13245498c0cd806c3af71ee57b3f179cbd1609440a3021c211c364ef74d3',
-            'com.github.bumptech.glide:annotations:057927a236f3229e72cfbac8bed0e9fb398473daf7d933390f59ea4cb79c137b',
+            'com.github.bumptech.glide:gifdecoder:4f94109bb8cd129210071cf2b855c0ef266762bc6525c17084ac8f2f41301ea5',
+            'com.github.bumptech.glide:disklrucache:cb4178babb0b54b171b02ae1b6024f28a59d9867b1b359f0e4224129423b8841',
+            'com.github.bumptech.glide:annotations:4f7cb25ce056756ba9b1f2b4f629ef6a334cdeb55d96204f91c4381a5900a0b4',
             'com.android.support:support-annotations:aedf76962584adfaed2bd3fcaa22406461c4310237fc27e301128edaa2dba2fa',
             'com.android.support:support-compat:e02d781268dc60aab6638d8dc20156ea11ca20b962d294b85e6f1e8418cabfa7',
             'com.android.support:support-media-compat:cbed07d07e0e84fdb4b75712f5fd946229a8af155933c9a92e41db64d00791e0',
