@@ -8,7 +8,10 @@ Android OS Version:
 Device:
 
 #### Please describe your issue in as much detail as possible:
+your text here
 
 #### Steps for reproducing this issue:
+your text here
 
 #### Screenshots (if possible):
+attach screenshots here
