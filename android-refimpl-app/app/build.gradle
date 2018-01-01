@@ -213,7 +213,7 @@ dependencies {
     compile 'info.guardianproject.netcipher:netcipher:2.0.0-alpha1'
     compile 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
     compile 'com.google.code.gson:gson:2.8.2'
-    compile 'com.github.medyo:android-about-page:1.2.1'
+    compile 'com.github.medyo:android-about-page:1.2.2'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'me.zhanghai.android.patternlock:library:2.1.2'
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
@@ -250,7 +250,7 @@ dependencyVerification {
             'info.guardianproject.netcipher:netcipher:eeeb5d0d95ccfe176b4296cbd71a9a24c6efb0bab5c4025a8c6bc36abdddfc75',
             'info.guardianproject.netcipher:netcipher-okhttp3:548b24763c57d273e1e3650e9974644f91c6a79350961905476456b6a485c905',
             'com.google.code.gson:gson:b7134929f7cc7c04021ec1cc27ef63ab907e410cf0588e397b8851181eb91092',
-            'com.github.medyo:android-about-page:262adb9c4e2ee9eea2ede2a1f4f64594c5f0f3a142255a70e6393361b158ad40',
+            'com.github.medyo:android-about-page:a488dca22173debb596212eeaceabce2f22df666b90be8ed775056483d76fad3',
             'de.hdodenhof:circleimageview:bc34761dcd5036229ac1ffed6b5b1bef722ad5b097a2c8bba1c5ed2cd4b5c82b',
             'me.zhanghai.android.patternlock:library:3b35da8f0ae09ce462d8ba9c896820d3bb0806151552b0af9caf349fb02dcb70',
             'com.github.armcha:AutoLinkTextView:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
