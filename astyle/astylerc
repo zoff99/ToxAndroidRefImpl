@@ -6,7 +6,7 @@
 
 # Indentation Options
 --indent-switches
---indent-preproc-block
+#--indent-preproc-block
 
 # Padding Options
 #--pad-header
