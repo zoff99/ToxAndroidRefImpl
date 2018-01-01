@@ -6,11 +6,13 @@
 
 # Indentation Options
 --indent-switches
+--indent-preproc-block
 
 # Padding Options
---pad-header
+#--pad-header
 --break-blocks
---pad-oper
+#--pad-oper
+--delete-empty-lines
 --unpad-paren
 --align-pointer=name
 --align-reference=name
