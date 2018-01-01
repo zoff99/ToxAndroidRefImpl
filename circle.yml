@@ -67,7 +67,7 @@ machine:
 
     # c-toxcore version
     # AND_CTOXCORE_VERSION: "eab6e81ec9ed5b88aa712093ea53c802ff81d611"
-    AND_CTOXCORE_VERSION: "zoff99/_0.1.10_2017_video_fix_05"
+    AND_CTOXCORE_VERSION: "zoff99/_0.1.10_2017_video_fix_07a"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
