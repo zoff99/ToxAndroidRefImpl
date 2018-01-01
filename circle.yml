@@ -104,6 +104,7 @@ dependencies:
   - sudo apt-get install clang
   - sudo apt-get install build-essential libtool autotools-dev automake checkinstall check yasm
   - sudo apt-get install pkg-config
+  - sudo apt-get install astyle ; exit 0
 
 # ------------ network_test requires that "localhost" resolves to ::1 ------------
   - sudo bash -c "echo '::1             localhost ipv6-localhost ipv6-loopback' >> /etc/hosts" # ipv6 localhost entry
@@ -112,6 +113,17 @@ dependencies:
   - java -version ; exit 0
   - gcc --version ; exit 0
   - clang --version ; exit 0
+  - sudo apt-get install astyle ; exit 0
+
+  ### ----- check code style ------
+  - cd .. ; cp -av ToxAndroidRefImpl ./astyle_check/
+  - cd ../astyle_check/ ; ls -al ./astyle/astylerc
+  - cd ../astyle_check/ ;
+    SOURCES=`find android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa -name '*.java'|sort`;
+    astyle -n --options=./astyle/astylerc jni-c-toxcore/jni-c-toxcore.c $SOURCES ; exit 0
+  - cd ../astyle_check/ ; git --no-pager diff
+  - cd ../astyle_check/ ; git diff | cat > $CIRCLE_ARTIFACTS/astyle_check.patch 2>&1
+  ### ----- check code style ------
 
   - mkdir -p /home/ubuntu/c-toxcore # workaround :-)
 
