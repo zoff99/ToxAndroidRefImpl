@@ -141,35 +141,35 @@ public class SetPasswordActivity extends AppCompatActivity
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password1))
+        if (TextUtils.isEmpty(password1))
         {
             mPasswordView1.setError(this.getString(R.string.set_password_message_empty));
             focusView = mPasswordView1;
             cancel = true;
         }
 
-        if (!isPasswordValid(password1))
+        if (isPasswordValid(password1))
         {
             mPasswordView1.setError(this.getString(R.string.set_password_message_password_invalid));
             focusView = mPasswordView1;
             cancel = true;
         }
 
-        if (!TextUtils.isEmpty(password2))
+        if (TextUtils.isEmpty(password2))
         {
             mPasswordView2.setError(this.getString(R.string.set_password_message_empty));
             focusView = mPasswordView2;
             cancel = true;
         }
 
-        if (!isPasswordValid(password2))
+        if (isPasswordValid(password2))
         {
             mPasswordView2.setError(this.getString(R.string.set_password_message_password_invalid));
             focusView = mPasswordView2;
             cancel = true;
         }
 
-        if (!TextUtils.isEmpty(password1) && !TextUtils.isEmpty(password2) && !TextUtils.equals(password1, password2))
+        if (!TextUtils.equals(password1, password2))
         {
             mPasswordView2.setError(this.getString(R.string.set_password_message_password_dont_match));
             focusView = mPasswordView2;
