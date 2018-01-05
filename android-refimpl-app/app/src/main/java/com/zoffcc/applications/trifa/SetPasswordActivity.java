@@ -148,7 +148,7 @@ public class SetPasswordActivity extends AppCompatActivity
             cancel = true;
         }
 
-        if (isPasswordValid(password1))
+        if (!isPasswordValid(password1))
         {
             mPasswordView1.setError(this.getString(R.string.set_password_message_password_invalid));
             focusView = mPasswordView1;
@@ -162,7 +162,7 @@ public class SetPasswordActivity extends AppCompatActivity
             cancel = true;
         }
 
-        if (isPasswordValid(password2))
+        if (!isPasswordValid(password2))
         {
             mPasswordView2.setError(this.getString(R.string.set_password_message_password_invalid));
             focusView = mPasswordView2;
