@@ -66,6 +66,7 @@ machine:
     # ---------------------------------------------------
 
     # c-toxcore version
+    # AND_CTOXCORE_VERSION: "eab6e81ec9ed5b88aa712093ea53c802ff81d611"
     AND_CTOXCORE_VERSION: "zoff99/_0.1.10_2017_video_fix_07a"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
@@ -103,6 +104,7 @@ dependencies:
   - sudo apt-get install clang
   - sudo apt-get install build-essential libtool autotools-dev automake checkinstall check yasm
   - sudo apt-get install pkg-config
+  - sudo apt-get install astyle ; exit 0
 
 # ------------ network_test requires that "localhost" resolves to ::1 ------------
   - sudo bash -c "echo '::1             localhost ipv6-localhost ipv6-loopback' >> /etc/hosts" # ipv6 localhost entry
@@ -111,6 +113,17 @@ dependencies:
   - java -version ; exit 0
   - gcc --version ; exit 0
   - clang --version ; exit 0
+  - sudo apt-get install astyle ; exit 0
+
+  ### ----- check code style ------
+  - cd .. ; cp -av ToxAndroidRefImpl ./astyle_check/
+  - cd ../astyle_check/ ; ls -al ./astyle/astylerc
+  - cd ../astyle_check/ ;
+    SOURCES=`find android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa -name '*.java'|sort`;
+    astyle -n --options=./astyle/astylerc jni-c-toxcore/jni-c-toxcore.c $SOURCES ; exit 0
+  - cd ../astyle_check/ ; git --no-pager diff
+  - cd ../astyle_check/ ; git diff | cat > $CIRCLE_ARTIFACTS/astyle_check.patch 2>&1
+  ### ----- check code style ------
 
   - mkdir -p /home/ubuntu/c-toxcore # workaround :-)
 
@@ -220,7 +233,14 @@ compile:
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=armv7-android-gcc
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
+    --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=armv7-android-gcc
+    --size-limit=16384x16384
+    --enable-postproc
+    --enable-multi-res-encoding
+    --enable-temporal-denoising
+    --enable-vp9-temporal-denoising
+    --enable-vp9-postproc
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -233,7 +253,7 @@ compile:
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -246,7 +266,7 @@ compile:
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-pie
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libsodium/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-pie
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -272,7 +292,7 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;export V=2;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -284,7 +304,7 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
     jni-c-toxcore.c -o libjni-c-toxcore.so
     -std=gnu99 -I/usr/local/include/
@@ -343,7 +363,15 @@ compile:
   - . ~/pp;mkdir -p ~/build/
 
   # --force-target=x86-android-gcc --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --sdk-path=/Downloads/android-ndk-r9d/
-  - . ~/pp;cd ~/build/;$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=x86-android-gcc
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr 
+    --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --disable-unit-tests
+    --sdk-path=/home/ubuntu/android-ndk --target=x86-android-gcc
+    --size-limit=16384x16384
+    --enable-postproc
+    --enable-multi-res-encoding
+    --enable-temporal-denoising
+    --enable-vp9-temporal-denoising
+    --enable-vp9-postproc
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -356,7 +384,7 @@ compile:
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/opus/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/opus/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -369,7 +397,7 @@ compile:
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/libsodium/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --disable-pie
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libsodium/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot --disable-pie
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -399,7 +427,7 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O2 -g -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O3 -g -funwind-tables -Wall -Wextra -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr
     --enable-logging --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
     --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;export V=2;make -j4
@@ -413,7 +441,7 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O2 -g -shared
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
     jni-c-toxcore.c -o libjni-c-toxcore.so
     -std=gnu99 -I/usr/local/include/
