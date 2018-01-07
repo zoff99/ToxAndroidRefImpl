@@ -3,50 +3,22 @@ machine:
     Europe/Berlin
   java:
     version: oraclejdk8
-#  environment:
-#    PATH: "/usr/bin:$PATH"
 
 dependencies:
   pre:
   - sudo apt-get update
-  - sudo apt-get install npm
-  - sudo apt-get install node nodejs nodejs-legacy
-
-  - sudo rm -f /opt/circleci/.rvm/rubies/ruby-2.2.6/bin/ruby
-  - sudo dpkg -r ruby ; exit 0
-  - sudo dpkg -r ruby-dev ; exit 0
-  - sudo dpkg -r ruby ; exit 0
-  - sudo dpkg -r ruby1.9.1 ; exit 0
-  - sudo dpkg -r ruby1.9.1-dev ; exit 0
-  - sudo dpkg -r ruby1.9.1 ; exit 0
-  - sudo dpkg -r ruby1.9.1-dev ; exit 0
-  - sudo dpkg -r libruby1.9.1 ; exit 0
-
-  - type -a ruby ; exit 0
-  - sudo apt-get install ruby2.0
-  - gem env ; exit 0
-  - type -a ruby ; exit 0
-
-  - sudo gem install rubygems-update ; exit 0
-  - sudo update_rubygems ; exit 0
-  - sudo gem install github_changelog_generator ; exit 0
-  - sudo npm install github-release-notes -g ; exit 0
+  - sudo $(which gem) install github_changelog_generator
+  #- sudo $(which npm) install github-release-notes -g ; exit 0
 
 compile:
   override:
-  - gren changelog --override ; exit 0
-  - github_changelog_generator --help ; exit 0
-  - github_changelog_generator -u zoff99 -p ToxAndroidRefImpl ; exit 0
+  #- gren changelog --override ; exit 0
+  - sudo $(which ruby) $(which github_changelog_generator) --help ; exit 0
+  - sudo $(which ruby) $(which github_changelog_generator) -u zoff99 -p ToxAndroidRefImpl ; exit 0
+  - sudo chmod a+r /home/ubuntu/CHANGELOG.md
   - ls -rattlh
-
 test:
   override:
-  - echo "dummy"
-# ----- CI artifact cleanup -----
-#    - . ~/_fullb1;mkdir -p $CIRCLE_ARTIFACTS/other/
-#    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/adb_out.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
-#    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/stderr*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
-#    - . ~/_fullb1;mv -v $CIRCLE_ARTIFACTS/stdout*.txt $CIRCLE_ARTIFACTS/other/ ; exit 0
-# ----- CI artifact cleanup -----
+  - cp -av /home/ubuntu/CHANGELOG.md $CIRCLE_ARTIFACTS/
 
 
