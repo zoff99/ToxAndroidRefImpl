@@ -14,11 +14,11 @@ compile:
   override:
   #- gren changelog --override ; exit 0
   - sudo $(which ruby) $(which github_changelog_generator) --help ; exit 0
-  - sudo $(which ruby) $(which github_changelog_generator) -u $CIRCLE_PROJECT_USERNAME -p $CIRCLE_PROJECT_REPONAME
-  - sudo chmod a+r /home/ubuntu/CHANGELOG.md
+  - sudo $(which ruby) $(which github_changelog_generator) -u "$CIRCLE_PROJECT_USERNAME" -p "$CIRCLE_PROJECT_REPONAME"
+  - sudo chmod a+r /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md
   - ls -rattlh
 test:
   override:
-  - cp -av /home/ubuntu/CHANGELOG.md $CIRCLE_ARTIFACTS/
+  - cp -av /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md
 
 
