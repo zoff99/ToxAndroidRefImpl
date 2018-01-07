@@ -7,7 +7,10 @@ machine:
 dependencies:
   pre:
   - sudo apt-get update
+  - type -a ruby
+  - sudo dpk -l |grep -i ruby
   - sudo apt-get install ruby2.0
+  - type -a ruby
   - sudo gem install github_changelog_generator
 
 compile:
