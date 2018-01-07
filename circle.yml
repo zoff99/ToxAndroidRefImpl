@@ -14,7 +14,10 @@ compile:
   override:
   #- gren changelog --override ; exit 0
   - sudo $(which ruby) $(which github_changelog_generator) --help ; exit 0
-  - sudo $(which ruby) $(which github_changelog_generator) -u "$CIRCLE_PROJECT_USERNAME" -p "$CIRCLE_PROJECT_REPONAME"
+  - sudo $(which ruby) $(which github_changelog_generator)
+     -u "$CIRCLE_PROJECT_USERNAME"
+     -p "$CIRCLE_PROJECT_REPONAME"
+     --exclude-tags 'trifajni-'
   - sudo chmod a+r /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md
   - ls -rattlh
 test:
