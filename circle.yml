@@ -10,13 +10,13 @@ dependencies:
   pre:
   - sudo apt-get update
   - sudo apt-get install npm
-  - gem env ; exit 0
+  - sudo apt-get install node
+
   - type -a ruby ; exit 0
-  - sudo dpkg -l |grep -i ruby ; exit 0
-  - sudo dpkg -r ruby ; exit 0
   - sudo apt-get install ruby2.0
   - gem env ; exit 0
   - type -a ruby ; exit 0
+
   - sudo gem install rubygems-update ; exit 0
   - sudo update_rubygems ; exit 0
   - sudo gem install github_changelog_generator ; exit 0
