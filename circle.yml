@@ -9,6 +9,7 @@ machine:
 dependencies:
   pre:
   - sudo apt-get update
+  - sudo install npm
   - gem env ; exit 0
   - type -a ruby ; exit 0
   - sudo dpkg -l |grep -i ruby ; exit 0
