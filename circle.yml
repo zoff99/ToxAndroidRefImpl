@@ -17,7 +17,8 @@ compile:
   - sudo $(which ruby) $(which github_changelog_generator)
      -u "$CIRCLE_PROJECT_USERNAME"
      -p "$CIRCLE_PROJECT_REPONAME"
-     --exclude-tags 'trifajni-'
+     --exclude-tags "$(git tag -l 'trifajni*'| tr '\n' ',')"
+     --token "$CHANGELOG_GEN_TOKEN"
   - sudo chmod a+r /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md
   - ls -rattlh
 test:
