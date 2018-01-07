@@ -11,12 +11,15 @@ dependencies:
   - sudo dpk -l |grep -i ruby
   - sudo apt-get install ruby2.0
   - type -a ruby
-  - sudo gem install github_changelog_generator
+  - sudo gem install github_changelog_generator ; exit 0
+  - sudo npm install github-release-notes -g ; exit 0
 
 compile:
   override:
-  - github_changelog_generator --help
-  - github_changelog_generator -u zoff99 -p ToxAndroidRefImpl
+  - gren changelog --override ; exit 0
+  - github_changelog_generator --help ; exit 0
+  - github_changelog_generator -u zoff99 -p ToxAndroidRefImpl ; exit 0
+  - ls -rattlh
 
 test:
   override:
