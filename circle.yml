@@ -12,6 +12,11 @@ dependencies:
   - sudo apt-get install npm
   - sudo apt-get install node
 
+  - sudo rm -f /opt/circleci/.rvm/rubies/ruby-2.2.6/bin/ruby
+  - sudo dpkg -r ruby1.9.1-dev ; exit 0
+  - sudo dpkg -r ruby1.9.1 ; exit 0
+  - sudo dpkg -r libruby1.9.1 ; exit 0
+
   - type -a ruby ; exit 0
   - sudo apt-get install ruby2.0
   - gem env ; exit 0
