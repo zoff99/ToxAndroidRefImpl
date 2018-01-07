@@ -3,6 +3,8 @@ machine:
     Europe/Berlin
   java:
     version: oraclejdk8
+  environment:
+    PATH: "/usr/bin:$PATH"
 
 dependencies:
   pre:
