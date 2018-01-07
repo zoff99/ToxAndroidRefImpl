@@ -19,6 +19,6 @@ compile:
   - ls -rattlh
 test:
   override:
-  - cp -av /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md
+  - cp -av /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md $CIRCLE_ARTIFACTS/
 
 
