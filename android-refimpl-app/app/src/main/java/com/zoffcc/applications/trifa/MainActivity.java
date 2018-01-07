@@ -55,10 +55,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.support.v8.renderscript.Allocation;
 import android.support.v8.renderscript.Element;
@@ -4453,7 +4453,6 @@ public class MainActivity extends AppCompatActivity
                 // --------------- BAD !! ---------------
                 // --------------- BAD !! ---------------
                 // --------------- BAD !! ---------------
-
 
 
                 ConferenceMessage m = new ConferenceMessage();
