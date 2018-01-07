@@ -17,6 +17,7 @@ dependencies:
   - sudo apt-get install ruby2.0
   - gem env ; exit 0
   - type -a ruby ; exit 0
+  - sudo gem install rubygems-update ; exit 0
   - sudo gem install github_changelog_generator ; exit 0
   - sudo npm install github-release-notes -g ; exit 0
 
