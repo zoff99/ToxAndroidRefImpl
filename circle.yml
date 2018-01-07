@@ -3,16 +3,18 @@ machine:
     Europe/Berlin
   java:
     version: oraclejdk8
-  environment:
-    PATH: "/usr/bin:$PATH"
+#  environment:
+#    PATH: "/usr/bin:$PATH"
 
 dependencies:
   pre:
   - sudo apt-get update
+  - gem env ; exit 0
   - type -a ruby ; exit 0
   - sudo dpkg -l |grep -i ruby ; exit 0
   - sudo dpkg -r ruby ; exit 0
   - sudo apt-get install ruby2.0
+  - gem env ; exit 0
   - type -a ruby ; exit 0
   - sudo gem install github_changelog_generator ; exit 0
   - sudo npm install github-release-notes -g ; exit 0
