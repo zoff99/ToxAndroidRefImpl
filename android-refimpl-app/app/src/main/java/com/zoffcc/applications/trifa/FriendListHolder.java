@@ -21,8 +21,10 @@ package com.zoffcc.applications.trifa;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -48,7 +50,6 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
-import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
@@ -449,6 +450,100 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
     }
 
+
+    public void show_confirm_dialog(final View view, final FriendList f2)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("Delete Friend?");
+        builder.setMessage("Do you want to delete this Friend including all Messages and Files?");
+
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+
+                            Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
+
+                            // delete friends files -------
+                            Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
+                            delete_friend_all_files(friend_num_temp);
+                            // delete friend  files -------
+
+                            // delete friends FTs -------
+                            Log.i(TAG, "onMenuItemClick:1.d:fnum=" + friend_num_temp);
+                            delete_friend_all_filetransfers(friend_num_temp);
+                            // delete friend  FTs -------
+
+                            // delete friends messages -------
+                            Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
+                            delete_friend_all_messages(friend_num_temp);
+                            // delete friend  messages -------
+
+                            // delete friend -------
+                            Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + f2.tox_public_key_string);
+                            delete_friend(f2.tox_public_key_string);
+                            // delete friend -------
+
+                            // delete friend - tox ----
+                            Log.i(TAG, "onMenuItemClick:4");
+                            if (friend_num_temp > -1)
+                            {
+                                int res = tox_friend_delete(friend_num_temp);
+                                cache_pubkey_fnum.clear();
+                                cache_fnum_pubkey.clear();
+                                update_savedata_file_wrapper(); // save toxcore datafile (friend removed)
+                                Log.i(TAG, "onMenuItemClick:5:res=" + res);
+                            }
+                            // delete friend - tox ----
+
+                            // load all friends into data list ---
+                            Log.i(TAG, "onMenuItemClick:6");
+                            try
+                            {
+                                if (MainActivity.friend_list_fragment != null)
+                                {
+                                    // reload friendlist
+                                    // TODO: only remove 1 item, don't clear all!! this can crash
+                                    MainActivity.friend_list_fragment.add_all_friends_clear(200);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            Log.i(TAG, "onMenuItemClick:7");
+                            // load all friends into data list ---
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
+                        }
+                    }
+                };
+                // TODO: use own handler
+                if (view.getHandler() != null)
+                {
+                    view.getHandler().post(myRunnable);
+                }
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     @Override
     public boolean onLongClick(final View v)
     {
@@ -478,80 +573,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         break;
                     case R.id.item_delete:
                         // delete friend -----------------
-                        Runnable myRunnable = new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                try
-                                {
-                                    long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-
-                                    Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
-
-                                    // delete friends files -------
-                                    Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
-                                    delete_friend_all_files(friend_num_temp);
-                                    // delete friend  files -------
-
-                                    // delete friends FTs -------
-                                    Log.i(TAG, "onMenuItemClick:1.d:fnum=" + friend_num_temp);
-                                    delete_friend_all_filetransfers(friend_num_temp);
-                                    // delete friend  FTs -------
-
-                                    // delete friends messages -------
-                                    Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
-                                    delete_friend_all_messages(friend_num_temp);
-                                    // delete friend  messages -------
-
-                                    // delete friend -------
-                                    Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + f2.tox_public_key_string);
-                                    delete_friend(f2.tox_public_key_string);
-                                    // delete friend -------
-
-                                    // delete friend - tox ----
-                                    Log.i(TAG, "onMenuItemClick:4");
-                                    if (friend_num_temp > -1)
-                                    {
-                                        int res = tox_friend_delete(friend_num_temp);
-                                        cache_pubkey_fnum.clear();
-                                        cache_fnum_pubkey.clear();
-                                        update_savedata_file_wrapper(); // save toxcore datafile (friend removed)
-                                        Log.i(TAG, "onMenuItemClick:5:res=" + res);
-                                    }
-                                    // delete friend - tox ----
-
-                                    // load all friends into data list ---
-                                    Log.i(TAG, "onMenuItemClick:6");
-                                    try
-                                    {
-                                        if (MainActivity.friend_list_fragment != null)
-                                        {
-                                            // reload friendlist
-                                            // TODO: only remove 1 item, don't clear all!! this can crash
-                                            MainActivity.friend_list_fragment.add_all_friends_clear(200);
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-
-                                    Log.i(TAG, "onMenuItemClick:7");
-                                    // load all friends into data list ---
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                    Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
-                                }
-                            }
-                        };
-                        // TODO: use own handler
-                        if (main_handler_s != null)
-                        {
-                            main_handler_s.post(myRunnable);
-                        }
+                        show_confirm_dialog(v, f2);
                         // delete friend -----------------
                         break;
                 }
