@@ -231,6 +231,13 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.daimajia.numberprogressbar");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/daimajia/NumberProgressBar"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
             //  --------- used libs ------------
 
             setContentView(aboutPage.create());

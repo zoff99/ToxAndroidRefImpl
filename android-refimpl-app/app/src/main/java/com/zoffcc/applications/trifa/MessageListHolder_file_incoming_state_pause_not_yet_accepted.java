@@ -59,7 +59,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
 
     ImageButton button_ok;
     ImageButton button_cancel;
-    ProgressBar ft_progressbar;
+    com.daimajia.numberprogressbar.NumberProgressBar ft_progressbar;
     ViewGroup ft_preview_container;
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
@@ -79,7 +79,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
 
         button_ok = (ImageButton) itemView.findViewById(R.id.ft_button_ok);
         button_cancel = (ImageButton) itemView.findViewById(R.id.ft_button_cancel);
-        ft_progressbar = (ProgressBar) itemView.findViewById(R.id.ft_progressbar);
+        ft_progressbar = (com.daimajia.numberprogressbar.NumberProgressBar) itemView.findViewById(R.id.ft_progressbar);
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
@@ -155,7 +155,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
         // TODO: make text better
         textView.setText("" + message.text + "\n Accept File?");
 
-        ft_progressbar.setIndeterminate(true);
+        // ft_progressbar.setIndeterminate(true);
         ft_progressbar.setVisibility(View.VISIBLE);
 
         button_ok.setOnTouchListener(new View.OnTouchListener()
@@ -176,7 +176,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
 
                         ft_progressbar.setProgress(0);
                         ft_progressbar.setMax(100);
-                        ft_progressbar.setIndeterminate(true);
+                        // ft_progressbar.setIndeterminate(true);
                         ft_progressbar.setVisibility(View.VISIBLE);
                         button_ok.setVisibility(View.GONE);
 

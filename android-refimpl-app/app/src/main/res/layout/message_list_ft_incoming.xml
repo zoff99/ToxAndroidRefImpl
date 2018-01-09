@@ -88,16 +88,28 @@
                     android:layout_marginRight="0dp"
                     android:orientation="horizontal">
 
-                    <ProgressBar
+                    // style="?android:attr/progressBarStyleHorizontal"
+
+                    <com.daimajia.numberprogressbar.NumberProgressBar
                         android:id="@+id/ft_progressbar"
-                        style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="fill_parent"
                         android:layout_height="24dp"
                         android:layout_gravity="center_vertical|center_horizontal"
                         android:minHeight="24dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
-                        android:visibility="visible"/>
+                        android:visibility="visible"
+
+                        app:progress_max="100"
+                        app:progress_reached_bar_height="15dp"
+                        app:progress_reached_color="@color/md_green_800"
+                        app:progress_text_color="@color/md_black_1000"
+                        app:progress_text_offset="5dp"
+                        app:progress_text_size="12sp"
+                        app:progress_text_visibility="visible"
+                        app:progress_unreached_bar_height="4dp"
+                        app:progress_unreached_color="#66CCCCCC"
+                        />
 
                 </LinearLayout>
 

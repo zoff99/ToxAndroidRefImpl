@@ -63,7 +63,7 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
 
     ImageButton button_ok;
     ImageButton button_cancel;
-    ProgressBar ft_progressbar;
+    com.daimajia.numberprogressbar.NumberProgressBar ft_progressbar;
     ViewGroup ft_preview_container;
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
@@ -84,7 +84,7 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
 
         button_ok = (ImageButton) itemView.findViewById(R.id.ft_button_ok);
         button_cancel = (ImageButton) itemView.findViewById(R.id.ft_button_cancel);
-        ft_progressbar = (ProgressBar) itemView.findViewById(R.id.ft_progressbar);
+        ft_progressbar = (com.daimajia.numberprogressbar.NumberProgressBar) itemView.findViewById(R.id.ft_progressbar);
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
@@ -167,7 +167,7 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
 
         ft_progressbar.setVisibility(View.VISIBLE);
         ft_progressbar.setMax(100);
-        ft_progressbar.setIndeterminate(false);
+        // ft_progressbar.setIndeterminate(false);
 
 
         ft_buttons_container.setVisibility(View.VISIBLE);
