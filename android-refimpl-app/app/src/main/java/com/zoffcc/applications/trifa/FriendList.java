@@ -35,14 +35,18 @@ public class FriendList
     @Nullable
     String name;
 
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
+    @Nullable
+    String alias_name;
+
     @Column
     @Nullable
     String status_message;
 
-    @Column
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_CONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
-    @Column
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_USER_STATUS; // 0 --> NONE, 1 --> online AWAY, 2 --> online BUSY
 
     @Column
@@ -52,6 +56,16 @@ public class FriendList
     @Column
     @Nullable
     String avatar_filename = null;
+
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    @Nullable
+    boolean notification_silent = false; // show notifications for this friend?
+
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    int sort = 0;
+
+    @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
+    long last_online_timestamp = -1L;
 
     static FriendList deep_copy(FriendList in)
     {
@@ -63,6 +77,10 @@ public class FriendList
         out.TOX_USER_STATUS = in.TOX_USER_STATUS;
         out.avatar_filename = in.avatar_filename;
         out.avatar_pathname = in.avatar_pathname;
+        out.notification_silent = in.notification_silent;
+        out.sort = in.sort;
+        out.last_online_timestamp = in.last_online_timestamp;
+        out.alias_name = in.alias_name;
 
         return out;
     }
@@ -70,6 +88,6 @@ public class FriendList
     @Override
     public String toString()
     {
-        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename;
+        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" + sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name;
     }
 }

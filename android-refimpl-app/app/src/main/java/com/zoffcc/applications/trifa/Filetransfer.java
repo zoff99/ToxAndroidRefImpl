@@ -31,7 +31,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_
 public class Filetransfer
 {
     @PrimaryKey(autoincrement = true, auto = true)
-    long id;
+    long id; // unique ID!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String tox_public_key_string = "";
@@ -40,7 +40,7 @@ public class Filetransfer
     int direction = TRIFA_FT_DIRECTION_INCOMING.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    long file_number = -1;
+    long file_number = -1; // given from toxcore!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     int kind = TOX_FILE_KIND_DATA.value;
@@ -81,7 +81,7 @@ public class Filetransfer
         out.kind = in.kind;
         out.state = in.state;
         out.ft_accepted = in.ft_accepted;
-        out.ft_outgoing_started=in.ft_outgoing_started;
+        out.ft_outgoing_started = in.ft_outgoing_started;
         out.path_name = in.path_name;
         out.file_name = in.file_name;
         out.fos_open = in.fos_open;
@@ -94,6 +94,6 @@ public class Filetransfer
     @Override
     public String toString()
     {
-        return "id=" + id + ", kind=" + kind + ", path_name=" + path_name + ", file_name=" + file_name + ", filesize=" + filesize + ", current_position=" + current_position + ", message_id=" + message_id;
+        return "id=" + id + ", kind=" + kind + ", state=" + state + ", direction=" + direction + ", path_name=" + path_name + ", file_name=" + file_name + ", filesize=" + filesize + ", current_position=" + current_position + ", message_id=" + message_id + ", tox_public_key_string=" + tox_public_key_string;
     }
 }

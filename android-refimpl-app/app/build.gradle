@@ -218,6 +218,7 @@ dependencies {
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
     compile 'com.squareup.okhttp3:okhttp:3.9.1'
+    compile 'com.daimajia.numberprogressbar:library:1.4@aar'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.0.1'
 }
@@ -281,5 +282,6 @@ dependencyVerification {
             'com.android.support:animated-vector-drawable:5b117a2c13a898c2a3c84c480d64edcfac2ef720aa9b742c29249fac774ffc48',
             'com.android.support:transition:1a7db0453c1467fc8fd815e6d50ca6bb475a7a9ba6b5f3b307329688a7c62a68',
             'com.android.support.constraint:constraint-layout-solver:8c62525a9bc5cff5633a96cb9b32fffeccaf41b8841aa87fc22607070dea9b8d',
+            'com.daimajia.numberprogressbar:library:94a81e9134f084a5327261972fc18f3afc457e8290324f7c3cae6dacb4c13ee5',
     ]
 }

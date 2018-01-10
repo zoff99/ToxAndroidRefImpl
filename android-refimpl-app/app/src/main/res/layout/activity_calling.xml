@@ -100,6 +100,26 @@
                         android:textSize="15sp"
                         android:textStyle="bold"/>
 
+                    <TextView
+                        android:id="@+id/right_top_text_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="IN   0 fps"
+                        android:textColor="@color/md_green_700"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/right_top_text_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="Out 0 fps"
+                        android:textColor="@color/md_red_700"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
                     <ImageView
                         android:id="@+id/audio_device_icon"
                         android:layout_width="30dp"
@@ -176,8 +196,8 @@
 
         <ImageButton
             android:id="@+id/camera_toggle_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
@@ -193,10 +213,37 @@
             android:text="">
         </TextView>
 
+
+
+
+        <ImageButton
+            android:id="@+id/misc_button"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:keepScreenOn="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_yellow"/>
+
+        <TextView
+            android:id="@+id/misc_button_pad"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+
+
+
+
+
         <ImageButton
             android:id="@+id/mute_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"

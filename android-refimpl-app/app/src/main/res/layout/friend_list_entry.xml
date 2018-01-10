@@ -1,27 +1,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="fill_parent"
-              android:layout_height="?android:attr/listPreferredItemHeight"
-              android:elevation="0dp"
-              android:padding="0dip"
+              android:layout_height="75dp"
               android:layout_margin="0dp"
-              android:orientation="horizontal">
+              android:background="@null"
+              android:elevation="0dp"
+              android:orientation="horizontal"
+              android:padding="0dip">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_margin="2dp"
-                    android:background="@color/md_grey_100"
-                    android:elevation="3dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@drawable/friend_list_round_bg"
+                    android:elevation="2dp"
                     android:padding="2dip">
+
+        <ImageView
+            android:id="@+id/f_notification"
+            android:layout_width="33dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="6dip"
+            android:padding="6dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/circle_red"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/f_avatar_icon"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="35dp"
             android:layout_height="fill_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
             android:layout_marginRight="6dip"
+            android:layout_toRightOf="@id/f_notification"
             android:src="@drawable/circle_blue"
             app:civ_border_color="#40000000"
             app:civ_border_width="2dp"/>
@@ -52,28 +68,53 @@
         <TextView
             android:id="@+id/f_status_message"
             android:layout_width="fill_parent"
-            android:layout_height="18dp"
-            android:layout_alignParentBottom="true"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
+            android:layout_below="@+id/f_name"
             android:layout_toRightOf="@id/f_user_status_icon"
             android:ellipsize="marquee"
+            android:fontFamily="monospace"
+            android:gravity="center_vertical"
+            android:maxLines="2"
+            android:paddingRight="6dp"
+            android:text="this is my status message long line this is my status message long line this is my status message long line"
+            android:textSize="11sp"
+            android:typeface="monospace"/>
+
+        <TextView
+            android:id="@+id/f_last_online_timestamp"
+            android:layout_width="fill_parent"
+            android:layout_height="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/f_status_message"
+            android:layout_toRightOf="@id/f_user_status_icon"
+            android:ellipsize="marquee"
+            android:fontFamily="monospace"
+            android:gravity="center_vertical"
             android:maxLines="1"
-            android:text="this is my status message"
-            android:textSize="10sp"/>
+            android:paddingRight="5dp"
+            android:text="2017-02-02 16:30:15"
+            android:textSize="10sp"
+            android:typeface="serif"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/f_name"
             android:layout_width="fill_parent"
-            android:layout_height="22dip"
-            android:layout_above="@id/f_status_message"
+            android:layout_height="20dip"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_alignWithParentIfMissing="true"
             android:layout_toRightOf="@id/f_user_status_icon"
             android:gravity="center_vertical"
             android:maxLines="1"
+            android:paddingRight="5dp"
             android:text="example name"
-            android:textSize="14sp"/>
+            android:textSize="16sp"
+            android:textStyle="bold"/>
 
 
         <FrameLayout
@@ -101,9 +142,9 @@
                 android:text="120"
                 android:textAlignment="center"
                 android:textColor="#ffffff"
-                android:textSize="10dp"
+                android:textSize="10sp"
                 android:textStyle="bold"
-                android:visibility="visible">
+                android:visibility="invisible">
             </TextView>
 
         </FrameLayout>

@@ -30,7 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -46,24 +46,33 @@ import java.net.URLConnection;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
+import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
     private static final String TAG = "trifa.MessageListHolder";
 
-    private Message message2;
+    private Message message_;
     private Context context;
 
     ImageButton button_ok;
     ImageButton button_cancel;
-    ProgressBar ft_progressbar;
+    com.daimajia.numberprogressbar.NumberProgressBar ft_progressbar;
     ViewGroup ft_preview_container;
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    TextView date_time;
+    ViewGroup layout_message_container;
+    boolean is_selected = false;
+    TextView message_text_date_string;
+    ViewGroup message_text_date;
 
     public MessageListHolder_file_incoming_state_cancel(View itemView, Context c)
     {
@@ -75,16 +84,17 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
         button_ok = (ImageButton) itemView.findViewById(R.id.ft_button_ok);
         button_cancel = (ImageButton) itemView.findViewById(R.id.ft_button_cancel);
-        ft_progressbar = (ProgressBar) itemView.findViewById(R.id.ft_progressbar);
+        ft_progressbar = (com.daimajia.numberprogressbar.NumberProgressBar) itemView.findViewById(R.id.ft_progressbar);
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
+        layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
+        message_text_date_string = (TextView) itemView.findViewById(R.id.message_text_date_string);
+        message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
     }
 
     public void bindMessageList(Message m)
@@ -97,6 +107,74 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             // only afer a crash
             m = new Message();
         }
+
+        message_ = m;
+
+        is_selected = false;
+        if (selected_messages.isEmpty())
+        {
+            is_selected = false;
+        }
+        else
+        {
+            if (selected_messages.contains(m.id))
+            {
+                is_selected = true;
+            }
+            else
+            {
+                is_selected = false;
+            }
+        }
+
+        if (is_selected)
+        {
+            layout_message_container.setBackgroundColor(Color.GRAY);
+        }
+        else
+        {
+            layout_message_container.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        message_text_date.setVisibility(View.GONE);
+        int my_position = this.getAdapterPosition();
+        if (my_position != RecyclerView.NO_POSITION)
+        {
+            if (MainActivity.message_list_fragment != null)
+            {
+                if (MainActivity.message_list_fragment.adapter != null)
+                {
+                    if (my_position < 1)
+                    {
+                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        {
+                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+        }
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+
+
+        itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
+
+        layout_message_container.setOnClickListener(onclick_listener);
+        layout_message_container.setOnLongClickListener(onlongclick_listener);
+
+        date_time.setText(long_date_time_format(m.rcvd_timestamp));
 
         final Message message = m;
 
@@ -217,7 +295,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             ft_preview_image.setVisibility(View.VISIBLE);
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -263,24 +341,33 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     @Override
     public void onClick(View v)
     {
-        Log.i(TAG, "onClick");
-        try
-        {
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "onClick:EE:" + e.getMessage());
-        }
+        //  Log.i(TAG, "onClick");
     }
 
     @Override
     public boolean onLongClick(final View v)
     {
-        Log.i(TAG, "onLongClick");
-
-        // sfinal Message m2 = this.message;
-
+        // Log.i(TAG, "onLongClick");
         return true;
     }
+
+    private View.OnClickListener onclick_listener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            is_selected = onClick_message_helper(v, is_selected, message_);
+        }
+    };
+
+    private View.OnLongClickListener onlongclick_listener = new View.OnLongClickListener()
+    {
+        @Override
+        public boolean onLongClick(final View v)
+        {
+            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected, message_);
+            is_selected = res.is_selected;
+            return res.ret_value;
+        }
+    };
 }

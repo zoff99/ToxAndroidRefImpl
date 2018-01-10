@@ -32,10 +32,15 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
 
+import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
+import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
@@ -46,6 +51,9 @@ import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
+import static com.zoffcc.applications.trifa.MainActivity.receiver1;
+import static com.zoffcc.applications.trifa.MainActivity.receiver2;
+import static com.zoffcc.applications.trifa.MainActivity.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
@@ -59,11 +67,21 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FULL_SPEED_SECONDS_AFTER_WENT_ONLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_NODES;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_offline_timestamp;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
 
 public class TrifaToxService extends Service
 {
@@ -79,7 +97,6 @@ public class TrifaToxService extends Service
     static boolean is_tox_started = false;
     static boolean global_toxid_text_set = false;
     static boolean TOX_SERVICE_STARTED = false;
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -266,6 +283,24 @@ public class TrifaToxService extends Service
 
                         try
                         {
+                            unregisterReceiver(receiver1);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        try
+                        {
+                            unregisterReceiver(receiver2);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        try
+                        {
                             Log.i(TAG, "stop_me:008");
                             nmn2.cancel(ONGOING_NOTIFICATION_ID);
                             Log.i(TAG, "stop_me:009");
@@ -354,6 +389,12 @@ public class TrifaToxService extends Service
                 change_notification(0); // set to offline
                 Log.i(TAG, "stop_tox_fg:008");
                 set_all_friends_offline();
+                Log.i(TAG, "set_all_conferences_inactive:003");
+                set_all_conferences_inactive();
+
+                // so that the app knows we went offline
+                global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+
                 is_tox_started = false;
 
                 Log.i(TAG, "stop_tox_fg:009");
@@ -397,7 +438,7 @@ public class TrifaToxService extends Service
                         if (!global_toxid_text_set)
                         {
                             global_toxid_text_set = true;
-                            MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + get_my_toxid());
+                            // MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + get_my_toxid());
                         }
                     }
                 };
@@ -409,8 +450,10 @@ public class TrifaToxService extends Service
 
                 if (!old_is_tox_started)
                 {
+                    Log.i(TAG, "set_all_conferences_inactive:004");
+                    set_all_conferences_inactive();
                     MainActivity.init_tox_callbacks();
-                    MainActivity.update_savedata_file();
+                    MainActivity.update_savedata_file_wrapper();
                 }
                 // ------ correct startup order ------
 
@@ -445,7 +488,7 @@ public class TrifaToxService extends Service
                 }
                 Log.i(TAG, "AAA:011");
 
-                MainActivity.update_savedata_file();
+                MainActivity.update_savedata_file_wrapper();
 
                 // TODO --------
 
@@ -559,7 +602,10 @@ public class TrifaToxService extends Service
                             if (MainActivity.friend_list_fragment != null)
                             {
                                 // reload friend in friendlist
-                                MainActivity.friend_list_fragment.modify_friend(fl_check.get(0), -1);
+                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                                cc.is_friend = true;
+                                cc.friend_item = fl_check.get(0);
+                                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                             }
                         }
                         catch (Exception e)
@@ -596,7 +642,9 @@ public class TrifaToxService extends Service
                 if (!old_is_tox_started)
                 {
                     bootstrapping = true;
-                    Log.i(TAG, "bootrapping:set to true");
+                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                    Log.i(TAG, "global_self_last_went_offline_timestamp[1]=" + global_self_last_went_offline_timestamp + " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
+                    Log.i(TAG, "bootrapping:set to true[1]");
                     try
                     {
                         tox_service_fg.change_notification_fg(0); // set notification to "bootstrapping"
@@ -606,31 +654,15 @@ public class TrifaToxService extends Service
                         e.printStackTrace();
                     }
 
-                    // ----- UDP ------
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("178.62.250.138", 33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("nodes.tox.chat", 33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("130.133.110.14", 33445, "461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("tox.zodiaclabs.org", 33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("163.172.136.118", 33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("217.182.143.254", 443, "7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("185.14.30.213", 443, "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("136.243.141.187", 443, "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("128.199.199.197", 33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09"));
-                    Log.i(TAG, "bootstrap_single:res=" + MainActivity.bootstrap_single_wrapper("biribiri.org", 33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67"));
-                    // ----- UDP ------
-                    //
-                    // ----- TCP ------
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("178.62.250.138", 33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("nodes.tox.chat", 33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("130.133.110.14", 33445, "461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("tox.zodiaclabs.org", 33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("163.172.136.118", 33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("217.182.143.254", 443, "7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("185.14.30.213", 443, "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("136.243.141.187", 443, "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("128.199.199.197", 33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09"));
-                    Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("biribiri.org", 33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67"));
-                    // ----- TCP ------
+                    try
+                    {
+                        bootstrap_me();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "bootstrap_me:001:EE:" + e.getMessage());
+                    }
                 }
 
                 // --------------- bootstrap ---------------
@@ -669,6 +701,9 @@ public class TrifaToxService extends Service
                     }
                 }
 
+                global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp + " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
+
 
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -679,15 +714,74 @@ public class TrifaToxService extends Service
                 {
                     try
                     {
-                        if (tox_iteration_interval_ms < 10)
+                        if (tox_iteration_interval_ms < 3)
                         {
-                            Log.i(TAG, "tox_iterate:(tox_iteration_interval_ms < 10ms!!):" + tox_iteration_interval_ms + "ms");
-                            Thread.sleep(10);
+                            Log.i(TAG, "tox_iterate:(tox_iteration_interval_ms < 2ms!!):" + tox_iteration_interval_ms + "ms");
+                            Thread.sleep(3);
                         }
                         else
                         {
-                            // Log.i(TAG, "(tox_iteration_interval_ms):" + tox_iteration_interval_ms + "ms");
-                            Thread.sleep(tox_iteration_interval_ms);
+                            if (PREF__X_battery_saving_mode)
+                            {
+                                if ((global_self_connection_status != ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value) && (Callstate.state == 0))
+                                {
+                                    if ((global_self_last_went_online_timestamp + FULL_SPEED_SECONDS_AFTER_WENT_ONLINE * 1000) < System.currentTimeMillis())
+                                    {
+                                        Thread.sleep(TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE); // sleep longer!!
+                                    }
+                                    else
+                                    {
+                                        Thread.sleep(tox_iteration_interval_ms);
+                                    }
+                                }
+                                else
+                                {
+                                    Thread.sleep(tox_iteration_interval_ms);
+                                }
+                            }
+                            else
+                            {
+                                // Log.i(TAG, "(tox_iteration_interval_ms):" + tox_iteration_interval_ms + "ms");
+                                Thread.sleep(tox_iteration_interval_ms);
+                            }
+                        }
+
+
+                        // ----------
+                        if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value)
+                        {
+                            if (HAVE_INTERNET_CONNECTIVITY)
+                            {
+                                if (global_self_last_went_offline_timestamp != -1)
+                                {
+                                    if (global_self_last_went_offline_timestamp + TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS < System.currentTimeMillis())
+                                    {
+                                        Log.i(TAG, "offline and we have internet connectivity --> bootstrap again ...");
+                                        global_self_last_went_offline_timestamp = System.currentTimeMillis();
+
+                                        bootstrapping = true;
+                                        Log.i(TAG, "bootrapping:set to true[2]");
+                                        try
+                                        {
+                                            tox_service_fg.change_notification_fg(0); // set notification to "bootstrapping"
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }
+
+                                        try
+                                        {
+                                            bootstrap_me();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                            Log.i(TAG, "bootstrap_me:001:EE:" + e.getMessage());
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     catch (InterruptedException e)
@@ -704,7 +798,7 @@ public class TrifaToxService extends Service
                     if (s_time + 4000 < System.currentTimeMillis())
                     {
                         tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
-                        Log.i(TAG, "tox_iterate:--END--:took" + ((float) s_time / 1000f) + "s, new inerval=" + tox_iteration_interval_ms + "ms");
+                        Log.i(TAG, "tox_iterate:--END--:took" + (long) (((float) (s_time - System.currentTimeMillis()) / 1000f)) + "s, new inerval=" + tox_iteration_interval_ms + "ms");
                     }
                 }
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -780,6 +874,97 @@ public class TrifaToxService extends Service
         startForeground(ONGOING_NOTIFICATION_ID, notification2);
     }
 
+    static void bootstrap_me()
+    {
+        // ----- UDP ------
+        get_udp_nodelist_from_db();
+        Log.i(TAG, "bootstrap_node_list[sort]=" + bootstrap_node_list.toString());
+        try
+        {
+            Collections.shuffle(bootstrap_node_list);
+            Collections.shuffle(bootstrap_node_list);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Log.i(TAG, "bootstrap_node_list[rand]=" + bootstrap_node_list.toString());
+
+        try
+        {
+            Iterator i2 = bootstrap_node_list.iterator();
+            BootstrapNodeEntryDB ee;
+            int used = 0;
+            while (i2.hasNext())
+            {
+                ee = (BootstrapNodeEntryDB) i2.next();
+                int bootstrap_result = MainActivity.bootstrap_single_wrapper(ee.ip, ee.port, ee.key_hex);
+                Log.i(TAG, "bootstrap_single:res=" + bootstrap_result);
+
+                if (bootstrap_result == 0)
+                {
+                    used++;
+                }
+
+                if (used > USE_MAX_NUMBER_OF_BOOTSTRAP_NODES)
+                {
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        // ----- UDP ------
+        //
+        // ----- TCP ------
+        get_tcprelay_nodelist_from_db();
+        Log.i(TAG, "tcprelay_node_list[sort]=" + tcprelay_node_list.toString());
+        try
+        {
+            Collections.shuffle(tcprelay_node_list);
+            Collections.shuffle(tcprelay_node_list);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Log.i(TAG, "tcprelay_node_list[rand]=" + tcprelay_node_list.toString());
+
+        try
+        {
+            Iterator i2 = tcprelay_node_list.iterator();
+            BootstrapNodeEntryDB ee;
+            int used = 0;
+            while (i2.hasNext())
+            {
+                ee = (BootstrapNodeEntryDB) i2.next();
+                int bootstrap_result = MainActivity.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex);
+                Log.i(TAG, "add_tcp_relay_single:res=" + bootstrap_result);
+
+                if (bootstrap_result == 0)
+                {
+                    used++;
+                }
+
+                if (used > USE_MAX_NUMBER_OF_BOOTSTRAP_NODES)
+                {
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        // ----- TCP ------
+
+        // ----- TCP mobile ------
+        // Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("127.0.0.1", 33447, "252E6D7F8168682363BC473C3951357FB2E28BC9A7B7E1F4CB3B302DC331BDAA".substring(0, (TOX_PUBLIC_KEY_SIZE * 2) - 0)));
+        // ----- TCP mobile ------
+    }
+
     @Override
     public boolean onUnbind(Intent intent)
     {
@@ -821,7 +1006,7 @@ public class TrifaToxService extends Service
 
     static String safe_string(byte[] in)
     {
-        Log.i(TAG, "safe_string:in=" + in);
+        // Log.i(TAG, "safe_string:in=" + in);
         String out = "";
 
         try
@@ -843,7 +1028,7 @@ public class TrifaToxService extends Service
             }
         }
 
-        Log.i(TAG, "safe_string:out=" + out);
+        // Log.i(TAG, "safe_string:out=" + out);
         return out;
     }
     // --------------- JNI ---------------

@@ -10,5 +10,4 @@
     app:navigationContentDescription="@string/abc_action_bar_up_description"
     app:navigationIcon="?attr/homeAsUpIndicator"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    app:title="@string/settings_toolbar_title"
-    />
+    app:title="@string/settings_toolbar_title"/>
