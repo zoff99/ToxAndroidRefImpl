@@ -11,6 +11,7 @@ Build Status
 =
 **CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003)
 **Bintray:** [![Download](https://api.bintray.com/packages/zoff99/maven/trifajni/images/download.svg)](https://bintray.com/zoff99/maven/trifajni/_latestVersion)
+**Methods:** <a href="http://www.methodscount.com/?lib=com.zoffcc.applications.trifajni%3Atrifa-jni-lib%3A%2B"><img src="https://img.shields.io/badge/Methods and size-2 | 2525 KB-e91e63.svg"/></a>
 
 Compile in Android Studio
 =
