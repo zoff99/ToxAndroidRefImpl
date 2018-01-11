@@ -346,7 +346,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     public void add_item(Message new_item)
     {
-        // Log.i(TAG, "add_item:" + new_item + ":" + this.messagelistitems.size());
+        Log.i(TAG, "add_item:" + new_item + ":" + this.messagelistitems.size());
 
         try
         {

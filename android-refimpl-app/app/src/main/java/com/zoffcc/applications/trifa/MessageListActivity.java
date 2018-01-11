@@ -81,6 +81,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
 import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_messageid_from_id;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FILE_PICK_METHOD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -895,6 +896,8 @@ public class MessageListActivity extends AppCompatActivity
             return;
         }
 
+        Log.i(TAG, "add_outgoing_file:friendnum(2)=" + friendnum);
+
         Filetransfer f = new Filetransfer();
         f.tox_public_key_string = tox_friend_get_public_key__wrapper(friendnum);
         f.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
@@ -914,12 +917,12 @@ public class MessageListActivity extends AppCompatActivity
         f.id = ft_id;
 
         // Message m_tmp = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(3)).orderByMessage_idDesc().get(0);
-        Log.i(TAG, "MM2MM:2:" + ft_id);
+        Log.i(TAG, "add_outgoing_file:MM2MM:2:" + ft_id);
 
 
         // ---------- DEBUG ----------
         Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
-        Log.i(TAG, "MM2MM:4a:" + "fid=" + ft_tmp.id + " mid=" + ft_tmp.message_id);
+        Log.i(TAG, "add_outgoing_file:MM2MM:4a:" + "fid=" + ft_tmp.id + " mid=" + ft_tmp.message_id);
         // ---------- DEBUG ----------
 
 
@@ -943,22 +946,23 @@ public class MessageListActivity extends AppCompatActivity
         m.id = new_msg_id;
 
         // ---------- DEBUG ----------
-        Log.i(TAG, "MM2MM:3:" + new_msg_id);
+        Log.i(TAG, "add_outgoing_file:MM2MM:3:" + new_msg_id);
         Message m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
-        Log.i(TAG, "MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
+        Log.i(TAG, "add_outgoing_file:MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
         // ---------- DEBUG ----------
 
         f.message_id = new_msg_id;
-        update_filetransfer_db_messageid_from_id(f, ft_id);
+        // ** // update_filetransfer_db_messageid_from_id(f, ft_id);
+        update_filetransfer_db_full(f);
 
         // ---------- DEBUG ----------
         Filetransfer ft_tmp2 = orma.selectFromFiletransfer().idEq(ft_id).get(0);
-        Log.i(TAG, "MM2MM:4b:" + "fid=" + ft_tmp2.id + " mid=" + ft_tmp2.message_id);
+        Log.i(TAG, "add_outgoing_file:MM2MM:4b:" + "fid=" + ft_tmp2.id + " mid=" + ft_tmp2.message_id);
         // ---------- DEBUG ----------
 
         // ---------- DEBUG ----------
         m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
-        Log.i(TAG, "MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
+        Log.i(TAG, "add_outgoing_file:MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
         // ---------- DEBUG ----------
 
         // --- ??? should we do this here?

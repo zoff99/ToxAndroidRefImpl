@@ -74,7 +74,8 @@ public class MessageListFragment extends Fragment
             // reset "new" flags for messages -------
             if (orma != null)
             {
-                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(
+                        false).execute();
             }
             // reset "new" flags for messages -------
         }
@@ -88,7 +89,8 @@ public class MessageListFragment extends Fragment
             if (orma != null)
             {
                 // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+                data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                        tox_friend_get_public_key__wrapper(current_friendnum)).toList();
                 Log.i(TAG, "loading data:001");
                 // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
                 // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
@@ -214,7 +216,8 @@ public class MessageListFragment extends Fragment
                 // reset "new" flags for messages -------
                 if (orma != null)
                 {
-                    orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                    orma.updateMessage().tox_friendpubkeyEq(
+                            tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
                     Log.i(TAG, "loading data:002");
                 }
                 // reset "new" flags for messages -------
@@ -267,7 +270,8 @@ public class MessageListFragment extends Fragment
         try
         {
             // reset "new" flags for messages -------
-            orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(
+                    false).execute();
             // reset "new" flags for messages -------
         }
         catch (Exception e)
@@ -285,7 +289,8 @@ public class MessageListFragment extends Fragment
                     data_values.clear();
                 }
                 Log.i(TAG, "data_values:005b");
-                adapter.add_list_clear(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
+                adapter.add_list_clear(orma.selectFromMessage().tox_friendpubkeyEq(
+                        tox_friend_get_public_key__wrapper(current_friendnum)).toList());
                 Log.i(TAG, "data_values:005c");
             }
             Log.i(TAG, "data_values:005d");
@@ -339,6 +344,7 @@ public class MessageListFragment extends Fragment
                 }
                 catch (Exception e)
                 {
+                    Log.i(TAG, "add_message:EE1:" + e.getMessage());
                     e.printStackTrace();
                 }
             }
