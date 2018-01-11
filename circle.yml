@@ -582,7 +582,7 @@ compile:
     - if [ "$EMU_" == "appemu23" ]; then echo "no" | android create avd -n appemu23 -f -t android-23 --abi default/armeabi-v7a --skin "WXGA720" ; fi
     - if [ "$EMU_" == "appemu23" ]; then cat ~/.android/avd/appemu23.avd/config.ini ; fi
 #
-    - if [ "$EMU_" == "appemu21" ]; then echo "no" | android create avd -n appemu21 -f -t android-21 --abi default/armeabi-v7a --skin "WXGA720" ; fi
+    - if [ "$EMU_" == "appemu21" ]; then echo "no" | android create avd -n appemu21 -f -t android-21 --abi google_apis/armeabi-v7a --skin "WXGA720" ; fi
     - if [ "$EMU_" == "appemu21" ]; then cat ~/.android/avd/appemu21.avd/config.ini ; fi
 #
     - if [ "$EMU_" == "appemu10" ]; then echo "no" | android create avd -n appemu10 -f -t android-10 --abi default/armeabi --skin "WQVGA432" ; fi
