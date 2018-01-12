@@ -300,6 +300,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__X_battery_saving_mode = false;
     static boolean PREF__X_misc_button_enabled = false;
     static String PREF__X_misc_button_msg = "t"; // TODO: hardcoded for now!
+    static boolean PREF__U_keep_nospam = false;
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
@@ -462,6 +463,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         PREF__fps_half = settings.getBoolean("fps_half", true);
+        PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
         PREF__set_fps = settings.getBoolean("set_fps", true);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
@@ -701,8 +703,25 @@ public class MainActivity extends AppCompatActivity
 
         // TODO: remake this into something nicer ----------
         top_imageview = (ImageView) this.findViewById(R.id.main_maintopimage);
-        top_imageview.setImageResource(R.drawable.web_hi_res_512);
         top_imageview.setVisibility(View.GONE);
+
+        if (PREF__U_keep_nospam == true)
+        {
+            top_imageview.setBackgroundColor(Color.TRANSPARENT);
+            // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
+            final Drawable d1 = new IconicsDrawable(this).
+                    icon(FontAwesome.Icon.faw_exclamation_circle).
+                    paddingDp(20).
+                    color(getResources().getColor(R.color.md_red_600)).
+                    sizeDp(100);
+            top_imageview.setImageDrawable(d1);
+        }
+        else
+        {
+            top_imageview.setBackgroundColor(Color.TRANSPARENT);
+            top_imageview.setImageResource(R.drawable.web_hi_res_512);
+        }
+
         fadeInAndShowImage(top_imageview, 5000);
         fadeOutAndHideImage(mt, 4000);
         // TODO: remake this into something nicer ----------
@@ -1684,11 +1703,30 @@ public class MainActivity extends AppCompatActivity
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         PREF__fps_half = settings.getBoolean("fps_half", true);
+        PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
         PREF__set_fps = settings.getBoolean("set_fps", true);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
+
+        if (PREF__U_keep_nospam == true)
+        {
+            top_imageview.setBackgroundColor(Color.TRANSPARENT);
+            // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
+            final Drawable d1 = new IconicsDrawable(this).
+                    icon(FontAwesome.Icon.faw_exclamation_circle).
+                    paddingDp(20).
+                    color(getResources().getColor(R.color.md_red_600)).
+                    sizeDp(100);
+            top_imageview.setImageDrawable(d1);
+        }
+        else
+        {
+            top_imageview.setBackgroundColor(Color.TRANSPARENT);
+            top_imageview.setImageResource(R.drawable.web_hi_res_512);
+        }
+
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {
@@ -3255,13 +3293,16 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
 
-                // ---- set new random nospam value after each added friend ----
-                // ---- set new random nospam value after each added friend ----
-                // ---- set new random nospam value after each added friend ----
-                set_new_random_nospam_value();
-                // ---- set new random nospam value after each added friend ----
-                // ---- set new random nospam value after each added friend ----
-                // ---- set new random nospam value after each added friend ----
+                if (PREF__U_keep_nospam == false)
+                {
+                    // ---- set new random nospam value after each added friend ----
+                    // ---- set new random nospam value after each added friend ----
+                    // ---- set new random nospam value after each added friend ----
+                    set_new_random_nospam_value();
+                    // ---- set new random nospam value after each added friend ----
+                    // ---- set new random nospam value after each added friend ----
+                    // ---- set new random nospam value after each added friend ----
+                }
             }
         };
         t.start();

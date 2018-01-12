@@ -77,6 +77,18 @@
         android:title="@string/pref_title_udp_enabled"/>
 
     <PreferenceCategory
+        android:title="! unsafe !">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="U_keep_nospam"
+            android:summary="@string/pref_description_U_keep_nospam"
+            android:title="@string/pref_title_U_keep_nospam"/>
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
         android:title="! eXperimental !">
 
         <SwitchPreference

@@ -147,7 +147,8 @@ public class ProfileActivity extends AppCompatActivity
         // don't show keyboard when activity starts
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
         profile_icon.setImageDrawable(d1);
 
         mytoxid_textview.setText("");
@@ -168,7 +169,8 @@ public class ProfileActivity extends AppCompatActivity
                     properties.selection_mode = DialogConfigs.SINGLE_MODE;
                     properties.selection_type = DialogConfigs.FILE_SELECT;
                     properties.root = new java.io.File("/");
-                    properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                    properties.error_dir = new java.io.File(
+                            Environment.getExternalStorageDirectory().getAbsolutePath());
                     properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
                     // TODO: hardcoded is always bad
                     properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF"};
@@ -186,10 +188,13 @@ public class ProfileActivity extends AppCompatActivity
                                 String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
                                 String src_filename = new File(files[0]).getName();
                                 Log.i(TAG, "select_avatar:p=" + src_path + " f=" + src_filename);
-                                copy_real_file_to_vfs_file(src_path, src_filename, VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
-                                set_g_opts("VFS_OWN_AVATAR_FNAME", VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+                                copy_real_file_to_vfs_file(src_path, src_filename, VFS_PREFIX + VFS_OWN_AVATAR_DIR,
+                                                           "avatar.png");
+                                set_g_opts("VFS_OWN_AVATAR_FNAME",
+                                           VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
 
-                                put_vfs_image_on_imageview(ProfileActivity.this, profile_icon, d1, VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+                                put_vfs_image_on_imageview(ProfileActivity.this, profile_icon, d1,
+                                                           VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
                             }
                             catch (Exception e)
                             {
@@ -257,7 +262,9 @@ public class ProfileActivity extends AppCompatActivity
             String color_nospam = "<font color=\"#990d45\">";
             String color_chksum = "<font color=\"#006600\">";
             String ec = "</font>";
-            mytoxid_textview.setText(Html.fromHtml(color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum + my_chksum_temp + ec));
+            mytoxid_textview.setText(Html.fromHtml(
+                    color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum +
+                    my_chksum_temp + ec));
         }
         catch (WriterException e)
         {
@@ -277,7 +284,8 @@ public class ProfileActivity extends AppCompatActivity
 
         try
         {
-            id_data = Identicon.create_identicon(MainActivity.get_my_toxid().substring(0, (ToxVars.TOX_PUBLIC_KEY_SIZE * 2))); // Pubkey
+            id_data = Identicon.create_identicon(
+                    MainActivity.get_my_toxid().substring(0, (ToxVars.TOX_PUBLIC_KEY_SIZE * 2))); // Pubkey
 
             int w = my_identicon_imageview.getWidth();
             int h = my_identicon_imageview.getHeight();
@@ -357,8 +365,10 @@ public class ProfileActivity extends AppCompatActivity
 
         try
         {
-            global_my_name = mynick_edittext.getText().toString().substring(0, Math.min(mynick_edittext.getText().toString().length(), TOX_MAX_NAME_LENGTH));
-            global_my_status_message = mystatus_message_edittext.getText().toString().substring(0, Math.min(mystatus_message_edittext.getText().toString().length(), TOX_MAX_STATUS_MESSAGE_LENGTH));
+            global_my_name = mynick_edittext.getText().toString().substring(0, Math.min(
+                    mynick_edittext.getText().toString().length(), TOX_MAX_NAME_LENGTH));
+            global_my_status_message = mystatus_message_edittext.getText().toString().substring(0, Math.min(
+                    mystatus_message_edittext.getText().toString().length(), TOX_MAX_STATUS_MESSAGE_LENGTH));
             tox_self_set_name(global_my_name);
             tox_self_set_status_message(global_my_status_message);
             update_savedata_file_wrapper();

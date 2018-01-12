@@ -86,6 +86,9 @@
     <string name="pref_title_local_discovery_enabled">LAN discovery</string>
     <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
 
+    <string name="pref_title_U_keep_nospam">keep NoSpam</string>
+    <string name="pref_description_U_keep_nospam">keep NoSpam value. This is not safe, only activate if you know what you are doing!</string>
+
     <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
     <string name="pref_description_X_battery_saving_mode">!! Expermimental !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
 
