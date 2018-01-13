@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
+import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
@@ -224,7 +225,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 with(avatar.getContext()).
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(StringSignature2("_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
+                                signature(StringSignature2(
+                                        "_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
                                 placeholder(d_lock).
                                 priority(Priority.HIGH).
                                 skipMemoryCache(false).
@@ -272,7 +274,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     with(avatar.getContext()).
                                     load(f1).
                                     diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                    signature(StringSignature2("_friendlist_avatar_" + new_avatar_pathname + "/" + new_avatar_filename)).
+                                    signature(StringSignature2(
+                                            "_friendlist_avatar_" + new_avatar_pathname + "/" + new_avatar_filename)).
                                     placeholder(d_lock).
                                     priority(Priority.HIGH).
                                     skipMemoryCache(false).
@@ -318,7 +321,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             load(byteArray).
                             placeholder(d_lock).
                             diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            signature(StringSignature2("_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
+                            signature(StringSignature2(
+                                    "_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
                             skipMemoryCache(false).
                             apply(glide_options).
                             into(avatar);
@@ -355,7 +359,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         try
         {
-            int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(fl.tox_public_key_string).and().is_newEq(true).count();
+            int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
+                    fl.tox_public_key_string).and().is_newEq(true).count();
             if (new_messages_count > 0)
             {
                 if (new_messages_count > 300)
@@ -403,8 +408,33 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             icon(GoogleMaterial.Icon.gmd_notifications_off).
                             color(context.getResources().
                                     getColor(R.color.colorPrimaryDark)).
-                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(
+                            FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
                     f_notification.setImageDrawable(d_notification);
+
+                    try
+                    {
+                        if (friend_list_fragment != null)
+                        {
+                            // TODO: dirty hack, make better
+                            final boolean sorted_reload = true;
+                            if (!sorted_reload)
+                            {
+                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                                cc.is_friend = true;
+                                cc.friend_item = this.friendlist;
+                                friend_list_fragment.modify_friend(cc, cc.is_friend);
+                            }
+                            else
+                            {
+                                friend_list_fragment.add_all_friends_clear(0);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 else
                 {
@@ -418,6 +448,30 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     getColor(R.color.colorPrimaryDark)).
                             alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
                     f_notification.setImageDrawable(d_notification);
+
+                    try
+                    {
+                        if (friend_list_fragment != null)
+                        {
+                            // TODO: dirty hack, make better
+                            final boolean sorted_reload = true;
+                            if (!sorted_reload)
+                            {
+                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                                cc.is_friend = true;
+                                cc.friend_item = this.friendlist;
+                                friend_list_fragment.modify_friend(cc, cc.is_friend);
+                            }
+                            else
+                            {
+                                friend_list_fragment.add_all_friends_clear(0);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
             else
@@ -510,11 +564,11 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             Log.i(TAG, "onMenuItemClick:6");
                             try
                             {
-                                if (MainActivity.friend_list_fragment != null)
+                                if (friend_list_fragment != null)
                                 {
                                     // reload friendlist
                                     // TODO: only remove 1 item, don't clear all!! this can crash
-                                    MainActivity.friend_list_fragment.add_all_friends_clear(200);
+                                    friend_list_fragment.add_all_friends_clear(200);
                                 }
                             }
                             catch (Exception e)
