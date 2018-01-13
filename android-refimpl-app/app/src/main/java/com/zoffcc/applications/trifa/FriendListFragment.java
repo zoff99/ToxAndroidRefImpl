@@ -252,7 +252,7 @@ public class FriendListFragment extends Fragment
             // reload friendlist
             Log.i(TAG, "onResume:AA");
             List<FriendList> fl = orma.selectFromFriendList().
-                    orderByTOX_CONNECTIONDesc().
+                    orderByTOX_CONNECTION_on_offDesc().
                     orderByNotification_silentAsc().
                     orderByLast_online_timestampDesc().
                     toList();
@@ -330,10 +330,10 @@ public class FriendListFragment extends Fragment
                             in_update_data = true;
 
                             Thread.sleep(delay);
-
                             adapter.clear_items(); // clears friends AND conferences!!
+
                             List<FriendList> fl = orma.selectFromFriendList().
-                                    orderByTOX_CONNECTIONDesc().
+                                    orderByTOX_CONNECTION_on_offDesc().
                                     orderByNotification_silentAsc().
                                     orderByLast_online_timestampDesc().
                                     toList();

@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
+import static com.zoffcc.applications.trifa.MainActivity.get_toxconnection_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
@@ -554,6 +555,7 @@ public class TrifaToxService extends Service
                         // get the real "live" connection status of this friend
                         // the value in the database may be old (and wrong)
                         f.TOX_CONNECTION = tox_friend_get_connection_status(MainActivity.friends[fc]);
+                        f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
                     }
                     catch (Exception e)
                     {
@@ -586,7 +588,7 @@ public class TrifaToxService extends Service
                     else
                     {
                         Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
-                        orma.updateFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
+                        orma.updateFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_CONNECTION_on_off(get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
                         Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
                     }
 

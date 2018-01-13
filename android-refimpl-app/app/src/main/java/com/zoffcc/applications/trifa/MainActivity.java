@@ -1963,6 +1963,7 @@ public class MainActivity extends AppCompatActivity
                 name(f.name).
                 status_message(f.status_message).
                 TOX_CONNECTION(f.TOX_CONNECTION).
+                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
                 execute();
     }
@@ -1993,6 +1994,7 @@ public class MainActivity extends AppCompatActivity
         orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_CONNECTION(f.TOX_CONNECTION).
+                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
                 execute();
     }
 
@@ -3064,6 +3066,8 @@ public class MainActivity extends AppCompatActivity
             }
 
             f.TOX_CONNECTION = a_TOX_CONNECTION;
+            f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
+
             update_friend_in_db_connection_status(f);
 
             try
@@ -3248,6 +3252,7 @@ public class MainActivity extends AppCompatActivity
                 f.tox_public_key_string = friend_public_key__final;
                 f.TOX_USER_STATUS = 0;
                 f.TOX_CONNECTION = 0;
+                f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
                 // set name as the last 5 char of the publickey (until we get a proper name)
                 f.name = friend_public_key__final.substring(friend_public_key__final.length() - 5,
                                                             friend_public_key__final.length());
@@ -6689,6 +6694,7 @@ public class MainActivity extends AppCompatActivity
             }
             f.TOX_USER_STATUS = 0;
             f.TOX_CONNECTION = 0;
+            f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
             f.avatar_filename = null;
             f.avatar_pathname = null;
 
@@ -8248,6 +8254,18 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPreExecute()
         {
+        }
+    }
+
+    static int get_toxconnection_wrapper(int TOX_CONNECTION_)
+    {
+        if (TOX_CONNECTION_ == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return 1;
         }
     }
 

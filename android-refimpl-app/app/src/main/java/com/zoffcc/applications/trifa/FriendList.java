@@ -47,6 +47,9 @@ public class FriendList
     int TOX_CONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    int TOX_CONNECTION_on_off; // 0 --> offline, 1 --> online
+
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_USER_STATUS; // 0 --> NONE, 1 --> online AWAY, 2 --> online BUSY
 
     @Column
@@ -74,6 +77,7 @@ public class FriendList
         out.name = in.name;
         out.status_message = in.status_message;
         out.TOX_CONNECTION = in.TOX_CONNECTION;
+        out.TOX_CONNECTION_on_off = in.TOX_CONNECTION_on_off;
         out.TOX_USER_STATUS = in.TOX_USER_STATUS;
         out.avatar_filename = in.avatar_filename;
         out.avatar_pathname = in.avatar_pathname;
@@ -88,6 +92,10 @@ public class FriendList
     @Override
     public String toString()
     {
-        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" + sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name;
+        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", status_message=" +
+               status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_CONNECTION_on_off=" +
+               TOX_CONNECTION_on_off + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
+               ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
+               sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name;
     }
 }
