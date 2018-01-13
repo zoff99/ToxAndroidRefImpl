@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity
     static TextView mt = null;
     ImageView top_imageview = null;
     static boolean native_lib_loaded = false;
+    static boolean native_audio_lib_loaded = false;
     static String app_files_directory = "";
     // static boolean stop_me = false;
     // static Thread ToxServiceThread = null;
@@ -4848,7 +4849,7 @@ public class MainActivity extends AppCompatActivity
         {
             System.loadLibrary("jni-c-toxcore");
             native_lib_loaded = true;
-            Log.i(TAG, "successfully loaded native library");
+            Log.i(TAG, "successfully loaded jni-c-toxcore library");
         }
         catch (java.lang.UnsatisfiedLinkError e)
         {
@@ -4856,6 +4857,20 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "loadLibrary jni-c-toxcore failed!");
             e.printStackTrace();
         }
+
+        try
+        {
+            System.loadLibrary("native-audio-jni");
+            native_audio_lib_loaded = true;
+            Log.i(TAG, "successfully loaded native-audio-jni library");
+        }
+        catch (java.lang.UnsatisfiedLinkError e)
+        {
+            native_audio_lib_loaded = false;
+            Log.i(TAG, "loadLibrary native-audio-jni failed!");
+            e.printStackTrace();
+        }
+
     }
 
     public static void add_single_conference_message_from_messge_id(final long message_id, final boolean force)
