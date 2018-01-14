@@ -99,7 +99,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
 
             Element tox_link = new Element();
             tox_link.setTitle("What is Tox?");
-            Intent tox_faq_page = new Intent(Intent.ACTION_VIEW, Uri.parse("https://tox.chat/faq.html"));
+            Intent tox_faq_page = new Intent(Intent.ACTION_VIEW, Uri.parse("https://tox.zoff.cc"));
             tox_link.setIntent(tox_faq_page);
             aboutPage.addItem(tox_link);
 
