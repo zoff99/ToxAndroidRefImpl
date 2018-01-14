@@ -212,34 +212,33 @@ public class AudioReceiver extends Thread
                 NativeAudio.sampling_rate = 48000;
                 NativeAudio.channel_count = 2;
 
-                NativeAudio.createEngine();
+                NativeAudio.createEngine(NativeAudio.n_audio_in_buffer_max_count);
 
                 int sampleRate = NativeAudio.sampling_rate;
                 int channels = NativeAudio.channel_count;
 
                 System.out.println("NativeAudio:[2]sampleRate=" + sampleRate + " channels=" + channels);
 
-                NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels);
 
-                NativeAudio.n_buf_size_in_bytes = 9600 * 10; // (48000*1*2) = 96000;
-                NativeAudio.n_audio_buffer_1 = ByteBuffer.allocateDirect(NativeAudio.n_buf_size_in_bytes);
-                NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer_1, NativeAudio.n_buf_size_in_bytes, 1);
+                NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count);
 
-                NativeAudio.n_audio_buffer_2 = ByteBuffer.allocateDirect(NativeAudio.n_buf_size_in_bytes);
-                NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer_2, NativeAudio.n_buf_size_in_bytes, 2);
+                NativeAudio.n_buf_size_in_bytes = (sampleRate * channels * 2) / 10; // = 100ms // (48000*1*2) = 96000;
 
-                //                for (int j = 0; j < NativeAudio.n_buf_size_in_bytes - 1; j++)
-                //                {
-                //                    NativeAudio.n_audio_buffer_2.position(j);
-                //                    NativeAudio.n_audio_buffer_2.put((byte) (j % 200));
-                //                }
+                for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
+                {
+                    NativeAudio.n_audio_buffer[i] = ByteBuffer.allocateDirect(NativeAudio.n_buf_size_in_bytes);
+                    NativeAudio.n_bytes_in_buffer[i] = 0;
+                    NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer[i], NativeAudio.n_buf_size_in_bytes, i);
+                }
 
                 NativeAudio.n_cur_buf = 1;
-                NativeAudio.n_bytes_in_buffer_1 = 0;
-                NativeAudio.n_bytes_in_buffer_2 = 0;
+                for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
+                {
+                    NativeAudio.n_bytes_in_buffer[i] = 0;
+                }
 
-                int res = NativeAudio.PlayPCM16(1);
-                Log.i(TAG, "audio_play:NativeAudio Play:res=" + res);
+                //int res = NativeAudio.PlayPCM16(1);
+                //Log.i(TAG, "audio_play:NativeAudio Play:res=" + res);
             }
             else
             {

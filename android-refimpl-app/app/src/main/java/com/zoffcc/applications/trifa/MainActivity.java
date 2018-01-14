@@ -2812,98 +2812,87 @@ public class MainActivity extends AppCompatActivity
 
                 audio_buffer_2[0].position(0);
                 int incoming_bytes = (int) ((sample_count * channels) * 2);
-                if (NativeAudio.n_cur_buf == 1)
+
+
+                if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
                 {
-                    if (NativeAudio.n_bytes_in_buffer_1 < NativeAudio.n_buf_size_in_bytes)
+                    int remain_bytes = incoming_bytes - (NativeAudio.n_buf_size_in_bytes -
+                                                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    int remain_start_pos = (incoming_bytes - remain_bytes);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(
+                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(), 0,
+                                                                          Math.min(incoming_bytes,
+                                                                                   NativeAudio.n_buf_size_in_bytes -
+                                                                                   NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]));
+
+                    // Log.i(TAG, "audio_play:NativeAudio:put 1:remain_bytes=" + remain_bytes);
+
+                    if (remain_bytes > 0)
                     {
-                        int remain_bytes =
-                                incoming_bytes - (NativeAudio.n_buf_size_in_bytes - NativeAudio.n_bytes_in_buffer_1);
-                        int remain_start_pos = (incoming_bytes - remain_bytes);
-                        NativeAudio.n_audio_buffer_1.position(NativeAudio.n_bytes_in_buffer_1);
-                        NativeAudio.n_audio_buffer_1.put(audio_buffer_2[0].array(), 0, Math.min(incoming_bytes,
-                                                                                                NativeAudio.n_buf_size_in_bytes -
-                                                                                                NativeAudio.n_bytes_in_buffer_1));
+                        //audio_buffer_2[0].position(remain_start_pos);
+                        audio_buffer_2[0].position(0);
 
-                        // Log.i(TAG, "audio_play:NativeAudio:put 1:remain_bytes=" + remain_bytes);
+                        int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+                        // System.out.println("NativeAudioPlay:001:res=" + res);
 
-                        if (remain_bytes > 0)
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+                        if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
                         {
-                            //audio_buffer_2[0].position(remain_start_pos);
-                            audio_buffer_2[0].position(0);
-
-                            NativeAudio.n_bytes_in_buffer_1 = 0;
-                            NativeAudio.n_cur_buf = 2;
-
-                            NativeAudio.n_audio_buffer_2.position(0);
-                            NativeAudio.n_audio_buffer_2.put(audio_buffer_2[0].array(), remain_start_pos, remain_bytes);
-
-                            NativeAudio.n_bytes_in_buffer_2 = remain_bytes;
-                        }
-                        else if (remain_bytes == 0)
-                        {
-                            NativeAudio.n_bytes_in_buffer_1 = 0;
-                            NativeAudio.n_cur_buf = 2;
+                            NativeAudio.n_cur_buf = 0;
                         }
                         else
                         {
-                            NativeAudio.n_bytes_in_buffer_1 = NativeAudio.n_bytes_in_buffer_1 + incoming_bytes;
-
-                            //                            for (int j = 0; j < NativeAudio.n_buf_size_in_bytes - 1; j++)
-                            //                            {
-                            //                                NativeAudio.n_audio_buffer_1.position(j);
-                            //                                NativeAudio.n_audio_buffer_1.put((byte) (j % 200));
-                            //                            }
+                            NativeAudio.n_cur_buf++;
                         }
+
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(0);
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
+                                                                              remain_start_pos, remain_bytes);
+
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = remain_bytes;
                     }
-                    else
+                    else if (remain_bytes == 0)
                     {
-                        NativeAudio.n_bytes_in_buffer_1 = 0;
-                        NativeAudio.n_cur_buf = 2;
-                    }
-                }
-                else // (NativeAudio.n_cur_buf == 2)
-                {
-                    if (NativeAudio.n_bytes_in_buffer_2 < NativeAudio.n_buf_size_in_bytes)
-                    {
-                        int remain_bytes =
-                                incoming_bytes - (NativeAudio.n_buf_size_in_bytes - NativeAudio.n_bytes_in_buffer_2);
-                        int remain_start_pos = (incoming_bytes - remain_bytes);
-                        NativeAudio.n_audio_buffer_2.position(NativeAudio.n_bytes_in_buffer_2);
-                        NativeAudio.n_audio_buffer_2.put(audio_buffer_2[0].array(), 0, Math.min(incoming_bytes,
-                                                                                                NativeAudio.n_buf_size_in_bytes -
-                                                                                                NativeAudio.n_bytes_in_buffer_2));
-
-                        // Log.i(TAG, "audio_play:NativeAudio:put 2");
-
-                        if (remain_bytes > 0)
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+                        int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+                        if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
                         {
-                            //audio_buffer_2[0].position(remain_start_pos);
-                            audio_buffer_2[0].position(0);
-
-                            NativeAudio.n_bytes_in_buffer_2 = 0;
-                            NativeAudio.n_cur_buf = 1;
-
-                            NativeAudio.n_audio_buffer_1.position(0);
-                            NativeAudio.n_audio_buffer_1.put(audio_buffer_2[0].array(), remain_start_pos, remain_bytes);
-
-                            NativeAudio.n_bytes_in_buffer_1 = remain_bytes;
-                        }
-                        else if (remain_bytes == 0)
-                        {
-                            NativeAudio.n_bytes_in_buffer_2 = 0;
-                            NativeAudio.n_cur_buf = 1;
+                            NativeAudio.n_cur_buf = 0;
                         }
                         else
                         {
-                            NativeAudio.n_bytes_in_buffer_2 = NativeAudio.n_bytes_in_buffer_2 + incoming_bytes;
+                            NativeAudio.n_cur_buf++;
                         }
+                        // System.out.println("NativeAudioPlay:002:res=" + res);
                     }
                     else
                     {
-                        NativeAudio.n_bytes_in_buffer_2 = 0;
-                        NativeAudio.n_cur_buf = 1;
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] =
+                                NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
+
+                        //                            for (int j = 0; j < NativeAudio.n_buf_size_in_bytes - 1; j++)
+                        //                            {
+                        //                                NativeAudio.n_audio_buffer_1.position(j);
+                        //                                NativeAudio.n_audio_buffer_1.put((byte) (j % 200));
+                        //                            }
+                        // System.out.println("NativeAudioPlay:002a");
                     }
                 }
+                else
+                {
+                    NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+                    if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
+                    {
+                        NativeAudio.n_cur_buf = 0;
+                    }
+                    else
+                    {
+                        NativeAudio.n_cur_buf++;
+                    }
+                    // System.out.println("NativeAudioPlay:002b");
+                }
+
             }
             else
             {
