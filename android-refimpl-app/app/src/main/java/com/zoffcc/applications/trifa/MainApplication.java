@@ -56,7 +56,7 @@ public class MainApplication extends Application
     // -----------------------
     // -----------------------
     // -----------------------
-    final static boolean CATCH_EXCEPTIONS = true; // set "true" for release builds!
+    final static boolean CATCH_EXCEPTIONS = false; // set "true" for release builds!
     // -----------------------
     // -----------------------
     // -----------------------

@@ -28,8 +28,13 @@ import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.util.Log;
 
+import com.zoffcc.applications.nativeaudio.NativeAudio;
+
+import java.nio.ByteBuffer;
+
 import static com.zoffcc.applications.trifa.CallingActivity.update_audio_device_icon;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.isBluetoothScoOn_old;
 import static com.zoffcc.applications.trifa.MainActivity.isWiredHeadsetOn_old;
@@ -64,15 +69,15 @@ public class AudioReceiver extends Thread
 
     public AudioReceiver()
     {
-        try
-        {
-            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        //        try
+        //        {
+        //            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        //            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //        }
         stopped = false;
         finished = false;
         start();
@@ -138,7 +143,8 @@ public class AudioReceiver extends Thread
 
         // Log.i(TAG, "t_prio:" + run_adb_command());
 
-        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize, AudioTrack.MODE_STREAM);
+        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize,
+                               AudioTrack.MODE_STREAM);
         // track = new AudioTrack(AudioManager.ROUTE_HEADSET, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize, AudioTrack.MODE_STREAM);
 
         try
@@ -201,186 +207,247 @@ public class AudioReceiver extends Thread
 
         try
         {
-            track = findAudioTrack();
+            if (PREF__use_native_audio_play)
+            {
+                NativeAudio.sampling_rate = 48000;
+                NativeAudio.channel_count = 2;
+
+                NativeAudio.createEngine();
+
+                int sampleRate = NativeAudio.sampling_rate;
+                int channels = NativeAudio.channel_count;
+
+                System.out.println("NativeAudio:[2]sampleRate=" + sampleRate + " channels=" + channels);
+
+                NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels);
+
+                NativeAudio.n_buf_size_in_bytes = 9600 * 10; // (48000*1*2) = 96000;
+                NativeAudio.n_audio_buffer_1 = ByteBuffer.allocateDirect(NativeAudio.n_buf_size_in_bytes);
+                NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer_1, NativeAudio.n_buf_size_in_bytes, 1);
+
+                NativeAudio.n_audio_buffer_2 = ByteBuffer.allocateDirect(NativeAudio.n_buf_size_in_bytes);
+                NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer_2, NativeAudio.n_buf_size_in_bytes, 2);
+
+                //                for (int j = 0; j < NativeAudio.n_buf_size_in_bytes - 1; j++)
+                //                {
+                //                    NativeAudio.n_audio_buffer_2.position(j);
+                //                    NativeAudio.n_audio_buffer_2.put((byte) (j % 200));
+                //                }
+
+                NativeAudio.n_cur_buf = 1;
+                NativeAudio.n_bytes_in_buffer_1 = 0;
+                NativeAudio.n_bytes_in_buffer_2 = 0;
+
+                int res = NativeAudio.PlayPCM16(1);
+                Log.i(TAG, "audio_play:NativeAudio Play:res=" + res);
+            }
+            else
+            {
+
+                track = findAudioTrack();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                {
+                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
+                    lec = null;
+                    try
+                    {
+                        if (ACTVIATE_LEC)
+                        {
+                            lec = new LoudnessEnhancer(track.getAudioSessionId());
+
+                            int res = lec.setEnabled(true);
+                            Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res + " SUCCESS=" +
+                                       AudioEffect.SUCCESS);
+
+                            float target_gain = lec.getTargetGain();
+                            Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
+
+                            if (PREF__audiosource == 1)
+                            {
+                                lec.setTargetGain(AUDIO_GAIN_VALUE);
+                            }
+                            else
+                            {
+                                // leave sound as is
+                            }
+
+                            target_gain = lec.getTargetGain();
+                            Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.i(TAG, "Audio Thread [IN]:EE1:" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
+
+
+                    Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:===============================");
+                    erv = null;
+                    try
+                    {
+                        if (ACTVIATE_ERVB)
+                        {
+                            erv = new EnvironmentalReverb(0, track.getAudioSessionId());
+                            int res = erv.setEnabled(true);
+                            // erv.setReflectionsLevel((short) -8500);
+                            // erv.setRoomLevel((short) -8500);
+                            // **//                    erv.setDecayHFRatio((short) 1000);
+                            // **//                    erv.setDecayTime(10000);
+                            // **//                    erv.setDensity((short) 1000);
+                            // **//                    erv.setDiffusion((short) 1000);
+                            // **//                    erv.setReverbLevel((short) 1000);
+                            // **//                    erv.setReverbDelay(100);
+                            Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:setEnabled:" + res + " SUCCESS=" +
+                                       AudioEffect.SUCCESS);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.i(TAG, "Audio Thread [IN]:EE1:" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:===============================");
+
+
+                }
+
+                int res = track.setPlaybackRate((int) sampling_rate_);
+
+                if (res != AudioTrack.SUCCESS)
+                {
+                    Log.i(TAG, "Audio Thread [IN]:setPlaybackRate(" + sampling_rate_ + ")=" + res);
+                }
+
+                try
+                {
+                    track.setPlaybackHeadPosition(0);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                track.play();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        if (PREF__use_native_audio_play)
+        {
+            while (!stopped)
+            {
+                try
+                {
+                    Thread.sleep(500);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "audio_play:recthr:EE2:" + e.getMessage());
+                }
+            }
+        }
+        else
+        {
+
+            // int res = 0;
+            // int read_bytes = 0;
+            // int played_bytes = 0;
+            while (!stopped)
+            {
+                try
+                {
+                    //                // puts data into "audio_buffer_play"
+                    //                // if ((audio_buffer_read_write(0, 0, 0, false)) && (audio_buffer_play_length > 0))
+                    //                if (audio_buffer_read_write(0, 0, 0, false))
+                    //                {
+                    //                    // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
+                    //
+                    //                    // ------- HINT: this will block !! -------
+                    //                    // ------- HINT: this will block !! -------
+                    //                    // ------- HINT: this will block !! -------
+                    //                    track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
+                    //                    // ------- HINT: this will block !! -------
+                    //                    // ------- HINT: this will block !! -------
+                    //                    // ------- HINT: this will block !! -------
+                    //
+                    //                    // Thread.sleep(sleep_millis);
+                    //
+                    //                    // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
+                    //                    // Log.i(TAG, "audio_play:recthr:play:bytes=" + played_bytes + " len=" + audio_buffer_play_length);
+                    //                }
+                    //                else
+                    //                {
+                    //                    try
+                    //                    {
+                    //                        // Log.i(TAG, "audio_play:recthr:no data");
+                    //                        Thread.sleep(sleep_millis);
+                    //                    }
+                    //                    catch (InterruptedException esleep)
+                    //                    {
+                    //                        Log.i(TAG, "audio_play:recthr:wake up:" + esleep.getMessage());
+                    //                    }
+                    //                }
+
+                    Thread.sleep(sleep_millis);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "audio_play:recthr:EE2:" + e.getMessage());
+                }
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             {
-                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
-                lec = null;
                 try
                 {
-                    if (ACTVIATE_LEC)
-                    {
-                        lec = new LoudnessEnhancer(track.getAudioSessionId());
-
-                        int res = lec.setEnabled(true);
-                        Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:setEnabled:" + res + " SUCCESS=" + AudioEffect.SUCCESS);
-
-                        float target_gain = lec.getTargetGain();
-                        Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:1:" + target_gain);
-
-                        if (PREF__audiosource == 1)
-                        {
-                            lec.setTargetGain(AUDIO_GAIN_VALUE);
-                        }
-                        else
-                        {
-                            // leave sound as is
-                        }
-
-                        target_gain = lec.getTargetGain();
-                        Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:getTargetGain:2:" + target_gain);
-                    }
+                    lec.release();
                 }
                 catch (Exception e)
                 {
-                    Log.i(TAG, "Audio Thread [IN]:EE1:" + e.getMessage());
+                    Log.i(TAG, "Audio Thread [IN]:EE3:" + e.getMessage());
                     e.printStackTrace();
                 }
-                Log.i(TAG, "Audio Thread [IN]:LoudnessEnhancer:===============================");
-
-
-                Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:===============================");
-                erv = null;
-                try
-                {
-                    if (ACTVIATE_ERVB)
-                    {
-                        erv = new EnvironmentalReverb(0, track.getAudioSessionId());
-                        int res = erv.setEnabled(true);
-                        // erv.setReflectionsLevel((short) -8500);
-                        // erv.setRoomLevel((short) -8500);
-                        // **//                    erv.setDecayHFRatio((short) 1000);
-                        // **//                    erv.setDecayTime(10000);
-                        // **//                    erv.setDensity((short) 1000);
-                        // **//                    erv.setDiffusion((short) 1000);
-                        // **//                    erv.setReverbLevel((short) 1000);
-                        // **//                    erv.setReverbDelay(100);
-                        Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:setEnabled:" + res + " SUCCESS=" + AudioEffect.SUCCESS);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "Audio Thread [IN]:EE1:" + e.getMessage());
-                    e.printStackTrace();
-                }
-                Log.i(TAG, "Audio Thread [IN]:EnvironmentalReverb:===============================");
-
-
-            }
-
-            int res = track.setPlaybackRate((int) sampling_rate_);
-
-            if (res != AudioTrack.SUCCESS)
-            {
-                Log.i(TAG, "Audio Thread [IN]:setPlaybackRate(" + sampling_rate_ + ")=" + res);
             }
 
             try
             {
-                track.setPlaybackHeadPosition(0);
+                track.stop();
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
-            track.play();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        // int res = 0;
-        // int read_bytes = 0;
-        // int played_bytes = 0;
-        while (!stopped)
-        {
             try
             {
-                //                // puts data into "audio_buffer_play"
-                //                // if ((audio_buffer_read_write(0, 0, 0, false)) && (audio_buffer_play_length > 0))
-                //                if (audio_buffer_read_write(0, 0, 0, false))
-                //                {
-                //                    // Log.i(TAG, "audio_play:RecThread:1:len=" + audio_buffer_play_length);
-                //
-                //                    // ------- HINT: this will block !! -------
-                //                    // ------- HINT: this will block !! -------
-                //                    // ------- HINT: this will block !! -------
-                //                    track.write(audio_buffer_play.array(), 0, audio_buffer_play_length);
-                //                    // ------- HINT: this will block !! -------
-                //                    // ------- HINT: this will block !! -------
-                //                    // ------- HINT: this will block !! -------
-                //
-                //                    // Thread.sleep(sleep_millis);
-                //
-                //                    // Log.i(TAG, "audio_play:RecThread:2:len=" + audio_buffer_play_length);
-                //                    // Log.i(TAG, "audio_play:recthr:play:bytes=" + played_bytes + " len=" + audio_buffer_play_length);
-                //                }
-                //                else
-                //                {
-                //                    try
-                //                    {
-                //                        // Log.i(TAG, "audio_play:recthr:no data");
-                //                        Thread.sleep(sleep_millis);
-                //                    }
-                //                    catch (InterruptedException esleep)
-                //                    {
-                //                        Log.i(TAG, "audio_play:recthr:wake up:" + esleep.getMessage());
-                //                    }
-                //                }
-
-                Thread.sleep(sleep_millis);
+                track.flush();
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-                Log.i(TAG, "audio_play:recthr:EE2:" + e.getMessage());
             }
-        }
+            track.release();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-        {
             try
             {
-                lec.release();
+                audio_manager_s.setSpeakerphoneOn(MainActivity.isSpeakerPhoneOn_old);
+                audio_manager_s.setMode(MainActivity.AudioMode_old);
+                audio_manager_s.setRingerMode(MainActivity.RingerMode_old);
+                audio_manager_s.setWiredHeadsetOn(isWiredHeadsetOn_old);
+                audio_manager_s.setBluetoothScoOn(isBluetoothScoOn_old);
             }
             catch (Exception e)
             {
-                Log.i(TAG, "Audio Thread [IN]:EE3:" + e.getMessage());
                 e.printStackTrace();
             }
-        }
 
-        try
-        {
-            track.stop();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            track.flush();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        track.release();
-
-        try
-        {
-            audio_manager_s.setSpeakerphoneOn(MainActivity.isSpeakerPhoneOn_old);
-            audio_manager_s.setMode(MainActivity.AudioMode_old);
-            audio_manager_s.setRingerMode(MainActivity.RingerMode_old);
-            audio_manager_s.setWiredHeadsetOn(isWiredHeadsetOn_old);
-            audio_manager_s.setBluetoothScoOn(isBluetoothScoOn_old);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
         }
 
         finished = true;
@@ -390,6 +457,11 @@ public class AudioReceiver extends Thread
     public static void close()
     {
         stopped = true;
+
+        NativeAudio.StopPCM16();
+        NativeAudio.shutdownEngine();
+
+        System.out.println("NativeAudio:shutdown");
     }
 
 }
