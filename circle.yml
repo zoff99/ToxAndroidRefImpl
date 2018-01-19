@@ -113,7 +113,7 @@ dependencies:
   - java -version ; exit 0
   - gcc --version ; exit 0
   - clang --version ; exit 0
-  - sudo apt-get install astyle ; exit 0
+  - astyle --version ; exit 0
 
   ### ----- check code style ------
   - cd .. ; cp -av ToxAndroidRefImpl ./astyle_check/
