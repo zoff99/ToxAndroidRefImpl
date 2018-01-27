@@ -697,7 +697,9 @@ public class TrifaToxService extends Service
                     {
                         Log.i(TAG, "need_add_bots:start");
                         add_friend_real(ECHOBOT_TOXID);
-                        add_friend_real(GROUPBOT_TOXID);
+                        // HINT: Disabled per request JFreegman ---------
+                        // add_friend_real(GROUPBOT_TOXID);
+                        // ----------------------------------------------
                         set_g_opts("ADD_BOTS_ON_STARTUP_done", "true");
                         Log.i(TAG, "need_add_bots=true (INSERT)");
                     }
