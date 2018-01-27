@@ -99,6 +99,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
+import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
@@ -218,6 +219,7 @@ public class MainActivity extends AppCompatActivity
     static TextView mt = null;
     ImageView top_imageview = null;
     static boolean native_lib_loaded = false;
+    static boolean native_audio_lib_loaded = false;
     static String app_files_directory = "";
     // static boolean stop_me = false;
     // static Thread ToxServiceThread = null;
@@ -301,6 +303,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__X_misc_button_enabled = false;
     static String PREF__X_misc_button_msg = "t"; // TODO: hardcoded for now!
     static boolean PREF__U_keep_nospam = false;
+    static boolean PREF__use_native_audio_play = false;
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
@@ -469,6 +472,8 @@ public class MainActivity extends AppCompatActivity
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
+        PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", false);
+
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
         {
@@ -1241,7 +1246,9 @@ public class MainActivity extends AppCompatActivity
         receiverFilter2 = new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
         receiver2 = new HeadsetStateReceiver();
         registerReceiver(receiver2, receiverFilter2);
+
     }
+
 
     public static void clearCache_s()
     {
@@ -1709,6 +1716,7 @@ public class MainActivity extends AppCompatActivity
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
+        PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", false);
 
         if (PREF__U_keep_nospam == true)
         {
@@ -2792,27 +2800,127 @@ public class MainActivity extends AppCompatActivity
         // TODO: dirty hack, "make good"
         try
         {
-            // audio_buffer_read_write(sample_count, channels, sampling_rate, true);
-            if (audio_receiver_thread != null)
+            if (PREF__use_native_audio_play)
             {
-                if (!audio_receiver_thread.stopped)
+                // Log.i(TAG, "audio_play:NativeAudio Play:001");
+
+
+                if ((NativeAudio.sampling_rate != (int) sampling_rate_) || (NativeAudio.channel_count != channels_))
                 {
-                    //                    if (android.os.Build.VERSION.SDK_INT >= 23)
-                    //                    {
-                    //                        // AudioTrack.write() called with invalid size (3840) value
-                    //                        audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
-                    //                    }
-                    if (android.os.Build.VERSION.SDK_INT >= 21)
+                    NativeAudio.sampling_rate = (int) sampling_rate_;
+                    NativeAudio.channel_count = channels_;
+                    Log.i(TAG, "audio_play:NativeAudio restart Engine");
+                    NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
+                }
+
+                audio_buffer_2[0].position(0);
+                int incoming_bytes = (int) ((sample_count * channels) * 2);
+
+
+                if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
+                {
+                    int remain_bytes = incoming_bytes - (NativeAudio.n_buf_size_in_bytes -
+                                                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    int remain_start_pos = (incoming_bytes - remain_bytes);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(
+                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(), 0,
+                                                                          Math.min(incoming_bytes,
+                                                                                   NativeAudio.n_buf_size_in_bytes -
+                                                                                   NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]));
+
+                    // Log.i(TAG, "audio_play:NativeAudio:put 1:remain_bytes=" + remain_bytes);
+
+                    if (remain_bytes > 0)
                     {
-                        // AudioTrack.write() called with invalid size (3840) value
+                        //audio_buffer_2[0].position(remain_start_pos);
                         audio_buffer_2[0].position(0);
-                        audio_receiver_thread.track.write(audio_buffer_2[0], (int) ((sample_count * channels) * 2),
-                                                          AudioTrack.WRITE_NON_BLOCKING);
+
+                        int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+                        // System.out.println("NativeAudioPlay:001:res=" + res);
+
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+                        if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
+                        {
+                            NativeAudio.n_cur_buf = 0;
+                        }
+                        else
+                        {
+                            NativeAudio.n_cur_buf++;
+                        }
+
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(0);
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
+                                                                              remain_start_pos, remain_bytes);
+
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = remain_bytes;
+                    }
+                    else if (remain_bytes == 0)
+                    {
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+                        int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+                        if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
+                        {
+                            NativeAudio.n_cur_buf = 0;
+                        }
+                        else
+                        {
+                            NativeAudio.n_cur_buf++;
+                        }
+                        // System.out.println("NativeAudioPlay:002:res=" + res);
                     }
                     else
                     {
-                        audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0,
-                                                          (int) ((sample_count * channels) * 2));
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] =
+                                NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
+
+                        //                            for (int j = 0; j < NativeAudio.n_buf_size_in_bytes - 1; j++)
+                        //                            {
+                        //                                NativeAudio.n_audio_buffer_1.position(j);
+                        //                                NativeAudio.n_audio_buffer_1.put((byte) (j % 200));
+                        //                            }
+                        // System.out.println("NativeAudioPlay:002a");
+                    }
+                }
+                else
+                {
+                    NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+                    if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
+                    {
+                        NativeAudio.n_cur_buf = 0;
+                    }
+                    else
+                    {
+                        NativeAudio.n_cur_buf++;
+                    }
+                    // System.out.println("NativeAudioPlay:002b");
+                }
+
+            }
+            else
+            {
+                // audio_buffer_read_write(sample_count, channels, sampling_rate, true);
+                if (audio_receiver_thread != null)
+                {
+                    if (!audio_receiver_thread.stopped)
+                    {
+                        //                    if (android.os.Build.VERSION.SDK_INT >= 23)
+                        //                    {
+                        //                        // AudioTrack.write() called with invalid size (3840) value
+                        //                        audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
+                        //                    }
+                        if (android.os.Build.VERSION.SDK_INT >= 21)
+                        {
+                            // AudioTrack.write() called with invalid size (3840) value
+                            audio_buffer_2[0].position(0);
+                            audio_receiver_thread.track.write(audio_buffer_2[0], (int) ((sample_count * channels) * 2),
+                                                              AudioTrack.WRITE_NON_BLOCKING);
+                        }
+                        else
+                        {
+                            audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0,
+                                                              (int) ((sample_count * channels) * 2));
+                        }
                     }
                 }
             }
@@ -4848,7 +4956,7 @@ public class MainActivity extends AppCompatActivity
         {
             System.loadLibrary("jni-c-toxcore");
             native_lib_loaded = true;
-            Log.i(TAG, "successfully loaded native library");
+            Log.i(TAG, "successfully loaded jni-c-toxcore library");
         }
         catch (java.lang.UnsatisfiedLinkError e)
         {
@@ -4856,6 +4964,20 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "loadLibrary jni-c-toxcore failed!");
             e.printStackTrace();
         }
+
+        try
+        {
+            System.loadLibrary("native-audio-jni");
+            native_audio_lib_loaded = true;
+            Log.i(TAG, "successfully loaded native-audio-jni library");
+        }
+        catch (java.lang.UnsatisfiedLinkError e)
+        {
+            native_audio_lib_loaded = false;
+            Log.i(TAG, "loadLibrary native-audio-jni failed!");
+            e.printStackTrace();
+        }
+
     }
 
     public static void add_single_conference_message_from_messge_id(final long message_id, final boolean force)

@@ -93,6 +93,13 @@
 
         <SwitchPreference
             android:defaultValue="false"
+            android:key="X_use_native_audio_play"
+            android:summary="@string/pref_description_X_use_native_audio_play"
+            android:title="@string/pref_title_X_use_native_audio_play"/>
+
+
+        <SwitchPreference
+            android:defaultValue="false"
             android:key="X_battery_saving_mode"
             android:summary="@string/pref_description_X_battery_saving_mode"
             android:title="@string/pref_title_X_battery_saving_mode"/>
