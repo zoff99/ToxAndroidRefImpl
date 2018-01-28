@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__X_misc_button_enabled = false;
     static String PREF__X_misc_button_msg = "t"; // TODO: hardcoded for now!
     static boolean PREF__U_keep_nospam = false;
-    static boolean PREF__use_native_audio_play = false;
+    static boolean PREF__use_native_audio_play = true;
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
@@ -472,7 +472,7 @@ public class MainActivity extends AppCompatActivity
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
-        PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", false);
+        PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
@@ -1716,7 +1716,7 @@ public class MainActivity extends AppCompatActivity
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
-        PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", false);
+        PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
         if (PREF__U_keep_nospam == true)
         {

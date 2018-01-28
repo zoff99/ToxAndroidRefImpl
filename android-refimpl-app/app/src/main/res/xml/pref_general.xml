@@ -92,7 +92,7 @@
         android:title="! eXperimental !">
 
         <SwitchPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="X_use_native_audio_play"
             android:summary="@string/pref_description_X_use_native_audio_play"
             android:title="@string/pref_title_X_use_native_audio_play"/>
