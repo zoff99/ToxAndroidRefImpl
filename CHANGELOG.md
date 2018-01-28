@@ -1,11 +1,28 @@
 # Change Log
 
+## [1.0.13](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.13) (2018-01-27)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.12...1.0.13)
+
+**Closed issues:**
+
+- outgoing filetransfers are not canceled when the cancel button is pressed [\#36](https://github.com/zoff99/ToxAndroidRefImpl/issues/36)
+- Crash on !callme & !videocallme [\#20](https://github.com/zoff99/ToxAndroidRefImpl/issues/20)
+- Friendlist ist not sorted correctly [\#37](https://github.com/zoff99/ToxAndroidRefImpl/issues/37)
+- outgoing Filetransfers do not show a Message in Message View [\#35](https://github.com/zoff99/ToxAndroidRefImpl/issues/35)
+- Ask before deleting a Friend and his Messages [\#34](https://github.com/zoff99/ToxAndroidRefImpl/issues/34)
+- Allow ToxID to be static [\#24](https://github.com/zoff99/ToxAndroidRefImpl/issues/24)
+
+**Merged pull requests:**
+
+- add Native Audio for playback [\#40](https://github.com/zoff99/ToxAndroidRefImpl/pull/40) ([zoff99](https://github.com/zoff99))
+
 ## [1.0.12](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.12) (2018-01-05)
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.11...1.0.12)
 
 **Closed issues:**
 
 - i [\#33](https://github.com/zoff99/ToxAndroidRefImpl/issues/33)
+- Can't choose a password manually [\#32](https://github.com/zoff99/ToxAndroidRefImpl/issues/32)
 
 **Merged pull requests:**
 
