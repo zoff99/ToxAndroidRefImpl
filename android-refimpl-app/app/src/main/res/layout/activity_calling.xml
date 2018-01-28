@@ -2,10 +2,11 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#0277bd"
+              android:background="#000000"
               android:orientation="vertical"
               tools:context="com.zoffcc.applications.trifa.CallingActivity">
 
+    <!--android:background="#0277bd"-->
 
     <TextView
         android:id="@+id/top_text_line"
@@ -14,8 +15,8 @@
         android:gravity="center_vertical"
         android:text="xxxxxxxx"
         android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="20sp"/>
+        android:textColor="@color/md_grey_400"
+        android:textSize="22sp"/>
 
 
     <LinearLayout
@@ -214,8 +215,6 @@
         </TextView>
 
 
-
-
         <ImageButton
             android:id="@+id/misc_button"
             android:layout_width="52dp"
@@ -235,9 +234,6 @@
             android:background="@android:color/transparent"
             android:text="">
         </TextView>
-
-
-
 
 
         <ImageButton

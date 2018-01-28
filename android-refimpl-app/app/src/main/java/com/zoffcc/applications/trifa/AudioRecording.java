@@ -92,7 +92,6 @@ public class AudioRecording extends Thread
 
         audio_manager_s.setMicrophoneMute(false);
         audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
-        audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
         start();
     }
 

@@ -125,9 +125,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         callactivity_handler_s = callactivity_handler;
 
         // set volume control -------------
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        System.out.println("AVCS:MUSIC:0");
+
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         manager.setMode(AudioManager.MODE_NORMAL);
-        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         // set volume control -------------
 
         mVisible = true;
@@ -194,7 +196,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             misc_button.setImageDrawable(d2a);
 
                             // send misc. message to friend
-                            long res = tox_friend_send_message(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0, PREF__X_misc_button_msg);
+                            long res = tox_friend_send_message(
+                                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
+                                    PREF__X_misc_button_msg);
                             Log.i(TAG, "tox_friend_send_message:result=" + res);
                         }
                         catch (Exception e)
@@ -217,7 +221,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         audio_device_icon.setImageDrawable(null);
 
-        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(
+                Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         mute_button.setImageDrawable(d1);
         mute_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -230,12 +235,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         if (audio_manager_s.isMicrophoneMute())
                         {
-                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(50);
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             mute_button.setImageDrawable(d1a);
                         }
                         else
                         {
-                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(50);
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             mute_button.setImageDrawable(d1a);
                         }
                     }
@@ -250,13 +259,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         if (audio_manager_s.isMicrophoneMute())
                         {
-                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
                             audio_manager_s.setMicrophoneMute(false);
                         }
                         else
                         {
-                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
                             audio_manager_s.setMicrophoneMute(true);
                         }
@@ -273,11 +286,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // on startup always use front camera
         active_camera_type = FRONT_CAMERA_USED;
 
-        final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
+        final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(
+                Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
         decline_button.setImageDrawable(d3);
         // #AARRGGBB
 
-        final Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50);
+        final Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(
+                Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50);
         accept_button.setImageDrawable(d4);
 
         if (Callstate.accepted_call == 1)
@@ -295,13 +310,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         if (active_camera_type == FRONT_CAMERA_USED)
         {
-            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
             camera_toggle_button.setImageDrawable(d5);
             Log.i(TAG, "active_camera_type(5)=" + active_camera_type);
         }
         else
         {
-            final Drawable d6 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            final Drawable d6 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
             camera_toggle_button.setImageDrawable(d6);
             Log.i(TAG, "active_camera_type(6)=" + active_camera_type);
         }
@@ -317,12 +334,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     if (active_camera_type == FRONT_CAMERA_USED)
                     {
-                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
                         camera_toggle_button.setImageDrawable(d2a);
                     }
                     else
                     {
-                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
                         camera_toggle_button.setImageDrawable(d2a);
                     }
                 }
@@ -332,12 +353,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     if (active_camera_type == FRONT_CAMERA_USED)
                     {
-                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
                         camera_toggle_button.setImageDrawable(d2a);
                     }
                     else
                     {
-                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
                         camera_toggle_button.setImageDrawable(d2a);
                     }
 
@@ -390,7 +415,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             Callstate.accepted_call = 1;
 
                             Log.i(TAG, "answer button pressed");
-                            toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE); // these 2 bitrate values are very strange!! sometimes no video incoming!!
+                            toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                         GLOBAL_AUDIO_BITRATE,
+                                         GLOBAL_VIDEO_BITRATE); // these 2 bitrate values are very strange!! sometimes no video incoming!!
                             // need to set our state manually here, no callback from toxcore :-(
                             Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             // need to set our state manually here, no callback from toxcore :-(
@@ -399,7 +426,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             mute_button.setVisibility(View.VISIBLE);
 
                             Callstate.call_start_timestamp = System.currentTimeMillis();
-                            String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
+                            String a = "" +
+                                       (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) +
+                                       "s";
                             top_text_line_str2 = a;
                             update_top_text_line();
                         }
@@ -426,7 +455,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     else
                     {
                         Log.i(TAG, "decline button pressed");
-                        toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+                        toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                           ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
                         close_calling_activity();
                     }
                 }
@@ -483,7 +513,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     if ((top_text_line_str3 != "") || (top_text_line_str4 != ""))
                     {
-                        top_text_line.setText(top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" + top_text_line_str4);
+                        top_text_line.setText(
+                                top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" +
+                                top_text_line_str4);
                     }
                     else
                     {
@@ -833,6 +865,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     public void turnOnScreen()
     {
+        mContentView.setVisibility(View.VISIBLE);
+
         // turn on screen
         try
         {
@@ -855,7 +889,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         if (wl1 == null)
         {
-            wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "trifa_screen_on");
+            wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                                 "trifa_screen_on");
         }
 
         try
@@ -918,6 +953,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+
+
+        // in case the phone does not really turn the screen off
+        mContentView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -954,6 +993,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         e.printStackTrace();
                         Callstate.audio_speaker = true;
                     }
+
+                    try
+                    {
+                        audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    try
+                    {
+                        // set volume control -------------
+                        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                        System.out.println("AVCS:VOICE:1");
+                        // set volume control -------------
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
             else
@@ -983,6 +1043,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         e.printStackTrace();
                         Callstate.audio_speaker = false;
                     }
+
+                    try
+                    {
+                        audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    try
+                    {
+                        // set volume control -------------
+                        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+                        System.out.println("AVCS:VOICE:2");
+                        // set volume control -------------
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -1001,7 +1082,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (Callstate.call_start_timestamp != -1)
             {
 
-                right_left_text_1.setText(format_timeduration_from_seconds((System.currentTimeMillis() - Callstate.call_start_timestamp) / 1000));
+                right_left_text_1.setText(format_timeduration_from_seconds(
+                        (System.currentTimeMillis() - Callstate.call_start_timestamp) / 1000));
             }
             else
             {
@@ -1029,12 +1111,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     }
                     else if (Callstate.audio_device == 1)
                     {
-                        Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(
+                                Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(
+                                80);
                         audio_device_icon.setImageDrawable(d4);
                     }
                     else if (Callstate.audio_device == 2)
                     {
-                        Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        Drawable d4 = new IconicsDrawable(ca).icon(
+                                GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
+                                ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
                         audio_device_icon.setImageDrawable(d4);
                     }
                     else // audio_device == ??
