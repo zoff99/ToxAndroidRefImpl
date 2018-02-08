@@ -191,6 +191,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_SEND;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_AWAY;
@@ -295,7 +296,8 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__orbot_enabled = false;
     static boolean PREF__local_discovery_enabled = false;
     static boolean PREF__audiorec_asynctask = true;
-    static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview buffer size!!
+    static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview
+    // buffer size!!
     static boolean PREF__set_fps = true;
     static boolean PREF__fps_half = true;
     static boolean PREF__conference_show_system_messages = false;
@@ -989,7 +991,8 @@ public class MainActivity extends AppCompatActivity
 
 
         //        DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.material_drawer_layout);
-        //        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.faw_envelope_open, R.string.faw_envelope_open);
+        //        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R
+        // .string.faw_envelope_open, R.string.faw_envelope_open);
         //
         //        drawer_layout.setDrawerListener(drawerToggle);
         //
@@ -1847,6 +1850,32 @@ public class MainActivity extends AppCompatActivity
 
         // just in case, update own activity pointer!
         main_activity_s = this;
+
+
+        // -------- DEBUG --------
+        // -------- DEBUG --------
+        // -------- DEBUG --------
+        long type = TOX_FILE_KIND_MESSAGEV2_SEND.value;
+        long text_length = "ab".length();
+        long alter_type = 0;
+        long raw_message_length = tox_messagev2_size(text_length, type, alter_type);
+        System.out.println("MSG_V2:001:raw_message_length=" + raw_message_length);
+
+        ByteBuffer msg_buf = ByteBuffer.allocateDirect((int) text_length);
+        ByteBuffer raw_msg_buf = ByteBuffer.allocateDirect((int) raw_message_length);
+        ByteBuffer msg_id_buf = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+
+        System.out.println("MSG_V2:001a:msg_id=" + msg_id_buf.asCharBuffer().toString());
+        System.out.println("MSG_V2:001b:raw_msg_buf=" + raw_msg_buf.asCharBuffer().toString());
+
+        // int res = tox_messagev2_wrap(text_length, type, 0, msg_buf, 1, 0, raw_msg_buf, msg_id_buf);
+        System.out.println("MSG_V2:002:res=" + res);
+        System.out.println("MSG_V2:003:msg_id=" + msg_id_buf.asCharBuffer().toString());
+        System.out.println("MSG_V2:004:raw_msg_buf=" + raw_msg_buf.asCharBuffer().toString());
+        // -------- DEBUG --------
+        // -------- DEBUG --------
+        // -------- DEBUG --------
+
     }
 
     @Override
@@ -2311,9 +2340,11 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_self_get_friend_list_size();
 
-    public static native void tox_self_set_nospam(long nospam); // this actually needs an "uint32_t" which is an unsigned 32bit integer value
+    public static native void tox_self_set_nospam(long nospam); // this actually needs an "uint32_t" which is an
+    // unsigned 32bit integer value
 
-    public static native long tox_self_get_nospam(); // this actually returns an "uint32_t" which is an unsigned 32bit integer value
+    public static native long tox_self_get_nospam(); // this actually returns an "uint32_t" which is an unsigned
+    // 32bit integer value
 
     public static native long tox_friend_by_public_key(@NonNull String friend_public_key_string);
 
@@ -2352,6 +2383,22 @@ public class MainActivity extends AppCompatActivity
     public static native long tox_file_send(long friend_number, long kind, long file_size, ByteBuffer file_id_buffer, String file_name, long filename_length);
 
     public static native int tox_file_send_chunk(long friend_number, long file_number, long position, ByteBuffer data_buffer, long data_length);
+
+
+    // --------------- Message V2 -------------
+    // --------------- Message V2 -------------
+    // --------------- Message V2 -------------
+    public static native long tox_messagev2_size(long text_length, long type, long alter_type);
+
+    public static native int tox_messagev2_wrap(long text_length, long type, long alter_type, ByteBuffer message_text_buffer, long ts_sec, long ts_ms, ByteBuffer raw_message_buffer, ByteBuffer msgid_buffer);
+
+    public static native int tox_messagev2_get_message_id(ByteBuffer raw_message_buffer, ByteBuffer msgid_buffer);
+
+    public static native int tox_messagev2_get_message_text(ByteBuffer raw_message_buffer, long raw_message_len, int is_alter_msg, long alter_type, ByteBuffer message_text_buffer);
+    // --------------- Message V2 -------------
+    // --------------- Message V2 -------------
+    // --------------- Message V2 -------------
+
 
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -2526,7 +2573,8 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
+        // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video
+        // height=" + frame_height_px);
         if ((Callstate.call_first_video_frame_received == -1) || (Callstate.frame_width_px != frame_width_px) ||
             (Callstate.frame_height_px != frame_height_px) || (Callstate.ystride != ystride))
         {
@@ -2912,7 +2960,8 @@ public class MainActivity extends AppCompatActivity
                         //                    if (android.os.Build.VERSION.SDK_INT >= 23)
                         //                    {
                         //                        // AudioTrack.write() called with invalid size (3840) value
-                        //                        audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
+                        //                        audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0,
+                        // (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
                         //                    }
                         if (android.os.Build.VERSION.SDK_INT >= 21)
                         {
@@ -3103,15 +3152,16 @@ public class MainActivity extends AppCompatActivity
                                         ByteBuffer avatar_bytes = file_to_bytebuffer(fname, true);
                                         if (avatar_bytes != null)
                                         {
-                                            // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:avatar_bytes=" + bytes_to_hex(avatar_bytes));
+                                            // Log.i(TAG,
+                                            // "android_tox_callback_friend_connection_status_cb_method:avatar_bytes=" + bytes_to_hex(avatar_bytes));
 
                                             ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
                                             int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
                                             if (res == 0)
                                             {
                                                 Log.i(TAG,
-                                                      "android_tox_callback_friend_connection_status_cb_method:hash(1)=" +
-                                                      bytes_to_hex(hash_bytes));
+                                                      "android_tox_callback_friend_connection_status_cb_method:hash" +
+                                                      "(1)=" + bytes_to_hex(hash_bytes));
 
 
                                                 // send avatar to friend -------
@@ -3284,7 +3334,8 @@ public class MainActivity extends AppCompatActivity
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
 
             // Log.i(TAG, "friend_read_receipt:m=" + m);
-            // Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendpubkey=" + m.tox_friendpubkey + " read=" + m.read + " direction=" + m.direction);
+            // Log.i(TAG, "friend_read_receipt:m:message_id=" + m.message_id + " text=" + m.text + " friendpubkey=" +
+            // m.tox_friendpubkey + " read=" + m.read + " direction=" + m.direction);
 
             if (m != null)
             {
@@ -4013,7 +4064,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
     {
-        // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
+        // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position +
+        // ":length=" + length + ":data len=" + data.length + ":data=" + data);
         // Log.i(TAG, "file_recv_chunk:--START--");
 
         // Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":" + position + ":" + length);
@@ -4621,7 +4673,8 @@ public class MainActivity extends AppCompatActivity
                 //                try
                 //                {
                 //                    // TODO: cache me!!
-                //                    conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
+                //                    conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq
+                // (conference_number).
                 //                            and().
                 //                            conference_activeEq(true).
                 //                            get(0);
@@ -4649,7 +4702,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_namelist_change_cb_method(long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
     {
-        // Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
+        // Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state="
+        // + a_TOX_CONFERENCE_STATE_CHANGE);
         // TODO: update peer status
 
         try
@@ -5059,7 +5113,8 @@ public class MainActivity extends AppCompatActivity
                                     {
                                         // ok, we need to wait for onResume to finish
                                         Log.i(TAG,
-                                              "add_single_message_from_messge_id:ok, we need to wait for onResume to finish");
+                                              "add_single_message_from_messge_id:ok, we need to wait for onResume to " +
+                                              "finish");
                                         long loop = 0;
                                         while (loop < 40) // wait 8 sec., then give up
                                         {
@@ -5211,7 +5266,8 @@ public class MainActivity extends AppCompatActivity
 
     //    public static void update_all_messages_global(boolean force)
     //    {
-    //        if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
+    //        if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System
+    // .currentTimeMillis()))
     //        {
     //            update_all_messages_global_timestamp = System.currentTimeMillis();
     //            update_message_view();
@@ -5242,30 +5298,39 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:" + orma.selectFromMessage().toList().size());
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages
+            // :=====================================");
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:" + orma
+            // .selectFromMessage().toList().size());
             //
             //            int i = 0;
             //            for (i = 0; i < orma.selectFromMessage().toList().size(); i++)
             //            {
             //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
-            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:#" + i + ":" + orma.selectFromMessage().toList().get(i));
+            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:#" + i + ":" +
+            // orma.selectFromMessage().toList().get(i));
             //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
             //            }
             //
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages
+            // :=====================================");
             //
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2" + orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size());
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2
+            // =====================================");
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2" + orma
+            // .selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size());
             //
-            //            for (i = 0; i < orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size(); i++)
+            //            for (i = 0; i < orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size()
+            // ; i++)
             //            {
             //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
-            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2#" + i + ":" + orma.selectFromMessage().toList().get(i));
+            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2#" + i + ":" +
+            // orma.selectFromMessage().toList().get(i));
             //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
             //            }
             //
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
+            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2
+            // =====================================");
             //
 
             Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id +
@@ -5288,7 +5353,8 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:friend_number=" + friend_number + " file_number=" + file_number);
+            // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:friend_number=" + friend_number + "
+            // file_number=" + file_number);
             long ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
                     and().
@@ -5663,7 +5729,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //    public static String XXXXXXXtox_conference_peer_get_name__wrapperXXXXXX(long conference_number, long peer_number)
+    //    public static String XXXXXXXtox_conference_peer_get_name__wrapperXXXXXX(long conference_number, long
+    // peer_number)
     //    {
     //        if (cache_peername_pubkey.containsKey("" + conference_number + ":" + peer_number))
     //        {
@@ -6217,7 +6284,8 @@ public class MainActivity extends AppCompatActivity
                         src_path_name + "/" + src_file_name);
 
                 uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length()) + appl;
-                // Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
+                // Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " +
+                // dst_path_name + "/" + uniq_temp_filename);
 
                 java.io.File f2 = new java.io.File(dst_path_name + "/" + uniq_temp_filename);
                 java.io.File dst_dir = new java.io.File(dst_path_name + "/");
@@ -6470,7 +6538,8 @@ public class MainActivity extends AppCompatActivity
             if (VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
-                // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
+                // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher
+                // .FileInputStream(f1);
 
                 //byte[] byteArray = new byte[(int) f1.length()];
                 // fis.read(byteArray, 0, (int) f1.length());
@@ -6754,7 +6823,8 @@ public class MainActivity extends AppCompatActivity
     //        try
     //        {
     //            // Log.i(TAG, "update_message_view:001 " + message_list_fragment);
-    //            // Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " + message_list_fragment.isVisible());
+    //            // Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " +
+    // message_list_fragment.isVisible());
     //            // update the message view (if possbile)
     //            if (message_list_fragment != null)
     //            {
@@ -7039,18 +7109,24 @@ public class MainActivity extends AppCompatActivity
                     {
                         audio_buffer_2[audio_in_buffer_element_count - 1 - j].rewind();
                         audio_buffer_2[audio_in_buffer_element_count - j].rewind();
-                        // Log.i(TAG, "audio_play:write:buffer size src=" + audio_buffer_2[audio_in_buffer_element_count - 1 - j].limit());
-                        // Log.i(TAG, "audio_play:write:buffer pos src=" + audio_buffer_2[audio_in_buffer_element_count - 1 - j].position());
-                        // Log.i(TAG, "audio_play:write:buffer size dst=" + audio_buffer_2[audio_in_buffer_element_count - j].limit());
-                        // Log.i(TAG, "audio_play:write:buffer pos dst=" + audio_buffer_2[audio_in_buffer_element_count - j].position());
-                        // audio_buffer_2[audio_in_buffer_element_count - j].put(audio_buffer_2[audio_in_buffer_element_count - 1 - j].array());
+                        // Log.i(TAG, "audio_play:write:buffer size src=" +
+                        // audio_buffer_2[audio_in_buffer_element_count - 1 - j].limit());
+                        // Log.i(TAG, "audio_play:write:buffer pos src=" +
+                        // audio_buffer_2[audio_in_buffer_element_count - 1 - j].position());
+                        // Log.i(TAG, "audio_play:write:buffer size dst=" +
+                        // audio_buffer_2[audio_in_buffer_element_count - j].limit());
+                        // Log.i(TAG, "audio_play:write:buffer pos dst=" +
+                        // audio_buffer_2[audio_in_buffer_element_count - j].position());
+                        // audio_buffer_2[audio_in_buffer_element_count - j].put
+                        // (audio_buffer_2[audio_in_buffer_element_count - 1 - j].array());
                         audio_buffer_2[audio_in_buffer_element_count - j].put(
                                 audio_buffer_2[audio_in_buffer_element_count - 1 - j].array(), 0,
                                 AudioReceiver.buffer_size);
                         audio_buffer_2[audio_in_buffer_element_count - j].rewind();
                         audio_buffer_2_read_length[audio_in_buffer_element_count - j] = audio_buffer_2_read_length[
                                 audio_in_buffer_element_count - 1 - j];
-                        // Log.i(TAG, "audio_play:write:mv " + (audio_in_buffer_element_count - 1 - j + " -> " + (audio_in_buffer_element_count - j)));
+                        // Log.i(TAG, "audio_play:write:mv " + (audio_in_buffer_element_count - 1 - j + " -> " +
+                        // (audio_in_buffer_element_count - j)));
                     }
                 }
                 // Log.i(TAG, "audio_play:write:set buffer 0:len=" + sample_count);
@@ -7085,7 +7161,8 @@ public class MainActivity extends AppCompatActivity
 
             if (audio_in_buffer_element_count > 0)
             {
-                // Log.i(TAG, "audio_play:read:load buffer " + (audio_in_buffer_element_count - 1) + ":len=" + audio_buffer_2_read_length[audio_in_buffer_element_count - 1]);
+                // Log.i(TAG, "audio_play:read:load buffer " + (audio_in_buffer_element_count - 1) + ":len=" +
+                // audio_buffer_2_read_length[audio_in_buffer_element_count - 1]);
 
                 audio_buffer_play.rewind();
                 audio_buffer_play.put(audio_buffer_2[audio_in_buffer_element_count - 1].array(), 0,
@@ -7696,7 +7773,8 @@ public class MainActivity extends AppCompatActivity
             //                    //
             //                    ".." +
             //                    //
-            //                    conference_identifier.substring(conference_identifier.length() - 5, conference_identifier.length());
+            //                    conference_identifier.substring(conference_identifier.length() - 5,
+            // conference_identifier.length());
             if (uppercase_result)
             {
                 return (conference_identifier.substring(conference_identifier.length() - 6,

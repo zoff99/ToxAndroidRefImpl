@@ -2682,18 +2682,27 @@ jobject msgid_buffer)
         return -3;
     }
 
+    dbg(0, "tox_messagev2_wrap:001");
     uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
+    dbg(0, "tox_messagev2_wrap:002");
     long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+    dbg(0, "tox_messagev2_wrap:00");
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    dbg(0, "tox_messagev2_wrap:003");
     long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    dbg(0, "tox_messagev2_wrap:004");
 
     uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
+    dbg(0, "tox_messagev2_wrap:005");
     long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    dbg(0, "tox_messagev2_wrap:006");
 
+    dbg(0, "tox_messagev2_wrap:007");
     bool res = tox_messagev2_wrap((uint32_t)text_length, (uint32_t)type,
                         (uint32_t)alter_type, message_text_buffer_c, (uint32_t)ts_sec,
                         (uint16_t)ts_ms, raw_message_buffer_c, msgid_buffer_c);
+    dbg(0, "tox_messagev2_wrap:008");
 
 	if (res == true)
     {

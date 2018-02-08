@@ -39,6 +39,11 @@ public class ToxVars
     public static final int TOX_HASH_LENGTH = 32;
     public static final int TOX_FILE_ID_LENGTH = 32;
     public static final int TOX_MAX_FILENAME_LENGTH = 255;
+    public static final int TOX_MESSAGEV2_MAX_TEXT_LENGTH = 4096;
+    public static final int TOX_MESSAGEV2_MAX_HEADER_SIZE = (32 + 4 + 2 + 1);
+    public static final int TOX_MAX_FILETRANSFER_SIZE_MSGV2 = (TOX_MESSAGEV2_MAX_TEXT_LENGTH +
+                                                               TOX_MESSAGEV2_MAX_HEADER_SIZE);
+
     // TODO: get these with the appropriate JNI functions!
     // ------ global defines ------
     // ------ global defines ------
@@ -868,7 +873,13 @@ public class ToxVars
          * When file_size is set to 0 in the transfer request it means that the client
          * has no avatar.
          */
-        TOX_FILE_KIND_AVATAR(1);
+        TOX_FILE_KIND_AVATAR(1),
+
+        TOX_FILE_KIND_MESSAGEV2_SEND(2),
+
+        TOX_FILE_KIND_MESSAGEV2_ANSWER(3),
+
+        TOX_FILE_KIND_MESSAGEV2_ALTER(4);
 
         public int value;
 
