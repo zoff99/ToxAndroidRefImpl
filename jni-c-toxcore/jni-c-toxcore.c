@@ -2659,23 +2659,162 @@ jlong type, jlong alter_type)
     return (jlong)tox_msg_size;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1wrap(JNIEnv *env, jobject thiz,
+jlong text_length, jlong type,
+jlong alter_type,
+jobject message_text_buffer, jlong ts_sec,
+jlong ts_ms, jobject raw_message_buffer,
+jobject msgid_buffer)
+{
+    if(message_text_buffer == NULL)
+    {
+        return -1;
+    }
 
-// uint32_t tox_messagev2_size(uint32_t text_length, uint32_t type, uint32_t alter_type);
-// bool tox_messagev2_wrap(uint32_t text_length, uint32_t type,
-//                        uint32_t alter_type,
-//                        uint8_t *message_text, uint32_t ts_sec,
-//                        uint16_t ts_ms, uint8_t *raw_message,
-//                        uint8_t *msgid);
+    if(raw_message_buffer == NULL)
+    {
+        return -2;
+    }
+
+    if(msgid_buffer == NULL)
+    {
+        return -3;
+    }
+
+    uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
+    long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
+    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+
+    bool res = tox_messagev2_wrap((uint32_t)text_length, (uint32_t)type,
+                        (uint32_t)alter_type, message_text_buffer_c, (uint32_t)ts_sec,
+                        (uint16_t)ts_ms, raw_message_buffer_c, msgid_buffer_c);
+
+	if (res == true)
+    {
+        return 0;
+    }
+    else
+    {
+         return 1;
+    }
+}
 
 
-// bool tox_messagev2_get_message_id(uint8_t *raw_message, uint8_t *msg_id);
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1id(JNIEnv *env, jobject thiz,
+jobject raw_message_buffer, jobject msgid_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return -1;
+    }
+
+    if(msgid_buffer == NULL)
+    {
+        return -2;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
+    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+
+	bool res = tox_messagev2_get_message_id(raw_message_buffer_c, msgid_buffer_c);
+
+	if (res == true)
+    {
+        return 0;
+    }
+    else
+    {
+         return 1;
+    }
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1sec(JNIEnv *env, jobject thiz,
+jobject raw_message_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+	uint32_t res = tox_messagev2_get_ts_sec(raw_message_buffer_c);
+
+	return (jlong)res;
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1ms(JNIEnv *env, jobject thiz,
+jobject raw_message_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+	uint16_t res = tox_messagev2_get_ts_ms(raw_message_buffer_c);
+
+	return (jlong)res;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1text(JNIEnv *env, jobject thiz,
+jobject raw_message_buffer, jlong raw_message_len,
+jint is_alter_msg,
+jlong alter_type,
+jobject message_text_buffer)
+{
+    if(message_text_buffer == NULL)
+    {
+        return -1;
+    }
+
+    if(raw_message_buffer == NULL)
+    {
+        return -2;
+    }
+
+    uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
+    long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    bool res = tox_messagev2_get_message_text(raw_message_buffer_c, (uint32_t)raw_message_len,
+                             (bool)is_alter_msg,
+                             (uint32_t)alter_type, raw_message_buffer_c);
+
+	if (res == true)
+    {
+        return 0;
+    }
+    else
+    {
+         return 1;
+    }
+}
+
+
 // bool tox_messagev2_get_message_alter_id(uint8_t *raw_message, uint8_t *alter_id);
 // uint8_t tox_messagev2_get_alter_type(uint8_t *raw_message);
-// uint32_t tox_messagev2_get_ts_sec(uint8_t *raw_message);
-// uint16_t tox_messagev2_get_ts_ms(uint8_t *raw_message);
-// bool tox_messagev2_get_message_text(uint8_t *raw_message, uint32_t raw_message_len,
-//                                     bool is_alter_msg,
-//                                     uint32_t alter_type, uint8_t *message_text);
 
 
 #endif
