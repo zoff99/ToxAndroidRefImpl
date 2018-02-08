@@ -1869,7 +1869,7 @@ public class MainActivity extends AppCompatActivity
         System.out.println("MSG_V2:001b:raw_msg_buf=" + raw_msg_buf.asCharBuffer().toString());
 
         // int res = tox_messagev2_wrap(text_length, type, 0, msg_buf, 1, 0, raw_msg_buf, msg_id_buf);
-        System.out.println("MSG_V2:002:res=" + res);
+        // System.out.println("MSG_V2:002:res=" + res);
         System.out.println("MSG_V2:003:msg_id=" + msg_id_buf.asCharBuffer().toString());
         System.out.println("MSG_V2:004:raw_msg_buf=" + raw_msg_buf.asCharBuffer().toString());
         // -------- DEBUG --------
