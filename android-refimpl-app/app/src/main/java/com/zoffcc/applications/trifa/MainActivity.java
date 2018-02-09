@@ -107,6 +107,7 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -1523,6 +1524,29 @@ public class MainActivity extends AppCompatActivity
         return sb.toString();
     }
 
+    // --------- HEX ---------
+    // --------- HEX ---------
+    // --------- HEX ---------
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+    public static String bytesToHex(byte[] bytes)
+    {
+        char[] hexChars = new char[bytes.length * 2];
+
+        System.out.println("blen=" + bytes.length);
+
+        for (int j = 0; j < bytes.length; j++)
+        {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+    // --------- HEX ---------
+    // --------- HEX ---------
+    // --------- HEX ---------
+
     void tox_thread_start()
     {
         try
@@ -1856,7 +1880,19 @@ public class MainActivity extends AppCompatActivity
         // -------- DEBUG --------
         // -------- DEBUG --------
         long type = TOX_FILE_KIND_MESSAGEV2_SEND.value;
-        long text_length = "ab".length();
+        String msgv2_input_str = "abäg 12";
+        byte[] b;
+        try
+        {
+            b = msgv2_input_str.getBytes("UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            b = new byte[1];
+            b[0] = 65;
+        }
+        long text_length = b.length;
+        System.out.println("MSG_V2:001:b.length=" + b.length);
         long alter_type = 0;
         long raw_message_length = tox_messagev2_size(text_length, type, alter_type);
         System.out.println("MSG_V2:001:raw_message_length=" + raw_message_length);
@@ -1865,13 +1901,26 @@ public class MainActivity extends AppCompatActivity
         ByteBuffer raw_msg_buf = ByteBuffer.allocateDirect((int) raw_message_length);
         ByteBuffer msg_id_buf = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
 
-        System.out.println("MSG_V2:001a:msg_id=" + msg_id_buf.asCharBuffer().toString());
-        System.out.println("MSG_V2:001b:raw_msg_buf=" + raw_msg_buf.asCharBuffer().toString());
+        System.out.println("MSG_V2:001aa:l1=" + msg_id_buf.capacity());
+        System.out.println("MSG_V2:001aa:l2=" + msg_id_buf.limit());
+        System.out.println("MSG_V2:001aa:l3=" + msg_id_buf.array().length);
+        System.out.println("MSG_V2:001aa:l3=" + msg_id_buf.arrayOffset());
 
-        // int res = tox_messagev2_wrap(text_length, type, 0, msg_buf, 1, 0, raw_msg_buf, msg_id_buf);
-        // System.out.println("MSG_V2:002:res=" + res);
-        System.out.println("MSG_V2:003:msg_id=" + msg_id_buf.asCharBuffer().toString());
-        System.out.println("MSG_V2:004:raw_msg_buf=" + raw_msg_buf.asCharBuffer().toString());
+        msg_buf.rewind();
+        msg_buf.wrap(b);
+
+        System.out.println("MSG_V2:001a:msg_id=" + bytesToHex(msg_id_buf.array()));
+        System.out.println("MSG_V2:001b:raw_msg_buf=" + bytesToHex(raw_msg_buf.array()));
+
+        int res = tox_messagev2_wrap(text_length, type, 0, msg_buf, 1, 0, raw_msg_buf, msg_id_buf);
+        System.out.println("MSG_V2:002:res=" + res);
+        System.out.println("MSG_V2:003:msg_id=" + bytesToHex(msg_id_buf.array()));
+
+        byte[] bytesArray = new byte[msg_id_buf.capacity()];
+        msg_id_buf.get(bytesArray, 0, bytesArray.length);
+        System.out.println("MSG_V2:003:msg_id=" + bytesToHex(bytesArray));
+
+        System.out.println("MSG_V2:004:raw_msg_buf=" + bytesToHex(raw_msg_buf.array()));
         // -------- DEBUG --------
         // -------- DEBUG --------
         // -------- DEBUG --------
