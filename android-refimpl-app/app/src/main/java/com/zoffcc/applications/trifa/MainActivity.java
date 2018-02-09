@@ -1529,17 +1529,17 @@ public class MainActivity extends AppCompatActivity
     // --------- HEX ---------
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    public static String bytesToHex(byte[] bytes)
+    public static String bytesToHex(byte[] bytes, int start, int len)
     {
-        char[] hexChars = new char[bytes.length * 2];
+        char[] hexChars = new char[(len) * 2];
 
-        System.out.println("blen=" + bytes.length);
+        System.out.println("blen=" + (len));
 
-        for (int j = 0; j < bytes.length; j++)
+        for (int j = start; j < (start + len); j++)
         {
             int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+            hexChars[(j - start) * 2] = hexArray[v >>> 4];
+            hexChars[(j - start) * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
     }
@@ -1907,20 +1907,30 @@ public class MainActivity extends AppCompatActivity
         System.out.println("MSG_V2:001aa:l3=" + msg_id_buf.arrayOffset());
 
         msg_buf.rewind();
-        msg_buf.wrap(b);
+        msg_buf.put(b);
 
-        System.out.println("MSG_V2:001a:msg_id=" + bytesToHex(msg_id_buf.array()));
-        System.out.println("MSG_V2:001b:raw_msg_buf=" + bytesToHex(raw_msg_buf.array()));
+        System.out.println(
+                "MSG_V2:001a:msg_id=" + bytesToHex(msg_id_buf.array(), msg_id_buf.arrayOffset(), msg_id_buf.limit()));
+        System.out.println("MSG_V2:001b:raw_msg_buf=" +
+                           bytesToHex(raw_msg_buf.array(), raw_msg_buf.arrayOffset(), raw_msg_buf.limit()));
 
         int res = tox_messagev2_wrap(text_length, type, 0, msg_buf, 1, 0, raw_msg_buf, msg_id_buf);
         System.out.println("MSG_V2:002:res=" + res);
-        System.out.println("MSG_V2:003:msg_id=" + bytesToHex(msg_id_buf.array()));
+        System.out.println(
+                "MSG_V2:003:msg_id=" + bytesToHex(msg_id_buf.array(), msg_id_buf.arrayOffset(), msg_id_buf.limit()));
 
         byte[] bytesArray = new byte[msg_id_buf.capacity()];
         msg_id_buf.get(bytesArray, 0, bytesArray.length);
-        System.out.println("MSG_V2:003:msg_id=" + bytesToHex(bytesArray));
+        System.out.println("MSG_V2:003:msg_id=" + bytesToHex(bytesArray, 0, bytesArray.length));
 
-        System.out.println("MSG_V2:004:raw_msg_buf=" + bytesToHex(raw_msg_buf.array()));
+        System.out.println("MSG_V2:004:raw_msg_buf=" +
+                           bytesToHex(raw_msg_buf.array(), raw_msg_buf.arrayOffset(), raw_msg_buf.limit()));
+
+        System.out.println("MSG_V2:004aa:l1=" + raw_msg_buf.capacity());
+        System.out.println("MSG_V2:004aa:l2=" + raw_msg_buf.limit());
+        System.out.println("MSG_V2:004aa:l3=" + raw_msg_buf.array().length);
+        System.out.println("MSG_V2:004aa:l3=" + raw_msg_buf.arrayOffset());
+
         // -------- DEBUG --------
         // -------- DEBUG --------
         // -------- DEBUG --------
