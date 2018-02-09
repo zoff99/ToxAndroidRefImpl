@@ -111,7 +111,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
@@ -193,6 +192,8 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ALTER;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ANSWER;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_SEND;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -3750,6 +3751,18 @@ public class MainActivity extends AppCompatActivity
                     // if outgoing FT set "ft_accepted" to true
                     set_filetransfer_accepted_from_id(ft_id);
                 }
+                else if (ft_check.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+                {
+                    Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME::+MESSAGEV2_SEND+");
+                }
+                else if (ft_check.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+                {
+                    Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME::+MESSAGEV2_ANSWER+");
+                }
+                else if (ft_check.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
+                {
+                    Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME::+MESSAGEV2_ALTER+");
+                }
                 else
                 {
                     Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME::*DATA*");
@@ -3877,6 +3890,18 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 }
+            }
+            else if (ft.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+            {
+                Log.i(TAG, "file_chunk_request:TOX_FILE_KIND_MESSAGEV2_SEND");
+            }
+            else if (ft.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+            {
+                Log.i(TAG, "file_chunk_request:TOX_FILE_KIND_MESSAGEV2_ANSWER");
+            }
+            else if (ft.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
+            {
+                Log.i(TAG, "file_chunk_request:TOX_FILE_KIND_MESSAGEV2_ALTER");
             }
             else // TOX_FILE_KIND_DATA.value
             {
@@ -4046,6 +4071,18 @@ public class MainActivity extends AppCompatActivity
             // TODO: we just accept incoming avatar, maybe make some checks first?
             tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_RESUME.value);
         }
+        else if (a_TOX_FILE_KIND == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+        {
+            Log.i(TAG, "file_recv:TOX_FILE_KIND_MESSAGEV2_SEND");
+        }
+        else if (a_TOX_FILE_KIND == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+        {
+            Log.i(TAG, "file_recv:TOX_FILE_KIND_MESSAGEV2_ANSWER");
+        }
+        else if (a_TOX_FILE_KIND == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
+        {
+            Log.i(TAG, "file_recv:TOX_FILE_KIND_MESSAGEV2_ALTER");
+        }
         else // DATA file ft
         {
             Log.i(TAG, "file_recv:incoming regular file");
@@ -4132,6 +4169,7 @@ public class MainActivity extends AppCompatActivity
         // Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":" + position + ":" + length);
 
         Filetransfer f = null;
+
         try
         {
             f = orma.selectFromFiletransfer().
@@ -4146,25 +4184,29 @@ public class MainActivity extends AppCompatActivity
 
             if (position == 0)
             {
-                Log.i(TAG, "file_recv_chunk:START-O-F:filesize==" + f.filesize);
+                if ((f.kind != TOX_FILE_KIND_MESSAGEV2_ALTER.value) &&
+                    (f.kind != TOX_FILE_KIND_MESSAGEV2_ANSWER.value) && (f.kind != TOX_FILE_KIND_MESSAGEV2_SEND.value))
+                {
+                    Log.i(TAG, "file_recv_chunk:START-O-F:filesize==" + f.filesize);
 
-                // file start. just to be sure, make directories
-                if (VFS_ENCRYPT)
-                {
-                    info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
-                            f.path_name + "/" + f.file_name);
-                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
-                    // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
-                    // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
-                    f2.mkdirs();
-                }
-                else
-                {
-                    java.io.File f1 = new java.io.File(f.path_name + "/" + f.file_name);
-                    java.io.File f2 = new java.io.File(f1.getParent());
-                    // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
-                    // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
-                    f2.mkdirs();
+                    // file start. just to be sure, make directories
+                    if (VFS_ENCRYPT)
+                    {
+                        info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
+                                f.path_name + "/" + f.file_name);
+                        info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
+                        // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                        // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                        f2.mkdirs();
+                    }
+                    else
+                    {
+                        java.io.File f1 = new java.io.File(f.path_name + "/" + f.file_name);
+                        java.io.File f2 = new java.io.File(f1.getParent());
+                        // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
+                        // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
+                        f2.mkdirs();
+                    }
                 }
             }
         }
@@ -4177,239 +4219,280 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "file_recv_chunk:END-O-F:filesize==" + f.filesize);
 
-            try
+
+            if (f.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
             {
-                Log.i(TAG, "file_recv_chunk:file fully received");
-
-                if (VFS_ENCRYPT)
-                {
-                    info.guardianproject.iocipher.FileOutputStream fos = null;
-                    fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
-
-                    if (f.fos_open)
-                    {
-                        try
-                        {
-                            fos.close();
-                        }
-                        catch (Exception e3)
-                        {
-                            Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
-                        }
-                    }
-                    f.fos_open = false;
-                }
-                else
-                {
-                    java.io.FileOutputStream fos = null;
-                    fos = cache_ft_fos_normal.get(
-                            tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
-
-                    if (f.fos_open)
-                    {
-                        try
-                        {
-                            fos.close();
-                        }
-                        catch (Exception e3)
-                        {
-                            Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
-                        }
-                    }
-                    f.fos_open = false;
-                }
-
-                update_filetransfer_db_fos_open(f);
-
-                move_tmp_file_to_real_file(f.path_name, f.file_name,
-                                           VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/",
-                                           f.file_name);
-
-                long filedb_id = -1;
-                if (f.kind != TOX_FILE_KIND_AVATAR.value)
-                {
-                    // put into "FileDB" table
-                    FileDB file_ = new FileDB();
-                    file_.kind = f.kind;
-                    file_.direction = f.direction;
-                    file_.tox_public_key_string = f.tox_public_key_string;
-                    file_.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
-                    file_.file_name = f.file_name;
-                    file_.filesize = f.filesize;
-                    long row_id = orma.insertIntoFileDB(file_);
-                    Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
-                    filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                            f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
-                    Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
-                }
-
-                Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
-                if (f.kind == TOX_FILE_KIND_AVATAR.value)
-                {
-                    set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number),
-                                      VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
-                }
-                else
-                {
-                    Log.i(TAG, "file_recv_chunk:file_READY:001:f.id=" + f.id);
-                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(f.id, friend_number);
-                    Log.i(TAG, "file_recv_chunk:file_READY:001a:msg_id=" + msg_id);
-
-                    update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number,
-                                                                                 VFS_PREFIX + VFS_FILE_DIR + "/" +
-                                                                                 f.tox_public_key_string + "/" +
-                                                                                 f.file_name);
-                    set_message_state_from_friendnum_and_filenum(friend_number, file_number,
-                                                                 TOX_FILE_CONTROL_CANCEL.value);
-                    set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
-                    set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
-
-                    try
-                    {
-                        Log.i(TAG, "file_recv_chunk:file_READY:002");
-                        if (f.id != -1)
-                        {
-                            Log.i(TAG, "file_recv_chunk:file_READY:003:f.id=" + f.id + " msg_id=" + msg_id);
-                            update_single_message_from_messge_id(msg_id, true);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Log.i(TAG, "file_recv_chunk:file_READY:EE:" + e.getMessage());
-                    }
-
-                }
-
-                // remove FT from DB
-                delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
-
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_ALTER");
             }
-            catch (Exception e2)
+            else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
             {
-                e2.printStackTrace();
-                Log.i(TAG, "file_recv_chunk:EE2:" + e2.getMessage());
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_ANSWER");
+            }
+            else if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+            {
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND");
+            }
+            else
+            {
+
+
+                try
+                {
+                    Log.i(TAG, "file_recv_chunk:file fully received");
+
+                    if (VFS_ENCRYPT)
+                    {
+                        info.guardianproject.iocipher.FileOutputStream fos = null;
+                        fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+
+                        if (f.fos_open)
+                        {
+                            try
+                            {
+                                fos.close();
+                            }
+                            catch (Exception e3)
+                            {
+                                Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
+                            }
+                        }
+                        f.fos_open = false;
+                    }
+                    else
+                    {
+                        java.io.FileOutputStream fos = null;
+                        fos = cache_ft_fos_normal.get(
+                                tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+
+                        if (f.fos_open)
+                        {
+                            try
+                            {
+                                fos.close();
+                            }
+                            catch (Exception e3)
+                            {
+                                Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
+                            }
+                        }
+                        f.fos_open = false;
+                    }
+
+                    update_filetransfer_db_fos_open(f);
+
+                    move_tmp_file_to_real_file(f.path_name, f.file_name,
+                                               VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/",
+                                               f.file_name);
+
+                    long filedb_id = -1;
+                    if (f.kind != TOX_FILE_KIND_AVATAR.value)
+                    {
+                        // put into "FileDB" table
+                        FileDB file_ = new FileDB();
+                        file_.kind = f.kind;
+                        file_.direction = f.direction;
+                        file_.tox_public_key_string = f.tox_public_key_string;
+                        file_.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/";
+                        file_.file_name = f.file_name;
+                        file_.filesize = f.filesize;
+                        long row_id = orma.insertIntoFileDB(file_);
+                        Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
+                        filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
+                                f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
+                        Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
+                    }
+
+                    Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
+                    if (f.kind == TOX_FILE_KIND_AVATAR.value)
+                    {
+                        set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number),
+                                          VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
+                    }
+                    else
+                    {
+                        Log.i(TAG, "file_recv_chunk:file_READY:001:f.id=" + f.id);
+                        long msg_id = get_message_id_from_filetransfer_id_and_friendnum(f.id, friend_number);
+                        Log.i(TAG, "file_recv_chunk:file_READY:001a:msg_id=" + msg_id);
+
+                        update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number,
+                                                                                     VFS_PREFIX + VFS_FILE_DIR + "/" +
+                                                                                     f.tox_public_key_string + "/" +
+                                                                                     f.file_name);
+                        set_message_state_from_friendnum_and_filenum(friend_number, file_number,
+                                                                     TOX_FILE_CONTROL_CANCEL.value);
+                        set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
+                        set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
+
+                        try
+                        {
+                            Log.i(TAG, "file_recv_chunk:file_READY:002");
+                            if (f.id != -1)
+                            {
+                                Log.i(TAG, "file_recv_chunk:file_READY:003:f.id=" + f.id + " msg_id=" + msg_id);
+                                update_single_message_from_messge_id(msg_id, true);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Log.i(TAG, "file_recv_chunk:file_READY:EE:" + e.getMessage());
+                        }
+
+                    }
+
+                    // remove FT from DB
+                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
+
+                }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                    Log.i(TAG, "file_recv_chunk:EE2:" + e2.getMessage());
+                }
             }
         }
         else // normal chunck recevied ---------- (NOT start, and NOT end)
         {
-            try
+            if (f.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
             {
-                if (VFS_ENCRYPT)
+                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_ALTER");
+            }
+            else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+            {
+                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_ANSWER");
+            }
+            else if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+            {
+                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_SEND");
+            }
+            else
+            {
+
+
+                try
                 {
-                    info.guardianproject.iocipher.FileOutputStream fos = null;
-                    if (!f.fos_open)
+                    if (VFS_ENCRYPT)
                     {
-                        fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                        Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                        cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
-                        f.fos_open = true;
-                        update_filetransfer_db_fos_open(f);
-                    }
-                    else
-                    {
-                        fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
-                        if (fos == null)
+                        info.guardianproject.iocipher.FileOutputStream fos = null;
+                        if (!f.fos_open)
                         {
                             fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
                             Log.i(TAG,
-                                  "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                                  "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
                                              fos);
                             f.fos_open = true;
                             update_filetransfer_db_fos_open(f);
                         }
-                        // Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                    }
+                        else
+                        {
+                            fos = cache_ft_fos.get(
+                                    tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                            if (fos == null)
+                            {
+                                fos = new info.guardianproject.iocipher.FileOutputStream(
+                                        f.path_name + "/" + f.file_name);
+                                Log.i(TAG,
+                                      "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                                cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                                 fos);
+                                f.fos_open = true;
+                                update_filetransfer_db_fos_open(f);
+                            }
+                            // Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        }
 
-                    // Log.i(TAG, "file_recv_chunk:fos:" + fos);
-                    fos.write(data);
-                }
-                else
-                {
-                    java.io.FileOutputStream fos = null;
-                    if (!f.fos_open)
-                    {
-                        fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                        Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                        cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                                fos);
-                        f.fos_open = true;
-                        update_filetransfer_db_fos_open(f);
+                        // Log.i(TAG, "file_recv_chunk:fos:" + fos);
+                        fos.write(data);
                     }
                     else
                     {
-                        fos = cache_ft_fos_normal.get(
-                                tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
-                        if (fos == null)
+                        java.io.FileOutputStream fos = null;
+                        if (!f.fos_open)
                         {
                             fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
                             Log.i(TAG,
-                                  "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                                  "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos_normal.put(
                                     tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                             f.fos_open = true;
                             update_filetransfer_db_fos_open(f);
                         }
-                        // Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        else
+                        {
+                            fos = cache_ft_fos_normal.get(
+                                    tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                            if (fos == null)
+                            {
+                                fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
+                                Log.i(TAG,
+                                      "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                                cache_ft_fos_normal.put(
+                                        tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
+                                f.fos_open = true;
+                                update_filetransfer_db_fos_open(f);
+                            }
+                            // Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        }
+
+                        // Log.i(TAG, "file_recv_chunk:fos:" + fos);
+                        fos.write(data);
                     }
 
-                    // Log.i(TAG, "file_recv_chunk:fos:" + fos);
-                    fos.write(data);
-                }
-
-                if (f.filesize < UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES)
-                {
-                    if ((f.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES) < position)
+                    if (f.filesize < UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES)
                     {
-                        f.current_position = position;
-                        // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
-                        update_filetransfer_db_current_position(f);
-
-                        if (f.kind != TOX_FILE_KIND_AVATAR.value)
+                        if ((f.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES) < position)
                         {
-                            // update_all_messages_global(false);
-                            try
+                            f.current_position = position;
+                            // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
+                            update_filetransfer_db_current_position(f);
+
+                            if (f.kind != TOX_FILE_KIND_AVATAR.value)
                             {
-                                if (f.id != -1)
+                                // update_all_messages_global(false);
+                                try
                                 {
-                                    update_single_message_from_ftid(f.id, false);
+                                    if (f.id != -1)
+                                    {
+                                        update_single_message_from_ftid(f.id, false);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
                                 }
                             }
-                            catch (Exception e)
+                        }
+                    }
+                    else
+                    {
+                        if ((f.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
+                        {
+                            f.current_position = position;
+                            // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
+                            update_filetransfer_db_current_position(f);
+
+                            if (f.kind != TOX_FILE_KIND_AVATAR.value)
                             {
+                                // update_all_messages_global(false);
+                                try
+                                {
+                                    if (f.id != -1)
+                                    {
+                                        update_single_message_from_ftid(f.id, false);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                }
                             }
                         }
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    if ((f.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
-                    {
-                        f.current_position = position;
-                        // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
-                        update_filetransfer_db_current_position(f);
-
-                        if (f.kind != TOX_FILE_KIND_AVATAR.value)
-                        {
-                            // update_all_messages_global(false);
-                            try
-                            {
-                                if (f.id != -1)
-                                {
-                                    update_single_message_from_ftid(f.id, false);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                    }
+                    e.printStackTrace();
+                    Log.i(TAG, "file_recv_chunk:EE1:" + e.getMessage());
                 }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "file_recv_chunk:EE1:" + e.getMessage());
+
             }
         }
 
@@ -5871,6 +5954,18 @@ public class MainActivity extends AppCompatActivity
                     {
                     }
                 }
+                else if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+                {
+                    Log.i(TAG, "cancel ft:incoming:TOX_FILE_KIND_MESSAGEV2_SEND");
+                }
+                else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+                {
+                    Log.i(TAG, "cancel ft:incoming:TOX_FILE_KIND_MESSAGEV2_SEND");
+                }
+                else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
+                {
+                    Log.i(TAG, "cancel ft:incoming:TOX_FILE_KIND_MESSAGEV2_SEND");
+                }
                 else // avatar FT
                 {
                     long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
@@ -5909,6 +6004,18 @@ public class MainActivity extends AppCompatActivity
                     catch (Exception e)
                     {
                     }
+                }
+                else if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+                {
+                    Log.i(TAG, "cancel ft:outgoing:TOX_FILE_KIND_MESSAGEV2_SEND");
+                }
+                else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+                {
+                    Log.i(TAG, "cancel ft:outgoing:TOX_FILE_KIND_MESSAGEV2_SEND");
+                }
+                else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
+                {
+                    Log.i(TAG, "cancel ft:outgoing:TOX_FILE_KIND_MESSAGEV2_SEND");
                 }
                 else // avatar FT
                 {

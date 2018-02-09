@@ -86,6 +86,13 @@ public class Message
     @Nullable
     String filename_fullpath = null;
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String msg_id_hash = null; // 32bit hash, used for MessageV2 Messages! and otherwise NULL
+
+    @Column(indexed = true, defaultExpr = "0")
+    int msg_version; // 0 -> old Message, 1 -> for MessageV2 Message
+
     static Message deep_copy(Message in)
     {
         Message out = new Message();
@@ -106,6 +113,8 @@ public class Message
         out.is_new = in.is_new;
         out.text = in.text;
         out.filename_fullpath = in.filename_fullpath;
+        out.msg_id_hash = in.msg_id_hash;
+        out.msg_version = in.msg_version;
 
         return out;
     }
@@ -113,6 +122,11 @@ public class Message
     @Override
     public String toString()
     {
-        return "id=" + id + ", message_id=" + message_id + ", filetransfer_id=" + filetransfer_id + ", filedb_id=" + filedb_id + ", tox_friendpubkey=" + tox_friendpubkey + ", direction=" + direction + ", state=" + state + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + text + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new;
+        return "id=" + id + ", message_id=" + message_id + ", filetransfer_id=" + filetransfer_id + ", filedb_id=" +
+               filedb_id + ", tox_friendpubkey=" + tox_friendpubkey + ", direction=" + direction + ", state=" + state +
+               ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE +
+               ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
+               ", text=" + text + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new + ", msg_id_hash=" +
+               msg_id_hash + ", msg_version=" + msg_version;
     }
 }
