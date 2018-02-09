@@ -111,6 +111,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
@@ -1914,7 +1915,7 @@ public class MainActivity extends AppCompatActivity
         System.out.println("MSG_V2:001b:raw_msg_buf=" +
                            bytesToHex(raw_msg_buf.array(), raw_msg_buf.arrayOffset(), raw_msg_buf.limit()));
 
-        int res = tox_messagev2_wrap(text_length, type, 0, msg_buf, 1, 0, raw_msg_buf, msg_id_buf);
+        int res = tox_messagev2_wrap(text_length, type, 0, msg_buf, 0xaffffffe, 0xaffe, raw_msg_buf, msg_id_buf);
         System.out.println("MSG_V2:002:res=" + res);
         System.out.println(
                 "MSG_V2:003:msg_id=" + bytesToHex(msg_id_buf.array(), msg_id_buf.arrayOffset(), msg_id_buf.limit()));
@@ -1924,7 +1925,8 @@ public class MainActivity extends AppCompatActivity
         System.out.println("MSG_V2:003:msg_id=" + bytesToHex(bytesArray, 0, bytesArray.length));
 
         System.out.println("MSG_V2:004:raw_msg_buf=" +
-                           bytesToHex(raw_msg_buf.array(), raw_msg_buf.arrayOffset(), raw_msg_buf.limit()));
+                           bytesToHex(raw_msg_buf.array(), raw_msg_buf.arrayOffset(), raw_msg_buf.limit()) +
+                           "\nMSG_V2:004:raw_msg_buf=" + Arrays.toString(raw_msg_buf.array()));
 
         System.out.println("MSG_V2:004aa:l1=" + raw_msg_buf.capacity());
         System.out.println("MSG_V2:004aa:l2=" + raw_msg_buf.limit());
