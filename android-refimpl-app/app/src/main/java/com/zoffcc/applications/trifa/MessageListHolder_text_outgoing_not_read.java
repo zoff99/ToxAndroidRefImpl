@@ -36,6 +36,7 @@ import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
@@ -151,6 +152,17 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
 
         textView.setCustomRegex(TOXURL_PATTERN);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
+
+        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
+        {
+            // text consits only of emojis -> increase size
+            textView.setEmojiSize((int) dp2px(36 * 2));
+        }
+        else
+        {
+            textView.setEmojiSize((int) dp2px(36));
+        }
+
         textView.setAutoLinkText(m.text);
 
         if (!m.read)
