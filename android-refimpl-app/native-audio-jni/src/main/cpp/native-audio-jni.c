@@ -231,27 +231,6 @@ short *createResampledBuf(uint32_t srcRate, int32_t srcSampleCount, short *src, 
 // this callback handler is called every time a buffer finishes playing
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
-#if 0
-    assert(bq == bqPlayerBufferQueue);
-    assert(NULL == context);
-
-    SLresult result;
-    if (cur_buf == 1)
-    {
-        cur_buf = 2;
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, (short *) audio_play_buffer_2,
-                                                 audio_play_buffer_2_size);
-        memset((short *) audio_play_buffer_1, 0, audio_play_buffer_1_size);
-    }
-    else
-    {
-        cur_buf = 1;
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, (short *) audio_play_buffer_1,
-                                                 audio_play_buffer_1_size);
-        memset((short *) audio_play_buffer_2, 0, audio_play_buffer_2_size);
-    }
-#endif
-
 }
 
 
@@ -389,10 +368,10 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     (void) result;
 
 #if 0
-    // register callback on the buffer queue
-    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
-    assert(SL_RESULT_SUCCESS == result);
-    (void) result;
+    //    // register callback on the buffer queue
+    //    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
+    //    assert(SL_RESULT_SUCCESS == result);
+    //    (void) result;
 #endif
 
 #if 0
@@ -528,7 +507,10 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *
 {
     cur_buf = 1;
     playing_state = _STOPPED;
-    (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
+    if (bqPlayerBufferQueue != NULL)
+    {
+        (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
+    }
 
     return JNI_TRUE;
 }
@@ -549,6 +531,10 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 
     if (nextSize > 0)
     {
+        if (bqPlayerBufferQueue == NULL)
+        {
+            return -2;
+        }
         // enque the buffer
         SLresult result;
         playing_state = _PLAYING;
@@ -568,7 +554,10 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
 {
     playing_state = _SHUTDOWN;
 
-    (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
+    if (bqPlayerBufferQueue != NULL)
+    {
+        (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
+    }
 
     // destroy buffer queue audio player object, and invalidate all associated interfaces
     if (bqPlayerObject != NULL)
