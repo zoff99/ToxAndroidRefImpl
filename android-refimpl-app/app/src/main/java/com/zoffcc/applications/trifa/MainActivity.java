@@ -4124,7 +4124,7 @@ public class MainActivity extends AppCompatActivity
             m.state = TOX_FILE_CONTROL_RESUME.value;
             m.ft_accepted = true;
             m.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
-            m.rcvd_timestamp = 0; // get sent datetime later
+            m.rcvd_timestamp = System.currentTimeMillis(); // get sent datetime later. now use "now"
             m.text = "..."; // get text later
             m.msg_version = 1;
             m.msg_id_hash = bytesToHex(ft_hash_32.array(), ft_hash_32.arrayOffset(), ft_hash_32.limit());
@@ -4371,7 +4371,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:raw_text_byte=" +
                            bytesToHex(raw_text_bytes, 0, raw_text_bytes.length));
 
-                System.out.println("file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:001b:=msg_text_buffer" +
+                System.out.println("file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:001b:msg_text_buffer=" +
                                    bytesToHex(msg_text_buffer.array(), msg_text_buffer.arrayOffset(),
                                               msg_text_buffer.limit()));
 
@@ -4381,6 +4381,19 @@ public class MainActivity extends AppCompatActivity
 
                 Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:len=" + msg_text_buffer.capacity() + " hex=" +
                            bytesToHex(raw_text_bytes, 0, (raw_message_bytes.length - (32 + 4 + 2))));
+
+                mm.text = message_text_decoded;
+
+                orma.updateMessage().idEq(f.message_id).text(mm.text).execute();
+
+                try
+                {
+                    update_single_message_from_messge_id(mm.id, true);
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "file_recv_chunk:file_READY:EE:" + e.getMessage());
+                }
             }
             else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
             {
