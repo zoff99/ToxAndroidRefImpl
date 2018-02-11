@@ -4084,6 +4084,82 @@ public class MainActivity extends AppCompatActivity
         else if (a_TOX_FILE_KIND == TOX_FILE_KIND_MESSAGEV2_SEND.value)
         {
             Log.i(TAG, "file_recv:TOX_FILE_KIND_MESSAGEV2_SEND");
+
+            // save FT to db ---------------
+            Filetransfer f = new Filetransfer();
+            f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
+            f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
+            f.file_number = file_number;
+            f.kind = a_TOX_FILE_KIND;
+            f.state = TOX_FILE_CONTROL_RESUME.value;
+            f.path_name = "";
+            f.file_name = "";
+            f.filesize = file_size;
+            f.ft_accepted = true;
+            f.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
+            f.current_position = 0;
+
+            long ft_id = insert_into_filetransfer_db(f);
+            f.id = ft_id;
+
+            // add FT message to UI
+            Message m = new Message();
+
+            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
+            m.direction = 0; // msg received
+            m.TOX_MESSAGE_TYPE = 0;
+            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+            m.filetransfer_id = ft_id;
+            m.filedb_id = -1;
+            m.state = TOX_FILE_CONTROL_RESUME.value;
+            m.ft_accepted = true;
+            m.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
+            m.rcvd_timestamp = 0; // get sent datetime later
+            m.text = "..."; // get text later
+
+            long new_msg_id = -1;
+
+            if (message_list_activity != null)
+            {
+                if (message_list_activity.get_current_friendnum() == friend_number)
+                {
+                    new_msg_id = insert_into_message_db(m, true);
+                    m.id = new_msg_id;
+                }
+                else
+                {
+                    new_msg_id = insert_into_message_db(m, false);
+                    m.id = new_msg_id;
+                }
+            }
+            else
+            {
+                new_msg_id = insert_into_message_db(m, false);
+                m.id = new_msg_id;
+            }
+
+
+            f.message_id = new_msg_id;
+            update_filetransfer_db_messageid_from_id(f, f.id);
+
+            try
+            {
+                // update "new" status on friendlist fragment
+                FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                cc.is_friend = true;
+                cc.friend_item = f2;
+                if (friend_list_fragment != null)
+                {
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
+            }
+
         }
         else if (a_TOX_FILE_KIND == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
         {
