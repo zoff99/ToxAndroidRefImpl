@@ -64,9 +64,14 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_messagev2_sending;
+import static com.zoffcc.applications.trifa.MainActivity.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_filetransfer_db;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
@@ -80,9 +85,10 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.MainActivity.tox_messagev2_size;
+import static com.zoffcc.applications.trifa.MainActivity.tox_messagev2_wrap;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
-import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_messageid_from_id;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FILE_PICK_METHOD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
@@ -97,6 +103,9 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_receiv
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_SEND;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGEV2_MAX_TEXT_LENGTH;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -218,8 +227,10 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-        final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
-        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         ml_friend_typing.setText("");
         attachemnt_instead_of_send = true;
@@ -340,7 +351,8 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
         final long fn = friendnum;
@@ -488,15 +500,16 @@ public class MessageListActivity extends AppCompatActivity
         //        }})
 
 
-        emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener()
-        {
-            @Override
-            public void onEmojiBackspaceClick(View v)
-            {
+        emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(
+                new OnEmojiBackspaceClickListener()
+                {
+                    @Override
+                    public void onEmojiBackspaceClick(View v)
+                    {
 
-            }
+                    }
 
-        }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
+                }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
         {
             @Override
             public void onEmojiPopupShown()
@@ -642,8 +655,10 @@ public class MessageListActivity extends AppCompatActivity
                         properties.selection_mode = DialogConfigs.SINGLE_MODE;
                         properties.selection_type = DialogConfigs.FILE_SELECT;
                         properties.root = new java.io.File("/");
-                        properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                        properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                        properties.error_dir = new java.io.File(
+                                Environment.getExternalStorageDirectory().getAbsolutePath());
+                        properties.offset = new java.io.File(
+                                Environment.getExternalStorageDirectory().getAbsolutePath());
                         properties.extensions = null;
                         // TODO: hardcoded is always bad
                         // properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF", "zip", "ZIP", "avi", "AVI", "mp4", "MP4"};
@@ -731,33 +746,138 @@ public class MessageListActivity extends AppCompatActivity
                 }
                 else
                 {
-                    // send typed message to friend
-                    msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
 
-                    Message m = new Message();
-                    m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
-                    m.direction = 1; // msg sent
-                    m.TOX_MESSAGE_TYPE = 0;
-                    m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
-                    m.rcvd_timestamp = 0L;
-                    m.is_new = false; // own messages are always "not new"
-                    m.sent_timestamp = System.currentTimeMillis();
-                    m.read = false;
-                    m.text = msg;
-
-                    if ((msg != null) && (!msg.equalsIgnoreCase("")))
+                    if (PREF__use_messagev2_sending)
                     {
-                        long res = tox_friend_send_message(friendnum, 0, msg);
-                        Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
+                        long type = TOX_FILE_KIND_MESSAGEV2_SEND.value;
+                        String msgv2_input_str = ml_new_message.getText().toString().substring(0, (int) Math.min(
+                                TOX_MESSAGEV2_MAX_TEXT_LENGTH, ml_new_message.getText().toString().length()));
 
-                        if (res > -1)
+                        byte[] b;
+                        try
                         {
-                            m.message_id = res;
-                            long row_id = insert_into_message_db(m, true);
-                            m.id = row_id;
-                            ml_new_message.setText("");
+                            b = msgv2_input_str.getBytes("UTF-8");
+                        }
+                        catch (UnsupportedEncodingException e)
+                        {
+                            b = new byte[1];
+                            b[0] = 65;
+                        }
+                        long text_length = b.length;
+                        System.out.println("MSG_V2:001:b.length=" + b.length);
+                        long alter_type = 0;
+                        long raw_message_length = tox_messagev2_size(text_length, type, alter_type);
+                        System.out.println("MSG_V2:001:raw_message_length=" + raw_message_length);
 
+                        ByteBuffer msg_buf = ByteBuffer.allocateDirect((int) text_length);
+                        ByteBuffer raw_msg_buf = ByteBuffer.allocateDirect((int) raw_message_length);
+                        ByteBuffer msg_id_buf = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+
+                        System.out.println("MSG_V2:001aa:l1=" + msg_id_buf.capacity());
+                        System.out.println("MSG_V2:001aa:l2=" + msg_id_buf.limit());
+                        System.out.println("MSG_V2:001aa:l3=" + msg_id_buf.array().length);
+                        System.out.println("MSG_V2:001aa:l3=" + msg_id_buf.arrayOffset());
+
+                        msg_buf.rewind();
+                        msg_buf.put(b);
+
+                        System.out.println("MSG_V2:001a:msg_id=" +
+                                           bytesToHex(msg_id_buf.array(), msg_id_buf.arrayOffset(),
+                                                      msg_id_buf.limit()));
+                        System.out.println("MSG_V2:001b:raw_msg_buf=" +
+                                           bytesToHex(raw_msg_buf.array(), raw_msg_buf.arrayOffset(),
+                                                      raw_msg_buf.limit()));
+
+                        int res = tox_messagev2_wrap(text_length, type, 0, msg_buf, 0xaffffffe, 0xaffe, raw_msg_buf,
+                                                     msg_id_buf);
+                        System.out.println("MSG_V2:002:res=" + res);
+                        System.out.println("MSG_V2:003:msg_id=" +
+                                           bytesToHex(msg_id_buf.array(), msg_id_buf.arrayOffset(),
+                                                      msg_id_buf.limit()));
+
+                        byte[] bytesArray = new byte[msg_id_buf.capacity()];
+                        msg_id_buf.get(bytesArray, 0, bytesArray.length);
+                        System.out.println("MSG_V2:003:msg_id=" + bytesToHex(bytesArray, 0, bytesArray.length));
+
+                        System.out.println("MSG_V2:004:raw_msg_buf=" +
+                                           bytesToHex(raw_msg_buf.array(), raw_msg_buf.arrayOffset(),
+                                                      raw_msg_buf.limit()) + "\nMSG_V2:004:raw_msg_buf=" +
+                                           Arrays.toString(raw_msg_buf.array()));
+
+                        byte[] raw_message = new byte[raw_msg_buf.capacity()];
+                        raw_msg_buf.get(raw_message, 0, raw_message.length);
+                        System.out.println("MSG_V2:004.a:raw_msg_buf=" + bytesToHex(raw_message, 0, raw_message.length));
+
+                        System.out.println("MSG_V2:004aa:l1=" + raw_msg_buf.capacity());
+                        System.out.println("MSG_V2:004aa:l2=" + raw_msg_buf.limit());
+                        System.out.println("MSG_V2:004aa:l3=" + raw_msg_buf.array().length);
+                        System.out.println("MSG_V2:004aa:l3=" + raw_msg_buf.arrayOffset());
+
+
+                        Message m = new Message();
+                        m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
+                        m.direction = 1; // msg sent
+                        m.TOX_MESSAGE_TYPE = 0;
+                        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                        m.rcvd_timestamp = 0L;
+                        m.is_new = false; // own messages are always "not new"
+                        m.sent_timestamp = System.currentTimeMillis();
+                        m.read = false;
+                        m.text = msg;
+                        m.msg_version = 1;
+                        m.msg_id_hash = bytesToHex(bytesArray, 0, bytesArray.length);
+                        m.raw_msgv2_bytes= bytesToHex(raw_message, 0, raw_message.length);
+
+                        if ((msg != null) && (!msg.equalsIgnoreCase("")))
+                        {
+                            //                            long res = tox_friend_send_message(friendnum, 0, msg);
+                            //                            Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
+                            //
+                            //                            if (res > -1)
+                            //                            {
+                            //                                m.message_id = res;
+                            //                                long row_id = insert_into_message_db(m, true);
+                            //                                m.id = row_id;
+                            //                                ml_new_message.setText("");
+                            //
                             stop_self_typing_indicator_s();
+                            //                            }
+                        }
+
+
+                    }
+                    else
+                    {
+
+                        // send typed message to friend
+                        msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(),
+                                                                                              ml_new_message.getText().toString().length()));
+
+                        Message m = new Message();
+                        m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
+                        m.direction = 1; // msg sent
+                        m.TOX_MESSAGE_TYPE = 0;
+                        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                        m.rcvd_timestamp = 0L;
+                        m.is_new = false; // own messages are always "not new"
+                        m.sent_timestamp = System.currentTimeMillis();
+                        m.read = false;
+                        m.text = msg;
+
+                        if ((msg != null) && (!msg.equalsIgnoreCase("")))
+                        {
+                            long res = tox_friend_send_message(friendnum, 0, msg);
+                            Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
+
+                            if (res > -1)
+                            {
+                                m.message_id = res;
+                                long row_id = insert_into_message_db(m, true);
+                                m.id = row_id;
+                                ml_new_message.setText("");
+
+                                stop_self_typing_indicator_s();
+                            }
                         }
                     }
                 }
@@ -1082,7 +1202,8 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     CallingActivity.top_text_line_str2 = "0s";
                                     update_top_text_line();
-                                    Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled + " f_video_enabled=" + f_video_enabled);
+                                    Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled +
+                                               " f_video_enabled=" + f_video_enabled);
 
                                     Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
                                     Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
@@ -1210,7 +1331,8 @@ public class MessageListActivity extends AppCompatActivity
             {
 
                 final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),
+                                                                  Long.valueOf(id));
 
                 return getDataColumn(context, contentUri, null, null);
             }

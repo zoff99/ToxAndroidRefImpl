@@ -90,6 +90,10 @@ public class Message
     @Nullable
     String msg_id_hash = null; // 32bit hash, used for MessageV2 Messages! and otherwise NULL
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String raw_msgv2_bytes = null; // used for MessageV2 Messages! and otherwise NULL
+
     @Column(indexed = true, defaultExpr = "0")
     int msg_version; // 0 -> old Message, 1 -> for MessageV2 Message
 
@@ -115,6 +119,7 @@ public class Message
         out.filename_fullpath = in.filename_fullpath;
         out.msg_id_hash = in.msg_id_hash;
         out.msg_version = in.msg_version;
+        out.raw_msgv2_bytes = in.raw_msgv2_bytes;
 
         return out;
     }
@@ -126,7 +131,7 @@ public class Message
                filedb_id + ", tox_friendpubkey=" + tox_friendpubkey + ", direction=" + direction + ", state=" + state +
                ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE +
                ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
-               ", text=" + text + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new + ", msg_id_hash=" +
-               msg_id_hash + ", msg_version=" + msg_version;
+               ", text=" + "yyyy" + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new + ", msg_id_hash=" +
+               msg_id_hash + ", msg_version=" + msg_version + ", raw_msgv2_bytes=" + "xxxxxx";
     }
 }
