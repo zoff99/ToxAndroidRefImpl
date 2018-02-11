@@ -2809,7 +2809,7 @@ jobject message_text_buffer)
 
     bool res = tox_messagev2_get_message_text(raw_message_buffer_c, (uint32_t)raw_message_len,
                              (bool)is_alter_msg,
-                             (uint32_t)alter_type, raw_message_buffer_c);
+                             (uint32_t)alter_type, message_text_buffer_c);
 
 	if (res == true)
     {

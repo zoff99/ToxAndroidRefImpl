@@ -190,6 +190,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTIO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ALTER;
@@ -203,6 +204,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STA
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.safe_string;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 @RuntimePermissions
@@ -4085,6 +4087,12 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "file_recv:TOX_FILE_KIND_MESSAGEV2_SEND");
 
+            ByteBuffer ft_hash_32 = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
+            tox_file_get_file_id(friend_number, file_number, ft_hash_32);
+
+            Log.i(TAG, "file_recv:TOX_FILE_KIND_MESSAGEV2_SEND:msg_hash=" +
+                       bytesToHex(ft_hash_32.array(), ft_hash_32.arrayOffset(), ft_hash_32.limit()));
+
             // save FT to db ---------------
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
@@ -4102,6 +4110,8 @@ public class MainActivity extends AppCompatActivity
             long ft_id = insert_into_filetransfer_db(f);
             f.id = ft_id;
 
+            // TODO: check if we already have a message for this hash!
+
             // add FT message to UI
             Message m = new Message();
 
@@ -4116,6 +4126,8 @@ public class MainActivity extends AppCompatActivity
             m.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
             m.rcvd_timestamp = 0; // get sent datetime later
             m.text = "..."; // get text later
+            m.msg_version = 1;
+            m.msg_id_hash = bytesToHex(ft_hash_32.array(), ft_hash_32.arrayOffset(), ft_hash_32.limit());
 
             long new_msg_id = -1;
 
@@ -4308,6 +4320,18 @@ public class MainActivity extends AppCompatActivity
                         f2.mkdirs();
                     }
                 }
+                else
+                {
+                    if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+                    {
+                    }
+                    else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+                    {
+                    }
+                    else // TOX_FILE_KIND_MESSAGEV2_ALTER.value
+                    {
+                    }
+                }
             }
         }
         catch (Exception e)
@@ -4319,18 +4343,52 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "file_recv_chunk:END-O-F:filesize==" + f.filesize);
 
-
-            if (f.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
+            if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
             {
-                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_ALTER");
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND");
+
+                Message mm = orma.selectFromMessage().idEq(f.message_id).get(0);
+
+                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_SEND:after :E=" + mm.raw_msgv2_bytes.length() +
+                           " data=" + mm.raw_msgv2_bytes);
+
+                byte[] raw_message_bytes = hex_to_bytes(mm.raw_msgv2_bytes);
+                ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) raw_message_bytes.length);
+                raw_message_buf.put(raw_message_bytes, 0, (int) raw_message_bytes.length);
+                ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+
+                tox_messagev2_get_message_id(raw_message_buf, msg_id_buffer);
+
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:mid:1=" + mm.msg_id_hash);
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:mid:2=" +
+                           bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit()));
+
+                ByteBuffer msg_text_buffer = ByteBuffer.allocateDirect(raw_message_bytes.length - (32 + 4 + 2));
+                tox_messagev2_get_message_text(raw_message_buf, raw_message_bytes.length, 0, 0, msg_text_buffer);
+
+                byte[] raw_text_bytes = new byte[raw_message_bytes.length - (32 + 4 + 2)];
+
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:raw_text_byte=" +
+                           bytesToHex(raw_text_bytes, 0, raw_text_bytes.length));
+
+                System.out.println("file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:001b:=msg_text_buffer" +
+                                   bytesToHex(msg_text_buffer.array(), msg_text_buffer.arrayOffset(),
+                                              msg_text_buffer.limit()));
+
+                msg_text_buffer.get(raw_text_bytes, 0, (raw_message_bytes.length - (32 + 4 + 2)));
+                String message_text_decoded = safe_string(raw_text_bytes);
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:message_decoded_text=" + message_text_decoded);
+
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND:len=" + msg_text_buffer.capacity() + " hex=" +
+                           bytesToHex(raw_text_bytes, 0, (raw_message_bytes.length - (32 + 4 + 2))));
             }
             else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
             {
                 Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_ANSWER");
             }
-            else if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+            else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
             {
-                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_SEND");
+                Log.i(TAG, "file_recv_chunk:TOX_FILE_KIND_MESSAGEV2_ALTER");
             }
             else
             {
@@ -4452,17 +4510,32 @@ public class MainActivity extends AppCompatActivity
         }
         else // normal chunck recevied ---------- (NOT start, and NOT end)
         {
-            if (f.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
+            if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
             {
-                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_ALTER");
+                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_SEND");
+
+                Message mm = orma.selectFromMessage().idEq(f.message_id).get(0);
+
+                if (mm.raw_msgv2_bytes == null)
+                {
+                    mm.raw_msgv2_bytes = "";
+                }
+
+                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_SEND:before:l=" + mm.raw_msgv2_bytes.length() +
+                           " data=" + mm.raw_msgv2_bytes);
+                mm.raw_msgv2_bytes = mm.raw_msgv2_bytes + bytesToHex(data, 0, data.length);
+                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_SEND:after :l=" + mm.raw_msgv2_bytes.length() +
+                           " data=" + mm.raw_msgv2_bytes);
+
+                orma.updateMessage().idEq(f.message_id).raw_msgv2_bytes(mm.raw_msgv2_bytes).execute();
             }
             else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
             {
                 Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_ANSWER");
             }
-            else if (f.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+            else if (f.kind == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
             {
-                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_SEND");
+                Log.i(TAG, "file_recv_chunk:2:TOX_FILE_KIND_MESSAGEV2_ALTER");
             }
             else
             {
