@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity
     // 120 is also valid!!
     static int PREF__milliseconds_record_audio_samples = 120;
     static boolean PREF__use_audio_rec_effects = true;
-    static boolean PREF__use_messagev2_sending = true;
+    static boolean PREF__use_messagev2_sending = true; // use Message V2 ?
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
@@ -3830,7 +3830,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_chunk_request_cb_method(long friend_number, long file_number, long position, long length)
     {
-        // Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
+        Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
 
         try
         {
@@ -3894,6 +3894,16 @@ public class MainActivity extends AppCompatActivity
             else if (ft.kind == TOX_FILE_KIND_MESSAGEV2_SEND.value)
             {
                 Log.i(TAG, "file_chunk_request:TOX_FILE_KIND_MESSAGEV2_SEND");
+                Log.i(TAG, "file_chunk_request:ft.message_id=" + ft.message_id);
+                Log.i(TAG, "file_chunk_request:ft.id=" + ft.id);
+
+                Message mm = orma.selectFromMessage().idEq(ft.message_id).get(0);
+                byte[] raw_message_bytes = hex_to_bytes(mm.raw_msgv2_bytes);
+
+                ByteBuffer file_chunk = ByteBuffer.allocateDirect((int) length);
+                file_chunk.put(raw_message_bytes, (int) position, (int) length);
+                int res = tox_file_send_chunk(friend_number, file_number, position, file_chunk, length);
+                Log.i(TAG, "file_chunk_request:res(1)=" + res);
             }
             else if (ft.kind == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
             {
@@ -4172,6 +4182,20 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
+            int num_results = orma.selectFromFiletransfer().
+                    directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
+                    file_numberEq(file_number).
+                    and().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    orderByIdDesc().count();
+
+            if (num_results < 1)
+            {
+                Log.i(TAG, "file_recv_chunk:no FT found in DB");
+                // nothing found in DB
+                return;
+            }
+
             f = orma.selectFromFiletransfer().
                     directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
                     file_numberEq(file_number).
@@ -5622,6 +5646,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static void set_message_filetransfer_from_id(long message_id, long filetransfer_id)
+    {
+        try
+        {
+            orma.updateMessage().idEq(message_id).filetransfer_id(filetransfer_id).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "set_message_filetransfer_from_id:EE:" + e.getMessage());
+        }
+    }
+
     public static void set_message_filedb_from_friendnum_and_filenum(long friend_number, long file_number, long filedb_id)
     {
         try
@@ -6058,6 +6095,13 @@ public class MainActivity extends AppCompatActivity
                 and().
                 file_numberEq(f.file_number).
                 current_position(f.current_position).
+                execute();
+    }
+
+    static void update_filetransfer_db_filenum(final Filetransfer f, long file_number)
+    {
+        orma.updateFiletransfer().idEq(f.id).
+                file_number(file_number).
                 execute();
     }
 
@@ -7700,6 +7744,18 @@ public class MainActivity extends AppCompatActivity
         }
         return "*ERROR*";
 
+    }
+
+    public static byte[] hex_to_bytes(String s)
+    {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2)
+        {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+        }
+
+        return data;
     }
 
     public static com.bumptech.glide.load.Key StringSignature2(final String in)

@@ -82,12 +82,16 @@ import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
+import static com.zoffcc.applications.trifa.MainActivity.set_message_filetransfer_from_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_file_send;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_messagev2_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_messagev2_wrap;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_filenum;
 import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FILE_PICK_METHOD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -727,7 +731,7 @@ public class MessageListActivity extends AppCompatActivity
                         // file (as opposed to a list of contacts or timezones)
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-                        // Filter to show only images, using the image MIME data type.
+                        // Filter.
                         // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
                         // To search for all documents available via installed storage providers,
                         // it would be "*/*".
@@ -746,7 +750,6 @@ public class MessageListActivity extends AppCompatActivity
                 }
                 else
                 {
-
                     if (PREF__use_messagev2_sending)
                     {
                         long type = TOX_FILE_KIND_MESSAGEV2_SEND.value;
@@ -760,6 +763,7 @@ public class MessageListActivity extends AppCompatActivity
                         }
                         catch (UnsupportedEncodingException e)
                         {
+                            // TODO: so something better here, when the input is not proper UTF-8
                             b = new byte[1];
                             b[0] = 65;
                         }
@@ -806,7 +810,8 @@ public class MessageListActivity extends AppCompatActivity
 
                         byte[] raw_message = new byte[raw_msg_buf.capacity()];
                         raw_msg_buf.get(raw_message, 0, raw_message.length);
-                        System.out.println("MSG_V2:004.a:raw_msg_buf=" + bytesToHex(raw_message, 0, raw_message.length));
+                        System.out.println(
+                                "MSG_V2:004.a:raw_msg_buf=" + bytesToHex(raw_message, 0, raw_message.length));
 
                         System.out.println("MSG_V2:004aa:l1=" + raw_msg_buf.capacity());
                         System.out.println("MSG_V2:004aa:l2=" + raw_msg_buf.limit());
@@ -823,13 +828,46 @@ public class MessageListActivity extends AppCompatActivity
                         m.is_new = false; // own messages are always "not new"
                         m.sent_timestamp = System.currentTimeMillis();
                         m.read = false;
-                        m.text = msg;
-                        m.msg_version = 1;
+                        m.text = msgv2_input_str;
+                        m.msg_version = 1; // Message V2
                         m.msg_id_hash = bytesToHex(bytesArray, 0, bytesArray.length);
-                        m.raw_msgv2_bytes= bytesToHex(raw_message, 0, raw_message.length);
+                        m.raw_msgv2_bytes = bytesToHex(raw_message, 0, raw_message.length);
 
-                        if ((msg != null) && (!msg.equalsIgnoreCase("")))
+                        System.out.println("MSG_V2:005");
+
+                        if ((msgv2_input_str != null) && (!msgv2_input_str.equalsIgnoreCase("")))
                         {
+
+                            System.out.println("MSG_V2:006");
+
+                            long msg_rowid = insert_into_message_db(m, true);
+
+                            ml_new_message.setText("");
+
+                            // save FT to db ---------------
+                            Filetransfer ft_outgoing = new Filetransfer();
+                            ft_outgoing.tox_public_key_string = m.tox_friendpubkey;
+                            ft_outgoing.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
+                            ft_outgoing.kind = TOX_FILE_KIND_MESSAGEV2_SEND.value;
+                            ft_outgoing.filesize = raw_msg_buf.capacity();
+                            ft_outgoing.message_id = msg_rowid;
+                            long ft_rowid = insert_into_filetransfer_db(ft_outgoing);
+                            ft_outgoing.id = ft_rowid;
+                            set_message_filetransfer_from_id(msg_rowid, ft_rowid);
+
+
+                            // actually start sending the file to friend
+                            long file_number = tox_file_send(tox_friend_by_public_key__wrapper(m.tox_friendpubkey),
+                                                             ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_SEND.value,
+                                                             raw_msg_buf.capacity(), msg_id_buf, "messagev2.txt",
+                                                             "messagev2.txt".length());
+
+                            ft_outgoing.file_number = file_number;
+                            update_filetransfer_db_filenum(ft_outgoing, file_number);
+
+                            Log.i(TAG, "MM2MM:9:new filenum=" + file_number);
+
+
                             //                            long res = tox_friend_send_message(friendnum, 0, msg);
                             //                            Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
                             //
@@ -887,6 +925,7 @@ public class MessageListActivity extends AppCompatActivity
         {
             msg = "";
             e.printStackTrace();
+            Log.i(TAG, "send_message_onclick:EE4:" + e.getMessage());
         }
 
         // Log.i(TAG,"send_message_onclick:---end");
