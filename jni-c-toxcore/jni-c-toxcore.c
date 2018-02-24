@@ -47,11 +47,17 @@
 #include <vpx/vpx_image.h>
 #include <sys/mman.h>
 
+
+#define USE_ECHO_CANCELLATION 1
+
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
 #include <jni.h>
 #include "coffeecatch.h"
 #include "coffeejni.h"
+#ifdef USE_ECHO_CANCELLATION
+	#include "filter_audio/filter_audio.h"
+#endif
 // ------- Android/JNI stuff -------
 
 
@@ -96,6 +102,10 @@ Tox *tox_global = NULL;
 ToxAV *tox_av_global = NULL;
 CallControl mytox_CC;
 pthread_t tid[2]; // 0 -> toxav_iterate thread, 1 -> video send thread
+
+#ifdef USE_ECHO_CANCELLATION
+Filter_Audio *filteraudio = NULL;
+#endif
 
 
 // ----- JNI stuff -----
@@ -427,6 +437,52 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     dbg(9, "local discovery enabled = %d", (int)local_discovery_enabled);
     free(full_path_filename);
     return tox;
+}
+
+
+void start_filter_audio()
+{
+#ifdef USE_ECHO_CANCELLATION
+	/* Prepare filter_audio */
+	filteraudio = new_filter_audio(af_info_in.samplerate);
+
+	if (filteraudio != NULL)
+	{
+		/* Enable/disable filters. 1 to enable, 0 to disable. */
+		int echo_ = 1;
+		int noise_ = 0;
+		int gain_ = 0;
+		int vad_ = 0;
+		enable_disable_filters(filteraudio, echo_, noise_, gain_, vad_);
+	}
+#endif
+}
+
+void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms)
+{
+    /* It's essential that echo delay is set correctly; it's the most important part of the
+     * echo cancellation process. If the delay is not set to the acceptable values the AEC
+     * will not be able to recover. Given that it's not that easy to figure out the exact
+     * time it takes for a signal to get from Output to the Input, setting it to suggested
+     * input device latency + frame duration works really good and gives the filter ability
+     * to adjust it internally after some time (usually up to 6-7 seconds in my tests when
+     * the error is about 20%).
+     */
+    set_echo_delay_ms(filteraudio, (input_latency_ms + frame_duration_ms));
+    /*
+     */
+}
+
+void stop_filter_audio()
+{
+#ifdef USE_ECHO_CANCELLATION
+	/* Prepare filter_audio */
+	if (filteraudio != NULL)
+	{
+		kill_filter_audio(filteraudio);
+		filteraudio = NULL;
+	}
+#endif
 }
 
 
@@ -1558,6 +1614,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
                                 "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
+
+	start_filter_audio();
+
     // ----------- create Tox instance -----------
     const char *proxy_host_str = (*env)->GetStringUTFChars(env, proxy_host, NULL);
     tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port,
@@ -1981,6 +2040,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     tox_av_global = NULL;
     tox_global = NULL;
     dbg(9, "tox_kill ... READY");
+
+	stop_filter_audio();
 }
 
 JNIEXPORT void JNICALL
