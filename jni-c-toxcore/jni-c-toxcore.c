@@ -440,11 +440,11 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 }
 
 
-void start_filter_audio()
+void start_filter_audio(uint32_t in_samplerate)
 {
 #ifdef USE_ECHO_CANCELLATION
 	/* Prepare filter_audio */
-	filteraudio = new_filter_audio(af_info_in.samplerate);
+	filteraudio = new_filter_audio(in_samplerate);
 
 	if (filteraudio != NULL)
 	{
@@ -1615,7 +1615,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
 
-	start_filter_audio();
+	start_filter_audio(48000);
 
     // ----------- create Tox instance -----------
     const char *proxy_host_str = (*env)->GetStringUTFChars(env, proxy_host, NULL);
