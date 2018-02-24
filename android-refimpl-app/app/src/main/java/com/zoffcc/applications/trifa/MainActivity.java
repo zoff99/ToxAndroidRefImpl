@@ -315,7 +315,7 @@ public class MainActivity extends AppCompatActivity
     // 120 is also valid!!
     static int PREF__milliseconds_record_audio_samples = 120;
     static boolean PREF__use_audio_rec_effects = true;
-    static boolean PREF__use_messagev2_sending = true; // use Message V2 ?
+    static boolean PREF__use_messagev2_sending = false; // use Message V2 ?
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
