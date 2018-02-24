@@ -287,7 +287,7 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
   # --- filter_audio ---
-  - . ~/pp;cd jni-c-toxcore/filter_audio; export V=2; make clean; make
+  - . ~/pp;cd jni-c-toxcore/filter_audio; make clean; make
   - . ~/pp;cd jni-c-toxcore/filter_audio; ls -hal
   # --- filter_audio ---
 
@@ -301,6 +301,7 @@ compile:
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a
+    ./filter_audio/libfilteraudio.a
     coffeecatch.c coffeejni.c
     -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
 
@@ -428,20 +429,21 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
   # --- filter_audio ---
-  - . ~/pp;cd jni-c-toxcore/filter_audio; export V=2; make clean; make
+  - . ~/pp;cd jni-c-toxcore/filter_audio; make clean; make
   - . ~/pp;cd jni-c-toxcore/filter_audio; ls -hal
   # --- filter_audio ---
 
   - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
     jni-c-toxcore.c -o libjni-c-toxcore.so
-    -std=gnu99 -I/usr/local/include/
+    -std=gnu99
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxcore.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxencryptsave.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxav.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libvpx.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libopus.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libsodium.a
+    ./filter_audio/libfilteraudio.a
     coffeecatch.c coffeejni.c
     -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
 
