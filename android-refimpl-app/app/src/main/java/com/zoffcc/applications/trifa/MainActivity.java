@@ -5938,8 +5938,8 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            Log.i(TAG, "set_friend_avatar:update:pubkey=" + friend_pubkey + " path=" + avatar_path_name + " file=" +
-                       avatar_file_name);
+            // Log.i(TAG, "set_friend_avatar:update:pubkey=" + friend_pubkey.substring(0,4) + " path=" + avatar_path_name + " file=" +
+            // avatar_file_name);
 
             if (avatar_filesize_non_zero)
             {
@@ -6794,7 +6794,7 @@ public class MainActivity extends AppCompatActivity
 
     static void add_friend_real(String friend_tox_id)
     {
-        Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
+        // Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
 
         // add friend ---------------
         long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
@@ -6805,7 +6805,7 @@ public class MainActivity extends AppCompatActivity
         {
             // nospam=8 chars, checksum=4 chars
             String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
-            Log.i(TAG, "add_friend_real:add friend PK:" + friend_public_key);
+            // Log.i(TAG, "add_friend_real:add friend PK:" + friend_public_key);
 
             FriendList f = new FriendList();
             f.tox_public_key_string = friend_public_key;
