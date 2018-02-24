@@ -30,6 +30,7 @@ else
     SHARED_EXT = so
     TARGET = $(BASE_NAME).$(SHARED_EXT).$(VERSION)
     SHARED_LIB = $(BASE_NAME).$(SHARED_EXT).$(shell echo $(VERSION) | rev | cut -d "." -f 1 | rev)
+    CFLAGS = -O3 -g
     LDFLAGS += -Wl,-soname=$(SHARED_LIB)
 endif
 
@@ -48,31 +49,7 @@ $(TARGET): $(OBJ)
 	@echo "  CC    $@"
 	@$(CC) $(CFLAGS) -fPIC -c -o $@ $<
 
-install: $(TARGET) $(HEADER) $(PC_FILE)
-	mkdir -p $(abspath $(DESTDIR)/$(PREFIX)/$(LIBDIR)/pkgconfig)
-	mkdir -p $(abspath $(DESTDIR)/$(PREFIX)/$(INCLUDEDIR))
-	@echo "Installing $(TARGET)"
-	@install -m 0755 $(TARGET) $(abspath $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(TARGET))
-	@echo "Installing $(HEADER)"
-	@install -m 0644 $(HEADER) $(abspath $(DESTDIR)/$(PREFIX)/$(INCLUDEDIR)/$(HEADER))
-	@echo "Installing $(PC_FILE)"
-	@install -m 0644 $(PC_FILE) $(abspath $(DESTDIR)/$(PREFIX)/$(LIBDIR)/pkgconfig/$(PC_FILE))
-	@if [ "$(NO_STATIC)" != "1" -a -e "$(STATIC_LIB)" ]; then \
-		echo "Installing $(STATIC_LIB)" ;\
-		install -m 0644 $(STATIC_LIB) $(abspath $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(STATIC_LIB)) ;\
-	fi
-	@if [ "$(TARGET_ONLY)" != "YES" ]; then \
-		cd $(abspath $(DESTDIR)/$(PREFIX)/$(LIBDIR)) ;\
-		ln -sf $(TARGET) $(SHARED_LIB) ;\
-		ln -sf $(SHARED_LIB) $(BASE_NAME).$(SHARED_EXT) ;\
-	fi
-	@pc_file=$(abspath $(DESTDIR)/$(PREFIX)/$(LIBDIR)/pkgconfig/$(PC_FILE)) ;\
-	sed -e 's:__PREFIX__:'$(abspath $(PREFIX))':g' $$pc_file > temp_file && mv temp_file $$pc_file ;\
-	sed -e 's:__LIBDIR__:'$(abspath $(PREFIX)/$(LIBDIR))':g' $$pc_file > temp_file && mv temp_file $$pc_file ;\
-	sed -e 's:__INCLUDEDIR__:'$(abspath $(PREFIX)/$(INCLUDEDIR))':g' $$pc_file > temp_file && mv temp_file $$pc_file ;\
-	sed -e 's:__VERSION__:'$(VERSION)':g' $$pc_file > temp_file && mv temp_file $$pc_file
-
 clean:
 	rm -f $(TARGET) $(STATIC_LIB) $(OBJ)
 
-.PHONY: all clean install
+.PHONY: all clean
