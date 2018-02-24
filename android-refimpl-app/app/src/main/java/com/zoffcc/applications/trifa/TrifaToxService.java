@@ -467,7 +467,7 @@ public class TrifaToxService extends Service
                 if (tox_self_get_name_size() > 0)
                 {
                     global_my_name = tox_self_get_name().substring(0, (int) tox_self_get_name_size());
-                    Log.i(TAG, "AAA:003:" + global_my_name + " size=" + tox_self_get_name_size());
+                    // Log.i(TAG, "AAA:003:" + global_my_name + " size=" + tox_self_get_name_size());
                 }
                 else
                 {
@@ -479,7 +479,7 @@ public class TrifaToxService extends Service
                 if (tox_self_get_status_message_size() > 0)
                 {
                     global_my_status_message = tox_self_get_status_message().substring(0, (int) tox_self_get_status_message_size());
-                    Log.i(TAG, "AAA:008:" + global_my_status_message + " size=" + tox_self_get_status_message_size());
+                    // Log.i(TAG, "AAA:008:" + global_my_status_message + " size=" + tox_self_get_status_message_size());
                 }
                 else
                 {
@@ -508,18 +508,18 @@ public class TrifaToxService extends Service
 
                 for (fc = 0; fc < MainActivity.friends.length; fc++)
                 {
-                    Log.i(TAG, "loading_friend:" + fc + " friendnum=" + MainActivity.friends[fc]);
-                    Log.i(TAG, "loading_friend:" + fc + " pubkey=" + tox_friend_get_public_key__wrapper(MainActivity.friends[fc]));
+                    // Log.i(TAG, "loading_friend:" + fc + " friendnum=" + MainActivity.friends[fc]);
+                    // Log.i(TAG, "loading_friend:" + fc + " pubkey=" + tox_friend_get_public_key__wrapper(MainActivity.friends[fc]));
 
                     FriendList f;
                     List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
 
-                    Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
+                    // Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
 
                     if (fl.size() > 0)
                     {
                         f = fl.get(0);
-                        Log.i(TAG, "loading_friend:" + fc + " db entry=" + f);
+                        // Log.i(TAG, "loading_friend:" + fc + " db entry=" + f);
                     }
                     else
                     {
@@ -542,11 +542,11 @@ public class TrifaToxService extends Service
                         }
                         f.name = "friend #" + fc;
                         exists_in_db = false;
-                        Log.i(TAG, "loading_friend:c is null fnew=" + f);
+                        // Log.i(TAG, "loading_friend:c is null fnew=" + f);
                     }
                     else
                     {
-                        Log.i(TAG, "loading_friend:found friend in DB " + f.tox_public_key_string + " f=" + f);
+                        // Log.i(TAG, "loading_friend:found friend in DB " + f.tox_public_key_string + " f=" + f);
                         exists_in_db = true;
                     }
 
@@ -581,23 +581,23 @@ public class TrifaToxService extends Service
 
                     if (exists_in_db == false)
                     {
-                        Log.i(TAG, "loading_friend:1:insertIntoFriendList:" + " f=" + f);
+                        // Log.i(TAG, "loading_friend:1:insertIntoFriendList:" + " f=" + f);
                         orma.insertIntoFriendList(f);
-                        Log.i(TAG, "loading_friend:2:insertIntoFriendList:" + " f=" + f);
+                        // Log.i(TAG, "loading_friend:2:insertIntoFriendList:" + " f=" + f);
                     }
                     else
                     {
-                        Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
+                        // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
                         orma.updateFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_CONNECTION_on_off(get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
-                        Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
+                        // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
                     }
 
                     FriendList f_check;
                     List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
-                    Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
+                    // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
                     try
                     {
-                        Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
+                        // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
 
                         try
                         {

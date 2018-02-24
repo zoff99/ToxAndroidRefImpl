@@ -1860,19 +1860,19 @@ public class MainActivity extends AppCompatActivity
     {
 
         String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
-        Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
+        // Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
 
         FriendList f;
         List<FriendList> fl = orma.selectFromFriendList().
                 tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                 toList();
 
-        Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
+        // Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
 
         if (fl.size() > 0)
         {
             f = fl.get(0);
-            Log.i(TAG, "main_get_friend:f=" + f);
+            // Log.i(TAG, "main_get_friend:f=" + f);
         }
         else
         {
@@ -2990,10 +2990,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_name_cb_method(long friend_number, String friend_name, long length)
     {
-        Log.i(TAG, "friend_name:friend:" + friend_number + " name:" + friend_name);
+        // Log.i(TAG, "friend_name:friend:" + friend_number + " name:" + friend_name);
 
         FriendList f = main_get_friend(friend_number);
-        Log.i(TAG, "friend_name:002:" + f);
+        // Log.i(TAG, "friend_name:002:" + f);
         if (f != null)
         {
             f.name = friend_name;
@@ -3031,12 +3031,12 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_status_cb_method(long friend_number, int a_TOX_USER_STATUS)
     {
-        Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
+        // Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
 
         FriendList f = main_get_friend(friend_number);
         if (f != null)
         {
-            Log.i(TAG, "friend_status:f=" + f);
+            // Log.i(TAG, "friend_status:f=" + f);
             Log.i(TAG, "friend_status:1:f.TOX_USER_STATUS=" + f.TOX_USER_STATUS);
         }
 
@@ -3109,9 +3109,9 @@ public class MainActivity extends AppCompatActivity
                                             int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
                                             if (res == 0)
                                             {
-                                                Log.i(TAG,
-                                                      "android_tox_callback_friend_connection_status_cb_method:hash(1)=" +
-                                                      bytes_to_hex(hash_bytes));
+                                                // Log.i(TAG,
+                                                //       "android_tox_callback_friend_connection_status_cb_method:hash(1)=" +
+                                                //       bytes_to_hex(hash_bytes));
 
 
                                                 // send avatar to friend -------
