@@ -59,8 +59,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 18
-static const char global_version_string[] = "0.99.18";
+#define VERSION_PATCH 19
+static const char global_version_string[] = "0.99.19";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -612,7 +612,7 @@ void print_tox_id(Tox *tox)
 {
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
     get_my_toxid(tox, tox_id_hex);
-    dbg(2, "MyToxID:%s", tox_id_hex);
+    // dbg(2, "MyToxID:%s", tox_id_hex);
 }
 
 void bootstrap()
@@ -1827,7 +1827,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
     dbg(9, "get_my_toxid");
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
     get_my_toxid(tox_global, tox_id_hex);
-    dbg(2, "MyToxID:%s", tox_id_hex);
+    // dbg(2, "MyToxID:%s", tox_id_hex);
     result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
     return result;
 }
