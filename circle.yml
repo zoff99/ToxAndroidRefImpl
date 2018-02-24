@@ -287,7 +287,8 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
   # --- filter_audio ---
-  - . ~/pp;cd jni-c-toxcore/filter_audio; export V=2; make
+  - . ~/pp;cd jni-c-toxcore/filter_audio; export V=2; make clean; make
+  - . ~/pp;cd jni-c-toxcore/filter_audio; ls -hal
   # --- filter_audio ---
 
   - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
@@ -427,7 +428,8 @@ compile:
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
   # --- filter_audio ---
-  - . ~/pp;cd jni-c-toxcore/filter_audio; export V=2; make
+  - . ~/pp;cd jni-c-toxcore/filter_audio; export V=2; make clean; make
+  - . ~/pp;cd jni-c-toxcore/filter_audio; ls -hal
   # --- filter_audio ---
 
   - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
