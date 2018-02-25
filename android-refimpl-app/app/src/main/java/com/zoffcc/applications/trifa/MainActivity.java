@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity
     static String PREF__X_misc_button_msg = "t"; // TODO: hardcoded for now!
     static boolean PREF__U_keep_nospam = false;
     static boolean PREF__use_native_audio_play = true;
-    static boolean PREF__use_audio_rec_effects = true;
+    static boolean PREF__use_audio_rec_effects = false;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int PREF__milliseconds_record_audio_samples = 120;
