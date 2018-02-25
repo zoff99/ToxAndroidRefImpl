@@ -143,6 +143,8 @@ long audio_buffer_pcm_1_size = 0;
 uint8_t *audio_buffer_pcm_2 = NULL;
 long audio_buffer_pcm_2_size = 0;
 
+uint32_t recording_samling_rate = 48000;
+
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_name_cb_method = NULL;
@@ -1627,7 +1629,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
 
-	start_filter_audio(48000);
+	start_filter_audio(recording_samling_rate);
+	set_delay_ms_filter_audio(30, 120);
 
     // ----------- create Tox instance -----------
     const char *proxy_host_str = (*env)->GetStringUTFChars(env, proxy_host, NULL);
@@ -3225,6 +3228,20 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
         int16_t *pcm = (int16_t *)audio_buffer_pcm_1;
 
 #ifdef USE_ECHO_CANCELLATION
+
+		// TODO: need some locking here!
+		if (recording_samling_rate != (uint32_t)sampling_rate)
+		{
+			if (filteraudio)
+			{
+				stop_filter_audio();
+			}
+			start_filter_audio((uint32_t)sampling_rate);
+			recording_samling_rate = (uint32_t)sampling_rate;
+			set_delay_ms_filter_audio(30, 120);
+		}
+		// TODO: need some locking here!
+
 		if ((filteraudio) && (pcm))
 		{
 			filter_audio(filteraudio, pcm, (unsigned int)sample_count);
