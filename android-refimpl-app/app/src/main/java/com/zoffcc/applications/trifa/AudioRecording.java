@@ -263,6 +263,19 @@ public class AudioRecording extends Thread
                                         (float) PREF__milliseconds_record_audio_samples * (float) CHANNELS_TOX * 2.0f);
         // try to read "PREF__milliseconds_record_audio_samples" of audio data
 
+        boolean microphone_muted = false;
+
+        try
+        {
+            if (audio_manager_s.isMicrophoneMute())
+            {
+                microphone_muted = true;
+            }
+        }
+        catch (Exception e)
+        {
+        }
+
         while (!stopped)
         {
             try
@@ -286,31 +299,52 @@ public class AudioRecording extends Thread
                             Log.i(TAG, "audio buffer:" + "ERROR:readBytes != _tempBufRec.length");
                         }
 
-                        if (PREF__audiorec_asynctask)
+                        try
                         {
-                            new send_audio_frame_to_toxcore(readBytes).execute();
-                        }
-                        else
-                        {
-                            try
+                            if (audio_manager_s.isMicrophoneMute())
                             {
-                                _recBuffer.rewind();
-                                _recBuffer.put(_tempBufRec);
-                                audio_send_res2 = toxav_audio_send_frame(
-                                        tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                        (long) (readBytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                                if (audio_send_res2 != 0)
-                                {
-                                    Log.i(TAG, "audio:res=" + audio_send_res2 + ":" +
-                                               ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res2));
-                                }
+                                microphone_muted = true;
                             }
-                            catch (Exception e)
+                            else
                             {
-                                e.printStackTrace();
-                                Log.i(TAG, "audio:EE8:" + e.getMessage());
-                                Log.i(TAG, "audio:EE9:" + _recBuffer.limit() + " <-> " + _tempBufRec.length + " <-> " +
-                                           readBytes);
+                                microphone_muted = false;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            microphone_muted = false;
+                        }
+
+                        // TODO: workaround. sometimes mute button does not mute mic? find a real fix
+                        if (!microphone_muted)
+                        {
+                            if (PREF__audiorec_asynctask)
+                            {
+                                new send_audio_frame_to_toxcore(readBytes).execute();
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    _recBuffer.rewind();
+                                    _recBuffer.put(_tempBufRec);
+                                    audio_send_res2 = toxav_audio_send_frame(
+                                            tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                            (long) (readBytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                                    if (audio_send_res2 != 0)
+                                    {
+                                        Log.i(TAG, "audio:res=" + audio_send_res2 + ":" +
+                                                   ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res2));
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    Log.i(TAG, "audio:EE8:" + e.getMessage());
+                                    Log.i(TAG,
+                                          "audio:EE9:" + _recBuffer.limit() + " <-> " + _tempBufRec.length + " <-> " +
+                                          readBytes);
+                                }
                             }
                         }
                     }

@@ -253,30 +253,31 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         e.printStackTrace();
                     }
                 }
-                else
+                else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
                     try
                     {
                         if (audio_manager_s.isMicrophoneMute())
                         {
+                            audio_manager_s.setMicrophoneMute(false);
                             Drawable d2a = new IconicsDrawable(v.getContext()).icon(
                                     GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
                                     getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
-                            audio_manager_s.setMicrophoneMute(false);
                         }
                         else
                         {
+                            audio_manager_s.setMicrophoneMute(true);
                             Drawable d2a = new IconicsDrawable(v.getContext()).icon(
                                     GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
                                     getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
-                            audio_manager_s.setMicrophoneMute(true);
                         }
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        Log.i(TAG, "setMicrophoneMute:001:EE:" + e.getMessage());
                     }
                 }
                 return true;
