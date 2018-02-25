@@ -445,6 +445,8 @@ void start_filter_audio(uint32_t in_samplerate)
 #ifdef USE_ECHO_CANCELLATION
 	/* Prepare filter_audio */
 	filteraudio = new_filter_audio(in_samplerate);
+    dbg(9, "filter_audio: prepare. samplerate=%d", (int)in_samplerate);
+
 
 	if (filteraudio != NULL)
 	{
@@ -468,6 +470,8 @@ void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_
      * to adjust it internally after some time (usually up to 6-7 seconds in my tests when
      * the error is about 20%).
      */
+    dbg(9, "filter_audio: set delay in ms=%d", (int)(input_latency_ms + frame_duration_ms));
+
     set_echo_delay_ms(filteraudio, (input_latency_ms + frame_duration_ms));
     /*
      */
@@ -479,6 +483,7 @@ void stop_filter_audio()
 	/* Prepare filter_audio */
 	if (filteraudio != NULL)
 	{
+		dbg(9, "filter_audio: shutdown");
 		kill_filter_audio(filteraudio);
 		filteraudio = NULL;
 	}
