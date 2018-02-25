@@ -466,6 +466,7 @@ void start_filter_audio(uint32_t in_samplerate)
 
 void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms)
 {
+#ifdef USE_ECHO_CANCELLATION
     /* It's essential that echo delay is set correctly; it's the most important part of the
      * echo cancellation process. If the delay is not set to the acceptable values the AEC
      * will not be able to recover. Given that it's not that easy to figure out the exact
@@ -476,9 +477,13 @@ void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_
      */
     dbg(9, "filter_audio: set delay in ms=%d", (int)(input_latency_ms + frame_duration_ms));
 
-    set_echo_delay_ms(filteraudio, (input_latency_ms + frame_duration_ms));
+	if (filteraudio)
+	{
+		set_echo_delay_ms(filteraudio, (input_latency_ms + frame_duration_ms));
+	}
     /*
      */
+#endif
 }
 
 void stop_filter_audio()
@@ -1395,6 +1400,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(
         jint audio_frame_duration_ms)
 {
 	global_audio_frame_duration_ms = (int16_t)audio_frame_duration_ms;
+
+#ifdef USE_ECHO_CANCELLATION
+	if (filteraudio)
+	{
+		set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+	}
+#endif
+
 }
 
 
