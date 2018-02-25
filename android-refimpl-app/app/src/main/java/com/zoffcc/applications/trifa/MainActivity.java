@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__X_eac_delay_ms = 60;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int PREF__milliseconds_record_audio_samples = 60; // !! 120 seems to work best somehow !!
+    static int PREF__X_audio_recording_frame_size = 120; // !! 120 seems to work best somehow !!
 
     static String versionName = "";
     static int versionCode = -1;
@@ -698,6 +698,17 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
+        }
+
+        try
+        {
+            PREF__X_audio_recording_frame_size = Integer.parseInt(
+                    settings.getString("X_audio_recording_frame_size", "" + 120));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__X_audio_recording_frame_size = 120;
         }
         // prefs ----------
 
@@ -1734,7 +1745,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        // set_audio_frame_duration_ms(PREF__X_eac_delay_ms);
+        set_audio_frame_duration_ms(PREF__X_eac_delay_ms);
 
         if (PREF__U_keep_nospam == true)
         {
@@ -1831,6 +1842,19 @@ public class MainActivity extends AppCompatActivity
         }
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__min_audio_samplingrate_out:2=" + PREF__min_audio_samplingrate_out);
+
+
+        try
+        {
+            PREF__X_audio_recording_frame_size = Integer.parseInt(
+                    settings.getString("X_audio_recording_frame_size", "" + 120));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__X_audio_recording_frame_size = 120;
+        }
+
         // prefs ----------
 
         try
