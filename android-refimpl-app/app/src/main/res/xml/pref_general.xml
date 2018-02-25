@@ -97,6 +97,13 @@
             android:summary="@string/pref_description_X_use_native_audio_play"
             android:title="@string/pref_title_X_use_native_audio_play"/>
 
+        <EditTextPreference
+            android:defaultValue="60"
+            android:key="X_eac_delay_ms"
+            android:maxLength="3"
+            android:numeric="integer"
+            android:summary="@string/pref_description_X_eac_delay_ms"
+            android:title="@string/pref_title_X_eac_delay_ms"/>
 
         <SwitchPreference
             android:defaultValue="false"

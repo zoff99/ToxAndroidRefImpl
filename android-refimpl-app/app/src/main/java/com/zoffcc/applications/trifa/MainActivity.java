@@ -305,9 +305,10 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__U_keep_nospam = false;
     static boolean PREF__use_native_audio_play = true;
     static boolean PREF__use_audio_rec_effects = false;
+    static int PREF__X_eac_delay_ms = 60;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int PREF__milliseconds_record_audio_samples = 120;
+    static int PREF__milliseconds_record_audio_samples = 60; // !! 120 seems to work best somehow !!
 
     static String versionName = "";
     static int versionCode = -1;
@@ -1722,6 +1723,18 @@ public class MainActivity extends AppCompatActivity
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
+
+        try
+        {
+            PREF__X_eac_delay_ms = Integer.parseInt(settings.getString("X_eac_delay_ms", "60"));
+        }
+        catch (Exception e)
+        {
+            PREF__X_eac_delay_ms = 60;
+            e.printStackTrace();
+        }
+
+        // set_audio_frame_duration_ms(PREF__X_eac_delay_ms);
 
         if (PREF__U_keep_nospam == true)
         {
