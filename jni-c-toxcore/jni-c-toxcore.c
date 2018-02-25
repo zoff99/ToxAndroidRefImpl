@@ -1272,6 +1272,13 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
         memcpy((void *)audio_buffer_pcm_2, (void *)pcm, (size_t)(sample_count * channels * 2));
     }
 
+#ifdef USE_ECHO_CANCELLATION
+	if ((filteraudio) && (pcm))
+	{
+		pass_audio_output(filteraudio, pcm, (unsigned int)sample_count);
+	}
+#endif
+
     android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
 }
 
@@ -3215,7 +3222,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
     if(audio_buffer_pcm_1)
     {
-        uint16_t *pcm = (uint16_t *)audio_buffer_pcm_1;
+        int16_t *pcm = (int16_t *)audio_buffer_pcm_1;
+
+#ifdef USE_ECHO_CANCELLATION
+		if ((filteraudio) && (pcm))
+		{
+			filter_audio(filteraudio, pcm, (unsigned int)sample_count);
+		}
+#endif
+
         bool res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
                                           (uint8_t)channels, (uint32_t)sampling_rate, &error);
     }
