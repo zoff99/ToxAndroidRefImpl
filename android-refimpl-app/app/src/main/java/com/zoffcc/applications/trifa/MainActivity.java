@@ -2409,6 +2409,8 @@ public class MainActivity extends AppCompatActivity
     // buffer2 is for incoming audio
     public static native void set_JNI_audio_buffer2(ByteBuffer audio_buffer2);
 
+    public static native void set_audio_frame_duration_ms(int audio_frame_duration_ms);
+
     /**
      * Send an audio frame to a friend.
      * <p>

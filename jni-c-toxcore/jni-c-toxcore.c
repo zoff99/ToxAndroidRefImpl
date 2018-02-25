@@ -144,6 +144,8 @@ uint8_t *audio_buffer_pcm_2 = NULL;
 long audio_buffer_pcm_2_size = 0;
 
 uint32_t recording_samling_rate = 48000;
+int16_t global_audio_frame_duration_ms = 60;
+
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -1388,6 +1390,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer2(JNIEnv 
 // ----- get audio buffer from Java -----
 
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(JNIEnv *env, jobject thiz,
+        jint audio_frame_duration_ms)
+{
+	global_audio_frame_duration_ms = (int16_t)audio_frame_duration_ms;
+}
 
 
 /*
@@ -1630,7 +1638,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     // -------- _callbacks_ --------
 
 	start_filter_audio(recording_samling_rate);
-	set_delay_ms_filter_audio(30, 120);
+	set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
 
     // ----------- create Tox instance -----------
     const char *proxy_host_str = (*env)->GetStringUTFChars(env, proxy_host, NULL);
@@ -3238,7 +3246,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 			}
 			start_filter_audio((uint32_t)sampling_rate);
 			recording_samling_rate = (uint32_t)sampling_rate;
-			set_delay_ms_filter_audio(30, 120);
+			set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
 		}
 		// TODO: need some locking here!
 
