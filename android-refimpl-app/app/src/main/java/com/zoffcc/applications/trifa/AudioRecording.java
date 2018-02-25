@@ -33,7 +33,7 @@ import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audiorec_asynctask;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__milliseconds_record_audio_samples;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_audio_rec_effects;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
@@ -260,8 +260,8 @@ public class AudioRecording extends Thread
         int audio_send_res2 = 0;
 
         int want_to_read_bytes = (int) (((float) SMAPLINGRATE_TOX / 1000.0f) *
-                                        (float) PREF__milliseconds_record_audio_samples * (float) CHANNELS_TOX * 2.0f);
-        // try to read "PREF__milliseconds_record_audio_samples" of audio data
+                                        (float) PREF__X_audio_recording_frame_size * (float) CHANNELS_TOX * 2.0f);
+        // try to read "PREF__X_audio_recording_frame_size" of audio data
 
         boolean microphone_muted = false;
 
