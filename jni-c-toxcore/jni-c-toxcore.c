@@ -107,6 +107,10 @@ pthread_t tid[2]; // 0 -> toxav_iterate thread, 1 -> video send thread
 Filter_Audio *filteraudio = NULL;
 #endif
 
+uint8_t filteraudio_active = 1;
+uint8_t filteraudio_incompatible_1 = 1;
+uint8_t filteraudio_incompatible_2 = 1;
+
 
 // ----- JNI stuff -----
 JNIEnv *jnienv;
@@ -1282,7 +1286,18 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
     }
 
 #ifdef USE_ECHO_CANCELLATION
-	if ((filteraudio) && (pcm))
+
+	if (((int)channels == 1) && ((int)sampling_rate == 48000))
+	{
+		filteraudio_incompatible_2 = 0;
+	}
+	else
+	{
+		filteraudio_incompatible_2 = 1;
+	}
+
+
+	if ((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0) && (filteraudio_incompatible_2 == 0))
 	{
 		pass_audio_output(filteraudio, pcm, (unsigned int)sample_count);
 	}
@@ -1409,6 +1424,23 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(
 #endif
 
 }
+
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1filteraudio_1active(JNIEnv *env, jobject thiz,
+        jint filteraudio_active)
+{
+
+#ifdef USE_ECHO_CANCELLATION
+	if (((uint8_t)filteraudio_active == 0) || ((uint8_t)filteraudio_active == 1))
+	{
+		filteraudio_active = (uint8_t)filteraudio_active;
+		dbg(2, "setting filteraudio_active=%d", (int)filteraudio_active);
+	}
+#endif
+
+}
+
 
 
 /*
@@ -3250,6 +3282,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
 #ifdef USE_ECHO_CANCELLATION
 
+		if (((int)channels == 1) && ((int)sampling_rate == 48000))
+		{
+			filteraudio_incompatible_1 = 0;
+		}
+		else
+		{
+			filteraudio_incompatible_1 = 1;
+		}
+
 		// TODO: need some locking here!
 		if (recording_samling_rate != (uint32_t)sampling_rate)
 		{
@@ -3263,7 +3304,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 		}
 		// TODO: need some locking here!
 
-		if ((filteraudio) && (pcm))
+		if ((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0) && (filteraudio_incompatible_2 == 0))
 		{
 			filter_audio(filteraudio, pcm, (unsigned int)sample_count);
 		}
