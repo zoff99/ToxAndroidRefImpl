@@ -204,16 +204,16 @@ compile:
   - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
   - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
-  - . ~/pp;cd $_s_/yasm/;autoreconf -fi
-  - . ~/pp;rm -Rf ~/build/
-  - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;$_s_/yasm/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
-  - . ~/pp;cd ~/build/;make -j4
-  - . ~/pp;cd ~/build/;make install
+  #- . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
+  #- . ~/pp;cd $_s_/yasm/;autoreconf -fi
+  #- . ~/pp;rm -Rf ~/build/
+  #- . ~/pp;mkdir -p ~/build/
+  #- . ~/pp;cd ~/build/;$_s_/yasm/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
+  #- . ~/pp;cd ~/build/;make -j4
+  #- . ~/pp;cd ~/build/;make install
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.7.0 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
   - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
@@ -232,7 +232,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.2.1 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3-beta https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -245,7 +245,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
     
     
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.16 https://github.com/jedisct1/libsodium.git
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
