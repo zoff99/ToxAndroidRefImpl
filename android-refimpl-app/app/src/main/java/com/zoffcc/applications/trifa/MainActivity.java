@@ -2507,6 +2507,9 @@ public class MainActivity extends AppCompatActivity
                     if (Callstate.state == 0)
                     {
                         Log.i(TAG, "CALL:start:show activity");
+
+                        set_filteraudio_active(1);
+
                         Callstate.state = 1;
                         Callstate.accepted_call = 0;
                         Callstate.call_first_video_frame_received = -1;

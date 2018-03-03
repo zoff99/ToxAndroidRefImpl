@@ -51,6 +51,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_ena
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
+import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
@@ -972,6 +973,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // close to ear
                 if (Callstate.audio_speaker == true)
                 {
+                    set_filteraudio_active(0);
+
                     Callstate.audio_speaker = false;
                     try
                     {
@@ -1022,6 +1025,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // away from ear
                 if (Callstate.audio_speaker == false)
                 {
+                    set_filteraudio_active(1);
+
                     Callstate.audio_speaker = true;
                     try
                     {

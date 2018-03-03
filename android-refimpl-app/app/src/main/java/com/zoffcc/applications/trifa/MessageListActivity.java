@@ -77,6 +77,7 @@ import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
+import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -1012,6 +1013,8 @@ public class MessageListActivity extends AppCompatActivity
                     if (Callstate.state == 0)
                     {
                         Log.i(TAG, "CALL:start:(2):show activity");
+                        set_filteraudio_active(1);
+
                         Callstate.state = 1;
                         Callstate.accepted_call = 1; // we started the call, so it's already accepted on our side
                         Callstate.call_first_video_frame_received = -1;
