@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity
     static boolean native_lib_loaded = false;
     static boolean native_audio_lib_loaded = false;
     static String app_files_directory = "";
+    final static boolean DEBUG_show_net_connection = false;
     // static boolean stop_me = false;
     // static Thread ToxServiceThread = null;
     Handler main_handler = null;
@@ -304,10 +305,11 @@ public class MainActivity extends AppCompatActivity
     static String PREF__X_misc_button_msg = "t"; // TODO: hardcoded for now!
     static boolean PREF__U_keep_nospam = false;
     static boolean PREF__use_native_audio_play = true;
-    static boolean PREF__use_audio_rec_effects = true;
+    static boolean PREF__use_audio_rec_effects = false;
+    static int PREF__X_eac_delay_ms = 60;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int PREF__milliseconds_record_audio_samples = 120;
+    static int PREF__X_audio_recording_frame_size = 120; // !! 120 seems to work best somehow !!
 
     static String versionName = "";
     static int versionCode = -1;
@@ -697,6 +699,17 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
+        }
+
+        try
+        {
+            PREF__X_audio_recording_frame_size = Integer.parseInt(
+                    settings.getString("X_audio_recording_frame_size", "" + 120));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__X_audio_recording_frame_size = 120;
         }
         // prefs ----------
 
@@ -1235,14 +1248,14 @@ public class MainActivity extends AppCompatActivity
             set_all_conferences_inactive();
             startService(i);
         }
-        // --- forground service ---
-        // --- forground service ---
-        // --- forground service ---
 
         if (!TOX_SERVICE_STARTED)
         {
             tox_thread_start();
         }
+        // --- forground service ---
+        // --- forground service ---
+        // --- forground service ---
 
         receiverFilter1 = new IntentFilter(AudioManager.ACTION_HEADSET_PLUG);
         receiver1 = new HeadsetStateReceiver();
@@ -1723,6 +1736,18 @@ public class MainActivity extends AppCompatActivity
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
+        try
+        {
+            PREF__X_eac_delay_ms = Integer.parseInt(settings.getString("X_eac_delay_ms", "60"));
+        }
+        catch (Exception e)
+        {
+            PREF__X_eac_delay_ms = 60;
+            e.printStackTrace();
+        }
+
+        set_audio_frame_duration_ms(PREF__X_eac_delay_ms);
+
         if (PREF__U_keep_nospam == true)
         {
             top_imageview.setBackgroundColor(Color.TRANSPARENT);
@@ -1818,6 +1843,19 @@ public class MainActivity extends AppCompatActivity
         }
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__min_audio_samplingrate_out:2=" + PREF__min_audio_samplingrate_out);
+
+
+        try
+        {
+            PREF__X_audio_recording_frame_size = Integer.parseInt(
+                    settings.getString("X_audio_recording_frame_size", "" + 120));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__X_audio_recording_frame_size = 120;
+        }
+
         // prefs ----------
 
         try
@@ -1860,19 +1898,19 @@ public class MainActivity extends AppCompatActivity
     {
 
         String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
-        Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
+        // Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
 
         FriendList f;
         List<FriendList> fl = orma.selectFromFriendList().
                 tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                 toList();
 
-        Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
+        // Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
 
         if (fl.size() > 0)
         {
             f = fl.get(0);
-            Log.i(TAG, "main_get_friend:f=" + f);
+            // Log.i(TAG, "main_get_friend:f=" + f);
         }
         else
         {
@@ -2409,6 +2447,12 @@ public class MainActivity extends AppCompatActivity
     // buffer2 is for incoming audio
     public static native void set_JNI_audio_buffer2(ByteBuffer audio_buffer2);
 
+    // for AEC (libfilteraudio)
+    public static native void set_audio_frame_duration_ms(int audio_frame_duration_ms);
+
+    // for AEC (libfilteraudio)
+    public static native void set_filteraudio_active(int filteraudio_active);
+
     /**
      * Send an audio frame to a friend.
      * <p>
@@ -2464,6 +2508,9 @@ public class MainActivity extends AppCompatActivity
                     if (Callstate.state == 0)
                     {
                         Log.i(TAG, "CALL:start:show activity");
+
+                        set_filteraudio_active(1);
+
                         Callstate.state = 1;
                         Callstate.accepted_call = 0;
                         Callstate.call_first_video_frame_received = -1;
@@ -2990,10 +3037,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_name_cb_method(long friend_number, String friend_name, long length)
     {
-        Log.i(TAG, "friend_name:friend:" + friend_number + " name:" + friend_name);
+        // Log.i(TAG, "friend_name:friend:" + friend_number + " name:" + friend_name);
 
         FriendList f = main_get_friend(friend_number);
-        Log.i(TAG, "friend_name:002:" + f);
+        // Log.i(TAG, "friend_name:002:" + f);
         if (f != null)
         {
             f.name = friend_name;
@@ -3031,12 +3078,12 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_status_cb_method(long friend_number, int a_TOX_USER_STATUS)
     {
-        Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
+        // Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
 
         FriendList f = main_get_friend(friend_number);
         if (f != null)
         {
-            Log.i(TAG, "friend_status:f=" + f);
+            // Log.i(TAG, "friend_status:f=" + f);
             Log.i(TAG, "friend_status:1:f.TOX_USER_STATUS=" + f.TOX_USER_STATUS);
         }
 
@@ -3109,9 +3156,9 @@ public class MainActivity extends AppCompatActivity
                                             int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
                                             if (res == 0)
                                             {
-                                                Log.i(TAG,
-                                                      "android_tox_callback_friend_connection_status_cb_method:hash(1)=" +
-                                                      bytes_to_hex(hash_bytes));
+                                                // Log.i(TAG,
+                                                //       "android_tox_callback_friend_connection_status_cb_method:hash(1)=" +
+                                                //       bytes_to_hex(hash_bytes));
 
 
                                                 // send avatar to friend -------
@@ -5938,8 +5985,8 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            Log.i(TAG, "set_friend_avatar:update:pubkey=" + friend_pubkey + " path=" + avatar_path_name + " file=" +
-                       avatar_file_name);
+            // Log.i(TAG, "set_friend_avatar:update:pubkey=" + friend_pubkey.substring(0,4) + " path=" + avatar_path_name + " file=" +
+            // avatar_file_name);
 
             if (avatar_filesize_non_zero)
             {
@@ -6794,7 +6841,7 @@ public class MainActivity extends AppCompatActivity
 
     static void add_friend_real(String friend_tox_id)
     {
-        Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
+        // Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
 
         // add friend ---------------
         long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
@@ -6805,7 +6852,7 @@ public class MainActivity extends AppCompatActivity
         {
             // nospam=8 chars, checksum=4 chars
             String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
-            Log.i(TAG, "add_friend_real:add friend PK:" + friend_public_key);
+            // Log.i(TAG, "add_friend_real:add friend PK:" + friend_public_key);
 
             FriendList f = new FriendList();
             f.tox_public_key_string = friend_public_key;
@@ -7491,8 +7538,11 @@ public class MainActivity extends AppCompatActivity
 
     static void get_network_connections()
     {
-        Detector.updateReportMap();
-        Collector.updateReports();
+        if (DEBUG_show_net_connection)
+        {
+            Detector.updateReportMap();
+            Collector.updateReports();
+        }
     }
 
     static String long_date_time_format(long timestamp_in_millis)
@@ -8450,12 +8500,19 @@ public class MainActivity extends AppCompatActivity
 
     static void update_savedata_file_wrapper()
     {
-        long start_timestamp = System.currentTimeMillis();
-        update_savedata_file(TrifaSetPatternActivity.bytesToString(
-                TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+        if (is_tox_started == true)
+        {
+            long start_timestamp = System.currentTimeMillis();
+            update_savedata_file(TrifaSetPatternActivity.bytesToString(
+                    TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
 
-        long end_timestamp = System.currentTimeMillis();
-        Log.i(TAG, "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
+            long end_timestamp = System.currentTimeMillis();
+            Log.i(TAG, "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
+        }
+        else
+        {
+            Log.i(TAG, "update_savedata_file(): ERROR:Tox not ready:001");
+        }
     }
 
     private void fadeInAndShowImage(final View img, long start_after_millis)

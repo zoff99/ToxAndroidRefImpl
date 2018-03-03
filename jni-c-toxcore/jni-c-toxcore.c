@@ -47,11 +47,17 @@
 #include <vpx/vpx_image.h>
 #include <sys/mman.h>
 
+
+#define USE_ECHO_CANCELLATION 1
+
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
 #include <jni.h>
 #include "coffeecatch.h"
 #include "coffeejni.h"
+#ifdef USE_ECHO_CANCELLATION
+	#include "filter_audio/filter_audio.h"
+#endif
 // ------- Android/JNI stuff -------
 
 
@@ -59,8 +65,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 18
-static const char global_version_string[] = "0.99.18";
+#define VERSION_PATCH 20
+static const char global_version_string[] = "0.99.20";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -97,6 +103,14 @@ ToxAV *tox_av_global = NULL;
 CallControl mytox_CC;
 pthread_t tid[2]; // 0 -> toxav_iterate thread, 1 -> video send thread
 
+#ifdef USE_ECHO_CANCELLATION
+Filter_Audio *filteraudio = NULL;
+#endif
+
+uint8_t filteraudio_active = 1;
+uint8_t filteraudio_incompatible_1 = 1;
+uint8_t filteraudio_incompatible_2 = 1;
+
 
 // ----- JNI stuff -----
 JNIEnv *jnienv;
@@ -132,6 +146,10 @@ long audio_buffer_pcm_1_size = 0;
 
 uint8_t *audio_buffer_pcm_2 = NULL;
 long audio_buffer_pcm_2_size = 0;
+
+uint32_t recording_samling_rate = 48000;
+int16_t global_audio_frame_duration_ms = 60;
+
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -430,6 +448,62 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 }
 
 
+void start_filter_audio(uint32_t in_samplerate)
+{
+#ifdef USE_ECHO_CANCELLATION
+	/* Prepare filter_audio */
+	filteraudio = new_filter_audio(in_samplerate);
+    dbg(9, "filter_audio: prepare. samplerate=%d", (int)in_samplerate);
+
+
+	if (filteraudio != NULL)
+	{
+		/* Enable/disable filters. 1 to enable, 0 to disable. */
+		int echo_ = 1;
+		int noise_ = 0;
+		int gain_ = 0;
+		int vad_ = 0;
+		enable_disable_filters(filteraudio, echo_, noise_, gain_, vad_);
+	}
+#endif
+}
+
+void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms)
+{
+#ifdef USE_ECHO_CANCELLATION
+    /* It's essential that echo delay is set correctly; it's the most important part of the
+     * echo cancellation process. If the delay is not set to the acceptable values the AEC
+     * will not be able to recover. Given that it's not that easy to figure out the exact
+     * time it takes for a signal to get from Output to the Input, setting it to suggested
+     * input device latency + frame duration works really good and gives the filter ability
+     * to adjust it internally after some time (usually up to 6-7 seconds in my tests when
+     * the error is about 20%).
+     */
+    dbg(9, "filter_audio: set delay in ms=%d", (int)(input_latency_ms + frame_duration_ms));
+
+	if (filteraudio)
+	{
+		set_echo_delay_ms(filteraudio, (input_latency_ms + frame_duration_ms));
+	}
+    /*
+     */
+#endif
+}
+
+void stop_filter_audio()
+{
+#ifdef USE_ECHO_CANCELLATION
+	/* Prepare filter_audio */
+	if (filteraudio != NULL)
+	{
+		dbg(9, "filter_audio: shutdown");
+		kill_filter_audio(filteraudio);
+		filteraudio = NULL;
+	}
+#endif
+}
+
+
 void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len)
 {
     size_t size = tox_get_savedata_size(tox);
@@ -612,7 +686,7 @@ void print_tox_id(Tox *tox)
 {
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
     get_my_toxid(tox, tox_id_hex);
-    dbg(2, "MyToxID:%s", tox_id_hex);
+    // dbg(2, "MyToxID:%s", tox_id_hex);
 }
 
 void bootstrap()
@@ -1211,6 +1285,24 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
         memcpy((void *)audio_buffer_pcm_2, (void *)pcm, (size_t)(sample_count * channels * 2));
     }
 
+#ifdef USE_ECHO_CANCELLATION
+
+	if (((int)channels == 1) && ((int)sampling_rate == 48000))
+	{
+		filteraudio_incompatible_2 = 0;
+	}
+	else
+	{
+		filteraudio_incompatible_2 = 1;
+	}
+
+
+	if ((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0) && (filteraudio_incompatible_2 == 0))
+	{
+		pass_audio_output(filteraudio, pcm, (unsigned int)sample_count);
+	}
+#endif
+
     android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
 }
 
@@ -1317,6 +1409,37 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer2(JNIEnv 
 // ----- get audio buffer from Java -----
 // ----- get audio buffer from Java -----
 
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(JNIEnv *env, jobject thiz,
+        jint audio_frame_duration_ms)
+{
+	global_audio_frame_duration_ms = (int16_t)audio_frame_duration_ms;
+
+#ifdef USE_ECHO_CANCELLATION
+	if (filteraudio)
+	{
+		set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+	}
+#endif
+
+}
+
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1filteraudio_1active(JNIEnv *env, jobject thiz,
+        jint filteraudio_active)
+{
+
+#ifdef USE_ECHO_CANCELLATION
+	if (((uint8_t)filteraudio_active == 0) || ((uint8_t)filteraudio_active == 1))
+	{
+		filteraudio_active = (uint8_t)filteraudio_active;
+		dbg(2, "setting filteraudio_active=%d", (int)filteraudio_active);
+	}
+#endif
+
+}
 
 
 
@@ -1558,6 +1681,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
                                 "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
+
+	start_filter_audio(recording_samling_rate);
+	set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+
     // ----------- create Tox instance -----------
     const char *proxy_host_str = (*env)->GetStringUTFChars(env, proxy_host, NULL);
     tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port,
@@ -1656,6 +1783,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, 
 void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(JNIEnv *env, jobject thiz,
         jstring passphrase_j)
 {
+	if (tox_global == NULL)
+	{
+		return;
+	}
+
     const char *s = (*env)->GetStringUTFChars(env, passphrase_j, NULL);
     char *passphrase = strdup(s);
     // WARNING // dbg(9, "passphrase=%s", passphraseXX);
@@ -1826,8 +1958,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
     jstring result;
     dbg(9, "get_my_toxid");
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
+
+	if (tox_global == NULL)
+	{
+		dbg(9, "get_my_toxid:NULL:1");
+		return (jstring)NULL;
+	}
+
     get_my_toxid(tox_global, tox_id_hex);
-    dbg(2, "MyToxID:%s", tox_id_hex);
+    // dbg(2, "MyToxID:%s", tox_id_hex);
     result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
     return result;
 }
@@ -1885,6 +2024,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1public_1key(JN
         jlong friend_number)
 {
     jstring result;
+
+	if (tox_global == NULL)
+	{
+		return (jstring)NULL;
+	}
+
     uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
     TOX_ERR_FRIEND_GET_PUBLIC_KEY error;
     bool res = tox_friend_get_public_key(tox_global, (uint32_t)friend_number, public_key, &error);
@@ -1909,13 +2054,32 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNIEnv *env, jobject thiz,
         jobject public_key_str)
 {
+	if (tox_global == NULL)
+	{
+		return (jlong)-1;
+	}
+
     unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
     char *public_key_str2 = NULL;
     const char *s = NULL;
+
+	if (public_key_str == NULL)
+	{
+		return (jlong)-1;
+	}
+
     s = (*env)->GetStringUTFChars(env, public_key_str, NULL);
+
+	if (s == NULL)
+	{
+		(*env)->ReleaseStringUTFChars(env, public_key_str, s);
+		return (jlong)-1;
+	}
+
     public_key_str2 = strdup(s);
     (*env)->ReleaseStringUTFChars(env, public_key_str, s);
     toxid_hex_to_bin(public_key_bin, public_key_str2);
+
     TOX_ERR_FRIEND_BY_PUBLIC_KEY error;
     uint32_t friendnum = tox_friend_by_public_key(tox_global, (uint8_t *)public_key_bin, &error);
 
@@ -1926,11 +2090,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNI
 
     if(error != TOX_ERR_FRIEND_BY_PUBLIC_KEY_OK)
     {
-        return (jlong)(unsigned long long)-1;
+        return (jlong)-1;
     }
     else
     {
-        return (jlong)(unsigned long long)friendnum;
+        return (jlong)friendnum;
     }
 }
 
@@ -1981,6 +2145,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     tox_av_global = NULL;
     tox_global = NULL;
     dbg(9, "tox_kill ... READY");
+
+	stop_filter_audio();
 }
 
 JNIEXPORT void JNICALL
@@ -2200,6 +2366,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env, jobject thiz, jobject name)
 {
+	if (tox_global == NULL)
+	{
+		return (jint)-1;
+	}
+
     const char *s = NULL;
     s = (*env)->GetStringUTFChars(env, name, NULL);
     TOX_ERR_SET_INFO error;
@@ -2212,6 +2383,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(JNIEnv *env, jobject thiz,
         jobject status_message)
 {
+	if (tox_global == NULL)
+	{
+		return (jint)-1;
+	}
+
     const char *s = NULL;
     s = (*env)->GetStringUTFChars(env, status_message, NULL);
     TOX_ERR_SET_INFO error;
@@ -2223,6 +2399,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status(JNIEnv *env, jobject thiz, jint status)
 {
+	if (tox_global == NULL)
+	{
+		return;
+	}
+
     tox_self_set_status(tox_global, (TOX_USER_STATUS)status);
 }
 
@@ -3149,7 +3330,38 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
     if(audio_buffer_pcm_1)
     {
-        uint16_t *pcm = (uint16_t *)audio_buffer_pcm_1;
+        int16_t *pcm = (int16_t *)audio_buffer_pcm_1;
+
+#ifdef USE_ECHO_CANCELLATION
+
+		if (((int)channels == 1) && ((int)sampling_rate == 48000))
+		{
+			filteraudio_incompatible_1 = 0;
+		}
+		else
+		{
+			filteraudio_incompatible_1 = 1;
+		}
+
+		// TODO: need some locking here!
+		if (recording_samling_rate != (uint32_t)sampling_rate)
+		{
+			if (filteraudio)
+			{
+				stop_filter_audio();
+			}
+			start_filter_audio((uint32_t)sampling_rate);
+			recording_samling_rate = (uint32_t)sampling_rate;
+			set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+		}
+		// TODO: need some locking here!
+
+		if ((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0) && (filteraudio_incompatible_2 == 0))
+		{
+			filter_audio(filteraudio, pcm, (unsigned int)sample_count);
+		}
+#endif
+
         bool res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
                                           (uint8_t)channels, (uint32_t)sampling_rate, &error);
     }

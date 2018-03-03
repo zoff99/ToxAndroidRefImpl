@@ -97,6 +97,24 @@
             android:summary="@string/pref_description_X_use_native_audio_play"
             android:title="@string/pref_title_X_use_native_audio_play"/>
 
+        <EditTextPreference
+            android:defaultValue="60"
+            android:key="X_eac_delay_ms"
+            android:maxLength="3"
+            android:numeric="integer"
+            android:summary="@string/pref_description_X_eac_delay_ms"
+            android:title="@string/pref_title_X_eac_delay_ms"/>
+
+        <ListPreference
+            android:defaultValue="120"
+            android:entries="@array/X_audio_recording_frame_size_titles"
+            android:entryValues="@array/X_audio_recording_frame_size_values"
+            android:key="X_audio_recording_frame_size"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="@string/pref_description_X_audio_recording_frame_size"
+            android:title="@string/pref_title_X_audio_recording_frame_size"/>
+
 
         <SwitchPreference
             android:defaultValue="false"

@@ -77,12 +77,12 @@ import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
+import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
-import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_messageid_from_id;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FILE_PICK_METHOD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
@@ -199,7 +199,7 @@ public class MessageListActivity extends AppCompatActivity
         setUpEmojiPopup();
 
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                icon(FontAwesome.Icon.faw_smile_o).
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                 color(getResources().
                         getColor(R.color.colorPrimaryDark)).
                 sizeDp(80);
@@ -218,8 +218,10 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-        final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
-        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         ml_friend_typing.setText("");
         attachemnt_instead_of_send = true;
@@ -340,7 +342,8 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
         final long fn = friendnum;
@@ -488,21 +491,22 @@ public class MessageListActivity extends AppCompatActivity
         //        }})
 
 
-        emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener()
-        {
-            @Override
-            public void onEmojiBackspaceClick(View v)
-            {
+        emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(
+                new OnEmojiBackspaceClickListener()
+                {
+                    @Override
+                    public void onEmojiBackspaceClick(View v)
+                    {
 
-            }
+                    }
 
-        }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
+                }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
         {
             @Override
             public void onEmojiPopupShown()
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                        icon(FontAwesome.Icon.faw_keyboard_o).
+                        icon(FontAwesome.Icon.faw_keyboard).
                         color(getResources().
                                 getColor(R.color.colorPrimaryDark)).
                         sizeDp(80);
@@ -523,7 +527,7 @@ public class MessageListActivity extends AppCompatActivity
             public void onEmojiPopupDismiss()
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                        icon(FontAwesome.Icon.faw_smile_o).
+                        icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                         color(getResources().
                                 getColor(R.color.colorPrimaryDark)).
                         sizeDp(80);
@@ -642,8 +646,10 @@ public class MessageListActivity extends AppCompatActivity
                         properties.selection_mode = DialogConfigs.SINGLE_MODE;
                         properties.selection_type = DialogConfigs.FILE_SELECT;
                         properties.root = new java.io.File("/");
-                        properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                        properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                        properties.error_dir = new java.io.File(
+                                Environment.getExternalStorageDirectory().getAbsolutePath());
+                        properties.offset = new java.io.File(
+                                Environment.getExternalStorageDirectory().getAbsolutePath());
                         properties.extensions = null;
                         // TODO: hardcoded is always bad
                         // properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF", "zip", "ZIP", "avi", "AVI", "mp4", "MP4"};
@@ -732,7 +738,8 @@ public class MessageListActivity extends AppCompatActivity
                 else
                 {
                     // send typed message to friend
-                    msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
+                    msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(),
+                                                                                          ml_new_message.getText().toString().length()));
 
                     Message m = new Message();
                     m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
@@ -1012,6 +1019,8 @@ public class MessageListActivity extends AppCompatActivity
                     if (Callstate.state == 0)
                     {
                         Log.i(TAG, "CALL:start:(2):show activity");
+                        set_filteraudio_active(1);
+
                         Callstate.state = 1;
                         Callstate.accepted_call = 1; // we started the call, so it's already accepted on our side
                         Callstate.call_first_video_frame_received = -1;
@@ -1082,7 +1091,8 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     CallingActivity.top_text_line_str2 = "0s";
                                     update_top_text_line();
-                                    Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled + " f_video_enabled=" + f_video_enabled);
+                                    Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled +
+                                               " f_video_enabled=" + f_video_enabled);
 
                                     Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
                                     Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
@@ -1210,7 +1220,8 @@ public class MessageListActivity extends AppCompatActivity
             {
 
                 final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),
+                                                                  Long.valueOf(id));
 
                 return getDataColumn(context, contentUri, null, null);
             }

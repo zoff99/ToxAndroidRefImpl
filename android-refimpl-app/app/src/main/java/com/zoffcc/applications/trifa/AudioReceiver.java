@@ -54,7 +54,7 @@ public class AudioReceiver extends Thread
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
     static long sampling_rate_ = SMAPLINGRATE_TOX;
     static int channels_ = 1;
-    static final boolean ACTVIATE_LEC = true;
+    static final boolean ACTVIATE_LEC = false;
     static final boolean ACTVIATE_ERVB = false;
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!

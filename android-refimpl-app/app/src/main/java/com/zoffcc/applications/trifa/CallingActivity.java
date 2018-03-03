@@ -51,6 +51,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_ena
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
+import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
@@ -253,30 +254,31 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         e.printStackTrace();
                     }
                 }
-                else
+                else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
                     try
                     {
                         if (audio_manager_s.isMicrophoneMute())
                         {
+                            audio_manager_s.setMicrophoneMute(false);
                             Drawable d2a = new IconicsDrawable(v.getContext()).icon(
                                     GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
                                     getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
-                            audio_manager_s.setMicrophoneMute(false);
                         }
                         else
                         {
+                            audio_manager_s.setMicrophoneMute(true);
                             Drawable d2a = new IconicsDrawable(v.getContext()).icon(
                                     GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
                                     getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
-                            audio_manager_s.setMicrophoneMute(true);
                         }
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        Log.i(TAG, "setMicrophoneMute:001:EE:" + e.getMessage());
                     }
                 }
                 return true;
@@ -971,6 +973,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // close to ear
                 if (Callstate.audio_speaker == true)
                 {
+                    set_filteraudio_active(0);
+
                     Callstate.audio_speaker = false;
                     try
                     {
@@ -1021,6 +1025,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // away from ear
                 if (Callstate.audio_speaker == false)
                 {
+                    set_filteraudio_active(1);
+
                     Callstate.audio_speaker = true;
                     try
                     {

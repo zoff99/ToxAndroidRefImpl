@@ -84,15 +84,15 @@ public class FriendlistAdapter extends RecyclerView.Adapter
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
-        Log.i(TAG, "onBindViewHolder:position=" + position);
+        // Log.i(TAG, "onBindViewHolder:position=" + position);
 
         try
         {
             CombinedFriendsAndConferences fl2 = this.friendlistitems.get(position);
-            Log.i(TAG, "onBindViewHolder:fl2=" + fl2);
+            // Log.i(TAG, "onBindViewHolder:fl2=" + fl2);
 
             int type = getItemViewType(position);
-            Log.i(TAG, "onBindViewHolder:type=" + type);
+            // Log.i(TAG, "onBindViewHolder:type=" + type);
 
             switch (type)
             {

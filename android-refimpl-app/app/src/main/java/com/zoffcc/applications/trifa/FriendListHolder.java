@@ -127,7 +127,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             return;
         }
 
-        Log.i(TAG, "bindFriendList:" + fl.name + "alias=" + fl.alias_name);
+        // Log.i(TAG, "bindFriendList:" + fl.name + " alias=" + fl.alias_name);
 
         this.friendlist = fl;
 
@@ -218,7 +218,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 {
                     if (f1.length() > 0)
                     {
-                        Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + fl.avatar_filename);
+                        // Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + fl.avatar_filename);
 
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
                         GlideApp.
@@ -267,7 +267,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     {
                         if (f1.length() > 0)
                         {
-                            Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + new_avatar_filename);
+                            // Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + new_avatar_filename);
 
                             final RequestOptions glide_options = new RequestOptions().fitCenter();
                             GlideApp.

@@ -31,6 +31,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.model.AbstractBadgeableDrawerItem;
 
@@ -137,7 +138,7 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                 peer_color_bg = ChatColors.PeerAvatarColors[hash_to_bucket(peer_pubkey, ChatColors.get_size())];
 
                 final Drawable smiley_face = new IconicsDrawable(context_s).
-                        icon(FontAwesome.Icon.faw_smile_o).
+                        icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                         backgroundColor(Color.TRANSPARENT).
                         color(peer_color_fg).sizeDp(70);
 

@@ -242,7 +242,10 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
                 info.guardianproject.iocipher.File f1 = null;
                 try
                 {
-                    f1 = new info.guardianproject.iocipher.File(fname);
+                    if (fname != null)
+                    {
+                        f1 = new info.guardianproject.iocipher.File(fname);
+                    }
                 }
                 catch (Exception e)
                 {
