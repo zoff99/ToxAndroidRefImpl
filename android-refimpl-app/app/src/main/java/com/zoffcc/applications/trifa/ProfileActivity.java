@@ -256,11 +256,11 @@ public class ProfileActivity extends AppCompatActivity
             // 2 	checksum
             String my_tox_id_temp = MainActivity.get_my_toxid();
 
-            if (my_tox_id_temp==null)
+            if (my_tox_id_temp == null)
             {
                 // on error use Echobots ToxID
                 // TODO: do something else here
-                my_tox_id_temp="76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C48A39218F515C39A6";
+                my_tox_id_temp = "76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C48A39218F515C39A6";
             }
 
             String my_pk_key_temp = my_tox_id_temp.substring(0, 64);
@@ -289,7 +289,7 @@ public class ProfileActivity extends AppCompatActivity
             }
 
         }
-        catch(Exception e3)
+        catch (Exception e3)
         {
             e3.printStackTrace();
         }

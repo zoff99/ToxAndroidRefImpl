@@ -1248,14 +1248,14 @@ public class MainActivity extends AppCompatActivity
             set_all_conferences_inactive();
             startService(i);
         }
-        // --- forground service ---
-        // --- forground service ---
-        // --- forground service ---
 
         if (!TOX_SERVICE_STARTED)
         {
             tox_thread_start();
         }
+        // --- forground service ---
+        // --- forground service ---
+        // --- forground service ---
 
         receiverFilter1 = new IntentFilter(AudioManager.ACTION_HEADSET_PLUG);
         receiver1 = new HeadsetStateReceiver();
@@ -8500,12 +8500,19 @@ public class MainActivity extends AppCompatActivity
 
     static void update_savedata_file_wrapper()
     {
-        long start_timestamp = System.currentTimeMillis();
-        update_savedata_file(TrifaSetPatternActivity.bytesToString(
-                TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+        if (is_tox_started == true)
+        {
+            long start_timestamp = System.currentTimeMillis();
+            update_savedata_file(TrifaSetPatternActivity.bytesToString(
+                    TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
 
-        long end_timestamp = System.currentTimeMillis();
-        Log.i(TAG, "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
+            long end_timestamp = System.currentTimeMillis();
+            Log.i(TAG, "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
+        }
+        else
+        {
+            Log.i(TAG, "update_savedata_file(): ERROR:Tox not ready:001");
+        }
     }
 
     private void fadeInAndShowImage(final View img, long start_after_millis)

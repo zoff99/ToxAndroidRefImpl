@@ -1783,6 +1783,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, 
 void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(JNIEnv *env, jobject thiz,
         jstring passphrase_j)
 {
+	if (tox_global == NULL)
+	{
+		return;
+	}
+
     const char *s = (*env)->GetStringUTFChars(env, passphrase_j, NULL);
     char *passphrase = strdup(s);
     // WARNING // dbg(9, "passphrase=%s", passphraseXX);
