@@ -42,6 +42,7 @@ import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
@@ -297,7 +298,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         // we need to do the rounded corner background manually here, to change the color ---------------
 
         final Drawable smiley_face = new IconicsDrawable(context).
-                icon(FontAwesome.Icon.faw_smile_o).
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                 backgroundColor(peer_color_bg).
                 color(peer_color_fg).sizeDp(70);
 

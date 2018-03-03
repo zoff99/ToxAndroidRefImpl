@@ -212,7 +212,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         setUpEmojiPopup();
 
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                icon(FontAwesome.Icon.faw_smile_o).
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                 color(getResources().
                         getColor(R.color.colorPrimaryDark)).
                 sizeDp(80);
@@ -359,7 +359,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             public void onEmojiPopupShown()
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                        icon(FontAwesome.Icon.faw_keyboard_o).
+                        icon(FontAwesome.Icon.faw_keyboard).
                         color(getResources().
                                 getColor(R.color.colorPrimaryDark)).
                         sizeDp(80);
@@ -380,7 +380,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             public void onEmojiPopupDismiss()
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                        icon(FontAwesome.Icon.faw_smile_o).
+                        icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                         color(getResources().
                                 getColor(R.color.colorPrimaryDark)).
                         sizeDp(80);
