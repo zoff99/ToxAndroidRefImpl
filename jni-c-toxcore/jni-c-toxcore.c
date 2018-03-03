@@ -1953,6 +1953,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
     jstring result;
     dbg(9, "get_my_toxid");
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
+
+	if (tox_global == NULL)
+	{
+		dbg(9, "get_my_toxid:NULL:1");
+		return (jstring)NULL;
+	}
+
     get_my_toxid(tox_global, tox_id_hex);
     // dbg(2, "MyToxID:%s", tox_id_hex);
     result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
@@ -2036,13 +2043,32 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNIEnv *env, jobject thiz,
         jobject public_key_str)
 {
+	if (tox_global == NULL)
+	{
+		return (jlong)-1;
+	}
+
     unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
     char *public_key_str2 = NULL;
     const char *s = NULL;
+
+	if (public_key_str == NULL)
+	{
+		return (jlong)-1;
+	}
+
     s = (*env)->GetStringUTFChars(env, public_key_str, NULL);
+
+	if (s == NULL)
+	{
+		(*env)->ReleaseStringUTFChars(env, public_key_str, s);
+		return (jlong)-1;
+	}
+
     public_key_str2 = strdup(s);
     (*env)->ReleaseStringUTFChars(env, public_key_str, s);
     toxid_hex_to_bin(public_key_bin, public_key_str2);
+
     TOX_ERR_FRIEND_BY_PUBLIC_KEY error;
     uint32_t friendnum = tox_friend_by_public_key(tox_global, (uint8_t *)public_key_bin, &error);
 
@@ -2053,11 +2079,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNI
 
     if(error != TOX_ERR_FRIEND_BY_PUBLIC_KEY_OK)
     {
-        return (jlong)(unsigned long long)-1;
+        return (jlong)-1;
     }
     else
     {
-        return (jlong)(unsigned long long)friendnum;
+        return (jlong)friendnum;
     }
 }
 
