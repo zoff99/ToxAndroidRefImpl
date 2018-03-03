@@ -2019,6 +2019,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1public_1key(JN
         jlong friend_number)
 {
     jstring result;
+
+	if (tox_global == NULL)
+	{
+		return (jstring)NULL;
+	}
+
     uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
     TOX_ERR_FRIEND_GET_PUBLIC_KEY error;
     bool res = tox_friend_get_public_key(tox_global, (uint32_t)friend_number, public_key, &error);
@@ -2355,6 +2361,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env, jobject thiz, jobject name)
 {
+	if (tox_global == NULL)
+	{
+		return (jint)-1;
+	}
+
     const char *s = NULL;
     s = (*env)->GetStringUTFChars(env, name, NULL);
     TOX_ERR_SET_INFO error;
@@ -2367,6 +2378,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(JNIEnv *env, jobject thiz,
         jobject status_message)
 {
+	if (tox_global == NULL)
+	{
+		return (jint)-1;
+	}
+
     const char *s = NULL;
     s = (*env)->GetStringUTFChars(env, status_message, NULL);
     TOX_ERR_SET_INFO error;
@@ -2378,6 +2394,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status(JNIEnv *env, jobject thiz, jint status)
 {
+	if (tox_global == NULL)
+	{
+		return;
+	}
+
     tox_self_set_status(tox_global, (TOX_USER_STATUS)status);
 }
 
