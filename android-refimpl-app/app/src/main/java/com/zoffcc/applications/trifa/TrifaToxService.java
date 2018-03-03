@@ -880,6 +880,8 @@ public class TrifaToxService extends Service
 
     static void bootstrap_me()
     {
+        Log.i(TAG, "bootstrap_me");
+
         // ----- UDP ------
         get_udp_nodelist_from_db();
         Log.i(TAG, "bootstrap_node_list[sort]=" + bootstrap_node_list.toString());
