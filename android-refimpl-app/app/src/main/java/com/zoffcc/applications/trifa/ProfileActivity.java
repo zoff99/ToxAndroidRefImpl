@@ -296,8 +296,8 @@ public class ProfileActivity extends AppCompatActivity
                 h = 400;
             }
 
-            Log.i(TAG, "update_toxid_display:w=" + w);
-            Log.i(TAG, "update_toxid_display:h=" + w);
+            // Log.i(TAG, "update_toxid_display:w=" + w);
+            // Log.i(TAG, "update_toxid_display:h=" + w);
 
             Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
             Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
@@ -319,22 +319,22 @@ public class ProfileActivity extends AppCompatActivity
             int dot_height = h / IDENTICON_ROWS;
             int columnIdx;
 
-            Log.i(TAG, "update_toxid_display:dot_width=" + dot_width + " ACTIVE_COLS=" + IDENTICON_ROWS);
-            Log.i(TAG, "update_toxid_display:dot_height=" + dot_height + " IDENTICON_ROWS=" + IDENTICON_ROWS);
+            // Log.i(TAG, "update_toxid_display:dot_width=" + dot_width + " ACTIVE_COLS=" + IDENTICON_ROWS);
+            // Log.i(TAG, "update_toxid_display:dot_height=" + dot_height + " IDENTICON_ROWS=" + IDENTICON_ROWS);
 
             for (int row = 0; row < IDENTICON_ROWS; ++row)
             {
                 for (int col = 0; col < IDENTICON_ROWS; ++col)
                 {
                     columnIdx = Math.abs((col * 2 - (IDENTICON_ROWS - 1)) / 2);
-                    Log.i(TAG, "update_toxid_display:col=" + col + " columnIdx=" + columnIdx + " row=" + row);
+                    // Log.i(TAG, "update_toxid_display:col=" + col + " columnIdx=" + columnIdx + " row=" + row);
 
                     x1 = col * dot_width;
                     x2 = (col + 1) * dot_width;
                     y1 = row * dot_height;
                     y2 = (row + 1) * dot_height;
 
-                    Log.i(TAG, "update_toxid_display:x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2=" + y2);
+                    // Log.i(TAG, "update_toxid_display:x1=" + x1 + " y1=" + y1 + " x2=" + x2 + " y2=" + y2);
 
                     if (id_data.dot_color[row][columnIdx] == true)
                     {

@@ -143,7 +143,7 @@ public class FriendInfoActivity extends AppCompatActivity
         try
         {
             String fname = get_vfs_image_filename_friend_avatar(friendnum);
-            Log.i(TAG, "fname=" + fname);
+            // Log.i(TAG, "fname=" + fname);
             if (fname != null)
             {
                 put_vfs_image_on_imageview(this, profile_icon, d1, fname);
