@@ -2029,7 +2029,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db_status(FriendList f)
     {
-        Log.i(TAG, "update_friend_in_db_status:f=" + f);
+        // Log.i(TAG, "update_friend_in_db_status:f=" + f);
 
         int numrows = orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
