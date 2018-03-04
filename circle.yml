@@ -29,7 +29,7 @@ machine:
     AND_READELF_X86: "$_toolchain_/x86/bin/i686-linux-android-readelf"
     AND_ARTEFACT_DIR_X86: "x86"
 # --- Android build ---
-    CF2: " -marm -mfpu=neon-fp-armv8 -mfloat-abi=hard -ftree-vectorize "
+    CF2: " -ftree-vectorize -ffast-math "
     CF3: " -funsafe-math-optimizations "
 
     # ---------------------------------------------------
