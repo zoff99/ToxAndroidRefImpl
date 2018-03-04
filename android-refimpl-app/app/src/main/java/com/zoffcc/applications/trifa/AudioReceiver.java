@@ -235,7 +235,7 @@ public class AudioReceiver extends Thread
                     NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer[i], NativeAudio.n_buf_size_in_bytes, i);
                 }
 
-                NativeAudio.n_cur_buf = 1;
+                NativeAudio.n_cur_buf = 0;
                 for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
                 {
                     NativeAudio.n_bytes_in_buffer[i] = 0;

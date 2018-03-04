@@ -26,13 +26,15 @@ import com.zoffcc.applications.trifa.AudioRecording;
 
 import java.nio.ByteBuffer;
 
+import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
+
 public class NativeAudio
 {
     private static final String TAG = "trifa.NativeAudio";
 
     public static final int n_audio_in_buffer_max_count = 5;
     public static ByteBuffer[] n_audio_buffer = new ByteBuffer[n_audio_in_buffer_max_count];
-    public static int n_cur_buf = 1;
+    public static int n_cur_buf = 0;
     public static int n_buf_size_in_bytes = 0;
     public static int[] n_bytes_in_buffer = new int[n_audio_in_buffer_max_count];
     public static int sampling_rate = 44100;
@@ -40,40 +42,9 @@ public class NativeAudio
 
     public static final int n_rec_audio_in_buffer_max_count = 2;
     public static ByteBuffer[] n_rec_audio_buffer = new ByteBuffer[n_rec_audio_in_buffer_max_count];
-    public static int n_rec_cur_buf = 1;
+    public static int n_rec_cur_buf = 0;
     public static int n_rec_buf_size_in_bytes = 0;
     public static int[] n_rec_bytes_in_buffer = new int[n_rec_audio_in_buffer_max_count];
-
-
-    public static void demo(Context c)
-    {
-        // ------- DEBUG -------
-        // ------- DEBUG -------
-        // ------- DEBUG -------
-        // ------- DEBUG -------
-
-        // initialize native audio system
-        createEngine(n_audio_in_buffer_max_count);
-        int sampleRate = 48000;
-        int channels = 1;
-        System.out.println("NativeAudio:sampleRate=" + sampleRate);
-
-        createBufferQueueAudioPlayer(sampleRate, channels, n_audio_in_buffer_max_count);
-
-        n_buf_size_in_bytes = (sampleRate * channels * 2) / 10; // = 100ms // (48000*1*2) = 96000;
-
-        for (int i = 0; i < n_audio_in_buffer_max_count; i++)
-        {
-            n_audio_buffer[i] = ByteBuffer.allocateDirect(n_buf_size_in_bytes);
-            n_bytes_in_buffer[i] = 0;
-            set_JNI_audio_buffer(n_audio_buffer[i], n_buf_size_in_bytes, i);
-        }
-        // ------- DEBUG -------
-        // ------- DEBUG -------
-        // ------- DEBUG -------
-        // ------- DEBUG -------
-
-    }
 
 
     public static void restartNativeAudioPlayEngine(int sampleRate, int channels)
@@ -88,7 +59,7 @@ public class NativeAudio
 
         NativeAudio.createEngine(n_audio_in_buffer_max_count);
         NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, n_audio_in_buffer_max_count);
-        NativeAudio.n_cur_buf = 1;
+        NativeAudio.n_cur_buf = 0;
 
         for (int i = 0; i < n_audio_in_buffer_max_count; i++)
         {
@@ -104,7 +75,12 @@ public class NativeAudio
     public static void rec_buffer_ready(int rec_buffer_num)
     {
         Log.i(TAG, "rec_buffer_ready:num=" + rec_buffer_num);
-        new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num).execute();
+        // TODO: workaround. sometimes mute button does not mute mic? find a real fix
+        if (!microphone_muted)
+        {
+            Log.i(TAG, "rec_buffer_ready:002");
+            new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num).execute();
+        }
     }
 
     /**

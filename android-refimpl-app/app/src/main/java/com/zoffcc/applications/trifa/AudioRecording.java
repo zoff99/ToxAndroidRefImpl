@@ -65,6 +65,7 @@ public class AudioRecording extends Thread
     AutomaticGainControl agc = null;
     AcousticEchoCanceler aec = null;
     NoiseSuppressor np = null;
+    public static boolean microphone_muted = false;
 
     // -----------------------
     static ByteBuffer _recBuffer = null;
@@ -134,16 +135,19 @@ public class AudioRecording extends Thread
 
                 NativeAudio.createAudioRecorder((int) SMAPLINGRATE_TOX, n_rec_audio_in_buffer_max_count);
 
-                int want_buf_size_in_bytes = (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 *
-                                                    2); // (int) (2 * (RECORDING_RATE / buffer_mem_factor));
+                int want_buf_size_in_bytes = (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2);
                 Log.i(TAG, "want_buf_size_in_bytes(1)=" + want_buf_size_in_bytes);
 
                 _recBuffer = ByteBuffer.allocateDirect(
                         (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2)); // Max 120 ms @ 48 kHz
                 set_JNI_audio_buffer(_recBuffer);
 
+                // for 60 ms --> 5760 bytes
                 NativeAudio.n_rec_buf_size_in_bytes =
-                        (sampling_rate * channel_count * 2) / 10; // = 100ms // (48000*1*2) = 96000;
+                        ((sampling_rate * channel_count * 2) / 1000) * PREF__X_audio_recording_frame_size;
+
+                Log.i(TAG, "NativeAudio.n_rec_buf_size_in_bytes=" + NativeAudio.n_rec_buf_size_in_bytes +
+                           " PREF__X_audio_recording_frame_size=" + PREF__X_audio_recording_frame_size);
 
                 for (int i = 0; i < n_rec_audio_in_buffer_max_count; i++)
                 {
@@ -153,7 +157,7 @@ public class AudioRecording extends Thread
                                                          NativeAudio.n_rec_buf_size_in_bytes, i);
                 }
 
-                NativeAudio.n_rec_cur_buf = 1;
+                NativeAudio.n_rec_cur_buf = 0;
                 for (int i = 0; i < n_rec_audio_in_buffer_max_count; i++)
                 {
                     NativeAudio.n_rec_bytes_in_buffer[i] = 0;
@@ -319,7 +323,7 @@ public class AudioRecording extends Thread
                                         (float) PREF__X_audio_recording_frame_size * (float) CHANNELS_TOX * 2.0f);
         // try to read "PREF__X_audio_recording_frame_size" of audio data
 
-        boolean microphone_muted = false;
+        microphone_muted = false;
 
         try
         {
@@ -348,6 +352,22 @@ public class AudioRecording extends Thread
                 {
                     e.printStackTrace();
                     Log.i(TAG, "audio_rec:EE2:" + e.getMessage());
+                }
+
+                try
+                {
+                    if (audio_manager_s.isMicrophoneMute())
+                    {
+                        microphone_muted = true;
+                    }
+                    else
+                    {
+                        microphone_muted = false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    microphone_muted = false;
                 }
             }
         }
@@ -536,6 +556,8 @@ public class AudioRecording extends Thread
         public send_audio_frame_to_toxcore_from_native(int bufnum)
         {
             bufnum_ = bufnum;
+
+            Log.i(TAG, "send_audio_frame_to_toxcore_from_native:bufnum=" + bufnum);
         }
 
         @Override
@@ -545,19 +567,24 @@ public class AudioRecording extends Thread
             {
                 _recBuffer.rewind();
                 _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
+
+                Log.i(TAG,
+                      "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX + " SMAPLINGRATE_TOX=" +
+                      SMAPLINGRATE_TOX);
+
                 audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                         (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2),
                                                         CHANNELS_TOX, SMAPLINGRATE_TOX);
                 if (audio_send_res != 0)
                 {
-                    Log.i(TAG,
-                          "audio:res=" + audio_send_res + ":" + ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                    Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" +
+                               ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
                 }
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-                Log.i(TAG, "audio:EE6:" + e.getMessage());
+                Log.i(TAG, "send_audio_frame_to_toxcore_from_native:EE6:" + e.getMessage());
             }
 
             return null;
