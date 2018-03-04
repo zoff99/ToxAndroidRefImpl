@@ -226,7 +226,7 @@ compile:
       --target=armv7-android-gcc
       --size-limit=16384x16384
       --enable-onthefly-bitpacking
-      --enable-runtime-cpu-detect
+      --disable-runtime-cpu-detect
 
     
   - . ~/pp;cd ~/build/;make -j4
