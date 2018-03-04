@@ -228,6 +228,8 @@ compile:
       --enable-onthefly-bitpacking
       --enable-runtime-cpu-detect
       --enable-realtime-only
+      --enable-multi-res-encoding
+      --enable-temporal-denoising
 
     
   - . ~/pp;cd ~/build/;make -j4
