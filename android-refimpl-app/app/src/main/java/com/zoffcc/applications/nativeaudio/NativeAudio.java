@@ -19,9 +19,6 @@
 
 package com.zoffcc.applications.nativeaudio;
 
-import android.content.Context;
-import android.util.Log;
-
 import com.zoffcc.applications.trifa.AudioRecording;
 
 import java.nio.ByteBuffer;
@@ -46,25 +43,34 @@ public class NativeAudio
     public static int n_rec_buf_size_in_bytes = 0;
     public static int[] n_rec_bytes_in_buffer = new int[n_rec_audio_in_buffer_max_count];
 
+    public static boolean native_audio_engine_down = false;
 
     public static void restartNativeAudioPlayEngine(int sampleRate, int channels)
     {
         System.out.println("restartNativeAudioPlayEngine:sampleRate=" + sampleRate + " channels=" + channels);
 
+        native_audio_engine_down = true;
+
         if (isPlaying() == 1)
         {
             NativeAudio.StopPCM16();
+            NativeAudio.StopREC();
             NativeAudio.shutdownEngine();
         }
 
         NativeAudio.createEngine(n_audio_in_buffer_max_count);
         NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, n_audio_in_buffer_max_count);
+        NativeAudio.createAudioRecorder((int) AudioRecording.SMAPLINGRATE_TOX, n_rec_audio_in_buffer_max_count);
+
         NativeAudio.n_cur_buf = 0;
 
         for (int i = 0; i < n_audio_in_buffer_max_count; i++)
         {
             n_bytes_in_buffer[i] = 0;
         }
+
+        native_audio_engine_down = false;
+
     }
 
     // ------- DEBUG -------
@@ -110,7 +116,7 @@ public class NativeAudio
 
     public static native int isRecording();
 
-    public static native int StartREC(int buf_num);
+    public static native int StartREC();
 
     public static native boolean StopREC();
 

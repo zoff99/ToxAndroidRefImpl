@@ -57,7 +57,7 @@ public class AudioRecording extends Thread
     static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     static final int CHANNELS_TOX = 1;
-    static long SMAPLINGRATE_TOX = 48000; // 16000;
+    public static long SMAPLINGRATE_TOX = 48000; // 16000;
     static boolean soft_echo_canceller_ready = false;
     final static int milliseconds_audio_samples_max = 120;
     private int buffer_size = 0;
@@ -341,7 +341,7 @@ public class AudioRecording extends Thread
         if (PREF__use_native_audio_play)
         {
 
-            NativeAudio.StartREC(NativeAudio.n_rec_cur_buf);
+            NativeAudio.StartREC();
 
             while (!stopped)
             {
@@ -592,11 +592,15 @@ public class AudioRecording extends Thread
 
                 audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                         (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2),
+
                                                         CHANNELS_TOX, SMAPLINGRATE_TOX);
-                if (audio_send_res != 0)
+
+                if (DEBUG_MIC_DATE_LOGGING)
                 {
-                    Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" +
-                               ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                    if (audio_send_res != 0)
+                    {
+                        Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" + ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                    }
                 }
             }
             catch (Exception e)
