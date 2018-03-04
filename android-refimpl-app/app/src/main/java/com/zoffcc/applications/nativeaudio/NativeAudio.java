@@ -89,6 +89,11 @@ public class NativeAudio
     // ------- DEBUG -------
     // ------- DEBUG -------
 
+    public static void rec_buffer_ready(int rec_buffer_num)
+    {
+
+    }
+
     /**
      * Native methods, implemented in jni folder
      */

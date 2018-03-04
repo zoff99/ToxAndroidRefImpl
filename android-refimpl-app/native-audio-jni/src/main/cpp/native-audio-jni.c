@@ -70,6 +70,18 @@ int num_play_bufs = 3;
 #define _PLAYING 1
 #define _SHUTDOWN 2
 int playing_state = _STOPPED;
+
+
+
+uint8_t *audio_rec_buffer[20];
+long audio_rec_buffer_size[20];
+int cur_rec_buf = 1;
+int num_rec_bufs = 3;
+#define _RECORDING 3
+int rec_state = _STOPPED;
+
+jclass NativeAudio_class = NULL;
+jmethodID rec_buffer_ready_method = NULL;
 // -----------------------------
 
 
@@ -117,30 +129,10 @@ static SLSeekItf fdPlayerSeek;
 static SLMuteSoloItf fdPlayerMuteSolo;
 static SLVolumeItf fdPlayerVolume;
 
-//// synthesized sawtooth clip
-//#define SAWTOOTH_FRAMES 8000
-//static short sawtoothBuffer[SAWTOOTH_FRAMES];
-//
-//// 5 seconds of recorded audio at 16 kHz mono, 16-bit signed little endian
-//#define RECORDER_FRAMES (16000 * 5)
-//static short recorderBuffer[RECORDER_FRAMES];
-//static unsigned recorderSize = 0;
-
-// pointer and size of the next player buffer to enqueue, and number of remaining buffers
-//static short *nextBuffer;
-//static unsigned nextSize;
-//static int nextCount;
-
-
-// synthesize a mono sawtooth wave and place it into a buffer (called automatically on load)
-//__attribute__((constructor)) static void onDlOpen(void)
-//{
-//    unsigned i;
-//    for (i = 0; i < SAWTOOTH_FRAMES; ++i)
-//    {
-//        sawtoothBuffer[i] = 32768 - ((i % 100) * 660);
-//    }
-//}
+// recorder interfaces
+static SLObjectItf recorderObject = NULL;
+static SLRecordItf recorderRecord;
+static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
@@ -165,6 +157,7 @@ JNIEnv *jni_getenv()
     (*cachedJVM)->GetEnv(cachedJVM, (void **) &env_this, JNI_VERSION_1_6);
     return env_this;
 }
+
 
 
 // --------------------------
@@ -228,9 +221,46 @@ short *createResampledBuf(uint32_t srcRate, int32_t srcSampleCount, short *src, 
 }
 #endif
 
+#if 0
 // this callback handler is called every time a buffer finishes playing
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
+}
+#endif
+
+
+// this callback handler is called every time a buffer finishes recording
+void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
+{
+    nextBuffer = (short *) audio_rec_buffer[cur_rec_buf];
+    nextSize = audio_rec_buffer_size[cur_rec_buf];
+
+    if (nextSize > 0)
+    {
+        if (recorderBufferQueue == NULL)
+        {
+            return;
+        }
+
+        // enque the buffer
+        SLresult result;
+		result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
+
+		// signal Java code that a new record data is available in buffer #cur_rec_buf
+		if((NativeAudio_class) && (rec_buffer_ready_method))
+		{
+			JNIEnv *jnienv2;
+			jnienv2 = jni_getenv();
+			(*jnienv2)->CallStaticVoidMethod(jnienv2, NativeAudio_class, rec_buffer_ready_method, cur_rec_buf);
+		}
+	}
+
+	cur_rec_buf++;
+	if (cur_rec_buf > num_rec_bufs)
+	{
+		cur_rec_buf = 1;
+	}
+
 }
 
 
@@ -238,8 +268,15 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *env, jclass clazz, jint num_bufs)
 {
     SLresult result;
-
     num_play_bufs = num_bufs;
+
+
+	// find java methods ------------
+    NativeAudio_class = NULL;
+    android_find_class_global("com/zoffcc/applications/nativeaudio/NativeAudio", &NativeAudio_class);
+    rec_buffer_ready_method = (*env)->GetStaticMethodID(env, NativeAudio_class, "rec_buffer_ready", "(I)V");
+	// find java methods ------------
+
 
     // create engine
     result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
@@ -479,6 +516,90 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_enableReverb(JNIEn
 }
 
 
+
+
+
+
+// create audio recorder: recorder is not in fast path
+void Java_com_example_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv* env, jclass clazz, jint sampleRate, jint num_bufs)
+{
+    SLresult result;
+
+	SLuint32 channels = 1; // always record mono
+    num_rec_bufs = num_bufs;
+
+
+    // configure audio source
+    SLDataLocator_IODevice loc_dev = {SL_DATALOCATOR_IODEVICE, SL_IODEVICE_AUDIOINPUT,
+            SL_DEFAULTDEVICEID_AUDIOINPUT, NULL};
+
+    SLDataSource audioSrc = {&loc_dev, NULL};
+
+	uint32_t rec_samplerate =  SL_SAMPLINGRATE_16;
+	if ((int)sampleRate == 48000)
+	{
+		rec_samplerate = SL_SAMPLINGRATE_48
+	}
+	else if ((int)sampleRate == 8000)
+	{
+		rec_samplerate = SL_SAMPLINGRATE_8
+	}
+	else if ((int)sampleRate == 16000)
+	{
+		rec_samplerate = SL_SAMPLINGRATE_16
+	}
+
+    // configure audio sink
+    SLDataLocator_AndroidSimpleBufferQueue loc_bq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, (SLuint32) num_rec_bufs};
+
+    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, (SLuint32) channels, rec_samplerate,
+        SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
+        SL_SPEAKER_FRONT_CENTER, SL_BYTEORDER_LITTLEENDIAN};
+
+    SLDataSink audioSnk = {&loc_bq, &format_pcm};
+
+    // create audio recorder
+    // (requires the RECORD_AUDIO permission)
+    const SLInterfaceID id[1] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE};
+    const SLboolean req[1] = {SL_BOOLEAN_TRUE};
+    result = (*engineEngine)->CreateAudioRecorder(engineEngine, &recorderObject, &audioSrc,
+            &audioSnk, 1, id, req);
+
+    if (SL_RESULT_SUCCESS != result) {
+        return JNI_FALSE;
+    }
+
+    // realize the audio recorder
+    result = (*recorderObject)->Realize(recorderObject, SL_BOOLEAN_FALSE);
+    if (SL_RESULT_SUCCESS != result) {
+        return JNI_FALSE;
+    }
+
+    // get the record interface
+    result = (*recorderObject)->GetInterface(recorderObject, SL_IID_RECORD, &recorderRecord);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+
+    // get the buffer queue interface
+    result = (*recorderObject)->GetInterface(recorderObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &recorderBufferQueue);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+
+#if 1
+    // register callback on the buffer queue
+    result = (*recorderBufferQueue)->RegisterCallback(recorderBufferQueue, bqRecorderCallback, NULL);
+    assert(SL_RESULT_SUCCESS == result);
+    (void)result;
+#endif
+
+    cur_rec_buf = 1;
+    rec_state = _STOPPED;
+
+}
+
+
+
+
 void
 Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNIEnv *env, jobject clazz, jobject buffer,
                                                                              jlong buffer_size_in_bytes, jint num)
@@ -490,6 +611,100 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNI
     jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer);
     audio_play_buffer_size[num] = (long) capacity;
 }
+
+void
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1rec_1buffer(JNIEnv *env, jobject clazz, jobject buffer,
+                                                                             jlong buffer_size_in_bytes, jint num)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+
+    audio_rec_buffer[num] = (uint8_t *) (*jnienv2)->GetDirectBufferAddress(jnienv2, buffer);
+    jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer);
+    audio_rec_buffer_size[num] = (long) capacity;
+}
+
+
+jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isRecording(JNIEnv *env, jclass clazz)
+{
+    if (rec_state == _RECORDING)
+    {
+        return (jint) 1;
+    }
+    else
+    {
+        return (jint) 0;
+    }
+}
+
+
+jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopREC(JNIEnv *env, jclass clazz)
+{
+    cur_rec_buf = 1;
+    rec_state = _STOPPED;
+
+    // stop recording and clear buffer queue
+	SLresult result;
+	if (recorderRecord != NULL)
+	{
+		result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
+	}
+
+    if (recorderBufferQueue != NULL)
+	{
+		result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
+	}
+
+    return JNI_TRUE;
+}
+
+
+
+jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, jclass clazz, jint bufnum)
+{
+    if (rec_state == _SHUTDOWN)
+    {
+        return -1;
+    }
+
+    cur_rec_buf = bufnum;
+    nextBuffer = (short *) audio_rec_buffer[cur_rec_buf];
+    nextSize = audio_rec_buffer_size[cur_rec_buf];
+	cur_rec_buf++;
+	if (cur_rec_buf > num_rec_bufs)
+	{
+		cur_rec_buf = 1;
+	}
+
+    if (nextSize > 0)
+    {
+        if (recorderBufferQueue == NULL)
+        {
+            return -2;
+        }
+
+		// in case already recording, stop recording and clear buffer queue
+		result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
+		result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
+
+        // enque the buffer
+        SLresult result;
+		result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
+        if (SL_RESULT_SUCCESS != result)
+        {
+            return -2;
+        }
+
+		// start recording
+		result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_RECORDING);
+        rec_state = _RECORDING;
+
+    }
+
+    return 0;
+}
+
+
 
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isPlaying(JNIEnv *env, jclass clazz)
 {
@@ -553,6 +768,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv *env, jclass clazz)
 {
     playing_state = _SHUTDOWN;
+	rec_state = _SHUTDOWN;
 
     if (bqPlayerBufferQueue != NULL)
     {
@@ -570,6 +786,15 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         bqPlayerMuteSolo = NULL;
         bqPlayerVolume = NULL;
     }
+
+    // destroy audio recorder object, and invalidate all associated interfaces
+    if (recorderObject != NULL) {
+        (*recorderObject)->Destroy(recorderObject);
+        recorderObject = NULL;
+        recorderRecord = NULL;
+        recorderBufferQueue = NULL;
+    }
+
 
     // destroy output mix object, and invalidate all associated interfaces
     if (outputMixObject != NULL)
