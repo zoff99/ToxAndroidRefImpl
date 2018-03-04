@@ -227,6 +227,7 @@ compile:
       --size-limit=16384x16384
       --enable-onthefly-bitpacking
       --disable-runtime-cpu-detect
+      --enable-realtime-only
 
     
   - . ~/pp;cd ~/build/;make -j4
