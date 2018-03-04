@@ -66,6 +66,7 @@ public class AudioRecording extends Thread
     AcousticEchoCanceler aec = null;
     NoiseSuppressor np = null;
     public static boolean microphone_muted = false;
+    static final boolean DEBUG_MIC_DATE_LOGGING = false;
 
     // -----------------------
     static ByteBuffer _recBuffer = null;
@@ -556,8 +557,7 @@ public class AudioRecording extends Thread
         public send_audio_frame_to_toxcore_from_native(int bufnum)
         {
             bufnum_ = bufnum;
-
-            Log.i(TAG, "send_audio_frame_to_toxcore_from_native:bufnum=" + bufnum);
+            // Log.i(TAG, "send_audio_frame_to_toxcore_from_native:bufnum=" + bufnum);
         }
 
         @Override
@@ -566,11 +566,29 @@ public class AudioRecording extends Thread
             try
             {
                 _recBuffer.rewind();
+                NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
                 _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
 
-                Log.i(TAG,
-                      "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX + " SMAPLINGRATE_TOX=" +
-                      SMAPLINGRATE_TOX);
+                if (DEBUG_MIC_DATE_LOGGING)
+                {
+                    Log.i(TAG, "send_audio_frame_to_toxcore_from_native:1:" +
+                               NativeAudio.n_rec_audio_buffer[bufnum_].get(0) + " " +
+                               NativeAudio.n_rec_audio_buffer[bufnum_].get(1) + " " +
+                               NativeAudio.n_rec_audio_buffer[bufnum_].get(2) + " " +
+                               NativeAudio.n_rec_audio_buffer[bufnum_].get(3) + " " +
+                               NativeAudio.n_rec_audio_buffer[bufnum_].get(4) + " " +
+                               NativeAudio.n_rec_audio_buffer[bufnum_].get(5) + " ");
+
+
+                    Log.i(TAG,
+                          "send_audio_frame_to_toxcore_from_native:2:" + _recBuffer.get(0) + " " + _recBuffer.get(1) +
+                          " " + _recBuffer.get(2) + " " + _recBuffer.get(3) + " " + _recBuffer.get(4) + " " +
+                          _recBuffer.get(5) + " ");
+                }
+
+                //Log.i(TAG,
+                //      "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX + " SMAPLINGRATE_TOX=" +
+                //      SMAPLINGRATE_TOX);
 
                 audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                         (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2),

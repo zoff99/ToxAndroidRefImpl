@@ -74,11 +74,11 @@ public class NativeAudio
 
     public static void rec_buffer_ready(int rec_buffer_num)
     {
-        Log.i(TAG, "rec_buffer_ready:num=" + rec_buffer_num);
+        // Log.i(TAG, "rec_buffer_ready:num=" + rec_buffer_num);
         // TODO: workaround. sometimes mute button does not mute mic? find a real fix
         if (!microphone_muted)
         {
-            Log.i(TAG, "rec_buffer_ready:002");
+            // Log.i(TAG, "rec_buffer_ready:002");
             new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num).execute();
         }
     }

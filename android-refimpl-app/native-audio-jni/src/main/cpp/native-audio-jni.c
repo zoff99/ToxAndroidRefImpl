@@ -247,8 +247,8 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 // this callback handler is called every time a buffer finishes recording
 void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:bufferq=%p recorderBufferQueue=%p cur_rec_buf=%d",
-                        bq, recorderBufferQueue, (int) cur_rec_buf);
+    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:bufferq=%p recorderBufferQueue=%p cur_rec_buf=%d",
+    //                    bq, recorderBufferQueue, (int) cur_rec_buf);
 
     int nextSize = 0;
     short *nextBuffer = NULL;
@@ -258,32 +258,32 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
     if ((nextSize > 0) && (nextBuffer))
     {
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:001");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:001");
 
         if (bq == NULL)
         {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:002");
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:002");
             return;
         }
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:003");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:003");
 
         // enque the buffer
         SLresult result;
         result = (*bq)->Enqueue(bq, nextBuffer, nextSize);
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:004:res=%d", (int) result);
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:004:res=%d", (int) result);
 
         // signal Java code that a new record data is available in buffer #cur_rec_buf
         if ((NativeAudio_class) && (rec_buffer_ready_method))
         {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:005:class=%p method=%p",
-                                NativeAudio_class, rec_buffer_ready_method);
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:005:class=%p method=%p",
+            //                     NativeAudio_class, rec_buffer_ready_method);
 
             JNIEnv *jnienv2;
             jnienv2 = jni_getenv();
 
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:006:jnienv2=%p", jnienv2);
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:006:jnienv2=%p", jnienv2);
 
             if (jnienv2 == NULL)
             {
@@ -294,7 +294,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                 (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **) &jnienv2, &args);
             }
 
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:007:jnienv2=%p", jnienv2);
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:007:jnienv2=%p", jnienv2);
 
             (*jnienv2)->CallStaticVoidMethod(jnienv2, NativeAudio_class, rec_buffer_ready_method, (int) cur_rec_buf);
 
@@ -308,7 +308,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         cur_rec_buf = 0;
     }
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:999");
+    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:999");
 }
 
 
