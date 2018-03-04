@@ -215,7 +215,7 @@ compile:
   - . ~/pp;cd ~/build/;make install
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.7.0 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
   - . ~/pp;cd ~/build/;export FFCXXFLAGS=" -O3 $CF2 $CF3 ";export FFCFLAGS=" -O3 $CF2 $CF3 ";$_s_/libvpx/configure
