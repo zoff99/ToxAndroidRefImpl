@@ -20,11 +20,14 @@
 package com.zoffcc.applications.nativeaudio;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 
 public class NativeAudio
 {
+    private static final String TAG = "trifa.NativeAudio";
+
     public static final int n_audio_in_buffer_max_count = 5;
     public static ByteBuffer[] n_audio_buffer = new ByteBuffer[n_audio_in_buffer_max_count];
     public static int n_cur_buf = 1;
@@ -91,13 +94,15 @@ public class NativeAudio
 
     public static void rec_buffer_ready(int rec_buffer_num)
     {
-
+        Log.i(TAG, "rec_buffer_ready:num=" + rec_buffer_num);
     }
 
     /**
      * Native methods, implemented in jni folder
      */
     public static native void createEngine(int num_bufs);
+
+    // ---------------------
 
     public static native void createBufferQueueAudioPlayer(int sampleRate, int channels, int num_bufs);
 
@@ -110,6 +115,20 @@ public class NativeAudio
     public static native int isPlaying();
 
     public static native boolean enableReverb(boolean enabled);
+
+    // ---------------------
+
+    public static native void createAudioRecorder(int sampleRate, int num_bufs);
+
+    public static native void set_JNI_audio_rec_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num);
+
+    public static native int isRecording();
+
+    public static native int StartREC(int buf_num);
+
+    public static native boolean StopREC();
+
+    // ---------------------
 
     public static native void shutdownEngine();
     // ------- DEBUG -------

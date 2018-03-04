@@ -519,9 +519,8 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_enableReverb(JNIEn
 
 
 
-
 // create audio recorder: recorder is not in fast path
-void Java_com_example_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv* env, jclass clazz, jint sampleRate, jint num_bufs)
+void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv* env, jclass clazz, jint sampleRate, jint num_bufs)
 {
     SLresult result;
 
