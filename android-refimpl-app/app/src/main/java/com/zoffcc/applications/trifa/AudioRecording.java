@@ -551,7 +551,7 @@ public class AudioRecording extends Thread
     public static class send_audio_frame_to_toxcore_from_native extends AsyncTask<Void, Void, String>
     {
         int audio_send_res = 0;
-        int bufnum_ = 1;
+        int bufnum_ = 0;
 
         public send_audio_frame_to_toxcore_from_native(int bufnum)
         {
