@@ -29,8 +29,8 @@ machine:
     AND_READELF_X86: "$_toolchain_/x86/bin/i686-linux-android-readelf"
     AND_ARTEFACT_DIR_X86: "x86"
 # --- Android build ---
-    CF2: " -ftree-vectorize -ffast-math "
-    CF3: " -funsafe-math-optimizations "
+    CF2: " -ftree-vectorize "
+    CF3: " -funsafe-math-optimizations -ffast-math "
 
     # ---------------------------------------------------
     # c-toxcore v0.1.9  a429ef4a28a5e5e0ad010efffb76d2abc3ada0af
@@ -244,7 +244,7 @@ compile:
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -O3 $CF2 $CF3 ";export CFLAGS=" -O3 $CF2 $CF3 ";$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -O3 $CF2 ";export CFLAGS=" -O3 $CF2 ";$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
