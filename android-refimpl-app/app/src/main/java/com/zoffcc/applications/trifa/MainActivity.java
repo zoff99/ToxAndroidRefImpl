@@ -2862,6 +2862,7 @@ public class MainActivity extends AppCompatActivity
                     NativeAudio.sampling_rate = (int) sampling_rate_;
                     NativeAudio.channel_count = channels_;
                     Log.i(TAG, "audio_play:NativeAudio restart Engine");
+                    // TODO: locking? or something like that
                     NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
                 }
 
