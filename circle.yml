@@ -218,7 +218,7 @@ compile:
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.7.0 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libvpx/configure
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";$_s_/libvpx/configure
       --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
       --sdk-path=/home/ubuntu/android-ndk
       --disable-examples
