@@ -159,6 +159,20 @@ JNIEnv *jni_getenv()
 }
 
 
+int android_find_class_global(char *name, jclass *ret)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    *ret = (*jnienv2)->FindClass(jnienv2, name);
+
+    if(!*ret)
+    {
+        return 0;
+    }
+
+    *ret = (*jnienv2)->NewGlobalRef(jnienv2, *ret);
+    return 1;
+}
 
 // --------------------------
 
@@ -232,6 +246,9 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 // this callback handler is called every time a buffer finishes recording
 void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
+    int nextSize = 0;
+    short *nextBuffer = NULL;
+
     nextBuffer = (short *) audio_rec_buffer[cur_rec_buf];
     nextSize = audio_rec_buffer_size[cur_rec_buf];
 
@@ -537,15 +554,15 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JN
 	uint32_t rec_samplerate =  SL_SAMPLINGRATE_16;
 	if ((int)sampleRate == 48000)
 	{
-		rec_samplerate = SL_SAMPLINGRATE_48
+		rec_samplerate = SL_SAMPLINGRATE_48;
 	}
 	else if ((int)sampleRate == 8000)
 	{
-		rec_samplerate = SL_SAMPLINGRATE_8
+		rec_samplerate = SL_SAMPLINGRATE_8;
 	}
 	else if ((int)sampleRate == 16000)
 	{
-		rec_samplerate = SL_SAMPLINGRATE_16
+		rec_samplerate = SL_SAMPLINGRATE_16;
 	}
 
     // configure audio sink
@@ -565,13 +582,13 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JN
             &audioSnk, 1, id, req);
 
     if (SL_RESULT_SUCCESS != result) {
-        return JNI_FALSE;
+        return;
     }
 
     // realize the audio recorder
     result = (*recorderObject)->Realize(recorderObject, SL_BOOLEAN_FALSE);
     if (SL_RESULT_SUCCESS != result) {
-        return JNI_FALSE;
+        return;
     }
 
     // get the record interface
@@ -667,6 +684,9 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
     }
 
     cur_rec_buf = bufnum;
+
+    int nextSize = 0;
+    short *nextBuffer = NULL;
     nextBuffer = (short *) audio_rec_buffer[cur_rec_buf];
     nextSize = audio_rec_buffer_size[cur_rec_buf];
 	cur_rec_buf++;
@@ -683,11 +703,11 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
         }
 
 		// in case already recording, stop recording and clear buffer queue
+        SLresult result;
 		result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
 		result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
 
         // enque the buffer
-        SLresult result;
 		result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
         if (SL_RESULT_SUCCESS != result)
         {
