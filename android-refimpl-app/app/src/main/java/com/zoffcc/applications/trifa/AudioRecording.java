@@ -34,6 +34,7 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_rec_audio_in_buffer_max_count;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audiorec_asynctask;
@@ -425,15 +426,18 @@ public class AudioRecording extends Thread
                                 {
                                     try
                                     {
-                                        _recBuffer.rewind();
-                                        _recBuffer.put(_tempBufRec);
-                                        audio_send_res2 = toxav_audio_send_frame(
-                                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                (long) (readBytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                                        if (audio_send_res2 != 0)
+                                        if (native_audio_engine_down == true)
                                         {
-                                            Log.i(TAG, "audio:res=" + audio_send_res2 + ":" +
-                                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res2));
+                                            _recBuffer.rewind();
+                                            _recBuffer.put(_tempBufRec);
+                                            audio_send_res2 = toxav_audio_send_frame(
+                                                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                    (long) (readBytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                                            if (audio_send_res2 != 0)
+                                            {
+                                                Log.i(TAG, "audio:res=" + audio_send_res2 + ":" +
+                                                           ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res2));
+                                            }
                                         }
                                     }
                                     catch (Exception e)
@@ -515,14 +519,17 @@ public class AudioRecording extends Thread
         {
             try
             {
-                _recBuffer.rewind();
-                _recBuffer.put(_tempBufRec);
-                audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                        (long) (readBytes_ / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                if (audio_send_res != 0)
+                if (native_audio_engine_down == true)
                 {
-                    Log.i(TAG,
-                          "audio:res=" + audio_send_res + ":" + ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                    _recBuffer.rewind();
+                    _recBuffer.put(_tempBufRec);
+                    audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                            (long) (readBytes_ / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                    if (audio_send_res != 0)
+                    {
+                        Log.i(TAG, "audio:res=" + audio_send_res + ":" +
+                                   ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                    }
                 }
             }
             catch (Exception e)
@@ -565,41 +572,45 @@ public class AudioRecording extends Thread
         {
             try
             {
-                _recBuffer.rewind();
-                NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
-                _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
-
-                if (DEBUG_MIC_DATE_LOGGING)
+                if (native_audio_engine_down == true)
                 {
-                    Log.i(TAG, "send_audio_frame_to_toxcore_from_native:1:" +
-                               NativeAudio.n_rec_audio_buffer[bufnum_].get(0) + " " +
-                               NativeAudio.n_rec_audio_buffer[bufnum_].get(1) + " " +
-                               NativeAudio.n_rec_audio_buffer[bufnum_].get(2) + " " +
-                               NativeAudio.n_rec_audio_buffer[bufnum_].get(3) + " " +
-                               NativeAudio.n_rec_audio_buffer[bufnum_].get(4) + " " +
-                               NativeAudio.n_rec_audio_buffer[bufnum_].get(5) + " ");
 
+                    _recBuffer.rewind();
+                    NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                    _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
 
-                    Log.i(TAG,
-                          "send_audio_frame_to_toxcore_from_native:2:" + _recBuffer.get(0) + " " + _recBuffer.get(1) +
-                          " " + _recBuffer.get(2) + " " + _recBuffer.get(3) + " " + _recBuffer.get(4) + " " +
-                          _recBuffer.get(5) + " ");
-                }
-
-                //Log.i(TAG,
-                //      "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX + " SMAPLINGRATE_TOX=" +
-                //      SMAPLINGRATE_TOX);
-
-                audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                        (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2),
-
-                                                        CHANNELS_TOX, SMAPLINGRATE_TOX);
-
-                if (DEBUG_MIC_DATE_LOGGING)
-                {
-                    if (audio_send_res != 0)
+                    if (DEBUG_MIC_DATE_LOGGING)
                     {
-                        Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" + ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                        Log.i(TAG, "send_audio_frame_to_toxcore_from_native:1:" +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(0) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(1) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(2) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(3) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(4) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(5) + " ");
+
+
+                        Log.i(TAG, "send_audio_frame_to_toxcore_from_native:2:" + _recBuffer.get(0) + " " +
+                                   _recBuffer.get(1) + " " + _recBuffer.get(2) + " " + _recBuffer.get(3) + " " +
+                                   _recBuffer.get(4) + " " + _recBuffer.get(5) + " ");
+                    }
+
+                    //Log.i(TAG,
+                    //      "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX + " SMAPLINGRATE_TOX=" +
+                    //      SMAPLINGRATE_TOX);
+
+                    audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                            (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2),
+
+                                                            CHANNELS_TOX, SMAPLINGRATE_TOX);
+
+                    if (DEBUG_MIC_DATE_LOGGING)
+                    {
+                        if (audio_send_res != 0)
+                        {
+                            Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" +
+                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                        }
                     }
                 }
             }

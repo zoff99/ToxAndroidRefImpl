@@ -32,6 +32,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.zoffcc.applications.nativeaudio.NativeAudio;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -69,7 +71,6 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FULL_SPEED_SECONDS_AFTER_WENT_ONLINE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
@@ -471,14 +472,17 @@ public class TrifaToxService extends Service
                 }
                 else
                 {
-                    tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5, my_tox_id_local.length()));
-                    global_my_name = ("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5, my_tox_id_local.length()));
+                    tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5,
+                                                                           my_tox_id_local.length()));
+                    global_my_name = ("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5,
+                                                                           my_tox_id_local.length()));
                     Log.i(TAG, "AAA:005");
                 }
 
                 if (tox_self_get_status_message_size() > 0)
                 {
-                    global_my_status_message = tox_self_get_status_message().substring(0, (int) tox_self_get_status_message_size());
+                    global_my_status_message = tox_self_get_status_message().substring(0,
+                                                                                       (int) tox_self_get_status_message_size());
                     // Log.i(TAG, "AAA:008:" + global_my_status_message + " size=" + tox_self_get_status_message_size());
                 }
                 else
@@ -512,7 +516,8 @@ public class TrifaToxService extends Service
                     // Log.i(TAG, "loading_friend:" + fc + " pubkey=" + tox_friend_get_public_key__wrapper(MainActivity.friends[fc]));
 
                     FriendList f;
-                    List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+                    List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
+                            tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
 
                     // Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
 
@@ -588,12 +593,18 @@ public class TrifaToxService extends Service
                     else
                     {
                         // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
-                        orma.updateFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_CONNECTION_on_off(get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
+                        orma.updateFriendList().tox_public_key_stringEq(
+                                tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(
+                                f.name).status_message(f.status_message).TOX_CONNECTION(
+                                f.TOX_CONNECTION).TOX_CONNECTION_on_off(
+                                get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(
+                                f.TOX_USER_STATUS).execute();
                         // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
                     }
 
                     FriendList f_check;
-                    List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+                    List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(
+                            tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
                     // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
                     try
                     {
@@ -645,7 +656,8 @@ public class TrifaToxService extends Service
                 {
                     bootstrapping = true;
                     global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                    Log.i(TAG, "global_self_last_went_offline_timestamp[1]=" + global_self_last_went_offline_timestamp + " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
+                    Log.i(TAG, "global_self_last_went_offline_timestamp[1]=" + global_self_last_went_offline_timestamp +
+                               " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
                     Log.i(TAG, "bootrapping:set to true[1]");
                     try
                     {
@@ -706,7 +718,8 @@ public class TrifaToxService extends Service
                 }
 
                 global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp + " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
+                Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp +
+                           " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
 
 
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -720,16 +733,19 @@ public class TrifaToxService extends Service
                     {
                         if (tox_iteration_interval_ms < 3)
                         {
-                            Log.i(TAG, "tox_iterate:(tox_iteration_interval_ms < 2ms!!):" + tox_iteration_interval_ms + "ms");
+                            Log.i(TAG, "tox_iterate:(tox_iteration_interval_ms < 2ms!!):" + tox_iteration_interval_ms +
+                                       "ms");
                             Thread.sleep(3);
                         }
                         else
                         {
                             if (PREF__X_battery_saving_mode)
                             {
-                                if ((global_self_connection_status != ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value) && (Callstate.state == 0))
+                                if ((global_self_connection_status !=
+                                     ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value) && (Callstate.state == 0))
                                 {
-                                    if ((global_self_last_went_online_timestamp + FULL_SPEED_SECONDS_AFTER_WENT_ONLINE * 1000) < System.currentTimeMillis())
+                                    if ((global_self_last_went_online_timestamp +
+                                         FULL_SPEED_SECONDS_AFTER_WENT_ONLINE * 1000) < System.currentTimeMillis())
                                     {
                                         Thread.sleep(TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE); // sleep longer!!
                                     }
@@ -758,7 +774,8 @@ public class TrifaToxService extends Service
                             {
                                 if (global_self_last_went_offline_timestamp != -1)
                                 {
-                                    if (global_self_last_went_offline_timestamp + TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS < System.currentTimeMillis())
+                                    if (global_self_last_went_offline_timestamp +
+                                        TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS < System.currentTimeMillis())
                                     {
                                         Log.i(TAG, "offline and we have internet connectivity --> bootstrap again ...");
                                         global_self_last_went_offline_timestamp = System.currentTimeMillis();
@@ -767,7 +784,8 @@ public class TrifaToxService extends Service
                                         Log.i(TAG, "bootrapping:set to true[2]");
                                         try
                                         {
-                                            tox_service_fg.change_notification_fg(0); // set notification to "bootstrapping"
+                                            tox_service_fg.change_notification_fg(
+                                                    0); // set notification to "bootstrapping"
                                         }
                                         catch (Exception e)
                                         {
@@ -802,7 +820,9 @@ public class TrifaToxService extends Service
                     if (s_time + 4000 < System.currentTimeMillis())
                     {
                         tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
-                        Log.i(TAG, "tox_iterate:--END--:took" + (long) (((float) (s_time - System.currentTimeMillis()) / 1000f)) + "s, new inerval=" + tox_iteration_interval_ms + "ms");
+                        Log.i(TAG, "tox_iterate:--END--:took" +
+                                   (long) (((float) (s_time - System.currentTimeMillis()) / 1000f)) +
+                                   "s, new inerval=" + tox_iteration_interval_ms + "ms");
                     }
                 }
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -815,6 +835,15 @@ public class TrifaToxService extends Service
                 try
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    NativeAudio.shutdownEngine();
                 }
                 catch (Exception e)
                 {
