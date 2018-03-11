@@ -4049,7 +4049,10 @@ public class MainActivity extends AppCompatActivity
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = true;
                 cc.friend_item = f2;
-                friend_list_fragment.modify_friend(cc, cc.is_friend);
+                if (friend_list_fragment != null)
+                {
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
             }
             catch (Exception e)
             {
@@ -6021,8 +6024,9 @@ public class MainActivity extends AppCompatActivity
 
     static void move_tmp_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
     {
-        Log.i(TAG, "move_tmp_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" +
-                   dst_file_name);
+        // Log.i(TAG, "move_tmp_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" +
+        //           dst_file_name);
+
         try
         {
             if (VFS_ENCRYPT)
