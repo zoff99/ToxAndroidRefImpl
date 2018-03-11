@@ -4238,7 +4238,7 @@ public class MainActivity extends AppCompatActivity
                     if (!f.fos_open)
                     {
                         fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                        Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        // Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                         f.fos_open = true;
                         update_filetransfer_db_fos_open(f);
@@ -4249,8 +4249,8 @@ public class MainActivity extends AppCompatActivity
                         if (fos == null)
                         {
                             fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                            Log.i(TAG,
-                                  "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                            // Log.i(TAG,
+                            //       "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
                                              fos);
                             f.fos_open = true;
@@ -4268,7 +4268,7 @@ public class MainActivity extends AppCompatActivity
                     if (!f.fos_open)
                     {
                         fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                        Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        // Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
                                                 fos);
                         f.fos_open = true;
@@ -4281,8 +4281,8 @@ public class MainActivity extends AppCompatActivity
                         if (fos == null)
                         {
                             fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                            Log.i(TAG,
-                                  "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                            // Log.i(TAG,
+                            //      "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos_normal.put(
                                     tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                             f.fos_open = true;
