@@ -426,7 +426,7 @@ public class AudioRecording extends Thread
                                 {
                                     try
                                     {
-                                        if (native_audio_engine_down == true)
+                                        if (native_audio_engine_down == false)
                                         {
                                             _recBuffer.rewind();
                                             _recBuffer.put(_tempBufRec);
@@ -519,7 +519,7 @@ public class AudioRecording extends Thread
         {
             try
             {
-                if (native_audio_engine_down == true)
+                if (native_audio_engine_down == false)
                 {
                     _recBuffer.rewind();
                     _recBuffer.put(_tempBufRec);
@@ -572,7 +572,7 @@ public class AudioRecording extends Thread
         {
             try
             {
-                if (native_audio_engine_down == true)
+                if (native_audio_engine_down == false)
                 {
 
                     _recBuffer.rewind();
