@@ -17,6 +17,12 @@
  * Boston, MA  02110-1301, USA.
  */
 buildscript {
+    repositories {
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+    }
     dependencies {
         classpath files('../gwitness/gwit/libs/gwitness.jar')
     }
