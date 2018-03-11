@@ -1157,6 +1157,9 @@ void android_tox_callback_conference_invite_cb(uint32_t friend_number, TOX_CONFE
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_conference_invite_cb_method, (jlong)(unsigned long long)friend_number, (jint)type,
                                      data2, (jlong)(unsigned long long)length);
+
+	// delete jobject --------
+    (*jnienv2)->DeleteLocalRef(jnienv2, data2);
 }
 
 void conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie,
@@ -1195,6 +1198,10 @@ void android_tox_callback_file_recv_chunk_cb(uint32_t friend_number, uint32_t fi
                                      android_tox_callback_file_recv_chunk_cb_method, (jlong)(unsigned long long)friend_number,
                                      (jlong)(unsigned long long)file_number,
                                      (jlong)(unsigned long long)position, data2, (jlong)(unsigned long long)length);
+
+	// delete jobject --------
+    (*jnienv2)->DeleteLocalRef(jnienv2, data2);
+
 }
 
 void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint64_t position, const uint8_t *data,
