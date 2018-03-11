@@ -260,6 +260,37 @@ public class TrifaToxService extends Service
 
                                     try
                                     {
+                                        Runnable myRunnable = new Runnable()
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                vfs.detachThread();
+                                            }
+                                        };
+                                        if (main_handler_s != null)
+                                        {
+                                            main_handler_s.post(myRunnable);
+                                        }
+                                        vfs.detachThread();
+                                        Log.i(TAG, "VFS:detachThread[1a]:OK");
+                                    }
+                                    catch (Exception e5)
+                                    {
+                                        Log.i(TAG, "VFS:detachThread[1a]:EE5:" + e5.getMessage());
+                                        e5.printStackTrace();
+                                    }
+
+                                    try
+                                    {
+                                        /*
+                                         * TODO: fix this on exit
+                                         * UPDATE: seems fixed now with the later unmount, see further down
+                                         * com.zoffcc.applications.trifa W/System.err: java.lang.IllegalStateException: Cannot unmount when threads are still active! (1 threads)
+                                         * com.zoffcc.applications.trifa W/System.err:     at info.guardianproject.iocipher.VirtualFileSystem.unmount(Native Method)
+                                         *
+                                         * https://github.com/guardianproject/IOCipher/blob/480b64685ace4aee416afe4f8e6c1e8b72f640f4/jni/info_guardianproject_iocipher_VirtualFileSystem.cpp#L215
+                                         */
                                         vfs.unmount();
                                         Log.i(TAG, "VFS:unmount[1]:OK");
                                     }
@@ -319,12 +350,35 @@ public class TrifaToxService extends Service
 
                         try
                         {
-                            vfs.unmount();
-                            Log.i(TAG, "VFS:unmount[3]:OK");
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    vfs.detachThread();
+                                }
+                            };
+                            if (main_handler_s != null)
+                            {
+                                main_handler_s.post(myRunnable);
+                            }
+                            vfs.detachThread();
+                            Log.i(TAG, "VFS:detachThread[3a]:OK");
                         }
                         catch (Exception e55)
                         {
-                            Log.i(TAG, "VFS:unmount[3]:EE55:" + e55.getMessage());
+                            Log.i(TAG, "VFS:detachThread[3a]:EE55:" + e55.getMessage());
+                            e55.printStackTrace();
+                        }
+
+                        try
+                        {
+                            vfs.unmount();
+                            Log.i(TAG, "VFS:unmount[3b]:OK");
+                        }
+                        catch (Exception e55)
+                        {
+                            Log.i(TAG, "VFS:unmount[3b]:EE55:" + e55.getMessage());
                             e55.printStackTrace();
                         }
 
