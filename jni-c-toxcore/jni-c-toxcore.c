@@ -2147,13 +2147,13 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     pthread_join(tid[0], NULL); // wait for toxav iterate thread to end
     toxav_video_thread_stop = 1;
     pthread_join(tid[1], NULL); // wait for toxav video thread to end
+	stop_filter_audio();
     toxav_kill(tox_av_global);
     tox_kill(tox_global);
     tox_av_global = NULL;
     tox_global = NULL;
     dbg(9, "tox_kill ... READY");
 
-	stop_filter_audio();
 }
 
 JNIEXPORT void JNICALL
