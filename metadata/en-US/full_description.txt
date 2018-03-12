@@ -4,3 +4,4 @@ It's still currently in heavy development.
 <b>More Information:</b>
 <a href="https://tox.zoff.cc">about Tox</a>
 <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a>
+<a href="https://matrix.to/#/#freenode_#tox:matrix.org">Join Toxuser Channel</a>
