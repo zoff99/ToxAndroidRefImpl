@@ -13,6 +13,11 @@ Build Status
 **Bintray:** [![Download](https://api.bintray.com/packages/zoff99/maven/trifajni/images/download.svg)](https://bintray.com/zoff99/maven/trifajni/_latestVersion)
 **Methods:** <a href="http://www.methodscount.com/?lib=com.zoffcc.applications.trifajni%3Atrifa-jni-lib%3A%2B"><img src="https://img.shields.io/badge/Methods and size-2 | 2525 KB-e91e63.svg"/></a>
 
+Get in touch
+=
+* <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
+* <a href="https://matrix.to/#/#freenode_#tox:matrix.org">Join Toxuser Channel</a><br>
+
 Compile in Android Studio
 =
 **Open an existing Project:**<br>
