@@ -8,6 +8,8 @@ machine:
 # --- Android build ---
     _toolchain_: "/home/ubuntu/c-toxcore/toolchains/"
     _s_: "/home/ubuntu/c-toxcore/src/"
+    CF2: " -ftree-vectorize "
+    CF3: " -funsafe-math-optimizations -ffast-math "
     # ---- arm -----
     AND_TOOLCHAIN_ARCH: "arm"
     AND_TOOLCHAIN_ARCH2: "arm-linux-androideabi"
@@ -31,30 +33,6 @@ machine:
 # --- Android build ---
 
     # ---------------------------------------------------
-    # v0.1.10 more vpx tweaks        eab6e81ec9ed5b88aa712093ea53c802ff81d611
-    # v0.1.10 cfg_dec2               3921fd04ee233a21befa960cf26214410e1b6582
-    # v0.1.10 cfg_dec                94bf0a32adac079b7739c6d32cfc0e504993f962
-    # v0.1.10 tweaks3   25d1fce22ddc87089cf53e9b3c5bcf9d56a57374
-    # v0.1.10 mtweaks2  d4c11ecbc45faf0e66fbe8c4df59b8087d22f409
-    # v0.1.10 mobtweaks f73b345c21fae0e0e56fae86dc82f63188a00aca
-    # v0.1.10 vp8tweaks cb5686de37e2b2d705ca4bd25f3a3beeef8bc152
-    # VP8 0.15 rsiliet  3bd08f62c4b3947bf7441e1d7f79fd48cc02521d
-    # VP8 0.14  lag     b8ad9e88c18c683beb46a8f62a0e88ee647698ff
-    # VP8 0.13targetbr  7dcef8c5b97adb70445ea68d9c31f9c458317232
-    # VP9 0.12          ed6ad27e2e997b249e6c7a896fbc140eb7779a37
-    # VP8 0.11          bc5d40a621b62b3db25dcccbcdbcbcd72992c5df
-    # VP8 0.10 threads  04a5ad10f14587a838728e32a2a9b3714fb8e8bf
-    # VP8 0.9 thresh    0bc98333a2108f31dab0c6938c3a3bb00327f0c1
-    # VP8 0.8 VPX_CQ    478c902611ff1ce28fb64ce1c18b9c70a0d51be3
-    # VP8 0.7 maxdist   b9623f86a4a5b2da3e540fa117f57b05785622b6
-    # VP8 revert        44e77e4b7f369681ef17024db6f5bcded3a79129
-    #
-    # VP8 0.6           08f0ea119c57c1596e899ae454b82534797873f8
-    # VP8 0.5           f22aaebbb5079b2924d46c6a9a20821e28479253
-    # VP8 0.4           e943446e0c6144948a9b9e6476ff7106744eeea9
-    # VP8 0.3           30f2a5917f71a2b1f7296a7e556ff1a5af84f8af
-    # VP9 0.2           c67afc441da958a9006a5938327cef929e1e9cb9
-    # VP9 0.1           b1753a6388b0571cbdd561eb6e533cf597074247
     # c-toxcore v0.1.9  a429ef4a28a5e5e0ad010efffb76d2abc3ada0af
     # c-toxcore v0.1.8  f6db9333e2d1262e7ba3846563c30f63c98ffa38
     # c-toxcore v0.1.7  48c86e942d487a8856cbd25797b320bfb1879ddc
@@ -67,7 +45,7 @@ machine:
 
     # c-toxcore version
     # AND_CTOXCORE_VERSION: "eab6e81ec9ed5b88aa712093ea53c802ff81d611"
-    AND_CTOXCORE_VERSION: "zoff99/_0.1.10_2017_video_fix_07a"
+    AND_CTOXCORE_VERSION: "zoff99/_0.1.10_2017_video_fix_09"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
     AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
@@ -113,7 +91,7 @@ dependencies:
   - java -version ; exit 0
   - gcc --version ; exit 0
   - clang --version ; exit 0
-  - sudo apt-get install astyle ; exit 0
+  - astyle --version ; exit 0
 
   ### ----- check code style ------
   - cd .. ; cp -av ToxAndroidRefImpl ./astyle_check/
@@ -173,7 +151,11 @@ dependencies:
   - echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
   - echo y | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3"
   - echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
-  #- echo y | $ANDROID_HOME/tools/bin/sdkmanager --update
+  # -- why is this not just called "cmake" ? --
+  - cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "$cmake_pkg_name"
+  # -- why is this not just called "cmake" ? --
+ #- echo y | $ANDROID_HOME/tools/bin/sdkmanager --update
 
 #    echo y | android update sdk --no-ui --all --filter "tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository"
 #    echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
@@ -233,17 +215,21 @@ compile:
   - . ~/pp;cd ~/build/;make install
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.7.0 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
-    --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=armv7-android-gcc
-    --size-limit=16384x16384
-    --enable-postproc
-    --enable-multi-res-encoding
-    --enable-temporal-denoising
-    --enable-vp9-temporal-denoising
-    --enable-vp9-postproc
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";$_s_/libvpx/configure
+      --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
+      --sdk-path=/home/ubuntu/android-ndk
+      --disable-examples
+      --disable-unit-tests
+      --target=armv7-android-gcc
+      --size-limit=16384x16384
+      --enable-onthefly-bitpacking
+      --enable-runtime-cpu-detect
+      --enable-realtime-only
+      --enable-multi-res-encoding
+      --enable-temporal-denoising
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -252,11 +238,11 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.2.1 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3-beta https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 ";$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -306,6 +292,10 @@ compile:
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
+  # --- filter_audio ---
+  - . ~/pp;cd jni-c-toxcore/filter_audio; make clean; make
+  - . ~/pp;cd jni-c-toxcore/filter_audio; ls -hal
+  # --- filter_audio ---
 
   - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
@@ -317,6 +307,7 @@ compile:
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a
+    ./filter_audio/libfilteraudio.a
     coffeecatch.c coffeejni.c
     -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
 
@@ -361,20 +352,18 @@ compile:
   - . ~/pp;cd ~/build/;make install
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.6.1 https://github.com/webmproject/libvpx.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.7.0 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
 
   # --force-target=x86-android-gcc --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --sdk-path=/Downloads/android-ndk-r9d/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr 
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr 
     --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --disable-unit-tests
     --sdk-path=/home/ubuntu/android-ndk --target=x86-android-gcc
     --size-limit=16384x16384
-    --enable-postproc
+    --enable-realtime-only
     --enable-multi-res-encoding
     --enable-temporal-denoising
-    --enable-vp9-temporal-denoising
-    --enable-vp9-postproc
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -383,11 +372,11 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.2.1 https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3-beta https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/opus/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 ";$_s_/opus/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -443,6 +432,10 @@ compile:
   - find / -name 'cpu-features*' 2>/dev/null ; exit 0
   - . ~/pp;cd jni-c-toxcore/; find .. -name 'cpu-features*' 2>/dev/null ; exit 0
 
+  # --- filter_audio ---
+  - . ~/pp;cd jni-c-toxcore/filter_audio; make clean; make
+  - . ~/pp;cd jni-c-toxcore/filter_audio; ls -hal
+  # --- filter_audio ---
 
   - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
@@ -454,6 +447,7 @@ compile:
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libvpx.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libopus.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libsodium.a
+    ./filter_audio/libfilteraudio.a
     coffeecatch.c coffeejni.c
     -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
 
@@ -579,13 +573,13 @@ compile:
     - echo 'mtools_skip_check=1' > ~/.mtoolsrc
     - android list targets
 #
-    - if [ "$EMU_" == "appemu23" ]; then echo "no" | android create avd -n appemu23 -f -t android-23 --abi default/armeabi-v7a --skin "WXGA720" ; fi
+    - if [ "$EMU_" == "appemu23" ]; then echo "no" | android create avd -n appemu23 -f -t android-23 --abi armeabi-v7a --skin "WXGA720" ; fi
     - if [ "$EMU_" == "appemu23" ]; then cat ~/.android/avd/appemu23.avd/config.ini ; fi
 #
-    - if [ "$EMU_" == "appemu21" ]; then echo "no" | android create avd -n appemu21 -f -t android-21 --abi default/armeabi-v7a --skin "WXGA720" ; fi
+    - if [ "$EMU_" == "appemu21" ]; then echo "no" | android create avd -n appemu21 -f -t android-21 --abi armeabi-v7a --skin "WXGA720" ; fi
     - if [ "$EMU_" == "appemu21" ]; then cat ~/.android/avd/appemu21.avd/config.ini ; fi
 #
-    - if [ "$EMU_" == "appemu10" ]; then echo "no" | android create avd -n appemu10 -f -t android-10 --abi default/armeabi --skin "WQVGA432" ; fi
+    - if [ "$EMU_" == "appemu10" ]; then echo "no" | android create avd -n appemu10 -f -t android-10 --abi armeabi --skin "WQVGA432" ; fi
     - if [ "$EMU_" == "appemu10" ]; then cat ~/.android/avd/appemu10.avd/config.ini ; fi
 #
     - echo "$EMU_"
