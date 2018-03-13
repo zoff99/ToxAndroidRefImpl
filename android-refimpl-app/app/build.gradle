@@ -17,12 +17,21 @@
  * Boston, MA  02110-1301, USA.
  */
 buildscript {
+    repositories {
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+    }
     dependencies {
         classpath files('../gwitness/gwit/libs/gwitness.jar')
     }
 }
 
 // gradlew -q calculateChecksums
+//
+// gradlew :app:dependencies
+// gradlew :app:androidDependencies.
 
 apply plugin: 'com.android.application'
 apply plugin: 'witness'
@@ -55,36 +64,42 @@ android {
         exclude 'lib/armeabi/libsqlcipher.so'
         exclude 'lib/armeabi/libiocipher.so'
         exclude 'lib/armeabi/libspeex.so'
+        exclude 'lib/armeabi/libblasV8.so'
         //
         exclude 'lib/arm64-v8a/libRSSupport.so'
         exclude 'lib/arm64-v8a/librsjni.so'
         exclude 'lib/arm64-v8a/libsqlcipher.so'
         exclude 'lib/arm64-v8a/libiocipher.so'
         exclude 'lib/arm64-v8a/libspeex.so'
+        exclude 'lib/arm64-v8a/libblasV8.so'
         //
         exclude 'lib/mips64/libRSSupport.so'
         exclude 'lib/mips64/librsjni.so'
         exclude 'lib/mips64/libsqlcipher.so'
         exclude 'lib/mips64/libiocipher.so'
         exclude 'lib/mips64/libspeex.so'
+        exclude 'lib/mips64/libblasV8.so'
         //
         exclude 'lib/mips/libRSSupport.so'
         exclude 'lib/mips/librsjni.so'
         exclude 'lib/mips/libsqlcipher.so'
         exclude 'lib/mips/libiocipher.so'
         exclude 'lib/mips/libspeex.so'
+        exclude 'lib/mips/libblasV8.so'
         //
         // exclude 'lib/x86/libRSSupport.so'
         // exclude 'lib/x86/librsjni.so'
         // exclude 'lib/x86/libsqlcipher.so'
         // exclude 'lib/x86/libiocipher.so'
         // exclude 'lib/x86/libspeex.so'
+        // exclude 'lib/x86/libblasV8.so'
         //
         exclude 'lib/x86_64/libRSSupport.so'
         exclude 'lib/x86_64/librsjni.so'
         exclude 'lib/x86_64/libsqlcipher.so'
         exclude 'lib/x86_64/libiocipher.so'
         exclude 'lib/x86_64/libspeex.so'
+        exclude 'lib/x86_64/libblasV8.so'
         //
     }
 
@@ -120,6 +135,7 @@ android {
 
         renderscriptTargetApi 25
         renderscriptSupportModeEnabled true
+        // renderscriptSupportModeBlasEnabled true
 
         // Enabling multidex support
         multiDexEnabled true
@@ -209,7 +225,9 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:27.0.2'
     compile 'com.android.support:cardview-v7:27.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.android.support:multidex:1.0.3'
+    androidTestCompile 'com.android.support:multidex:1.0.3'
+    androidTestCompile 'com.android.support:multidex-instrumentation:1.0.3'
     compile 'info.guardianproject.iocipher:IOCipher:0.4'
     compile 'info.guardianproject.netcipher:netcipher:2.0.0-alpha1'
     compile 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
@@ -246,7 +264,7 @@ dependencyVerification {
             'com.android.support:design:fa5c27a705310e95a8f4099c98777132ed901a0d69178942306bb34cd76f0d57',
             'com.android.support:recyclerview-v7:3eb953930f10941f2b0447ec123a9b03d2746a42a99c523e82c3ece3308ca70b',
             'com.android.support.constraint:constraint-layout:b0c688cc2b7172608f8153a689d746da40f71e52d7e2fe2bfd9df2f92db77085',
-            'com.android.support:multidex:60df8e7153fabdcf3a6a48a2ce5980b599cf25cbeb3b689b7b615975ca731840',
+            'com.android.support:multidex:ecf6098572e23b5155bab3b9a82b2fd1530eda6c6c157745e0f5287c66eec60c',
             'info.guardianproject.iocipher:IOCipher:ab7da0f23e256a2ced9492c73e37812c26e7beccc1a99815e6d65a75728ba6d3',
             'info.guardianproject.netcipher:netcipher:eeeb5d0d95ccfe176b4296cbd71a9a24c6efb0bab5c4025a8c6bc36abdddfc75',
             'info.guardianproject.netcipher:netcipher-okhttp3:548b24763c57d273e1e3650e9974644f91c6a79350961905476456b6a485c905',

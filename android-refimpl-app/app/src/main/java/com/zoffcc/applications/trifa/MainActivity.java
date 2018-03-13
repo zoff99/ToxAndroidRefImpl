@@ -2029,7 +2029,7 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db_status(FriendList f)
     {
-        Log.i(TAG, "update_friend_in_db_status:f=" + f);
+        // Log.i(TAG, "update_friend_in_db_status:f=" + f);
 
         int numrows = orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
@@ -2862,6 +2862,7 @@ public class MainActivity extends AppCompatActivity
                     NativeAudio.sampling_rate = (int) sampling_rate_;
                     NativeAudio.channel_count = channels_;
                     Log.i(TAG, "audio_play:NativeAudio restart Engine");
+                    // TODO: locking? or something like that
                     NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
                 }
 
@@ -4048,7 +4049,10 @@ public class MainActivity extends AppCompatActivity
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = true;
                 cc.friend_item = f2;
-                friend_list_fragment.modify_friend(cc, cc.is_friend);
+                if (friend_list_fragment != null)
+                {
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
             }
             catch (Exception e)
             {
@@ -4234,7 +4238,7 @@ public class MainActivity extends AppCompatActivity
                     if (!f.fos_open)
                     {
                         fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                        Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        // Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                         f.fos_open = true;
                         update_filetransfer_db_fos_open(f);
@@ -4245,8 +4249,8 @@ public class MainActivity extends AppCompatActivity
                         if (fos == null)
                         {
                             fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                            Log.i(TAG,
-                                  "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                            // Log.i(TAG,
+                            //       "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
                                              fos);
                             f.fos_open = true;
@@ -4264,7 +4268,7 @@ public class MainActivity extends AppCompatActivity
                     if (!f.fos_open)
                     {
                         fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                        Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                        // Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
                                                 fos);
                         f.fos_open = true;
@@ -4277,8 +4281,8 @@ public class MainActivity extends AppCompatActivity
                         if (fos == null)
                         {
                             fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                            Log.i(TAG,
-                                  "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
+                            // Log.i(TAG,
+                            //      "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos_normal.put(
                                     tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                             f.fos_open = true;
@@ -6020,8 +6024,9 @@ public class MainActivity extends AppCompatActivity
 
     static void move_tmp_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
     {
-        Log.i(TAG, "move_tmp_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" +
-                   dst_file_name);
+        // Log.i(TAG, "move_tmp_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" +
+        //           dst_file_name);
+
         try
         {
             if (VFS_ENCRYPT)

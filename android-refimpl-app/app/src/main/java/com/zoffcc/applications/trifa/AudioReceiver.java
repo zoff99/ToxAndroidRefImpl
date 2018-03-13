@@ -57,6 +57,8 @@ public class AudioReceiver extends Thread
     static final boolean ACTVIATE_LEC = false;
     static final boolean ACTVIATE_ERVB = false;
 
+    static boolean native_audio_engine_running = false;
+
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
     final static int buffer_multiplier = 4;
     static int buffer_size = 1920 * buffer_multiplier; // TODO: hardcoded is bad!!!!
@@ -214,6 +216,8 @@ public class AudioReceiver extends Thread
 
                 NativeAudio.createEngine(NativeAudio.n_audio_in_buffer_max_count);
 
+                native_audio_engine_running = true;
+
                 int sampleRate = NativeAudio.sampling_rate;
                 int channels = NativeAudio.channel_count;
 
@@ -231,7 +235,7 @@ public class AudioReceiver extends Thread
                     NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer[i], NativeAudio.n_buf_size_in_bytes, i);
                 }
 
-                NativeAudio.n_cur_buf = 1;
+                NativeAudio.n_cur_buf = 0;
                 for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
                 {
                     NativeAudio.n_bytes_in_buffer[i] = 0;
@@ -457,7 +461,9 @@ public class AudioReceiver extends Thread
     {
         stopped = true;
 
+        native_audio_engine_running = false;
         NativeAudio.StopPCM16();
+        NativeAudio.StopREC();
         NativeAudio.shutdownEngine();
 
         System.out.println("NativeAudio:shutdown");

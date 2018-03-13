@@ -8,6 +8,8 @@ machine:
 # --- Android build ---
     _toolchain_: "/home/ubuntu/c-toxcore/toolchains/"
     _s_: "/home/ubuntu/c-toxcore/src/"
+    CF2: " -ftree-vectorize "
+    CF3: " -funsafe-math-optimizations -ffast-math "
     # ---- arm -----
     AND_TOOLCHAIN_ARCH: "arm"
     AND_TOOLCHAIN_ARCH2: "arm-linux-androideabi"
@@ -216,14 +218,18 @@ compile:
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.7.0 https://github.com/webmproject/libvpx.git
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
-    --disable-examples --disable-unit-tests --sdk-path=/home/ubuntu/android-ndk --target=armv7-android-gcc
-    --size-limit=16384x16384
-    --enable-postproc
-    --enable-multi-res-encoding
-    --enable-temporal-denoising
-    --enable-vp9-temporal-denoising
-    --enable-vp9-postproc
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";$_s_/libvpx/configure
+      --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
+      --sdk-path=/home/ubuntu/android-ndk
+      --disable-examples
+      --disable-unit-tests
+      --target=armv7-android-gcc
+      --size-limit=16384x16384
+      --enable-onthefly-bitpacking
+      --enable-runtime-cpu-detect
+      --enable-realtime-only
+      --enable-multi-res-encoding
+      --enable-temporal-denoising
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -236,7 +242,7 @@ compile:
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 ";$_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --disable-shared --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -351,15 +357,13 @@ compile:
   - . ~/pp;mkdir -p ~/build/
 
   # --force-target=x86-android-gcc --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --sdk-path=/Downloads/android-ndk-r9d/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr 
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";$_s_/libvpx/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr 
     --disable-ssse3 --disable-sse4_1 --disable-avx2 --disable-examples --disable-unit-tests
     --sdk-path=/home/ubuntu/android-ndk --target=x86-android-gcc
     --size-limit=16384x16384
-    --enable-postproc
+    --enable-realtime-only
     --enable-multi-res-encoding
     --enable-temporal-denoising
-    --enable-vp9-temporal-denoising
-    --enable-vp9-postproc
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -372,7 +376,7 @@ compile:
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 ";$_s_/opus/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 ";$_s_/opus/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
