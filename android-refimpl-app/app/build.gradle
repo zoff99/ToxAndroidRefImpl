@@ -214,7 +214,7 @@ dependencies {
     //
     //
     //
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.12@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.13@aar'
     //
     //
     //
@@ -246,7 +246,7 @@ dependencies {
 
 dependencyVerification {
     verify = [
-            'com.zoffcc.applications.trifajni:trifa-jni-lib:af0ab4b3c27fbf673aab014d863c3ba8cec70f3be23501223ed95e28d351018b',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:e5f9afad59c5afad1bd750d80fe98e847cd9613dde555816f341bab531b3bffd',
 //
             'com.mikepenz:materialdrawer:f7b380cd85ae55bcd3111855bd9104ba86b5c1160e8a31ae89fe1725c5f3c587',
             'com.mikepenz:google-material-typeface:3c8629e573d311a3edaff1b70aa5ac10183a8e3984acf225b2f996ebd077351c',
