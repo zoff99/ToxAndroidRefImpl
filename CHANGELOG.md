@@ -1,5 +1,27 @@
 # Change Log
 
+## [1.0.15](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.15) (2018-03-14)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.14...1.0.15)
+
+**Closed issues:**
+
+- call icon not responding on Trifa [\#46](https://github.com/zoff99/ToxAndroidRefImpl/issues/46)
+- Logout/Login option is not very clear [\#45](https://github.com/zoff99/ToxAndroidRefImpl/issues/45)
+- can not send File while Friend is offline [\#42](https://github.com/zoff99/ToxAndroidRefImpl/issues/42)
+- Can not send Message when Friend is offline [\#41](https://github.com/zoff99/ToxAndroidRefImpl/issues/41)
+- signal 11 \(SIGSEGV\), code 1 \(SEGV\_MAPERR\)  in getfriend\_id [\#39](https://github.com/zoff99/ToxAndroidRefImpl/issues/39)
+- signal 11 \(SIGSEGV\), code 1 \(SEGV\_MAPERR\)  in getaddress [\#38](https://github.com/zoff99/ToxAndroidRefImpl/issues/38)
+- contact names in TRIfA always stay offline after SECOND 5minute-interruption of connection [\#25](https://github.com/zoff99/ToxAndroidRefImpl/issues/25)
+
+**Merged pull requests:**
+
+- update maven artefact [\#55](https://github.com/zoff99/ToxAndroidRefImpl/pull/55) ([zoff99](https://github.com/zoff99))
+- Updates [\#54](https://github.com/zoff99/ToxAndroidRefImpl/pull/54) ([zoff99](https://github.com/zoff99))
+- add contact URLs [\#52](https://github.com/zoff99/ToxAndroidRefImpl/pull/52) ([zoff99](https://github.com/zoff99))
+- add url [\#51](https://github.com/zoff99/ToxAndroidRefImpl/pull/51) ([zoff99](https://github.com/zoff99))
+- add f-droid metadata [\#50](https://github.com/zoff99/ToxAndroidRefImpl/pull/50) ([zoff99](https://github.com/zoff99))
+- add AEC \(software echo cancellation\) [\#43](https://github.com/zoff99/ToxAndroidRefImpl/pull/43) ([zoff99](https://github.com/zoff99))
+
 ## [1.0.14](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.14) (2018-02-10)
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.13...1.0.14)
 
