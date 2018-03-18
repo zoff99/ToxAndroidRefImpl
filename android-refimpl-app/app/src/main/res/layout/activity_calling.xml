@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -22,7 +23,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="0dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
@@ -162,6 +163,78 @@
         </FrameLayout>
 
     </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/quality_slider_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="1dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/text_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            android:layout_marginTop="0dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:elevation="2dp"
+                android:gravity="left"
+                android:paddingLeft="20dp"
+                android:text="low"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:elevation="2dp"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Video Quality"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:elevation="2dp"
+                android:gravity="right"
+                android:paddingRight="20dp"
+                android:text="high"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <com.etiennelawlor.discreteslider.library.ui.DiscreteSlider
+            android:id="@+id/quality_slider"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_gravity="bottom"
+            android:background="@color/md_black_1000"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            app:backdropFillColor="@color/md_green_A400"
+            app:backdropStrokeColor="@color/md_black_1000"
+            app:backdropStrokeWidth="2dp"
+            app:horizontalBarThickness="4dp"
+            app:position="0"
+            app:tickMarkCount="3"
+            app:tickMarkRadius="8dp"/>
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/bottom"

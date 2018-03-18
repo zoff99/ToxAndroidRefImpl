@@ -239,6 +239,7 @@ dependencies {
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
     compile 'com.squareup.okhttp3:okhttp:3.10.0'
     compile 'com.daimajia.numberprogressbar:library:1.4@aar'
+    compile 'com.github.lawloretienne:discreteslider:0.0.9'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.0.1'
 }

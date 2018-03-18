@@ -44,6 +44,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.etiennelawlor.discreteslider.library.ui.DiscreteSlider;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -56,6 +57,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -106,6 +108,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     TextView right_top_text_4 = null;
     TextView right_left_text_1 = null;
     static int activity_state = 0;
+    com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
+    int quality_slider_position = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -141,10 +145,69 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         right_top_text_3 = (TextView) findViewById(R.id.right_top_text_3);
         right_top_text_4 = (TextView) findViewById(R.id.right_top_text_4);
         right_left_text_1 = (TextView) findViewById(R.id.right_left_text_1);
+        quality_slider = (com.etiennelawlor.discreteslider.library.ui.DiscreteSlider) findViewById(R.id.quality_slider);
 
         update_bitrates();
         update_fps();
         update_call_time();
+
+        quality_slider.setPosition(quality_slider_position);
+
+        // Detect when slider position changes
+        quality_slider.setOnDiscreteSliderChangeListener(new DiscreteSlider.OnDiscreteSliderChangeListener()
+        {
+            @Override
+            public void onPositionChanged(int position)
+            {
+                Log.i(TAG, "setOnDiscreteSliderChangeListener:pos=" + position);
+                final int prev_position = quality_slider_position;
+
+                if (prev_position != position)
+                {
+                    int value = 63;
+                    if (position == 1)
+                    {
+                        value = 45;
+                    }
+                    else if (position == 2)
+                    {
+                        value = 20;
+                    }
+                    int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                               ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
+                                               value);
+                    Log.i(TAG, "setOnDiscreteSliderChangeListener:res:" + res);
+
+                    if (res != 0)
+                    {
+                        quality_slider_position = position;
+                        Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_NEW:" + quality_slider.getPosition());
+                    }
+                    else
+                    {
+                        Thread t = new Thread()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    Thread.sleep(100);
+                                    // set slide back to prev. position
+                                    quality_slider.setPosition(prev_position);
+                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_revert:" + quality_slider.getPosition());
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:001:EE:" + e.getMessage());
+                                }
+                            }
+                        };
+                        t.start();
+                    }
+                }
+            }
+        });
 
         top_text_line = (TextView) findViewById(R.id.top_text_line);
         accept_button = (ImageButton) findViewById(R.id.accept_button);
@@ -642,7 +705,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     //        mHideHandler.removeCallbacks(mHideRunnable);
     //        mHideHandler.postDelayed(mHideRunnable, delayMillis);
     //    }
-
 
     @Override
     protected void onResume()
