@@ -1322,9 +1322,65 @@ public class ToxVars
     }
 
 
-    // ---------- TOX -------------
-    // ---------- TOX -------------
-    // ---------- TOX -------------
+    public static enum TOXAV_OPTIONS_VP8_QUALITY_VALUE
+    {
+        TOXAV_ENCODER_VP8_QUALITY_NORMAL(0),
+        TOXAV_ENCODER_VP8_QUALITY_HIGH(1);
+        public int value;
+        private TOXAV_OPTIONS_VP8_QUALITY_VALUE(int value)
+        {
+            this.value = value;
+        }
+    }
 
 
+    public static enum TOXAV_ENCODER_CODEC_USED_VALUE
+    {
+        TOXAV_ENCODER_CODEC_USED_VP8(0),
+        TOXAV_ENCODER_CODEC_USED_VP9(1);
+        public int value;
+
+        private TOXAV_ENCODER_CODEC_USED_VALUE(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    public static enum TOXAV_ENCODER_KF_METHOD_VALUE
+    {
+        TOXAV_ENCODER_KF_METHOD_NORMAL(0),
+        TOXAV_ENCODER_KF_METHOD_PATTERN(1);
+        public int value;
+
+        private TOXAV_ENCODER_KF_METHOD_VALUE(int value)
+        {
+            this.value = value;
+        }
+    }
+
+
+    public static enum TOXAV_OPTIONS_OPTION
+    {
+        TOXAV_ENCODER_CPU_USED(0),
+        TOXAV_ENCODER_VP8_QUALITY(1),
+        TOXAV_ENCODER_MIN_SOFTDEADLINE(2),
+        TOXAV_ENCODER_MAX_SOFTDEADLINE(3),
+        TOXAV_DECODER_MIN_SOFTDEADLINE(4),
+        TOXAV_DECODER_MAX_SOFTDEADLINE(5),
+        TOXAV_ENCODER_RC_MAX_QUANTIZER(6),
+        TOXAV_ENCODER_RC_MIN_QUANTIZER(8),
+        TOXAV_DECODER_ERROR_CONCEALMENT(7),
+        TOXAV_ENCODER_CODEC_USED(9),
+        TOXAV_ENCODER_KF_METHOD(10);
+        public int value;
+
+        private TOXAV_OPTIONS_OPTION(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    // ---------- TOX -------------
+    // ---------- TOX -------------
+    // ---------- TOX -------------
 }
