@@ -2438,6 +2438,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native int toxav_video_send_frame(long friendnum, int frame_width_px, int frame_height_px);
 
+    public static native int toxav_option_set(long friendnum, long option, long value);
+
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
     public static native void set_JNI_video_buffer2(ByteBuffer buffer2, int frame_width_px, int frame_height_px);
