@@ -62,6 +62,9 @@ import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_LOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_MED;
 
 public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback, SensorEventListener
 {
@@ -110,6 +113,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static int activity_state = 0;
     com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
     int quality_slider_position = 0;
+    TextView text_vq_low = null;
+    TextView text_vq_med = null;
+    TextView text_vq_high = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -146,6 +152,96 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         right_top_text_4 = (TextView) findViewById(R.id.right_top_text_4);
         right_left_text_1 = (TextView) findViewById(R.id.right_left_text_1);
         quality_slider = (com.etiennelawlor.discreteslider.library.ui.DiscreteSlider) findViewById(R.id.quality_slider);
+        text_vq_low = (TextView) findViewById(R.id.text_vq_low);
+        text_vq_med = (TextView) findViewById(R.id.text_vq_med);
+        text_vq_high = (TextView) findViewById(R.id.text_vq_high);
+
+
+        text_vq_low.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                   ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
+                                                   VIDEO_ENCODER_MAX_QUANTIZER_LOW);
+                        if (res != 0)
+                        {
+                            quality_slider_position = 0;
+                            quality_slider.setPosition(quality_slider_position);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "text_vq_low:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                return true;
+            }
+        });
+
+
+        text_vq_med.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                   ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
+                                                   VIDEO_ENCODER_MAX_QUANTIZER_MED);
+                        if (res != 0)
+                        {
+                            quality_slider_position = 1;
+                            quality_slider.setPosition(quality_slider_position);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "text_vq_low:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                return true;
+            }
+        });
+
+        text_vq_high.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                   ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
+                                                   VIDEO_ENCODER_MAX_QUANTIZER_HIGH);
+                        if (res != 0)
+                        {
+                            quality_slider_position = 2;
+                            quality_slider.setPosition(quality_slider_position);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "text_vq_low:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                return true;
+            }
+        });
+
 
         update_bitrates();
         update_fps();
@@ -164,14 +260,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                 if (prev_position != position)
                 {
-                    int value = 63;
+                    int value = VIDEO_ENCODER_MAX_QUANTIZER_LOW;
                     if (position == 1)
                     {
-                        value = 45;
+                        value = VIDEO_ENCODER_MAX_QUANTIZER_MED;
                     }
                     else if (position == 2)
                     {
-                        value = 20;
+                        value = VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
                     }
                     int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
@@ -195,7 +291,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                     Thread.sleep(100);
                                     // set slide back to prev. position
                                     quality_slider.setPosition(prev_position);
-                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_revert:" + quality_slider.getPosition());
+                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_revert:" +
+                                               quality_slider.getPosition());
                                 }
                                 catch (Exception e)
                                 {

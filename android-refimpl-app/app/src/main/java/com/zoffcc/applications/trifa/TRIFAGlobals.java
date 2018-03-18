@@ -83,6 +83,10 @@ public class TRIFAGlobals
     static long last_video_frame_received = -1;
     static int count_video_frame_received = 0;
 
+    final static int VIDEO_ENCODER_MAX_QUANTIZER_LOW = 63;
+    final static int VIDEO_ENCODER_MAX_QUANTIZER_MED = 45;
+    final static int VIDEO_ENCODER_MAX_QUANTIZER_HIGH = 20;
+
     final static int GLOBAL_MIN_VIDEO_BITRATE = 190;
     final static int GLOBAL_MIN_AUDIO_BITRATE = 6; // allowed values: (xx>=6) && (xx<=510)
 
