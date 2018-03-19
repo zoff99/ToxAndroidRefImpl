@@ -266,8 +266,8 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 15; // how many out play buffers?
-    final static int audio_out_buffer_mult = 15;
+    final static int audio_in_buffer_max_count = 8; // how many out play buffers?
+    final static int audio_out_buffer_mult = 8;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
@@ -2764,6 +2764,9 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
     {
+
+        Log.i(TAG, "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count + " " + channels + " " + sampling_rate);
+
         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now

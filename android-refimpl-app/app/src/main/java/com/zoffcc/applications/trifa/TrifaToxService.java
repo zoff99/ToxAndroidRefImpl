@@ -58,6 +58,7 @@ import static com.zoffcc.applications.trifa.MainActivity.receiver1;
 import static com.zoffcc.applications.trifa.MainActivity.receiver2;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
+import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
@@ -218,6 +219,7 @@ public class TrifaToxService extends Service
                     public void run()
                     {
                         Log.i(TAG, "stop_me:005");
+                        set_filteraudio_active(0);
                         long i = 0;
                         while (is_tox_started)
                         {

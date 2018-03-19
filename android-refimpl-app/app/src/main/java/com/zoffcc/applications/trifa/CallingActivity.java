@@ -91,6 +91,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static String top_text_line_str4 = "";
     Handler callactivity_handler = null;
     static Handler callactivity_handler_s = null;
+    static boolean trifa_is_MicrophoneMute = false;
     private static final String TAG = "trifa.CallingActivity";
     // Camera camera = null;
     static CameraSurfacePreview cameraSurfacePreview = null;
@@ -126,6 +127,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         setContentView(R.layout.activity_calling);
 
+        // prevent screenshots and also dont show the window content in recent activity screen
+        initializeScreenshotSecurity();
+
+        trifa_is_MicrophoneMute = false;
         ca = this;
 
         sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -394,7 +399,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        if (audio_manager_s.isMicrophoneMute())
+                        // if (audio_manager_s.isMicrophoneMute())
+                        if (trifa_is_MicrophoneMute)
                         {
                             Drawable d1a = new IconicsDrawable(v.getContext()).icon(
                                     GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
@@ -418,9 +424,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        if (audio_manager_s.isMicrophoneMute())
+                        // if (audio_manager_s.isMicrophoneMute())
+                        if (trifa_is_MicrophoneMute)
                         {
                             audio_manager_s.setMicrophoneMute(false);
+                            trifa_is_MicrophoneMute = false;
                             Drawable d2a = new IconicsDrawable(v.getContext()).icon(
                                     GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
                                     getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
@@ -429,6 +437,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         else
                         {
                             audio_manager_s.setMicrophoneMute(true);
+                            trifa_is_MicrophoneMute = true;
                             Drawable d2a = new IconicsDrawable(v.getContext()).icon(
                                     GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
                                     getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);

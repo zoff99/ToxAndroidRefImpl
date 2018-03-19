@@ -36,6 +36,7 @@ import java.nio.ByteBuffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_rec_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
+import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audiorec_asynctask;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
@@ -329,7 +330,8 @@ public class AudioRecording extends Thread
 
         try
         {
-            if (audio_manager_s.isMicrophoneMute())
+            // if (audio_manager_s.isMicrophoneMute())
+            if (trifa_is_MicrophoneMute)
             {
                 microphone_muted = true;
             }
@@ -358,7 +360,8 @@ public class AudioRecording extends Thread
 
                 try
                 {
-                    if (audio_manager_s.isMicrophoneMute())
+                    // if (audio_manager_s.isMicrophoneMute())
+                    if (trifa_is_MicrophoneMute)
                     {
                         microphone_muted = true;
                     }
@@ -401,7 +404,8 @@ public class AudioRecording extends Thread
 
                             try
                             {
-                                if (audio_manager_s.isMicrophoneMute())
+                                // if (audio_manager_s.isMicrophoneMute())
+                                if (trifa_is_MicrophoneMute)
                                 {
                                     microphone_muted = true;
                                 }
