@@ -65,8 +65,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 20
-static const char global_version_string[] = "0.99.20";
+#define VERSION_PATCH 22
+static const char global_version_string[] = "0.99.22";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -3243,6 +3243,16 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1bit_1rate_1set(JNIEnv *en
 
 
 JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1option_1set(JNIEnv *env, jobject thiz, jlong friend_number,
+        jlong option, jlong value)
+{
+    TOXAV_ERR_OPTION_SET error;
+    bool res = toxav_option_set(tox_av_global, (uint32_t)friend_number, (TOXAV_OPTIONS_OPTION)option, (int32_t)value, &error);
+    return (jint)res;
+}
+
+
+JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv *env, jobject thiz, jlong friend_number,
         jint control)
 {
@@ -3250,6 +3260,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv *env
     bool res = toxav_call_control(tox_av_global, (uint32_t)friend_number, (TOXAV_CALL_CONTROL)control, &error);
     return (jint)res;
 }
+
 
 
 // reverse the order of the U and V planes ---------------
