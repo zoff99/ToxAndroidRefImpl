@@ -3098,9 +3098,12 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                Log.i(TAG, "friend_status:002");
-                message_list_activity.set_friend_status_icon();
-                Log.i(TAG, "friend_status:003");
+                if (message_list_activity != null)
+                {
+                    Log.i(TAG, "friend_status:002");
+                    message_list_activity.set_friend_status_icon();
+                    Log.i(TAG, "friend_status:003");
+                }
             }
             catch (Exception e)
             {
@@ -6642,12 +6645,12 @@ public class MainActivity extends AppCompatActivity
             if (orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).count() == 0)
             {
                 orma.insertIntoFriendList(f);
-                Log.i(TAG, "friend added to DB: " + f.tox_public_key_string);
+                // Log.i(TAG, "friend added to DB: " + f.tox_public_key_string);
             }
             else
             {
                 // friend already in DB
-                Log.i(TAG, "friend already in DB: " + f.tox_public_key_string);
+                // Log.i(TAG, "friend already in DB: " + f.tox_public_key_string);
             }
         }
         catch (Exception e)

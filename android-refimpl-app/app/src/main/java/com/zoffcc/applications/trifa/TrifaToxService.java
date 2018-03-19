@@ -748,10 +748,13 @@ public class TrifaToxService extends Service
 
                     try
                     {
-                        if (get_g_opts("ADD_BOTS_ON_STARTUP_done").equals("true"))
+                        if (get_g_opts("ADD_BOTS_ON_STARTUP_done") != null)
                         {
-                            need_add_bots = false;
-                            Log.i(TAG, "need_add_bots=false");
+                            if (get_g_opts("ADD_BOTS_ON_STARTUP_done").equals("true"))
+                            {
+                                need_add_bots = false;
+                                Log.i(TAG, "need_add_bots=false");
+                            }
                         }
                     }
                     catch (Exception e)
