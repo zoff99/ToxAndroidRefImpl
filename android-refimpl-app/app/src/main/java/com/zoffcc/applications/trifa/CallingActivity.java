@@ -27,6 +27,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -1129,6 +1131,32 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         mContentView.setVisibility(View.INVISIBLE);
     }
 
+    private void requestAudioFocus()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            AudioAttributes playbackAttributes = new AudioAttributes.Builder().setUsage(
+                    AudioAttributes.USAGE_VOICE_COMMUNICATION).setContentType(
+                    AudioAttributes.CONTENT_TYPE_SPEECH).build();
+            AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes(
+                    playbackAttributes).setAcceptsDelayedFocusGain(true).setOnAudioFocusChangeListener(
+                    new AudioManager.OnAudioFocusChangeListener()
+                    {
+                        @Override
+                        public void onAudioFocusChange(int i)
+                        {
+                        }
+                    }).build();
+            audio_manager_s.requestAudioFocus(focusRequest);
+        }
+        else
+        {
+            audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                                              AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+        }
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event)
     {
@@ -1144,16 +1172,33 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     set_filteraudio_active(0);
 
                     Callstate.audio_speaker = false;
+
+                    //audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                    //                                  AudioManager.AUDIOFOCUS_GAIN);
+                    requestAudioFocus();
+
+                    try
+                    {
+                        audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                        Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_IN_COMMUNICATION)");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                     try
                     {
                         if (!audio_manager_s.isWiredHeadsetOn())
                         {
                             audio_manager_s.setSpeakerphoneOn(false);
+                            Log.i(TAG, "onSensorChanged:setSpeakerphoneOn(false)");
                         }
 
                         try
                         {
                             turnOffScreen();
+                            Log.i(TAG, "onSensorChanged:turnOffScreen()");
                         }
                         catch (Exception e2)
                         {
@@ -1164,15 +1209,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         e.printStackTrace();
                         Callstate.audio_speaker = true;
-                    }
-
-                    try
-                    {
-                        audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
+                        Log.i(TAG, "onSensorChanged:audio_speaker = true");
                     }
 
                     try
@@ -1196,16 +1233,33 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     set_filteraudio_active(1);
 
                     Callstate.audio_speaker = true;
+
+                    // audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
+                    //                                  AudioManager.AUDIOFOCUS_GAIN);
+                    requestAudioFocus();
+
+                    try
+                    {
+                        audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+                        Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_NORMAL)");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                     try
                     {
                         if (!audio_manager_s.isWiredHeadsetOn())
                         {
                             audio_manager_s.setSpeakerphoneOn(true);
+                            Log.i(TAG, "onSensorChanged:setSpeakerphoneOn(true)");
                         }
 
                         try
                         {
                             turnOnScreen();
+                            Log.i(TAG, "onSensorChanged:turnOnScreen()");
                         }
                         catch (Exception e2)
                         {
@@ -1216,15 +1270,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         e.printStackTrace();
                         Callstate.audio_speaker = false;
-                    }
-
-                    try
-                    {
-                        audio_manager_s.setMode(AudioManager.MODE_NORMAL);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
+                        Log.i(TAG, "onSensorChanged:audio_speaker = false");
                     }
 
                     try

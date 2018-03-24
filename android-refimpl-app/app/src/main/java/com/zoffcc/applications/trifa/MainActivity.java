@@ -2765,7 +2765,9 @@ public class MainActivity extends AppCompatActivity
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
     {
 
-        Log.i(TAG, "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count + " " + channels + " " + sampling_rate);
+        Log.i(TAG,
+              "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
+              " " + channels + " " + sampling_rate);
 
         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
@@ -2895,7 +2897,10 @@ public class MainActivity extends AppCompatActivity
                         audio_buffer_2[0].position(0);
 
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
-                        // System.out.println("NativeAudioPlay:001:res=" + res);
+                        System.out.println("NativeAudioPlay:001:res=" + res + " bytes=" +
+                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
+                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
+                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " ");
 
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
                         if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
@@ -2917,6 +2922,13 @@ public class MainActivity extends AppCompatActivity
                     {
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+
+                        System.out.println("NativeAudioPlay:002:res=" + res + " bytes=" +
+                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
+                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
+                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " ");
+
+
                         if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
                         {
                             NativeAudio.n_cur_buf = 0;
@@ -2954,7 +2966,7 @@ public class MainActivity extends AppCompatActivity
                     // System.out.println("NativeAudioPlay:002b");
                 }
 
-            }
+            } // PREF__use_native_audio_play -----
             else
             {
                 // audio_buffer_read_write(sample_count, channels, sampling_rate, true);

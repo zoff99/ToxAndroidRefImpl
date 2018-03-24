@@ -422,20 +422,25 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
     SLDataSink audioSnk = {&loc_outmix, NULL};
 
+
     /*
      * create audio player:
      *     fast audio does not support when SL_IID_EFFECTSEND is required, skip it
      *     for fast audio case
      */
-    const SLInterfaceID ids[2] = {SL_IID_BUFFERQUEUE, SL_IID_VOLUME,
+    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE,
+                                  SL_IID_VOLUME,
+                                  SL_IID_ANDROIDCONFIGURATION,
             /*SL_IID_EFFECTSEND,*/
             /*SL_IID_MUTESOLO,*/};
-    const SLboolean req[2] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE,
+                              SL_BOOLEAN_TRUE,
+                              SL_BOOLEAN_TRUE,
             /*SL_BOOLEAN_TRUE,*/
             /*SL_BOOLEAN_TRUE,*/};
 
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
-                                                2, ids, req);
+                                                3, ids, req);
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
 
@@ -448,6 +453,20 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
+
+#if 0
+    // ----------------------------------------------------------
+    // Code for working with ear speaker by setting stream type to STREAM_VOICE
+    SLAndroidConfigurationItf playerConfig;
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_ANDROIDCONFIGURATION, &playerConfig);
+    if (SL_RESULT_SUCCESS == result)
+    {
+        SLint32 streamType = SL_ANDROID_STREAM_VOICE;
+        result = (*playerConfig)->SetConfiguration(playerConfig, SL_ANDROID_KEY_STREAM_TYPE, &streamType,
+                                                   sizeof(SLint32));
+    }
+    // ----------------------------------------------------------
+#endif
 
     // get the buffer queue interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
