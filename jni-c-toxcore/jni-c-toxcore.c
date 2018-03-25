@@ -3114,7 +3114,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
         return -2;
     }
 
-	uint2_t text_length = 0;
+	uint32_t text_length = 0;
     uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
     long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
