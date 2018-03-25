@@ -2391,6 +2391,22 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_file_send_chunk(long friend_number, long file_number, long position, ByteBuffer data_buffer, long data_length);
 
+
+    // --------------- Message V2 -------------
+    // --------------- Message V2 -------------
+    // --------------- Message V2 -------------
+    public static native long tox_messagev2_size(long text_length, long type, long alter_type);
+
+    public static native int tox_messagev2_wrap(long text_length, long type, long alter_type, ByteBuffer message_text_buffer, long ts_sec, long ts_ms, ByteBuffer raw_message_buffer, ByteBuffer msgid_buffer);
+
+    public static native int tox_messagev2_get_message_id(ByteBuffer raw_message_buffer, ByteBuffer msgid_buffer);
+
+    public static native int tox_messagev2_get_message_text(ByteBuffer raw_message_buffer, long raw_message_len, int is_alter_msg, long alter_type, ByteBuffer message_text_buffer);
+    // --------------- Message V2 -------------
+    // --------------- Message V2 -------------
+    // --------------- Message V2 -------------
+
+
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -3493,6 +3509,14 @@ public class MainActivity extends AppCompatActivity
         };
         t.start();
     }
+
+
+    static void android_tox_callback_friend_message_v2_cb_method(long friend_number,
+        String friend_message, long length, long ts_sec, long ts_ms)
+    {
+        Log.i(TAG, "friend_message_v2:friend:" + friend_number + " message:" + friend_message);
+    }
+
 
     // --- incoming message ---
     // --- incoming message ---
