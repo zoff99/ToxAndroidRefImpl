@@ -270,6 +270,7 @@ void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_i
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data);
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length,
                        void *user_data);
+void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len);
 
 void file_recv_control_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control,
                           void *user_data);
@@ -1101,7 +1102,7 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uin
                                              android_tox_callback_friend_message_v2_cb_method,
                                              (jlong)(unsigned long long)friend_number,
                                              js1,
-                                             (jlong)(unsigned long long)length,
+                                             (jlong)(unsigned long long)text_length,
                                              (jlong)ts_sec,
                                              (jlong)ts_ms);
             (*jnienv2)->DeleteLocalRef(jnienv2, js1);
@@ -3113,13 +3114,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
         return -2;
     }
 
+	uint2_t text_length = 0;
     uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
     long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
     long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     bool res = tox_messagev2_get_message_text(raw_message_buffer_c, (uint32_t)raw_message_len,
                (bool)is_alter_msg,
-               (uint32_t)alter_type, message_text_buffer_c);
+               (uint32_t)alter_type, message_text_buffer_c,
+				&text_length);
 
     if(res == true)
     {
