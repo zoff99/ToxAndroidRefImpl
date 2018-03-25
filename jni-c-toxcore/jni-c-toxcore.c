@@ -784,8 +784,8 @@ void init_tox_callbacks()
     tox_callback_conference_title(tox_global, conference_title_cb);
     tox_callback_conference_namelist_change(tox_global, conference_namelist_change_cb);
     // --------------------
-    tox_utils_callback_self_connection_status(tox, self_connection_status_cb);
-    tox_callback_self_connection_status(tox, tox_utils_self_connection_status_cb);
+    tox_utils_callback_self_connection_status(tox_global, self_connection_status_cb);
+    tox_callback_self_connection_status(tox_global, tox_utils_self_connection_status_cb);
     tox_utils_callback_friend_connection_status(tox_global, friend_connection_status_cb);
     tox_callback_friend_connection_status(tox_global, tox_utils_friend_connection_status_cb);
     tox_callback_friend_lossless_packet(tox_global, tox_utils_friend_lossless_packet_cb);
@@ -1066,14 +1066,18 @@ void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uin
     (*jnienv2)->DeleteLocalRef(jnienv2, js2);
 }
 
-void friend_message_v2_cb(Tox *tox, uint32_t friend_number,
-                          const uint8_t *raw_message, size_t raw_message_len)
+
+void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data)
 {
-    android_tox_callback_friend_message_v2_cb(friend_number, raw_message, raw_message_len);
+    android_tox_callback_friend_request_cb(public_key, message, length);
 }
 
-void android_tox_callback_friend_message_v2_cb(uint32_t friend_number,
-        const uint8_t *raw_message, size_t raw_message_len)
+
+
+
+
+
+void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
 {
 #ifdef TOX_MESSAGE_V2_ACTIVE
     uint8_t *message_text = calloc(1, raw_message_len);
@@ -1097,7 +1101,7 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number,
                                              android_tox_callback_friend_message_v2_cb_method,
                                              (jlong)(unsigned long long)friend_number,
                                              js1,
-                                             (jlong)(unsigned long long)length
+                                             (jlong)(unsigned long long)length,
                                              (jlong)ts_sec,
                                              (jlong)ts_ms);
             (*jnienv2)->DeleteLocalRef(jnienv2, js1);
@@ -1107,9 +1111,11 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number,
 #endif
 }
 
-void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data)
+
+
+void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
 {
-    android_tox_callback_friend_request_cb(public_key, message, length);
+    android_tox_callback_friend_message_v2_cb(friend_number, raw_message, raw_message_len);
 }
 
 void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
@@ -1701,6 +1707,8 @@ void *thread_av(void *data)
     dbg(2, "ToxVideo:Clean thread exit!\n");
     (*cachedJVM)->DetachCurrentThread(cachedJVM);
     env = NULL;
+
+	return (void *)NULL;
 }
 
 
@@ -1740,6 +1748,8 @@ void *thread_video_av(void *data)
     dbg(2, "ToxVideo:Clean video thread exit!\n");
     (*cachedJVM)->DetachCurrentThread(cachedJVM);
     env = NULL;
+
+	return (void *)NULL;
 }
 
 
@@ -1999,6 +2009,10 @@ int add_tcp_relay_single(Tox *tox, const char *ip, uint16_t port, const char *ke
         {
             return 3;
         }
+		else
+		{
+			return 99;
+		}
     }
     else
     {
@@ -2070,6 +2084,10 @@ int bootstrap_single(Tox *tox, const char *ip, uint16_t port, const char *key_he
         {
             return 3;
         }
+		else
+		{
+			return 99;
+		}
     }
     else
     {
@@ -2705,20 +2723,35 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1seek(JNIEnv *env, job
 
     if(res != true)
     {
-        if(error == TOX_ERR_FILE_GET_NULL)
+        if(error == TOX_ERR_FILE_SEEK_FRIEND_NOT_FOUND)
         {
-            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_NULL");
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_FRIEND_NOT_FOUND");
             return (jint)-1;
         }
-        else if(error == TOX_ERR_FILE_GET_FRIEND_NOT_FOUND)
+        else if(error == TOX_ERR_FILE_SEEK_FRIEND_NOT_CONNECTED)
         {
-            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_FRIEND_NOT_FOUND");
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_FRIEND_NOT_CONNECTED");
             return (jint)-2;
         }
-        else if(error == TOX_ERR_FILE_GET_NOT_FOUND)
+        else if(error == TOX_ERR_FILE_SEEK_NOT_FOUND)
         {
-            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_NOT_FOUND");
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_NOT_FOUND");
             return (jint)-3;
+        }
+        else if(error == TOX_ERR_FILE_SEEK_DENIED)
+        {
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_DENIED");
+            return (jint)-4;
+        }
+        else if(error == TOX_ERR_FILE_SEEK_INVALID_POSITION)
+        {
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_INVALID_POSITION");
+            return (jint)-5;
+        }
+        else if(error == TOX_ERR_FILE_SEEK_SENDQ)
+        {
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_SENDQ");
+            return (jint)-6;
         }
         else
         {
