@@ -2481,6 +2481,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
 #else
 	return (jlong)-99;
 #endif
+
 }
 
 JNIEXPORT jlong JNICALL
