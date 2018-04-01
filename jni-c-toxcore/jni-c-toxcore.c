@@ -2413,6 +2413,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
         jobject thiz, jlong friend_number, jint type, jlong ts_sec,
         jobject message, jlong length)
 {
+#ifdef TOX_HAVE_TOXUTIL
     const char *message_str = NULL;
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
     TOX_ERR_FRIEND_SEND_MESSAGE error;
@@ -2428,10 +2429,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
         if (error == 0)
         {
             // return OK
-            return 0;
+            return (jlong)-9999;
         }
         // otherwise give some error
-        return -1;
+        return (jlong)-9991;
     }
 
     if(error != 0)
@@ -2477,7 +2478,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
         dbg(9, "tox_util_friend_send_message_v2");
         return (jlong)res;
     }
-
+#else
+	return (jlong)-99;
+#endif
 }
 
 JNIEXPORT jlong JNICALL
