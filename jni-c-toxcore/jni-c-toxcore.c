@@ -2408,6 +2408,81 @@ Java_com_zoffcc_applications_trifa_MainActivity_jnictoxcore_1version(JNIEnv *env
     return (*env)->NewStringUTF(env, global_version_string);
 }
 
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message_1v2(JNIEnv *env,
+        jobject thiz, jlong friend_number, jint type, jlong ts_sec,
+        jobject message, jlong length)
+{
+#ifdef TOX_HAVE_TOXUTIL
+    const char *message_str = NULL;
+    message_str = (*env)->GetStringUTFChars(env, message, NULL);
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
+        (int)type, (uint32_t) ts_sec,
+        (const uint8_t *)message_str, (size_t)strlen(message_str),
+        &error);
+    (*env)->ReleaseStringUTFChars(env, message, message_str);
+
+    if(res == -1)
+    {
+        // MSG V2 was used to send message
+        if (error == 0)
+        {
+            // return OK
+            return (jlong)-9999;
+        }
+        // otherwise give some error
+        return (jlong)-9991;
+    }
+
+    if(error != 0)
+    {
+        if(error == TOX_ERR_FRIEND_SEND_MESSAGE_NULL)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_NULL");
+            return (jlong)-1;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_FOUND)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_FOUND");
+            return (jlong)-2;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_CONNECTED)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_CONNECTED");
+            return (jlong)-3;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_SENDQ)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_SENDQ");
+            return (jlong)-4;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_TOO_LONG)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_TOO_LONG");
+            return (jlong)-5;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_EMPTY)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_EMPTY");
+            return (jlong)-6;
+        }
+        else
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:%d", (int)error);
+            return (jlong)-99;
+        }
+    }
+    else
+    {
+        dbg(9, "tox_util_friend_send_message_v2");
+        return (jlong)res;
+    }
+#else
+	return (jlong)-99;
+#endif
+
+}
 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEnv *env, jobject thiz,
