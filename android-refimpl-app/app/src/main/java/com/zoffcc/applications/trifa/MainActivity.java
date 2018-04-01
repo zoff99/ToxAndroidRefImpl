@@ -3511,8 +3511,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    static void android_tox_callback_friend_message_v2_cb_method(long friend_number,
-        String friend_message, long length, long ts_sec, long ts_ms)
+    static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms)
     {
         Log.i(TAG, "friend_message_v2:friend:" + friend_number + " message:" + friend_message);
     }
@@ -5366,10 +5365,17 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id +
                        " friend_number=" + friend_number);
 
-            return orma.selectFromMessage().
+            List<Message> m = orma.selectFromMessage().
                     filetransfer_idEq(filetransfer_id).and().
                     tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    orderByIdDesc().toList().get(0).id;
+                    orderByIdDesc().toList();
+
+            if (m.size() == 0)
+            {
+                return -1;
+            }
+
+            return m.get(0).id;
         }
         catch (Exception e)
         {
