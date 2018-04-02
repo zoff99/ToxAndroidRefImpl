@@ -1084,6 +1084,23 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uin
     uint8_t *message_text = calloc(1, raw_message_len);
     if (message_text)
     {
+
+		JNIEnv *jnienv2;
+		jnienv2 = jni_getenv();
+		jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)raw_message_len);
+
+		if(data2 == NULL)
+		{
+			// TODO: catch this OOM error!!
+			// return; // out of memory error thrown
+		}
+
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		(*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)raw_message_len, (const jbyte *)raw_message);
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+
         uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
         uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
         uint32_t text_length = 0;
@@ -1098,15 +1115,21 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uin
             JNIEnv *jnienv2;
             jnienv2 = jni_getenv();
             jstring js1 = c_safe_string_from_java((char *)message_text, text_length);
+			// TODO: give back also the raw message bytes!
             (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                              android_tox_callback_friend_message_v2_cb_method,
                                              (jlong)(unsigned long long)friend_number,
                                              js1,
                                              (jlong)(unsigned long long)text_length,
                                              (jlong)ts_sec,
-                                             (jlong)ts_ms);
+                                             (jlong)ts_ms,
+										     data2,
+                                             (jlong)(unsigned long long)raw_message_len
+											 );
             (*jnienv2)->DeleteLocalRef(jnienv2, js1);
         }
+
+		(*jnienv2)->DeleteLocalRef(jnienv2, data2);
         free(message_text);
     }
 #endif
@@ -1826,7 +1849,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_tox_callback_friend_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
     android_tox_callback_friend_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
-            "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ)V");
+            "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
     android_tox_callback_file_recv_control_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_file_recv_control_cb_method", "(JJI)V");
     android_tox_callback_file_chunk_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
