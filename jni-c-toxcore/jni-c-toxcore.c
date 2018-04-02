@@ -2423,6 +2423,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
         &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
 
+
     if(res == -1)
     {
         // MSG V2 was used to send message
