@@ -1896,7 +1896,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_tox_callback_friend_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
     android_tox_callback_friend_read_receipt_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
-            "android_tox_callback_friend_read_receipt_message_v2_cb_method", "(JJ[BJ)V");
+            "android_tox_callback_friend_read_receipt_message_v2_cb_method", "(JJ[B)V");
     android_tox_callback_file_recv_control_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_file_recv_control_cb_method", "(JJI)V");
     android_tox_callback_file_chunk_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2512,27 +2512,57 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1msg_1re
 }
 
 
-int64_t tox_util_friend_send_message_v2(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type,
-                                        uint32_t ts_sec, const uint8_t *message, size_t length,
-                                        uint8_t *raw_message_back, uint32_t *raw_msg_len_back,
-                                        uint8_t *msgid_back,
-                                        TOX_ERR_FRIEND_SEND_MESSAGE *error);
-
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message_1v2(JNIEnv *env,
         jobject thiz, jlong friend_number, jint type, jlong ts_sec,
-        jobject message, jlong length)
+        jobject message, jlong length,
+        jobject raw_message_back,
+        jobject raw_msg_len_back,
+        jobject msgid_back)
 {
 #ifdef TOX_HAVE_TOXUTIL
-    const char *message_str = NULL;
-    message_str = (*env)->GetStringUTFChars(env, message, NULL);
+
+    uint8_t *raw_message_back_buffer_c = NULL;
+    long capacity = 0;
+
+    if(raw_message_back_buffer == NULL)
+    {
+        return (jlong)-9991;
+    }
+
+    if(msgid_back_buffer == NULL)
+    {
+        return (jlong)-9991;
+    }
+
+    if(raw_msg_len_back == NULL)
+    {
+        return (jlong)-9991;
+    }
+
+    raw_message_back_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_back_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, raw_message_back_buffer);
+
+    msgid_back_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_back_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, msgid_back_buffer);
+
+    raw_msg_len_back_c_2 = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_msg_len_back);
+    capacity = (*env)->GetDirectBufferCapacity(env, raw_msg_len_back);
+
+    uint32_t raw_msg_len_back_c;
+
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
         (int)type, (uint32_t) ts_sec,
         (const uint8_t *)message_str, (size_t)strlen(message_str),
-        NULL, NULL, NULL,
+        (uint8_t *)raw_message_back_buffer_c, &raw_msg_len_back_c, (uint8_t *)msgid_back_buffer_c,
         &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
+
+    // HINT: give number back as 2 bytes in ByteBuffer
+    //       a bit hacky, but it works
+    raw_msg_len_back_c_2[0] = (uint8_t)(raw_msg_len_back_c % 256); // low byte
+    raw_msg_len_back_c_2[1] = (uint8_t)(raw_msg_len_back_c / 256); // high byte
 
     if(res == -1)
     {
