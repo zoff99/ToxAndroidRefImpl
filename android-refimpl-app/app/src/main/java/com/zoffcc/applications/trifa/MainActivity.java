@@ -3364,7 +3364,7 @@ public class MainActivity extends AppCompatActivity
         String message_id_hash_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
                                                           msg_id_buffer.limit());
 
-        Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
+        // Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
 
         try
         {
@@ -3573,9 +3573,9 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
     {
-        Log.i(TAG,
-              "friend_message_v2:friend:" + friend_number + " ts:" + ts_sec + " systime" + System.currentTimeMillis() +
-              " message:" + friend_message);
+        // Log.i(TAG,
+        //      "friend_message_v2:friend:" + friend_number + " ts:" + ts_sec + " systime" + System.currentTimeMillis() +
+        //      " message:" + friend_message);
 
         // if message list for this friend is open, then don't do notification and "new" badge
         boolean do_notification = true;
@@ -3600,7 +3600,7 @@ public class MainActivity extends AppCompatActivity
 
         String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
                                                  msg_id_buffer.limit());
-        Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
+        // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
 
         int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
                 tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(msg_id_as_hex_string).count();
@@ -8732,8 +8732,8 @@ public class MainActivity extends AppCompatActivity
                 array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
                 array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
 
-        Log.i(TAG,
-              "tox_friend_send_message_wrapper:message=" + message + " res=" + res + " len=" + raw_message_length_int);
+        // Log.i(TAG,
+        //      "tox_friend_send_message_wrapper:message=" + message + " res=" + res + " len=" + raw_message_length_int);
 
         if (res == -9999)
         {
@@ -8744,8 +8744,8 @@ public class MainActivity extends AppCompatActivity
             result.raw_message_buf_hex = bytesToHex(raw_message_buf.array(), raw_message_buf.arrayOffset(),
                                                     raw_message_length_int);
 
-            Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
-                       result.raw_message_buf_hex);
+            // Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
+            //           result.raw_message_buf_hex);
 
             return result;
         }
