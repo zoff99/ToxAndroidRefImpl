@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -1267,7 +1267,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
     public static void clearCache_s()
     {
         Runnable myRunnable = new Runnable()
@@ -1332,7 +1331,7 @@ public class MainActivity extends AppCompatActivity
                             }
                             else
                             {
-                                Log.i(TAG, "clearCache:" + child.getAbsolutePath());
+                                // Log.i(TAG, "clearCache:" + child.getAbsolutePath());
                             }
                         }
                     }
@@ -1414,12 +1413,12 @@ public class MainActivity extends AppCompatActivity
         {
             if (file.isFile())
             {
-                Log.i(TAG, "VFS:REAL:rm:" + file);
+                // Log.i(TAG, "VFS:REAL:rm:" + file);
                 file.delete();
             }
             else if (file.isDirectory())
             {
-                Log.i(TAG, "VFS:REAL:rm:D:" + file);
+                // Log.i(TAG, "VFS:REAL:rm:D:" + file);
                 vfs_deleteFilesAndFilesSubDirectories_real(file.getAbsolutePath());
                 file.delete();
             }
@@ -1438,12 +1437,12 @@ public class MainActivity extends AppCompatActivity
             {
                 if (file.isFile())
                 {
-                    Log.i(TAG, "VFS:VFS:rm:" + file);
+                    // Log.i(TAG, "VFS:VFS:rm:" + file);
                     file.delete();
                 }
                 else if (file.isDirectory())
                 {
-                    Log.i(TAG, "VFS:VFS:rm:D:" + file);
+                    // Log.i(TAG, "VFS:VFS:rm:D:" + file);
                     vfs_deleteFilesAndFilesSubDirectories_vfs(file.getAbsolutePath());
                     file.delete();
                 }
@@ -2404,6 +2403,8 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_messagev2_get_message_text(ByteBuffer raw_message_buffer, long raw_message_len, int is_alter_msg, long alter_type, ByteBuffer message_text_buffer);
     
     public static native int tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
+
+    public static native long tox_util_friend_send_message_v2(long friend_number, int type, long ts_sec, String message, long length);
     // --------------- Message V2 -------------
     // --------------- Message V2 -------------
     // --------------- Message V2 -------------
@@ -3513,9 +3514,189 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms)
+    static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
     {
-        Log.i(TAG, "friend_message_v2:friend:" + friend_number + " message:" + friend_message);
+        Log.i(TAG,
+              "friend_message_v2:friend:" + friend_number + " ts:" + ts_sec + " systime" + System.currentTimeMillis() +
+              " message:" + friend_message);
+
+        // if message list for this friend is open, then don't do notification and "new" badge
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        // Log.i(TAG, "noti_and_badge:001:" + message_list_activity);
+        if (message_list_activity != null)
+        {
+            // Log.i(TAG, "noti_and_badge:002:" + message_list_activity.get_current_friendnum() + ":" + friend_number);
+            if (message_list_activity.get_current_friendnum() == friend_number)
+            {
+                // Log.i(TAG, "noti_and_badge:003:");
+                // no notifcation and no badge update
+                do_notification = false;
+                do_badge_update = false;
+            }
+        }
+
+        ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) raw_message_length);
+        raw_message_buf.put(raw_message, 0, (int) raw_message_length);
+        ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+        tox_messagev2_get_message_id(raw_message_buf, msg_id_buffer);
+
+        Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:mid:2=" +
+                   bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit()));
+
+        // add FT message to UI
+        Message m = new Message();
+
+        if (!do_badge_update)
+        {
+            Log.i(TAG, "noti_and_badge:004a:");
+            m.is_new = false;
+        }
+        else
+        {
+            Log.i(TAG, "noti_and_badge:004b:");
+            m.is_new = true;
+        }
+
+
+        m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
+        m.direction = 0; // msg received
+        m.TOX_MESSAGE_TYPE = 0;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.filetransfer_id = -1;
+        m.filedb_id = -1;
+        m.state = TOX_FILE_CONTROL_RESUME.value;
+        m.ft_accepted = false;
+        m.ft_outgoing_started = false;
+        m.rcvd_timestamp = (ts_sec * 1000); // sent time as unix timestamp -> convert to milliseconds
+        m.rcvd_timestamp_ms = ts_ms; // "ms" part of timestamp (could be just an increasing number)
+        m.text = friend_message;
+        m.msg_version = 1;
+        m.msg_id_hash = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit());
+
+        Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
+
+        if (message_list_activity != null)
+        {
+            if (message_list_activity.get_current_friendnum() == friend_number)
+            {
+                insert_into_message_db(m, true);
+            }
+            else
+            {
+                insert_into_message_db(m, false);
+            }
+        }
+        else
+        {
+            insert_into_message_db(m, false);
+        }
+
+        try
+        {
+            // update "new" status on friendlist fragment
+            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+            if (friend_list_fragment != null)
+            {
+                if (f != null)
+                {
+                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                    cc.is_friend = true;
+                    cc.friend_item = f;
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
+            }
+
+            if (f.notification_silent)
+            {
+                do_notification = false;
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
+        }
+
+        if (do_notification)
+        {
+            Log.i(TAG, "noti_and_badge:005:");
+
+            // start "new" notification
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // allow notification every n seconds
+                        if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) <
+                            System.currentTimeMillis())
+                        {
+
+                            if (PREF__notification)
+                            {
+                                Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
+
+                                Intent notificationIntent = new Intent(context_s, StartMainActivityWrapper.class);
+                                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0,
+                                                                                        notificationIntent, 0);
+
+                                // -- notification ------------------
+                                // -- notification ------------------
+
+                                NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                                b.setContentIntent(pendingIntent);
+                                b.setSmallIcon(R.drawable.circle_orange);
+                                b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                                Uri default_notification_sound = RingtoneManager.getDefaultUri(
+                                        RingtoneManager.TYPE_NOTIFICATION);
+
+                                if (PREF__notification_sound)
+                                {
+                                    b.setSound(default_notification_sound);
+                                }
+
+                                if (PREF__notification_vibrate)
+                                {
+                                    long[] vibrate_pattern = {100, 300};
+                                    b.setVibrate(vibrate_pattern);
+                                }
+
+                                b.setContentTitle("TRIfA");
+                                b.setAutoCancel(true);
+                                b.setContentText("new Message");
+
+                                Notification notification3 = b.build();
+                                nmn3.notify(Notification_new_message_ID, notification3);
+                                // -- notification ------------------
+                                // -- notification ------------------
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            try
+            {
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+
     }
 
 
@@ -7523,6 +7704,23 @@ public class MainActivity extends AppCompatActivity
         return null;
     }
 
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+    public static String bytesToHex(byte[] bytes, int start, int len)
+    {
+        char[] hexChars = new char[(len) * 2];
+
+        System.out.println("blen=" + (len));
+
+        for (int j = start; j < (start + len); j++)
+        {
+            int v = bytes[j] & 0xFF;
+            hexChars[(j - start) * 2] = hexArray[v >>> 4];
+            hexChars[(j - start) * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
     public static String bytes_to_hex(ByteBuffer in)
     {
         try
@@ -7559,6 +7757,18 @@ public class MainActivity extends AppCompatActivity
         }
         return "*ERROR*";
 
+    }
+
+    public static byte[] hex_to_bytes(String s)
+    {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2)
+        {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+        }
+
+        return data;
     }
 
     public static com.bumptech.glide.load.Key StringSignature2(final String in)
@@ -8500,6 +8710,45 @@ public class MainActivity extends AppCompatActivity
         else
         {
             return 1;
+        }
+    }
+
+    static class send_message_result
+    {
+        long msg_num;
+        boolean msg_v2;
+    }
+
+    public static send_message_result tox_friend_send_message_wrapper(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message)
+    {
+        send_message_result result = new send_message_result();
+
+        // use msg V2 API Call
+        long t_sec = (System.currentTimeMillis() / 1000);
+        long res = tox_util_friend_send_message_v2(friendnum, a_TOX_MESSAGE_TYPE, t_sec, message, message.length());
+
+        Log.i(TAG, "tox_friend_send_message_wrapper:message=" + message + " res=" + res);
+
+        if (res == -9999)
+        {
+            // msg V2 OK
+            result.msg_num = (Long.MAX_VALUE - 1);
+            result.msg_v2 = true;
+            return result;
+        }
+        else if (res == -9991)
+        {
+            // msg V2 error
+            result.msg_num = -1;
+            result.msg_v2 = true;
+            return result;
+        }
+        else
+        {
+            // old message
+            result.msg_num = res;
+            result.msg_v2 = false;
+            return result;
         }
     }
 

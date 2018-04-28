@@ -79,7 +79,7 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incom
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
@@ -754,8 +754,9 @@ public class MessageListActivity extends AppCompatActivity
 
                     if ((msg != null) && (!msg.equalsIgnoreCase("")))
                     {
-                        long res = tox_friend_send_message(friendnum, 0, msg);
-                        Log.i(TAG, "tox_friend_send_message:result=" + res + " m=" + m);
+                        MainActivity.send_message_result result = tox_friend_send_message_wrapper(friendnum, 0, msg);
+                        long res=result.msg_num;
+                        Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res + " m=" + m);
 
                         if (res > -1)
                         {
