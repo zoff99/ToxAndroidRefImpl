@@ -3355,6 +3355,17 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static void android_tox_callback_friend_read_receipt_message_v2_cb_method(long friend_number, long_ts_sec, byte[] msg_id)
+    {
+
+        ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+        msg_id_buffer.put(msg_id, 0, (int) TOX_HASH_LENGTH);
+
+        Log.i(TAG, "receipt_message_v2_cb:mid:2=" +
+                   bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit()));
+
+    }
+
     static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
     {
         // Log.i(TAG, "friend_read_receipt:friend:" + friend_number + " message_id:" + message_id);
