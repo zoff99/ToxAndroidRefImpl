@@ -2253,12 +2253,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         /*
-        * YUV420 frame with width * height
-        *
-        * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
-        * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
-        * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
-        */
+         * YUV420 frame with width * height
+         *
+         * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
+         * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
+         * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
+         */
         int y_layer_size = (int) Math.max(frame_width_px1, Math.abs(ystride)) * frame_height_px1;
         int u_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(ustride)) * (frame_height_px1 / 2);
         int v_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(vstride)) * (frame_height_px1 / 2);
@@ -2401,7 +2401,7 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_messagev2_get_message_id(ByteBuffer raw_message_buffer, ByteBuffer msgid_buffer);
 
     public static native int tox_messagev2_get_message_text(ByteBuffer raw_message_buffer, long raw_message_len, int is_alter_msg, long alter_type, ByteBuffer message_text_buffer);
-    
+
     public static native int tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
 
     public static native long tox_util_friend_send_message_v2(long friend_number, int type, long ts_sec, String message, long length);
@@ -3360,10 +3360,55 @@ public class MainActivity extends AppCompatActivity
 
         ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
         msg_id_buffer.put(msg_id, 0, (int) TOX_HASH_LENGTH);
+        String message_id_hash_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
+                                                          msg_id_buffer.limit());
 
-        Log.i(TAG, "receipt_message_v2_cb:mid:2=" +
-                   bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit()));
+        Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
 
+        try
+        {
+            final Message m = orma.selectFromMessage().
+                    msg_id_hashEq(message_id_hash_as_hex_string).
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    directionEq(1).
+                    readEq(false).
+                    toList().get(0);
+
+            if (m != null)
+            {
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            m.rcvd_timestamp = System.currentTimeMillis();
+                            m.read = true;
+                            update_message_in_db_read_rcvd_timestamp(m);
+
+                            // TODO this updates all messages. should be done nicer and faster!
+                            // update_message_view();
+                            update_single_message(m, true);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
@@ -3552,8 +3597,21 @@ public class MainActivity extends AppCompatActivity
         ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
         tox_messagev2_get_message_id(raw_message_buf, msg_id_buffer);
 
-        Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:mid:2=" +
-                   bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit()));
+        String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
+                                                 msg_id_buffer.limit());
+        Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
+
+        int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
+                tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(msg_id_as_hex_string).count();
+        if (already_have_message > 0)
+        {
+            // it's a double send, ignore it
+            // send message receipt v2, most likely the other party did not get it yet
+            // TODO: use received timstamp, not "now" here!
+            long t_sec_receipt = (System.currentTimeMillis() / 1000);
+            tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
+            return;
+        }
 
         // add FT message to UI
         Message m = new Message();
@@ -3583,7 +3641,7 @@ public class MainActivity extends AppCompatActivity
         m.rcvd_timestamp_ms = ts_ms; // "ms" part of timestamp (could be just an increasing number)
         m.text = friend_message;
         m.msg_version = 1;
-        m.msg_id_hash = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit());
+        m.msg_id_hash = msg_id_as_hex_string;
 
         Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
 
@@ -3602,6 +3660,10 @@ public class MainActivity extends AppCompatActivity
         {
             insert_into_message_db(m, false);
         }
+
+        // send message receipt v2
+        long t_sec_receipt = (System.currentTimeMillis() / 1000);
+        tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
 
         try
         {
@@ -5240,9 +5302,9 @@ public class MainActivity extends AppCompatActivity
 
     /*
      * this is used to load the native library on
-	 * application startup. The library has already been unpacked at
-	 * installation time by the package manager.
-	 */
+     * application startup. The library has already been unpacked at
+     * installation time by the package manager.
+     */
     static
     {
         try
@@ -5496,15 +5558,6 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "update_message_view:EE:" + e.getMessage());
         }
     }
-
-    //    public static void update_all_messages_global(boolean force)
-    //    {
-    //        if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
-    //        {
-    //            update_all_messages_global_timestamp = System.currentTimeMillis();
-    //            update_message_view();
-    //        }
-    //    }
 
     public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
     {
@@ -5957,35 +6010,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
-    //    public static String XXXXXXXtox_conference_peer_get_name__wrapperXXXXXX(long conference_number, long peer_number)
-    //    {
-    //        if (cache_peername_pubkey.containsKey("" + conference_number + ":" + peer_number))
-    //        {
-    //            // Log.i(TAG, "cache hit:2a");
-    //            return cache_peernum_pubkey.get("" + conference_number + ":" + peer_number);
-    //        }
-    //        else
-    //        {
-    //            if (cache_peernum_pubkey.size() >= 100)
-    //            {
-    //                // TODO: bad!
-    //                cache_peernum_pubkey.clear();
-    //            }
-    //
-    //            String result = tox_conference_peer_get_name(conference_number, peer_number);
-    //            if (result.equals("-1"))
-    //            {
-    //                return null;
-    //            }
-    //            else
-    //            {
-    //                cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
-    //                return result;
-    //            }
-    //        }
-    //    }
-
 
     public void show_add_friend(View view)
     {
@@ -7024,47 +7048,6 @@ public class MainActivity extends AppCompatActivity
         };
         t.start();
     }
-
-    //    static void update_message_view_on_UI()
-    //    {
-    //        Runnable myRunnable = new Runnable()
-    //        {
-    //            @Override
-    //            public void run()
-    //            {
-    //                try
-    //                {
-    //                    update_message_view();
-    //                }
-    //                catch (Exception e)
-    //                {
-    //                    e.printStackTrace();
-    //                }
-    //            }
-    //        };
-    //        main_handler_s.post(myRunnable);
-    //    }
-
-    //    static void update_message_view()
-    //    {
-    //        try
-    //        {
-    //            // Log.i(TAG, "update_message_view:001 " + message_list_fragment);
-    //            // Log.i(TAG, "update_message_view:002 " + message_list_fragment.isAdded() + " " + message_list_fragment.isVisible());
-    //            // update the message view (if possbile)
-    //            if (message_list_fragment != null)
-    //            {
-    //                Log.i(TAG, "update_message_view:005");
-    //                MainActivity.message_list_fragment.update_all_messages(false);
-    //                Log.i(TAG, "update_message_view:006");
-    //            }
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            // e.printStackTrace();
-    //            Log.i(TAG, "update_message_view:EE:" + e.getMessage());
-    //        }
-    //    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
