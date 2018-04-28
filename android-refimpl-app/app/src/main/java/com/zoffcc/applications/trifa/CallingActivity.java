@@ -367,7 +367,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             MainActivity.send_message_result result = tox_friend_send_message_wrapper(
                                     tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
                                     PREF__X_misc_button_msg);
-                            long res=result.msg_num;
+                            long res = result.msg_num;
                             Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res);
                         }
                         catch (Exception e)
