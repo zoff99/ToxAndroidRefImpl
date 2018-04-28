@@ -192,6 +192,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILETRANSFER_SIZE_MSGV2;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_AWAY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_BUSY;
@@ -2404,10 +2405,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
 
-    public static native long tox_util_friend_send_message_v2(long friend_number, int type, long ts_sec,
-        String message, long length,
-        ByteBuffer raw_message_back_buffer, ByteBuffer raw_message_back_buffer_length,
-        ByteBuffer msgid_back_buffer);
+    public static native long tox_util_friend_send_message_v2(long friend_number, int type, long ts_sec, String message, long length, ByteBuffer raw_message_back_buffer, ByteBuffer raw_message_back_buffer_length, ByteBuffer msgid_back_buffer);
     // --------------- Message V2 -------------
     // --------------- Message V2 -------------
     // --------------- Message V2 -------------
@@ -3366,7 +3364,7 @@ public class MainActivity extends AppCompatActivity
         String message_id_hash_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
                                                           msg_id_buffer.limit());
 
-        Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
+        // Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
 
         try
         {
@@ -3575,9 +3573,9 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
     {
-        Log.i(TAG,
-              "friend_message_v2:friend:" + friend_number + " ts:" + ts_sec + " systime" + System.currentTimeMillis() +
-              " message:" + friend_message);
+        // Log.i(TAG,
+        //      "friend_message_v2:friend:" + friend_number + " ts:" + ts_sec + " systime" + System.currentTimeMillis() +
+        //      " message:" + friend_message);
 
         // if message list for this friend is open, then don't do notification and "new" badge
         boolean do_notification = true;
@@ -3602,7 +3600,7 @@ public class MainActivity extends AppCompatActivity
 
         String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
                                                  msg_id_buffer.limit());
-        Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
+        // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
 
         int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
                 tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(msg_id_as_hex_string).count();
@@ -8714,24 +8712,41 @@ public class MainActivity extends AppCompatActivity
     {
         long msg_num;
         boolean msg_v2;
+        String msg_hash_hex;
+        String raw_message_buf_hex;
     }
 
     public static send_message_result tox_friend_send_message_wrapper(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message)
     {
         send_message_result result = new send_message_result();
 
+        ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) TOX_MAX_FILETRANSFER_SIZE_MSGV2);
+        ByteBuffer raw_message_length_buf = ByteBuffer.allocateDirect((int) 2); // 2 bytes for length
+        ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+
         // use msg V2 API Call
         long t_sec = (System.currentTimeMillis() / 1000);
-        long res = tox_util_friend_send_message_v2(friendnum, a_TOX_MESSAGE_TYPE, t_sec,
-            message, message.length());
+        long res = tox_util_friend_send_message_v2(friendnum, a_TOX_MESSAGE_TYPE, t_sec, message, message.length(),
+                                                   raw_message_buf, raw_message_length_buf, msg_id_buffer);
+        int raw_message_length_int = raw_message_length_buf.
+                array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
+                array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
 
-        Log.i(TAG, "tox_friend_send_message_wrapper:message=" + message + " res=" + res);
+        // Log.i(TAG,
+        //      "tox_friend_send_message_wrapper:message=" + message + " res=" + res + " len=" + raw_message_length_int);
 
         if (res == -9999)
         {
             // msg V2 OK
             result.msg_num = (Long.MAX_VALUE - 1);
             result.msg_v2 = true;
+            result.msg_hash_hex = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit());
+            result.raw_message_buf_hex = bytesToHex(raw_message_buf.array(), raw_message_buf.arrayOffset(),
+                                                    raw_message_length_int);
+
+            // Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
+            //           result.raw_message_buf_hex);
+
             return result;
         }
         else if (res == -9991)
@@ -8739,6 +8754,8 @@ public class MainActivity extends AppCompatActivity
             // msg V2 error
             result.msg_num = -1;
             result.msg_v2 = true;
+            result.msg_hash_hex = "";
+            result.raw_message_buf_hex = "";
             return result;
         }
         else
@@ -8746,6 +8763,8 @@ public class MainActivity extends AppCompatActivity
             // old message
             result.msg_num = res;
             result.msg_v2 = false;
+            result.msg_hash_hex = "";
+            result.raw_message_buf_hex = "";
             return result;
         }
     }

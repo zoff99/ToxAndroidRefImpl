@@ -755,14 +755,24 @@ public class MessageListActivity extends AppCompatActivity
                     if ((msg != null) && (!msg.equalsIgnoreCase("")))
                     {
                         MainActivity.send_message_result result = tox_friend_send_message_wrapper(friendnum, 0, msg);
-                        long res=result.msg_num;
-                        Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res + " m=" + m);
+                        long res = result.msg_num;
+                        // Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res + " m=" + m);
 
-                        if (res > -1)
+                        if (res > -1) // sending was OK
                         {
                             m.message_id = res;
+                            if (!result.msg_hash_hex.equalsIgnoreCase(""))
+                            {
+                                m.msg_id_hash = result.msg_hash_hex;
+                            }
+                            if (!result.raw_message_buf_hex.equalsIgnoreCase(""))
+                            {
+                                m.raw_msgv2_bytes = result.raw_message_buf_hex;
+                            }
                             long row_id = insert_into_message_db(m, true);
                             m.id = row_id;
+                            // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3=" + m.msg_id_hash);
+                            // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3raw=" + m.raw_msgv2_bytes);
                             ml_new_message.setText("");
 
                             stop_self_typing_indicator_s();
