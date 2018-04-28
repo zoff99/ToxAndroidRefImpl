@@ -297,7 +297,7 @@ compile:
   - . ~/pp;cd jni-c-toxcore/filter_audio; ls -hal
   # --- filter_audio ---
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra -Wno-unused-parameter
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
     jni-c-toxcore.c -o libjni-c-toxcore.so
     -std=gnu99 -I/usr/local/include/
@@ -437,7 +437,7 @@ compile:
   - . ~/pp;cd jni-c-toxcore/filter_audio; ls -hal
   # --- filter_audio ---
 
-  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
+  - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra -Wno-unused-parameter
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
     jni-c-toxcore.c -o libjni-c-toxcore.so
     -std=gnu99 -I/usr/local/include/
