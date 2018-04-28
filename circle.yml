@@ -298,7 +298,7 @@ compile:
   # --- filter_audio ---
 
   - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
-    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable
+    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
     jni-c-toxcore.c -o libjni-c-toxcore.so
     -std=gnu99 -I/usr/local/include/
@@ -439,7 +439,7 @@ compile:
   # --- filter_audio ---
 
   - . ~/pp;cd jni-c-toxcore/; export V=2;$GCC -O3 -g -shared -Wall -Wextra
-    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable
+    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so
     jni-c-toxcore.c -o libjni-c-toxcore.so
     -std=gnu99 -I/usr/local/include/
