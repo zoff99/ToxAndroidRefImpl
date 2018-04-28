@@ -2516,13 +2516,12 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message_1v2(JNIEnv *env,
         jobject thiz, jlong friend_number, jint type, jlong ts_sec,
         jobject message, jlong length,
-        jobject raw_message_back,
+        jobject raw_message_back_buffer,
         jobject raw_msg_len_back,
-        jobject msgid_back)
+        jobject msgid_back_buffer)
 {
 #ifdef TOX_HAVE_TOXUTIL
 
-    uint8_t *raw_message_back_buffer_c = NULL;
     long capacity = 0;
 
     if(raw_message_back_buffer == NULL)
@@ -2540,16 +2539,19 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
         return (jlong)-9991;
     }
 
-    raw_message_back_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_back_buffer);
+    uint8_t *raw_message_back_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_back_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, raw_message_back_buffer);
 
-    msgid_back_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_back_buffer);
+    uint8_t *msgid_back_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_back_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, msgid_back_buffer);
 
-    raw_msg_len_back_c_2 = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_msg_len_back);
+    uint8_t *raw_msg_len_back_c_2 = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_msg_len_back);
     capacity = (*env)->GetDirectBufferCapacity(env, raw_msg_len_back);
 
     uint32_t raw_msg_len_back_c;
+
+    const char *message_str = NULL;
+    message_str = (*env)->GetStringUTFChars(env, message, NULL);
 
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
