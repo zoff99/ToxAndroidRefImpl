@@ -2359,7 +2359,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
     }
 
     jlong buffer[numfriends];
-    int i = 0;
+    size_t i = 0;
 
     for(i=0; i<numfriends; i++)
     {
