@@ -800,6 +800,7 @@ void init_tox_callbacks()
     tox_utils_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
     tox_callback_file_recv_chunk(tox_global, tox_utils_file_recv_chunk_cb);
 
+
     tox_utils_callback_friend_message_v2(tox_global, friend_message_v2_cb);
     tox_utils_callback_friend_read_receipt_message_v2(tox_global, friend_read_receipt_message_v2_cb);
     // -------- _callbacks_ --------
