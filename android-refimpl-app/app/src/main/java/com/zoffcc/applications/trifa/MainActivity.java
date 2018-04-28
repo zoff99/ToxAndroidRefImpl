@@ -3355,7 +3355,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void android_tox_callback_friend_read_receipt_message_v2_cb_method(long friend_number, long_ts_sec, byte[] msg_id)
+    static void android_tox_callback_friend_read_receipt_message_v2_cb_method(long friend_number, long ts_sec, byte[] msg_id)
     {
 
         ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
