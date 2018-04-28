@@ -56,7 +56,7 @@ import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -364,10 +364,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             misc_button.setImageDrawable(d2a);
 
                             // send misc. message to friend
-                            long res = tox_friend_send_message(
+                            MainActivity.send_message_result result = tox_friend_send_message_wrapper(
                                     tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
                                     PREF__X_misc_button_msg);
-                            Log.i(TAG, "tox_friend_send_message:result=" + res);
+                            long res=result.msg_num;
+                            Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res);
                         }
                         catch (Exception e)
                         {

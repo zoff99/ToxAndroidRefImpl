@@ -64,13 +64,21 @@ public class Message
     @Column(indexed = true, defaultExpr = "-1")
     long filetransfer_id; // f_key -> Filetransfer.id
 
-    @Column(helpers = Column.Helpers.ALL)
+    @Column(helpers = Column.Helpers.ALL, defaultExpr = "0")
     @Nullable
     long sent_timestamp = 0L;
 
-    @Column(indexed = true)
+    @Column(helpers = Column.Helpers.ALL, defaultExpr = "0")
+    @Nullable
+    long sent_timestamp_ms = 0L;
+
+    @Column(indexed = true, defaultExpr = "0")
     @Nullable
     long rcvd_timestamp = 0L;
+
+    @Column(indexed = true, defaultExpr = "0")
+    @Nullable
+    long rcvd_timestamp_ms = 0L;
 
     @Column(helpers = Column.Helpers.ALL)
     boolean read = false;
@@ -85,6 +93,17 @@ public class Message
     @Column(helpers = Column.Helpers.ALL)
     @Nullable
     String filename_fullpath = null;
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String msg_id_hash = null; // 32bit hash, used for MessageV2 Messages! and otherwise NULL
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String raw_msgv2_bytes = null; // used for MessageV2 Messages! and otherwise NULL
+
+    @Column(indexed = true, defaultExpr = "0")
+    int msg_version; // 0 -> old Message, 1 -> for MessageV2 Message
 
     static Message deep_copy(Message in)
     {
@@ -101,11 +120,16 @@ public class Message
         out.filedb_id = in.filedb_id;
         out.filetransfer_id = in.filetransfer_id;
         out.sent_timestamp = in.sent_timestamp;
+        out.sent_timestamp_ms = in.sent_timestamp_ms;
         out.rcvd_timestamp = in.rcvd_timestamp;
+        out.rcvd_timestamp_ms = in.rcvd_timestamp_ms;
         out.read = in.read;
         out.is_new = in.is_new;
         out.text = in.text;
         out.filename_fullpath = in.filename_fullpath;
+        out.msg_id_hash = in.msg_id_hash;
+        out.msg_version = in.msg_version;
+        out.raw_msgv2_bytes = in.raw_msgv2_bytes;
 
         return out;
     }
@@ -113,12 +137,11 @@ public class Message
     @Override
     public String toString()
     {
-        return "id=" + id + ", message_id=" + message_id + 
-            ", filetransfer_id=" + filetransfer_id + ", filedb_id=" + filedb_id + 
-            ", tox_friendpubkey=" + "*pubkey*" + ", direction=" + direction + 
-            ", state=" + state + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + 
-            ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + 
-            ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + "xxxxxx" + 
-            ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new;
+        return "id=" + id + ", message_id=" + message_id + ", filetransfer_id=" + filetransfer_id + ", filedb_id=" +
+               filedb_id + ", tox_friendpubkey=" + "*pubkey*" + ", direction=" + direction + ", state=" + state +
+               ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE +
+               ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
+               ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new +
+               ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version + ", raw_msgv2_bytes=" + "xxxxxx";
     }
 }
