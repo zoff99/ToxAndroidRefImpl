@@ -70,8 +70,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 23
-static const char global_version_string[] = "0.99.23";
+#define VERSION_PATCH 24
+static const char global_version_string[] = "0.99.24";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -223,6 +223,7 @@ jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_v2_cb_method = NULL;
+jmethodID android_tox_callback_friend_read_receipt_message_v2_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_control_cb_method = NULL;
 jmethodID android_tox_callback_file_chunk_request_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_cb_method = NULL;
@@ -798,7 +799,9 @@ void init_tox_callbacks()
     tox_callback_file_recv(tox_global, tox_utils_file_recv_cb);
     tox_utils_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
     tox_callback_file_recv_chunk(tox_global, tox_utils_file_recv_chunk_cb);
+
     tox_utils_callback_friend_message_v2(tox_global, friend_message_v2_cb);
+    tox_utils_callback_friend_read_receipt_message_v2(tox_global, friend_read_receipt_message_v2_cb);
     // -------- _callbacks_ --------
 #else
     // -------- _callbacks_ --------
@@ -1076,6 +1079,47 @@ void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *messa
 
 
 
+void android_tox_callback_friend_read_receipt_message_v2_cb(uint32_t friend_number,
+    uint32_t ts_sec, const uint8_t *msgid)
+{
+#ifdef TOX_MESSAGE_V2_ACTIVE
+
+    if (msgid)
+    {
+		JNIEnv *jnienv2;
+		jnienv2 = jni_getenv();
+		jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)TOX_PUBLIC_KEY_SIZE);
+
+		if(data2 == NULL)
+		{
+			// TODO: catch this OOM error!!
+			// return; // out of memory error thrown
+		}
+
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		(*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)TOX_PUBLIC_KEY_SIZE, (const jbyte *)msgid);
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+
+        (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                         android_tox_callback_friend_read_receipt_message_v2_cb_method,
+                                         (jlong)(unsigned long long)friend_number,
+                                         (jlong)ts_sec,
+                                         data2
+                                         );
+
+		(*jnienv2)->DeleteLocalRef(jnienv2, data2);
+    }
+
+#endif
+}
+
+void friend_read_receipt_message_v2_cb(Tox *tox, uint32_t friend_number,
+        uint32_t ts_sec, const uint8_t *msgid)
+{
+    android_tox_callback_friend_read_receipt_message_v2_cb(friend_number, ts_sec, msgid);
+}
 
 
 void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
@@ -1134,7 +1178,6 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uin
     }
 #endif
 }
-
 
 
 void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
@@ -1850,6 +1893,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
     android_tox_callback_friend_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
+    android_tox_callback_friend_read_receipt_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_friend_read_receipt_message_v2_cb_method", "(JJ[BJ)V");
     android_tox_callback_file_recv_control_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_file_recv_control_cb_method", "(JJI)V");
     android_tox_callback_file_chunk_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2431,6 +2476,46 @@ Java_com_zoffcc_applications_trifa_MainActivity_jnictoxcore_1version(JNIEnv *env
     return (*env)->NewStringUTF(env, global_version_string);
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1msg_1receipt_1v2(JNIEnv *env,
+        jobject thiz, jlong friend_number, jlong ts_sec,
+        jobject msgid_buffer)
+{
+#ifdef TOX_HAVE_TOXUTIL
+
+    if(msgid_buffer == NULL)
+    {
+        return (jint)-3;
+    }
+
+    uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
+    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+
+    bool res = tox_util_friend_send_msg_receipt_v2(tox_global,
+            (uint32_t)friend_number, msgid_buffer_c, (uint32_t)ts_sec);
+
+    if (res == true)
+    {
+        return (jint)0;
+    }
+    else
+    {
+        return (jint)1;
+    }
+#else
+	return (jint)-99;
+#endif
+
+}
+
+
+int64_t tox_util_friend_send_message_v2(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type,
+                                        uint32_t ts_sec, const uint8_t *message, size_t length,
+                                        uint8_t *raw_message_back, uint32_t *raw_msg_len_back,
+                                        uint8_t *msgid_back,
+                                        TOX_ERR_FRIEND_SEND_MESSAGE *error);
+
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message_1v2(JNIEnv *env,
         jobject thiz, jlong friend_number, jint type, jlong ts_sec,
@@ -2443,6 +2528,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
     int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
         (int)type, (uint32_t) ts_sec,
         (const uint8_t *)message_str, (size_t)strlen(message_str),
+        NULL, NULL, NULL,
         &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
 
