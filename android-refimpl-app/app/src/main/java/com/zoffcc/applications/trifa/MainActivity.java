@@ -2146,13 +2146,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void update_message_in_db_read_rcvd_timestamp(final Message m)
+    static void update_message_in_db_read_rcvd_timestamp_rawmsgbytes(final Message m)
     {
         try
         {
             orma.updateMessage().
                     idEq(m.id).
                     read(m.read).
+                    raw_msgv2_bytes(m.raw_msgv2_bytes).
                     rcvd_timestamp(m.rcvd_timestamp).
                     execute();
         }
@@ -3356,13 +3357,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void android_tox_callback_friend_read_receipt_message_v2_cb_method(long friend_number, long ts_sec, byte[] msg_id)
+    static void android_tox_callback_friend_read_receipt_message_v2_cb_method(final long friend_number, long ts_sec, byte[] msg_id)
     {
 
         ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
         msg_id_buffer.put(msg_id, 0, (int) TOX_HASH_LENGTH);
-        String message_id_hash_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
-                                                          msg_id_buffer.limit());
+        final String message_id_hash_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
+                                                                msg_id_buffer.limit());
 
         // Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
 
@@ -3384,9 +3385,10 @@ public class MainActivity extends AppCompatActivity
                     {
                         try
                         {
+                            m.raw_msgv2_bytes = "";
                             m.rcvd_timestamp = System.currentTimeMillis();
                             m.read = true;
-                            update_message_in_db_read_rcvd_timestamp(m);
+                            update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
 
                             // TODO this updates all messages. should be done nicer and faster!
                             // update_message_view();
@@ -3441,7 +3443,7 @@ public class MainActivity extends AppCompatActivity
                         {
                             m.rcvd_timestamp = System.currentTimeMillis();
                             m.read = true;
-                            update_message_in_db_read_rcvd_timestamp(m);
+                            update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
 
                             // TODO this updates all messages. should be done nicer and faster!
                             // update_message_view();
@@ -3638,8 +3640,10 @@ public class MainActivity extends AppCompatActivity
         m.state = TOX_FILE_CONTROL_RESUME.value;
         m.ft_accepted = false;
         m.ft_outgoing_started = false;
-        m.rcvd_timestamp = (ts_sec * 1000); // sent time as unix timestamp -> convert to milliseconds
-        m.rcvd_timestamp_ms = ts_ms; // "ms" part of timestamp (could be just an increasing number)
+        m.sent_timestamp = (ts_sec * 1000); // sent time as unix timestamp -> convert to milliseconds
+        m.sent_timestamp_ms = ts_ms; // "ms" part of timestamp (could be just an increasing number)
+        m.rcvd_timestamp = System.currentTimeMillis();
+        m.rcvd_timestamp_ms = 0;
         m.text = friend_message;
         m.msg_version = 1;
         m.msg_id_hash = msg_id_as_hex_string;
@@ -3817,7 +3821,11 @@ public class MainActivity extends AppCompatActivity
         m.read = false;
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
+        m.rcvd_timestamp_ms = 0;
+        m.sent_timestamp = System.currentTimeMillis();
+        m.sent_timestamp_ms = 0;
         m.text = friend_message;
+        m.msg_version = 0;
 
         if (message_list_activity != null)
         {

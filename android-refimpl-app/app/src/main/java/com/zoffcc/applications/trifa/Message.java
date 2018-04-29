@@ -83,6 +83,9 @@ public class Message
     @Column(helpers = Column.Helpers.ALL)
     boolean read = false;
 
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    int send_retries = 0;
+
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     boolean is_new = true;
 
@@ -124,6 +127,7 @@ public class Message
         out.rcvd_timestamp = in.rcvd_timestamp;
         out.rcvd_timestamp_ms = in.rcvd_timestamp_ms;
         out.read = in.read;
+        out.send_retries = in.send_retries;
         out.is_new = in.is_new;
         out.text = in.text;
         out.filename_fullpath = in.filename_fullpath;
@@ -141,7 +145,8 @@ public class Message
                filedb_id + ", tox_friendpubkey=" + "*pubkey*" + ", direction=" + direction + ", state=" + state +
                ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE +
                ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
-               ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath + ", is_new=" + is_new +
-               ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version + ", raw_msgv2_bytes=" + "xxxxxx";
+               ", send_retries=" + send_retries + ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath +
+               ", is_new=" + is_new + ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version +
+               ", raw_msgv2_bytes=" + "xxxxxx";
     }
 }

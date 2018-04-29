@@ -751,6 +751,7 @@ public class MessageListActivity extends AppCompatActivity
                     m.sent_timestamp = System.currentTimeMillis();
                     m.read = false;
                     m.text = msg;
+                    m.msg_version = 0;
 
                     if ((msg != null) && (!msg.equalsIgnoreCase("")))
                     {
@@ -764,6 +765,7 @@ public class MessageListActivity extends AppCompatActivity
                             if (!result.msg_hash_hex.equalsIgnoreCase(""))
                             {
                                 m.msg_id_hash = result.msg_hash_hex;
+                                m.msg_version = 1; // msgV2 message
                             }
                             if (!result.raw_message_buf_hex.equalsIgnoreCase(""))
                             {

@@ -159,7 +159,22 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
-        date_time.setText(long_date_time_format(m.sent_timestamp));
+        final String unicode_PERSONAL_COMPUTER = "\uD83D\uDCBB";
+        final String unicode_INCOMING_ENVELOPE = "\uD83D\uDCE8";
+        final String unicode_Mobile_Phone_With_Arrow = "\uD83D\uDCF2";
+        final String unicode_MEMO = "\uD83D\uDCDD";
+        final String unicode_ARROW_LEFT = "←";
+
+        if (m.msg_version == 1)
+        {
+            date_time.setText(unicode_ARROW_LEFT + long_date_time_format(m.sent_timestamp) + "\n" +
+                              unicode_Mobile_Phone_With_Arrow + long_date_time_format(m.rcvd_timestamp));
+        }
+        else
+        {
+            date_time.setText(long_date_time_format(m.sent_timestamp));
+        }
+
 
         textView.setCustomRegex(TOXURL_PATTERN);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
