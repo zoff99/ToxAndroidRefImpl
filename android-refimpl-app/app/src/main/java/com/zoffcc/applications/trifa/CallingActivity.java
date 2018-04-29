@@ -54,6 +54,8 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_ena
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
+import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
@@ -78,6 +80,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static int active_camera_type = FRONT_CAMERA_USED;
     // private final Handler mHideHandler = new Handler();
     static ImageView mContentView;
+    static ImageView caller_avatar_view;
     static ImageButton accept_button = null;
     ImageButton decline_button = null;
     static ImageButton camera_toggle_button = null;
@@ -152,6 +155,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         mVisible = true;
         mContentView = (ImageView) findViewById(R.id.video_view);
+
+        caller_avatar_view = (ImageView) findViewById(R.id.caller_avatar_view);
+
+        try
+        {
+            final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
+                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+            caller_avatar_view.setImageDrawable(d1);
+
+            String fname = get_vfs_image_filename_friend_avatar(
+                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
+
+            if (fname != null)
+            {
+                put_vfs_image_on_imageview(this, caller_avatar_view, d1, fname);
+            }
+        }
+        catch (Exception e1)
+        {
+            e1.printStackTrace();
+        }
 
         right_top_text_1 = (TextView) findViewById(R.id.right_top_text_1);
         right_top_text_2 = (TextView) findViewById(R.id.right_top_text_2);
@@ -471,12 +495,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         if (Callstate.accepted_call == 1)
         {
+            // HINT: also when starting a call ourselves!!
+            caller_avatar_view.setVisibility(View.VISIBLE);
             accept_button.setVisibility(View.GONE);
             camera_toggle_button.setVisibility(View.VISIBLE);
             mute_button.setVisibility(View.VISIBLE);
         }
         else
         {
+            caller_avatar_view.setVisibility(View.VISIBLE);
             accept_button.setVisibility(View.VISIBLE);
             camera_toggle_button.setVisibility(View.GONE);
             mute_button.setVisibility(View.GONE);
@@ -595,6 +622,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             // need to set our state manually here, no callback from toxcore :-(
                             Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             // need to set our state manually here, no callback from toxcore :-(
+
+                            caller_avatar_view.setVisibility(View.GONE);
                             accept_button.setVisibility(View.GONE);
                             camera_toggle_button.setVisibility(View.VISIBLE);
                             mute_button.setVisibility(View.VISIBLE);

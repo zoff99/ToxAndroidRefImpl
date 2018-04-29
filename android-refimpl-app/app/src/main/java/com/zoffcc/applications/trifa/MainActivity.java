@@ -2700,6 +2700,16 @@ public class MainActivity extends AppCompatActivity
                         {
                             e.printStackTrace();
                         }
+
+                        try
+                        {
+                            CallingActivity.caller_avatar_view.setVisibility(View.GONE);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
                     }
                 };
                 CallingActivity.callactivity_handler_s.post(myRunnable);

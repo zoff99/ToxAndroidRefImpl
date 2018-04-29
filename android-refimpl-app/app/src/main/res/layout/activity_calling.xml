@@ -33,12 +33,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
             <ImageView
                 android:id="@+id/video_view"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:background="@android:color/black"/>
-
 
             <FrameLayout
                 android:layout_width="125dp"
@@ -68,7 +68,6 @@
 
                 </LinearLayout>
             </FrameLayout>
-
 
             <FrameLayout
                 android:layout_width="125dp"
@@ -135,6 +134,13 @@
                 </LinearLayout>
             </FrameLayout>
 
+            <ImageView
+                android:id="@+id/caller_avatar_view"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:background="@android:color/black"/>
 
             <FrameLayout
                 android:layout_width="125dp"
@@ -198,8 +204,8 @@
                 android:id="@+id/text_vq_med"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:elevation="2dp"
                 android:layout_weight="1"
+                android:elevation="2dp"
                 android:gravity="center_horizontal"
                 android:text="Video Quality"
                 android:textColor="@color/md_green_600"
