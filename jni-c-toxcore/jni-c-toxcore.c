@@ -2512,6 +2512,53 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1msg_1re
 }
 
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1message_1v2(JNIEnv *env,
+        jobject thiz, jlong friend_number,
+        jobject raw_message_buffer,
+        jlong raw_msg_len)
+{
+#ifdef TOX_HAVE_TOXUTIL
+
+    if(raw_message_buffer == NULL)
+    {
+        return (jint)-2;
+    }
+
+    if (raw_msg_len < 1)
+    {
+        return (jint)-3;
+    }
+
+    long capacity = 0;
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    bool res = tox_util_friend_resend_message_v2(tox_global, (uint32_t) friend_number,
+        (const uint8_t *)raw_message_buffer_c,
+        (const uint32_t)raw_msg_len,
+        &error);
+
+    (*env)->ReleaseStringUTFChars(env, raw_message_buffer, raw_message_buffer_c);
+
+    if (res == false)
+    {
+        return (jint)-1;
+    }
+    else
+    {
+        return (jint)0;
+    }
+#else
+	return (jint)-99;
+#endif
+}
+
+
+
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message_1v2(JNIEnv *env,
         jobject thiz, jlong friend_number, jint type, jlong ts_sec,

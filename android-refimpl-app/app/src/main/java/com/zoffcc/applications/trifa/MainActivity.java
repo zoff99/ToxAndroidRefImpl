@@ -2407,6 +2407,8 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
 
     public static native long tox_util_friend_send_message_v2(long friend_number, int type, long ts_sec, String message, long length, ByteBuffer raw_message_back_buffer, ByteBuffer raw_message_back_buffer_length, ByteBuffer msgid_back_buffer);
+
+    public static native int tox_util_friend_resend_message_v2(long friend_number, ByteBuffer raw_message_buffer, long raw_msg_len);
     // --------------- Message V2 -------------
     // --------------- Message V2 -------------
     // --------------- Message V2 -------------
