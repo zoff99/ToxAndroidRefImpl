@@ -1531,6 +1531,8 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
 	}
 #endif
 
+    dbg(9, "toxav_audio_receive_frame_cb_: %d %d %d %d %d %d %d", (int)pcm[0], (int)pcm[1], (int)pcm[2], (int)pcm[3], (int)pcm[4], (int)pcm[5], (int)pcm[6]);
+
     android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
 }
 
@@ -1805,13 +1807,22 @@ void *thread_video_av(void *data)
 
     dbg(2, "AV video Thread #%d: starting", (int) id);
 
+    long av_iterate_interval = 1;
     while(toxav_video_thread_stop != 1)
     {
         pthread_mutex_lock(&av_thread_lock);
         toxav_iterate(av);
         // dbg(9, "AV video Thread #%d running ...", (int) id);
         pthread_mutex_unlock(&av_thread_lock);
-        usleep(toxav_iteration_interval(av) * 1000);
+        av_iterate_interval = toxav_iteration_interval(av);
+        if ((av_iterate_interval / 2) < 1)
+        {
+		    usleep(1 * 1000);
+        }
+        else
+        {
+            usleep(av_iterate_interval * 1000);
+        }
     }
 
     dbg(2, "ToxVideo:Clean video thread exit!\n");
@@ -2424,7 +2435,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv *env, jobject thiz)
 {
     long long l = (long long)tox_iteration_interval(tox_global);
-    dbg(9, "tox_iteration_interval=%lld", (long long)l);
+    // dbg(9, "tox_iteration_interval=%lld", (long long)l);
     return (jlong)(unsigned long long)l;
 }
 
