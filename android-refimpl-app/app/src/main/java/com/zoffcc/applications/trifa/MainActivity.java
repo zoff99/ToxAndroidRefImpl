@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -2798,9 +2798,9 @@ public class MainActivity extends AppCompatActivity
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
     {
 
-        Log.i(TAG,
-              "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
-              " " + channels + " " + sampling_rate);
+        // Log.i(TAG,
+        //      "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
+        //      " " + channels + " " + sampling_rate);
 
         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
@@ -2896,7 +2896,6 @@ public class MainActivity extends AppCompatActivity
             {
                 // Log.i(TAG, "audio_play:NativeAudio Play:001");
 
-
                 if ((NativeAudio.sampling_rate != (int) sampling_rate_) || (NativeAudio.channel_count != channels_))
                 {
                     NativeAudio.sampling_rate = (int) sampling_rate_;
@@ -2909,6 +2908,24 @@ public class MainActivity extends AppCompatActivity
                 audio_buffer_2[0].position(0);
                 int incoming_bytes = (int) ((sample_count * channels) * 2);
 
+//                System.out.println("NativeAudioPlay:000a:size="+ incoming_bytes +
+//                                   " offset="+audio_buffer_2[0].arrayOffset() +
+//                                   " limit="+audio_buffer_2[0].limit() +
+//                                   " bytes=" +
+//                                   audio_buffer_2[0].get(0) + " " +
+//                                   audio_buffer_2[0].get(1) + " " +
+//                                   audio_buffer_2[0].get(2) + " " +
+//                                   audio_buffer_2[0].get(3) + " " +
+//                                   audio_buffer_2[0].get(4) + " " +
+//                                   audio_buffer_2[0].get(5) + " " +
+//                                   audio_buffer_2[0].get(6) + " " +
+//                                   audio_buffer_2[0].get(7) + " " +
+//                                   audio_buffer_2[0].get(8) + " " +
+//                                   audio_buffer_2[0].get(9) + " " +
+//                                   audio_buffer_2[0].get(10) + " " +
+//                                   audio_buffer_2[0].get(11) + " " +
+//                                   audio_buffer_2[0].get(12)
+//                                   );
 
                 if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
                 {
@@ -2917,7 +2934,8 @@ public class MainActivity extends AppCompatActivity
                     int remain_start_pos = (incoming_bytes - remain_bytes);
                     NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(
                             NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
-                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(), 0,
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
+                                                                          audio_buffer_2[0].arrayOffset(),
                                                                           Math.min(incoming_bytes,
                                                                                    NativeAudio.n_buf_size_in_bytes -
                                                                                    NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]));
@@ -2930,10 +2948,10 @@ public class MainActivity extends AppCompatActivity
                         audio_buffer_2[0].position(0);
 
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
-                        System.out.println("NativeAudioPlay:001:res=" + res + " bytes=" +
-                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
-                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
-                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " ");
+//                        System.out.println("NativeAudioPlay:001:res=" + res + " bytes=" +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " ");
 
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
                         if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
@@ -2956,10 +2974,20 @@ public class MainActivity extends AppCompatActivity
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
 
-                        System.out.println("NativeAudioPlay:002:res=" + res + " bytes=" +
-                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
-                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
-                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " ");
+//                        System.out.println("NativeAudioPlay:002:res=" + res + " bytes=" +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(3) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(4) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(5) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(6) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(7) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(8) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(9) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(10) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(11) + " " +
+//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(12) + " ");
 
 
                         if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)

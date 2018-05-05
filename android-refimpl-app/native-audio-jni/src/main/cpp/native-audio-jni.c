@@ -93,7 +93,7 @@ static SLEngineItf engineEngine;
 
 // output mix interfaces
 static SLObjectItf outputMixObject = NULL;
-static SLEnvironmentalReverbItf outputMixEnvironmentalReverb = NULL;
+// static SLEnvironmentalReverbItf outputMixEnvironmentalReverb = NULL;
 
 // buffer queue player interfaces
 static SLObjectItf bqPlayerObject = NULL;
@@ -114,8 +114,8 @@ static short *resampleBuf = NULL;
 // static pthread_mutex_t audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
 
 // aux effect on the output mix, used by the buffer queue player
-static const SLEnvironmentalReverbSettings reverbSettings =
-        SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
+//static const SLEnvironmentalReverbSettings reverbSettings =
+//        SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
 
 // URI player interfaces
 static SLObjectItf uriPlayerObject = NULL;
@@ -177,6 +177,8 @@ int android_find_class_global(char *name, jclass *ret)
 }
 
 // --------------------------
+
+
 
 void releaseResampleBuf(void)
 {
@@ -252,9 +254,9 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
     //                    bq, recorderBufferQueue, (int) cur_rec_buf);
 
     int nextSize = 0;
-    short *nextBuffer = NULL;
+    int8_t *nextBuffer = NULL;
 
-    nextBuffer = (short *) audio_rec_buffer[rec_buf_pointer_next];
+    nextBuffer = (int8_t *) audio_rec_buffer[rec_buf_pointer_next];
     nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
 
     if ((nextSize > 0) && (nextBuffer))
@@ -265,7 +267,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         }
 
         // enque the next buffer
-        SLresult result = (*bq)->Enqueue(bq, nextBuffer, nextSize);
+        SLresult result = (*bq)->Enqueue(bq, nextBuffer, (SLuint32) nextSize);
 
         // signal Java code that a new record data is available in buffer #cur_rec_buf
         if ((NativeAudio_class) && (rec_buffer_ready_method))
@@ -278,11 +280,30 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                 args.version = JNI_VERSION_1_6; // choose your JNI version
                 args.name = NULL; // you might want to give the java thread a name
                 args.group = NULL; // you might want to assign the java thread to a ThreadGroup
-                (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **) &jnienv2, &args);
+                (*cachedJVM)->AttachCurrentThread(cachedJVM, (JNIEnv **) &jnienv2, &args);
             }
 
+//            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+//                                "bqRecorderCallback:buf#:%d sz:%d - %d %d %d %d %d %d %d %d %d %d %d %d",
+//                                (int) rec_buf_pointer_start,
+//                                (int) audio_rec_buffer_size[rec_buf_pointer_start],
+//                                (int) nextBuffer[0],
+//                                (int) nextBuffer[1],
+//                                (int) nextBuffer[2],
+//                                (int) nextBuffer[3],
+//                                (int) nextBuffer[4],
+//                                (int) nextBuffer[5],
+//                                (int) nextBuffer[6],
+//                                (int) nextBuffer[7],
+//                                (int) nextBuffer[8],
+//                                (int) nextBuffer[9],
+//                                (int) nextBuffer[10],
+//                                (int) nextBuffer[11]
+//            );
+
+
             (*jnienv2)->CallStaticVoidMethod(jnienv2, NativeAudio_class, rec_buffer_ready_method,
-                                             (int) rec_buf_pointer_start);
+                                             rec_buf_pointer_start);
             (*cachedJVM)->DetachCurrentThread(cachedJVM);
 
         }
@@ -342,40 +363,15 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *e
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
 
-#if 0
-    // create output mix, with environmental reverb specified as a non-required interface
-    const SLInterfaceID ids[1] = {SL_IID_ENVIRONMENTALREVERB};
-    const SLboolean req[1] = {SL_BOOLEAN_FALSE};
-    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1, ids, req);
-    assert(SL_RESULT_SUCCESS == result);
-    (void) result;
-#else
     // create output mix
     result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, 0, 0);
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
-#endif
 
     // realize the output mix
     result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
-
-#if 0
-    // get the environmental reverb interface
-    // this could fail if the environmental reverb effect is not available,
-    // either because the feature is not present, excessive CPU load, or
-    // the required MODIFY_AUDIO_SETTINGS permission was not requested and granted
-    result = (*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB,
-                                              &outputMixEnvironmentalReverb);
-    if (SL_RESULT_SUCCESS == result)
-    {
-        result = (*outputMixEnvironmentalReverb)->SetEnvironmentalReverbProperties(
-                outputMixEnvironmentalReverb, &reverbSettings);
-        (void) result;
-    }
-    // ignore unsuccessful result codes for environmental reverb, as it is optional for this example
-#endif
 
 }
 
@@ -394,7 +390,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         bqPlayerSampleRate = sampleRate * 1000;
     }
 
-    SLuint32 _speakers = SL_SPEAKER_FRONT_LEFT;
+    SLuint32 _speakers = SL_SPEAKER_FRONT_CENTER;
 
     if (channels == 2)
     {
@@ -430,17 +426,17 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
      */
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE,
                                   SL_IID_VOLUME,
-                                  SL_IID_ANDROIDCONFIGURATION,
+            /*SL_IID_ANDROIDCONFIGURATION,*/
             /*SL_IID_EFFECTSEND,*/
             /*SL_IID_MUTESOLO,*/};
     const SLboolean req[3] = {SL_BOOLEAN_TRUE,
                               SL_BOOLEAN_TRUE,
-                              SL_BOOLEAN_TRUE,
+            /*SL_BOOLEAN_TRUE,*/
             /*SL_BOOLEAN_TRUE,*/
             /*SL_BOOLEAN_TRUE,*/};
 
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
-                                                3, ids, req);
+                                                2, ids, req);
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
 
@@ -555,35 +551,35 @@ static SLVolumeItf getVolume()
 }
 
 
-// enable reverb on the buffer queue player
-jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_enableReverb(JNIEnv *env, jclass clazz,
-                                                                           jboolean enabled)
-{
-    SLresult result;
-
-    // we might not have been able to add environmental reverb to the output mix
-    if (NULL == outputMixEnvironmentalReverb)
-    {
-        return JNI_FALSE;
-    }
-
-    if (bqPlayerSampleRate)
-    {
-        /*
-         * we are in fast audio, reverb is not supported.
-         */
-        return JNI_FALSE;
-    }
-    result = (*bqPlayerEffectSend)->EnableEffectSend(bqPlayerEffectSend,
-                                                     outputMixEnvironmentalReverb, (SLboolean) enabled, (SLmillibel) 0);
-    // and even if environmental reverb was present, it might no longer be available
-    if (SL_RESULT_SUCCESS != result)
-    {
-        return JNI_FALSE;
-    }
-
-    return JNI_TRUE;
-}
+//// enable reverb on the buffer queue player
+//jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_enableReverb(JNIEnv *env, jclass clazz,
+//                                                                           jboolean enabled)
+//{
+//    SLresult result;
+//
+//    // we might not have been able to add environmental reverb to the output mix
+//    if (NULL == outputMixEnvironmentalReverb)
+//    {
+//        return JNI_FALSE;
+//    }
+//
+//    if (bqPlayerSampleRate)
+//    {
+//        /*
+//         * we are in fast audio, reverb is not supported.
+//         */
+//        return JNI_FALSE;
+//    }
+//    result = (*bqPlayerEffectSend)->EnableEffectSend(bqPlayerEffectSend,
+//                                                     outputMixEnvironmentalReverb, (SLboolean) enabled, (SLmillibel) 0);
+//    // and even if environmental reverb was present, it might no longer be available
+//    if (SL_RESULT_SUCCESS != result)
+//    {
+//        return JNI_FALSE;
+//    }
+//
+//    return JNI_TRUE;
+//}
 
 
 // create audio recorder: recorder is not in fast path
@@ -650,7 +646,7 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
 
     if (SL_RESULT_SUCCESS == result)
     {
-        SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION;
+        SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION;
         (*inputConfig)->SetConfiguration(inputConfig,
                                          SL_ANDROID_KEY_RECORDING_PRESET,
                                          &presetValue,
@@ -694,7 +690,7 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNI
     jnienv2 = jni_getenv();
 
     audio_play_buffer[num] = (uint8_t *) (*jnienv2)->GetDirectBufferAddress(jnienv2, buffer);
-    jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer);
+    jlong capacity = buffer_size_in_bytes; // (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer);
     audio_play_buffer_size[num] = (long) capacity;
 }
 
@@ -710,7 +706,7 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1rec_1buffe
                         (int) buffer_size_in_bytes);
 
     audio_rec_buffer[num] = (uint8_t *) (*jnienv2)->GetDirectBufferAddress(jnienv2, buffer);
-    jlong capacity = (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer);
+    jlong capacity = buffer_size_in_bytes; // (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer);
     audio_rec_buffer_size[num] = (long) capacity;
 }
 
@@ -792,7 +788,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
         result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
 
         // enque the buffer
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:1:Enqueue -> %d", rec_buf_pointer_next);
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:1:Enqueue -> %d", rec_buf_pointer_next);
         result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
         if (SL_RESULT_SUCCESS != result)
         {
@@ -815,7 +811,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
                 if (nextSize > 0)
                 {
                     // enque the buffer
-                    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:2:Enqueue -> %d", rec_buf_pointer_next);
+                    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:2:Enqueue -> %d", rec_buf_pointer_next);
                     result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
                     if (SL_RESULT_SUCCESS != result)
                     {
@@ -873,11 +869,28 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     }
 
     int nextSize = 0;
-    short *nextBuffer = NULL;
+    int8_t *nextBuffer = NULL;
 
     cur_buf = bufnum;
-    nextBuffer = (short *) audio_play_buffer[bufnum];
+    nextBuffer = (int8_t *) audio_play_buffer[bufnum];
     nextSize = audio_play_buffer_size[bufnum];
+
+//    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "PlayPCM16:buf#:%d sz:%d - %d %d %d %d %d %d %d %d %d %d %d %d",
+//                        (int) bufnum,
+//                        (int) audio_play_buffer_size[bufnum],
+//                        (int) nextBuffer[0],
+//                        (int) nextBuffer[1],
+//                        (int) nextBuffer[2],
+//                        (int) nextBuffer[3],
+//                        (int) nextBuffer[4],
+//                        (int) nextBuffer[5],
+//                        (int) nextBuffer[6],
+//                        (int) nextBuffer[7],
+//                        (int) nextBuffer[8],
+//                        (int) nextBuffer[9],
+//                        (int) nextBuffer[10],
+//                        (int) nextBuffer[11]
+//    );
 
     if (nextSize > 0)
     {
@@ -888,7 +901,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         // enque the buffer
         SLresult result;
         playing_state = _PLAYING;
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, nextSize);
+        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, (SLuint32) nextSize);
         if (SL_RESULT_SUCCESS != result)
         {
             return -2;
@@ -939,7 +952,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
     {
         (*outputMixObject)->Destroy(outputMixObject);
         outputMixObject = NULL;
-        outputMixEnvironmentalReverb = NULL;
+        // outputMixEnvironmentalReverb = NULL;
     }
 
     // destroy engine object, and invalidate all associated interfaces

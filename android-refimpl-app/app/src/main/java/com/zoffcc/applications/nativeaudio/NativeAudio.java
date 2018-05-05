@@ -106,7 +106,7 @@ public class NativeAudio
 
     public static native int isPlaying();
 
-    public static native boolean enableReverb(boolean enabled);
+    // public static native boolean enableReverb(boolean enabled);
 
     // ---------------------
 

@@ -68,7 +68,7 @@ public class AudioRecording extends Thread
     AcousticEchoCanceler aec = null;
     NoiseSuppressor np = null;
     public static boolean microphone_muted = false;
-    static final boolean DEBUG_MIC_DATE_LOGGING = false;
+    static final boolean DEBUG_MIC_DATA_LOGGING = false;
 
     // -----------------------
     static ByteBuffer _recBuffer = null;
@@ -583,7 +583,7 @@ public class AudioRecording extends Thread
                     NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
                     _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
 
-                    if (DEBUG_MIC_DATE_LOGGING)
+                    if (DEBUG_MIC_DATA_LOGGING)
                     {
                         Log.i(TAG, "send_audio_frame_to_toxcore_from_native:1:" +
                                    NativeAudio.n_rec_audio_buffer[bufnum_].get(0) + " " +
@@ -608,7 +608,7 @@ public class AudioRecording extends Thread
 
                                                             CHANNELS_TOX, SMAPLINGRATE_TOX);
 
-                    if (DEBUG_MIC_DATE_LOGGING)
+                    if (DEBUG_MIC_DATA_LOGGING)
                     {
                         if (audio_send_res != 0)
                         {
