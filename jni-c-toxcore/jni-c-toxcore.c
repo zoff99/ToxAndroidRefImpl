@@ -1531,8 +1531,15 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
 	}
 #endif
 
+#if 0
 	const int8_t *pcm2 = (int8_t *)pcm;
-    dbg(9, "toxav_audio_receive_frame_cb_: %d %d %d %d %d %d %d", (int8_t)pcm[0], (int8_t)pcm[1], (int8_t)pcm[2], (int8_t)pcm[3], (int8_t)pcm[4], (int8_t)pcm[5], (int8_t)pcm[6]);
+    dbg(9, "toxav_audio_receive_frame_cb_: ch:%d r:%d - %d %d %d %d %d %d %d",
+        (int)channels,
+        (int)sampling_rate,
+        (int8_t)pcm[0], (int8_t)pcm[1], (int8_t)pcm[2],
+        (int8_t)pcm[3], (int8_t)pcm[4], (int8_t)pcm[5],
+        (int8_t)pcm[6]);
+#endif
 
     android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
 }
@@ -4008,6 +4015,19 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
     if(audio_buffer_pcm_1)
     {
         int16_t *pcm = (int16_t *)audio_buffer_pcm_1;
+
+#if 0
+        const int8_t *pcm2 = (int8_t *)pcm;
+        dbg(9, "toxav_audio_send_frame: ch:%d r:%d c:%d - %d %d %d %d %d %d %d",
+            (int)channels,
+            (int)sampling_rate,
+            (int)sample_count,
+            (int8_t)pcm[0], (int8_t)pcm[1], (int8_t)pcm[2],
+            (int8_t)pcm[3], (int8_t)pcm[4], (int8_t)pcm[5],
+            (int8_t)pcm[6]);
+#endif
+
+
 
 #ifdef USE_ECHO_CANCELLATION
 
