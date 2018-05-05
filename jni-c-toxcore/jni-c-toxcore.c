@@ -1531,7 +1531,8 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
 	}
 #endif
 
-    dbg(9, "toxav_audio_receive_frame_cb_: %d %d %d %d %d %d %d", (int)pcm[0], (int)pcm[1], (int)pcm[2], (int)pcm[3], (int)pcm[4], (int)pcm[5], (int)pcm[6]);
+	const int8_t *pcm2 = (int8_t *)pcm;
+    dbg(9, "toxav_audio_receive_frame_cb_: %d %d %d %d %d %d %d", (int8_t)pcm[0], (int8_t)pcm[1], (int8_t)pcm[2], (int8_t)pcm[3], (int8_t)pcm[4], (int8_t)pcm[5], (int8_t)pcm[6]);
 
     android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
 }
