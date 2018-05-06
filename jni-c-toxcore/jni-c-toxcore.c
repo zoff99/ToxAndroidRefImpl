@@ -1779,8 +1779,8 @@ void *thread_av(void *data)
 
     while(toxav_iterate_thread_stop != 1)
     {
-        usleep(toxav_iteration_interval(av) * 1000);
-        // yieldcpu(10);
+        // usleep(toxav_iteration_interval(av) * 1000);
+        yieldcpu(100);
     }
 
     dbg(2, "ToxVideo:Clean thread exit!\n");
@@ -1829,7 +1829,8 @@ void *thread_video_av(void *data)
         }
         else
         {
-            usleep(av_iterate_interval * 1000);
+            // usleep((av_iterate_interval / 2) * 1000);
+            usleep(5 * 1000);
         }
     }
 
