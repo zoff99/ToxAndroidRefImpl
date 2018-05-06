@@ -36,6 +36,11 @@
 #include <errno.h>
 
 #include <tox/tox.h>
+
+#ifdef TOX_HAVE_TOXUTIL
+#include <tox/toxutil.h>
+#endif
+
 #include <tox/toxav.h>
 #include <tox/toxencryptsave.h>
 
@@ -65,10 +70,66 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 22
-static const char global_version_string[] = "0.99.22";
+#define VERSION_PATCH 24
+static const char global_version_string[] = "0.99.24";
 // ----------- version -----------
 // ----------- version -----------
+
+
+
+
+
+/*
+ * ------------------------------------------------------------
+ * TOXCORE compatibility layer --------------------------------
+ * ------------------------------------------------------------
+ */
+#ifndef TOXCOMPAT_H_
+#define TOXCOMPAT_H_
+
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+static void toxav_callback_bit_rate_status(ToxAV *av,
+        void *callback, void *user_data)
+{
+    // dummy function
+}
+
+#define TOXAV_ERR_BIT_RATE_SET_INVALID_AUDIO_BIT_RATE (TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
+#define TOXAV_ERR_BIT_RATE_SET_INVALID_VIDEO_BIT_RATE (TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
+
+static bool toxav_bit_rate_set(ToxAV *av, uint32_t friend_number, int32_t audio_bit_rate,
+                               int32_t video_bit_rate, TOXAV_ERR_BIT_RATE_SET *error)
+{
+    bool res = toxav_video_set_bit_rate(av, friend_number, video_bit_rate, error);
+
+    if(*error == TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
+    {
+        *error = TOXAV_ERR_BIT_RATE_SET_INVALID_VIDEO_BIT_RATE;
+    }
+
+    return res;
+}
+#else
+// no need to fake the function
+#endif
+
+#endif
+/*
+ * ------------------------------------------------------------
+ * TOXCORE compatibility layer --------------------------------
+ * ------------------------------------------------------------
+ */
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -161,6 +222,8 @@ jmethodID android_tox_callback_friend_typing_cb_method = NULL;
 jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_cb_method = NULL;
+jmethodID android_tox_callback_friend_message_v2_cb_method = NULL;
+jmethodID android_tox_callback_friend_read_receipt_message_v2_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_control_cb_method = NULL;
 jmethodID android_tox_callback_file_chunk_request_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_cb_method = NULL;
@@ -208,6 +271,8 @@ void friend_read_receipt_cb(Tox *tox, uint32_t friend_number, uint32_t message_i
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data);
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length,
                        void *user_data);
+void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len);
+void friend_read_receipt_message_v2_cb(Tox *tox, uint32_t friend_number, uint32_t ts_sec, const uint8_t *msgid);
 
 void file_recv_control_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control,
                           void *user_data);
@@ -413,7 +478,11 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
         options.savedata_data = savedata;
         options.savedata_length = fsize;
         dbg(9, "1008");
+#ifdef TOX_HAVE_TOXUTIL
+        tox = tox_utils_new(&options, &error);
+#else
         tox = tox_new(&options, &error);
+#endif
         dbg(9, "1009 tox=%p error=%d", tox, error);
         int j = 0;
 
@@ -428,7 +497,11 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 
             // could not allocate network port, sleep and try again ...
             c_sleep(150);
+#ifdef TOX_HAVE_TOXUTIL
+            tox = tox_utils_new(&options, &error);
+#else
             tox = tox_new(&options, &error);
+#endif
             dbg(9, "1009 tox=%p error=%d", tox, error);
         }
 
@@ -437,7 +510,11 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     else
     {
         dbg(9, "1010");
+#ifdef TOX_HAVE_TOXUTIL
+        tox = tox_utils_new(&options, NULL);
+#else
         tox = tox_new(&options, NULL);
+#endif
         dbg(9, "1011 tox=%p", tox);
     }
 
@@ -696,6 +773,39 @@ void bootstrap()
 
 void init_tox_callbacks()
 {
+#ifdef TOX_HAVE_TOXUTIL
+    // -------- _callbacks_ --------
+    tox_callback_friend_name(tox_global, friend_name_cb);
+    tox_callback_friend_status_message(tox_global, friend_status_message_cb);
+    tox_callback_friend_status(tox_global, friend_status_cb);
+    tox_callback_friend_typing(tox_global, friend_typing_cb);
+    tox_callback_friend_read_receipt(tox_global, friend_read_receipt_cb);
+    tox_callback_friend_request(tox_global, friend_request_cb);
+    tox_callback_friend_message(tox_global, friend_message_cb);
+    tox_callback_conference_invite(tox_global, conference_invite_cb);
+    tox_callback_conference_message(tox_global, conference_message_cb);
+    tox_callback_conference_title(tox_global, conference_title_cb);
+    tox_callback_conference_namelist_change(tox_global, conference_namelist_change_cb);
+    // --------------------
+    tox_utils_callback_self_connection_status(tox_global, self_connection_status_cb);
+    tox_callback_self_connection_status(tox_global, tox_utils_self_connection_status_cb);
+    tox_utils_callback_friend_connection_status(tox_global, friend_connection_status_cb);
+    tox_callback_friend_connection_status(tox_global, tox_utils_friend_connection_status_cb);
+    tox_callback_friend_lossless_packet(tox_global, tox_utils_friend_lossless_packet_cb);
+    tox_utils_callback_file_recv_control(tox_global, file_recv_control_cb);
+    tox_callback_file_recv_control(tox_global, tox_utils_file_recv_control_cb);
+    tox_utils_callback_file_chunk_request(tox_global, file_chunk_request_cb);
+    tox_callback_file_chunk_request(tox_global, tox_utils_file_chunk_request_cb);
+    tox_utils_callback_file_recv(tox_global, file_recv_cb);
+    tox_callback_file_recv(tox_global, tox_utils_file_recv_cb);
+    tox_utils_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
+    tox_callback_file_recv_chunk(tox_global, tox_utils_file_recv_chunk_cb);
+
+
+    tox_utils_callback_friend_message_v2(tox_global, friend_message_v2_cb);
+    tox_utils_callback_friend_read_receipt_message_v2(tox_global, friend_read_receipt_message_v2_cb);
+    // -------- _callbacks_ --------
+#else
     // -------- _callbacks_ --------
     tox_callback_self_connection_status(tox_global, self_connection_status_cb);
     tox_callback_friend_name(tox_global, friend_name_cb);
@@ -717,6 +827,7 @@ void init_tox_callbacks()
     // tox_callback_friend_lossy_packet(tox_global, friend_lossy_packet_cb);
     // tox_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
     // -------- _callbacks_ --------
+#endif
 }
 
 
@@ -838,7 +949,7 @@ void android_tox_callback_friend_name_cb(uint32_t friend_number, const uint8_t *
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-    // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)name);
+
     jstring js1 = c_safe_string_from_java((char *)name, length);
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_friend_name_cb_method, (jlong)(unsigned long long)friend_number, js1,
@@ -855,7 +966,7 @@ void android_tox_callback_friend_status_message_cb(uint32_t friend_number, const
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-    // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+
     jstring js1 = c_safe_string_from_java((char *)message, length);
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_friend_status_message_cb_method, (jlong)(unsigned long long)friend_number, js1,
@@ -953,7 +1064,7 @@ void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uin
     tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
     dbg(9, "pubkey string=%s", tox_id_hex);
     jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, tox_id_hex);
-    // jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, message);
+
     jstring js2 = c_safe_string_from_java((char *)message, length);
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_friend_request_cb_method, js1, js2, (jlong)(unsigned long long)length);
@@ -961,9 +1072,119 @@ void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uin
     (*jnienv2)->DeleteLocalRef(jnienv2, js2);
 }
 
+
 void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *message, size_t length, void *user_data)
 {
     android_tox_callback_friend_request_cb(public_key, message, length);
+}
+
+
+
+
+void android_tox_callback_friend_read_receipt_message_v2_cb(uint32_t friend_number,
+    uint32_t ts_sec, const uint8_t *msgid)
+{
+#ifdef TOX_MESSAGE_V2_ACTIVE
+
+    if (msgid)
+    {
+		JNIEnv *jnienv2;
+		jnienv2 = jni_getenv();
+		jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)TOX_PUBLIC_KEY_SIZE);
+
+		if(data2 == NULL)
+		{
+			// TODO: catch this OOM error!!
+			// return; // out of memory error thrown
+		}
+
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		(*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)TOX_PUBLIC_KEY_SIZE, (const jbyte *)msgid);
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+
+        (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                         android_tox_callback_friend_read_receipt_message_v2_cb_method,
+                                         (jlong)(unsigned long long)friend_number,
+                                         (jlong)ts_sec,
+                                         data2
+                                         );
+
+		(*jnienv2)->DeleteLocalRef(jnienv2, data2);
+    }
+
+#endif
+}
+
+void friend_read_receipt_message_v2_cb(Tox *tox, uint32_t friend_number,
+        uint32_t ts_sec, const uint8_t *msgid)
+{
+    android_tox_callback_friend_read_receipt_message_v2_cb(friend_number, ts_sec, msgid);
+}
+
+
+void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
+{
+#ifdef TOX_MESSAGE_V2_ACTIVE
+    uint8_t *message_text = calloc(1, raw_message_len);
+    if (message_text)
+    {
+
+		JNIEnv *jnienv2;
+		jnienv2 = jni_getenv();
+		jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)raw_message_len);
+
+		if(data2 == NULL)
+		{
+			// TODO: catch this OOM error!!
+			// return; // out of memory error thrown
+		}
+
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		(*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)raw_message_len, (const jbyte *)raw_message);
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+		// TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+
+        uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
+        uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
+        uint32_t text_length = 0;
+
+        bool res = tox_messagev2_get_message_text(raw_message,
+                   (uint32_t)raw_message_len,
+                   (bool)false, (uint32_t)0,
+                   message_text, &text_length);
+
+        if (text_length > 0)
+        {
+            JNIEnv *jnienv2;
+            jnienv2 = jni_getenv();
+            jstring js1 = c_safe_string_from_java((char *)message_text, text_length);
+			// TODO: give back also the raw message bytes!
+            (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                             android_tox_callback_friend_message_v2_cb_method,
+                                             (jlong)(unsigned long long)friend_number,
+                                             js1,
+                                             (jlong)(unsigned long long)text_length,
+                                             (jlong)ts_sec,
+                                             (jlong)ts_ms,
+										     data2,
+                                             (jlong)(unsigned long long)raw_message_len
+											 );
+            (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+        }
+
+		(*jnienv2)->DeleteLocalRef(jnienv2, data2);
+        free(message_text);
+    }
+#endif
+}
+
+
+void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
+{
+    android_tox_callback_friend_message_v2_cb(friend_number, raw_message, raw_message_len);
 }
 
 void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
@@ -971,7 +1192,7 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-    // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+
     jstring js1 = c_safe_string_from_java((char *)message, length);
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_friend_message_cb_method, (jlong)(unsigned long long)friend_number, (jint) type, js1,
@@ -1122,7 +1343,7 @@ void android_tox_callback_conference_message_cb(uint32_t conference_number, uint
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-    // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, (char *)message);
+
     jstring js1 = c_safe_string_from_java((char *)message, length);
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_conference_message_cb_method, (jlong)(unsigned long long)conference_number,
@@ -1308,6 +1529,16 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
 	{
 		pass_audio_output(filteraudio, pcm, (unsigned int)sample_count);
 	}
+#endif
+
+#if 0
+	const int8_t *pcm2 = (int8_t *)pcm;
+    dbg(9, "toxav_audio_receive_frame_cb_: ch:%d r:%d - %d %d %d %d %d %d %d",
+        (int)channels,
+        (int)sampling_rate,
+        (int8_t)pcm[0], (int8_t)pcm[1], (int8_t)pcm[2],
+        (int8_t)pcm[3], (int8_t)pcm[4], (int8_t)pcm[5],
+        (int8_t)pcm[6]);
 #endif
 
     android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
@@ -1555,6 +1786,8 @@ void *thread_av(void *data)
     dbg(2, "ToxVideo:Clean thread exit!\n");
     (*cachedJVM)->DetachCurrentThread(cachedJVM);
     env = NULL;
+
+	return (void *)NULL;
 }
 
 
@@ -1582,18 +1815,29 @@ void *thread_video_av(void *data)
 
     dbg(2, "AV video Thread #%d: starting", (int) id);
 
+    long av_iterate_interval = 1;
     while(toxav_video_thread_stop != 1)
     {
         pthread_mutex_lock(&av_thread_lock);
         toxav_iterate(av);
         // dbg(9, "AV video Thread #%d running ...", (int) id);
         pthread_mutex_unlock(&av_thread_lock);
-        usleep(toxav_iteration_interval(av) * 1000);
+        av_iterate_interval = toxav_iteration_interval(av);
+        if ((av_iterate_interval / 2) < 1)
+        {
+		    usleep(1 * 1000);
+        }
+        else
+        {
+            usleep(av_iterate_interval * 1000);
+        }
     }
 
     dbg(2, "ToxVideo:Clean video thread exit!\n");
     (*cachedJVM)->DetachCurrentThread(cachedJVM);
     env = NULL;
+
+	return (void *)NULL;
 }
 
 
@@ -1668,6 +1912,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_friend_request_cb_method", "(Ljava/lang/String;Ljava/lang/String;J)V");
     android_tox_callback_friend_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
+    android_tox_callback_friend_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
+    android_tox_callback_friend_read_receipt_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_friend_read_receipt_message_v2_cb_method", "(JJ[B)V");
     android_tox_callback_file_recv_control_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_file_recv_control_cb_method", "(JJI)V");
     android_tox_callback_file_chunk_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -1851,6 +2099,10 @@ int add_tcp_relay_single(Tox *tox, const char *ip, uint16_t port, const char *ke
         {
             return 3;
         }
+		else
+		{
+			return 99;
+		}
     }
     else
     {
@@ -1922,6 +2174,10 @@ int bootstrap_single(Tox *tox, const char *ip, uint16_t port, const char *key_he
         {
             return 3;
         }
+		else
+		{
+			return 99;
+		}
     }
     else
     {
@@ -2122,7 +2378,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
     }
 
     jlong buffer[numfriends];
-    int i = 0;
+    size_t i = 0;
 
     for(i=0; i<numfriends; i++)
     {
@@ -2149,7 +2405,11 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     pthread_join(tid[1], NULL); // wait for toxav video thread to end
 	stop_filter_audio();
     toxav_kill(tox_av_global);
+#ifdef TOX_HAVE_TOXUTIL
+    tox_utils_kill(tox_global);
+#else
     tox_kill(tox_global);
+#endif
     tox_av_global = NULL;
     tox_global = NULL;
     dbg(9, "tox_kill ... READY");
@@ -2183,7 +2443,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv *env, jobject thiz)
 {
     long long l = (long long)tox_iteration_interval(tox_global);
-    dbg(9, "tox_iteration_interval=%lld", (long long)l);
+    // dbg(9, "tox_iteration_interval=%lld", (long long)l);
     return (jlong)(unsigned long long)l;
 }
 
@@ -2237,6 +2497,201 @@ Java_com_zoffcc_applications_trifa_MainActivity_jnictoxcore_1version(JNIEnv *env
     return (*env)->NewStringUTF(env, global_version_string);
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1msg_1receipt_1v2(JNIEnv *env,
+        jobject thiz, jlong friend_number, jlong ts_sec,
+        jobject msgid_buffer)
+{
+#ifdef TOX_HAVE_TOXUTIL
+
+    if(msgid_buffer == NULL)
+    {
+        return (jint)-3;
+    }
+
+    uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
+    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+
+    bool res = tox_util_friend_send_msg_receipt_v2(tox_global,
+            (uint32_t)friend_number, msgid_buffer_c, (uint32_t)ts_sec);
+
+    if (res == true)
+    {
+        return (jint)0;
+    }
+    else
+    {
+        return (jint)1;
+    }
+#else
+	return (jint)-99;
+#endif
+
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1message_1v2(JNIEnv *env,
+        jobject thiz, jlong friend_number,
+        jobject raw_message_buffer,
+        jlong raw_msg_len)
+{
+#ifdef TOX_HAVE_TOXUTIL
+
+    if(raw_message_buffer == NULL)
+    {
+        return (jint)-2;
+    }
+
+    if (raw_msg_len < 1)
+    {
+        return (jint)-3;
+    }
+
+    long capacity = 0;
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    bool res = tox_util_friend_resend_message_v2(tox_global, (uint32_t) friend_number,
+        (const uint8_t *)raw_message_buffer_c,
+        (const uint32_t)raw_msg_len,
+        &error);
+
+    (*env)->ReleaseStringUTFChars(env, raw_message_buffer, raw_message_buffer_c);
+
+    if (res == false)
+    {
+        return (jint)-1;
+    }
+    else
+    {
+        return (jint)0;
+    }
+#else
+	return (jint)-99;
+#endif
+}
+
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message_1v2(JNIEnv *env,
+        jobject thiz, jlong friend_number, jint type, jlong ts_sec,
+        jobject message, jlong length,
+        jobject raw_message_back_buffer,
+        jobject raw_msg_len_back,
+        jobject msgid_back_buffer)
+{
+#ifdef TOX_HAVE_TOXUTIL
+
+    long capacity = 0;
+
+    if(raw_message_back_buffer == NULL)
+    {
+        return (jlong)-9991;
+    }
+
+    if(msgid_back_buffer == NULL)
+    {
+        return (jlong)-9991;
+    }
+
+    if(raw_msg_len_back == NULL)
+    {
+        return (jlong)-9991;
+    }
+
+    uint8_t *raw_message_back_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_back_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, raw_message_back_buffer);
+
+    uint8_t *msgid_back_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_back_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, msgid_back_buffer);
+
+    uint8_t *raw_msg_len_back_c_2 = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_msg_len_back);
+    capacity = (*env)->GetDirectBufferCapacity(env, raw_msg_len_back);
+
+    uint32_t raw_msg_len_back_c;
+
+    const char *message_str = NULL;
+    message_str = (*env)->GetStringUTFChars(env, message, NULL);
+
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
+        (int)type, (uint32_t) ts_sec,
+        (const uint8_t *)message_str, (size_t)strlen(message_str),
+        (uint8_t *)raw_message_back_buffer_c, &raw_msg_len_back_c, (uint8_t *)msgid_back_buffer_c,
+        &error);
+    (*env)->ReleaseStringUTFChars(env, message, message_str);
+
+    // HINT: give number back as 2 bytes in ByteBuffer
+    //       a bit hacky, but it works
+    raw_msg_len_back_c_2[0] = (uint8_t)(raw_msg_len_back_c % 256); // low byte
+    raw_msg_len_back_c_2[1] = (uint8_t)(raw_msg_len_back_c / 256); // high byte
+
+    if(res == -1)
+    {
+        // MSG V2 was used to send message
+        if (error == 0)
+        {
+            // return OK
+            return (jlong)-9999;
+        }
+        // otherwise give some error
+        return (jlong)-9991;
+    }
+
+    if(error != 0)
+    {
+        if(error == TOX_ERR_FRIEND_SEND_MESSAGE_NULL)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_NULL");
+            return (jlong)-1;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_FOUND)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_FOUND");
+            return (jlong)-2;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_CONNECTED)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_FRIEND_NOT_CONNECTED");
+            return (jlong)-3;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_SENDQ)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_SENDQ");
+            return (jlong)-4;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_TOO_LONG)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_TOO_LONG");
+            return (jlong)-5;
+        }
+        else if(error == TOX_ERR_FRIEND_SEND_MESSAGE_EMPTY)
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_EMPTY");
+            return (jlong)-6;
+        }
+        else
+        {
+            dbg(9, "tox_util_friend_send_message_v2:ERROR:%d", (int)error);
+            return (jlong)-99;
+        }
+    }
+    else
+    {
+        dbg(9, "tox_util_friend_send_message_v2");
+        return (jlong)res;
+    }
+#else
+	return (jlong)-99;
+#endif
+
+}
 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEnv *env, jobject thiz,
@@ -2437,8 +2892,13 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1delete(JNIEnv *env, jobject thiz, jlong friend_number)
 {
     TOX_ERR_FRIEND_DELETE error;
+#ifdef TOX_HAVE_TOXUTIL
+    bool res = tox_utils_friend_delete(tox_global, (uint32_t)friend_number, &error);
+    return (jint)res;
+#else
     bool res = tox_friend_delete(tox_global, (uint32_t)friend_number, &error);
     return (jint)res;
+#endif
 }
 
 JNIEXPORT jstring JNICALL
@@ -2476,7 +2936,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(
     char message[length + 1];
     CLEAR(message);
     tox_self_get_status_message(tox_global, message);
-    //return (*env)->NewStringUTF(env, (uint8_t *)message);
+
     jstring js1 = c_safe_string_from_java((char *)message, length);
     return js1;
 }
@@ -2548,20 +3008,35 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1seek(JNIEnv *env, job
 
     if(res != true)
     {
-        if(error == TOX_ERR_FILE_GET_NULL)
+        if(error == TOX_ERR_FILE_SEEK_FRIEND_NOT_FOUND)
         {
-            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_NULL");
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_FRIEND_NOT_FOUND");
             return (jint)-1;
         }
-        else if(error == TOX_ERR_FILE_GET_FRIEND_NOT_FOUND)
+        else if(error == TOX_ERR_FILE_SEEK_FRIEND_NOT_CONNECTED)
         {
-            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_FRIEND_NOT_FOUND");
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_FRIEND_NOT_CONNECTED");
             return (jint)-2;
         }
-        else if(error == TOX_ERR_FILE_GET_NOT_FOUND)
+        else if(error == TOX_ERR_FILE_SEEK_NOT_FOUND)
         {
-            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_GET_NOT_FOUND");
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_NOT_FOUND");
             return (jint)-3;
+        }
+        else if(error == TOX_ERR_FILE_SEEK_DENIED)
+        {
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_DENIED");
+            return (jint)-4;
+        }
+        else if(error == TOX_ERR_FILE_SEEK_INVALID_POSITION)
+        {
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_INVALID_POSITION");
+            return (jint)-5;
+        }
+        else if(error == TOX_ERR_FILE_SEEK_SENDQ)
+        {
+            dbg(9, "tox_file_seek:ERROR:TOX_ERR_FILE_SEEK_SENDQ");
+            return (jint)-6;
         }
         else
         {
@@ -2767,6 +3242,197 @@ TOX_USER_STATUS tox_friend_get_status(const Tox *tox, uint32_t friend_number, TO
 // -----------------------
 // TODO
 // -----------------------
+
+
+
+
+
+
+
+
+/*
+ * ------------------------------------------------------------
+ * ----------------- MessageV2 --------------------------------
+ * ------------------------------------------------------------
+ */
+#ifdef TOX_MESSAGE_V2_ACTIVE
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1size(JNIEnv *env, jobject thiz, jlong text_length,
+        jlong type, jlong alter_type)
+{
+    uint32_t tox_msg_size = tox_messagev2_size((uint32_t)text_length, (uint32_t)type, (uint32_t)alter_type);
+    return (jlong)tox_msg_size;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1wrap(JNIEnv *env, jobject thiz,
+        jlong text_length, jlong type,
+        jlong alter_type,
+        jobject message_text_buffer, jlong ts_sec,
+        jlong ts_ms, jobject raw_message_buffer,
+        jobject msgid_buffer)
+{
+    if(message_text_buffer == NULL)
+    {
+        return -1;
+    }
+
+    if(raw_message_buffer == NULL)
+    {
+        return -2;
+    }
+
+    if(msgid_buffer == NULL)
+    {
+        return -3;
+    }
+
+    dbg(0, "tox_messagev2_wrap:001");
+    uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
+    dbg(0, "tox_messagev2_wrap:002");
+    long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+    dbg(0, "tox_messagev2_wrap:00");
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    dbg(0, "tox_messagev2_wrap:003");
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    dbg(0, "tox_messagev2_wrap:004");
+    uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
+    dbg(0, "tox_messagev2_wrap:005");
+    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    dbg(0, "tox_messagev2_wrap:006");
+    dbg(0, "tox_messagev2_wrap:007");
+    bool res = tox_messagev2_wrap((uint32_t)text_length, (uint32_t)type,
+                                  (uint32_t)alter_type, message_text_buffer_c, (uint32_t)ts_sec,
+                                  (uint16_t)ts_ms, raw_message_buffer_c, msgid_buffer_c);
+    dbg(0, "tox_messagev2_wrap:008");
+
+    if(res == true)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1id(JNIEnv *env, jobject thiz,
+        jobject raw_message_buffer, jobject msgid_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return -1;
+    }
+
+    if(msgid_buffer == NULL)
+    {
+        return -2;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
+    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    bool res = tox_messagev2_get_message_id(raw_message_buffer_c, msgid_buffer_c);
+
+    if(res == true)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1sec(JNIEnv *env, jobject thiz,
+        jobject raw_message_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    uint32_t res = tox_messagev2_get_ts_sec(raw_message_buffer_c);
+    return (jlong)res;
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1ms(JNIEnv *env, jobject thiz,
+        jobject raw_message_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return -1;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    uint16_t res = tox_messagev2_get_ts_ms(raw_message_buffer_c);
+    return (jlong)res;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1text(JNIEnv *env, jobject thiz,
+        jobject raw_message_buffer, jlong raw_message_len,
+        jint is_alter_msg,
+        jlong alter_type,
+        jobject message_text_buffer)
+{
+    if(message_text_buffer == NULL)
+    {
+        return -1;
+    }
+
+    if(raw_message_buffer == NULL)
+    {
+        return -2;
+    }
+
+	uint32_t text_length = 0;
+    uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
+    long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    bool res = tox_messagev2_get_message_text(raw_message_buffer_c, (uint32_t)raw_message_len,
+               (bool)is_alter_msg,
+               (uint32_t)alter_type, message_text_buffer_c,
+				&text_length);
+
+    if(res == true)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+
+// bool tox_messagev2_get_message_alter_id(uint8_t *raw_message, uint8_t *alter_id);
+// uint8_t tox_messagev2_get_alter_type(uint8_t *raw_message);
+
+
+#endif
+/*
+ * ------------------------------------------------------------
+ * ----------------- MessageV2 --------------------------------
+ * ------------------------------------------------------------
+ */
+
+
+
+
 
 
 
@@ -3077,7 +3743,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name
         }
         else
         {
-            // return (*env)->NewStringUTF(env, (uint8_t *)name);
+
             jstring js1 = c_safe_string_from_java((char *)name, length);
             return js1;
         }
@@ -3180,7 +3846,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIE
         }
         else
         {
-            // return (*env)->NewStringUTF(env, (uint8_t *)title);
+
             jstring js1 = c_safe_string_from_java((char *)title, length);
             return js1;
         }
@@ -3349,6 +4015,19 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
     if(audio_buffer_pcm_1)
     {
         int16_t *pcm = (int16_t *)audio_buffer_pcm_1;
+
+#if 0
+        const int8_t *pcm2 = (int8_t *)pcm;
+        dbg(9, "toxav_audio_send_frame: ch:%d r:%d c:%d - %d %d %d %d %d %d %d",
+            (int)channels,
+            (int)sampling_rate,
+            (int)sample_count,
+            (int8_t)pcm[0], (int8_t)pcm[1], (int8_t)pcm[2],
+            (int8_t)pcm[3], (int8_t)pcm[4], (int8_t)pcm[5],
+            (int8_t)pcm[6]);
+#endif
+
+
 
 #ifdef USE_ECHO_CANCELLATION
 
