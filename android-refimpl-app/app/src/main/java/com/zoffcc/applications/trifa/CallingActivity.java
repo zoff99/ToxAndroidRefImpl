@@ -150,7 +150,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         System.out.println("AVCS:MUSIC:0");
 
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        manager.setMode(AudioManager.MODE_NORMAL);
+        try
+        {
+            manager.setMode(AudioManager.MODE_NORMAL);
+            // manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
         // set volume control -------------
 
         mVisible = true;
@@ -1199,40 +1207,57 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // close to ear
                 if (Callstate.audio_speaker == true)
                 {
+                    Log.i(TAG, "onSensorChanged:--> EAR");
+
                     set_filteraudio_active(0);
 
                     Callstate.audio_speaker = false;
 
                     //audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
                     //                                  AudioManager.AUDIOFOCUS_GAIN);
-                    requestAudioFocus();
+                    //**// requestAudioFocus();
 
                     try
                     {
+                        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                         audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                        // audioManager.setMode(AudioManager.MODE_IN_CALL);
+                        // audioManager.setMode(AudioManager.MODE_NORMAL);
+                        // audio_manager_s.setMode(AudioManager.MODE_NORMAL);
                         Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_IN_COMMUNICATION)");
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        Log.i(TAG, "onSensorChanged:EE1:" + e.getMessage());
                     }
 
                     try
                     {
                         if (!audio_manager_s.isWiredHeadsetOn())
                         {
-                            audio_manager_s.setSpeakerphoneOn(false);
+                            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                            audioManager.setSpeakerphoneOn(false);
+
+                            //                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                            //                            {
+                            //                                Log.i(TAG, "onSensorChanged:isStreamMute(STREAM_MUSIC)=" +
+                            //                                           audio_manager_s.isStreamMute(AudioManager.STREAM_MUSIC));
+                            //                                Log.i(TAG, "onSensorChanged:isStreamMute(STREAM_VOICE_CALL)=" +
+                            //                                           audio_manager_s.isStreamMute(AudioManager.STREAM_VOICE_CALL));
+                            //                            }
                             Log.i(TAG, "onSensorChanged:setSpeakerphoneOn(false)");
                         }
 
                         try
                         {
-                            turnOffScreen();
+                            //**// turnOffScreen();
                             Log.i(TAG, "onSensorChanged:turnOffScreen()");
                         }
                         catch (Exception e2)
                         {
                             e2.printStackTrace();
+                            Log.i(TAG, "onSensorChanged:EE2:" + e2.getMessage());
                         }
                     }
                     catch (Exception e)
@@ -1245,13 +1270,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     try
                     {
                         // set volume control -------------
-                        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                        // setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                        // HINT: this seems to be correct now? at least the on devices I tested on
+                        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+                        //                        Class audioSystemClass = Class.forName("android.media.AudioManager");
+                        //                        Method setForceUse = audioSystemClass.getMethod("forceVolumeControlStream", int.class);
+                        //                        setForceUse.invoke(audio_manager_s, AudioManager.STREAM_MUSIC);
+
                         System.out.println("AVCS:VOICE:1");
                         // set volume control -------------
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        Log.i(TAG, "onSensorChanged:EE3:" + e.getMessage());
                     }
                 }
             }
@@ -1260,22 +1293,26 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // away from ear
                 if (Callstate.audio_speaker == false)
                 {
+                    Log.i(TAG, "onSensorChanged:--> speaker");
+
                     set_filteraudio_active(1);
 
                     Callstate.audio_speaker = true;
 
                     // audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
                     //                                  AudioManager.AUDIOFOCUS_GAIN);
-                    requestAudioFocus();
+                    //**// requestAudioFocus();
 
                     try
                     {
                         audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+                        // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
                         Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_NORMAL)");
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        Log.i(TAG, "onSensorChanged:EE4:" + e.getMessage());
                     }
 
                     try
@@ -1294,6 +1331,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         catch (Exception e2)
                         {
                             e2.printStackTrace();
+                            Log.i(TAG, "onSensorChanged:EE5:" + e2.getMessage());
                         }
                     }
                     catch (Exception e)
@@ -1301,19 +1339,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         e.printStackTrace();
                         Callstate.audio_speaker = false;
                         Log.i(TAG, "onSensorChanged:audio_speaker = false");
+                        Log.i(TAG, "onSensorChanged:EE6:" + e.getMessage());
                     }
 
-                    try
-                    {
-                        // set volume control -------------
-                        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-                        System.out.println("AVCS:VOICE:2");
-                        // set volume control -------------
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+                    //                    try
+                    //                    {
+                    //                        // set volume control -------------
+                    //                        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+                    //                        System.out.println("AVCS:VOICE:2");
+                    //                        // set volume control -------------
+                    //                    }
+                    //                    catch (Exception e)
+                    //                    {
+                    //                        e.printStackTrace();
+                    //                        Log.i(TAG, "onSensorChanged:EE7:" + e.getMessage());
+                    //                    }
                 }
             }
         }
