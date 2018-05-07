@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.0.16](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.16) (2018-05-07)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.15...1.0.16)
+
 ## [1.0.15](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.15) (2018-03-14)
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.14...1.0.15)
 
