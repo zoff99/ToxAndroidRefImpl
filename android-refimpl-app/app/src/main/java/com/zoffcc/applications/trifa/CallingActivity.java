@@ -1251,7 +1251,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                         try
                         {
-                            //**// turnOffScreen();
+                            turnOffScreen();
                             Log.i(TAG, "onSensorChanged:turnOffScreen()");
                         }
                         catch (Exception e2)
