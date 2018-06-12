@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_clear_glide_cache"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="clear Glide Cache"
+                android:textSize="14sp"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_sql_vacuum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="run VACUUM on Sql Database"
+                android:textSize="14sp"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_sql_analyze"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="run ANALYZE on Sql Database"
+                android:textSize="14sp"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_fav_emoji_reset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="reset favorite Emoji List"
+                android:textSize="14sp"/>
+
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_avatar_icons_delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="delete all Avatar Icons"
+                android:textSize="14sp"/>
+
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_update_nodelist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="update Bootstrapnodes from Internet"
+                android:textSize="14sp"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_reset_nodelist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="reset Bootstrapnodes to default"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/text_sqlstats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/rounded_blue_bg"
+                android:padding="5dp"
+                android:text="Database Stats:\nMesssages: 102"
+                android:textColor="@color/md_black_1000"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

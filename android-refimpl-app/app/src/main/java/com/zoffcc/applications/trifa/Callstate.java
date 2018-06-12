@@ -33,6 +33,11 @@ public class Callstate
     static int other_video_enabled = 1;
     static int my_audio_enabled = 1;
     static int my_video_enabled = 1;
+    static long frame_width_px = -1;
+    static long frame_height_px = -1;
+    static long ystride = -1;
+    static long ustride = -1;
+    static long vstride = -1;
     static long audio_bitrate = GLOBAL_AUDIO_BITRATE;
     static long video_bitrate = GLOBAL_VIDEO_BITRATE;
     static int accepted_call = 0;

@@ -1,7 +1,12 @@
 <resources>
     <string name="app_name">TRIfA</string>
-    <string name="add_friend_activity_name">add Friend</string>
+    <string name="add_friend_activity_name">Add Friend</string>
     <string name="message_list_activity_name">Chat</string>
+    <string name="conference_message_list_activity_name">Conference</string>
+
+    <string name="set_password_message_empty">Password is empty</string>
+    <string name="set_password_message_password_invalid">Password too short</string>
+    <string name="set_password_message_password_dont_match">Passwords do NOT match</string>
 
     <string name="title_activity_calling">Call</string>
     <string name="title_activity_profile">Profile</string>
@@ -9,7 +14,17 @@
     <string name="title_activity_crash">Crash</string>
     <string name="title_activity_friendinfo">Friendinfo</string>
     <string name="title_activity_aboutpage">About</string>
+    <string name="title_activity_set_password">Set Password</string>
+    <string name="title_activity_check_password">Enter Password</string>
+    <string name="title_activity_share">open with TRIfA</string>
+    <string name="title_activity_maintenance">Maintenance</string>
 
+
+    <string-array name="spinner_own_status_array">
+        <item>Online</item>
+        <item>Away</item>
+        <item>Busy</item>
+    </string-array>
 
     <string name="settings_toolbar_title">Settings</string>
 
@@ -24,14 +39,67 @@
     <string name="pref_title_software_echo_cancel">Echo Cancellation</string>
     <string name="pref_description_software_echo_cancel">Use Software Echo Cancellation</string>
 
+    <string name="pref_title_higher_video_quality">Video Quality</string>
+    <string name="pref_description_higher_video_quality">Use better Video quality.\nChange needs RESTART!</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>low bandwidth\n(250 kb/s)</item>
+        <item>normal bandwidth\n(2500 kb/s)</item>
+        <item>high bandwidth\n(3500 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_higher_audio_quality">Audio Quality</string>
+    <string name="pref_description_higher_audio_quality">Use better Audio quality.\nChange needs RESTART!</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>low\n(6 kb/s)</item>
+        <item>normal\n(32 kb/s)</item>
+        <item>high\n(64 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <string name="pref_title_udp_enabled">enable UDP</string>
     <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
 
     <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
     <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
 
+    <string name="pref_title_fps_half">lower fps</string>
+    <string name="pref_description_fps_half">Video Framerate 7fps instead of 15fps</string>
+
+    <string name="pref_title_set_fps">set fps</string>
+    <string name="pref_description_set_fps">try to set wanted [15fps] video framerate, this may crash on some phones</string>
+
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_conference_show_system_messages">System Messages</string>
+    <string name="pref_description_conference_show_system_messages">show System Messages in Conferences</string>
+
+    <string name="pref_title_local_discovery_enabled">LAN discovery</string>
+    <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
+
+    <string name="pref_title_U_keep_nospam">keep NoSpam</string>
+    <string name="pref_description_U_keep_nospam">keep NoSpam value. This is not safe, only activate if you know what you are doing!</string>
+
+    <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
+    <string name="pref_description_X_use_native_audio_play">!! Expermimental !!\nUse Native Audio to Play Sound</string>
+
+    <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
+    <string name="pref_description_X_battery_saving_mode">!! Expermimental !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
+
+    <string name="pref_title_X_misc_button_enabled">Misc. Button</string>
+    <string name="pref_description_X_misc_button_enabled">!! Expermimental !!\nadd a Button on Calling Screen to send a fixed Message</string>
+
+    <string name="pref_title_X_eac_delay_ms">AEC delay</string>
+    <string name="pref_description_X_eac_delay_ms">!! Expermimental !!\nAEC delay in ms</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">
@@ -82,6 +150,22 @@
     </string-array>
 
 
+    <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
+    <string name="pref_description_X_audio_recording_frame_size">Default setting is 120 ms</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+
+
     <string-array name="list_preference_entries">
         <item>Entry 1</item>
         <item>Entry 2</item>
@@ -107,6 +191,10 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="pref_title_sound">Sound</string>
+    <string name="add_friend_activity_help">Paste friend\'s Tox ID in the text box above or tap the
+    QR code button to scan friend\'s code with a camera.</string>
+    <string name="add_friend_activity_add">Add Friend</string>
+    <string name="cancel">Cancel</string>
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->

@@ -23,18 +23,23 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
+
 public class AddFriendActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.AddFrdActivity";
-    EditText t = null;
-    Button b_add = null;
-    Button b_qr = null;
+    EditText toxid_text = null;
+    Button button_add = null;
+    TextInputLayout friend_toxid_inputlayout = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -45,11 +50,54 @@ public class AddFriendActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        t = (EditText) findViewById(R.id.friend_toxid);
-        b_add = (Button) findViewById(R.id.friend_addbutton);
-        b_qr = (Button) findViewById(R.id.friend_qrbutton);
+        toxid_text = (EditText) findViewById(R.id.friend_toxid);
+        button_add = (Button) findViewById(R.id.friend_addbutton);
+        friend_toxid_inputlayout = (TextInputLayout) findViewById(R.id.friend_toxid_inputlayout);
 
-        t.setText("");
+        toxid_text.setText("");
+        // friend_toxid_inputlayout.setError("No ToxID");
+        friend_toxid_inputlayout.setError(null);
+
+        toxid_text.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void afterTextChanged(Editable editable)
+            {
+                if (editable.length() == (TOX_ADDRESS_SIZE * 2))
+                {
+                    button_add.setEnabled(true);
+                    friend_toxid_inputlayout.setErrorEnabled(false);
+                }
+                else if (editable.length() == ((TOX_ADDRESS_SIZE * 2) + "tox:".length()))
+                {
+                    // TODO: acutally see if editable starts with "tox:", but it can be in any case (ToX: or toX: or TOX: ....)
+                    button_add.setEnabled(true);
+                    friend_toxid_inputlayout.setErrorEnabled(false);
+                }
+                else
+                {
+                    button_add.setEnabled(false);
+                    if (editable.length() > 0)
+                    {
+                        friend_toxid_inputlayout.setError("incorrect ToxID");
+                    }
+                    else
+                    {
+                        friend_toxid_inputlayout.setError("No ToxID");
+                    }
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+            }
+        });
     }
 
     public void read_qr_code(View v)
@@ -80,9 +128,9 @@ public class AddFriendActivity extends AppCompatActivity
     {
         Intent intent = new Intent();
         boolean toxid_ok = false;
-        if (t.getText() != null)
+        if (toxid_text.getText() != null)
         {
-            if (t.getText().length() > 0)
+            if (toxid_text.getText().length() > 0)
             {
                 toxid_ok = true;
             }
@@ -90,13 +138,18 @@ public class AddFriendActivity extends AppCompatActivity
 
         if (toxid_ok == true)
         {
-            intent.putExtra("toxid", t.getText().toString());
+            intent.putExtra("toxid", toxid_text.getText().toString());
             setResult(RESULT_OK, intent);
         }
         else
         {
             setResult(RESULT_CANCELED, intent);
         }
+        finish();
+    }
+
+    public void cancel_clicked(View v)
+    {
         finish();
     }
 
@@ -110,7 +163,7 @@ public class AddFriendActivity extends AppCompatActivity
             {
                 String contents = data.getStringExtra("SCAN_RESULT");
                 String format = data.getStringExtra("SCAN_RESULT_FORMAT");
-                t.setText(contents);
+                toxid_text.setText(contents);
             }
         }
     }

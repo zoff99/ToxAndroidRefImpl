@@ -1,0 +1,28 @@
+# Bracket Style Options
+--style=allman
+
+# Tab Options
+--indent=spaces=4
+
+# Indentation Options
+--indent-switches
+#--indent-preproc-block
+
+# Padding Options
+#--pad-header
+--break-blocks
+#--pad-oper
+--delete-empty-lines
+--unpad-paren
+--align-pointer=name
+--align-reference=name
+
+# Formatting Options
+--add-brackets
+--convert-tabs
+--max-code-length=120
+
+# Other Options
+--preserve-date
+--formatted
+--lineend=linux

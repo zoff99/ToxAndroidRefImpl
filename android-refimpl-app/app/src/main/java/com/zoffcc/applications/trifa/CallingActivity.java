@@ -27,6 +27,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,18 +46,29 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.etiennelawlor.discreteslider.library.ui.DiscreteSlider;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
+import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
+import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
+import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_LOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_MED;
 
 public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback, SensorEventListener
 {
@@ -67,10 +80,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static int active_camera_type = FRONT_CAMERA_USED;
     // private final Handler mHideHandler = new Handler();
     static ImageView mContentView;
+    static ImageView caller_avatar_view;
     static ImageButton accept_button = null;
     ImageButton decline_button = null;
     static ImageButton camera_toggle_button = null;
     static ImageButton mute_button = null;
+    ImageButton misc_button = null;
+    TextView misc_button_pad = null;
     static ImageView audio_device_icon = null;
     static TextView top_text_line = null;
     static CallingActivity ca = null;
@@ -80,6 +96,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static String top_text_line_str4 = "";
     Handler callactivity_handler = null;
     static Handler callactivity_handler_s = null;
+    static boolean trifa_is_MicrophoneMute = false;
     private static final String TAG = "trifa.CallingActivity";
     // Camera camera = null;
     static CameraSurfacePreview cameraSurfacePreview = null;
@@ -96,8 +113,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     PowerManager.WakeLock wl2 = null;
     TextView right_top_text_1 = null;
     TextView right_top_text_2 = null;
+    TextView right_top_text_3 = null;
+    TextView right_top_text_4 = null;
     TextView right_left_text_1 = null;
     static int activity_state = 0;
+    com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
+    int quality_slider_position = 0;
+    TextView text_vq_low = null;
+    TextView text_vq_med = null;
+    TextView text_vq_high = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -108,6 +132,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         setContentView(R.layout.activity_calling);
 
+        // prevent screenshots and also dont show the window content in recent activity screen
+        initializeScreenshotSecurity();
+
+        trifa_is_MicrophoneMute = false;
         ca = this;
 
         sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -118,20 +146,204 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         callactivity_handler_s = callactivity_handler;
 
         // set volume control -------------
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        System.out.println("AVCS:MUSIC:0");
+
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        manager.setMode(AudioManager.MODE_NORMAL);
-        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        try
+        {
+            manager.setMode(AudioManager.MODE_NORMAL);
+            // manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
         // set volume control -------------
 
         mVisible = true;
         mContentView = (ImageView) findViewById(R.id.video_view);
 
+        caller_avatar_view = (ImageView) findViewById(R.id.caller_avatar_view);
+
+        try
+        {
+            final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
+                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+            caller_avatar_view.setImageDrawable(d1);
+
+            String fname = get_vfs_image_filename_friend_avatar(
+                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
+
+            if (fname != null)
+            {
+                put_vfs_image_on_imageview(this, caller_avatar_view, d1, fname);
+            }
+        }
+        catch (Exception e1)
+        {
+            e1.printStackTrace();
+        }
+
         right_top_text_1 = (TextView) findViewById(R.id.right_top_text_1);
         right_top_text_2 = (TextView) findViewById(R.id.right_top_text_2);
+        right_top_text_3 = (TextView) findViewById(R.id.right_top_text_3);
+        right_top_text_4 = (TextView) findViewById(R.id.right_top_text_4);
         right_left_text_1 = (TextView) findViewById(R.id.right_left_text_1);
+        quality_slider = (com.etiennelawlor.discreteslider.library.ui.DiscreteSlider) findViewById(R.id.quality_slider);
+        text_vq_low = (TextView) findViewById(R.id.text_vq_low);
+        text_vq_med = (TextView) findViewById(R.id.text_vq_med);
+        text_vq_high = (TextView) findViewById(R.id.text_vq_high);
+
+
+        text_vq_low.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                   ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
+                                                   VIDEO_ENCODER_MAX_QUANTIZER_LOW);
+                        if (res != 0)
+                        {
+                            quality_slider_position = 0;
+                            quality_slider.setPosition(quality_slider_position);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "text_vq_low:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                return true;
+            }
+        });
+
+
+        text_vq_med.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                   ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
+                                                   VIDEO_ENCODER_MAX_QUANTIZER_MED);
+                        if (res != 0)
+                        {
+                            quality_slider_position = 1;
+                            quality_slider.setPosition(quality_slider_position);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "text_vq_low:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                return true;
+            }
+        });
+
+        text_vq_high.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                   ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
+                                                   VIDEO_ENCODER_MAX_QUANTIZER_HIGH);
+                        if (res != 0)
+                        {
+                            quality_slider_position = 2;
+                            quality_slider.setPosition(quality_slider_position);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "text_vq_low:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                return true;
+            }
+        });
+
 
         update_bitrates();
+        update_fps();
         update_call_time();
+
+        quality_slider.setPosition(quality_slider_position);
+
+        // Detect when slider position changes
+        quality_slider.setOnDiscreteSliderChangeListener(new DiscreteSlider.OnDiscreteSliderChangeListener()
+        {
+            @Override
+            public void onPositionChanged(int position)
+            {
+                Log.i(TAG, "setOnDiscreteSliderChangeListener:pos=" + position);
+                final int prev_position = quality_slider_position;
+
+                if (prev_position != position)
+                {
+                    int value = VIDEO_ENCODER_MAX_QUANTIZER_LOW;
+                    if (position == 1)
+                    {
+                        value = VIDEO_ENCODER_MAX_QUANTIZER_MED;
+                    }
+                    else if (position == 2)
+                    {
+                        value = VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
+                    }
+                    int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                               ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
+                                               value);
+                    Log.i(TAG, "setOnDiscreteSliderChangeListener:res:" + res);
+
+                    if (res != 0)
+                    {
+                        quality_slider_position = position;
+                        Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_NEW:" + quality_slider.getPosition());
+                    }
+                    else
+                    {
+                        Thread t = new Thread()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    Thread.sleep(100);
+                                    // set slide back to prev. position
+                                    quality_slider.setPosition(prev_position);
+                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_revert:" +
+                                               quality_slider.getPosition());
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:001:EE:" + e.getMessage());
+                                }
+                            }
+                        };
+                        t.start();
+                    }
+                }
+            }
+        });
 
         top_text_line = (TextView) findViewById(R.id.top_text_line);
         accept_button = (ImageButton) findViewById(R.id.accept_button);
@@ -139,11 +351,79 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
         mute_button = (ImageButton) findViewById(R.id.mute_button);
         audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
+        misc_button = (ImageButton) findViewById(R.id.misc_button);
+        misc_button_pad = (TextView) findViewById(R.id.misc_button_pad);
 
-        Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        if (PREF__X_misc_button_enabled)
+        {
+            misc_button.setVisibility(View.VISIBLE);
+            misc_button_pad.setVisibility(View.VISIBLE);
+
+            Drawable d8 = new IconicsDrawable(this).
+                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                    getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            misc_button.setImageDrawable(d8);
+
+            misc_button.setOnTouchListener(new View.OnTouchListener()
+            {
+                @Override
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    if (event.getAction() != MotionEvent.ACTION_UP)
+                    {
+                        try
+                        {
+                            Drawable d1a = new IconicsDrawable(v.getContext()).
+                                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                                    getColor(R.color.md_green_600)).sizeDp(50);
+                            misc_button.setImageDrawable(d1a);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            Drawable d2a = new IconicsDrawable(v.getContext()).
+                                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                                    getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                            misc_button.setImageDrawable(d2a);
+
+                            // send misc. message to friend
+                            MainActivity.send_message_result result = tox_friend_send_message_wrapper(
+                                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
+                                    PREF__X_misc_button_msg);
+                            long res = result.msg_num;
+                            Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    return true;
+                }
+            });
+
+
+        }
+        else
+        {
+            misc_button.setVisibility(View.GONE);
+            misc_button_pad.setVisibility(View.GONE);
+        }
+
+        // Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         audio_device_icon.setImageDrawable(null);
 
-        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(
+                Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         mute_button.setImageDrawable(d1);
         mute_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -154,14 +434,19 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        if (audio_manager_s.isMicrophoneMute())
+                        // if (audio_manager_s.isMicrophoneMute())
+                        if (trifa_is_MicrophoneMute)
                         {
-                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(50);
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             mute_button.setImageDrawable(d1a);
                         }
                         else
                         {
-                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(50);
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             mute_button.setImageDrawable(d1a);
                         }
                     }
@@ -170,55 +455,82 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         e.printStackTrace();
                     }
                 }
-                else
+                else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
                     try
                     {
-                        if (audio_manager_s.isMicrophoneMute())
+                        // if (audio_manager_s.isMicrophoneMute())
+                        if (trifa_is_MicrophoneMute)
                         {
-                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-                            mute_button.setImageDrawable(d2a);
                             audio_manager_s.setMicrophoneMute(false);
+                            trifa_is_MicrophoneMute = false;
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                            mute_button.setImageDrawable(d2a);
                         }
                         else
                         {
-                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-                            mute_button.setImageDrawable(d2a);
                             audio_manager_s.setMicrophoneMute(true);
+                            trifa_is_MicrophoneMute = true;
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                            mute_button.setImageDrawable(d2a);
                         }
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        Log.i(TAG, "setMicrophoneMute:001:EE:" + e.getMessage());
                     }
                 }
                 return true;
             }
         });
 
-        final Drawable d5 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        camera_toggle_button.setImageDrawable(d5);
+        // on startup always use front camera
+        active_camera_type = FRONT_CAMERA_USED;
 
-        final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
+        final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(
+                Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
         decline_button.setImageDrawable(d3);
         // #AARRGGBB
 
-        final Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50);
+        final Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(
+                Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50);
         accept_button.setImageDrawable(d4);
 
         if (Callstate.accepted_call == 1)
         {
+            // HINT: also when starting a call ourselves!!
+            caller_avatar_view.setVisibility(View.VISIBLE);
             accept_button.setVisibility(View.GONE);
             camera_toggle_button.setVisibility(View.VISIBLE);
             mute_button.setVisibility(View.VISIBLE);
         }
         else
         {
+            caller_avatar_view.setVisibility(View.VISIBLE);
             accept_button.setVisibility(View.VISIBLE);
             camera_toggle_button.setVisibility(View.GONE);
             mute_button.setVisibility(View.GONE);
         }
 
+        if (active_camera_type == FRONT_CAMERA_USED)
+        {
+            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            camera_toggle_button.setImageDrawable(d5);
+            Log.i(TAG, "active_camera_type(5)=" + active_camera_type);
+        }
+        else
+        {
+            final Drawable d6 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            camera_toggle_button.setImageDrawable(d6);
+            Log.i(TAG, "active_camera_type(6)=" + active_camera_type);
+        }
 
         camera_toggle_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -227,13 +539,41 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (event.getAction() != MotionEvent.ACTION_UP)
                 {
-                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.md_green_600)).sizeDp(7);
-                    camera_toggle_button.setImageDrawable(d2a);
+                    Log.i(TAG, "active_camera_type(7)=" + active_camera_type);
+
+                    if (active_camera_type == FRONT_CAMERA_USED)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        camera_toggle_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        camera_toggle_button.setImageDrawable(d2a);
+                    }
                 }
                 else
                 {
-                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(FontAwesome.Icon.faw_camera).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
-                    camera_toggle_button.setImageDrawable(d2a);
+                    Log.i(TAG, "active_camera_type(8)=" + active_camera_type);
+
+                    if (active_camera_type == FRONT_CAMERA_USED)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        camera_toggle_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        camera_toggle_button.setImageDrawable(d2a);
+                    }
 
                     final Thread toggle_thread = new Thread()
                     {
@@ -284,16 +624,22 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             Callstate.accepted_call = 1;
 
                             Log.i(TAG, "answer button pressed");
-                            toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE); // these 2 bitrate values are very strange!! sometimes no video incoming!!
+                            toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                         GLOBAL_AUDIO_BITRATE,
+                                         GLOBAL_VIDEO_BITRATE); // these 2 bitrate values are very strange!! sometimes no video incoming!!
                             // need to set our state manually here, no callback from toxcore :-(
                             Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             // need to set our state manually here, no callback from toxcore :-(
+
+                            caller_avatar_view.setVisibility(View.GONE);
                             accept_button.setVisibility(View.GONE);
                             camera_toggle_button.setVisibility(View.VISIBLE);
                             mute_button.setVisibility(View.VISIBLE);
 
                             Callstate.call_start_timestamp = System.currentTimeMillis();
-                            String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
+                            String a = "" +
+                                       (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) +
+                                       "s";
                             top_text_line_str2 = a;
                             update_top_text_line();
                         }
@@ -320,7 +666,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     else
                     {
                         Log.i(TAG, "decline button pressed");
-                        toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+                        toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                           ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
                         close_calling_activity();
                     }
                 }
@@ -377,7 +724,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     if ((top_text_line_str3 != "") || (top_text_line_str4 != ""))
                     {
-                        top_text_line.setText(top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" + top_text_line_str4);
+                        top_text_line.setText(
+                                top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" +
+                                top_text_line_str4);
                     }
                     else
                     {
@@ -503,7 +852,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     //        mHideHandler.postDelayed(mHideRunnable, delayMillis);
     //    }
 
-
     @Override
     protected void onResume()
     {
@@ -572,12 +920,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         CameraWrapper.camera_preview_size2 = null;
                         active_camera_type = BACK_CAMERA_USED;
+                        Log.i(TAG, "active_camera_type(8a)=" + active_camera_type);
                         CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, false);
                     }
                     else
                     {
                         CameraWrapper.camera_preview_size2 = null;
                         active_camera_type = FRONT_CAMERA_USED;
+                        Log.i(TAG, "active_camera_type(8b)=" + active_camera_type);
                         CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
                     }
                 }
@@ -687,6 +1037,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             public void run()
             {
                 active_camera_type = FRONT_CAMERA_USED;
+                Log.i(TAG, "active_camera_type(01)=" + active_camera_type);
                 CameraWrapper.camera_preview_size2 = null;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
             }
@@ -724,6 +1075,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     public void turnOnScreen()
     {
+        mContentView.setVisibility(View.VISIBLE);
+
         // turn on screen
         try
         {
@@ -746,7 +1099,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         if (wl1 == null)
         {
-            wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "trifa_screen_on");
+            wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                                 "trifa_screen_on");
         }
 
         try
@@ -809,6 +1163,36 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+
+
+        // in case the phone does not really turn the screen off
+        mContentView.setVisibility(View.INVISIBLE);
+    }
+
+    private void requestAudioFocus()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            AudioAttributes playbackAttributes = new AudioAttributes.Builder().setUsage(
+                    AudioAttributes.USAGE_VOICE_COMMUNICATION).setContentType(
+                    AudioAttributes.CONTENT_TYPE_SPEECH).build();
+            AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes(
+                    playbackAttributes).setAcceptsDelayedFocusGain(true).setOnAudioFocusChangeListener(
+                    new AudioManager.OnAudioFocusChangeListener()
+                    {
+                        @Override
+                        public void onAudioFocusChange(int i)
+                        {
+                        }
+                    }).build();
+            audio_manager_s.requestAudioFocus(focusRequest);
+        }
+        else
+        {
+            audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                                              AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+        }
     }
 
     @Override
@@ -823,27 +1207,84 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // close to ear
                 if (Callstate.audio_speaker == true)
                 {
+                    Log.i(TAG, "onSensorChanged:--> EAR");
+
+                    set_filteraudio_active(0);
+
                     Callstate.audio_speaker = false;
+
+                    //audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                    //                                  AudioManager.AUDIOFOCUS_GAIN);
+                    //**// requestAudioFocus();
+
+                    try
+                    {
+                        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                        // audioManager.setMode(AudioManager.MODE_IN_CALL);
+                        // audioManager.setMode(AudioManager.MODE_NORMAL);
+                        // audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+                        Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_IN_COMMUNICATION)");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "onSensorChanged:EE1:" + e.getMessage());
+                    }
+
                     try
                     {
                         if (!audio_manager_s.isWiredHeadsetOn())
                         {
-                            audio_manager_s.setSpeakerphoneOn(false);
+                            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                            audioManager.setSpeakerphoneOn(false);
+
+                            //                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                            //                            {
+                            //                                Log.i(TAG, "onSensorChanged:isStreamMute(STREAM_MUSIC)=" +
+                            //                                           audio_manager_s.isStreamMute(AudioManager.STREAM_MUSIC));
+                            //                                Log.i(TAG, "onSensorChanged:isStreamMute(STREAM_VOICE_CALL)=" +
+                            //                                           audio_manager_s.isStreamMute(AudioManager.STREAM_VOICE_CALL));
+                            //                            }
+                            Log.i(TAG, "onSensorChanged:setSpeakerphoneOn(false)");
                         }
 
                         try
                         {
                             turnOffScreen();
+                            Log.i(TAG, "onSensorChanged:turnOffScreen()");
                         }
                         catch (Exception e2)
                         {
                             e2.printStackTrace();
+                            Log.i(TAG, "onSensorChanged:EE2:" + e2.getMessage());
                         }
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                         Callstate.audio_speaker = true;
+                        Log.i(TAG, "onSensorChanged:audio_speaker = true");
+                    }
+
+                    try
+                    {
+                        // set volume control -------------
+                        // setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                        // HINT: this seems to be correct now? at least the on devices I tested on
+                        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+                        //                        Class audioSystemClass = Class.forName("android.media.AudioManager");
+                        //                        Method setForceUse = audioSystemClass.getMethod("forceVolumeControlStream", int.class);
+                        //                        setForceUse.invoke(audio_manager_s, AudioManager.STREAM_MUSIC);
+
+                        System.out.println("AVCS:VOICE:1");
+                        // set volume control -------------
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "onSensorChanged:EE3:" + e.getMessage());
                     }
                 }
             }
@@ -852,28 +1293,67 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // away from ear
                 if (Callstate.audio_speaker == false)
                 {
+                    Log.i(TAG, "onSensorChanged:--> speaker");
+
+                    set_filteraudio_active(1);
+
                     Callstate.audio_speaker = true;
+
+                    // audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
+                    //                                  AudioManager.AUDIOFOCUS_GAIN);
+                    //**// requestAudioFocus();
+
+                    try
+                    {
+                        audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+                        // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                        Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_NORMAL)");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "onSensorChanged:EE4:" + e.getMessage());
+                    }
+
                     try
                     {
                         if (!audio_manager_s.isWiredHeadsetOn())
                         {
                             audio_manager_s.setSpeakerphoneOn(true);
+                            Log.i(TAG, "onSensorChanged:setSpeakerphoneOn(true)");
                         }
 
                         try
                         {
                             turnOnScreen();
+                            Log.i(TAG, "onSensorChanged:turnOnScreen()");
                         }
                         catch (Exception e2)
                         {
                             e2.printStackTrace();
+                            Log.i(TAG, "onSensorChanged:EE5:" + e2.getMessage());
                         }
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                         Callstate.audio_speaker = false;
+                        Log.i(TAG, "onSensorChanged:audio_speaker = false");
+                        Log.i(TAG, "onSensorChanged:EE6:" + e.getMessage());
                     }
+
+                    //                    try
+                    //                    {
+                    //                        // set volume control -------------
+                    //                        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+                    //                        System.out.println("AVCS:VOICE:2");
+                    //                        // set volume control -------------
+                    //                    }
+                    //                    catch (Exception e)
+                    //                    {
+                    //                        e.printStackTrace();
+                    //                        Log.i(TAG, "onSensorChanged:EE7:" + e.getMessage());
+                    //                    }
                 }
             }
         }
@@ -892,7 +1372,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (Callstate.call_start_timestamp != -1)
             {
 
-                right_left_text_1.setText(format_timeduration_from_seconds((System.currentTimeMillis() - Callstate.call_start_timestamp) / 1000));
+                right_left_text_1.setText(format_timeduration_from_seconds(
+                        (System.currentTimeMillis() - Callstate.call_start_timestamp) / 1000));
             }
             else
             {
@@ -920,12 +1401,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     }
                     else if (Callstate.audio_device == 1)
                     {
-                        Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(
+                                Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(
+                                80);
                         audio_device_icon.setImageDrawable(d4);
                     }
                     else if (Callstate.audio_device == 2)
                     {
-                        Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        Drawable d4 = new IconicsDrawable(ca).icon(
+                                GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
+                                ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
                         audio_device_icon.setImageDrawable(d4);
                     }
                     else // audio_device == ??

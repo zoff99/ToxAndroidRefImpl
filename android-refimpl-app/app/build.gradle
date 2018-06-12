@@ -16,20 +16,31 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301, USA.
  */
-
-import java.security.MessageDigest
-
 buildscript {
+    repositories {
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        maven {
+            url "https://jitpack.io"
+        }
+    }
     dependencies {
         classpath files('../gwitness/gwit/libs/gwitness.jar')
     }
 }
 
+// gradlew -q calculateChecksums
+//
+// gradlew :app:dependencies
+// gradlew :app:androidDependencies.
+
 apply plugin: 'com.android.application'
 apply plugin: 'witness'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 27
     buildToolsVersion "25.0.3"
     compileOptions.encoding = 'UTF-8'
     // generatedDensities = []
@@ -56,36 +67,42 @@ android {
         exclude 'lib/armeabi/libsqlcipher.so'
         exclude 'lib/armeabi/libiocipher.so'
         exclude 'lib/armeabi/libspeex.so'
+        exclude 'lib/armeabi/libblasV8.so'
         //
         exclude 'lib/arm64-v8a/libRSSupport.so'
         exclude 'lib/arm64-v8a/librsjni.so'
         exclude 'lib/arm64-v8a/libsqlcipher.so'
         exclude 'lib/arm64-v8a/libiocipher.so'
         exclude 'lib/arm64-v8a/libspeex.so'
+        exclude 'lib/arm64-v8a/libblasV8.so'
         //
         exclude 'lib/mips64/libRSSupport.so'
         exclude 'lib/mips64/librsjni.so'
         exclude 'lib/mips64/libsqlcipher.so'
         exclude 'lib/mips64/libiocipher.so'
         exclude 'lib/mips64/libspeex.so'
+        exclude 'lib/mips64/libblasV8.so'
         //
         exclude 'lib/mips/libRSSupport.so'
         exclude 'lib/mips/librsjni.so'
         exclude 'lib/mips/libsqlcipher.so'
         exclude 'lib/mips/libiocipher.so'
         exclude 'lib/mips/libspeex.so'
+        exclude 'lib/mips/libblasV8.so'
         //
-        exclude 'lib/x86/libRSSupport.so'
-        exclude 'lib/x86/librsjni.so'
-        exclude 'lib/x86/libsqlcipher.so'
-        exclude 'lib/x86/libiocipher.so'
-        exclude 'lib/x86/libspeex.so'
+        // exclude 'lib/x86/libRSSupport.so'
+        // exclude 'lib/x86/librsjni.so'
+        // exclude 'lib/x86/libsqlcipher.so'
+        // exclude 'lib/x86/libiocipher.so'
+        // exclude 'lib/x86/libspeex.so'
+        // exclude 'lib/x86/libblasV8.so'
         //
         exclude 'lib/x86_64/libRSSupport.so'
         exclude 'lib/x86_64/librsjni.so'
         exclude 'lib/x86_64/libsqlcipher.so'
         exclude 'lib/x86_64/libiocipher.so'
         exclude 'lib/x86_64/libspeex.so'
+        exclude 'lib/x86_64/libblasV8.so'
         //
     }
 
@@ -116,47 +133,58 @@ android {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 10005
-        versionName "1.0.5"
+        versionCode 10016
+        versionName "1.0.16"
 
         renderscriptTargetApi 25
         renderscriptSupportModeEnabled true
+        // renderscriptSupportModeBlasEnabled true
+
+        // Enabling multidex support
+        multiDexEnabled true
 
         vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro',
+                    'proguard-glide.pro',
+                    //'proguard-mikepenz-android-iconics.pro',
+                    //'proguard-rounded-image-view.pro',
+                    'proguard-support-v7-appcompat.pro',
+                    'proguard-gson.pro'
+        }
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles = buildTypes.debug.proguardFiles
+            testProguardFile 'proguard-project-test.pro'
         }
-//        debug {
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
     }
 }
 
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.3@aar'
     compile project(':library')
+    compile project(':native-audio-jni')
     //
     //
-    compile('com.mikepenz:materialdrawer:5.9.3@aar') {
+    compile('com.mikepenz:materialdrawer:6.0.7@aar') {
         transitive = true
         exclude group: 'com.android.support'
         exclude group: 'com.github.bumptech.glide'
     }
     //
-    compile('com.mikepenz:google-material-typeface:3.0.1.1.original@aar') {
+    compile('com.mikepenz:google-material-typeface:3.0.1.2.original@aar') {
         exclude group: 'com.android.support'
     }
-    compile('com.mikepenz:fontawesome-typeface:4.7.0.1@aar') {
+    compile('com.mikepenz:fontawesome-typeface:5.0.6.0@aar') {
         exclude group: 'com.android.support'
     }
-    compile('com.google.zxing:core:3.3.0') {
+    compile('com.google.zxing:core:3.3.2') {
         exclude group: 'com.android.support'
     }
     compile('com.github.gfx.android.orma:orma:5.0.0-rc4') {
@@ -165,9 +193,8 @@ dependencies {
     compile('com.github.gfx.android.orma:orma-encryption:5.0.0-rc4') {
         exclude group: 'com.android.support'
     }
-    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
     //
-    compile('com.github.hotchemi:permissionsdispatcher:2.4.0') {
+    compile('com.github.hotchemi:permissionsdispatcher:3.2.0') {
         exclude group: 'com.android.support'
     }
     //
@@ -175,80 +202,118 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
+    compile('com.l4digital.fastscroll:fastscroll:1.0.4') {
+        exclude group: 'com.android.support'
+    }
     //
-    compile 'com.android.support:support-vector-drawable:25.3.1'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile('com.vanniktech:emoji-ios:0.5.1') {
+        exclude group: 'com.android.support'
+    }
+    //
+    compile('com.github.bumptech.glide:glide:4.7.1') {
+        exclude group: 'com.android.support'
+    }
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+    //
+    //
+    //
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.17@aar'
+    //
+    //
+    //
+    //noinspection GradleCompatible
+    compile 'com.android.support:support-v4:27.1.1'
+    compile 'com.android.support:appcompat-v7:27.1.1'
+    compile 'com.android.support:design:27.1.1'
+    compile 'com.android.support:recyclerview-v7:27.1.1'
+    compile 'com.android.support:cardview-v7:27.1.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    //
+    compile 'com.android.support:multidex:1.0.3'
+    androidTestCompile 'com.android.support:multidex:1.0.3'
+    androidTestCompile 'com.android.support:multidex-instrumentation:1.0.3'
     compile 'info.guardianproject.iocipher:IOCipher:0.4'
-    //
-    compile 'com.github.medyo:android-about-page:1.2.1'
-    compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile 'com.vanniktech:emoji-ios:0.4.0'
-    compile 'com.l4digital.fastscroll:fastscroll:1.0.4'
+    compile 'info.guardianproject.netcipher:netcipher:2.0.0-alpha1'
+    compile 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
+    compile 'com.google.code.gson:gson:2.8.3'
+    compile 'com.github.medyo:android-about-page:1.2.4'
+    compile 'de.hdodenhof:circleimageview:2.2.0'
+    compile 'me.zhanghai.android.patternlock:library:2.1.2'
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
-    compile 'info.guardianproject.netcipher:netcipher:1.2.1'
-    //
-    compile 'com.github.chrisbanes:PhotoView:2.0.0'
-    //
-    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
-    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.4.0'
+    compile 'com.github.chrisbanes:PhotoView:2.1.3'
+    compile 'com.squareup.okhttp3:okhttp:3.10.0'
+    compile 'com.daimajia.numberprogressbar:library:1.4@aar'
+    compile 'com.github.lawloretienne:discreteslider:0.0.9'
+    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
 }
+
 
 dependencyVerification {
     verify = [
-            'com.zoffcc.applications.trifajni:trifa-jni-lib:fcbe677d3ce2abfe2aba2a00b312d2f2d8ed1829d854af918137017c2348bf9f',
-            'com.mikepenz:materialdrawer:f8a0e341da6fd62588fd87260208dd616e16fcd79c8605720f3f25b65ce41ea1',
-            'com.mikepenz:google-material-typeface:72f56673dd5f646193cfe7b7513a4689869365069d27ac60faf4c4fdfb330054',
-            'com.mikepenz:fontawesome-typeface:ea35952a9126ddf01ad9c804c24fa97fad577ab4eb2af74e364d198040eabcd4',
-            'com.google.zxing:core:bba7724e02a997cec38213af77133ee8e24b0d5cf5fa7ecbc16a4fa93f11ee0d',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:86b0b5745d2b464efcde887f67ebea005d26cee93cca7a8eff3a80c74c0dcee6',
+            'com.mikepenz:materialdrawer:47c0c716b7838fcbe1258e8e9f4b34f95064138d039aaddd2f65ed83ec287706',
+            'com.mikepenz:google-material-typeface:3c8629e573d311a3edaff1b70aa5ac10183a8e3984acf225b2f996ebd077351c',
+            'com.mikepenz:fontawesome-typeface:c61323ebf3ac3d5c3375e027caa20173b73e46e10310248fa5af6ab03305eaf0',
+            'com.google.zxing:core:52dd6211bbaf4e600de693834d597e49707f3e6606e1f5d3740fbb8274466abe',
             'com.github.gfx.android.orma:orma:a639113c84239b52f7c58641b86b4ce3e13a395567bf7b1f3d04069939abce53',
             'com.github.gfx.android.orma:orma-encryption:9971a52bcadebebb53662ba0a0eb26836af6d9919c7fe2e43a54167b9a45d82d',
-            'com.github.hotchemi:permissionsdispatcher:f7344982c92d26a1e0bc0ea2b02d4311b543d560e57f42131467e60a3bcdcf6a',
+            'com.github.hotchemi:permissionsdispatcher:40191c8c726445dcab4fa2a4ef7a7e76186ef154dc385fe07520944fe4720089',
             'com.github.angads25:filepicker:8582d3a57d590945c05a00af265f63258da85523a61bd14556f545ad54da228b',
-            'com.android.support:support-vector-drawable:13728f337f36d1c02d52198a6c20724edb447a0875454d829f95cb9eb4aa293b',
-            'com.android.support:support-v4:07d389154bcf73b47e514964df1578136b26cba78257b8a577a3ccb54beff0ae',
-            'com.android.support:appcompat-v7:ac1ebbc46589195dda3e0b1becfe410bafd75bdf3edd1cd9acf04850f3895830',
-            'com.android.support:design:a3e83064fe99d0a4369f9b46d8bfbe77d0c3022fffdee4be3ac3857b87cc89e3',
-            'com.android.support:recyclerview-v7:375974a8724e359d97d77fa8522c614f813a3ac4583c1807f154a3f9a054b0a1',
-            'com.android.support.constraint:constraint-layout:b0c688cc2b7172608f8153a689d746da40f71e52d7e2fe2bfd9df2f92db77085',
-            'info.guardianproject.iocipher:IOCipher:ab7da0f23e256a2ced9492c73e37812c26e7beccc1a99815e6d65a75728ba6d3',
-            'com.github.medyo:android-about-page:262adb9c4e2ee9eea2ede2a1f4f64594c5f0f3a142255a70e6393361b158ad40',
-            'de.hdodenhof:circleimageview:bcbc588e19e6dcf8c120b1957776bfe229efba5d2fbe5da7156372eeacf65503',
-            'com.vanniktech:emoji-ios:8c8492311a83fad0e22d785a976de9b5ed2a6970c60aeb034e1b5fdcf1f5dd1d',
             'com.l4digital.fastscroll:fastscroll:54886e21c76ca3fbad958c0c21d8f8cc83f24cf41f83e0138bd7a3d6f2b5bbe5',
+            'com.vanniktech:emoji-ios:f30f5ad996b81d3a1a5987055d22b2e1bcecc5067c1524addabb271366452e80',
+            'com.github.bumptech.glide:glide:aee9dca7546d1e9dc829006d3347d6a062e345d1db3ddddaacc413d3b649d015',
+            'com.android.support:support-v4:4f41dfc3e89f2738e45c86264a85c0934d055ee8ebe2020e23c97f303b80a48b',
+            'com.android.support:appcompat-v7:0c7808fbbc5838d831e32e3c0a6f84e1f2c981deb8f11e010650f2b57923a335',
+            'com.android.support:design:7225973f7ee03765008a9c2f17a40b154c6885169fef022276e811c926a2202c',
+            'com.android.support:recyclerview-v7:d735e4727878e99ef3980c10d15dc3468462fd509d4fb60cb8bd20b0f735085c',
+            'com.android.support:cardview-v7:8ed955dd037d82a7b4bbcaedb4f896523c3e4c1bf3ca698ce807c350767a2886',
+            'com.android.support.constraint:constraint-layout:b0c688cc2b7172608f8153a689d746da40f71e52d7e2fe2bfd9df2f92db77085',
+            'com.android.support:multidex:ecf6098572e23b5155bab3b9a82b2fd1530eda6c6c157745e0f5287c66eec60c',
+            'info.guardianproject.iocipher:IOCipher:ab7da0f23e256a2ced9492c73e37812c26e7beccc1a99815e6d65a75728ba6d3',
+            'info.guardianproject.netcipher:netcipher:eeeb5d0d95ccfe176b4296cbd71a9a24c6efb0bab5c4025a8c6bc36abdddfc75',
+            'info.guardianproject.netcipher:netcipher-okhttp3:548b24763c57d273e1e3650e9974644f91c6a79350961905476456b6a485c905',
+            'com.google.code.gson:gson:1c1cf64005afab2ed36cc75c2736b8afa2fe2895912d9472a440e6e01eda6afe',
+            'com.github.medyo:android-about-page:15108c8bdedf5975d2aa60604107017109a4ad3640e0e95fa97fd438d347eb5c',
+            'de.hdodenhof:circleimageview:bc34761dcd5036229ac1ffed6b5b1bef722ad5b097a2c8bba1c5ed2cd4b5c82b',
+            'me.zhanghai.android.patternlock:library:3b35da8f0ae09ce462d8ba9c896820d3bb0806151552b0af9caf349fb02dcb70',
             'com.github.armcha:AutoLinkTextView:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
-            'info.guardianproject.netcipher:netcipher:611ec5bde9d799fd57e1efec5c375f9f460de2cdda98918541decc9a7d02f2ad',
-            'com.github.chrisbanes:PhotoView:458cfff9421cc28b608139fd9dffba6399d7f654b688e3f105a3a03a9b82cc7d',
-            'com.github.bumptech.glide:glide:72bbcdb2087c4f0baf36ff6488fd5b36d35d602d60dc5826da724597bf0504ba',
-            'com.mikepenz:materialize:7add9fff9ccc20e4bbc508b7d2727594369def95d9ca58c620503cf0d1ee67f1',
-            'com.mikepenz:iconics-core:aa05fe57f493b0b4639b1ace5979ae5287cc09fcaf7496fbc281fc0ce3cf5254',
-            'com.mikepenz:fastadapter:aaf090fa286bf9cfae7031faf80370f01a605e49f3ec18a9276b178b7d71281d',
+            'com.github.chrisbanes:PhotoView:7f12b0a9f24b132fc743861ab8f045625faa95c8357887a5fac58fa34a3759e4',
+            'com.squareup.okhttp3:okhttp:4aca3e552afb1ceb47f8956685f6295a276e49fa03f9066f8b6be83bec56fb66',
+            'com.daimajia.numberprogressbar:library:94a81e9134f084a5327261972fc18f3afc457e8290324f7c3cae6dacb4c13ee5',
+            'com.github.lawloretienne:discreteslider:2a5b1a28060d20e070ff8ee2c9538e4427e04d56467453813b5efa05ea9390d1',
+            'com.mikepenz:materialize:2834b735fefcb2e1ab356e926a652396a4ece0dffc05184ea755366c3d2ee79f',
+            'com.mikepenz:iconics-core:b976b33a6ff475fc111d445bedf4c9bae4c70514049467d3ff5d3dee8910327a',
+            'com.mikepenz:fastadapter:634d582c4b3906c593ff39271c23cf23e6dc1e8dc6aeb0f560d0d44627aa4d9e',
+            'com.mikepenz:fastadapter-extensions-expandable:a8cfb8e9024bb0126d5c2382dfec62f03113bf34ca405e840abc451cc69c2820',
             'com.github.gfx.android.orma:orma-migration:be4f09f3e89a93ff68c5a2af65c8e8c9b3cea4acb4bc2bf2ffd86c1a8fc38229',
             'com.github.gfx.android.orma:orma-annotations:288b71aace681a9320284f74ce56b184c16979048e22b8021fe0da7ce06f0682',
             'io.reactivex.rxjava2:rxjava:dc612f6887f8a4ff1ae33f55eeef59d8028e53f0cea9b40c7ddba1d8fee51736',
             'io.reactivex.rxjava2:rxandroid:f81bc2b2553ce77bdcdadbcb28e748344f9cfe57511bfc2f488cbbc6d7782f3e',
             'com.github.gfx.android.orma:orma-core:0929c79c3a6e96042fa8dcbba8dc91ff9047ca35b09a3fedaf015c1c27cc3c8a',
             'net.zetetic:android-database-sqlcipher:20e9276aacd18f0fffe62221545046696460775af56736ddd33b8a04a78bc756',
-            'com.android.support:support-annotations:aedf76962584adfaed2bd3fcaa22406461c4310237fc27e301128edaa2dba2fa',
-            'com.android.support:support-compat:e02d781268dc60aab6638d8dc20156ea11ca20b962d294b85e6f1e8418cabfa7',
-            'com.android.support:support-media-compat:cbed07d07e0e84fdb4b75712f5fd946229a8af155933c9a92e41db64d00791e0',
-            'com.android.support:support-core-utils:32fac02eb2c20a77fa3e3bc3ede62392a19613f72b8f8e10f5dfa84bb4c89ea1',
-            'com.android.support:support-core-ui:6182278a6653e6c111c888963626cbb16f2d0022571cb239760475119e0b92a8',
-            'com.android.support:support-fragment:541d6393c1e024453aca2a14f31bea0c7270ff4e2a02783f3528aa426367444d',
-            'com.android.support:animated-vector-drawable:4bc46edf1946b32d518b41416d1734e915e0cbb28021de3b340527419b070691',
-            'com.android.support:transition:36c688825a8c0e6e879e18886de83dc90673322822d5b606ee302f70fb558e16',
+            'com.vanniktech:emoji:d55f44e04e31895647d62c33c34a8d501995e9e1b5c5f5cee6cbb8630eeb37f7',
+            'com.github.bumptech.glide:gifdecoder:9b67e1e5a0a30dd06722aa5dae45d713fdfb1a59040d66f26743c8acd6f14173',
+            'com.github.bumptech.glide:disklrucache:e7e84872477702af06f8a9da8b7657fe4b385609668d2a48df36c5d340506021',
+            'com.github.bumptech.glide:annotations:292d161e4b0c1d2eddfab15b01f9d0be064da5c5ff1f29cd54f50ec29522cdf2',
+            'com.android.support:support-compat:880ce01ff5be42b233ff8ec0c61cefb7dc3dc9500fea9e24423214813ac27ea2',
+            'com.android.support:support-media-compat:55e9837dda88b74a8c812c63a78c63fd83c6c039a8c22d318492663a493585eb',
+            'com.android.support:support-core-utils:61036832c54e8701aae954fc3bf96d1d80bf8d9dd531bff77d72def456ba087a',
+            'com.android.support:support-core-ui:a3ae20e6d5dffba69ac97b99846d2738003af8563843d5f3c9dc4c35b4804241',
+            'com.android.support:support-fragment:ec72d6ac36a1a0e6523bbddba33d73ffad070b9b3dd246cc44d8727a41ddb5e6',
+            'com.android.support:support-annotations:3365960206c3d2b09e845f555e7f88f8effc8d2f00b369e66c4be384029299cf',
+            'com.android.support:support-vector-drawable:1c0f421114cf4627cf208776d6eb4f76340c78b7e96fe6e12b3e6eb950caf1b9',
+            'com.android.support:animated-vector-drawable:59670473f6e98fda792f7bef25dd7292b0a3106031c7a5e30eb020bf26f077bd',
+            'com.android.support:transition:c0765b2f3c78696567ec5b3f519d22da1e3df11ac994625adf4bb4dc571caacc',
             'com.android.support.constraint:constraint-layout-solver:8c62525a9bc5cff5633a96cb9b32fffeccaf41b8841aa87fc22607070dea9b8d',
-            'com.vanniktech:emoji:741ef2eff9c4cbc176292bea40cdf898a7a2219909cfaa86f67b77694df44d1d',
-            'com.github.bumptech.glide:gifdecoder:0ab61481061c1237711f70652c4abf83d461e5ca0fd2e55af0fe3f9fdcf73c6e',
-            'com.github.bumptech.glide:disklrucache:da55fe28ae8b8003f4fe963fec67b7620ad6c545b58cec01f599fb788c419a18',
-            'com.github.bumptech.glide:annotations:36efd480cbd30ef29a461621776592427e50e072614d29bd006f5f3fa6f18127',
+            'com.squareup.okio:okio:4633c331f50642ebe795dc089d6a5928aff43071c9d17e7840a009eea2fe95a3',
             'org.antlr:antlr4-runtime:08b519ce8883f9e0c92d5e16b911dbbb3d29faa434efc4c3c62435341ec4b332',
             'org.reactivestreams:reactive-streams:ef867702a614b96eb6c64fb65a8f5e14bdfcabbc1ae056f78a1643f7b79ca0eb',
+            'android.arch.lifecycle:runtime:094fd793924dd6a5136753e599ac8174a8147f4a401386b694ba7d818c223e2e',
+            'android.arch.lifecycle:livedata-core:14e57ff8ffb65a80c7e72d91f2076acccdaf2970f234c6261e03a6127eb5206b',
+            'android.arch.lifecycle:viewmodel:6407c93a5ea9850661dca42a0068d6f3deccefd7228ee69bae1c35d70cbc2557',
+            'android.arch.lifecycle:common:614e31cfd33255dc4d5f5d8e62cfa6be2fbbc2a35643a79dc3ed008004c30807',
+            'android.arch.core:common:d34824b794bc92ff8f647a9bb13a7c73de920de5b47075b5d2c4f0770e9b8bfd',
+            'android.arch.core:runtime:83400f7575bcfb8a2eeec64e05590f037bfaed1e56aa3a4214d20e55878445e3',
     ]
 }
 

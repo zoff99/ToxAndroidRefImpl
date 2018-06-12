@@ -1,11 +1,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#0277bd"
+              android:background="#000000"
               android:orientation="vertical"
               tools:context="com.zoffcc.applications.trifa.CallingActivity">
 
+    <!--android:background="#0277bd"-->
 
     <TextView
         android:id="@+id/top_text_line"
@@ -14,14 +16,14 @@
         android:gravity="center_vertical"
         android:text="xxxxxxxx"
         android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="20sp"/>
+        android:textColor="@color/md_grey_400"
+        android:textSize="22sp"/>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="0dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
@@ -31,12 +33,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
             <ImageView
                 android:id="@+id/video_view"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:background="@android:color/black"/>
-
 
             <FrameLayout
                 android:layout_width="125dp"
@@ -66,7 +68,6 @@
 
                 </LinearLayout>
             </FrameLayout>
-
 
             <FrameLayout
                 android:layout_width="125dp"
@@ -100,6 +101,26 @@
                         android:textSize="15sp"
                         android:textStyle="bold"/>
 
+                    <TextView
+                        android:id="@+id/right_top_text_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="IN   0 fps"
+                        android:textColor="@color/md_green_700"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/right_top_text_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="Out 0 fps"
+                        android:textColor="@color/md_red_700"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
                     <ImageView
                         android:id="@+id/audio_device_icon"
                         android:layout_width="30dp"
@@ -113,6 +134,13 @@
                 </LinearLayout>
             </FrameLayout>
 
+            <ImageView
+                android:id="@+id/caller_avatar_view"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:background="@android:color/black"/>
 
             <FrameLayout
                 android:layout_width="125dp"
@@ -141,6 +169,81 @@
         </FrameLayout>
 
     </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/quality_slider_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="1dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/text_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            android:layout_marginTop="0dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/text_vq_low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:elevation="2dp"
+                android:gravity="left"
+                android:paddingLeft="30dp"
+                android:text="low"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/text_vq_med"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="2dp"
+                android:gravity="center_horizontal"
+                android:text="Video Quality"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/text_vq_high"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:elevation="2dp"
+                android:gravity="right"
+                android:paddingRight="30dp"
+                android:text="high"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <com.etiennelawlor.discreteslider.library.ui.DiscreteSlider
+            android:id="@+id/quality_slider"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_gravity="bottom"
+            android:background="@color/md_black_1000"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            app:backdropFillColor="@color/md_green_A400"
+            app:backdropStrokeColor="@color/md_black_1000"
+            app:backdropStrokeWidth="2dp"
+            app:horizontalBarThickness="4dp"
+            app:position="0"
+            app:tickMarkCount="3"
+            app:tickMarkRadius="8dp"/>
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/bottom"
@@ -176,8 +279,8 @@
 
         <ImageButton
             android:id="@+id/camera_toggle_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
@@ -193,10 +296,32 @@
             android:text="">
         </TextView>
 
+
+        <ImageButton
+            android:id="@+id/misc_button"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:keepScreenOn="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_yellow"/>
+
+        <TextView
+            android:id="@+id/misc_button_pad"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="">
+        </TextView>
+
+
         <ImageButton
             android:id="@+id/mute_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"

@@ -37,7 +37,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
-    <uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY"/>
+    <!--<uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY"/>-->
 
     <application
         android:name=".MainApplication"
@@ -48,12 +48,8 @@
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label,android:icon">
 
-        <!-- <meta-data -->
-        <!-- android:name="com.zoffcc.applications.trifa.MyGlideModule" -->
-        <!-- android:value="GlideModule"/> -->
-
         <activity
-            android:name=".MainActivity"
+            android:name=".StartMainActivityWrapper"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:launchMode="singleTask">
             <intent-filter>
@@ -63,14 +59,24 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".MainActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:launchMode="singleTask">
+        </activity>
+        <activity
             android:name=".AddFriendActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/add_friend_activity_name">
-            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>
         <activity
             android:name=".MessageListActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/message_list_activity_name">
-            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
+            android:name=".ConferenceMessageListActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/conference_message_list_activity_name">
         </activity>
         <activity
             android:name=".CallingActivity"
@@ -102,7 +108,26 @@
             android:name=".ImageviewerActivity_SD"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>
-
+        <activity
+            android:name=".TrifaSetPatternActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
+            android:name=".TrifaCheckPatternActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
+            android:name=".SetPasswordActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_set_password"
+            android:launchMode="singleTask">
+        </activity>
+        <activity
+            android:name=".CheckPasswordActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_check_password"
+            android:launchMode="singleTask">
+        </activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings">
@@ -111,12 +136,66 @@
             android:name=".Aboutpage"
             android:label="@string/title_activity_aboutpage">
         </activity>
+        <activity
+            android:name=".MaintenanceActivity"
+            android:label="@string/title_activity_maintenance">
+        </activity>
+        <activity
+            android:name=".ShareActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:label="@string/title_activity_share"
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="audio/*"/>
+                <data android:mimeType="image/*"/>
+                <data android:mimeType="text/plain"/>
+                <data android:mimeType="video/*"/>
+            </intent-filter>
+            <!-- Intent filter for handling tox: links -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="tox"/>
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".ConnectionManager"
+            android:label="NetworkConnection">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+        <!--<receiver android:name=".BootReceiver">-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.BOOT_COMPLETED"/>-->
+        <!--</intent-filter>-->
+        <!--</receiver>-->
 
         <service
             android:name=".TrifaToxService"
             android:enabled="true"
             android:exported="false">
         </service>
+
+        <provider
+            android:name=".GenericFileProvider"
+            android:authorities="com.zoffcc.applications.trifa.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
 
 </manifest>

@@ -29,7 +29,7 @@ public class ToxVars
     public static final int sizeof_uint32_t = 4; // 4 bytes
     // TODO: get these with the appropriate JNI functions!
     public static final int TOX_MAX_NAME_LENGTH = 128;
-    public static final int OX_MAX_STATUS_MESSAGE_LENGTH = 1007;
+    public static final int TOX_MAX_STATUS_MESSAGE_LENGTH = 1007;
     public static final int TOX_MAX_FRIEND_REQUEST_LENGTH = 1016;
     public static final int TOX_PUBLIC_KEY_SIZE = 32; // --> 64 hex chars!!
     public static final int TOX_SECRET_KEY_SIZE = 32;
@@ -439,20 +439,26 @@ public class ToxVars
         /**
          * User is online and available.
          */
-        TOX_USER_STATUS_NONE,
+        TOX_USER_STATUS_NONE(0),
 
         /**
          * User is away. Clients can set this e.g. after a user defined
          * inactivity time.
          */
-        TOX_USER_STATUS_AWAY,
+        TOX_USER_STATUS_AWAY(1),
 
         /**
          * User is busy. Signals to other clients that this client does not
          * currently wish to communicate.
          */
-        TOX_USER_STATUS_BUSY,
+        TOX_USER_STATUS_BUSY(2);
 
+        public int value;
+
+        private TOX_USER_STATUS(int value)
+        {
+            this.value = value;
+        }
     }
 
     public static enum TOX_MESSAGE_TYPE
@@ -1110,9 +1116,278 @@ public class ToxVars
 
     }
 
-    // ---------- TOX -------------
-    // ---------- TOX -------------
-    // ---------- TOX -------------
+
+    public static enum TOX_CONFERENCE_TYPE
+    {
+        /**
+         * Text-only conferences that must be accepted with the tox_conference_join function.
+         */
+        TOX_CONFERENCE_TYPE_TEXT(0),
+
+        /**
+         * Video conference. The function to accept these is in toxav.
+         */
+        TOX_CONFERENCE_TYPE_AV(1);
+
+        public int value;
+
+        private TOX_CONFERENCE_TYPE(int value)
+        {
+            this.value = value;
+        }
+
+    }
+
+    public static enum TOX_CONFERENCE_STATE_CHANGE
+    {
+
+        /**
+         * A peer has joined the conference.
+         */
+        TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN(0),
+
+        /**
+         * A peer has exited the conference.
+         */
+        TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT(1),
+
+        /**
+         * A peer has changed their name.
+         */
+        TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE(2);
+
+        public int value;
+
+        private TOX_CONFERENCE_STATE_CHANGE(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    public static enum TOX_ERR_CONFERENCE_PEER_QUERY
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_PEER_QUERY_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND,
+
+        /**
+         * The peer number passed did not designate a valid peer.
+         */
+        TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND,
+
+        /**
+         * The client is not connected to the conference.
+         */
+        TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION,
+
+    }
+
+    public static enum TOX_ERR_CONFERENCE_INVITE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_INVITE_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_INVITE_CONFERENCE_NOT_FOUND,
+
+        /**
+         * The invite packet failed to send.
+         */
+        TOX_ERR_CONFERENCE_INVITE_FAIL_SEND,
+
+    }
+
+    public static enum TOX_ERR_CONFERENCE_JOIN
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_JOIN_OK,
+
+        /**
+         * The cookie passed has an invalid length.
+         */
+        TOX_ERR_CONFERENCE_JOIN_INVALID_LENGTH,
+
+        /**
+         * The conference is not the expected type. This indicates an invalid cookie.
+         */
+        TOX_ERR_CONFERENCE_JOIN_WRONG_TYPE,
+
+        /**
+         * The friend number passed does not designate a valid friend.
+         */
+        TOX_ERR_CONFERENCE_JOIN_FRIEND_NOT_FOUND,
+
+        /**
+         * Client is already in this conference.
+         */
+        TOX_ERR_CONFERENCE_JOIN_DUPLICATE,
+
+        /**
+         * Conference instance failed to initialize.
+         */
+        TOX_ERR_CONFERENCE_JOIN_INIT_FAIL,
+
+        /**
+         * The join packet failed to send.
+         */
+        TOX_ERR_CONFERENCE_JOIN_FAIL_SEND,
+
+    }
+
+    public static enum TOX_ERR_CONFERENCE_SEND_MESSAGE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_CONFERENCE_NOT_FOUND,
+
+        /**
+         * The message is too long.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_TOO_LONG,
+
+        /**
+         * The client is not connected to the conference.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_NO_CONNECTION,
+
+        /**
+         * The message packet failed to send.
+         */
+        TOX_ERR_CONFERENCE_SEND_MESSAGE_FAIL_SEND,
+
+    }
 
 
+    public static enum TOX_ERR_CONFERENCE_TITLE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_TITLE_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_TITLE_CONFERENCE_NOT_FOUND,
+
+        /**
+         * The title is too long or empty.
+         */
+        TOX_ERR_CONFERENCE_TITLE_INVALID_LENGTH,
+
+        /**
+         * The title packet failed to send.
+         */
+        TOX_ERR_CONFERENCE_TITLE_FAIL_SEND,
+
+    }
+
+
+    public static enum TOX_ERR_CONFERENCE_GET_TYPE
+    {
+
+        /**
+         * The function returned successfully.
+         */
+        TOX_ERR_CONFERENCE_GET_TYPE_OK,
+
+        /**
+         * The conference number passed did not designate a valid conference.
+         */
+        TOX_ERR_CONFERENCE_GET_TYPE_CONFERENCE_NOT_FOUND,
+
+    }
+
+
+    public static enum TOXAV_OPTIONS_VP8_QUALITY_VALUE
+    {
+        TOXAV_ENCODER_VP8_QUALITY_NORMAL(0), TOXAV_ENCODER_VP8_QUALITY_HIGH(1);
+        public int value;
+
+        private TOXAV_OPTIONS_VP8_QUALITY_VALUE(int value)
+        {
+            this.value = value;
+        }
+    }
+
+
+    public static enum TOXAV_ENCODER_CODEC_USED_VALUE
+    {
+        TOXAV_ENCODER_CODEC_USED_VP8(0), TOXAV_ENCODER_CODEC_USED_VP9(1);
+        public int value;
+
+        private TOXAV_ENCODER_CODEC_USED_VALUE(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    public static enum TOXAV_ENCODER_KF_METHOD_VALUE
+    {
+        TOXAV_ENCODER_KF_METHOD_NORMAL(0), TOXAV_ENCODER_KF_METHOD_PATTERN(1);
+        public int value;
+
+        private TOXAV_ENCODER_KF_METHOD_VALUE(int value)
+        {
+            this.value = value;
+        }
+    }
+
+
+    /**
+     * Maximum size of MessageV2 Messagetext
+     */
+    public static int TOX_MESSAGEV2_MAX_TEXT_LENGTH = 4096;
+
+    /**
+     * Maximum size of MessageV2 Messagetext
+     */
+    public static int TOX_MESSAGEV2_MAX_HEADER_SIZE = (32 + 4 + 2 + 1);
+
+    /**
+     * Maximum size of MessageV2 Filetransfers (overall size including any overhead)
+     */
+    public static int TOX_MAX_FILETRANSFER_SIZE_MSGV2 = (TOX_MESSAGEV2_MAX_TEXT_LENGTH + TOX_MESSAGEV2_MAX_HEADER_SIZE);
+
+
+    public static enum TOXAV_OPTIONS_OPTION
+    {
+        TOXAV_ENCODER_CPU_USED(0), TOXAV_ENCODER_VP8_QUALITY(1), TOXAV_ENCODER_MIN_SOFTDEADLINE(
+            2), TOXAV_ENCODER_MAX_SOFTDEADLINE(3), TOXAV_DECODER_MIN_SOFTDEADLINE(4), TOXAV_DECODER_MAX_SOFTDEADLINE(
+            5), TOXAV_ENCODER_RC_MAX_QUANTIZER(6), TOXAV_ENCODER_RC_MIN_QUANTIZER(8), TOXAV_DECODER_ERROR_CONCEALMENT(
+            7), TOXAV_ENCODER_CODEC_USED(9), TOXAV_ENCODER_KF_METHOD(10);
+        public int value;
+
+        private TOXAV_OPTIONS_OPTION(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    // ---------- TOX -------------
+    // ---------- TOX -------------
+    // ---------- TOX -------------
 }

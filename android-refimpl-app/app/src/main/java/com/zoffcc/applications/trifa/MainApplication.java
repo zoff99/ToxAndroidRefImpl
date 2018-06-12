@@ -25,9 +25,12 @@ import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -53,7 +56,7 @@ public class MainApplication extends Application
     // -----------------------
     // -----------------------
     // -----------------------
-    final static boolean CATCH_EXCEPTIONS = true; // set true for release builds
+    final static boolean CATCH_EXCEPTIONS = true; // set "true" for release builds!
     // -----------------------
     // -----------------------
     // -----------------------
@@ -73,6 +76,20 @@ public class MainApplication extends Application
 
         Log.i(TAG, "MainApplication:" + randnum + ":" + "onCreate");
         super.onCreate();
+
+        try
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            {
+                IntentFilter intentFilter = new IntentFilter();
+                intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+                registerReceiver(new ConnectionManager(), intentFilter);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         crashes = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getInt("crashes", 0);
 
@@ -105,6 +122,7 @@ public class MainApplication extends Application
     protected void attachBaseContext(Context base)
     {
         super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
     public static String run_adb_command()
@@ -212,7 +230,9 @@ public class MainApplication extends Application
             Calendar c = Calendar.getInstance();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
             String formattedDate = df.format(c.getTime());
+            // File myDir = new File(getExternalFilesDir(null).getAbsolutePath() + "/crashes");
             File myDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes");
+
             myDir.mkdirs();
             File myFile = new File(myDir.getAbsolutePath() + "/crash_" + formattedDate + ".txt");
             Log.i(TAG, "MainApplication:" + randnum + ":" + "crash file=" + myFile.getAbsolutePath());

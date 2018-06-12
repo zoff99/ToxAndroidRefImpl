@@ -17,6 +17,12 @@ class HeadsetStateReceiver extends BroadcastReceiver
     {
         try
         {
+            if (isInitialStickyBroadcast())
+            {
+                Log.i(TAG, "onReceive:headset:isInitialStickyBroadcast");
+            }
+
+
             if (CallingActivity.activity_state == 1)
             {
                 if (intent.getAction().equals("android.intent.action.HEADSET_PLUG"))

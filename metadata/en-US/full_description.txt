@@ -1,0 +1,7 @@
+<b>TRIfA is a Tox Client for Android.</b><br>
+It's still currently in heavy development.<br><br>
+
+<b>More Information:</b><br>
+* <a href="https://tox.zoff.cc">about Tox</a><br>
+* <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
+* <a href="https://matrix.to/#/#freenode_#tox:matrix.org">Join Toxuser Channel</a><br>
