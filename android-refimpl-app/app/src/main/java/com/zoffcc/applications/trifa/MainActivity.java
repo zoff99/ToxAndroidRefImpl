@@ -2778,15 +2778,12 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        // set audio and video bitrate according to suggestion from c-toxcore
-                        toxav_bit_rate_set(friend_number_, audio_bit_rate_, video_bit_rate_);
-
-                        // HINT: dont use that // Callstate.audio_bitrate = audio_bit_rate_;
-
-                        //**// TODO: for VP8 we still need this
+                        // HINT: disabled (for VP8 this does not work properly anyway)
+                        // set only video bitrate according to suggestion from c-toxcore
                         // Callstate.video_bitrate = video_bit_rate_;
-                        update_bitrates();
+                        // toxav_bit_rate_set(friend_number_, Callstate.audio_bitrate, video_bit_rate_);
 
+                        update_bitrates();
                         Log.i(TAG, "toxav_bit_rate_status:CALL:toxav_bit_rate_set");
                     }
                     catch (Exception e)
