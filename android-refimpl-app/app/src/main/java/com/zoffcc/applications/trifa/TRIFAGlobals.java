@@ -114,6 +114,9 @@ public class TRIFAGlobals
     static final int FL_NOTIFICATION_ICON_SIZE_DP_SELECTED = 90;
     static final int FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED = 15;
 
+    static final int VIDEO_CODEC_VP8 = 0;
+    static final int VIDEO_CODEC_H264 = 1;
+
     static final int MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE = 256;
     static final int LEN_TRIFA_AUTOGEN_PASSWORD = 32;
 

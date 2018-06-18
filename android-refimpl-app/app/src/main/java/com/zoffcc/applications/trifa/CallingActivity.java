@@ -112,6 +112,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     PowerManager.WakeLock wl1 = null;
     PowerManager.WakeLock wl2 = null;
     TextView right_top_text_1 = null;
+    TextView right_top_text_1b = null;
     TextView right_top_text_2 = null;
     TextView right_top_text_3 = null;
     TextView right_top_text_4 = null;
@@ -186,6 +187,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
 
         right_top_text_1 = (TextView) findViewById(R.id.right_top_text_1);
+        right_top_text_1b = (TextView) findViewById(R.id.right_top_text_1b);
         right_top_text_2 = (TextView) findViewById(R.id.right_top_text_2);
         right_top_text_3 = (TextView) findViewById(R.id.right_top_text_3);
         right_top_text_4 = (TextView) findViewById(R.id.right_top_text_4);

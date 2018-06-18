@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_VP8;
 
 public class Callstate
 {
@@ -40,6 +41,9 @@ public class Callstate
     static long vstride = -1;
     static long audio_bitrate = GLOBAL_AUDIO_BITRATE;
     static long video_bitrate = GLOBAL_VIDEO_BITRATE;
+    static long video_in_bitrate = 0;
+    static long video_out_codec = VIDEO_CODEC_VP8;
+    static long video_in_codec = VIDEO_CODEC_VP8;
     static int accepted_call = 0;
     static long call_init_timestamp = -1L; // when it starts ringing (someone calls us)
     static long call_start_timestamp = -1L; // when we actually start the call (someone calls us)
@@ -64,8 +68,23 @@ public class Callstate
         Callstate.my_video_enabled = 1;
         Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
         Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
+        Callstate.video_in_bitrate = 0;
+        Callstate.video_out_codec = VIDEO_CODEC_VP8;
+        Callstate.video_in_codec = VIDEO_CODEC_VP8;
         Callstate.accepted_call = 0;
         Callstate.audio_speaker = true;
         Callstate.audio_device = 0;
+    }
+
+    public static String codec_to_str(long v)
+    {
+        if (v == VIDEO_CODEC_VP8)
+        {
+            return "VP8";
+        }
+        else
+        {
+            return "H264";
+        }
     }
 }

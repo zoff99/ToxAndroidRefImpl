@@ -166,6 +166,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.UPDATE_MESSAGE_PROGRESS
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H264;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_VP8;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
@@ -182,6 +184,12 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_tox_self_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_DECODER_CURRENT_BITRATE;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_DECODER_IN_USE_H264;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_DECODER_IN_USE_VP8;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_H264;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_VP8;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE;
@@ -2773,8 +2781,10 @@ public class MainActivity extends AppCompatActivity
                         // set audio and video bitrate according to suggestion from c-toxcore
                         toxav_bit_rate_set(friend_number_, audio_bit_rate_, video_bit_rate_);
 
-                        Callstate.audio_bitrate = audio_bit_rate_;
-                        Callstate.video_bitrate = video_bit_rate_;
+                        // HINT: dont use that // Callstate.audio_bitrate = audio_bit_rate_;
+
+                        //**// TODO: for VP8 we still need this
+                        // Callstate.video_bitrate = video_bit_rate_;
                         update_bitrates();
 
                         Log.i(TAG, "toxav_bit_rate_status:CALL:toxav_bit_rate_set");
@@ -2797,6 +2807,47 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_comm_cb_method(long friend_number, long a_TOXAV_CALL_COMM_INFO, long comm_number)
     {
+        // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+
+        if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_DECODER_IN_USE_VP8.value)
+        {
+            // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:3:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+            Callstate.video_in_codec = VIDEO_CODEC_VP8;
+        }
+        else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_DECODER_IN_USE_H264.value)
+        {
+            // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:4:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+            Callstate.video_in_codec = VIDEO_CODEC_H264;
+        }
+        else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_ENCODER_IN_USE_VP8.value)
+        {
+            Callstate.video_out_codec = VIDEO_CODEC_VP8;
+            // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:1:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+        }
+        else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_ENCODER_IN_USE_H264.value)
+        {
+            Callstate.video_out_codec = VIDEO_CODEC_H264;
+            // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:2:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+        }
+        else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_DECODER_CURRENT_BITRATE.value)
+        {
+            Callstate.video_in_bitrate = comm_number;
+            // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:66B:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+        }
+        else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE.value)
+        {
+            Callstate.video_bitrate = comm_number;
+        }
+
+        try
+        {
+            update_bitrates();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "android_toxav_callback_call_comm_cb_method:EE:" + e.getMessage());
+        }
     }
 
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
@@ -2912,24 +2963,24 @@ public class MainActivity extends AppCompatActivity
                 audio_buffer_2[0].position(0);
                 int incoming_bytes = (int) ((sample_count * channels) * 2);
 
-//                System.out.println("NativeAudioPlay:000a:size="+ incoming_bytes +
-//                                   " offset="+audio_buffer_2[0].arrayOffset() +
-//                                   " limit="+audio_buffer_2[0].limit() +
-//                                   " bytes=" +
-//                                   audio_buffer_2[0].get(0) + " " +
-//                                   audio_buffer_2[0].get(1) + " " +
-//                                   audio_buffer_2[0].get(2) + " " +
-//                                   audio_buffer_2[0].get(3) + " " +
-//                                   audio_buffer_2[0].get(4) + " " +
-//                                   audio_buffer_2[0].get(5) + " " +
-//                                   audio_buffer_2[0].get(6) + " " +
-//                                   audio_buffer_2[0].get(7) + " " +
-//                                   audio_buffer_2[0].get(8) + " " +
-//                                   audio_buffer_2[0].get(9) + " " +
-//                                   audio_buffer_2[0].get(10) + " " +
-//                                   audio_buffer_2[0].get(11) + " " +
-//                                   audio_buffer_2[0].get(12)
-//                                   );
+                //                System.out.println("NativeAudioPlay:000a:size="+ incoming_bytes +
+                //                                   " offset="+audio_buffer_2[0].arrayOffset() +
+                //                                   " limit="+audio_buffer_2[0].limit() +
+                //                                   " bytes=" +
+                //                                   audio_buffer_2[0].get(0) + " " +
+                //                                   audio_buffer_2[0].get(1) + " " +
+                //                                   audio_buffer_2[0].get(2) + " " +
+                //                                   audio_buffer_2[0].get(3) + " " +
+                //                                   audio_buffer_2[0].get(4) + " " +
+                //                                   audio_buffer_2[0].get(5) + " " +
+                //                                   audio_buffer_2[0].get(6) + " " +
+                //                                   audio_buffer_2[0].get(7) + " " +
+                //                                   audio_buffer_2[0].get(8) + " " +
+                //                                   audio_buffer_2[0].get(9) + " " +
+                //                                   audio_buffer_2[0].get(10) + " " +
+                //                                   audio_buffer_2[0].get(11) + " " +
+                //                                   audio_buffer_2[0].get(12)
+                //                                   );
 
                 if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
                 {
@@ -2952,10 +3003,10 @@ public class MainActivity extends AppCompatActivity
                         audio_buffer_2[0].position(0);
 
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
-//                        System.out.println("NativeAudioPlay:001:res=" + res + " bytes=" +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " ");
+                        //                        System.out.println("NativeAudioPlay:001:res=" + res + " bytes=" +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " ");
 
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
                         if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
@@ -2978,20 +3029,20 @@ public class MainActivity extends AppCompatActivity
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
 
-//                        System.out.println("NativeAudioPlay:002:res=" + res + " bytes=" +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(3) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(4) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(5) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(6) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(7) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(8) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(9) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(10) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(11) + " " +
-//                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(12) + " ");
+                        //                        System.out.println("NativeAudioPlay:002:res=" + res + " bytes=" +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(0) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(1) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(3) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(4) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(5) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(6) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(7) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(8) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(9) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(10) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(11) + " " +
+                        //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(12) + " ");
 
 
                         if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
@@ -7668,8 +7719,13 @@ public class MainActivity extends AppCompatActivity
                         {
                             try
                             {
-                                CallingActivity.ca.right_top_text_1.setText("V " + Callstate.video_bitrate + " kbit/s");
-                                CallingActivity.ca.right_top_text_2.setText("A " + Callstate.audio_bitrate + " kbit/s");
+                                CallingActivity.ca.right_top_text_1.setText(
+                                        "O:" + Callstate.codec_to_str(Callstate.video_out_codec) + ":" +
+                                        Callstate.video_bitrate);
+                                CallingActivity.ca.right_top_text_1b.setText(
+                                        "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
+                                        Callstate.video_in_bitrate);
+                                CallingActivity.ca.right_top_text_2.setText("AO:" + Callstate.audio_bitrate);
                             }
                             catch (Exception e)
                             {

@@ -86,9 +86,19 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:elevation="2dp"
-                        android:text="V 4000 kbit/s"
+                        android:text="O:VP8 4000 kbit/s"
                         android:textColor="@color/md_green_700"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/right_top_text_1b"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="I:VP8 4000 kbit/s"
+                        android:textColor="@color/md_green_700"
+                        android:textSize="14sp"
                         android:textStyle="bold"/>
 
                     <TextView
@@ -98,7 +108,7 @@
                         android:elevation="2dp"
                         android:text="A 350 kbit/s"
                         android:textColor="@color/md_red_700"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"/>
 
                     <TextView
@@ -108,7 +118,7 @@
                         android:elevation="2dp"
                         android:text="IN   0 fps"
                         android:textColor="@color/md_green_700"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"/>
 
                     <TextView
@@ -118,7 +128,7 @@
                         android:elevation="2dp"
                         android:text="Out 0 fps"
                         android:textColor="@color/md_red_700"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"/>
 
                     <ImageView

@@ -1387,6 +1387,20 @@ public class ToxVars
         }
     }
 
+    public static enum TOXAV_CALL_COMM_INFO
+    {
+        TOXAV_CALL_COMM_DECODER_IN_USE_VP8(0), TOXAV_CALL_COMM_DECODER_IN_USE_H264(
+            1), TOXAV_CALL_COMM_ENCODER_IN_USE_VP8(2), TOXAV_CALL_COMM_ENCODER_IN_USE_H264(
+            3), TOXAV_CALL_COMM_ENCODER_IN_USE_H264_OMX_PI(6), TOXAV_CALL_COMM_DECODER_CURRENT_BITRATE(
+            4), TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE(5);
+
+        public int value;
+
+        private TOXAV_CALL_COMM_INFO(int value)
+        {
+            this.value = value;
+        }
+    }
     // ---------- TOX -------------
     // ---------- TOX -------------
     // ---------- TOX -------------
