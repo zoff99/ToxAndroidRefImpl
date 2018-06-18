@@ -239,6 +239,7 @@ jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
 jmethodID android_toxav_callback_call_state_cb_method = NULL;
 jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
 jmethodID android_toxav_callback_audio_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_call_comm_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 // -------- _callbacks_ --------
 
@@ -1481,6 +1482,24 @@ void toxav_bit_rate_status_cb_(ToxAV *av, uint32_t friend_number, uint32_t audio
     android_toxav_callback_bit_rate_status_cb(friend_number, audio_bit_rate, video_bit_rate);
 }
 
+#ifdef TOX_HAVE_TOXAV_CALLBACKS_002
+void android_toxav_callback_call_comm_cb(uint32_t friend_number, TOXAV_CALL_COMM_INFO comm_value,
+                                 int64_t comm_number)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_call_comm_cb_method, (jlong)friend_number,
+                                     (jlong)comm_value, (jlong)comm_number);
+}
+
+void toxav_call_comm_cb_(ToxAV *av, uint32_t friend_number, TOXAV_CALL_COMM_INFO comm_value,
+                                 int64_t comm_number, void *user_data)
+{
+    android_toxav_callback_call_comm_cb(friend_number, comm_value, comm_number);
+}
+#endif
+
 void android_toxav_callback_audio_receive_frame_cb(uint32_t friend_number, size_t sample_count, uint8_t channels,
         uint32_t sampling_rate)
 {
@@ -1986,6 +2005,13 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_toxav_callback_audio_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_audio_receive_frame_cb_method", "(JJIJ)V");
     toxav_callback_audio_receive_frame(tox_av_global, toxav_audio_receive_frame_cb_, &mytox_CC);
+    
+#ifdef TOX_HAVE_TOXAV_CALLBACKS_002
+    android_toxav_callback_call_comm_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_toxav_callback_call_comm_cb_method", "(JJJ)V");
+    toxav_callback_call_comm(tox_av_global, toxav_call_comm_cb_, &mytox_CC);
+#endif
+
     dbg(9, "linking AV callbacks ... READY");
     // init AV callbacks -------------------------------
     // start toxav thread ------------------------------

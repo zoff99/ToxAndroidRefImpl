@@ -2795,6 +2795,10 @@ public class MainActivity extends AppCompatActivity
         // TODO: suggested bitrates!!!! ---------------
     }
 
+    static void android_toxav_callback_call_comm_cb_method(long friend_number, long a_TOXAV_CALL_COMM_INFO, long comm_number)
+    {
+    }
+
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
     {
 
