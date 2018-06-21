@@ -70,7 +70,7 @@ public class TRIFAGlobals
     final static int LOWER_GLOBAL_VIDEO_BITRATE = 250;
 
     final static int HIGHER_GLOBAL_AUDIO_BITRATE = 64;
-    final static int NORMAL_GLOBAL_AUDIO_BITRATE = 32;
+    final static int NORMAL_GLOBAL_AUDIO_BITRATE = 20;
     final static int LOWER_GLOBAL_AUDIO_BITRATE = 6;
 
     static int GLOBAL_VIDEO_BITRATE = NORMAL_GLOBAL_VIDEO_BITRATE; // this works nice: 2500;
@@ -87,7 +87,7 @@ public class TRIFAGlobals
     final static int VIDEO_ENCODER_MAX_QUANTIZER_MED = 45;
     final static int VIDEO_ENCODER_MAX_QUANTIZER_HIGH = 20;
 
-    final static int GLOBAL_MIN_VIDEO_BITRATE = 190;
+    final static int GLOBAL_MIN_VIDEO_BITRATE = 100;
     final static int GLOBAL_MIN_AUDIO_BITRATE = 6; // allowed values: (xx>=6) && (xx<=510)
 
     static final int CAMPREVIEW_NUM_BUFFERS = 3;
