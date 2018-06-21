@@ -151,7 +151,7 @@
 
 
     <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
-    <string name="pref_description_X_audio_recording_frame_size">Default setting is 120 ms</string>
+    <string name="pref_description_X_audio_recording_frame_size">Default setting is 60 ms</string>
     <string-array name="X_audio_recording_frame_size_titles">
         <item>120</item>
         <item>60</item>

@@ -106,7 +106,7 @@
             android:title="@string/pref_title_X_eac_delay_ms"/>
 
         <ListPreference
-            android:defaultValue="120"
+            android:defaultValue="60"
             android:entries="@array/X_audio_recording_frame_size_titles"
             android:entryValues="@array/X_audio_recording_frame_size_values"
             android:key="X_audio_recording_frame_size"
