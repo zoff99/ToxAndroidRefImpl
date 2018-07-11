@@ -54,7 +54,7 @@
 
 
 // HINT: it's not working properly, so disable it for now
-// #define USE_ECHO_CANCELLATION 1
+#define USE_ECHO_CANCELLATION 1
 
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
