@@ -3941,7 +3941,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1option_1set(JNIEnv *env, 
         jlong option, jlong value)
 {
     TOXAV_ERR_OPTION_SET error;
-    bool res = toxav_option_set(tox_av_global, (uint32_t)friend_number, (TOXAV_OPTIONS_OPTION)option, (int32_t)value, &error);
+    int res = toxav_option_set(tox_av_global, (uint32_t)friend_number, (TOXAV_OPTIONS_OPTION)option, (int32_t)value, &error);
     return (jint)res;
 }
 
