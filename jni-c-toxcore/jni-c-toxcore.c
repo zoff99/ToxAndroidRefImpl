@@ -71,8 +71,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 25
-static const char global_version_string[] = "0.99.25";
+#define VERSION_PATCH 26
+static const char global_version_string[] = "0.99.26";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -89,27 +89,6 @@ static const char global_version_string[] = "0.99.25";
 #define TOXCOMPAT_H_
 
 #if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
-static void toxav_callback_bit_rate_status(ToxAV *av,
-        void *callback, void *user_data)
-{
-    // dummy function
-}
-
-#define TOXAV_ERR_BIT_RATE_SET_INVALID_AUDIO_BIT_RATE (TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
-#define TOXAV_ERR_BIT_RATE_SET_INVALID_VIDEO_BIT_RATE (TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
-
-static bool toxav_bit_rate_set(ToxAV *av, uint32_t friend_number, int32_t audio_bit_rate,
-                               int32_t video_bit_rate, TOXAV_ERR_BIT_RATE_SET *error)
-{
-    bool res = toxav_video_set_bit_rate(av, friend_number, video_bit_rate, error);
-
-    if(*error == TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
-    {
-        *error = TOXAV_ERR_BIT_RATE_SET_INVALID_VIDEO_BIT_RATE;
-    }
-
-    return res;
-}
 #else
 // no need to fake the function
 #endif
@@ -291,8 +270,12 @@ void conference_message_cb(Tox *tox, uint32_t conference_number, uint32_t peer_n
                            const uint8_t *message, size_t length, void *user_data);
 void conference_title_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *title,
                          size_t length, void *user_data);
+
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+#else
 void conference_namelist_change_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
                                    TOX_CONFERENCE_STATE_CHANGE change, void *user_data);
+#endif
 
 void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func,
                         const char *message, void *user_data);
@@ -787,7 +770,10 @@ void init_tox_callbacks()
     tox_callback_conference_invite(tox_global, conference_invite_cb);
     tox_callback_conference_message(tox_global, conference_message_cb);
     tox_callback_conference_title(tox_global, conference_title_cb);
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+#else
     tox_callback_conference_namelist_change(tox_global, conference_namelist_change_cb);
+#endif
     // --------------------
     tox_utils_callback_self_connection_status(tox_global, self_connection_status_cb);
     tox_callback_self_connection_status(tox_global, tox_utils_self_connection_status_cb);
@@ -825,7 +811,10 @@ void init_tox_callbacks()
     tox_callback_conference_invite(tox_global, conference_invite_cb);
     tox_callback_conference_message(tox_global, conference_message_cb);
     tox_callback_conference_title(tox_global, conference_title_cb);
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+#else
     tox_callback_conference_namelist_change(tox_global, conference_namelist_change_cb);
+#endif
     // tox_callback_friend_lossy_packet(tox_global, friend_lossy_packet_cb);
     // tox_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
     // -------- _callbacks_ --------
@@ -1303,6 +1292,8 @@ void file_recv_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint32
 // ------------ Conference [2] ------------
 // ------------ Conference [2] ------------
 
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+#else
 void android_tox_callback_conference_namelist_change_cb(uint32_t conference_number, uint32_t peer_number,
         TOX_CONFERENCE_STATE_CHANGE change)
 {
@@ -1319,7 +1310,7 @@ void conference_namelist_change_cb(Tox *tox, uint32_t conference_number, uint32_
 {
     android_tox_callback_conference_namelist_change_cb(conference_number, peer_number, change);
 }
-
+#endif
 
 void android_tox_callback_conference_title_cb(uint32_t conference_number, uint32_t peer_number, const uint8_t *title,
         size_t length)
