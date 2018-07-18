@@ -1308,9 +1308,9 @@ void android_tox_callback_conference_peer_list_changed_cb(uint32_t conference_nu
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-
-    // TODO: write me
-
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_conference_peer_list_changed_cb_method,
+                                     (jlong)(unsigned long long)conference_number);
 }
 
 void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data)
@@ -1362,6 +1362,15 @@ void android_tox_callback_conference_peer_name_cb(uint32_t conference_number, ui
         const uint8_t *name, size_t length)
 {
     // TODO: write me
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    jstring js1 = c_safe_string_from_java((char *)name, length);
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_conference_peer_name_cb_method,
+                                     (jlong)(unsigned long long)conference_number,
+                                     (jlong)(unsigned long long)peer_number,
+                                     js1, (jlong)(unsigned long long)length);
+    (*jnienv2)->DeleteLocalRef(jnienv2, js1);
 }
 
 void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
@@ -1982,15 +1991,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_conference_message_cb_method", "(JJILjava/lang/String;J)V");
     android_tox_callback_conference_title_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_title_cb_method", "(JJLjava/lang/String;J)V");
-
-
-    // TODO: correct me
     android_tox_callback_conference_peer_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_peer_name_cb_method", "(JJLjava/lang/String;J)V");
     android_tox_callback_conference_peer_list_changed_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
-            "android_tox_callback_conference_peer_list_changed_cb_method", "(JJLjava/lang/String;J)V");
-
-
+            "android_tox_callback_conference_peer_list_changed_cb_method", "(J)V");
     android_tox_callback_conference_namelist_change_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_namelist_change_cb_method", "(JJI)V");
     android_tox_log_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_log_cb_method",
