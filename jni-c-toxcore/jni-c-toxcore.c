@@ -53,6 +53,7 @@
 #include <sys/mman.h>
 
 
+// HINT: it's not working properly, so disable it for now
 #define USE_ECHO_CANCELLATION 1
 
 // ------- Android/JNI stuff -------
@@ -70,8 +71,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 24
-static const char global_version_string[] = "0.99.24";
+#define VERSION_PATCH 26
+static const char global_version_string[] = "0.99.26";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -88,27 +89,6 @@ static const char global_version_string[] = "0.99.24";
 #define TOXCOMPAT_H_
 
 #if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
-static void toxav_callback_bit_rate_status(ToxAV *av,
-        void *callback, void *user_data)
-{
-    // dummy function
-}
-
-#define TOXAV_ERR_BIT_RATE_SET_INVALID_AUDIO_BIT_RATE (TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
-#define TOXAV_ERR_BIT_RATE_SET_INVALID_VIDEO_BIT_RATE (TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
-
-static bool toxav_bit_rate_set(ToxAV *av, uint32_t friend_number, int32_t audio_bit_rate,
-                               int32_t video_bit_rate, TOXAV_ERR_BIT_RATE_SET *error)
-{
-    bool res = toxav_video_set_bit_rate(av, friend_number, video_bit_rate, error);
-
-    if(*error == TOXAV_ERR_BIT_RATE_SET_INVALID_BIT_RATE)
-    {
-        *error = TOXAV_ERR_BIT_RATE_SET_INVALID_VIDEO_BIT_RATE;
-    }
-
-    return res;
-}
 #else
 // no need to fake the function
 #endif
@@ -231,6 +211,8 @@ jmethodID android_tox_callback_file_recv_chunk_cb_method = NULL;
 jmethodID android_tox_callback_conference_invite_cb_method = NULL;
 jmethodID android_tox_callback_conference_message_cb_method = NULL;
 jmethodID android_tox_callback_conference_title_cb_method = NULL;
+jmethodID android_tox_callback_conference_peer_name_cb_method = NULL;
+jmethodID android_tox_callback_conference_peer_list_changed_cb_method = NULL;
 jmethodID android_tox_callback_conference_namelist_change_cb_method = NULL;
 jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
@@ -290,8 +272,16 @@ void conference_message_cb(Tox *tox, uint32_t conference_number, uint32_t peer_n
                            const uint8_t *message, size_t length, void *user_data);
 void conference_title_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *title,
                          size_t length, void *user_data);
+
+void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
+        const uint8_t *name, size_t length, void *user_data);
+
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data);
+#else
 void conference_namelist_change_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
                                    TOX_CONFERENCE_STATE_CHANGE change, void *user_data);
+#endif
 
 void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func,
                         const char *message, void *user_data);
@@ -786,7 +776,12 @@ void init_tox_callbacks()
     tox_callback_conference_invite(tox_global, conference_invite_cb);
     tox_callback_conference_message(tox_global, conference_message_cb);
     tox_callback_conference_title(tox_global, conference_title_cb);
+    tox_callback_conference_peer_name(tox_global, conference_peer_name_cb);
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+    tox_callback_conference_peer_list_changed(tox_global, conference_peer_list_changed_cb);
+#else
     tox_callback_conference_namelist_change(tox_global, conference_namelist_change_cb);
+#endif
     // --------------------
     tox_utils_callback_self_connection_status(tox_global, self_connection_status_cb);
     tox_callback_self_connection_status(tox_global, tox_utils_self_connection_status_cb);
@@ -824,7 +819,12 @@ void init_tox_callbacks()
     tox_callback_conference_invite(tox_global, conference_invite_cb);
     tox_callback_conference_message(tox_global, conference_message_cb);
     tox_callback_conference_title(tox_global, conference_title_cb);
+    tox_callback_conference_peer_name(tox_global, conference_peer_name_cb);
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+    tox_callback_conference_peer_list_changed(tox_global, conference_peer_list_changed_cb);
+#else
     tox_callback_conference_namelist_change(tox_global, conference_namelist_change_cb);
+#endif
     // tox_callback_friend_lossy_packet(tox_global, friend_lossy_packet_cb);
     // tox_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
     // -------- _callbacks_ --------
@@ -1302,6 +1302,24 @@ void file_recv_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, uint32
 // ------------ Conference [2] ------------
 // ------------ Conference [2] ------------
 
+#if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
+
+void android_tox_callback_conference_peer_list_changed_cb(uint32_t conference_number)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_conference_peer_list_changed_cb_method,
+                                     (jlong)(unsigned long long)conference_number);
+}
+
+void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data)
+{
+    android_tox_callback_conference_peer_list_changed_cb(conference_number);
+}
+
+#else
+
 void android_tox_callback_conference_namelist_change_cb(uint32_t conference_number, uint32_t peer_number,
         TOX_CONFERENCE_STATE_CHANGE change)
 {
@@ -1319,6 +1337,7 @@ void conference_namelist_change_cb(Tox *tox, uint32_t conference_number, uint32_
     android_tox_callback_conference_namelist_change_cb(conference_number, peer_number, change);
 }
 
+#endif
 
 void android_tox_callback_conference_title_cb(uint32_t conference_number, uint32_t peer_number, const uint8_t *title,
         size_t length)
@@ -1337,6 +1356,28 @@ void conference_title_cb(Tox *tox, uint32_t conference_number, uint32_t peer_num
                          size_t length, void *user_data)
 {
     android_tox_callback_conference_title_cb(conference_number, peer_number, title, length);
+}
+
+void android_tox_callback_conference_peer_name_cb(uint32_t conference_number, uint32_t peer_number,
+        const uint8_t *name, size_t length)
+{
+    // TODO: write me
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    jstring js1 = c_safe_string_from_java((char *)name, length);
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_conference_peer_name_cb_method,
+                                     (jlong)(unsigned long long)conference_number,
+                                     (jlong)(unsigned long long)peer_number,
+                                     js1, (jlong)(unsigned long long)length);
+    (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+}
+
+void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
+        const uint8_t *name, size_t length, void *user_data)
+{
+    android_tox_callback_conference_peer_name_cb(conference_number, peer_number,
+                        name, length);
 }
 
 void android_tox_callback_conference_message_cb(uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type,
@@ -1950,6 +1991,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_conference_message_cb_method", "(JJILjava/lang/String;J)V");
     android_tox_callback_conference_title_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_title_cb_method", "(JJLjava/lang/String;J)V");
+    android_tox_callback_conference_peer_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_conference_peer_name_cb_method", "(JJLjava/lang/String;J)V");
+    android_tox_callback_conference_peer_list_changed_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_conference_peer_list_changed_cb_method", "(J)V");
     android_tox_callback_conference_namelist_change_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_namelist_change_cb_method", "(JJI)V");
     android_tox_log_cb_method = (*env)->GetStaticMethodID(env, MainActivity, "android_tox_log_cb_method",
@@ -3940,7 +3985,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1option_1set(JNIEnv *env, 
         jlong option, jlong value)
 {
     TOXAV_ERR_OPTION_SET error;
-    bool res = toxav_option_set(tox_av_global, (uint32_t)friend_number, (TOXAV_OPTIONS_OPTION)option, (int32_t)value, &error);
+    int res = toxav_option_set(tox_av_global, (uint32_t)friend_number, (TOXAV_OPTIONS_OPTION)option, (int32_t)value, &error);
     return (jint)res;
 }
 

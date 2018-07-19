@@ -5110,7 +5110,66 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void android_tox_callback_conference_namelist_change_cb_method(long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
+    static void android_tox_callback_conference_peer_name_cb_method(long conference_number, long peer_number,
+        String name, long name_length)
+    {
+        // TODO: write me ...
+        try
+        {
+            ConferenceDB conf_temp = null;
+
+            try
+            {
+                // TODO: cache me!!
+                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
+                        and().
+                        conference_activeEq(true).
+                        get(0);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            if (conf_temp != null)
+            {
+            }
+        }
+
+    }
+    
+    static void android_tox_callback_conference_peer_list_changed_cb_method(long conference_number)
+    {
+        // TODO: write me ...
+        // update all peers in this conference        
+        try
+        {
+            ConferenceDB conf_temp = null;
+
+            try
+            {
+                // TODO: cache me!!
+                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
+                        and().
+                        conference_activeEq(true).
+                        get(0);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            if (conf_temp != null)
+            {
+            }
+        }
+    }
+
+    // ------------------------
+    // this is an old toxcore 0.1.x callback
+    // not called anymore!!
+    static void android_tox_callback_conference_namelist_change_cb_method(
+    long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
     {
         // Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
         // TODO: update peer status
@@ -5408,6 +5467,10 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "android_tox_callback_conference_title_cb_method:EE1:" + e.getMessage());
         }
     }
+    // ------------------------
+    // this is an old toxcore 0.1.x callback
+    // not called anymore!!
+
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
