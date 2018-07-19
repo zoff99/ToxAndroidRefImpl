@@ -137,6 +137,8 @@ import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
+import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
+import static com.zoffcc.applications.trifa.CallingActivity.set_max_video_bitrate;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
@@ -217,7 +219,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -315,6 +317,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__U_keep_nospam = false;
     static boolean PREF__use_native_audio_play = true;
     static boolean PREF__use_audio_rec_effects = false;
+    static boolean PREF__window_security = false;
     static int PREF__X_eac_delay_ms = 60;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
@@ -414,6 +417,13 @@ public class MainActivity extends AppCompatActivity
         }
 
         setContentView(R.layout.activity_main);
+
+        if (PREF__window_security)
+        {
+            // prevent screenshots and also dont show the window content in recent activity screen
+            initializeScreenshotSecurity(this);
+        }
+
 
         //        try
         //        {
@@ -2696,6 +2706,8 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call starting");
                 Callstate.call_start_timestamp = System.currentTimeMillis();
+
+                set_max_video_bitrate();
 
                 Runnable myRunnable = new Runnable()
                 {

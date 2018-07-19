@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -52,6 +53,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
@@ -65,6 +67,7 @@ import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MAX_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_LOW;
@@ -133,8 +136,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         setContentView(R.layout.activity_calling);
 
-        // prevent screenshots and also dont show the window content in recent activity screen
-        initializeScreenshotSecurity();
+        if (PREF__window_security)
+        {
+            // prevent screenshots and also dont show the window content in recent activity screen
+            initializeScreenshotSecurity(this);
+        }
 
         trifa_is_MicrophoneMute = false;
         ca = this;
@@ -633,6 +639,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             // need to set our state manually here, no callback from toxcore :-(
 
+                            set_max_video_bitrate();
+
                             caller_avatar_view.setVisibility(View.GONE);
                             accept_button.setVisibility(View.GONE);
                             camera_toggle_button.setVisibility(View.VISIBLE);
@@ -680,6 +688,22 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 return true;
             }
         });
+    }
+
+    public static void set_max_video_bitrate()
+    {
+        try
+        {
+            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
+                                       GLOBAL_MAX_VIDEO_BITRATE);
+            Log.i(TAG, "max_v_birate_set:res=" + res);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "max_v_birate_set:EE:" + e.getMessage());
+        }
     }
 
     public static void close_calling_activity()
@@ -750,15 +774,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         callactivity_handler_s.post(myRunnable);
     }
 
-    private void initializeScreenshotSecurity()
+    public static void initializeScreenshotSecurity(Activity a)
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            a.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
         else
         {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            a.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
     }
 
