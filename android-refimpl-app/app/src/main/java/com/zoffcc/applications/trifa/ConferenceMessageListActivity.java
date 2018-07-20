@@ -608,7 +608,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         return ret;
     }
 
-    void remove_group_user(String peer_pubkey)
+    synchronized void update_group_all_users()
+    {
+        // TODO: write me
+    }
+
+    synchronized void remove_group_user(String peer_pubkey)
     {
         try
         {
