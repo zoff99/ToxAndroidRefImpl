@@ -5224,6 +5224,7 @@ public class MainActivity extends AppCompatActivity
 
                 try
                 {
+                    // TODO: this is just doing nothing useful! check me! FIX ME!
                     ConferencePeerCacheDB cpcdb = new ConferencePeerCacheDB();
                     cpcdb.conference_identifier = conf_temp.conference_identifier;
                     String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number, peer_number);

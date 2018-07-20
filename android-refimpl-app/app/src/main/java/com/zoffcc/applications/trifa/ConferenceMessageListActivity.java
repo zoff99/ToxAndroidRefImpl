@@ -229,12 +229,14 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         });
 
         // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
-        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         attachemnt_instead_of_send = true;
         ml_button_01.setImageDrawable(send_message_icon);
 
-        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
         set_peer_count_header();
@@ -290,17 +292,38 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized void set_peer_names_and_avatars()
     {
-        if (is_conference_active(conf_id)) {
+        if (is_conference_active(conf_id))
+        {
+            Log.d(TAG, "set_peer_names_and_avatars:001");
+
+            try
+            {
+                remove_group_all_users();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            Log.d(TAG, "set_peer_names_and_avatars:002");
+
             final long conference_num = get_conference_num_from_confid(conf_id);
             long num_peers = tox_conference_peer_count(conference_num);
-            if (num_peers > 0) {
+
+            Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers);
+
+            if (num_peers > 0)
+            {
                 long i = 0;
-                for (i = 0; i < num_peers; i++) {
+                for (i = 0; i < num_peers; i++)
+                {
                     String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_num, i);
                     String peer_name_temp = tox_conference_peer_get_name(conference_num, i);
-                    if (peer_name_temp.equals("")) {
+                    if (peer_name_temp.equals(""))
+                    {
                         peer_name_temp = null;
                     }
+                    // Log.d(TAG, "set_peer_names_and_avatars:004:add:" + peer_name_temp);
                     add_group_user(peer_pubkey_temp, i, peer_name_temp);
                 }
             }
@@ -350,15 +373,16 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     private void setUpEmojiPopup()
     {
-        emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener()
-        {
-            @Override
-            public void onEmojiBackspaceClick(View v)
-            {
+        emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(
+                new OnEmojiBackspaceClickListener()
+                {
+                    @Override
+                    public void onEmojiBackspaceClick(View v)
+                    {
 
-            }
+                    }
 
-        }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
+                }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
         {
             @Override
             public void onEmojiPopupShown()
@@ -449,7 +473,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             if (is_conference_active(conf_id))
             {
                 // send typed message to friend
-                msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(), ml_new_message.getText().toString().length()));
+                msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(),
+                                                                                      ml_new_message.getText().toString().length()));
 
                 try
                 {
@@ -558,7 +583,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 {
                     try
                     {
-                        amode = MainActivity.conference_message_list_activity.startSupportActionMode(new ToolbarActionMode(context));
+                        amode = MainActivity.conference_message_list_activity.startSupportActionMode(
+                                new ToolbarActionMode(context));
                         amode_save_menu_item = amode.getMenu().findItem(R.id.action_save);
                         v.setBackgroundColor(Color.GRAY);
                         ret.is_selected = true;
@@ -619,7 +645,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         {
             set_peer_count_header();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -628,10 +654,73 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         {
             set_peer_names_and_avatars();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
+    }
+
+    synchronized void remove_group_all_users()
+    {
+        Log.d(TAG, "remove_group_all_users:001");
+
+        try
+        {
+            Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Runnable myRunnable = new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    lookup_peer_listnum_pubkey.clear();
+                                    conference_message_drawer.removeAllItems();
+                                }
+                                catch (Exception e2)
+                                {
+                                    e2.printStackTrace();
+                                }
+                            }
+                        };
+
+                        if (conferences_handler_s != null)
+                        {
+                            conferences_handler_s.post(myRunnable);
+                        }
+
+                        // TODO: hack to be synced with additions later
+                        Thread.sleep(120);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    Log.d(TAG, "remove_group_all_users:T:END");
+
+                }
+            };
+            t.start();
+            t.join();
+
+            Log.d(TAG, "remove_group_all_users:T:099");
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "remove_group_user:EE:" + e.getMessage());
+        }
+
+        Log.d(TAG, "remove_group_all_users:002");
+
     }
 
     synchronized void remove_group_user(String peer_pubkey)
@@ -744,7 +833,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                                 info.guardianproject.iocipher.File f1 = null;
                                                 try
                                                 {
-                                                    f1 = new info.guardianproject.iocipher.File(fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                                                    f1 = new info.guardianproject.iocipher.File(
+                                                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                                                     if (f1.length() > 0)
                                                     {
                                                         have_avatar_for_pubkey = true;
@@ -771,7 +861,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
                                         try
                                         {
-                                            new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey, peer_pubkey).
+                                            new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
+                                                                                          peer_pubkey).
                                                     withIdentifier(peernum).
                                                     withName(name3);
                                         }
@@ -809,6 +900,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     }
                 };
                 t.start();
+                t.join();
             }
             else
             {
@@ -850,7 +942,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                     try
                                     {
                                         StringHolder sh = new StringHolder(name3);
-                                        Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
+                                        // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
                                         conference_message_drawer.updateName(peernum, sh);
                                     }
                                     catch (Exception e2)
@@ -875,6 +967,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     }
                 };
                 t.start();
+                t.join();
             }
         }
         catch (Exception e)
