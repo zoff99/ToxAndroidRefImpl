@@ -5112,7 +5112,6 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_peer_name_cb_method(long conference_number, long peer_number, String name, long name_length)
     {
-        // TODO: write me ...
         try
         {
             ConferenceDB conf_temp = null;
@@ -5132,6 +5131,115 @@ public class MainActivity extends AppCompatActivity
 
             if (conf_temp != null)
             {
+
+                // --------------- BAD !! ---------------
+                // --------------- BAD !! ---------------
+                // --------------- BAD !! ---------------
+                // workaround to fix a bug, where messages would appear to be from the wrong user in a conference
+                // because toxcore changes all "peer numbers" when somebody leaves the confrence
+                // but this can happen very often. so for now, clear cache every time
+                cache_peernum_pubkey.clear();
+                cache_peername_pubkey2.clear();
+                // --------------- BAD !! ---------------
+                // --------------- BAD !! ---------------
+                // --------------- BAD !! ---------------
+
+
+                ConferenceMessage m = new ConferenceMessage();
+                m.is_new = false;
+
+                // m.tox_friendnum = friend_number;
+                m.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+                m.direction = 0; // msg received
+                m.TOX_MESSAGE_TYPE = 0;
+                m.read = false;
+                m.tox_peername = "* System Message *";
+                m.conference_identifier = conf_temp.conference_identifier;
+                m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                m.rcvd_timestamp = System.currentTimeMillis();
+
+                String peer_name_temp = "Unknown";
+                String peer_name_temp2 = null;
+
+
+
+
+                try
+                {
+                    // don't use the wrapper here!
+                    String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_number, peer_number);
+                    Log.i(TAG, "namelist_change_cb:003:peer_pubkey_temp=" + peer_pubkey_temp);
+                    // don't use the wrapper here!
+                    peer_name_temp = name;
+                    Log.i(TAG, "namelist_change_cb:004:peer_name_temp=" + peer_name_temp);
+
+                    try
+                    {
+                        if ((peer_name_temp != null) && (!peer_name_temp.equals("")))
+                        {
+                            peer_name_temp2 = peer_name_temp;
+                        }
+                    }
+                    catch (Exception e5)
+                    {
+                        e5.printStackTrace();
+                    }
+
+                    if (peer_name_temp == null)
+                    {
+                        peer_name_temp = "Unknown";
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "namelist_change_cb:005:EE1:" + e.getMessage());
+                }
+
+
+
+                try
+                {
+                    if (conference_message_list_activity != null)
+                    {
+                        Log.i(TAG, "namelist_change_cb:INFO:" + " 001");
+                        if (conference_message_list_activity.get_current_conf_id().equals(
+                                conf_temp.conference_identifier))
+                        {
+                            String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
+                                    peer_number);
+                            Log.i(TAG,
+                                    "namelist_change_cb:INFO:" + " 002 " + conference_number + ":" + peer_number +
+                                            ":" + peer_pubkey_temp2);
+                            conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number,
+                                    peer_name_temp2);
+                            Log.i(TAG, "namelist_change_cb:INFO:" + " 003");
+                        }
+                    }
+                }
+                catch (Exception e3)
+                {
+                    e3.printStackTrace();
+                }
+
+                try
+                {
+                    ConferencePeerCacheDB cpcdb = new ConferencePeerCacheDB();
+                    cpcdb.conference_identifier = conf_temp.conference_identifier;
+                    String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number, peer_number);
+                    cpcdb.peer_pubkey = peer_pubkey_temp2;
+                    cpcdb.peer_name = peer_name_temp2;
+                    cpcdb.last_update_timestamp = System.currentTimeMillis();
+                    orma.insertIntoConferencePeerCacheDB(cpcdb);
+                    Log.i(TAG, "namelist_change_cb:insertIntoConferencePeerCacheDB:" + cpcdb);
+                }
+                catch (Exception e4)
+                {
+                    e4.printStackTrace();
+                }
+
+                m.text = "" + peer_name_temp + " changed name.";
+                Log.i(TAG, "namelist_change_cb:INFO:" + peer_name_temp + " changed name.");
             }
         }
         catch (Exception e)
