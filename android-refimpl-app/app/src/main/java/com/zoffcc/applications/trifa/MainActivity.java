@@ -5271,6 +5271,26 @@ public class MainActivity extends AppCompatActivity
 
             if (conf_temp != null)
             {
+                try
+                {
+                    if (conference_message_list_activity != null)
+                    {
+                        Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
+                        if (conference_message_list_activity.get_current_conf_id().equals(
+                                conf_temp.conference_identifier))
+                        {
+                            Log.i(TAG,
+                                    "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
+                            conference_message_list_activity.update_group_all_users();
+                        }
+                    }
+                }
+                catch (Exception e3)
+                {
+                    e3.printStackTrace();
+                }
+
+
             }
         }
         catch (Exception e)
