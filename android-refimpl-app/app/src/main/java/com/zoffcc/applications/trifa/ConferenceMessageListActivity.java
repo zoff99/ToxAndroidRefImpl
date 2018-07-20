@@ -237,6 +237,14 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
+        set_peer_count_header();
+        set_peer_names_and_avatars();
+
+        Log.i(TAG, "onCreate:099");
+    }
+
+    synchronized void set_peer_count_header()
+    {
         Thread t = new Thread()
         {
             @Override
@@ -278,28 +286,25 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             }
         };
         t.start();
+    }
 
-        if (is_conference_active(conf_id))
-        {
+    synchronized void set_peer_names_and_avatars()
+    {
+        if (is_conference_active(conf_id)) {
             final long conference_num = get_conference_num_from_confid(conf_id);
             long num_peers = tox_conference_peer_count(conference_num);
-            if (num_peers > 0)
-            {
+            if (num_peers > 0) {
                 long i = 0;
-                for (i = 0; i < num_peers; i++)
-                {
+                for (i = 0; i < num_peers; i++) {
                     String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_num, i);
                     String peer_name_temp = tox_conference_peer_get_name(conference_num, i);
-                    if (peer_name_temp.equals(""))
-                    {
+                    if (peer_name_temp.equals("")) {
                         peer_name_temp = null;
                     }
                     add_group_user(peer_pubkey_temp, i, peer_name_temp);
                 }
             }
         }
-
-        Log.i(TAG, "onCreate:099");
     }
 
     @Override
@@ -610,7 +615,23 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized void update_group_all_users()
     {
-        // TODO: write me
+        try
+        {
+            set_peer_count_header();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            set_peer_names_and_avatars();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     synchronized void remove_group_user(String peer_pubkey)
