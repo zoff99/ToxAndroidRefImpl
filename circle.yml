@@ -233,7 +233,7 @@ compile:
     $_s_/x264/configure
     --host=arm-linux
     --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
-    --cross-prefix=arm-linux-androideabi- \
+    --cross-prefix=arm-linux-androideabi-
     --disable-opencl
     --enable-pic
     --enable-static --disable-avs --disable-cli
@@ -396,6 +396,56 @@ compile:
   - . ~/pp;cd ~/build/;$_s_/yasm/configure --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr --disable-shared --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
   - . ~/pp;cd ~/build/;make -j4
   - . ~/pp;cd ~/build/;make install
+
+
+
+
+
+# --- LIBAV ---
+  - . ~/pp;cd $_s_;git clone https://github.com/libav/libav
+  - . ~/pp;cd $_s_/libav/;git checkout v12.3
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";
+    $_s_/libav/configure
+    --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr
+    --target-os=android
+    --arch=x86
+    --cross-prefix=i686-linux-android-
+    --enable-cross-compile
+        --disable-devices --disable-programs
+        --disable-doc --disable-avdevice --disable-avformat
+        --disable-swscale
+        --disable-avfilter --disable-network --disable-everything
+        --disable-bzlib
+        --disable-libxcb-shm
+        --disable-libxcb-xfixes
+        --enable-parser=h264
+        --enable-runtime-cpudetect
+        --enable-gpl --enable-decoder=h264
+  - . ~/pp;cd ~/build/;make -j4
+  - . ~/pp;cd ~/build/;make install
+# --- LIBAV ---
+
+
+# --- x264 ---
+  - . ~/pp;cd $_s_;git clone git://git.videolan.org/x264.git
+  - . ~/pp;cd $_s_/x264/;git checkout stable
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";
+    $_s_/x264/configure
+    --host="$TOOLCHAIN_ARCH2"
+    --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr
+    --cross-prefix=i686-linux-android-
+    --disable-opencl
+    --enable-pic
+    --enable-static --disable-avs --disable-cli
+  - . ~/pp;cd ~/build/;make -j4
+  - . ~/pp;cd ~/build/;make install
+# --- x264 ---
+
+
 
 
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.7.0 https://github.com/webmproject/libvpx.git
