@@ -32,23 +32,11 @@ machine:
     AND_ARTEFACT_DIR_X86: "x86"
 # --- Android build ---
 
-    # ---------------------------------------------------
-    # c-toxcore v0.1.9  a429ef4a28a5e5e0ad010efffb76d2abc3ada0af
-    # c-toxcore v0.1.8  f6db9333e2d1262e7ba3846563c30f63c98ffa38
-    # c-toxcore v0.1.7  48c86e942d487a8856cbd25797b320bfb1879ddc
-    # c-toxcore v0.1.6  895de7ef26e7617769f2271345e414545c2581f8
-    # c-toxcore v0.1.5  995578f1038842288c1ff552fd796ab2377db6e1
-    # c-toxcore v0.1.4  27a97a8280813ec05a5209811c40ab23203bb292
-    # c-toxcore v0.1.3  fdb46f6cf216a866d29402ae991be9c43282dde6
-    # c-toxcore v0.1.2  a096c71db867ac83fc3e01e0fbe98573d20f9286
-    # ---------------------------------------------------
-
     # c-toxcore version
-    # AND_CTOXCORE_VERSION: "eab6e81ec9ed5b88aa712093ea53c802ff81d611"
-    AND_CTOXCORE_VERSION: "zoff99/_0.1.10_2017_video_fix_10p"
+    AND_CTOXCORE_VERSION: "zoff99/toxcore_v0.2.3__toxav_h264_002"
     # c-toxcore repo url
     # AND_CTOXCORE_URL: "https://github.com/TokTok/c-toxcore"
-    AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore"
+    AND_CTOXCORE_URL: "https://github.com/zoff99/c-toxcore_team"
 
     _SDK_: /usr/local/android-sdk-linux/
     _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
@@ -206,6 +194,55 @@ compile:
   - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
   - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
 
+
+
+
+# --- LIBAV ---
+  - . ~/pp;cd $_s_;git clone https://github.com/libav/libav
+  - . ~/pp;cd $_s_/libav/;git checkout v12.3
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";
+    $_s_/libav/configure
+    --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
+    --target-os=android
+    --arch=armv7te
+    --cross-prefix=arm-linux-androideabi-
+    --enable-cross-compile
+        --disable-devices --disable-programs
+        --disable-doc --disable-avdevice --disable-avformat
+        --disable-swscale
+        --disable-avfilter --disable-network --disable-everything
+        --disable-bzlib
+        --disable-libxcb-shm
+        --disable-libxcb-xfixes
+        --enable-parser=h264
+        --enable-runtime-cpudetect
+        --enable-gpl --enable-decoder=h264
+  - . ~/pp;cd ~/build/;make -j4
+  - . ~/pp;cd ~/build/;make install
+# --- LIBAV ---
+
+
+# --- x264 ---
+  - . ~/pp;cd $_s_;git clone git://git.videolan.org/x264.git
+  - . ~/pp;cd $_s_/x264/;git checkout stable
+  - . ~/pp;rm -Rf ~/build/
+  - . ~/pp;mkdir -p ~/build/
+  - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";
+    $_s_/yasm/configure
+    --host=arm-linux
+    --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
+    --cross-prefix=arm-linux-androideabi- \
+    --disable-opencl
+    --enable-pic
+    --enable-static --disable-avs --disable-cli
+  - . ~/pp;cd ~/build/;make -j4
+  - . ~/pp;cd ~/build/;make install
+# --- x264 ---
+
+
+
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
   - . ~/pp;cd $_s_/yasm/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
@@ -238,7 +275,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3-beta https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3-rc https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -249,8 +286,8 @@ compile:
   - rm -Rf /home/ubuntu/install_dest/ ; mkdir -p /home/ubuntu/install_dest/
   - . ~/pp;cd ~/build/;make DESTDIR=/home/ubuntu/install_dest/ install
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/arm-linux-androideabi/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/opus.zip *
-    
-    
+
+
   - . ~/pp;cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
   - . ~/pp;cd $_s_/libsodium/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
@@ -373,7 +410,7 @@ compile:
   - cd /home/ubuntu/install_dest/ ; cd home/ubuntu/c-toxcore/toolchains/"$TOOLCHAIN_ARCH2"/sysroot/ ; zip -r $CIRCLE_ARTIFACTS/android/libvpx.zip *
 
 
-  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3-beta https://github.com/xiph/opus.git
+  - . ~/pp;cd $_s_;git clone --depth=1 --branch=v1.3-rc https://github.com/xiph/opus.git
   - . ~/pp;cd $_s_/opus/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
