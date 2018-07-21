@@ -13,7 +13,7 @@ machine:
     # ---- arm -----
     AND_TOOLCHAIN_ARCH: "arm"
     AND_TOOLCHAIN_ARCH2: "arm-linux-androideabi"
-    AND_PATH: "$_toolchain_/arm-linux-androideabi/bin:$PATH"
+    AND_PATH: "/home/ubuntu/nasm_inst/bin:$_toolchain_/arm-linux-androideabi/bin:$PATH"
     AND_PKG_CONFIG_PATH: "$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
     AND_CC: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
     AND_GCC: "$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-gcc"
@@ -23,7 +23,7 @@ machine:
     # ---- x86 -----
     AND_TOOLCHAIN_ARCH_X86: "x86"
     AND_TOOLCHAIN_ARCH2_X86: "x86"
-    AND_PATH_X86: "$_toolchain_/x86/bin:$PATH"
+    AND_PATH_X86: "/home/ubuntu/nasm_inst/bin:$_toolchain_/x86/bin:$PATH"
     AND_PKG_CONFIG_PATH_X86: "$_toolchain_/x86/sysroot/usr/lib/pkgconfig"
     AND_CC_X86: "$_toolchain_/x86/bin/i686-linux-android-clang"
     AND_GCC_X86: "$_toolchain_/x86/bin/i686-linux-android-gcc"
