@@ -230,7 +230,7 @@ compile:
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
   - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";
-    $_s_/yasm/configure
+    $_s_/x264/configure
     --host=arm-linux
     --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
     --cross-prefix=arm-linux-androideabi- \
@@ -318,7 +318,12 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr --enable-logging --disable-soname-versions --host=arm-linux-androideabi --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-testing --disable-rt
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure
+    CFLAGS="-O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries"
+    --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr
+    --disable-soname-versions --host=arm-linux-androideabi
+    --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
+    --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;export V=2;make -j4
   - . ~/pp;cd ~/build/;make install
   - . ~/pp;cd ~/build/;make clean
@@ -344,7 +349,10 @@ compile:
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libtoxav.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libvpx.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a
-    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libx264.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavcodec.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavutil.a
     ./filter_audio/libfilteraudio.a
     coffeecatch.c coffeejni.c
     -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
@@ -457,8 +465,11 @@ compile:
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
-  - . ~/pp;cd ~/build/;~/c-toxcore/configure CFLAGS="-O3 -g -funwind-tables -Wall -Wextra -Wl,--no-merge-exidx-entries" --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr
-    --enable-logging --disable-soname-versions --host="$TOOLCHAIN_ARCH2" --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
+  - . ~/pp;cd ~/build/;~/c-toxcore/configure
+    CFLAGS="-O3 -g -funwind-tables -Wall -Wextra -Wl,--no-merge-exidx-entries"
+    --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr
+    --disable-soname-versions --host="$TOOLCHAIN_ARCH2"
+    --with-sysroot="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot
     --disable-testing --disable-rt
   - . ~/pp;cd ~/build/;export V=2;make -j4
   - . ~/pp;cd ~/build/;make install
@@ -485,6 +496,9 @@ compile:
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libtoxav.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libvpx.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libopus.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libx264.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libavcodec.a
+    "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libavutil.a
     "$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr/lib/libsodium.a
     ./filter_audio/libfilteraudio.a
     coffeecatch.c coffeejni.c
