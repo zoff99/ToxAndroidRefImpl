@@ -54,7 +54,7 @@ machine:
 
 ###### custom 2 ######
     GRADLE_HOME: ~/g/gradle-custom
-    PATH: ~/g/gradle-custom/bin:$PATH
+    PATH: ~/g/gradle-custom/bin:/home/ubuntu/nasm_inst/bin:$PATH
 #
 #   GRADLE_CUSTOM_VERSION -> [0, 1]
 #   GRADLE_CUSTOM_VNUM -> what version?
@@ -194,6 +194,23 @@ compile:
   - . ~/pp;mkdir -p "$PKG_CONFIG_PATH"
   - . ~/pp;/home/ubuntu/android-ndk/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
 
+
+# -- nasm --
+  - cd; mkdir -p nasm_build ; mkdir -p /home/ubuntu/nasm_inst/
+  - cd; cd nasm_build; git clone http://repo.or.cz/nasm.git
+  - cd; cd nasm_build; cd nasm; git checkout nasm-2.13.03
+  - cd; cd nasm_build; cd nasm; ./autogen.sh
+  - cd; cd nasm_build; cd nasm; ./configure --prefix=/home/ubuntu/nasm_inst/
+  - cd; cd nasm_build; cd nasm; make -j4
+  # seems man pages are not always built. but who needs those
+  - cd; cd nasm_build; cd nasm; touch nasm.1
+  - cd; cd nasm_build; cd nasm; touch ndisasm.1
+  - cd; cd nasm_build; cd nasm; make install
+  - ls -alR /home/ubuntu/nasm_inst/ ; exit 0
+  - export PATH=/home/ubuntu/nasm_inst/bin:$PATH
+  - type -a nasm
+  - nasm --version
+# -- nasm --
 
 
 
@@ -435,7 +452,7 @@ compile:
   - . ~/pp;mkdir -p ~/build/
   - . ~/pp;cd ~/build/;export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 ";
     $_s_/x264/configure
-    --host="$TOOLCHAIN_ARCH2"
+    --host=i686-linux-android
     --prefix="$_toolchain_"/"$TOOLCHAIN_ARCH2"/sysroot/usr
     --cross-prefix=i686-linux-android-
     --disable-opencl
