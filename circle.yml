@@ -374,8 +374,8 @@ compile:
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libx264.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavcodec.a
-    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libopus.a
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavutil.a
+    "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libsodium.a
     ./filter_audio/libfilteraudio.a
     coffeecatch.c coffeejni.c
     -lm /home/ubuntu/android-ndk/sources/android/cpufeatures/cpu-features.c
