@@ -53,7 +53,7 @@
 #include <sys/mman.h>
 
 
-// HINT: it's not working properly, so disable it for now
+// HINT: it may not be working properly
 #define USE_ECHO_CANCELLATION 1
 
 // ------- Android/JNI stuff -------
