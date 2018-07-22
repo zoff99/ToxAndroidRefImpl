@@ -332,6 +332,12 @@ compile:
   - ls -al ~/c-toxcore/
   # --- get wanted c-toxcore version ---
 
+  # --- disable H264 ---
+  - cd ~/c-toxcore/toxav/ ; cat tox_generic.h |grep 'define DISABLE_H264_ENCODER_FEATURE'
+  - cd ~/c-toxcore/toxav/ ; sed -i -e 'sm#define DISABLE_H264_ENCODER_FEATURE.*m#define DISABLE_H264_ENCODER_FEATURE 1m' ;
+  - cd ~/c-toxcore/toxav/ ; cat tox_generic.h |grep 'define DISABLE_H264_ENCODER_FEATURE'
+  # --- disable H264 ---
+
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
   - . ~/pp;mkdir -p ~/build/
@@ -528,6 +534,12 @@ compile:
   - ls -al ~
   - ls -al ~/c-toxcore/
   # --- get wanted c-toxcore version ---
+
+  # --- disable H264 ---
+  - cd ~/c-toxcore/toxav/ ; cat tox_generic.h |grep 'define DISABLE_H264_ENCODER_FEATURE'
+  - cd ~/c-toxcore/toxav/ ; sed -i -e 'sm#define DISABLE_H264_ENCODER_FEATURE.*m#define DISABLE_H264_ENCODER_FEATURE 1m' ;
+  - cd ~/c-toxcore/toxav/ ; cat tox_generic.h |grep 'define DISABLE_H264_ENCODER_FEATURE'
+  # --- disable H264 ---
 
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
   - . ~/pp;rm -Rf ~/build/
