@@ -610,12 +610,12 @@ compile:
 # --------- GRADLE -------------
 # - cd android-refimpl-app/ ; if [ "$GRADLE_CUSTOM_VERSION""x" == "1x" ]; then gradle wrapper --no-daemon --gradle-version "$GRADLE_CUSTOM_VNUM" --info ; else gradle wrapper --no-daemon --info ; fi ; exit 0
   - cd android-refimpl-app/ ; chmod a+rx ./gradlew
-  - cd android-refimpl-app/gwitness ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; rm -Rf gwit ; ../gradlew build --info
-  - ls -al /home/ubuntu/android-ndk
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:dependencies
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:'
-  - cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:' > $CIRCLE_ARTIFACTS/android/calculateChecksums.txt
+  - . ~/_fullb1;cd android-refimpl-app/gwitness ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk'; rm -Rf gwit ; ../gradlew build --info
+  - . ~/_fullb1;ls -al /home/ubuntu/android-ndk
+  - . ~/_fullb1;cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:dependencies
+  - . ~/_fullb1;cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
+  - . ~/_fullb1;cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:'
+  - . ~/_fullb1;cd android-refimpl-app/ ; export ANDROID_NDK_HOME='/home/ubuntu/android-ndk' ; ./gradlew -q calculateChecksums 2> /dev/null|grep -v 'android-refimpl-app:library:' > $CIRCLE_ARTIFACTS/android/calculateChecksums.txt
 # --------- GRADLE -------------
 
 
@@ -655,10 +655,10 @@ compile:
 # --- save lint output ---
 
 # ----------- show generated apk file -----------
-  - cd android-refimpl-app/ ; ls -al app/build/outputs/apk/ ; exit 0
-  - cd android-refimpl-app/ ; find ./ -name '*.apk' ; exit 0
-  - mkdir -p app/build/outputs/apk/
-  - cd android-refimpl-app/ ; cp -av ./app/build/outputs/apk/app-release-unsigned.apk ../app/build/outputs/apk/
+  - . ~/_fullb1;cd android-refimpl-app/ ; ls -al app/build/outputs/apk/ ; exit 0
+  - . ~/_fullb1;cd android-refimpl-app/ ; find ./ -name '*.apk' ; exit 0
+  - . ~/_fullb1;mkdir -p app/build/outputs/apk/
+  - . ~/_fullb1;cd android-refimpl-app/ ; cp -av ./app/build/outputs/apk/app-release-unsigned.apk ../app/build/outputs/apk/
 # ----------- show generated apk file -----------
 
 
@@ -672,8 +672,8 @@ compile:
     #- . f;cd ~/and_stud_prj/ ; zip -r $CIRCLE_ARTIFACTS/supplement.zip *
 # ----------- make zipfile for builds [for download-dependencies.sh] -----------
 
-  - zip -d app/build/outputs/apk/app-release-unsigned.apk META-INF/\*     # remove signature !!
-  - cp -av app/build/outputs/apk/app-release-unsigned.apk ~/app.apk ;
+  - . ~/_fullb1;zip -d app/build/outputs/apk/app-release-unsigned.apk META-INF/\*     # remove signature !!
+  - . ~/_fullb1;cp -av app/build/outputs/apk/app-release-unsigned.apk ~/app.apk ;
     cd ~/ ;
     echo xxxxxxrm -f ~/.android/debug.keystore ;
     ls -al ~/.android/debug.keystore ;
@@ -692,11 +692,11 @@ compile:
     cp -av app-signed-aligned.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk || exit 1
 
 ##   also make apk files with different names for each build (for individual downloads)
-  - cp -av $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk
+  - . ~/_fullb1;cp -av $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk
 ##   qr code to scan with your phone to directly download the apk file (for convenience)
-  - qrencode -o $CIRCLE_ARTIFACTS/QR_apk.png 'https://circle-artifacts.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'/artifacts/'${CIRCLE_NODE_INDEX}'/tmp/'`basename $CIRCLE_ARTIFACTS`'/'"${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk" ; exit 0
+  - . ~/_fullb1;qrencode -o $CIRCLE_ARTIFACTS/QR_apk.png 'https://circle-artifacts.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'/artifacts/'${CIRCLE_NODE_INDEX}'/tmp/'`basename $CIRCLE_ARTIFACTS`'/'"${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk" ; exit 0
 ##   qr code to go directly to the aritfacts (to scan with phone)
-  - qrencode -o $CIRCLE_ARTIFACTS/QR_artifacts.png 'https://circleci.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'#artifacts' ; exit 0
+  - . ~/_fullb1;qrencode -o $CIRCLE_ARTIFACTS/QR_artifacts.png 'https://circleci.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'#artifacts' ; exit 0
 
 
 
