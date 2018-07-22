@@ -227,7 +227,7 @@ dependencies {
     compile 'com.android.support:design:27.1.1'
     compile 'com.android.support:recyclerview-v7:27.1.1'
     compile 'com.android.support:cardview-v7:27.1.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.android.support.constraint:constraint-layout:1.1.2'
     compile 'com.android.support:multidex:1.0.3'
     androidTestCompile 'com.android.support:multidex:1.0.3'
     androidTestCompile 'com.android.support:multidex-instrumentation:1.0.3'
@@ -257,8 +257,8 @@ dependencyVerification {
             'android.arch.lifecycle:livedata-core:14e57ff8ffb65a80c7e72d91f2076acccdaf2970f234c6261e03a6127eb5206b',
             'android.arch.lifecycle:runtime:094fd793924dd6a5136753e599ac8174a8147f4a401386b694ba7d818c223e2e',
             'android.arch.lifecycle:viewmodel:6407c93a5ea9850661dca42a0068d6f3deccefd7228ee69bae1c35d70cbc2557',
-            'com.android.support.constraint:constraint-layout-solver:8c62525a9bc5cff5633a96cb9b32fffeccaf41b8841aa87fc22607070dea9b8d',
-            'com.android.support.constraint:constraint-layout:b0c688cc2b7172608f8153a689d746da40f71e52d7e2fe2bfd9df2f92db77085',
+            'com.android.support.constraint:constraint-layout-solver:55f82d93e188b5183b71f4f3bace5725c900b737c3514c841114e225627ff88f',
+            'com.android.support.constraint:constraint-layout:839a7e16fc50adfabaa8cb753e675ed63f94e1e91ba9115ce43b0d6a37fe8aa6',
             'com.android.support:animated-vector-drawable:59670473f6e98fda792f7bef25dd7292b0a3106031c7a5e30eb020bf26f077bd',
             'com.android.support:appcompat-v7:0c7808fbbc5838d831e32e3c0a6f84e1f2c981deb8f11e010650f2b57923a335',
             'com.android.support:cardview-v7:8ed955dd037d82a7b4bbcaedb4f896523c3e4c1bf3ca698ce807c350767a2886',
