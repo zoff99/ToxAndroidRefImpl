@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.0.17](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.17) (2018-07-23)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.16...1.0.17)
+
+**Closed issues:**
+
+- Rebuild with toxcore v0.2 [\#75](https://github.com/zoff99/ToxAndroidRefImpl/issues/75)
+- Copy message contents to clipboard [\#72](https://github.com/zoff99/ToxAndroidRefImpl/issues/72)
+- JVM implementation of ToxCore [\#67](https://github.com/zoff99/ToxAndroidRefImpl/issues/67)
+
 ## [1.0.16](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.16) (2018-05-07)
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.15...1.0.16)
 
