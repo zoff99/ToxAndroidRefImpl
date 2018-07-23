@@ -333,9 +333,9 @@ compile:
   # --- get wanted c-toxcore version ---
 
   # --- disable H264 ---
-  - cd ~/c-toxcore/toxav/ ; cat tox_generic.h |grep 'define DISABLE_H264_ENCODER_FEATURE'
-  - cd ~/c-toxcore/toxav/ ; sed -i -e 'sm#define DISABLE_H264_ENCODER_FEATURE.*m#define DISABLE_H264_ENCODER_FEATURE 1m' tox_generic.h
-  - cd ~/c-toxcore/toxav/ ; cat tox_generic.h |grep 'define DISABLE_H264_ENCODER_FEATURE'
+  - cd ~/c-toxcore/toxav/ ; cat rtp.c |grep 'define DISABLE_H264_ENCODER_FEATURE'
+  - cd ~/c-toxcore/toxav/ ; sed -i -e 'sm#define DISABLE_H264_ENCODER_FEATURE.*m#define DISABLE_H264_ENCODER_FEATURE 1m' rtp.c
+  - cd ~/c-toxcore/toxav/ ; cat rtp.c |grep 'define DISABLE_H264_ENCODER_FEATURE'
   # --- disable H264 ---
 
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
@@ -536,9 +536,9 @@ compile:
   # --- get wanted c-toxcore version ---
 
   # --- disable H264 ---
-  - cd ~/c-toxcore/toxav/ ; cat tox_generic.h |grep 'define DISABLE_H264_ENCODER_FEATURE'
-  - cd ~/c-toxcore/toxav/ ; sed -i -e 'sm#define DISABLE_H264_ENCODER_FEATURE.*m#define DISABLE_H264_ENCODER_FEATURE 1m' tox_generic.h
-  - cd ~/c-toxcore/toxav/ ; cat tox_generic.h |grep 'define DISABLE_H264_ENCODER_FEATURE'
+  - cd ~/c-toxcore/toxav/ ; cat rtp.c |grep 'define DISABLE_H264_ENCODER_FEATURE'
+  - cd ~/c-toxcore/toxav/ ; sed -i -e 'sm#define DISABLE_H264_ENCODER_FEATURE.*m#define DISABLE_H264_ENCODER_FEATURE 1m' rtp.c
+  - cd ~/c-toxcore/toxav/ ; cat rtp.c |grep 'define DISABLE_H264_ENCODER_FEATURE'
   # --- disable H264 ---
 
   - . ~/pp;cd ~/c-toxcore/;autoreconf -fi
