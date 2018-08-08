@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_zoom_incoming_video;
+
 public class CustomVideoImageView extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener
 {
     private Matrix matrix = new Matrix();
@@ -48,6 +50,10 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
     {
         this(context, null, 0);
         matrix_was_reset = true;
+        if (PREF__X_zoom_incoming_video)
+        {
+            this.setScaleType(ScaleType.MATRIX);
+        }
         this.setOnTouchListener(this);
     }
 
@@ -55,6 +61,10 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
     {
         this(context, attrs, 0);
         matrix_was_reset = true;
+        if (PREF__X_zoom_incoming_video)
+        {
+            this.setScaleType(ScaleType.MATRIX);
+        }
         this.setOnTouchListener(this);
     }
 
@@ -62,6 +72,10 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
     {
         super(context, attrs, defStyle);
         matrix_was_reset = true;
+        if (PREF__X_zoom_incoming_video)
+        {
+            this.setScaleType(ScaleType.MATRIX);
+        }
         this.setOnTouchListener(this);
     }
 
@@ -69,65 +83,73 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
     public void onSizeChanged(int w, int h, int oldw, int oldh)
     {
         super.onSizeChanged(w, h, oldw, oldh);
-        mViewWidth = w;
-        mViewHeight = h;
 
-        matrix.reset();
-        savedMatrix.reset();
-        sum_scale_factor = 1;
-        scaled_mBitmapWidth = 1;
-        scaled_mBitmapHeight = 1;
-        matrix_was_reset = true;
+        if (PREF__X_zoom_incoming_video)
+        {
+            mViewWidth = w;
+            mViewHeight = h;
+
+            matrix.reset();
+            savedMatrix.reset();
+            sum_scale_factor = 1;
+            scaled_mBitmapWidth = 1;
+            scaled_mBitmapHeight = 1;
+            matrix_was_reset = true;
+        }
     }
 
     public void setBitmap(Bitmap bitmap)
     {
         if (bitmap != null)
         {
-            mBitmapWidth = bitmap.getWidth();
-            mBitmapHeight = bitmap.getHeight();
-
-            if (matrix_was_reset)
+            if (PREF__X_zoom_incoming_video)
             {
-                try
+
+                mBitmapWidth = bitmap.getWidth();
+                mBitmapHeight = bitmap.getHeight();
+
+                if (matrix_was_reset)
                 {
-
-                    float scale_h = (float) mViewHeight / (float) mBitmapHeight;
-                    float scale_w = (float) mViewWidth / (float) mBitmapWidth;
-
-                    // System.out.println("__onTouch__:" + "scale_w=" + scale_w + ",scale_h=" + scale_h);
-                    float scale = Math.min(scale_h, scale_w);
-                    if (scale < MIN_SCALE_BITMAP)
+                    try
                     {
-                        scale = MIN_SCALE_BITMAP;
+
+                        float scale_h = (float) mViewHeight / (float) mBitmapHeight;
+                        float scale_w = (float) mViewWidth / (float) mBitmapWidth;
+
+                        // System.out.println("__onTouch__:" + "scale_w=" + scale_w + ",scale_h=" + scale_h);
+                        float scale = Math.min(scale_h, scale_w);
+                        if (scale < MIN_SCALE_BITMAP)
+                        {
+                            scale = MIN_SCALE_BITMAP;
+                        }
+                        else if (scale > MAX_SCALE_BITMAP)
+                        {
+                            scale = MAX_SCALE_BITMAP;
+                        }
+
+                        sum_scale_factor = 1;
+
+                        scaled_mBitmapWidth = (float) mBitmapWidth * scale;
+                        scaled_mBitmapHeight = (float) mBitmapHeight * scale;
+
+                        mBitmapMiddlePoint.x = (mViewWidth / 2) - ((int) scaled_mBitmapWidth / 2);
+                        mBitmapMiddlePoint.y = (mViewHeight / 2) - ((int) scaled_mBitmapHeight / 2);
+
+                        System.out.println("__onTouch__:" + "001:" + scale + ":" + mBitmapMiddlePoint.x + "," +
+                                           mBitmapMiddlePoint.y + ":bm=" + mBitmapWidth + "," + mBitmapHeight +
+                                           ":view=" + mViewWidth + "," + mViewHeight);
+
+                        matrix.postTranslate(mBitmapMiddlePoint.x, mBitmapMiddlePoint.y);
+                        matrix_was_reset = false;
                     }
-                    else if (scale > MAX_SCALE_BITMAP)
+                    catch (Exception e)
                     {
-                        scale = MAX_SCALE_BITMAP;
+                        e.printStackTrace();
                     }
-
-                    sum_scale_factor = 1;
-
-                    scaled_mBitmapWidth = (float) mBitmapWidth * scale;
-                    scaled_mBitmapHeight = (float) mBitmapHeight * scale;
-
-                    mBitmapMiddlePoint.x = (mViewWidth / 2) - ((int) scaled_mBitmapWidth / 2);
-                    mBitmapMiddlePoint.y = (mViewHeight / 2) - ((int) scaled_mBitmapHeight / 2);
-
-                    System.out.println(
-                            "__onTouch__:" + "001:" + scale + ":" + mBitmapMiddlePoint.x + "," + mBitmapMiddlePoint.y +
-                            ":bm=" + mBitmapWidth + "," + mBitmapHeight + ":view=" + mViewWidth + "," + mViewHeight);
-
-                    matrix.postTranslate(mBitmapMiddlePoint.x, mBitmapMiddlePoint.y);
-                    matrix_was_reset = false;
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+
+                this.setImageMatrix(matrix);
             }
-
-            this.setImageMatrix(matrix);
 
             setImageBitmap(bitmap);
         }
@@ -138,42 +160,51 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
     {
         // System.out.println("__onTouch__:" + "mask=" + (event.getAction() & MotionEvent.ACTION_MASK));
 
-        switch (event.getAction() & MotionEvent.ACTION_MASK)
+        if (PREF__X_zoom_incoming_video)
         {
-            case MotionEvent.ACTION_DOWN:
-                // System.out.println("__onTouch__:" + "ACTION_DOWN");
-                savedMatrix.set(matrix);
-                mStartPoint.set(event.getX(), event.getY());
-                mode = DRAG;
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                // System.out.println("__onTouch__:" + "ACTION_POINTER_DOWN");
-                oldDist = spacing(event);
-                if (oldDist > 10f)
-                {
-                    savedMatrix.set(matrix);
-                    midPoint(mMiddlePoint, event);
-                    mode = ZOOM;
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_POINTER_UP:
-                mode = NONE;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mode == DRAG)
-                {
-                    drag(event);
-                }
-                else if (mode == ZOOM)
-                {
-                    // System.out.println("__onTouch__:" + "ZOOM");
-                    zoom(event);
-                }
-                break;
-        }
 
-        return true;
+            switch (event.getAction() & MotionEvent.ACTION_MASK)
+            {
+                case MotionEvent.ACTION_DOWN:
+                    // System.out.println("__onTouch__:" + "ACTION_DOWN");
+                    savedMatrix.set(matrix);
+                    mStartPoint.set(event.getX(), event.getY());
+                    mode = DRAG;
+                    break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    // System.out.println("__onTouch__:" + "ACTION_POINTER_DOWN");
+                    oldDist = spacing(event);
+                    if (oldDist > 10f)
+                    {
+                        savedMatrix.set(matrix);
+                        midPoint(mMiddlePoint, event);
+                        mode = ZOOM;
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_POINTER_UP:
+                    mode = NONE;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (mode == DRAG)
+                    {
+                        drag(event);
+                    }
+                    else if (mode == ZOOM)
+                    {
+                        // System.out.println("__onTouch__:" + "ZOOM");
+                        zoom(event);
+                    }
+                    break;
+            }
+
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 

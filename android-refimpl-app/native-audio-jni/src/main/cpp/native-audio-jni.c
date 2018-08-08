@@ -410,7 +410,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
      */
     if (bqPlayerSampleRate)
     {
-        format_pcm.samplesPerSec = bqPlayerSampleRate;       //sample rate in mili second
+        format_pcm.samplesPerSec = bqPlayerSampleRate;       //sample rate in milli seconds
     }
     SLDataSource audioSrc = {&loc_bufq, &format_pcm};
 
@@ -424,29 +424,20 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
      *     fast audio does not support when SL_IID_EFFECTSEND is required, skip it
      *     for fast audio case
      */
-    const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE,
-                                  SL_IID_VOLUME,
-                                  SL_IID_ANDROIDCONFIGURATION,
+#define  num_params  3
+    const SLInterfaceID ids[num_params] = {SL_IID_BUFFERQUEUE,
+                                           SL_IID_VOLUME,
+                                           SL_IID_ANDROIDCONFIGURATION,
             /*SL_IID_EFFECTSEND,*/
             /*SL_IID_MUTESOLO,*/};
-    const SLboolean req[3] = {SL_BOOLEAN_TRUE,
-                              SL_BOOLEAN_TRUE,
-                              SL_BOOLEAN_TRUE,
+    const SLboolean req[num_params] = {SL_BOOLEAN_TRUE,
+                                       SL_BOOLEAN_TRUE,
+                                       SL_BOOLEAN_TRUE,
             /*SL_BOOLEAN_TRUE,*/
             /*SL_BOOLEAN_TRUE,*/};
 
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
-                                                3, ids, req);
-    assert(SL_RESULT_SUCCESS == result);
-    (void) result;
-
-    // realize the player
-    result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
-    assert(SL_RESULT_SUCCESS == result);
-    (void) result;
-
-    // get the play interface
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
+                                                num_params, ids, req);
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
 
@@ -455,19 +446,39 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     // Code for working with ear speaker by setting stream type to STREAM_VOICE ??
     SLAndroidConfigurationItf playerConfig;
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_ANDROIDCONFIGURATION, &playerConfig);
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_001=%d SL_RESULT_SUCCESS=%d",
+                        (int) result, (int) SL_RESULT_SUCCESS);
+
     if (SL_RESULT_SUCCESS == result)
     {
-        SLint32 streamType = SL_ANDROID_STREAM_MEDIA;
+        // SLint32 streamType = SL_ANDROID_STREAM_MEDIA;
+        SLint32 streamType = SL_ANDROID_STREAM_VOICE;
         result = (*playerConfig)->SetConfiguration(playerConfig, SL_ANDROID_KEY_STREAM_TYPE, &streamType,
                                                    sizeof(SLint32));
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_002=%d", (int) result);
     }
     // ----------------------------------------------------------
 #endif
 
+    // realize the player
+    result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_Realize=%d SL_RESULT_SUCCESS=%d",
+                        (int) result, (int) SL_RESULT_SUCCESS);
+    (void) result;
+
+    // get the play interface
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_003=%d SL_RESULT_SUCCESS=%d",
+                        (int) result, (int) SL_RESULT_SUCCESS);
+    (void) result;
+
+
     // get the buffer queue interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
                                              &bqPlayerBufferQueue);
-    assert(SL_RESULT_SUCCESS == result);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_005=%d SL_RESULT_SUCCESS=%d",
+                        (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
 #if 0
@@ -499,12 +510,14 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
 
     // get the volume interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
-    assert(SL_RESULT_SUCCESS == result);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_006=%d SL_RESULT_SUCCESS=%d",
+                        (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
     // set the player's state to playing
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-    assert(SL_RESULT_SUCCESS == result);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_007=%d SL_RESULT_SUCCESS=%d",
+                        (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
     cur_buf = 0;

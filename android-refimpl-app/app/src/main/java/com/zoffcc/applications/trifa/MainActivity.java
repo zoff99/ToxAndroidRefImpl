@@ -322,6 +322,7 @@ public class MainActivity extends AppCompatActivity
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int PREF__X_audio_recording_frame_size = 60; // !! 120 seems to work best somehow !!
+    static boolean PREF__X_zoom_incoming_video = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -5162,8 +5163,6 @@ public class MainActivity extends AppCompatActivity
                 String peer_name_temp2 = null;
 
 
-
-
                 try
                 {
                     // don't use the wrapper here!
@@ -5197,7 +5196,6 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-
                 try
                 {
                     if (conference_message_list_activity != null)
@@ -5207,12 +5205,12 @@ public class MainActivity extends AppCompatActivity
                                 conf_temp.conference_identifier))
                         {
                             String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
-                                    peer_number);
+                                                                                          peer_number);
                             Log.i(TAG,
-                                    "namelist_change_cb:INFO:" + " 002 " + conference_number + ":" + peer_number +
-                                            ":" + peer_pubkey_temp2);
+                                  "namelist_change_cb:INFO:" + " 002 " + conference_number + ":" + peer_number + ":" +
+                                  peer_pubkey_temp2);
                             conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number,
-                                    peer_name_temp2);
+                                                                            peer_name_temp2);
                             Log.i(TAG, "namelist_change_cb:INFO:" + " 003");
                         }
                     }
@@ -5280,8 +5278,7 @@ public class MainActivity extends AppCompatActivity
                         if (conference_message_list_activity.get_current_conf_id().equals(
                                 conf_temp.conference_identifier))
                         {
-                            Log.i(TAG,
-                                    "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
+                            Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
                             conference_message_list_activity.update_group_all_users();
                         }
                     }

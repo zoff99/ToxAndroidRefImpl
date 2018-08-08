@@ -153,14 +153,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         callactivity_handler_s = callactivity_handler;
 
         // set volume control -------------
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        //**//setVolumeControlStream(AudioManager.STREAM_MUSIC);
         System.out.println("AVCS:MUSIC:0");
 
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         try
         {
-            manager.setMode(AudioManager.MODE_NORMAL);
+            //**//manager.setMode(AudioManager.MODE_NORMAL);
             // manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            manager.setSpeakerphoneOn(true);
+            Callstate.audio_speaker = true;
         }
         catch (Exception ee)
         {
@@ -1197,28 +1199,28 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     private void requestAudioFocus()
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            AudioAttributes playbackAttributes = new AudioAttributes.Builder().setUsage(
-                    AudioAttributes.USAGE_VOICE_COMMUNICATION).setContentType(
-                    AudioAttributes.CONTENT_TYPE_SPEECH).build();
-            AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(
-                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes(
-                    playbackAttributes).setAcceptsDelayedFocusGain(true).setOnAudioFocusChangeListener(
-                    new AudioManager.OnAudioFocusChangeListener()
-                    {
-                        @Override
-                        public void onAudioFocusChange(int i)
-                        {
-                        }
-                    }).build();
-            audio_manager_s.requestAudioFocus(focusRequest);
-        }
-        else
-        {
-            audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
-                                              AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//        {
+//            AudioAttributes playbackAttributes = new AudioAttributes.Builder().setUsage(
+//                    AudioAttributes.USAGE_VOICE_COMMUNICATION).setContentType(
+//                    AudioAttributes.CONTENT_TYPE_SPEECH).build();
+//            AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(
+//                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes(
+//                    playbackAttributes).setAcceptsDelayedFocusGain(true).setOnAudioFocusChangeListener(
+//                    new AudioManager.OnAudioFocusChangeListener()
+//                    {
+//                        @Override
+//                        public void onAudioFocusChange(int i)
+//                        {
+//                        }
+//                    }).build();
+//            audio_manager_s.requestAudioFocus(focusRequest);
+//        }
+//        else
+//        {
+//            audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+//                                              AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+//        }
     }
 
     @Override

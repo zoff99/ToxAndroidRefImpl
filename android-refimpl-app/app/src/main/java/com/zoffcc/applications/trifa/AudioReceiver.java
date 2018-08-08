@@ -347,7 +347,7 @@ public class AudioReceiver extends Thread
             {
                 try
                 {
-                    Thread.sleep(500);
+                    Thread.sleep(300);
                 }
                 catch (Exception e)
                 {
