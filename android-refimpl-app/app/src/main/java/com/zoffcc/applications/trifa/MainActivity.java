@@ -2671,7 +2671,7 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    CallingActivity.mContentView.setImageBitmap(video_frame_image);
+                    CallingActivity.mContentView.setBitmap(video_frame_image);
                 }
                 catch (Exception e)
                 {

@@ -34,11 +34,12 @@
             android:layout_height="match_parent">
 
 
-            <ImageView
+            <com.zoffcc.applications.trifa.CustomVideoImageView
                 android:id="@+id/video_view"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/black"/>
+                android:background="@android:color/black"
+                android:scaleType="matrix"/>
 
             <FrameLayout
                 android:layout_width="125dp"

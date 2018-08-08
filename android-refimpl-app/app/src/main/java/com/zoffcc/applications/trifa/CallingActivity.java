@@ -82,7 +82,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static final int BACK_CAMERA_USED = 2;
     static int active_camera_type = FRONT_CAMERA_USED;
     // private final Handler mHideHandler = new Handler();
-    static ImageView mContentView;
+    static CustomVideoImageView mContentView;
     static ImageView caller_avatar_view;
     static ImageButton accept_button = null;
     ImageButton decline_button = null;
@@ -169,7 +169,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // set volume control -------------
 
         mVisible = true;
-        mContentView = (ImageView) findViewById(R.id.video_view);
+        mContentView = (CustomVideoImageView) findViewById(R.id.video_view);
 
         caller_avatar_view = (ImageView) findViewById(R.id.caller_avatar_view);
 
