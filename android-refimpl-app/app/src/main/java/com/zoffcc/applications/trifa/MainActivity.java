@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int PREF__X_audio_recording_frame_size = 60; // !! 120 seems to work best somehow !!
-    static boolean PREF__X_zoom_incoming_video = true;
+    static boolean PREF__X_zoom_incoming_video = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2618,13 +2618,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
-        if ((Callstate.call_first_video_frame_received == -1)
-            || (Callstate.frame_width_px != frame_width_px)
-            || (Callstate.frame_height_px != frame_height_px)
-            || (Callstate.ystride != ystride)
-            || (Callstate.ustride != ustride)
-            || (Callstate.vstride != vstride)
-            )
+        if ((Callstate.call_first_video_frame_received == -1) || (Callstate.frame_width_px != frame_width_px) ||
+            (Callstate.frame_height_px != frame_height_px) || (Callstate.ystride != ystride) ||
+            (Callstate.ustride != ustride) || (Callstate.vstride != vstride))
         {
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
             last_video_frame_received = System.currentTimeMillis();
