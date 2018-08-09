@@ -1770,19 +1770,23 @@ void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t w
                 dbg(9, "Video buffer too small for incoming frame frame=%d buffer=%d",
                     (int)(actual_y_size + actual_u_size + actual_v_size),
                     (int)video_buffer_1_size);
-                return;
+                // clear out any data in the video buffer
+                // TODO: with all "0" the video frame is all green!
+                memset(video_buffer_1, 0, video_buffer_1_size);
             }
-
-            // copy the Y layer into the buffer
-            //dbg(9, "[V1]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
-            memcpy(video_buffer_1, y, (size_t)(actual_y_size));
-            // copy the U layer into the buffer
-            //dbg(9, "[V2]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
-            memcpy(video_buffer_1_u, u, (size_t)(actual_u_size));
-            // copy the V layer into the buffer
-            //dbg(9, "[V3]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
-            memcpy(video_buffer_1_v, v, (size_t)(actual_v_size));
-            //dbg(9, "[V4]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+            else
+            {
+                // copy the Y layer into the buffer
+                //dbg(9, "[V1]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+                memcpy(video_buffer_1, y, (size_t)(actual_y_size));
+                // copy the U layer into the buffer
+                //dbg(9, "[V2]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+                memcpy(video_buffer_1_u, u, (size_t)(actual_u_size));
+                // copy the V layer into the buffer
+                //dbg(9, "[V3]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+                memcpy(video_buffer_1_v, v, (size_t)(actual_v_size));
+                //dbg(9, "[V4]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+            }
         }
     }
 
