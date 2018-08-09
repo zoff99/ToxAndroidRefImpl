@@ -2618,8 +2618,13 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
-        if ((Callstate.call_first_video_frame_received == -1) || (Callstate.frame_width_px != frame_width_px) ||
-            (Callstate.frame_height_px != frame_height_px) || (Callstate.ystride != ystride))
+        if ((Callstate.call_first_video_frame_received == -1)
+            || (Callstate.frame_width_px != frame_width_px)
+            || (Callstate.frame_height_px != frame_height_px)
+            || (Callstate.ystride != ystride)
+            || (Callstate.ustride != ustride)
+            || (Callstate.vstride != vstride)
+            )
         {
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
             last_video_frame_received = System.currentTimeMillis();

@@ -1762,6 +1762,17 @@ void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t w
             int actual_y_size = max(width, abs(ystride)) * height;
             int actual_u_size = max(width/2, abs(ustride)) * (height/2);
             int actual_v_size = max(width/2, abs(vstride)) * (height/2);
+            video_buffer_1_u = (uint8_t *)(video_buffer_1 + actual_y_size);
+            video_buffer_1_v = (uint8_t *)(video_buffer_1 + actual_y_size + actual_u_size);
+
+            if((actual_y_size + actual_u_size + actual_v_size) > video_buffer_1_size)
+            {
+                dbg(9, "Video buffer too small for incoming frame frame=%d buffer=%d",
+                    (int)(actual_y_size + actual_u_size + actual_v_size),
+                    (int)video_buffer_1_size);
+                return;
+            }
+
             // copy the Y layer into the buffer
             //dbg(9, "[V1]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
             memcpy(video_buffer_1, y, (size_t)(actual_y_size));
