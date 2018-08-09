@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int PREF__X_audio_recording_frame_size = 60; // !! 120 seems to work best somehow !!
-    static boolean PREF__X_zoom_incoming_video = false;
+    static boolean PREF__X_zoom_incoming_video = true;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -5167,10 +5167,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     // don't use the wrapper here!
                     String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_number, peer_number);
-                    Log.i(TAG, "namelist_change_cb:003:peer_pubkey_temp=" + peer_pubkey_temp);
+                    // Log.i(TAG, "namelist_change_cb:003:peer_pubkey_temp=" + peer_pubkey_temp);
                     // don't use the wrapper here!
                     peer_name_temp = name;
-                    Log.i(TAG, "namelist_change_cb:004:peer_name_temp=" + peer_name_temp);
+                    // Log.i(TAG, "namelist_change_cb:004:peer_name_temp=" + peer_name_temp);
 
                     try
                     {
@@ -5230,7 +5230,7 @@ public class MainActivity extends AppCompatActivity
                     cpcdb.peer_name = peer_name_temp2;
                     cpcdb.last_update_timestamp = System.currentTimeMillis();
                     orma.insertIntoConferencePeerCacheDB(cpcdb);
-                    Log.i(TAG, "namelist_change_cb:insertIntoConferencePeerCacheDB:" + cpcdb);
+                    // Log.i(TAG, "namelist_change_cb:insertIntoConferencePeerCacheDB:" + cpcdb);
                 }
                 catch (Exception e4)
                 {

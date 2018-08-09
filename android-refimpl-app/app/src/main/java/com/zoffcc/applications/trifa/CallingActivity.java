@@ -1300,7 +1300,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         // set volume control -------------
                         // setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
                         // HINT: this seems to be correct now? at least the on devices I tested on
-                        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+                        //**//setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
                         //                        Class audioSystemClass = Class.forName("android.media.AudioManager");
                         //                        Method setForceUse = audioSystemClass.getMethod("forceVolumeControlStream", int.class);
