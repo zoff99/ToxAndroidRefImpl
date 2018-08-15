@@ -2263,7 +2263,6 @@ public class MainActivity extends AppCompatActivity
     {
         if (video_buffer_1 != null)
         {
-            // video_buffer_1.clear();
             video_buffer_1 = null;
         }
 
@@ -2617,11 +2616,18 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        // Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" + frame_height_px);
+        //        Log.i(TAG,
+        //              "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" +
+        //              frame_height_px + " call_first_video_frame_received=" + Callstate.call_first_video_frame_received);
+
         if ((Callstate.call_first_video_frame_received == -1) || (Callstate.frame_width_px != frame_width_px) ||
             (Callstate.frame_height_px != frame_height_px) || (Callstate.ystride != ystride) ||
             (Callstate.ustride != ustride) || (Callstate.vstride != vstride))
         {
+
+            //            Log.i(TAG, "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px +
+            //                       " video height=" + frame_height_px);
+
             Callstate.call_first_video_frame_received = System.currentTimeMillis();
             last_video_frame_received = System.currentTimeMillis();
             count_video_frame_received++;

@@ -54,6 +54,10 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
         {
             this.setScaleType(ScaleType.MATRIX);
         }
+        else
+        {
+            this.setScaleType(ScaleType.FIT_CENTER);
+        }
         this.setOnTouchListener(this);
     }
 
@@ -65,6 +69,10 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
         {
             this.setScaleType(ScaleType.MATRIX);
         }
+        else
+        {
+            this.setScaleType(ScaleType.FIT_CENTER);
+        }
         this.setOnTouchListener(this);
     }
 
@@ -75,6 +83,10 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
         if (PREF__X_zoom_incoming_video)
         {
             this.setScaleType(ScaleType.MATRIX);
+        }
+        else
+        {
+            this.setScaleType(ScaleType.FIT_CENTER);
         }
         this.setOnTouchListener(this);
     }
