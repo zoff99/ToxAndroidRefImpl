@@ -2051,8 +2051,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     {
         dbg(0, "Error at toxav_new: %d", rc);
     }
-    global_toxav_valid = true;
 
+    global_toxav_valid = true;
     memset(&mytox_CC, 0, sizeof(CallControl));
     // ----------- create Tox AV instance --------
     // init AV callbacks -------------------------------
@@ -2490,7 +2490,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
 void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env, jobject thiz)
 {
     global_toxav_valid = false;
-
     dbg(9, "tox_kill ... START");
     stop_filter_audio();
     toxav_iterate_thread_stop = 1;
@@ -4092,7 +4091,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 {
     TOXAV_ERR_SEND_FRAME error;
 
-    if (global_toxav_valid != true)
+    if(global_toxav_valid != true)
     {
         return (jint)TOXAV_ERR_SEND_FRAME_FRIEND_NOT_IN_CALL;
     }
