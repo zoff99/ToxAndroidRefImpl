@@ -28,8 +28,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -69,6 +67,9 @@ import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MAX_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_HIGH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_LOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_MED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_LOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_MED;
@@ -215,6 +216,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
+                        int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
+                                                    VIDEO_ENCODER_MAX_BITRATE_LOW);
+
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_LOW);
@@ -244,6 +249,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
+                        int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
+                                                    VIDEO_ENCODER_MAX_BITRATE_MED);
+
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_MED);
@@ -272,6 +281,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
+                        int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
+                                                    VIDEO_ENCODER_MAX_BITRATE_HIGH);
+
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_HIGH);
@@ -310,14 +323,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 if (prev_position != position)
                 {
                     int value = VIDEO_ENCODER_MAX_QUANTIZER_LOW;
+                    int value1 = VIDEO_ENCODER_MAX_BITRATE_LOW;
                     if (position == 1)
                     {
                         value = VIDEO_ENCODER_MAX_QUANTIZER_MED;
+                        value1 = VIDEO_ENCODER_MAX_BITRATE_MED;
                     }
                     else if (position == 2)
                     {
                         value = VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
+                        value1 = VIDEO_ENCODER_MAX_BITRATE_HIGH;
                     }
+                    int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
+                                                value1);
+
                     int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                value);
@@ -698,7 +718,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                        ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
-                                       GLOBAL_MAX_VIDEO_BITRATE);
+                                       VIDEO_ENCODER_MAX_BITRATE_LOW);
             Log.i(TAG, "max_v_birate_set:res=" + res);
         }
         catch (Exception e)
@@ -1199,28 +1219,28 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     private void requestAudioFocus()
     {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-//        {
-//            AudioAttributes playbackAttributes = new AudioAttributes.Builder().setUsage(
-//                    AudioAttributes.USAGE_VOICE_COMMUNICATION).setContentType(
-//                    AudioAttributes.CONTENT_TYPE_SPEECH).build();
-//            AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(
-//                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes(
-//                    playbackAttributes).setAcceptsDelayedFocusGain(true).setOnAudioFocusChangeListener(
-//                    new AudioManager.OnAudioFocusChangeListener()
-//                    {
-//                        @Override
-//                        public void onAudioFocusChange(int i)
-//                        {
-//                        }
-//                    }).build();
-//            audio_manager_s.requestAudioFocus(focusRequest);
-//        }
-//        else
-//        {
-//            audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
-//                                              AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-//        }
+        //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        //        {
+        //            AudioAttributes playbackAttributes = new AudioAttributes.Builder().setUsage(
+        //                    AudioAttributes.USAGE_VOICE_COMMUNICATION).setContentType(
+        //                    AudioAttributes.CONTENT_TYPE_SPEECH).build();
+        //            AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(
+        //                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT).setAudioAttributes(
+        //                    playbackAttributes).setAcceptsDelayedFocusGain(true).setOnAudioFocusChangeListener(
+        //                    new AudioManager.OnAudioFocusChangeListener()
+        //                    {
+        //                        @Override
+        //                        public void onAudioFocusChange(int i)
+        //                        {
+        //                        }
+        //                    }).build();
+        //            audio_manager_s.requestAudioFocus(focusRequest);
+        //        }
+        //        else
+        //        {
+        //            audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+        //                                              AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+        //        }
     }
 
     @Override
