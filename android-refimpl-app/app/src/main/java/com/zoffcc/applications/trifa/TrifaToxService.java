@@ -267,7 +267,7 @@ public class TrifaToxService extends Service
                                             @Override
                                             public void run()
                                             {
-                                                vfs.detachThread();
+                                                // vfs.detachThread();
                                             }
                                         };
                                         if (main_handler_s != null)
@@ -364,7 +364,21 @@ public class TrifaToxService extends Service
                             {
                                 main_handler_s.post(myRunnable);
                             }
+                            // vfs.detachThread();
+
+                            try
+                            {
+                                Log.i(TAG, "stop_me:dt001");
+                                Thread.sleep(1500);
+                                Log.i(TAG, "stop_me:dt002");
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
                             vfs.detachThread();
+
                             Log.i(TAG, "VFS:detachThread[3a]:OK");
                         }
                         catch (Exception e55)
@@ -375,6 +389,7 @@ public class TrifaToxService extends Service
 
                         try
                         {
+                            Log.i(TAG, "VFS:unmount[3b]:trying ...");
                             vfs.unmount();
                             Log.i(TAG, "VFS:unmount[3b]:OK");
                         }
@@ -387,7 +402,7 @@ public class TrifaToxService extends Service
                         try
                         {
                             Log.i(TAG, "stop_me:012");
-                            Thread.sleep(1500);
+                            Thread.sleep(500);
                             Log.i(TAG, "stop_me:013");
                         }
                         catch (Exception e)
