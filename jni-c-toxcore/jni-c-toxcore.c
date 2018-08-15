@@ -71,8 +71,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 27
-static const char global_version_string[] = "0.99.27";
+#define VERSION_PATCH 28
+static const char global_version_string[] = "0.99.28";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -152,6 +152,7 @@ int toxav_iterate_thread_stop = 0;
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
 ToxAV *tox_av_global = NULL;
+bool global_toxav_valid = false;
 CallControl mytox_CC;
 pthread_t tid[2]; // 0 -> toxav_iterate thread, 1 -> video send thread
 
@@ -2050,6 +2051,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     {
         dbg(0, "Error at toxav_new: %d", rc);
     }
+    global_toxav_valid = true;
 
     memset(&mytox_CC, 0, sizeof(CallControl));
     // ----------- create Tox AV instance --------
@@ -2487,19 +2489,21 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
 
 void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env, jobject thiz)
 {
+    global_toxav_valid = false;
+
     dbg(9, "tox_kill ... START");
+    stop_filter_audio();
     toxav_iterate_thread_stop = 1;
     pthread_join(tid[0], NULL); // wait for toxav iterate thread to end
     toxav_video_thread_stop = 1;
     pthread_join(tid[1], NULL); // wait for toxav video thread to end
-    stop_filter_audio();
     toxav_kill(tox_av_global);
+    tox_av_global = NULL;
 #ifdef TOX_HAVE_TOXUTIL
     tox_utils_kill(tox_global);
 #else
     tox_kill(tox_global);
 #endif
-    tox_av_global = NULL;
     tox_global = NULL;
     dbg(9, "tox_kill ... READY");
 }
@@ -4087,6 +4091,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
         jlong friend_number, jlong sample_count, jint channels, jlong sampling_rate)
 {
     TOXAV_ERR_SEND_FRAME error;
+
+    if (global_toxav_valid != true)
+    {
+        return (jint)TOXAV_ERR_SEND_FRAME_FRIEND_NOT_IN_CALL;
+    }
 
     if(audio_buffer_pcm_1)
     {
