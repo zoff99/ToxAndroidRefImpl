@@ -41,6 +41,7 @@
                 android:background="@android:color/black"/>
 
             <FrameLayout
+                android:id="@+id/video_box_left_top_01"
                 android:layout_width="125dp"
                 android:layout_height="125dp"
                 android:layout_gravity="top|left"
@@ -70,6 +71,7 @@
             </FrameLayout>
 
             <FrameLayout
+                android:id="@+id/video_box_right_top_01"
                 android:layout_width="125dp"
                 android:layout_height="125dp"
                 android:layout_gravity="top|right"
@@ -153,6 +155,7 @@
                 android:background="@android:color/black"/>
 
             <FrameLayout
+                android:id="@+id/video_box_self_preview_01"
                 android:layout_width="125dp"
                 android:layout_height="125dp"
                 android:layout_gravity="bottom|right"

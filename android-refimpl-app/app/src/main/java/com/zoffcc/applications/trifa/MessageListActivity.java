@@ -67,6 +67,7 @@ import java.io.File;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_filetransfer_db;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
@@ -1029,10 +1030,19 @@ public class MessageListActivity extends AppCompatActivity
             {
                 try
                 {
+                    Log.i(TAG, "CALL:start:(2.0):Callstate.state=" + Callstate.state);
+
                     if (Callstate.state == 0)
                     {
-                        Log.i(TAG, "CALL:start:(2):show activity");
-                        set_filteraudio_active(1);
+                        Log.i(TAG, "CALL:start:(2.1):show activity");
+                        if (PREF__use_software_aec)
+                        {
+                            set_filteraudio_active(1);
+                        }
+                        else
+                        {
+                            set_filteraudio_active(0);
+                        }
 
                         Callstate.state = 1;
                         Callstate.accepted_call = 1; // we started the call, so it's already accepted on our side

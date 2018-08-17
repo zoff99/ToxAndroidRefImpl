@@ -138,6 +138,8 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_threa
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
+import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
+import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.set_max_video_bitrate;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
@@ -192,6 +194,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_C
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_H264;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_VP8;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_PLAY_DELAY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE;
@@ -323,6 +326,7 @@ public class MainActivity extends AppCompatActivity
     // 120 is also valid!!
     static int PREF__X_audio_recording_frame_size = 60; // !! 120 seems to work best somehow !!
     static boolean PREF__X_zoom_incoming_video = false;
+    static boolean PREF__use_software_aec = true;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2491,6 +2495,9 @@ public class MainActivity extends AppCompatActivity
     public static native void set_JNI_audio_buffer2(ByteBuffer audio_buffer2);
 
     // for AEC (libfilteraudio)
+    public static native void restart_filteraudio(long sampling_rate);
+
+    // for AEC (libfilteraudio)
     public static native void set_audio_frame_duration_ms(int audio_frame_duration_ms);
 
     // for AEC (libfilteraudio)
@@ -2551,9 +2558,14 @@ public class MainActivity extends AppCompatActivity
                     if (Callstate.state == 0)
                     {
                         Log.i(TAG, "CALL:start:show activity");
-
-                        set_filteraudio_active(1);
-
+                        if (PREF__use_software_aec)
+                        {
+                            set_filteraudio_active(1);
+                        }
+                        else
+                        {
+                            set_filteraudio_active(0);
+                        }
                         Callstate.state = 1;
                         Callstate.accepted_call = 0;
                         Callstate.call_first_video_frame_received = -1;
@@ -2715,8 +2727,6 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call starting");
                 Callstate.call_start_timestamp = System.currentTimeMillis();
 
-                set_max_video_bitrate();
-
                 Runnable myRunnable = new Runnable()
                 {
                     @Override
@@ -2743,16 +2753,18 @@ public class MainActivity extends AppCompatActivity
                     }
                 };
                 CallingActivity.callactivity_handler_s.post(myRunnable);
+
+                on_call_started_actions();
             }
             else if ((a_TOXAV_FRIEND_CALL_STATE & (2)) > 0)
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending(1)");
-                close_calling_activity();
+                on_call_ended_actions();
             }
             else if ((old_value > 0) && (a_TOXAV_FRIEND_CALL_STATE == 0))
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending(2)");
-                close_calling_activity();
+                on_call_ended_actions();
             }
 
         }
@@ -2854,6 +2866,10 @@ public class MainActivity extends AppCompatActivity
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE.value)
         {
             Callstate.video_bitrate = comm_number;
+        }
+        else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_PLAY_DELAY.value)
+        {
+            Callstate.play_delay = comm_number;
         }
 
         try
@@ -7935,7 +7951,7 @@ public class MainActivity extends AppCompatActivity
                                 CallingActivity.ca.right_top_text_1b.setText(
                                         "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
                                         Callstate.video_in_bitrate);
-                                CallingActivity.ca.right_top_text_2.setText("AO:" + Callstate.audio_bitrate);
+                                CallingActivity.ca.right_top_text_2.setText("AO:" + Callstate.audio_bitrate+" "+Callstate.play_delay);
                             }
                             catch (Exception e)
                             {

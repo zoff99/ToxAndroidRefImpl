@@ -51,6 +51,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
@@ -65,7 +66,6 @@ import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MAX_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_HIGH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_LOW;
@@ -127,6 +127,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     TextView text_vq_low = null;
     TextView text_vq_med = null;
     TextView text_vq_high = null;
+    static View video_box_self_preview_01 = null;
+    static View video_box_left_top_01 = null;
+    static View video_box_right_top_01 = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -175,6 +178,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         mContentView = (CustomVideoImageView) findViewById(R.id.video_view);
 
         caller_avatar_view = (ImageView) findViewById(R.id.caller_avatar_view);
+
+        video_box_self_preview_01 = findViewById(R.id.video_box_self_preview_01);
+        video_box_left_top_01 = findViewById(R.id.video_box_left_top_01);
+        video_box_right_top_01 = findViewById(R.id.video_box_right_top_01);
+
+        video_box_self_preview_01.setVisibility(View.INVISIBLE);
+        video_box_left_top_01.setVisibility(View.INVISIBLE);
+        video_box_right_top_01.setVisibility(View.INVISIBLE);
 
         try
         {
@@ -661,8 +672,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             // need to set our state manually here, no callback from toxcore :-(
 
-                            set_max_video_bitrate();
-
                             caller_avatar_view.setVisibility(View.GONE);
                             accept_button.setVisibility(View.GONE);
                             camera_toggle_button.setVisibility(View.VISIBLE);
@@ -674,6 +683,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                        "s";
                             top_text_line_str2 = a;
                             update_top_text_line();
+
+                            on_call_started_actions();
                         }
                     }
                 }
@@ -700,7 +711,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         Log.i(TAG, "decline button pressed");
                         toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                            ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
-                        close_calling_activity();
+                        on_call_ended_actions();
                     }
                 }
                 catch (Exception e)
@@ -710,6 +721,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 return true;
             }
         });
+    }
+
+    public static void set_av_latency()
+    {
+        try
+        {
+            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value, 2);
+            Log.i(TAG, "decoder buffer set to ms=" + 2 + ":res=" + res);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "max_v_birate_set:EE:" + e.getMessage());
+        }
     }
 
     public static void set_max_video_bitrate()
@@ -1070,6 +1096,19 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e.printStackTrace();
         }
 
+        try
+        {
+            // HINT: of we should for any reason leave the callscreen activity, end any active call
+            // TODO: make this nicer, let the user return to an active call
+            toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                               ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        on_call_ended_actions();
     }
 
     // ---------------
@@ -1342,8 +1381,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 if (Callstate.audio_speaker == false)
                 {
                     Log.i(TAG, "onSensorChanged:--> speaker");
-
-                    set_filteraudio_active(1);
+                    if (PREF__use_software_aec)
+                    {
+                        set_filteraudio_active(1);
+                    }
+                    else
+                    {
+                        set_filteraudio_active(0);
+                    }
 
                     Callstate.audio_speaker = true;
 
@@ -1474,4 +1519,48 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         callactivity_handler_s.post(myRunnable);
     }
 
+
+    // actions to take when a call starts by:
+    // a) accepting an incoming call
+    // b) the other party accepting our call invitation
+    static void on_call_started_actions()
+    {
+        set_max_video_bitrate();
+        set_av_latency();
+
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    CallingActivity.video_box_self_preview_01.setVisibility(View.VISIBLE);
+                    CallingActivity.video_box_left_top_01.setVisibility(View.VISIBLE);
+                    CallingActivity.video_box_right_top_01.setVisibility(View.VISIBLE);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        };
+        CallingActivity.callactivity_handler_s.post(myRunnable);
+    }
+
+    // actions to take when a call ends by:
+    // a) us ending the call
+    // b) the other party ending the call
+    static void on_call_ended_actions()
+    {
+        try
+        {
+            close_calling_activity();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

@@ -52,6 +52,7 @@ public class Callstate
     static boolean camera_opened = false;
     static boolean audio_speaker = true; // true -> loudspeaker, false -> for your ear-speaker
     static int audio_device = 0; // 0 -> phone, 1 -> headset, 2 -> bluetoothdevice
+    static long play_delay = 0;
 
     static void reset_values()
     {
@@ -74,6 +75,7 @@ public class Callstate
         Callstate.accepted_call = 0;
         Callstate.audio_speaker = true;
         Callstate.audio_device = 0;
+        Callstate.play_delay = 0;
     }
 
     public static String codec_to_str(long v)
