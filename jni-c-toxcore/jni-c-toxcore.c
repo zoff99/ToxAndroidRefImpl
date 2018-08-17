@@ -71,8 +71,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 28
-static const char global_version_string[] = "0.99.28";
+#define VERSION_PATCH 29
+static const char global_version_string[] = "0.99.29";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -528,9 +528,30 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 }
 
 
+void stop_filter_audio()
+{
+#ifdef USE_ECHO_CANCELLATION
+
+    /* Prepare filter_audio */
+    if(filteraudio != NULL)
+    {
+        dbg(9, "filter_audio: shutdown");
+        kill_filter_audio(filteraudio);
+        filteraudio = NULL;
+    }
+
+#endif
+}
+
 void start_filter_audio(uint32_t in_samplerate)
 {
 #ifdef USE_ECHO_CANCELLATION
+
+    if(filteraudio)
+    {
+        stop_filter_audio();
+    }
+
     /* Prepare filter_audio */
     filteraudio = new_filter_audio(in_samplerate);
     dbg(9, "filter_audio: prepare. samplerate=%d", (int)in_samplerate);
@@ -571,18 +592,17 @@ void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_
 #endif
 }
 
-void stop_filter_audio()
+void restart_filter_audio(uint32_t in_samplerate)
 {
 #ifdef USE_ECHO_CANCELLATION
+    dbg(9, "filter_audio: restart. samplerate=%d", (int)in_samplerate);
 
-    /* Prepare filter_audio */
-    if(filteraudio != NULL)
+    if(filteraudio)
     {
-        dbg(9, "filter_audio: shutdown");
-        kill_filter_audio(filteraudio);
-        filteraudio = NULL;
+        stop_filter_audio();
     }
 
+    start_filter_audio(in_samplerate);
 #endif
 }
 
@@ -1550,9 +1570,10 @@ void android_toxav_callback_audio_receive_frame_cb(uint32_t friend_number, size_
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-                                     android_toxav_callback_audio_receive_frame_cb_method, (jlong)(unsigned long long)friend_number,
-                                     (jlong)(unsigned long long)sample_count, (jint)channels,
-                                     (jlong)(unsigned long long)sampling_rate
+                                     android_toxav_callback_audio_receive_frame_cb_method,
+                                     (jlong)(unsigned long long)friend_number,
+                                     (jlong)sample_count, (jint)channels,
+                                     (jlong)sampling_rate
                                     );
 }
 
@@ -1709,6 +1730,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer2(JNIEnv 
 // ----- get audio buffer from Java -----
 // ----- get audio buffer from Java -----
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_restart_1filteraudio(JNIEnv *env, jobject thiz,
+        jlong in_samplerate)
+{
+    restart_filter_audio((uint32_t)in_samplerate);
+}
 
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(JNIEnv *env, jobject thiz,
@@ -3986,6 +4013,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1bit_1rate_1set(JNIEnv *en
 }
 
 
+#ifdef HAVE_TOXAV_OPTION_SET
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1option_1set(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong option, jlong value)
@@ -3995,7 +4023,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1option_1set(JNIEnv *env, 
                                &error);
     return (jint)res;
 }
-
+#endif
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv *env, jobject thiz, jlong friend_number,
@@ -4123,14 +4151,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
         // TODO: need some locking here!
         if(recording_samling_rate != (uint32_t)sampling_rate)
         {
-            if(filteraudio)
-            {
-                stop_filter_audio();
-            }
-
-            start_filter_audio((uint32_t)sampling_rate);
             recording_samling_rate = (uint32_t)sampling_rate;
-            set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+            restart_filter_audio((uint32_t)sampling_rate);
         }
 
         // TODO: need some locking here!
