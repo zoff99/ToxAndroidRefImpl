@@ -13,4 +13,5 @@
     <color name="date_bg_color">#EE3F51B5</color>
     <color name="fast_scroller_color">#3F51B5</color>
 
+    <color name="ok_icon_color">#55D400</color>
 </resources>

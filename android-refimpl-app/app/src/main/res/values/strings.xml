@@ -195,6 +195,10 @@
     QR code button to scan friend\'s code with a camera.</string>
     <string name="add_friend_activity_add">Add Friend</string>
     <string name="cancel">Cancel</string>
+
+    <string name="friend_request_sent"> Friend request has been sent.</string>
+    <string name="default_add_friend_message">Hello</string>
+
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->

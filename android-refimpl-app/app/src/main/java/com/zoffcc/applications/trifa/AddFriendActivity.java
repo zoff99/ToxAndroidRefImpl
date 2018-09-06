@@ -175,7 +175,7 @@ public class AddFriendActivity extends AppCompatActivity
                 //showToxIdWithDialog(toxId);
                 //toxid_text.setText(toxId);
 
-				// To add friend directly without waiting users to press the button.
+                // To add friend directly without waiting users to press the button.
                 add_friend(toxId);
                 finish();
 
