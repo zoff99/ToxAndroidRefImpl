@@ -19,6 +19,8 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,9 +30,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+
+import com.blikoon.qrcodescanner.QrCodeActivity;
 
 import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
 
@@ -40,6 +46,7 @@ public class AddFriendActivity extends AppCompatActivity
     EditText toxid_text = null;
     Button button_add = null;
     TextInputLayout friend_toxid_inputlayout = null;
+    private static final int REQUEST_CODE_QR_SCAN = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -104,33 +111,34 @@ public class AddFriendActivity extends AppCompatActivity
     {
         try
         {
-            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-            intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
+            // Disuse the API from zxing client
+            //Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            //intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
 
-            startActivityForResult(intent, 0);
+            //startActivityForResult(intent, 0);
+
+            // Alternatively,use in-app QRCodeScanner to scan QR code
+            Intent i = new Intent(this,QrCodeActivity.class);
+            startActivityForResult( i,REQUEST_CODE_QR_SCAN);
         }
         catch (Exception e)
         {
-            try
-            {
-                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-                Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
-                startActivity(marketIntent);
-            }
-            catch (Exception e2)
-            {
-                e2.printStackTrace();
-            }
+            e.printStackTrace();
         }
     }
 
     public void add_friend_clicked(View v)
     {
+        add_friend(toxid_text.getText().toString());
+        finish();
+    }
+
+    private void add_friend(String toxId){
         Intent intent = new Intent();
         boolean toxid_ok = false;
-        if (toxid_text.getText() != null)
+        if (toxId != null)
         {
-            if (toxid_text.getText().length() > 0)
+            if (toxId.length() > 0)
             {
                 toxid_ok = true;
             }
@@ -138,14 +146,14 @@ public class AddFriendActivity extends AppCompatActivity
 
         if (toxid_ok == true)
         {
-            intent.putExtra("toxid", toxid_text.getText().toString());
+            intent.putExtra("toxid", toxId);
             setResult(RESULT_OK, intent);
         }
         else
         {
             setResult(RESULT_CANCELED, intent);
         }
-        finish();
+
     }
 
     public void cancel_clicked(View v)
@@ -157,14 +165,37 @@ public class AddFriendActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0)
+        if (requestCode == REQUEST_CODE_QR_SCAN)
         {
             if (resultCode == RESULT_OK)
             {
-                String contents = data.getStringExtra("SCAN_RESULT");
-                String format = data.getStringExtra("SCAN_RESULT_FORMAT");
-                toxid_text.setText(contents);
+                //String contents = data.getStringExtra("SCAN_RESULT");
+                //String format = data.getStringExtra("SCAN_RESULT_FORMAT");
+                String toxId = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
+                //showToxIdWithDialog(toxId);
+                //toxid_text.setText(toxId);
+
+				// To add friend directly without waiting users to press the button.
+                add_friend(toxId);
+                finish();
+
             }
         }
     }
+
+    private void showToxIdWithDialog(String toxId){
+        Log.d(TAG,"Have scan result in your app activity :"+ toxId);
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Scan result");
+        alertDialog.setMessage(toxId);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
+
+
 }
