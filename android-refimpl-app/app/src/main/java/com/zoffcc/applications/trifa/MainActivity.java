@@ -51,10 +51,12 @@ import android.media.AudioTrack;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -67,6 +69,7 @@ import android.support.v8.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.v8.renderscript.Type;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -136,11 +139,9 @@ import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
-import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
-import static com.zoffcc.applications.trifa.CallingActivity.set_max_video_bitrate;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
@@ -1008,11 +1009,20 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     tox_service_fg.stop_tox_fg();
                                     tox_service_fg.stop_me(true);
+
                                 }
                                 else
                                 {
                                     // just exit
                                     tox_service_fg.stop_me(true);
+                                }
+
+                                if(Build.VERSION.SDK_INT>=16 && Build.VERSION.SDK_INT<21){
+                                    //getActivity.finishAffinity();
+                                    ActivityCompat.finishAffinity(MainActivity.this);
+                                } else if(Build.VERSION.SDK_INT>=21){
+                                    //getActivity().finishAndRemoveTask();
+                                    ActivityCompat.finishAffinity(MainActivity.this);
                                 }
                             }
                             catch (Exception e)
@@ -7391,8 +7401,8 @@ public class MainActivity extends AppCompatActivity
                 String friend_tox_id = "";
                 friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst(
                         "TOX:", "").replaceFirst("Tox:", "");
-
                 add_friend_real(friend_tox_id);
+                showDialogOfSentRequest();
             }
             else
             {
@@ -7401,10 +7411,34 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**This method opens a dialog tells users that their friend request has been sent sucessfully.**/
+    private void showDialogOfSentRequest(){
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+        View v = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_friend_request_success,null);
+        ImageView okButton = (ImageView) v.findViewById(R.id.dialog_friend_request_success_ok_button) ;
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.setTitle(getString(R.string.friend_request_sent));
+        alertDialog.setView(v);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+
+    }
+
     static void add_friend_real(String friend_tox_id)
     {
         // Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
-
         // add friend ---------------
         long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
         Log.i(TAG, "add_friend_real:add friend  #:" + friendnum);
