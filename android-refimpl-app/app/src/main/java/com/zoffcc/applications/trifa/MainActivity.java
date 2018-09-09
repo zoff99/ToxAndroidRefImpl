@@ -7422,7 +7422,7 @@ public class MainActivity extends AppCompatActivity
         alertDialog.setView(v);
         alertDialog.show();
 
-		// Dialog dismisses after 1 sec 
+        // Dialog dismisses after 1 sec
         final Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override

@@ -22,7 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -34,7 +33,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.blikoon.qrcodescanner.QrCodeActivity;
 
@@ -129,11 +127,11 @@ public class AddFriendActivity extends AppCompatActivity
 
     public void add_friend_clicked(View v)
     {
-        add_friend(toxid_text.getText().toString());
+        addFriend(toxid_text.getText().toString());
         finish();
     }
 
-    private void add_friend(String toxId){
+    private void addFriend(String toxId){
         Intent intent = new Intent();
         boolean toxid_ok = false;
         if (toxId != null && toxId.length() > 0)
@@ -186,7 +184,7 @@ public class AddFriendActivity extends AppCompatActivity
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        add_friend(toxId);
+                        addFriend(toxId);
                         dialog.dismiss();
                         finish();
                     }
