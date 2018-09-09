@@ -136,12 +136,9 @@ public class AddFriendActivity extends AppCompatActivity
     private void add_friend(String toxId){
         Intent intent = new Intent();
         boolean toxid_ok = false;
-        if (toxId != null)
+        if (toxId != null && toxId.length() > 0)
         {
-            if (toxId.length() > 0)
-            {
                 toxid_ok = true;
-            }
         }
 
         if (toxid_ok == true)
@@ -164,6 +161,7 @@ public class AddFriendActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_QR_SCAN)
         {
@@ -172,28 +170,34 @@ public class AddFriendActivity extends AppCompatActivity
                 //String contents = data.getStringExtra("SCAN_RESULT");
                 //String format = data.getStringExtra("SCAN_RESULT_FORMAT");
                 String toxId = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
-                //showToxIdWithDialog(toxId);
+                show_friend_request__dialog(toxId);
                 //toxid_text.setText(toxId);
-
-                // To add friend directly without waiting users to press the button.
-                add_friend(toxId);
-                finish();
 
             }
         }
     }
 
-    private void showToxIdWithDialog(String toxId){
+    private void show_friend_request__dialog(final String toxId){
         Log.d(TAG,"Have scan result in your app activity :"+ toxId);
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("Scan result");
-        alertDialog.setMessage(toxId);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Add friend request");
+        alertDialog.setMessage("Do you want to add this user as friend? : \n" + toxId + "\n ");
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        add_friend(toxId);
                         dialog.dismiss();
+                        finish();
                     }
                 });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                alertDialog.dismiss();
+            }
+        });
+
         alertDialog.show();
     }
 

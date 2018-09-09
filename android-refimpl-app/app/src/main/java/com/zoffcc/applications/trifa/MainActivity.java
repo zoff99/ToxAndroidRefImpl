@@ -127,6 +127,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
@@ -7402,7 +7404,7 @@ public class MainActivity extends AppCompatActivity
                 friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst(
                         "TOX:", "").replaceFirst("Tox:", "");
                 add_friend_real(friend_tox_id);
-                showDialogOfSentRequest();
+                show_dialog_request_sent_successfully();
             }
             else
             {
@@ -7412,28 +7414,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**This method opens a dialog tells users that their friend request has been sent sucessfully.**/
-    private void showDialogOfSentRequest(){
+    private void show_dialog_request_sent_successfully(){
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 
         View v = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_friend_request_success,null);
-        ImageView okButton = (ImageView) v.findViewById(R.id.dialog_friend_request_success_ok_button) ;
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-            }
-        });
-
-        alertDialog.setTitle(getString(R.string.friend_request_sent));
+        //alertDialog.setTitle(getString(R.string.friend_request_sent));
         alertDialog.setView(v);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
         alertDialog.show();
 
+		// Dialog dismisses after 1 sec 
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                alertDialog.dismiss();
+                timer.cancel();
+            }
+        },1000);
     }
 
     static void add_friend_real(String friend_tox_id)
