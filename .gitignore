@@ -10,3 +10,5 @@
 /android-refimpl-app.externalNativeBuild
 android-refimpl-app/app/nativelibs/armeabi/libjni-c-toxcore.so
 android-refimpl-app/app/nativelibs/armeabi-v7a/libjni-c-toxcore.so
+.idea/vcs.xml
+.idea/workspace.xml

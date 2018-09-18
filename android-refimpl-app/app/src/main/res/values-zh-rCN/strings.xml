@@ -1,0 +1,203 @@
+<resources>
+    <string name="app_name">TRIfA</string>
+    <string name="add_friend_activity_name"></string>
+    <string name="message_list_activity_name">聊天室</string>
+
+    <string name="set_password_message_empty">您没有输入任何密码</string>
+    <string name="set_password_message_password_invalid">您输入的密码太短了</string>
+    <string name="set_password_message_password_dont_match">两个密码不一样</string>
+
+    <string name="title_activity_calling">语音通话</string>
+    <string name="title_activity_profile">我的档案</string>
+    <string name="title_activity_settings">功能选项</string>
+    <string name="title_activity_crash">崩溃</string>
+    <string name="title_activity_friendinfo">朋友的资料</string>
+    <string name="title_activity_aboutpage">更多信息</string>
+    <string name="title_activity_set_password">设置密码</string>
+    <string name="title_activity_check_password">验证密码</string>
+    <string name="title_activity_share">用TRIfA打开</string>
+    <string name="title_activity_maintenance">维护页面</string>
+
+
+    <string-array name="spinner_own_status_array">
+        <item>在线</item>
+        <item>离开</item>
+        <item>没空</item>
+    </string-array>
+
+    <string name="settings_toolbar_title">功能选项</string>
+
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <string name="pref_header_general">全局设置</string>
+
+    <string name="pref_title_video_uv_reversed">在视频中反转UV</string>
+    <string name="pref_description_video_uv_reversed">在拍摄视频时反转UV平面的顺序。</string>
+
+    <string name="pref_title_software_echo_cancel">关闭自动聊天</string>
+    <string name="pref_description_software_echo_cancel">关闭自动聊天机械人</string>
+
+    <string name="pref_title_higher_video_quality">画面质量</string>
+    <string name="pref_description_higher_video_quality">调整视频画面的质量.\n 修改后程序会重启！</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>low bandwidth\n(250 kb/s)</item>
+        <item>normal bandwidth\n(2500 kb/s)</item>
+        <item>high bandwidth\n(3500 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_higher_audio_quality">语音质量</string>
+    <string name="pref_description_higher_audio_quality">调整音频的质量.\n 修改后程序会重启！</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>低\n(6 kb/s)</item>
+        <item>中\n(32 kb/s)</item>
+        <item>高\n(64 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_udp_enabled">开启UDP</string>
+    <string name="pref_description_udp_enabled">开启UDP之后，大部分的设备会使用更多的流量。.\n 更改参数后软件会重启!\n 默认状态下是UDP模式是关闭的。</string>
+
+    <string name="pref_title_orbot_enabled">开启TOR代理服务</string>
+    <string name="pref_description_orbot_enabled">你需要先安装Orbot，然后才能使用Tor代理服务.\n 修改后程序会重启！!</string>
+
+    <string name="pref_title_fps_half">降低fps</string>
+    <string name="pref_description_fps_half">将视频画面的刷新率从15fps改为到7fps。</string>
+
+    <string name="pref_title_set_fps">恢复fps</string>
+    <string name="pref_description_set_fps">尝试将画面刷新率改为默认值15fps，但在一些手机上，重置后该软件可能会崩溃。</string>
+
+    <string name="pref_title_display_name">显示名称</string>
+    <string name="pref_default_display_name">王维</string>
+
+    <string name="pref_title_conference_show_system_messages">显示系统信息</string>
+    <string name="pref_description_conference_show_system_messages">在群聊中显示系统信息</string>
+
+    <string name="pref_title_local_discovery_enabled">使用LAN 启动</string>
+    <string name="pref_description_local_discovery_enabled">使用本地LAN网络上的节点来接入TOX网络</string>
+
+    <string name="pref_title_U_keep_nospam">保持Nospam码不变</string>
+    <string name="pref_description_U_keep_nospam">固定Nospam码的值。使用一个固定的Nospam码会带来安全隐患。请不要开启这个选项，除非你知道自己的行动会带来什么后果。</string>
+
+    <string name="pref_title_X_use_native_audio_play">使用C库播放音频</string>
+    <string name="pref_description_X_use_native_audio_play">!! 实验功能 !!\n 使用C库播放音频</string>
+
+    <string name="pref_title_X_battery_saving_mode">省电模式</string>
+    <string name="pref_description_X_battery_saving_mode">!! 实验功能 !!\n 开启该功能会节省手机的电量，但需要更长的时间去发送和接收信息。\n 开启后程序可能会变得不稳定！</string>
+
+    <string name="pref_title_X_misc_button_enabled">其他按钮</string>
+    <string name="pref_description_X_misc_button_enabled">!! 实验功能 !!\n 在通话的界面上添加一个按钮，可以用来发送一条固定的信息。</string>
+
+    <string name="pref_title_X_eac_delay_ms">开启AEC延迟</string>
+    <string name="pref_description_X_eac_delay_ms">!! 实验功能 !!\n AEC 延迟至每毫秒被执行一次</string>
+
+    <string name="pref_title_add_friends_to_messages">将朋友添加到聊天列表</string>
+    <string-array name="pref_example_list_titles">
+        <item>总是添加</item>
+        <item>可以的时候才添加</item>
+        <item>不添加</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_header_data_sync">数据 &amp; 同步</string>
+
+    <string name="pref_title_sync_frequency">同步的频率</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 分钟一次</item>
+        <item>30 分钟一次</item>
+        <item>1 小时一次</item>
+        <item>3 小时一次</item>
+        <item>6 小时一次</item>
+        <item>不同步</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+
+    <string name="pref_title_min_audio_samplingrate_out">音频采样率</string>
+    <string name="pref_description_min_audio_samplingrate_out">默认的采样率是 48000 Hz</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>自动设置</item>
+        <item>8000 Hz</item>
+        <item>16000 Hz</item>
+        <item>48000 Hz</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>自动设置</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+
+
+    <string name="pref_title_X_audio_recording_frame_size">录制音频时的刷新率</string>
+    <string name="pref_description_X_audio_recording_frame_size">默认的刷新率是 60 ms</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value"/>
+
+    <string name="pref_title_system_sync_settings">关联其他软件的账户</string>
+
+    <string name="pref_header_notifications">通知</string>
+
+    <string name="pref_title_new_message_notifications">新的信息</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">振动</string>
+    <string name="pref_title_sound">播放声音</string>
+    <string name="add_friend_activity_help">输入您的朋友的TOX-ID，或者通过摄像头扫描他/她的 ID。</string>
+    <string name="add_friend_activity_add">添加好友</string>
+    <string name="cancel">取消</string>
+
+    <string name="friend_request_sent"> 好友请求已被发送</string>
+    <string name="default_add_friend_message">Hello</string>
+
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+</resources>
