@@ -90,12 +90,14 @@ android {
         exclude 'lib/mips/libspeex.so'
         exclude 'lib/mips/libblasV8.so'
         //
-        // exclude 'lib/x86/libRSSupport.so'
-        // exclude 'lib/x86/librsjni.so'
-        // exclude 'lib/x86/libsqlcipher.so'
-        // exclude 'lib/x86/libiocipher.so'
-        // exclude 'lib/x86/libspeex.so'
-        // exclude 'lib/x86/libblasV8.so'
+        exclude 'lib/x86/libRSSupport.so'
+        exclude 'lib/x86/librsjni.so'
+        exclude 'lib/x86/libsqlcipher.so'
+        exclude 'lib/x86/libiocipher.so'
+        exclude 'lib/x86/libspeex.so'
+        exclude 'lib/x86/libblasV8.so'
+        exclude 'lib/x86/libnative-audio-jni.so'
+        exclude 'lib/x86'
         //
         exclude 'lib/x86_64/libRSSupport.so'
         exclude 'lib/x86_64/librsjni.so'
@@ -217,7 +219,7 @@ dependencies {
     //
     //
     //
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.20@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.21@aar'
     //
     //
     //
@@ -250,7 +252,7 @@ dependencies {
 
 dependencyVerification {
     verify = [
-            'com.zoffcc.applications.trifajni:trifa-jni-lib:e3028bd1e6102f9e3933eaa3bd5754546bfcf8cf4d44f68fdd3a995237a95d9e',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:b213e3640ff113ec66c7b287abe8afc1b1e82836cf8dd5bbfc09b4f6c47ec985',
             'android.arch.core:common:d34824b794bc92ff8f647a9bb13a7c73de920de5b47075b5d2c4f0770e9b8bfd',
             'android.arch.core:runtime:83400f7575bcfb8a2eeec64e05590f037bfaed1e56aa3a4214d20e55878445e3',
             'android.arch.lifecycle:common:614e31cfd33255dc4d5f5d8e62cfa6be2fbbc2a35643a79dc3ed008004c30807',
