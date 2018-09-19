@@ -1289,6 +1289,8 @@ public class MainActivity extends AppCompatActivity
         receiver2 = new HeadsetStateReceiver();
         registerReceiver(receiver2, receiverFilter2);
 
+        MainActivity.set_av_call_status(Callstate.state);
+
     }
 
     public static void clearCache_s()
@@ -2485,6 +2487,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native int toxav_option_set(long friendnum, long a_TOXAV_OPTIONS_OPTION, long value);
 
+    public static native void set_av_call_status(int status); 
+
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
     public static native void set_JNI_video_buffer2(ByteBuffer buffer2, int frame_width_px, int frame_height_px);
@@ -2582,6 +2586,7 @@ public class MainActivity extends AppCompatActivity
                         count_video_frame_sent = 0;
                         VIDEO_FRAME_RATE_INCOMING = 0;
                         last_video_frame_received = -1;
+                        MainActivity.set_av_call_status(Callstate.state);
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         try

@@ -76,6 +76,7 @@ public class Callstate
         Callstate.audio_speaker = true;
         Callstate.audio_device = 0;
         Callstate.play_delay = 0;
+        MainActivity.set_av_call_status(Callstate.state);
     }
 
     public static String codec_to_str(long v)

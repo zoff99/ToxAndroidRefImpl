@@ -1055,6 +1055,8 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.other_video_enabled = 1;
                         Callstate.my_audio_enabled = 1;
                         Callstate.my_video_enabled = 1;
+                        MainActivity.set_av_call_status(Callstate.state);
+
 
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         try
