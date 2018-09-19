@@ -136,11 +136,9 @@ import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
-import static com.zoffcc.applications.trifa.CallingActivity.close_calling_activity;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
-import static com.zoffcc.applications.trifa.CallingActivity.set_max_video_bitrate;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
@@ -2487,7 +2485,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native int toxav_option_set(long friendnum, long a_TOXAV_OPTIONS_OPTION, long value);
 
-    public static native void set_av_call_status(int status); 
+    public static native void set_av_call_status(int status);
 
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
@@ -7956,7 +7954,8 @@ public class MainActivity extends AppCompatActivity
                                 CallingActivity.ca.right_top_text_1b.setText(
                                         "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
                                         Callstate.video_in_bitrate);
-                                CallingActivity.ca.right_top_text_2.setText("AO:" + Callstate.audio_bitrate+" "+Callstate.play_delay);
+                                CallingActivity.ca.right_top_text_2.setText(
+                                        "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
                             }
                             catch (Exception e)
                             {
