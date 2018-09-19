@@ -71,8 +71,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 29
-static const char global_version_string[] = "0.99.29";
+#define VERSION_PATCH 30
+static const char global_version_string[] = "0.99.30";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -202,6 +202,7 @@ long audio_buffer_pcm_2_size = 0;
 
 uint32_t recording_samling_rate = 48000;
 int16_t global_audio_frame_duration_ms = 60;
+uint8_t global_av_call_active = 0;
 
 
 // -------- _callbacks_ --------
@@ -1640,6 +1641,12 @@ void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint1
                                     );
 }
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1av_1call_1status(JNIEnv *env, jobject thiz, jint status)
+{
+    global_av_call_active = (uint8_t)status;
+}
+
 // ----- get video buffer from Java -----
 // ----- get video buffer from Java -----
 // ----- get video buffer from Java -----
@@ -1940,8 +1947,15 @@ void *thread_video_av(void *data)
         }
         else
         {
-            // usleep((av_iterate_interval / 2) * 1000);
-            usleep(5 * 1000);
+            //usleep((av_iterate_interval / 2) * 1000);
+            if(global_av_call_active == 1)
+            {
+                usleep(8 * 1000);
+            }
+            else
+            {
+                usleep(800 * 1000);
+            }
         }
     }
 
