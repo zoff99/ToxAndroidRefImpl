@@ -135,8 +135,8 @@ android {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 10018
-        versionName "1.0.18"
+        versionCode 10019
+        versionName "1.0.19"
 
         renderscriptTargetApi 25
         renderscriptSupportModeEnabled true
@@ -219,7 +219,7 @@ dependencies {
     //
     //
     //
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.21@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.22@aar'
     //
     //
     //
@@ -252,7 +252,7 @@ dependencies {
 
 dependencyVerification {
     verify = [
-            'com.zoffcc.applications.trifajni:trifa-jni-lib:b213e3640ff113ec66c7b287abe8afc1b1e82836cf8dd5bbfc09b4f6c47ec985',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:32f213668f60ffb5d19f01ed24c679e80384ef53f26ca333df6899777d5a0175',
             'android.arch.core:common:d34824b794bc92ff8f647a9bb13a7c73de920de5b47075b5d2c4f0770e9b8bfd',
             'android.arch.core:runtime:83400f7575bcfb8a2eeec64e05590f037bfaed1e56aa3a4214d20e55878445e3',
             'android.arch.lifecycle:common:614e31cfd33255dc4d5f5d8e62cfa6be2fbbc2a35643a79dc3ed008004c30807',
