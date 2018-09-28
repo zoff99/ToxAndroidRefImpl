@@ -12,11 +12,11 @@
     <string name="title_activity_profile">Профиль</string>
     <string name="title_activity_settings">Настройки</string>
     <string name="title_activity_crash">Падение</string>
-    <string name="title_activity_friendinfo">Friendinfo</string>
+    <string name="title_activity_friendinfo">Данные друга</string>
     <string name="title_activity_aboutpage">О программе</string>
     <string name="title_activity_set_password">Изменить пароль</string>
     <string name="title_activity_check_password">Ввод пароля</string>
-    <string name="title_activity_share">открыть с TRIfA</string>
+    <string name="title_activity_share">открыть в TRIfA</string>
     <string name="title_activity_maintenance">Сервисное</string>
 
 
@@ -77,17 +77,17 @@
     <string name="pref_title_set_fps">set fps</string>
     <string name="pref_description_set_fps">try to set wanted [15fps] video framerate, this may crash on some phones</string>
 
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
+    <string name="pref_title_display_name">Видимое имя</string>
+    <string name="pref_default_display_name">Иван Иванов</string>
 
-    <string name="pref_title_conference_show_system_messages">System Messages</string>
-    <string name="pref_description_conference_show_system_messages">show System Messages in Conferences</string>
+    <string name="pref_title_conference_show_system_messages">Системные сообщения</string>
+    <string name="pref_description_conference_show_system_messages">включить их показ в конференциях</string>
 
     <string name="pref_title_local_discovery_enabled">LAN discovery</string>
     <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
 
     <string name="pref_title_U_keep_nospam">keep NoSpam</string>
-    <string name="pref_description_U_keep_nospam">keep NoSpam value. This is not safe, only activate if you know what you are doing!</string>
+    <string name="pref_description_U_keep_nospam">keep NoSpam value. Это небезопасно, используйте, если знаете, что делаете!</string>
 
     <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
     <string name="pref_description_X_use_native_audio_play">!! Expermimental !!\nUse Native Audio to Play Sound</string>
@@ -135,7 +135,7 @@
 
 
     <string name="pref_title_min_audio_samplingrate_out">Audio Samplingrate</string>
-    <string name="pref_description_min_audio_samplingrate_out">Default setting is 48000 Hz</string>
+    <string name="pref_description_min_audio_samplingrate_out">По умолчанию 48000 Hz</string>
     <string-array name="pref_min_audio_samplingrate_out_titles">
         <item>Auto</item>
         <item>8000 Hz</item>
