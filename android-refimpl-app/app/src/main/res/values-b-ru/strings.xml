@@ -1,1 +1,200 @@
+<resources>
+    <string name="app_name">TRIfA</string>
+    <string name="add_friend_activity_name">Добавить друга</string>
+    <string name="message_list_activity_name">Чат</string>
+    <string name="conference_message_list_activity_name">Конференция</string>
 
+    <string name="set_password_message_empty">Введите пароль</string>
+    <string name="set_password_message_password_invalid">Пароль слишком краток</string>
+    <string name="set_password_message_password_dont_match">Пароли не совпадают</string>
+
+    <string name="title_activity_calling">Звонок</string>
+    <string name="title_activity_profile">Профиль</string>
+    <string name="title_activity_settings">Настройки</string>
+    <string name="title_activity_crash">Падение</string>
+    <string name="title_activity_friendinfo">Данные друга</string>
+    <string name="title_activity_aboutpage">О программе</string>
+    <string name="title_activity_set_password">Изменить пароль</string>
+    <string name="title_activity_check_password">Ввод пароля</string>
+    <string name="title_activity_share">открыть в TRIfA</string>
+    <string name="title_activity_maintenance">Сервисное</string>
+
+
+    <string-array name="spinner_own_status_array">
+        <item>В сети</item>
+        <item>Отошел</item>
+        <item>Занят</item>
+    </string-array>
+
+    <string name="settings_toolbar_title">Настройки</string>
+
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <string name="pref_header_general">Основное</string>
+
+    <string name="pref_title_video_uv_reversed">reverse UV in Video</string>
+    <string name="pref_description_video_uv_reversed">Reverse the order of UV planes in the camera video</string>
+
+    <string name="pref_title_software_echo_cancel">Echo Cancellation</string>
+    <string name="pref_description_software_echo_cancel">Use Software Echo Cancellation</string>
+
+    <string name="pref_title_higher_video_quality">Качество видео</string>
+    <string name="pref_description_higher_video_quality">Лучшее качество видео.\nChange needs RESTART!</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>low bandwidth\n(250 kb/s)</item>
+        <item>normal bandwidth\n(2500 kb/s)</item>
+        <item>high bandwidth\n(3500 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_higher_audio_quality">Качество звука</string>
+    <string name="pref_description_higher_audio_quality">Лучшее качество.\nНужен перезапуск!</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>low\n(6 kb/s)</item>
+        <item>normal\n(32 kb/s)</item>
+        <item>high\n(64 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_udp_enabled">Включить UDP</string>
+    <string name="pref_description_udp_enabled">Может вызвать большее потребление трафика на мобильном устройстве.\nНужен перезапуск!\nПо умолчанию ОТКЛ.</string>
+
+    <string name="pref_title_orbot_enabled">Включить Tor Proxy</string>
+    <string name="pref_description_orbot_enabled">Требуется Orbot для работы.\nНужен перезапуск!</string>
+
+    <string name="pref_title_fps_half">Понизить к/с</string>
+    <string name="pref_description_fps_half">Видео 7 к/с вместо 15 к/с</string>
+
+    <string name="pref_title_set_fps">Настроить к/с</string>
+    <string name="pref_description_set_fps">try to set wanted [15fps] video framerate, this may crash on some phones</string>
+
+    <string name="pref_title_display_name">Видимое имя</string>
+    <string name="pref_default_display_name">Иван Иванов</string>
+
+    <string name="pref_title_conference_show_system_messages">Системные сообщения</string>
+    <string name="pref_description_conference_show_system_messages">включить их показ в конференциях</string>
+
+    <string name="pref_title_local_discovery_enabled">LAN discovery</string>
+    <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
+
+    <string name="pref_title_U_keep_nospam">keep NoSpam</string>
+    <string name="pref_description_U_keep_nospam">keep NoSpam value. Это небезопасно, используйте, если знаете, что делаете!</string>
+
+    <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
+    <string name="pref_description_X_use_native_audio_play">!! Тестовое !!\nUse Native Audio to Play Sound</string>
+
+    <string name="pref_title_X_battery_saving_mode">Экономия батарии</string>
+    <string name="pref_description_X_battery_saving_mode">!! Тестовое !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
+
+    <string name="pref_title_X_misc_button_enabled">Misc. Button</string>
+    <string name="pref_description_X_misc_button_enabled">!! Тестовое !!\nadd a Button on Calling Screen to send a fixed Message</string>
+
+    <string name="pref_title_X_eac_delay_ms">AEC задержка</string>
+    <string name="pref_description_X_eac_delay_ms">!! Тестовое !!\nAEC задержка в мс</string>
+
+    <string name="pref_title_add_friends_to_messages">Добавить друга к сообщениям</string>
+    <string-array name="pref_example_list_titles">
+        <item>Всегда</item>
+        <item>Если возможно</item>
+        <item>Никогда</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_header_data_sync">Синх. &amp; данных</string>
+
+    <string name="pref_title_sync_frequency">Период синх.</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 минут</item>
+        <item>30 минут</item>
+        <item>1 час</item>
+        <item>3 часа</item>
+        <item>6 часов</item>
+        <item>Никогда</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+
+    <string name="pref_title_min_audio_samplingrate_out">Audio Samplingrate</string>
+    <string name="pref_description_min_audio_samplingrate_out">По умолчанию 48000 Hz</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>Auto</item>
+        <item>8000 Hz</item>
+        <item>16000 Hz</item>
+        <item>48000 Hz</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>Auto</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+
+
+    <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
+    <string name="pref_description_X_audio_recording_frame_size">По умолчанию 60 мс</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value"/>
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <string name="pref_header_notifications">Оповещения</string>
+
+    <string name="pref_title_new_message_notifications">Оповещение о новом сообщении</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Вибрация</string>
+    <string name="pref_title_sound">Звук</string>
+    <string name="add_friend_activity_help">Вставьте Tox ID друга в поле выше или нажмите на QR код для съемки кода камерой.</string>
+    <string name="add_friend_activity_add">Добавить друга</string>
+    <string name="cancel">Выход</string>
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+</resources>
