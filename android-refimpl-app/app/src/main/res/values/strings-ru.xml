@@ -92,7 +92,7 @@
     <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
     <string name="pref_description_X_use_native_audio_play">!! Expermimental !!\nUse Native Audio to Play Sound</string>
 
-    <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
+    <string name="pref_title_X_battery_saving_mode">Экономия батарии</string>
     <string name="pref_description_X_battery_saving_mode">!! Expermimental !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
 
     <string name="pref_title_X_misc_button_enabled">Misc. Button</string>
