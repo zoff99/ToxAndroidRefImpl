@@ -65,16 +65,16 @@
         <item>2</item>
     </string-array>
 
-    <string name="pref_title_udp_enabled">enable UDP</string>
-    <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
+    <string name="pref_title_udp_enabled">Включить UDP</string>
+    <string name="pref_description_udp_enabled">Может вызвать большее потребление трафика на мобильном устройстве.\nНужен перезапуск!\nПо умолчанию ОТКЛ.</string>
 
-    <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
+    <string name="pref_title_orbot_enabled">Включить Tor Proxy</string>
     <string name="pref_description_orbot_enabled">Требуется Orbot для работы.\nНужен перезапуск!</string>
 
     <string name="pref_title_fps_half">Понизить к/с</string>
     <string name="pref_description_fps_half">Видео 7 к/с вместо 15 к/с</string>
 
-    <string name="pref_title_set_fps">set fps</string>
+    <string name="pref_title_set_fps">Настроить к/с</string>
     <string name="pref_description_set_fps">try to set wanted [15fps] video framerate, this may crash on some phones</string>
 
     <string name="pref_title_display_name">Видимое имя</string>
