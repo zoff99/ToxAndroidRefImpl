@@ -71,8 +71,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 30
-static const char global_version_string[] = "0.99.30";
+#define VERSION_PATCH 31
+static const char global_version_string[] = "0.99.31";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -147,6 +147,7 @@ const char *savedata_filename = "savedata.tox";
 const char *savedata_tmp_filename = "savedata.tox.tmp";
 int tox_loop_running = 1;
 int toxav_video_thread_stop = 0;
+int toxav_audio_thread_stop = 0;
 int toxav_iterate_thread_stop = 0;
 
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
@@ -154,7 +155,7 @@ Tox *tox_global = NULL;
 ToxAV *tox_av_global = NULL;
 bool global_toxav_valid = false;
 CallControl mytox_CC;
-pthread_t tid[2]; // 0 -> toxav_iterate thread, 1 -> video send thread
+pthread_t tid[3]; // 0 -> toxav_iterate thread, 1 -> video iterate thread, 2 -> audio iterate thread
 
 #ifdef USE_ECHO_CANCELLATION
 Filter_Audio *filteraudio = NULL;
@@ -1918,8 +1919,9 @@ void *thread_video_av(void *data)
     dbg(9, "2002");
     pthread_t id = pthread_self();
     dbg(9, "2003");
-    pthread_mutex_t av_thread_lock;
+    // pthread_mutex_t av_thread_lock;
     dbg(9, "2004");
+#if 0
 
     if(pthread_mutex_init(&av_thread_lock, NULL) != 0)
     {
@@ -1930,15 +1932,56 @@ void *thread_video_av(void *data)
         dbg(2, "av_thread_lock video created successfully");
     }
 
+#endif
     dbg(2, "AV video Thread #%d: starting", (int) id);
     long av_iterate_interval = 1;
 
     while(toxav_video_thread_stop != 1)
     {
-        pthread_mutex_lock(&av_thread_lock);
+        // pthread_mutex_lock(&av_thread_lock);
         toxav_iterate(av);
         // dbg(9, "AV video Thread #%d running ...", (int) id);
-        pthread_mutex_unlock(&av_thread_lock);
+        // pthread_mutex_unlock(&av_thread_lock);
+        av_iterate_interval = toxav_iteration_interval(av);
+
+        if((av_iterate_interval / 2) < 1)
+        {
+            usleep(1 * 1000);
+        }
+        else
+        {
+            //usleep((av_iterate_interval / 2) * 1000);
+            if(global_av_call_active == 1)
+            {
+                usleep(8 * 1000);
+            }
+            else
+            {
+                usleep(800 * 1000);
+            }
+        }
+    }
+
+    dbg(2, "ToxVideo:Clean video thread exit!\n");
+    (*cachedJVM)->DetachCurrentThread(cachedJVM);
+    env = NULL;
+    return (void *)NULL;
+}
+
+void *thread_audio_av(void *data)
+{
+    JavaVMAttachArgs args = {JNI_VERSION_1_6, 0, 0};
+    JNIEnv *env;
+    (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
+    ToxAV *av = (ToxAV *) data;
+    pthread_t id = pthread_self();
+    dbg(2, "AV audio Thread #%d: starting", (int) id);
+    long av_iterate_interval = 1;
+
+    while(toxav_audio_thread_stop != 1)
+    {
+        toxav_audio_iterate(av);
+        // dbg(9, "AV audio Thread #%d running ...", (int) id);
         av_iterate_interval = toxav_iteration_interval(av);
 
         if((av_iterate_interval / 2) < 1)
@@ -2096,6 +2139,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     global_toxav_valid = true;
     memset(&mytox_CC, 0, sizeof(CallControl));
     // ----------- create Tox AV instance --------
+    toxav_audio_iterate_seperation(tox_av_global, true);
     // init AV callbacks -------------------------------
     dbg(9, "linking AV callbacks ... START");
     android_toxav_callback_call_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2141,6 +2185,17 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     else
     {
         dbg(2, "AV video Thread successfully created");
+    }
+
+    toxav_audio_thread_stop = 0;
+
+    if(pthread_create(&(tid[2]), NULL, thread_audio_av, (void *)tox_av_global) != 0)
+    {
+        dbg(0, "AV audio Thread create failed");
+    }
+    else
+    {
+        dbg(2, "AV audio Thread successfully created");
     }
 
     // start toxav thread ------------------------------
@@ -2537,6 +2592,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     pthread_join(tid[0], NULL); // wait for toxav iterate thread to end
     toxav_video_thread_stop = 1;
     pthread_join(tid[1], NULL); // wait for toxav video thread to end
+    toxav_audio_thread_stop = 1;
+    pthread_join(tid[2], NULL); // wait for toxav audio thread to end
     toxav_kill(tox_av_global);
     tox_av_global = NULL;
 #ifdef TOX_HAVE_TOXUTIL
