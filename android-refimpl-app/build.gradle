@@ -6,6 +6,9 @@ buildscript {
         google()
     }
     dependencies {
+        classpath "com.gradle:build-scan-plugin:1.13.4"
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.4'
+
         classpath 'com.android.tools.build:gradle:3.0.1'
         classpath "com.android.tools.build:gradle-experimental:0.11.1"
 
