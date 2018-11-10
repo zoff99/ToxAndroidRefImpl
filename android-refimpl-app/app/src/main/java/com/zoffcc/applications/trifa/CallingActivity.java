@@ -941,7 +941,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 AudioRecording.close();
                 audio_thread.join();
-                audio_thread=null;
+                audio_thread = null;
             }
         }
         catch (Exception e)
@@ -955,7 +955,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 AudioReceiver.close();
                 audio_receiver_thread.join();
-                audio_receiver_thread=null;
+                audio_receiver_thread = null;
             }
         }
         catch (Exception e)
