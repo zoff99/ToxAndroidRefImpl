@@ -66,8 +66,6 @@ const char *LOGTAG = "trifa.nativeaudio";
 JavaVM *cachedJVM = NULL;
 uint8_t *audio_play_buffer[20];
 long audio_play_buffer_size[20];
-int cur_buf = 0;
-int num_play_bufs = 3;
 #define _STOPPED 0
 #define _PLAYING 1
 #define _SHUTDOWN 2
@@ -93,7 +91,6 @@ static SLEngineItf engineEngine;
 
 // output mix interfaces
 static SLObjectItf outputMixObject = NULL;
-// static SLEnvironmentalReverbItf outputMixEnvironmentalReverb = NULL;
 
 // buffer queue player interfaces
 static SLObjectItf bqPlayerObject = NULL;
@@ -103,19 +100,7 @@ static SLEffectSendItf bqPlayerEffectSend;
 static SLMuteSoloItf bqPlayerMuteSolo;
 static SLVolumeItf bqPlayerVolume;
 static SLmilliHertz bqPlayerSampleRate = 0;
-// static jint bqPlayerBufSize = 0;
 static short *resampleBuf = NULL;
-// a mutext to guard against re-entrance to record & playback
-// as well as make recording and playing back to be mutually exclusive
-// this is to avoid crash at situations like:
-//    recording is in session [not finished]
-//    user presses record button and another recording coming in
-// The action: when recording/playing back is not finished, ignore the new request
-// static pthread_mutex_t audioEngineLock = PTHREAD_MUTEX_INITIALIZER;
-
-// aux effect on the output mix, used by the buffer queue player
-//static const SLEnvironmentalReverbSettings reverbSettings =
-//        SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
 
 // URI player interfaces
 static SLObjectItf uriPlayerObject = NULL;
@@ -178,73 +163,6 @@ int android_find_class_global(char *name, jclass *ret)
 
 // --------------------------
 
-
-
-void releaseResampleBuf(void)
-{
-    if (bqPlayerSampleRate == 0)
-    {
-        /*
-         * we are not using fast path, so we were not creating buffers, nothing to do
-         */
-        return;
-    }
-
-    free(resampleBuf);
-    resampleBuf = NULL;
-}
-
-/*
- * Only support up-sampling
- */
-#if 0
-short *createResampledBuf(uint32_t srcRate, int32_t srcSampleCount, short *src, unsigned *size)
-{
-    short *workBuf;
-    int upSampleRate;
-
-    if (0 == bqPlayerSampleRate)
-    {
-        return NULL;
-    }
-
-    if (bqPlayerSampleRate % srcRate)
-    {
-        /*
-         * simple up-sampling, must be divisible
-         */
-        return NULL;
-    }
-    upSampleRate = bqPlayerSampleRate / srcRate;
-
-    // srcSampleCount = SAWTOOTH_FRAMES;
-    // src = sawtoothBuffer;
-
-    resampleBuf = (short *) calloc(1, (srcSampleCount * upSampleRate) << 1);
-    if (resampleBuf == NULL)
-    {
-        return resampleBuf;
-    }
-    workBuf = resampleBuf;
-    for (int sample = 0; sample < srcSampleCount; sample++)
-    {
-        for (int dup = 0; dup < upSampleRate; dup++)
-        {
-            *workBuf++ = src[sample];
-        }
-    }
-
-    *size = (srcSampleCount * upSampleRate) << 1;     // sample format is 16 bit
-    return resampleBuf;
-}
-#endif
-
-#if 0
-// this callback handler is called every time a buffer finishes playing
-void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
-{
-}
-#endif
 
 
 // this callback handler is called every time a buffer finishes recording
@@ -334,7 +252,6 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *env, jclass clazz, jint num_bufs)
 {
     SLresult result;
-    num_play_bufs = num_bufs;
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine");
 
@@ -481,33 +398,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
-#if 0
-    //    // register callback on the buffer queue
-    //    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
-    //    assert(SL_RESULT_SUCCESS == result);
-    //    (void) result;
-#endif
-
-#if 0
-    // get the effect send interface
-    bqPlayerEffectSend = NULL;
-    if (0 == bqPlayerSampleRate)
-    {
-        result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
-                                                 &bqPlayerEffectSend);
-        assert(SL_RESULT_SUCCESS == result);
-        (void) result;
-    }
-#endif
-
-#if 0
-    // mute/solo is not supported for sources that are known to be mono, as this is
-    // get the mute/solo interface
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_MUTESOLO, &bqPlayerMuteSolo);
-    assert(SL_RESULT_SUCCESS == result);
-    (void)result;
-#endif
-
     // get the volume interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_006=%d SL_RESULT_SUCCESS=%d",
@@ -520,79 +410,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
-    cur_buf = 0;
     playing_state = _STOPPED;
 }
-
-
-
-// expose the mute/solo APIs to Java for one of the 3 players
-
-static SLMuteSoloItf getMuteSolo()
-{
-    if (uriPlayerMuteSolo != NULL)
-    {
-        return uriPlayerMuteSolo;
-    }
-    else if (fdPlayerMuteSolo != NULL)
-    {
-        return fdPlayerMuteSolo;
-    }
-    else
-    {
-        return bqPlayerMuteSolo;
-    }
-}
-
-
-// expose the volume APIs to Java for one of the 3 players
-
-static SLVolumeItf getVolume()
-{
-    if (uriPlayerVolume != NULL)
-    {
-        return uriPlayerVolume;
-    }
-    else if (fdPlayerVolume != NULL)
-    {
-        return fdPlayerVolume;
-    }
-    else
-    {
-        return bqPlayerVolume;
-    }
-}
-
-
-//// enable reverb on the buffer queue player
-//jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_enableReverb(JNIEnv *env, jclass clazz,
-//                                                                           jboolean enabled)
-//{
-//    SLresult result;
-//
-//    // we might not have been able to add environmental reverb to the output mix
-//    if (NULL == outputMixEnvironmentalReverb)
-//    {
-//        return JNI_FALSE;
-//    }
-//
-//    if (bqPlayerSampleRate)
-//    {
-//        /*
-//         * we are in fast audio, reverb is not supported.
-//         */
-//        return JNI_FALSE;
-//    }
-//    result = (*bqPlayerEffectSend)->EnableEffectSend(bqPlayerEffectSend,
-//                                                     outputMixEnvironmentalReverb, (SLboolean) enabled, (SLmillibel) 0);
-//    // and even if environmental reverb was present, it might no longer be available
-//    if (SL_RESULT_SUCCESS != result)
-//    {
-//        return JNI_FALSE;
-//    }
-//
-//    return JNI_TRUE;
-//}
 
 
 // create audio recorder: recorder is not in fast path
@@ -864,7 +683,6 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isPlaying(JNIEnv *env,
 
 jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *env, jclass clazz)
 {
-    cur_buf = 0;
     playing_state = _STOPPED;
     if (bqPlayerBufferQueue != NULL)
     {
@@ -884,26 +702,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     int nextSize = 0;
     int8_t *nextBuffer = NULL;
 
-    cur_buf = bufnum;
     nextBuffer = (int8_t *) audio_play_buffer[bufnum];
     nextSize = audio_play_buffer_size[bufnum];
-
-//    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "PlayPCM16:buf#:%d sz:%d - %d %d %d %d %d %d %d %d %d %d %d %d",
-//                        (int) bufnum,
-//                        (int) audio_play_buffer_size[bufnum],
-//                        (int) nextBuffer[0],
-//                        (int) nextBuffer[1],
-//                        (int) nextBuffer[2],
-//                        (int) nextBuffer[3],
-//                        (int) nextBuffer[4],
-//                        (int) nextBuffer[5],
-//                        (int) nextBuffer[6],
-//                        (int) nextBuffer[7],
-//                        (int) nextBuffer[8],
-//                        (int) nextBuffer[9],
-//                        (int) nextBuffer[10],
-//                        (int) nextBuffer[11]
-//    );
 
     if (nextSize > 0)
     {

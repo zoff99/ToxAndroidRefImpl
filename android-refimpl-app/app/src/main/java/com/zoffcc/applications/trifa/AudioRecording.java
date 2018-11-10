@@ -198,20 +198,6 @@ public class AudioRecording extends Thread
                 int want_buf_size_in_bytes = (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 *
                                                     2); // (int) (2 * (RECORDING_RATE / buffer_mem_factor));
                 Log.i(TAG, "want_buf_size_in_bytes(1)=" + want_buf_size_in_bytes);
-                //if (want_buf_size_in_bytes < buffer_size)
-                //{
-                //    want_buf_size_in_bytes = buffer_size;
-                //}
-
-                //            if (want_buf_size_in_bytes < 6000)
-                //            {
-                //                want_buf_size_in_bytes = 6550;
-                //            }
-
-                //            if (android_M_bug)
-                //            {
-                //                want_buf_size_in_bytes = buffer_size_M;
-                //            }
 
                 _recBuffer = ByteBuffer.allocateDirect(
                         (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2)); // Max 120 ms @ 48 kHz
@@ -220,11 +206,6 @@ public class AudioRecording extends Thread
                                               2)]; // [want_buf_size_in_bytes];
                 int recBufSize = (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 *
                                         2); // buffer_size * buf_multiplier;
-
-                //            if (android_M_bug)
-                //            {
-                //                recBufSize = buffer_size_M;
-                //            }
 
                 // _bufferedRecSamples = RECORDING_RATE / 200;
                 // ---------- 222 ----------
@@ -493,10 +474,7 @@ public class AudioRecording extends Thread
             }
 
             recorder.release();
-
-
         }
-
 
         finished = true;
 

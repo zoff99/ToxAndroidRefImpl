@@ -642,7 +642,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         initUI();
         initViewParams();
 
-        top_text_line_str1 = Callstate.friend_name;
+        top_text_line_str1 = Callstate.friend_alias_name;
         top_text_line_str2 = "";
         top_text_line_str3 = "";
         top_text_line_str4 = "";
@@ -937,9 +937,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            if (audio_thread.stopped)
+            if (!AudioRecording.stopped)
             {
-                audio_thread = new AudioRecording();
+                AudioRecording.close();
+                audio_thread.join();
+                audio_thread = null;
             }
         }
         catch (Exception e)
@@ -949,9 +951,35 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            if (audio_receiver_thread.stopped)
+            if (!AudioReceiver.stopped)
+            {
+                AudioReceiver.close();
+                audio_receiver_thread.join();
+                audio_receiver_thread = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (AudioReceiver.stopped)
             {
                 audio_receiver_thread = new AudioReceiver();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (AudioRecording.stopped)
+            {
+                audio_thread = new AudioRecording();
             }
         }
         catch (Exception e)
@@ -1074,9 +1102,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            if (!audio_thread.stopped)
+            if (!AudioRecording.stopped)
             {
-                audio_thread.close();
+                AudioRecording.close();
+                audio_thread.join();
             }
         }
         catch (Exception e)
@@ -1086,9 +1115,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            if (!audio_receiver_thread.stopped)
+            if (!AudioReceiver.stopped)
             {
-                audio_receiver_thread.close();
+                AudioReceiver.close();
+                audio_receiver_thread.join();
             }
         }
         catch (Exception e)
@@ -1187,7 +1217,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         if (wl1 == null)
         {
             wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                                 "trifa_screen_on");
+                                 "TRIfA:trifa_screen_on");
         }
 
         try
@@ -1232,7 +1262,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // turn off screen
         if (wl2 == null)
         {
-            wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "trifa_screen_OFF");
+            wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "TRIfA:trifa_screen_OFF");
         }
 
 

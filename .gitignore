@@ -1,4 +1,5 @@
 *.iml
+/.idea
 /android-refimpl-app/.gradle
 /android-refimpl-app/.idea
 /android-refimpl-app/local.properties

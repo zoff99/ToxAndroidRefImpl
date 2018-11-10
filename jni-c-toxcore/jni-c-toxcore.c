@@ -1767,13 +1767,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(
 
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1filteraudio_1active(JNIEnv *env, jobject thiz,
-        jint filteraudio_active)
+        jint filteraudio_active_new)
 {
 #ifdef USE_ECHO_CANCELLATION
 
-    if(((uint8_t)filteraudio_active == 0) || ((uint8_t)filteraudio_active == 1))
+    if(((uint8_t)filteraudio_active_new == 0) || ((uint8_t)filteraudio_active_new == 1))
     {
-        filteraudio_active = (uint8_t)filteraudio_active;
+        filteraudio_active = (uint8_t)filteraudio_active_new;
         dbg(2, "setting filteraudio_active=%d", (int)filteraudio_active);
     }
 
