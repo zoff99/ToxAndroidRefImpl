@@ -612,14 +612,18 @@ void restart_filter_audio(uint32_t in_samplerate)
 void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len)
 {
     size_t size = tox_get_savedata_size(tox);
+    dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
     char *savedata = malloc(size);
+    dbg(9, "update_savedata_file:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
     char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
     size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
+    dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
     char *savedata_enc = malloc(size_enc);
+    dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
     TOX_ERR_ENCRYPTION error;
     tox_pass_encrypt(savedata, size, passphrase, passphrase_len, savedata_enc, &error);
     dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
@@ -2110,6 +2114,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     // -------- _callbacks_ --------
     start_filter_audio(recording_samling_rate);
     set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+    tox_set_filetransfer_resumable(true);
     // ----------- create Tox instance -----------
     const char *proxy_host_str = (*env)->GetStringUTFChars(env, proxy_host, NULL);
     tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port,
