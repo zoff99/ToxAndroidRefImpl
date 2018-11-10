@@ -2589,13 +2589,13 @@ public class MainActivity extends AppCompatActivity
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         try
                         {
-                            Callstate.friend_name = orma.selectFromFriendList().
+                            Callstate.friend_alias_name = orma.selectFromFriendList().
                                     tox_public_key_stringEq(Callstate.friend_pubkey).
                                     toList().get(0).alias_name;
                         }
                         catch (Exception e)
                         {
-                            Callstate.friend_name = "Unknown";
+                            Callstate.friend_alias_name = "Unknown";
                             e.printStackTrace();
                         }
                         Callstate.other_audio_enabled = f_audio_enabled;
@@ -3207,17 +3207,17 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_name_cb_method(long friend_number, String friend_name, long length)
     {
-        // Log.i(TAG, "friend_name:friend:" + friend_number + " name:" + friend_name);
+        // Log.i(TAG, "friend_alias_name:friend:" + friend_number + " name:" + friend_alias_name);
 
         FriendList f = main_get_friend(friend_number);
-        // Log.i(TAG, "friend_name:002:" + f);
+        // Log.i(TAG, "friend_alias_name:002:" + f);
         if (f != null)
         {
             f.name = friend_name;
             update_friend_in_db_name(f);
             if (friend_list_fragment != null)
             {
-                Log.i(TAG, "friend_name:003");
+                Log.i(TAG, "friend_alias_name:003");
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = true;
                 cc.friend_item = f;

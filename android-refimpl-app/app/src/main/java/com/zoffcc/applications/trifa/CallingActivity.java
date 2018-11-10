@@ -642,7 +642,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         initUI();
         initViewParams();
 
-        top_text_line_str1 = Callstate.friend_name;
+        top_text_line_str1 = Callstate.friend_alias_name;
         top_text_line_str2 = "";
         top_text_line_str3 = "";
         top_text_line_str4 = "";
