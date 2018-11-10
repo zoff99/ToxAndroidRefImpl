@@ -1063,7 +1063,7 @@ public class MessageListActivity extends AppCompatActivity
                         {
                             Callstate.friend_name = orma.selectFromFriendList().
                                     tox_public_key_stringEq(Callstate.friend_pubkey).
-                                    toList().get(0).name;
+                                    toList().get(0).alias_name;
                         }
                         catch (Exception e)
                         {
