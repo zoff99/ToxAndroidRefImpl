@@ -937,9 +937,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            if (audio_thread.stopped)
+            if (!AudioRecording.stopped)
             {
-                audio_thread = new AudioRecording();
+                AudioRecording.close();
+                audio_thread.join();
+                audio_thread=null;
             }
         }
         catch (Exception e)
@@ -949,9 +951,35 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            if (audio_receiver_thread.stopped)
+            if (!AudioReceiver.stopped)
+            {
+                AudioReceiver.close();
+                audio_receiver_thread.join();
+                audio_receiver_thread=null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (AudioReceiver.stopped)
             {
                 audio_receiver_thread = new AudioReceiver();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (AudioRecording.stopped)
+            {
+                audio_thread = new AudioRecording();
             }
         }
         catch (Exception e)
@@ -1074,9 +1102,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            if (!audio_thread.stopped)
+            if (!AudioRecording.stopped)
             {
-                audio_thread.close();
+                AudioRecording.close();
+                audio_thread.join();
             }
         }
         catch (Exception e)
@@ -1086,9 +1115,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            if (!audio_receiver_thread.stopped)
+            if (!AudioReceiver.stopped)
             {
-                audio_receiver_thread.close();
+                AudioReceiver.close();
+                audio_receiver_thread.join();
             }
         }
         catch (Exception e)
