@@ -69,6 +69,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
+import static com.zoffcc.applications.trifa.MainActivity.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_filetransfer_db;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
@@ -1057,19 +1058,8 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.my_video_enabled = 1;
                         MainActivity.set_av_call_status(Callstate.state);
 
-
                         Intent intent = new Intent(context_s, CallingActivity.class);
-                        try
-                        {
-                            Callstate.friend_alias_name = orma.selectFromFriendList().
-                                    tox_public_key_stringEq(Callstate.friend_pubkey).
-                                    toList().get(0).alias_name;
-                        }
-                        catch (Exception e)
-                        {
-                            Callstate.friend_alias_name = "Unknown";
-                            e.printStackTrace();
-                        }
+                        Callstate.friend_alias_name = get_friend_name_from_pubkey(Callstate.friend_pubkey);
 
                         Thread t = new Thread()
                         {
