@@ -71,6 +71,7 @@ int audio_play_buffers_in_queue = 0;
 #define _PLAYING 1
 #define _SHUTDOWN 2
 int playing_state = _STOPPED;
+int player_state_current = _STOPPED;
 #define PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS 2
 pthread_mutex_t play_buffer_queued_count_mutex;
 
@@ -243,13 +244,17 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
     if (audio_play_buffers_in_queue < PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS)
     {
-        // set the player's state
-        SLresult result;
-        result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PAUSED);
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "player_state:res_011=%d SL_RESULT_SUCCESS=%d PAUSED",
-                            (int) result, (int) SL_RESULT_SUCCESS);
-        (void) result;
+        if (player_state_current != _STOPPED)
+        {
+            // set the player's state
+            SLresult result;
+            result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PAUSED);
+            player_state_current = _STOPPED;
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                                "player_state:res_011=%d SL_RESULT_SUCCESS=%d PAUSED",
+                                (int) result, (int) SL_RESULT_SUCCESS);
+            (void) result;
+        }
     }
 }
 
@@ -411,7 +416,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_005a=%d SL_RESULT_SUCCESS=%d",
                         (int) result, (int) SL_RESULT_SUCCESS);
-    (void)result;
+    (void) result;
 
     // get the volume interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
@@ -425,6 +430,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
+    player_state_current = _STOPPED;
     playing_state = _STOPPED;
 }
 
@@ -724,6 +730,8 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
+    player_state_current = _STOPPED;
+
     if (bqPlayerBufferQueue != NULL)
     {
         (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
@@ -772,13 +780,18 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 
         if (audio_play_buffers_in_queue > PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS)
         {
-            // set the player's state
-            SLresult result;
-            result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                "player_state:res_010=%d SL_RESULT_SUCCESS=%d PLAYING",
-                                (int) result, (int) SL_RESULT_SUCCESS);
-            (void) result;
+            if (player_state_current != _PLAYING)
+            {
+                // set the player's state
+                SLresult result;
+                result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+                __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                                    "player_state:res_010=%d SL_RESULT_SUCCESS=%d PLAYING",
+                                    (int) result, (int) SL_RESULT_SUCCESS);
+                (void) result;
+
+                player_state_current = _PLAYING;
+            }
         }
     }
 
@@ -800,6 +813,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "player_state:res_009=%d SL_RESULT_SUCCESS=%d STOPPED",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
+
+    player_state_current = _STOPPED;
 
     if (bqPlayerBufferQueue != NULL)
     {
