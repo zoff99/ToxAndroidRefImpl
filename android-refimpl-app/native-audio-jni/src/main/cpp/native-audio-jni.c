@@ -169,9 +169,6 @@ int android_find_class_global(char *name, jclass *ret)
 // this callback handler is called every time a buffer finishes recording
 void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
-    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:bufferq=%p recorderBufferQueue=%p cur_rec_buf=%d",
-    //                    bq, recorderBufferQueue, (int) cur_rec_buf);
-
     int nextSize = 0;
     int8_t *nextBuffer = NULL;
 
@@ -194,12 +191,14 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             rec_buf_pointer_next = 0;
         }
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-CB:max_num_bufs=%d,bs=%d,bn=%d",
-                            (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-CB:max_num_bufs=%d,bs=%d,bn=%d",
+        //                    (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
 
         // signal Java code that a new record data is available in buffer #cur_rec_buf
         if ((NativeAudio_class) && (rec_buffer_ready_method))
         {
+            // TODO: rewerite this, so that it does not need to call "AttachCurrentThread" and "DetachCurrentThread"
+            //       every time!
             JNIEnv *jnienv2;
             jnienv2 = jni_getenv();
             if (jnienv2 == NULL)
@@ -211,33 +210,11 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                 (*cachedJVM)->AttachCurrentThread(cachedJVM, (JNIEnv **) &jnienv2, &args);
             }
 
-//            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-//                                "bqRecorderCallback:buf#:%d sz:%d - %d %d %d %d %d %d %d %d %d %d %d %d",
-//                                (int) rec_buf_pointer_start,
-//                                (int) audio_rec_buffer_size[rec_buf_pointer_start],
-//                                (int) nextBuffer[0],
-//                                (int) nextBuffer[1],
-//                                (int) nextBuffer[2],
-//                                (int) nextBuffer[3],
-//                                (int) nextBuffer[4],
-//                                (int) nextBuffer[5],
-//                                (int) nextBuffer[6],
-//                                (int) nextBuffer[7],
-//                                (int) nextBuffer[8],
-//                                (int) nextBuffer[9],
-//                                (int) nextBuffer[10],
-//                                (int) nextBuffer[11]
-//            );
-
-
             (*jnienv2)->CallStaticVoidMethod(jnienv2, NativeAudio_class, rec_buffer_ready_method,
                                              rec_buf_pointer_start);
             (*cachedJVM)->DetachCurrentThread(cachedJVM);
 
         }
-
-        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:1:next=%d start=%d",
-        //                    rec_buf_pointer_next, rec_buf_pointer_start);
 
         rec_buf_pointer_start++;
         if (rec_buf_pointer_start >= num_rec_bufs)
@@ -245,12 +222,8 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             rec_buf_pointer_start = 0;
         }
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-CB_PR:max_num_bufs=%d,bs=%d,bn=%d",
-                            (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
-
-
-        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:2:next=%d start=%d",
-        //                    rec_buf_pointer_next, rec_buf_pointer_start);
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-CB_PR:max_num_bufs=%d,bs=%d,bn=%d",
+        //                    (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
 
     }
 }
@@ -366,7 +339,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
 
-#if 1
     // ----------------------------------------------------------
     // Code for working with ear speaker by setting stream type to STREAM_VOICE ??
     SLAndroidConfigurationItf playerConfig;
@@ -384,7 +356,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_002=%d", (int) result);
     }
     // ----------------------------------------------------------
-#endif
 
     // realize the player
     result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
@@ -619,7 +590,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
     nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A001:max_num_bufs=%d,bs=%d,bn=%d",
-                        (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
+                        (int) num_rec_bufs, (int) rec_buf_pointer_start, (int) rec_buf_pointer_next);
 
     if (nextSize > 0)
     {
@@ -646,7 +617,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
         rec_buf_pointer_next++;
 
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-01:max_num_bufs=%d,bs=%d,bn=%d",
-                            (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
+                            (int) num_rec_bufs, (int) rec_buf_pointer_start, (int) rec_buf_pointer_next);
 
         if (num_rec_bufs > 1)
         {
@@ -661,7 +632,6 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
                 if (nextSize > 0)
                 {
                     // enque the buffer
-                    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:2:Enqueue -> %d", rec_buf_pointer_next);
                     result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
                     if (SL_RESULT_SUCCESS != result)
                     {
@@ -670,9 +640,10 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
 
                     rec_buf_pointer_next++;
 
-                    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-02:max_num_bufs=%d,bs=%d,bn=%d,jj=%d",
-                                        (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next,
-                                        (int)jj);
+                    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                                        "StartREC:A003:ENQU-02:max_num_bufs=%d,bs=%d,bn=%d,jj=%d",
+                                        (int) num_rec_bufs, (int) rec_buf_pointer_start, (int) rec_buf_pointer_next,
+                                        (int) jj);
 
                 }
             }
