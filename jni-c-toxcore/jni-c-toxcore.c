@@ -2006,7 +2006,7 @@ void *thread_audio_av(void *data)
         }
     }
 
-    dbg(2, "ToxVideo:Clean video thread exit!\n");
+    dbg(2, "ToxVideo:Clean audio thread exit!\n");
     (*cachedJVM)->DetachCurrentThread(cachedJVM);
     env = NULL;
     return (void *)NULL;
@@ -2114,12 +2114,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     // -------- _callbacks_ --------
     start_filter_audio(recording_samling_rate);
     set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
-
     // -------- resumable FTs: not working fully yet, so turn it off --------
     // tox_set_filetransfer_resumable(true);
     tox_set_filetransfer_resumable(false);
     // -------- resumable FTs: not working fully yet, so turn it off --------
-
     // ----------- create Tox instance -----------
     const char *proxy_host_str = (*env)->GetStringUTFChars(env, proxy_host, NULL);
     tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port,
