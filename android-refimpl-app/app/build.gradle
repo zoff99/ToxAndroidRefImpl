@@ -41,7 +41,7 @@ apply plugin: 'witness'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "26.0.2"
+    buildToolsVersion "26.0.3"
     compileOptions.encoding = 'UTF-8'
     // generatedDensities = []
 
