@@ -37,7 +37,7 @@ public class NativeAudio
     public static int sampling_rate = 44100;
     public static int channel_count = 2;
 
-    public static final int n_rec_audio_in_buffer_max_count = 2;
+    public static final int n_rec_audio_in_buffer_max_count = 5;
     public static ByteBuffer[] n_rec_audio_buffer = new ByteBuffer[n_rec_audio_in_buffer_max_count];
     public static int n_rec_cur_buf = 0;
     public static int n_rec_buf_size_in_bytes = 0;

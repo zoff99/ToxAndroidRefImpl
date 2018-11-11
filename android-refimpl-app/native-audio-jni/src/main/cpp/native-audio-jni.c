@@ -79,6 +79,7 @@ int rec_buf_pointer_next = 0;
 int num_rec_bufs = 3;
 #define _RECORDING 3
 int rec_state = _STOPPED;
+#define RECORD_BUFFERS_BETWEEN_REC_AND_PROCESS 2
 
 jclass NativeAudio_class = NULL;
 jmethodID rec_buffer_ready_method = NULL;
@@ -187,6 +188,15 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         // enque the next buffer
         SLresult result = (*bq)->Enqueue(bq, nextBuffer, (SLuint32) nextSize);
 
+        rec_buf_pointer_next++;
+        if (rec_buf_pointer_next >= num_rec_bufs)
+        {
+            rec_buf_pointer_next = 0;
+        }
+
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-CB:max_num_bufs=%d,bs=%d,bn=%d",
+                            (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
+
         // signal Java code that a new record data is available in buffer #cur_rec_buf
         if ((NativeAudio_class) && (rec_buffer_ready_method))
         {
@@ -229,17 +239,15 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:1:next=%d start=%d",
         //                    rec_buf_pointer_next, rec_buf_pointer_start);
 
-        rec_buf_pointer_next++;
-        if (rec_buf_pointer_next >= num_rec_bufs)
-        {
-            rec_buf_pointer_next = 0;
-        }
-
         rec_buf_pointer_start++;
         if (rec_buf_pointer_start >= num_rec_bufs)
         {
             rec_buf_pointer_start = 0;
         }
+
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-CB_PR:max_num_bufs=%d,bs=%d,bn=%d",
+                            (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
+
 
         // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:2:next=%d start=%d",
         //                    rec_buf_pointer_next, rec_buf_pointer_start);
@@ -586,6 +594,10 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopREC(JNIEnv *en
         result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
     }
 
+    // also reset buffer pointers
+    rec_buf_pointer_start = 0;
+    rec_buf_pointer_next = 0;
+
     return JNI_TRUE;
 }
 
@@ -605,6 +617,9 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
     short *nextBuffer = NULL;
     nextBuffer = (short *) audio_rec_buffer[rec_buf_pointer_next];
     nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A001:max_num_bufs=%d,bs=%d,bn=%d",
+                        (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
 
     if (nextSize > 0)
     {
@@ -628,14 +643,17 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
             return -2;
         }
 
+        rec_buf_pointer_next++;
+
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-01:max_num_bufs=%d,bs=%d,bn=%d",
+                            (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
+
         if (num_rec_bufs > 1)
         {
             int jj = 0;
-            for (jj; jj < (num_rec_bufs - 1); jj++)
+            for (jj; jj < (num_rec_bufs - (RECORD_BUFFERS_BETWEEN_REC_AND_PROCESS + 1)); jj++)
             {
-                rec_buf_pointer_next++;
 
-                nextSize = 0;
                 *nextBuffer = NULL;
                 nextBuffer = (short *) audio_rec_buffer[rec_buf_pointer_next];
                 nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
@@ -649,6 +667,13 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
                     {
                         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:07");
                     }
+
+                    rec_buf_pointer_next++;
+
+                    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-02:max_num_bufs=%d,bs=%d,bn=%d,jj=%d",
+                                        (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next,
+                                        (int)jj);
+
                 }
             }
         }
