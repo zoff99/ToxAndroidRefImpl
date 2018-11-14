@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -50,6 +51,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
@@ -1192,11 +1194,36 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
 
+
     public void turnOnScreen()
+    {
+        if (PREF__allow_screen_off_in_audio_call)
+        {
+            turnOnScreen__old();
+        }
+        else
+        {
+            turnOnScreen__new();
+        }
+    }
+
+    public void turnOffScreen()
+    {
+        if (PREF__allow_screen_off_in_audio_call)
+        {
+            turnOffScreen__old();
+        }
+        else
+        {
+            turnOffScreen__new();
+        }
+    }
+
+    public void turnOnScreen__new()
     {
         try
         {
-            calling_activity_top_viewgroup_vg.setVisibility(View.VISIBLE);
+            // calling_activity_top_viewgroup_vg.setVisibility(View.VISIBLE);
             mContentView.setVisibility(View.VISIBLE);
         }
         catch (Exception e)
@@ -1204,51 +1231,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e.printStackTrace();
         }
 
-        //        try
-        //        {
-        //            final Window window = getWindow();
-        //            WindowManager.LayoutParams lAttrs = getWindow().getAttributes();
-        //            View view = ((ViewGroup) window.getDecorView().findViewById(android.R.id.content)).getChildAt(0);
-        //            // turn on screen
-        //            lAttrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //            view.setVisibility(View.VISIBLE);
-        //            // turn on screen
-        //            window.setAttributes(lAttrs);
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            e.printStackTrace();
-        //        }
-
         Log.i(TAG, "turn*ON*Screen");
         Callstate.other_video_enabled = 1;
         Callstate.my_video_enabled = 1;
     }
 
-    public void turnOffScreen()
+    public void turnOffScreen__new()
     {
-        //        try
-        //        {
-        //            final Window window = getWindow();
-        //            WindowManager.LayoutParams lAttrs = getWindow().getAttributes();
-        //            View view = ((ViewGroup) window.getDecorView().findViewById(android.R.id.content)).getChildAt(0);
-        //            // turn off screen
-        //            lAttrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-        //            view.setVisibility(View.INVISIBLE);
-        //            // turn off screen
-        //            window.setAttributes(lAttrs);
-        //
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            e.printStackTrace();
-        //        }
-
         try
         {
             // in case the phone does not really turn the screen off
             mContentView.setVisibility(View.INVISIBLE);
-            calling_activity_top_viewgroup_vg.setVisibility(View.INVISIBLE);
+            // calling_activity_top_viewgroup_vg.setVisibility(View.INVISIBLE);
         }
         catch (Exception e)
         {
@@ -1259,6 +1253,104 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Callstate.other_video_enabled = 0;
         Callstate.my_video_enabled = 0;
     }
+
+
+    public void turnOnScreen__old()
+    {
+        mContentView.setVisibility(View.VISIBLE);
+
+        // turn on screen
+        try
+        {
+            if (wl2 != null)
+            {
+                if (wl2.isHeld())
+                {
+                    wl2.release();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Log.i(TAG, "turn*ON*Screen");
+        Callstate.other_video_enabled = 1;
+        Callstate.my_video_enabled = 1;
+
+        if (wl1 == null)
+        {
+            wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                                 "trifa_screen_on");
+        }
+
+        try
+        {
+            if (wl1 != null)
+            {
+                if (!wl1.isHeld())
+                {
+                    wl1.acquire();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @TargetApi(21)
+    public void turnOffScreen__old()
+    {
+        try
+        {
+            if (wl1 != null)
+            {
+                if (wl1.isHeld())
+                {
+                    wl1.release();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        Log.i(TAG, "turnOffScreen");
+        Callstate.other_video_enabled = 0;
+        Callstate.my_video_enabled = 0;
+
+        // turn off screen
+        if (wl2 == null)
+        {
+            wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "trifa_screen_OFF");
+        }
+
+
+        try
+        {
+            if (wl2 != null)
+            {
+                if (!wl2.isHeld())
+                {
+                    wl2.acquire();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        // in case the phone does not really turn the screen off
+        mContentView.setVisibility(View.INVISIBLE);
+    }
+
 
     private void requestAudioFocus()
     {

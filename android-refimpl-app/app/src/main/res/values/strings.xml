@@ -89,6 +89,12 @@
     <string name="pref_title_U_keep_nospam">keep NoSpam</string>
     <string name="pref_description_U_keep_nospam">keep NoSpam value. This is not safe, only activate if you know what you are doing!</string>
 
+    <string name="pref_title_allow_screen_off_in_audio_call">Turn screen off</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">If you experience troubles with screen turning off in an Audiocall, set this to off</string>
+
+    <string name="pref_title_X_zoom_incoming_video">Zoom Videocall Window</string>
+    <string name="pref_description_X_zoom_incoming_video">allow to pinch-zoom the Videocall Window. This is not working fully!</string>
+
     <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
     <string name="pref_description_X_use_native_audio_play">!! Expermimental !!\nUse Native Audio to Play Sound</string>
 

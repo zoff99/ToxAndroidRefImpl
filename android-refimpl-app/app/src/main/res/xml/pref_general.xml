@@ -39,6 +39,12 @@
         android:summary="@string/pref_description_set_fps"
         android:title="@string/pref_title_set_fps"/>
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="allow_screen_off_in_audio_call"
+        android:summary="@string/pref_description_allow_screen_off_in_audio_call"
+        android:title="@string/pref_title_allow_screen_off_in_audio_call"/>
+
     <ListPreference
         android:defaultValue="1"
         android:entries="@array/pref_higher_audio_quality_titles"
@@ -115,7 +121,6 @@
             android:summary="@string/pref_description_X_audio_recording_frame_size"
             android:title="@string/pref_title_X_audio_recording_frame_size"/>
 
-
         <SwitchPreference
             android:defaultValue="false"
             android:key="X_battery_saving_mode"
@@ -127,6 +132,12 @@
             android:key="X_misc_button_enabled"
             android:summary="@string/pref_description_X_misc_button_enabled"
             android:title="@string/pref_title_X_misc_button_enabled"/>
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_zoom_incoming_video"
+            android:summary="@string/pref_description_X_zoom_incoming_video"
+            android:title="@string/pref_title_X_zoom_incoming_video"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

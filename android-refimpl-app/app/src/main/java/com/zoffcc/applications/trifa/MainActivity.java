@@ -51,9 +51,11 @@ import android.media.AudioTrack;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
@@ -270,6 +272,7 @@ public class MainActivity extends AppCompatActivity
     final static int SettingsActivity_ID = 10004;
     final static int AboutpageActivity_ID = 10005;
     final static int MaintenanceActivity_ID = 10006;
+    final static int WhiteListFromDozeActivity_ID = 10008;
     final static int Notification_new_message_ID = 10023;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
@@ -325,6 +328,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__X_audio_recording_frame_size = 60; // !! 120 seems to work best somehow !!
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
+    static boolean PREF__allow_screen_off_in_audio_call = true;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -721,6 +725,26 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
+        }
+
+        try
+        {
+            PREF__allow_screen_off_in_audio_call = settings.getBoolean("allow_screen_off_in_audio_call", true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__allow_screen_off_in_audio_call = true;
+        }
+
+        try
+        {
+            PREF__X_zoom_incoming_video = settings.getBoolean("X_zoom_incoming_video", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__X_zoom_incoming_video = false;
         }
 
         try
@@ -1545,6 +1569,7 @@ public class MainActivity extends AppCompatActivity
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
 
+    // this is NOT a crpytographically secure random string generator!!
     static String getRandomString(final int sizeOfRandomString)
     {
         final Random random = new Random();
@@ -1867,6 +1892,25 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__min_audio_samplingrate_out:2=" + PREF__min_audio_samplingrate_out);
 
+        try
+        {
+            PREF__allow_screen_off_in_audio_call = settings.getBoolean("allow_screen_off_in_audio_call", true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__allow_screen_off_in_audio_call = true;
+        }
+
+        try
+        {
+            PREF__X_zoom_incoming_video = settings.getBoolean("X_zoom_incoming_video", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__X_zoom_incoming_video = false;
+        }
 
         try
         {
@@ -1908,6 +1952,52 @@ public class MainActivity extends AppCompatActivity
 
         // just in case, update own activity pointer!
         main_activity_s = this;
+
+        try
+        {
+            // ask user to whitelist app from DozeMode/BatteryOptimizations
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                SharedPreferences settings2 = PreferenceManager.getDefaultSharedPreferences(this);
+                boolean asked_for_whitelist_doze_already = settings2.getBoolean("asked_whitelist_doze", false);
+
+                if (!asked_for_whitelist_doze_already)
+                {
+                    settings2.edit().putBoolean("asked_whitelist_doze", true).commit();
+                    final Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+
+                    ResolveInfo resolve_activity = getPackageManager().resolveActivity(intent, 0);
+                    if (resolve_activity != null)
+                    {
+                        AlertDialog ad = new AlertDialog.Builder(this).
+                                setNegativeButton("no", new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        return;
+                                    }
+                                }).
+                                setPositiveButton("OK, take me there", new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        startActivity(intent);
+                                    }
+                                }).create();
+                        ad.setTitle("INFO");
+                        ad.setMessage("Please add TRIfA to the exception list for Batteryoptimization!");
+                        ad.setCancelable(false);
+                        ad.setCanceledOnTouchOutside(false);
+                        ad.show();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
