@@ -195,7 +195,20 @@ public class TrifaToxService extends Service
     {
         Log.i(TAG, "stop_me:001");
 
+        try
+        {
+            Log.i(TAG, "stop_me:002");
+            nmn2.cancel(ONGOING_NOTIFICATION_ID);
+            Log.i(TAG, "stop_me:003");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "stop_me:EEn1" + e.getMessage());
+        }
+
         stopForeground(true);
+
         try
         {
             Log.i(TAG, "stop_me:002");
@@ -233,7 +246,7 @@ public class TrifaToxService extends Service
 
                             try
                             {
-                                Thread.sleep(200);
+                                Thread.sleep(150);
                             }
                             catch (Exception e)
                             {
@@ -369,7 +382,7 @@ public class TrifaToxService extends Service
                             try
                             {
                                 Log.i(TAG, "stop_me:dt001");
-                                Thread.sleep(1500);
+                                Thread.sleep(1200);
                                 Log.i(TAG, "stop_me:dt002");
                             }
                             catch (Exception e)
@@ -402,7 +415,7 @@ public class TrifaToxService extends Service
                         try
                         {
                             Log.i(TAG, "stop_me:012");
-                            Thread.sleep(500);
+                            Thread.sleep(300);
                             Log.i(TAG, "stop_me:013");
                         }
                         catch (Exception e)
@@ -443,6 +456,7 @@ public class TrifaToxService extends Service
             {
                 Log.i(TAG, "stop_tox_fg:002");
                 stop_me = true;
+
                 ToxServiceThread.interrupt();
                 Log.i(TAG, "stop_tox_fg:003");
                 try
