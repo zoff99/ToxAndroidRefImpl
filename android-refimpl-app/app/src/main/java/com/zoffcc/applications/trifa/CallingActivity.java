@@ -707,10 +707,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
-                    if (event.getAction() != MotionEvent.ACTION_UP)
-                    {
-                    }
-                    else
+                    if (event.getAction() == MotionEvent.ACTION_DOWN)
                     {
                         Log.i(TAG, "decline button pressed");
                         toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
