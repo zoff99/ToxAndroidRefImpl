@@ -180,13 +180,16 @@ dependencies {
         exclude group: 'com.github.bumptech.glide'
     }
     //
-    compile('com.mikepenz:google-material-typeface:3.0.1.2.original@aar') {
+    compile('com.mikepenz:google-material-typeface:3.0.1.3.original@aar') {
         exclude group: 'com.android.support'
     }
     compile('com.mikepenz:fontawesome-typeface:5.0.13.0@aar') {
         exclude group: 'com.android.support'
     }
-    compile('com.google.zxing:core:3.3.2') {
+    compile('com.mikepenz:material-design-iconic-typeface:2.2.0.5@aar') {
+        exclude group: 'com.android.support'
+    }
+    compile('com.google.zxing:core:3.3.3') {
         exclude group: 'com.android.support'
     }
     compile('com.github.gfx.android.orma:orma:5.0.0-rc4') {
@@ -204,7 +207,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.l4digital.fastscroll:fastscroll:1.0.4') {
+    compile('com.l4digital.fastscroll:fastscroll:1.1.2') {
         exclude group: 'com.android.support'
     }
     //
@@ -212,14 +215,14 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.github.bumptech.glide:glide:4.7.1') {
+    compile('com.github.bumptech.glide:glide:4.8.0') {
         exclude group: 'com.android.support'
     }
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
     //
     //
     //
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.22@aar'
+    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.23@aar'
     //
     //
     //
@@ -234,15 +237,15 @@ dependencies {
     androidTestCompile 'com.android.support:multidex:1.0.3'
     androidTestCompile 'com.android.support:multidex-instrumentation:1.0.3'
     compile 'info.guardianproject.iocipher:IOCipher:0.4'
-    compile 'info.guardianproject.netcipher:netcipher:2.0.0-alpha1'
+    compile 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
     compile 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
-    compile 'com.google.code.gson:gson:2.8.3'
+    compile 'com.google.code.gson:gson:2.8.5'
     compile 'com.github.medyo:android-about-page:1.2.4'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'me.zhanghai.android.patternlock:library:2.1.2'
     compile 'com.github.armcha:AutoLinkTextView:0.3.0'
     compile 'com.github.chrisbanes:PhotoView:2.1.3'
-    compile 'com.squareup.okhttp3:okhttp:3.11.0'
+    compile 'com.squareup.okhttp3:okhttp:3.12.0'
     compile 'com.daimajia.numberprogressbar:library:1.4@aar'
     compile 'com.github.lawloretienne:discreteslider:0.0.9'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
@@ -252,7 +255,7 @@ dependencies {
 
 dependencyVerification {
     verify = [
-            'com.zoffcc.applications.trifajni:trifa-jni-lib:32f213668f60ffb5d19f01ed24c679e80384ef53f26ca333df6899777d5a0175',
+            'com.zoffcc.applications.trifajni:trifa-jni-lib:35279b1e4f4348212a8c8deeb05b6d60cbbc061e7bacdbcc0ceccb3d8a8d61e3',
             'android.arch.core:common:d34824b794bc92ff8f647a9bb13a7c73de920de5b47075b5d2c4f0770e9b8bfd',
             'android.arch.core:runtime:83400f7575bcfb8a2eeec64e05590f037bfaed1e56aa3a4214d20e55878445e3',
             'android.arch.lifecycle:common:614e31cfd33255dc4d5f5d8e62cfa6be2fbbc2a35643a79dc3ed008004c30807',
@@ -279,10 +282,10 @@ dependencyVerification {
             'com.daimajia.numberprogressbar:library:94a81e9134f084a5327261972fc18f3afc457e8290324f7c3cae6dacb4c13ee5',
             'com.github.angads25:filepicker:8582d3a57d590945c05a00af265f63258da85523a61bd14556f545ad54da228b',
             'com.github.armcha:AutoLinkTextView:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
-            'com.github.bumptech.glide:annotations:292d161e4b0c1d2eddfab15b01f9d0be064da5c5ff1f29cd54f50ec29522cdf2',
-            'com.github.bumptech.glide:disklrucache:e7e84872477702af06f8a9da8b7657fe4b385609668d2a48df36c5d340506021',
-            'com.github.bumptech.glide:gifdecoder:9b67e1e5a0a30dd06722aa5dae45d713fdfb1a59040d66f26743c8acd6f14173',
-            'com.github.bumptech.glide:glide:aee9dca7546d1e9dc829006d3347d6a062e345d1db3ddddaacc413d3b649d015',
+            'com.github.bumptech.glide:annotations:4ea82e59874673105165820336c6ac268fc46149892486aad8e7a131a4449446',
+            'com.github.bumptech.glide:disklrucache:557f4fe83dfa1abae11250ed29b2be7f6aa60e626e764c977b68e3e498e85bee',
+            'com.github.bumptech.glide:gifdecoder:b00c5454a023a9488ea49603930d9c25e09192e5ceaadf64977aa52946b3c1b4',
+            'com.github.bumptech.glide:glide:5ddf08b12cc43332e812988f16c2c39e7fce49d1c4d94b7948dcde7f00bf49d6',
             'com.github.chrisbanes:PhotoView:7f12b0a9f24b132fc743861ab8f045625faa95c8357887a5fac58fa34a3759e4',
             'com.github.gfx.android.orma:orma-annotations:288b71aace681a9320284f74ce56b184c16979048e22b8021fe0da7ce06f0682',
             'com.github.gfx.android.orma:orma-core:0929c79c3a6e96042fa8dcbba8dc91ff9047ca35b09a3fedaf015c1c27cc3c8a',
@@ -292,25 +295,26 @@ dependencyVerification {
             'com.github.hotchemi:permissionsdispatcher:40191c8c726445dcab4fa2a4ef7a7e76186ef154dc385fe07520944fe4720089',
             'com.github.lawloretienne:discreteslider:2a5b1a28060d20e070ff8ee2c9538e4427e04d56467453813b5efa05ea9390d1',
             'com.github.medyo:android-about-page:15108c8bdedf5975d2aa60604107017109a4ad3640e0e95fa97fd438d347eb5c',
-            'com.google.code.gson:gson:1c1cf64005afab2ed36cc75c2736b8afa2fe2895912d9472a440e6e01eda6afe',
-            'com.google.zxing:core:52dd6211bbaf4e600de693834d597e49707f3e6606e1f5d3740fbb8274466abe',
-            'com.l4digital.fastscroll:fastscroll:54886e21c76ca3fbad958c0c21d8f8cc83f24cf41f83e0138bd7a3d6f2b5bbe5',
+            'com.google.code.gson:gson:233a0149fc365c9f6edbd683cfe266b19bdc773be98eabdaf6b3c924b48e7d81',
+            'com.google.zxing:core:5820f81e943e4bce0329306621e2d6255d2930b0a6ce934c5c23c0d6d3f20599',
+            'com.l4digital.fastscroll:fastscroll:dc664aee43caa6d0c7dc54a44a9f7243f9b7180d7c101d4ed01bcb025aefbdb2',
             'com.mikepenz:fastadapter-commons:3b9c4840b011b84a4fe120905fe98cc0b885ab02d6b1ae25ebe956205e5006f2',
             'com.mikepenz:fastadapter-extensions-expandable:b760ea69e94abd83ee5aef12dad020cff0030071c36154f1dc28d4a7b285cc94',
             'com.mikepenz:fastadapter:38be860fb026f9e5080076da12c538eeab723616cc5fc193c6a3d0871b07fa21',
             'com.mikepenz:fontawesome-typeface:ba4a55850d4e7c1a2cb909eaf08011020b7b670a5ea552d296e3bfa476dde7c2',
-            'com.mikepenz:google-material-typeface:3c8629e573d311a3edaff1b70aa5ac10183a8e3984acf225b2f996ebd077351c',
+            'com.mikepenz:google-material-typeface:f6c7da4553fa88170926263596cf9f8aed130348ea3b247902a0a4a830002b83',
             'com.mikepenz:iconics-core:e7083f84428fd1bd5e7c8e6fc4d3601218c3bf60b5c9c60cb25ecb6793472a2f',
+            'com.mikepenz:material-design-iconic-typeface:5e7d55adcb41e68ed4871e6871ba40f057324126f169e31da6ce352c9cbe8691',
             'com.mikepenz:materialdrawer:ba1f71dae8924c1a5d0f40a9a1c2c80ac819ef334fd85be2f0bd7745f304df65',
             'com.mikepenz:materialize:2834b735fefcb2e1ab356e926a652396a4ece0dffc05184ea755366c3d2ee79f',
-            'com.squareup.okhttp3:okhttp:e27c7742448f816da1cac72b4ca283b0d7920749e09f5dd0ac017e40714a2efe',
-            'com.squareup.okio:okio:4633c331f50642ebe795dc089d6a5928aff43071c9d17e7840a009eea2fe95a3',
+            'com.squareup.okhttp3:okhttp:71787f2c599e0441c7a4413983bfdd93d40b56e1badc5e0413d6a4c485ba3f35',
+            'com.squareup.okio:okio:693fa319a7e8843300602b204023b7674f106ebcb577f2dd5807212b66118bd2',
             'com.vanniktech:emoji-ios:f30f5ad996b81d3a1a5987055d22b2e1bcecc5067c1524addabb271366452e80',
             'com.vanniktech:emoji:d55f44e04e31895647d62c33c34a8d501995e9e1b5c5f5cee6cbb8630eeb37f7',
             'de.hdodenhof:circleimageview:bc34761dcd5036229ac1ffed6b5b1bef722ad5b097a2c8bba1c5ed2cd4b5c82b',
             'info.guardianproject.iocipher:IOCipher:ab7da0f23e256a2ced9492c73e37812c26e7beccc1a99815e6d65a75728ba6d3',
             'info.guardianproject.netcipher:netcipher-okhttp3:548b24763c57d273e1e3650e9974644f91c6a79350961905476456b6a485c905',
-            'info.guardianproject.netcipher:netcipher:eeeb5d0d95ccfe176b4296cbd71a9a24c6efb0bab5c4025a8c6bc36abdddfc75',
+            'info.guardianproject.netcipher:netcipher:ea12ebfc601ac8b6c5d2227367f971ee1059f3901b7791bd291b65dcefb53e5a',
             'io.reactivex.rxjava2:rxandroid:f81bc2b2553ce77bdcdadbcb28e748344f9cfe57511bfc2f488cbbc6d7782f3e',
             'io.reactivex.rxjava2:rxjava:dc612f6887f8a4ff1ae33f55eeef59d8028e53f0cea9b40c7ddba1d8fee51736',
             'me.zhanghai.android.patternlock:library:3b35da8f0ae09ce462d8ba9c896820d3bb0806151552b0af9caf349fb02dcb70',
