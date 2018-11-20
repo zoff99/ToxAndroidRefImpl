@@ -134,11 +134,11 @@ android {
     defaultConfig {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 10020
-        versionName "1.0.20"
+        targetSdkVersion 26
+        versionCode 10021
+        versionName "1.0.21"
 
-        renderscriptTargetApi 25
+        renderscriptTargetApi 26
         renderscriptSupportModeEnabled true
         // renderscriptSupportModeBlasEnabled true
 
