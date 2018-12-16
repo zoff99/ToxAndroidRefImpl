@@ -52,6 +52,11 @@
 #include <vpx/vpx_image.h>
 #include <sys/mman.h>
 
+// #define AV_MEDIACODEC 1
+
+#ifdef AV_MEDIACODEC
+#include <libavcodec/jni.h>
+#endif
 
 // HINT: it may not be working properly
 #define USE_ECHO_CANCELLATION 1
@@ -887,6 +892,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
         // dbg(0,"Could not get JVM");
         return JNI_ERR;
     }
+
+#ifdef AV_MEDIACODEC
+    // Required for MediaCodec HW decoder
+	if (av_jni_set_java_vm(jvm, NULL) != 0)
+    {
+    }
+#endif
 
     // dbg(0,"++ Found JVM ++");
     return JNI_VERSION_1_6;
