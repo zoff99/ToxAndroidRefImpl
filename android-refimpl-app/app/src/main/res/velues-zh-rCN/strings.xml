@@ -1,0 +1,206 @@
+<resources>
+    <string name="app_name">TRIfA</string>
+    <string name="add_friend_activity_name">添加好友</string>
+    <string name="message_list_activity_name">聊天</string>
+    <string name="conference_message_list_activity_name">会议</string>
+
+    <string name="set_password_message_empty">密码为空</string>
+    <string name="set_password_message_password_invalid">密码太短</string>
+    <string name="set_password_message_password_dont_match">密码不匹配</string>
+
+    <string name="title_activity_calling">呼叫</string>
+    <string name="title_activity_profile">个人信息</string>
+    <string name="title_activity_settings">设置</string>
+    <string name="title_activity_crash">崩溃</string>
+    <string name="title_activity_friendinfo">好友信息</string>
+    <string name="title_activity_aboutpage">关于</string>
+    <string name="title_activity_set_password">设置密码</string>
+    <string name="title_activity_check_password">输入密码</string>
+    <string name="title_activity_share">通过 TRIfA 打开</string>
+    <string name="title_activity_maintenance">管理</string>
+
+
+    <string-array name="spinner_own_status_array">
+        <item>在线</item>
+        <item>离开</item>
+        <item>忙碌</item>
+    </string-array>
+
+    <string name="settings_toolbar_title">设置</string>
+
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <string name="pref_header_general">通用</string>
+
+    <string name="pref_title_video_uv_reversed">在视频中反转 UV</string>
+    <string name="pref_description_video_uv_reversed">反转摄像机视频中 UV 平面的顺序</string>
+
+    <string name="pref_title_software_echo_cancel">回声消除</string>
+    <string name="pref_description_software_echo_cancel">使用软件消除回声</string>
+
+    <string name="pref_title_higher_video_quality">视频质量</string>
+    <string name="pref_description_higher_video_quality">使用更好的视频质量。\n更改需重启！</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>低带宽\n(250 kb/s)</item>
+        <item>正常带宽\n(2500 kb/s)</item>
+        <item>高带宽\n(3500 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_higher_audio_quality">音频质量</string>
+    <string name="pref_description_higher_audio_quality">使用更好的音频质量。\n更改需重启！</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>低\n(6 kb/s)</item>
+        <item>正常\n(32 kb/s)</item>
+        <item>高\n(64 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_udp_enabled">启用 UDP</string>
+    <string name="pref_description_udp_enabled">对于大多数移动设备 UDP 为产生更多网络流量。\n更改需重启！\n默认设置为关闭</string>
+
+    <string name="pref_title_orbot_enabled">启用 Tor 代理</string>
+    <string name="pref_description_orbot_enabled">你需要安装 Orbot 以使用。\n更改需重启！</string>
+
+    <string name="pref_title_fps_half">更低 fps</string>
+    <string name="pref_description_fps_half">视频帧率 7fps 而非 15fps</string>
+
+    <string name="pref_title_set_fps">设置 fps</string>
+    <string name="pref_description_set_fps">尝试设置想要的 [15fps] 视频帧率，可能会在某些设备上崩溃</string>
+
+    <string name="pref_title_display_name">显示姓名</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_conference_show_system_messages">系统消息</string>
+    <string name="pref_description_conference_show_system_messages">会议中显示系统消息</string>
+
+    <string name="pref_title_local_discovery_enabled">LAN 发现</string>
+    <string name="pref_description_local_discovery_enabled">使用本地 LAN 节点引导</string>
+
+    <string name="pref_title_U_keep_nospam">保存 NoSpam</string>
+    <string name="pref_description_U_keep_nospam">保存 NoSpam 值。这不安全，只有你知道自己在做什么才会激活！</string>
+
+    <string name="pref_title_allow_screen_off_in_audio_call">关闭屏幕</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">如果你在音频通话中屏幕关闭时遇到问题，请设置为关闭</string>
+
+    <string name="pref_title_X_zoom_incoming_video">缩放视频通话窗口</string>
+    <string name="pref_description_X_zoom_incoming_video">允许二指缩放视频通话窗口。这无法完全工作！</string>
+
+    <string name="pref_title_X_use_native_audio_play">原生音频系统</string>
+    <string name="pref_description_X_use_native_audio_play">!! 实验性 !!\n使用原生音频播放声音</string>
+
+    <string name="pref_title_X_battery_saving_mode">省电选项</string>
+    <string name="pref_description_X_battery_saving_mode">!! 实验性 !!\n这会节省一些电量，但发送和接收消息会花费更长时间。\n可能会有其他负面影响！</string>
+
+    <string name="pref_title_X_misc_button_enabled">杂项按钮</string>
+    <string name="pref_description_X_misc_button_enabled">!! 实验性 !!\n在通话界面上添加一个按钮发送固定消息</string>
+
+    <string name="pref_title_X_eac_delay_ms">AEC 延迟</string>
+    <string name="pref_description_X_eac_delay_ms">!! 实验性 !!\nAEC 延迟（单位 ms）</string>
+
+    <string name="pref_title_add_friends_to_messages">向消息添加好友</string>
+    <string-array name="pref_example_list_titles">
+        <item>总是</item>
+        <item>可能时</item>
+        <item>从不</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_header_data_sync">数据 &amp; 同步</string>
+
+    <string name="pref_title_sync_frequency">同步频率</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 分钟</item>
+        <item>30 分钟</item>
+        <item>1 小时</item>
+        <item>3 小时</item>
+        <item>6 小时</item>
+        <item>从不</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+
+    <string name="pref_title_min_audio_samplingrate_out">音频采样率</string>
+    <string name="pref_description_min_audio_samplingrate_out">默认设置为 48000 Hz</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>自动</item>
+        <item>8000 Hz</item>
+        <item>16000 Hz</item>
+        <item>48000 Hz</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>自动</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+
+
+    <string name="pref_title_X_audio_recording_frame_size">音频记录帧尺寸</string>
+    <string name="pref_description_X_audio_recording_frame_size">默认设置为 60 ms</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+
+
+    <string-array name="list_preference_entries">
+        <item>项目 1</item>
+        <item>项目 2</item>
+        <item>项目 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value"/>
+
+    <string name="pref_title_system_sync_settings">系统同步设置</string>
+
+    <string name="pref_header_notifications">通知</string>
+
+    <string name="pref_title_new_message_notifications">新消息通知</string>
+
+    <string name="pref_title_ringtone">铃声</string>
+    <string name="pref_ringtone_silent">无声</string>
+
+    <string name="pref_title_vibrate">振动</string>
+    <string name="pref_title_sound">声音</string>
+    <string name="add_friend_activity_help">在上方文本框中粘贴好友的 Tox ID 或点击二维码按钮扫描好友的二维码</string>
+    <string name="add_friend_activity_add">添加好友</string>
+    <string name="cancel">取消</string>
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+</resources>
