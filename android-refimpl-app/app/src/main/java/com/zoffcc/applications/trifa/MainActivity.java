@@ -492,9 +492,9 @@ public class MainActivity extends AppCompatActivity
         waiting_image.setVisibility(View.GONE);
         normal_container.setVisibility(View.VISIBLE);
 
-        SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
-        SD_CARD_STATIC_DIR = getExternalFilesDir(null).getAbsolutePath() + "/_staticdir/";
-        SD_CARD_FILES_EXPORT_DIR = getExternalFilesDir(null).getAbsolutePath() + "/vfs_export/";
+        SD_CARD_TMP_DIR = getExternalStoragePublicDirectory(null).getAbsolutePath() + "/tmpdir/";
+        SD_CARD_STATIC_DIR = getExternalStoragePublicDirectory(null).getAbsolutePath() + "/_staticdir/";
+        SD_CARD_FILES_EXPORT_DIR = getExternalStoragePublicDirectory(null).getAbsolutePath() + "/vfs_export/";
         Log.i(TAG, "SD_CARD_FILES_EXPORT_DIR:" + SD_CARD_FILES_EXPORT_DIR);
         SD_CARD_TMP_DUMMYFILE = make_some_static_dummy_file(this.getBaseContext());
 
@@ -1329,7 +1329,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 // VFS not encrypted -------------
-                VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath() + "/vfs/";
+                VFS_PREFIX = getExternalStoragePublicDirectory(null).getAbsolutePath() + "/vfs/";
                 Log.i(TAG, "vfs:not_encrypted:(2)prefix=" + VFS_PREFIX);
                 // VFS not encrypted -------------
 
