@@ -2786,6 +2786,9 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        // Log.i(TAG,
+        //      "---> VIDEO_FRAME_RATE_INCOMING w=" + frame_width_px + " h=" + frame_height_px + " ystride=" + ystride);
+
         //        Log.i(TAG,
         //              "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" +
         //              frame_height_px + " call_first_video_frame_received=" + Callstate.call_first_video_frame_received);
@@ -3027,7 +3030,19 @@ public class MainActivity extends AppCompatActivity
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_PLAY_DELAY.value)
         {
-            Callstate.play_delay = comm_number;
+            if (comm_number < 0)
+            {
+                Callstate.play_delay = 0;
+            }
+            else if (comm_number > 11000)
+            {
+                Callstate.play_delay = 11000;
+            }
+            else
+            {
+                Callstate.play_delay = comm_number;
+                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
+            }
         }
 
         try

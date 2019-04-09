@@ -29,6 +29,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
+import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
+import android.media.MediaFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,6 +51,9 @@ import android.widget.TextView;
 import com.etiennelawlor.discreteslider.library.ui.DiscreteSlider;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
@@ -132,6 +138,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static View video_box_self_preview_01 = null;
     static View video_box_left_top_01 = null;
     static View video_box_right_top_01 = null;
+    private MediaCodec.BufferInfo mBufferInfo;
+    private MediaCodec mEncoder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -931,7 +939,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     protected void onResume()
     {
         super.onResume();
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+            prepareEncoder();
+        }
         activity_state = 1;
 
         sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -1068,7 +1079,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     protected void onPause()
     {
         super.onPause();
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+            releaseEncoder();
+        }
         sensor_manager.unregisterListener(this);
         activity_state = 0;
 
@@ -1654,6 +1668,284 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+
+    /* Use this method to provide YUV420 buffers for encoding */
+    public void feedEncoder(byte[] buf)
+    {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+        {
+            /* Find an unallocated input buffer to store food */
+            try
+            {
+                int inputBufferIndex = mEncoder.dequeueInputBuffer(
+                        0); // This method will return immediately if timeoutUs == 0
+                if (inputBufferIndex >= 0)
+                {
+                    /* Get input buffer and fill it with our input */
+                    ByteBuffer inputBuffer = null;
+                    inputBuffer = mEncoder.getInputBuffer(inputBufferIndex);
+                    inputBuffer.clear();
+                    inputBuffer.put(buf);
+                    /* Enqueue buffer */
+                    Log.d(TAG, "feedEncoder:Enqueued input index: " + inputBufferIndex);
+
+                    long ptsUsec = computePresentationTime(1); // TODO: make good
+                    mEncoder.queueInputBuffer(inputBufferIndex, 0, buf.length, ptsUsec, 0);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.d(TAG, "feedEncoder:Get free buffer failed");
+            }
+        }
+        else
+        {
+            // TODO: do something here?
+        }
+    }
+
+
+    public byte[] fetchFromEncoder()
+    {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+        {
+
+            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+            int encoderStatus = mEncoder.dequeueOutputBuffer(info,
+                                                             1000); // Dequeue an output buffer, block at most "timeoutUs" microseconds.
+
+            if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER)
+            {
+                // no output available yet
+                Log.d(TAG, "fetchFromEncoder:no output from encoder available");
+                return null;
+            }
+            else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
+            {
+                // not expected for an encoder
+                MediaFormat newFormat = mEncoder.getOutputFormat();
+                Log.d(TAG, "fetchFromEncoder:encoder output format changed: " + newFormat);
+                return null;
+            }
+            else if (encoderStatus < 0)
+            {
+                Log.d(TAG, "fetchFromEncoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
+                return null;
+            }
+            else // encoderStatus >= 0
+            {
+                /* Compressed frame is ready! */
+                ByteBuffer compressed = mEncoder.getOutputBuffer(encoderStatus);
+                if (compressed == null)
+                {
+                    Log.d(TAG, "fetchFromEncoder:encoderOutputBuffer " + encoderStatus + " was null");
+                    return null;
+                }
+                else
+                {
+                    Log.d(TAG, "fetchFromEncoder:Dequeue output index: " + encoderStatus);
+                    // It's usually necessary to adjust the ByteBuffer values to match BufferInfo.
+                    compressed.position(info.offset);
+                    compressed.limit(info.offset + info.size);
+                    /* Copy to byte array for further processing */
+                    byte[] arr = new byte[compressed.remaining()];
+                    compressed.get(arr);
+                    compressed.position(info.offset);
+
+
+                    if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)
+                    {
+                        // Codec config info.  Only expected on first packet.  One way to
+                        // handle this is to manually stuff the data into the MediaFormat
+                        // and pass that to configure().  We do that here to exercise the API.
+                        //**// MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
+                        //**// format.setByteBuffer("csd-0", compressed);
+                    }
+                    else
+                    {
+                        // Get a decoder input buffer, blocking until it's available.
+                    }
+
+                    /* Release MediaCodec buffer */
+                    mEncoder.releaseOutputBuffer(encoderStatus, false);
+                    return arr;
+                }
+            }
+        }
+        else
+        {
+            // TODO: do something here?
+        }
+
+        return null;
+    }
+
+    /**
+     * Generates the presentation time for frame N, in microseconds.
+     */
+    private static long computePresentationTime(int frameIndex)
+    {
+        final int FRAME_RATE = 15;
+        return 132 + frameIndex * 1000000 / FRAME_RATE;
+    }
+
+    /**
+     * Configures the H264 encoder
+     */
+    void prepareEncoder()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+
+            mBufferInfo = new MediaCodec.BufferInfo();
+
+            // parameters for the encoder
+            final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
+            final int FRAME_RATE = 15;               // 15fps
+            final int IFRAME_INTERVAL = 5;          // 5 seconds between I-frames
+            final int mBitRate = 1000000; // video bitrate 5kbps, in bits per second
+
+            MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, 480, 640);
+
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
+            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+            format.setInteger(MediaFormat.KEY_LATENCY, 1);
+            format.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            Log.d(TAG, "prepareEncoder:format: " + format);
+
+            try
+            {
+                mEncoder = MediaCodec.createEncoderByType(MIME_TYPE);
+                Log.d(TAG, "prepareEncoder:SUCCESS: " + mEncoder.getCodecInfo());
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                Log.d(TAG, "prepareEncoder:EE1: " + e.getMessage());
+            }
+            mEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            mEncoder.start();
+        }
+    }
+
+
+    /**
+     * Extracts all pending data from the encoder.
+     */
+    private void drainEncoder()
+    {
+        final int TIMEOUT_USEC = 10000;
+        Log.d(TAG, "drainEncoder:start");
+
+        ByteBuffer[] encoderOutputBuffers = mEncoder.getOutputBuffers();
+        while (true)
+        {
+            int encoderStatus = mEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
+            if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER)
+            {
+                break;      // out of while
+            }
+            else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED)
+            {
+                // not expected for an encoder
+                encoderOutputBuffers = mEncoder.getOutputBuffers();
+            }
+            else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
+            {
+                // should happen before receiving buffers, and should only happen once
+                MediaFormat newFormat = mEncoder.getOutputFormat();
+                Log.d(TAG, "drainEncoder:encoder output format changed: " + newFormat);
+
+            }
+            else if (encoderStatus < 0)
+            {
+                Log.w(TAG, "drainEncoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
+                // let's ignore it
+            }
+            else
+            {
+                ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
+                if (encodedData == null)
+                {
+                    throw new RuntimeException("drainEncoder:encoderOutputBuffer " + encoderStatus + " was null");
+                }
+
+                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)
+                {
+                    // The codec config data was pulled out and fed to the muxer when we got
+                    // the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
+                    Log.d(TAG, "drainEncoder:ignoring BUFFER_FLAG_CODEC_CONFIG");
+                    mBufferInfo.size = 0;
+                }
+
+                if (mBufferInfo.size != 0)
+                {
+                    // adjust the ByteBuffer values to match BufferInfo (not needed?)
+                    encodedData.position(mBufferInfo.offset);
+                    encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
+                    Log.d(TAG, "sent " + mBufferInfo.size + " bytes to muxer");
+                }
+
+                mEncoder.releaseOutputBuffer(encoderStatus, false);
+
+                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0)
+                {
+                    Log.w(TAG, "drainEncoder:reached end of stream unexpectedly");
+                    break;      // out of while
+                }
+            }
+        }
+    }
+
+    /**
+     * Releases encoder resources.  May be called after partial / failed initialization.
+     */
+    private void releaseEncoder()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+            Log.d(TAG, "releaseEncoder:start ...");
+            if (mEncoder != null)
+            {
+                try
+                {
+                    drainEncoder();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    mEncoder.stop();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    mEncoder.release();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                mEncoder = null;
+                Log.d(TAG, "releaseEncoder:SUCCESS");
+            }
+            else
+            {
+                Log.d(TAG, "releaseEncoder:already released");
+            }
         }
     }
 }
