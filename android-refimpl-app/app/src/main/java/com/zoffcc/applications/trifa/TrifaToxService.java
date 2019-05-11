@@ -125,9 +125,18 @@ public class TrifaToxService extends Service
     {
         Log.i(TAG, "change_notification_fg");
 
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+        NotificationCompat.Builder b;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            b = new NotificationCompat.Builder(this, MainActivity.channelId_toxservice);
+        }
+        else
+        {
+            b = new NotificationCompat.Builder(this);
+        }
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        b.setOnlyAlertOnce(false);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         if (bootstrapping)
@@ -988,8 +997,17 @@ public class TrifaToxService extends Service
         notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
         notification_view.setTextViewText(R.id.text, "");
 
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+        NotificationCompat.Builder b;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            b = new NotificationCompat.Builder(this, MainActivity.channelId_toxservice);
+        }
+        else
+        {
+            b = new NotificationCompat.Builder(this);
+        }
         b.setContent(notification_view);
+        b.setOnlyAlertOnce(false);
         b.setContentIntent(pendingIntent);
         b.setSmallIcon(R.drawable.circle_red_notification);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)

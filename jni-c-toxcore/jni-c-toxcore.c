@@ -76,8 +76,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 32
-static const char global_version_string[] = "0.99.32";
+#define VERSION_PATCH 33
+static const char global_version_string[] = "0.99.33";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -228,6 +228,7 @@ jmethodID android_tox_callback_file_chunk_request_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_chunk_cb_method = NULL;
 jmethodID android_tox_callback_conference_invite_cb_method = NULL;
+jmethodID android_tox_callback_conference_connected_cb_method = NULL;
 jmethodID android_tox_callback_conference_message_cb_method = NULL;
 jmethodID android_tox_callback_conference_title_cb_method = NULL;
 jmethodID android_tox_callback_conference_peer_name_cb_method = NULL;
@@ -287,6 +288,7 @@ void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, 
 
 void conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie,
                           size_t length, void *user_data);
+void conference_connected_cb(Tox *tox, uint32_t conference_number, void *user_data);
 void conference_message_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type,
                            const uint8_t *message, size_t length, void *user_data);
 void conference_title_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *title,
@@ -824,6 +826,7 @@ void init_tox_callbacks()
     tox_callback_friend_request(tox_global, friend_request_cb);
     tox_callback_friend_message(tox_global, friend_message_cb);
     tox_callback_conference_invite(tox_global, conference_invite_cb);
+    tox_callback_conference_connected(tox_global, conference_connected_cb);
     tox_callback_conference_message(tox_global, conference_message_cb);
     tox_callback_conference_title(tox_global, conference_title_cb);
     tox_callback_conference_peer_name(tox_global, conference_peer_name_cb);
@@ -865,6 +868,7 @@ void init_tox_callbacks()
     tox_callback_file_recv(tox_global, file_recv_cb);
     tox_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
     tox_callback_conference_invite(tox_global, conference_invite_cb);
+    tox_callback_conference_connected(tox_global, conference_connected_cb);
     tox_callback_conference_message(tox_global, conference_message_cb);
     tox_callback_conference_title(tox_global, conference_title_cb);
     tox_callback_conference_peer_name(tox_global, conference_peer_name_cb);
@@ -1477,6 +1481,22 @@ void conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE 
 {
     android_tox_callback_conference_invite_cb(friend_number, type, cookie, length);
 }
+
+
+void android_tox_callback_conference_connected_cb(uint32_t conference_number)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_conference_connected_cb_method, 
+                                     (jlong)(unsigned long long)conference_number);
+}
+
+void conference_connected_cb(Tox *tox, uint32_t conference_number, void *user_data)
+{
+    android_tox_callback_conference_connected_cb(conference_number);
+}
+
 
 // ------------ Conference [2] ------------
 // ------------ Conference [2] ------------
@@ -2133,6 +2153,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_file_recv_chunk_cb_method", "(JJJ[BJ)V");
     android_tox_callback_conference_invite_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_invite_cb_method", "(JI[BJ)V");
+    android_tox_callback_conference_connected_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_conference_connected_cb_method", "(J)V");
     android_tox_callback_conference_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_message_cb_method", "(JJILjava/lang/String;J)V");
     android_tox_callback_conference_title_cb_method = (*env)->GetStaticMethodID(env, MainActivity,

@@ -1,30 +1,29 @@
-apply plugin: 'com.android.model.library'
+apply plugin: 'com.android.library'
 
-model {
-    android {
-        compileSdkVersion = 27
-        buildToolsVersion = '26.0.3'
+android {
+    compileSdkVersion = 27
+    buildToolsVersion = '28.0.3'
 
-        defaultConfig {
-            minSdkVersion.apiLevel = 14
-            targetSdkVersion.apiLevel = 26
-        }
-
-        ndk {
-            moduleName = 'native-audio-jni'
-            platformVersion = '12'
-            toolchain = 'clang'
-            abiFilters.addAll(["armeabi-v7a","x86"])
-
-            CFlags.add('-g')
-            CFlags.add('-O3')
-        }
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
 
         externalNativeBuild {
             cmake {
-                // todo: need to disable REVERT for fast audio recording
-                path 'src/main/cpp/CMakeLists.txt'
+                // arguments "-G\"BorlandMakeFiles\""
+                cFlags "-g -O3"
+                cppFlags "-g -O3"
+                // targets 'native-audio-jni'
+                // armeabi-v7a, arm64-v8a, x86, x86_64
+                // * does not work * // abiFilters "armeabi-v7a", "x86"
             }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            // version "3.10.2"
+            path 'src/main/cpp/CMakeLists.txt'
         }
     }
 }

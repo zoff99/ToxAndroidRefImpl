@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.Manifest;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -252,6 +253,16 @@ public class MainActivity extends AppCompatActivity
     static boolean isBluetoothScoOn_old;
     static Notification notification = null;
     static NotificationManager nmn3 = null;
+    static NotificationChannel notification_channel_toxservice = null;
+    static NotificationChannel notification_channel_newmessage_sound_and_vibrate = null;
+    static NotificationChannel notification_channel_newmessage_sound = null;
+    static NotificationChannel notification_channel_newmessage_vibrate = null;
+    static NotificationChannel notification_channel_newmessage_silent = null;
+    static String channelId_toxservice = null;
+    static String channelId_newmessage_sound_and_vibrate = null;
+    static String channelId_newmessage_sound = null;
+    static String channelId_newmessage_vibrate = null;
+    static String channelId_newmessage_silent = null;
     static int NOTIFICATION_ID = 293821038;
     static RemoteViews notification_view = null;
     static long[] friends = null;
@@ -490,6 +501,72 @@ public class MainActivity extends AppCompatActivity
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         Log.i(TAG, "java.library.path:" + System.getProperty("java.library.path"));
+
+
+        nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            String channelName;
+
+            // ---------------------
+
+            channelId_newmessage_sound_and_vibrate = "trifa_new_message_sound_and_vibrate";
+            channelName = "New Message Sound and Vibrate";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            notification_channel_newmessage_sound_and_vibrate = new NotificationChannel(
+                    channelId_newmessage_sound_and_vibrate, channelName, importance);
+            notification_channel_newmessage_sound_and_vibrate.setDescription(channelId_newmessage_sound_and_vibrate);
+            notification_channel_newmessage_sound_and_vibrate.enableVibration(true);
+            nmn3.createNotificationChannel(notification_channel_newmessage_sound_and_vibrate);
+
+            // ---------------------
+
+            channelId_newmessage_sound = "trifa_new_message_sound";
+            channelName = "New Message Sound";
+            importance = NotificationManager.IMPORTANCE_DEFAULT;
+            notification_channel_newmessage_sound = new NotificationChannel(channelId_newmessage_sound, channelName,
+                                                                            importance);
+            notification_channel_newmessage_sound.setDescription(channelId_newmessage_sound);
+            notification_channel_newmessage_sound.enableVibration(false);
+            nmn3.createNotificationChannel(notification_channel_newmessage_sound);
+
+            // ---------------------
+
+            channelId_newmessage_vibrate = "trifa_new_message_vibrate";
+            channelName = "New Message Vibrate";
+            importance = NotificationManager.IMPORTANCE_DEFAULT;
+            notification_channel_newmessage_vibrate = new NotificationChannel(channelId_newmessage_vibrate, channelName,
+                                                                              importance);
+            notification_channel_newmessage_vibrate.setDescription(channelId_newmessage_vibrate);
+            notification_channel_newmessage_vibrate.setSound(null, null);
+            notification_channel_newmessage_vibrate.enableVibration(true);
+            nmn3.createNotificationChannel(notification_channel_newmessage_vibrate);
+
+            // ---------------------
+
+            channelId_newmessage_silent = "trifa_new_message_silent";
+            channelName = "New Message Silent";
+            importance = NotificationManager.IMPORTANCE_DEFAULT;
+            notification_channel_newmessage_silent = new NotificationChannel(channelId_newmessage_silent, channelName,
+                                                                             importance);
+            notification_channel_newmessage_silent.setDescription(channelId_newmessage_silent);
+            notification_channel_newmessage_silent.setSound(null, null);
+            notification_channel_newmessage_silent.enableVibration(false);
+            nmn3.createNotificationChannel(notification_channel_newmessage_silent);
+
+            // ---------------------
+
+            channelId_toxservice = "trifa_tox_service";
+            channelName = "Tox Service";
+            importance = NotificationManager.IMPORTANCE_LOW;
+            notification_channel_toxservice = new NotificationChannel(channelId_toxservice, channelName, importance);
+            notification_channel_toxservice.setDescription(channelId_toxservice);
+            notification_channel_toxservice.setSound(null, null);
+            notification_channel_toxservice.enableVibration(false);
+            nmn3.createNotificationChannel(notification_channel_toxservice);
+        }
+
 
         // prefs ----------
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -852,8 +929,6 @@ public class MainActivity extends AppCompatActivity
         }
         // --------- status spinner ---------
 
-
-        nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
 
         // get permission ----------
         MainActivityPermissionsDispatcher.dummyForPermissions001WithPermissionCheck(this);
@@ -2711,6 +2786,9 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        // Log.i(TAG,
+        //      "---> VIDEO_FRAME_RATE_INCOMING w=" + frame_width_px + " h=" + frame_height_px + " ystride=" + ystride);
+
         //        Log.i(TAG,
         //              "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" +
         //              frame_height_px + " call_first_video_frame_received=" + Callstate.call_first_video_frame_received);
@@ -2952,7 +3030,19 @@ public class MainActivity extends AppCompatActivity
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_PLAY_DELAY.value)
         {
-            Callstate.play_delay = comm_number;
+            if (comm_number < 0)
+            {
+                Callstate.play_delay = 0;
+            }
+            else if (comm_number > 11000)
+            {
+                Callstate.play_delay = 11000;
+            }
+            else
+            {
+                Callstate.play_delay = comm_number;
+                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
+            }
         }
 
         try
@@ -3936,8 +4026,34 @@ public class MainActivity extends AppCompatActivity
 
                                 // -- notification ------------------
                                 // -- notification ------------------
-
-                                NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                                NotificationCompat.Builder b;
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                                {
+                                    if ((PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound_and_vibrate);
+                                    }
+                                    else if ((PREF__notification_sound) && (!PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound);
+                                    }
+                                    else if ((!PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_vibrate);
+                                    }
+                                    else
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_silent);
+                                    }
+                                }
+                                else
+                                {
+                                    b = new NotificationCompat.Builder(context_s);
+                                }
                                 b.setContentIntent(pendingIntent);
                                 b.setSmallIcon(R.drawable.circle_orange);
                                 b.setLights(Color.parseColor("#ffce00"), 500, 500);
@@ -4109,8 +4225,34 @@ public class MainActivity extends AppCompatActivity
 
                                 // -- notification ------------------
                                 // -- notification ------------------
-
-                                NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                                NotificationCompat.Builder b;
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                                {
+                                    if ((PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound_and_vibrate);
+                                    }
+                                    else if ((PREF__notification_sound) && (!PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound);
+                                    }
+                                    else if ((!PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_vibrate);
+                                    }
+                                    else
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_silent);
+                                    }
+                                }
+                                else
+                                {
+                                    b = new NotificationCompat.Builder(context_s);
+                                }
                                 b.setContentIntent(pendingIntent);
                                 b.setSmallIcon(R.drawable.circle_orange);
                                 b.setLights(Color.parseColor("#ffce00"), 500, 500);
@@ -4898,6 +5040,12 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
+
+    static void android_tox_callback_conference_connected_cb_method(long conference_number)
+    {
+        Log.i(TAG, "conference_connected_cb:cf_num=" + conference_number);
+    }
+
     static void android_tox_callback_conference_invite_cb_method(long friend_number, int a_TOX_CONFERENCE_TYPE, byte[] cookie_buffer, long cookie_length)
     {
         Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" +
@@ -5093,9 +5241,35 @@ public class MainActivity extends AppCompatActivity
                                                                                         notificationIntent, 0);
 
                                 // -- notification ------------------
-                                // -- notification ------------------
-
-                                NotificationCompat.Builder b = new NotificationCompat.Builder(context_s);
+                                // -- notification -----------------
+                                NotificationCompat.Builder b;
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                                {
+                                    if ((PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound_and_vibrate);
+                                    }
+                                    else if ((PREF__notification_sound) && (!PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound);
+                                    }
+                                    else if ((!PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_vibrate);
+                                    }
+                                    else
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_silent);
+                                    }
+                                }
+                                else
+                                {
+                                    b = new NotificationCompat.Builder(context_s);
+                                }
                                 b.setContentIntent(pendingIntent);
                                 b.setSmallIcon(R.drawable.circle_orange);
                                 b.setLights(Color.parseColor("#ffce00"), 500, 500);
