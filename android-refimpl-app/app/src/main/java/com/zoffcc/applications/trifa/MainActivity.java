@@ -2628,7 +2628,7 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_conference_delete(long conference_number);
 
     public static native long tox_conference_get_chatlist_size();
-    
+
     public static native long[] tox_conference_get_chatlist();
 
     public static native int tox_conference_get_id(long conference_number, ByteBuffer cookie_buffer);
@@ -5089,6 +5089,11 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        MainActivity.update_savedata_file_wrapper(); // join new conference
+
+        // long num_conferences = tox_conference_get_chatlist_size();
+        // Log.i(TAG, "load conferences at startup[2]: num=" + num_conferences);
 
         Log.i(TAG, "conference_invite_cb:res=" + conference_num);
     }
@@ -9454,7 +9459,7 @@ public class MainActivity extends AppCompatActivity
         long new_nospam = (long) random.nextInt() + (1L << 31);
         // Log.i(TAG, "generated NOSPAM=" + new_nospam);
         tox_self_set_nospam(new_nospam);
-        update_savedata_file_wrapper();
+        update_savedata_file_wrapper(); // set new random nospam
         try
         {
             update_toxid_display_s();
