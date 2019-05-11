@@ -4071,6 +4071,31 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIE
     }
 }
 
+/**
+ * Return the number of conferences in the Tox instance.
+ * This should be used to determine how much memory to allocate for `tox_conference_get_chatlist`.
+ */
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1size(JNIEnv *env, jobject thiz)
+{
+    size_t res = tox_conference_get_chatlist_size(tox_global);
+
+    if(res < 0)
+    {
+        return (jlong)-1;
+    }
+
+    return (jlong)(unsigned long long)res;
+
+}
+
+/**
+ * Copy a list of valid conference numbers into the array chatlist. Determine how much space
+ * to allocate for the array with the `tox_conference_get_chatlist_size` function.
+ */
+// void tox_conference_get_chatlist(const Tox *tox, uint32_t *chatlist);
+
 
 
 // ------------------- Conference -------------------
