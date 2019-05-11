@@ -62,6 +62,9 @@ android {
         exclude 'LICENSE.txt'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/rxjava.properties'
+        exclude 'META-INF/*version'
+        exclude 'META-INF/proguard/okhttp3.pro'
+        exclude 'androidsupportmultidexversion.txt'
 //
         exclude 'lib/armeabi/libRSSupport.so'
         exclude 'lib/armeabi/librsjni.so'
@@ -69,6 +72,7 @@ android {
         exclude 'lib/armeabi/libiocipher.so'
         exclude 'lib/armeabi/libspeex.so'
         exclude 'lib/armeabi/libblasV8.so'
+        exclude 'lib/armeabi/librsjni_androidx.so'
         //
         exclude 'lib/arm64-v8a/libRSSupport.so'
         exclude 'lib/arm64-v8a/librsjni.so'
@@ -76,6 +80,8 @@ android {
         exclude 'lib/arm64-v8a/libiocipher.so'
         exclude 'lib/arm64-v8a/libspeex.so'
         exclude 'lib/arm64-v8a/libblasV8.so'
+        exclude 'lib/arm64-v8a/librsjni_androidx.so'
+        exclude 'lib/arm64-v8a/libnative-audio-jni.so'
         //
         exclude 'lib/mips64/libRSSupport.so'
         exclude 'lib/mips64/librsjni.so'
@@ -83,6 +89,7 @@ android {
         exclude 'lib/mips64/libiocipher.so'
         exclude 'lib/mips64/libspeex.so'
         exclude 'lib/mips64/libblasV8.so'
+        exclude 'lib/mips64/librsjni_androidx.so'
         //
         exclude 'lib/mips/libRSSupport.so'
         exclude 'lib/mips/librsjni.so'
@@ -90,6 +97,7 @@ android {
         exclude 'lib/mips/libiocipher.so'
         exclude 'lib/mips/libspeex.so'
         exclude 'lib/mips/libblasV8.so'
+        exclude 'lib/mips/librsjni_androidx.so'
         //
         exclude 'lib/x86/libRSSupport.so'
         exclude 'lib/x86/librsjni.so'
@@ -98,6 +106,7 @@ android {
         exclude 'lib/x86/libspeex.so'
         exclude 'lib/x86/libblasV8.so'
         exclude 'lib/x86/libnative-audio-jni.so'
+        exclude 'lib/x86/librsjni_androidx.so'
         exclude 'lib/x86'
         //
         exclude 'lib/x86_64/libRSSupport.so'
@@ -106,6 +115,8 @@ android {
         exclude 'lib/x86_64/libiocipher.so'
         exclude 'lib/x86_64/libspeex.so'
         exclude 'lib/x86_64/libblasV8.so'
+        exclude 'lib/x86_64/librsjni_androidx.so'
+        exclude 'lib/x86_64/libnative-audio-jni.so'
         //
     }
 
