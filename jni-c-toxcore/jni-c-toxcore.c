@@ -52,7 +52,7 @@
 #include <vpx/vpx_image.h>
 #include <sys/mman.h>
 
-// #define AV_MEDIACODEC 1
+#define AV_MEDIACODEC 1
 
 #ifdef AV_MEDIACODEC
 #include <libavcodec/jni.h>
@@ -308,7 +308,7 @@ void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_
                         const char *message, void *user_data);
 
 void android_logger(int level, const char *logtext);
-jstring c_safe_string_from_java(char *instr, size_t len);
+jstring c_safe_string_from_java(const char *instr, size_t len);
 // functions -----------
 // functions -----------
 // functions -----------
@@ -578,6 +578,10 @@ void start_filter_audio(uint32_t in_samplerate)
 #endif
 }
 
+/*
+ * input_latency_ms mostly set to "0" (zero)
+ * use frame_duration_ms for cumulative value
+ */
 void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms)
 {
 #ifdef USE_ECHO_CANCELLATION
@@ -1323,7 +1327,7 @@ void android_tox_callback_file_recv_cb(uint32_t friend_number, uint32_t file_num
     dbg(9, "file_recv_cb:009");
 }
 
-jstring c_safe_string_from_java(char *instr, size_t len)
+jstring c_safe_string_from_java(const char *instr, size_t len)
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
@@ -1536,11 +1540,29 @@ void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, 
 
 void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message)
 {
+    if (message == NULL)
+    {
+        return;
+    }
+    
+    if (file == NULL)
+    {
+        return;
+    }
+
+    if (func == NULL)
+    {
+        return;
+    }
+
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-    jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
-    jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, func);
-    jstring js3 = (*jnienv2)->NewStringUTF(jnienv2, message);
+    // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
+    jstring js1 = c_safe_string_from_java((const char *)file, strlen(file));
+    // jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, func);
+    jstring js2 = c_safe_string_from_java((const char *)func, strlen(func));
+    // jstring js3 = (*jnienv2)->NewStringUTF(jnienv2, message);
+    jstring js3 = c_safe_string_from_java((const char *)message, strlen(message));
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, android_tox_log_cb_method, (int)level, js1,
                                      (jlong)(unsigned long long)line, js2, js3);
     (*jnienv2)->DeleteLocalRef(jnienv2, js1);
@@ -1790,7 +1812,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(
 
     if(filteraudio)
     {
-        set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+        set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
     }
 
 #endif
@@ -1896,7 +1918,8 @@ void android_logger(int level, const char *logtext)
         {
             JNIEnv *jnienv2;
             jnienv2 = jni_getenv();
-            jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
+            // jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
+            jstring js2 = c_safe_string_from_java((const char *)logtext, strlen(logtext));
             (*jnienv2)->CallStaticVoidMethod(jnienv2, TrifaToxService_class, logger_method, level, js2);
             (*jnienv2)->DeleteLocalRef(jnienv2, js2);
         }
@@ -2147,7 +2170,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
     start_filter_audio(recording_samling_rate);
-    set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+    set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
     // -------- resumable FTs: not working fully yet, so turn it off --------
     tox_set_filetransfer_resumable(true);
     // tox_set_filetransfer_resumable(false);
