@@ -2626,6 +2626,11 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_conference_send_message(long conference_number, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
     public static native int tox_conference_delete(long conference_number);
+
+    public static native long tox_conference_get_chatlist_size();
+    
+    public static native long[] tox_conference_get_chatlist();
+
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------

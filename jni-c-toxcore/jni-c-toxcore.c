@@ -4119,6 +4119,40 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1
  */
 // void tox_conference_get_chatlist(const Tox *tox, uint32_t *chatlist);
 
+JNIEXPORT jlongArray JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist(JNIEnv *env, jobject thiz)
+{
+    size_t numconferences = tox_conference_get_chatlist_size(tox_global);
+    size_t memsize = (numconferences * sizeof(uint32_t));
+    uint32_t *conferences_list = malloc(memsize);
+    uint32_t *conferences_list_iter = conferences_list;
+    jlongArray result;
+    tox_conference_get_chatlist(tox_global, conferences_list);
+    result = (*env)->NewLongArray(env, numconferences);
+
+    if(result == NULL)
+    {
+        // TODO this would be bad!!
+    }
+
+    jlong buffer[numconferences];
+    size_t i = 0;
+
+    for(i=0; i<numconferences; i++)
+    {
+        buffer[i] = (long)conferences_list_iter[i];
+    }
+
+    (*env)->SetLongArrayRegion(env, result, 0, numconferences, buffer);
+
+    if(conferences_list)
+    {
+        free(conferences_list);
+    }
+
+    return result;
+}
+
 
 
 // ------------------- Conference -------------------
