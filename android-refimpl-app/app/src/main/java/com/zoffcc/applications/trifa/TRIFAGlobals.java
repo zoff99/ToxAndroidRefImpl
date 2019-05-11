@@ -44,6 +44,7 @@ public class TRIFAGlobals
     static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS = 1000 * 60 * 2; // bootstrap again after 2 minutes offline
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
+    public static final int CONFERENCE_COOKIE_LENGTH = 35;
 
     // ----------
     // https://toxme.io/u/echobot

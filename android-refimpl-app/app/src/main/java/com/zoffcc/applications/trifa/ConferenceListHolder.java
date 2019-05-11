@@ -42,6 +42,7 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_conference_inactive;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
@@ -280,6 +281,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                         if ((f2.tox_conference_number > -1) && (f2.conference_active))
                         {
                             tox_conference_delete(f2.tox_conference_number);
+                            update_savedata_file_wrapper(); // after deleteing a conference
                         }
 
                         set_conference_inactive(f2.conference_identifier);
@@ -326,6 +328,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                         if ((f2.tox_conference_number > -1) && (f2.conference_active))
                         {
                             tox_conference_delete(f2.tox_conference_number);
+                            update_savedata_file_wrapper(); // after deleteing a conference
                         }
 
                         Log.i(TAG, "onMenuItemClick:info:33");
