@@ -5040,6 +5040,12 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
+
+    static void android_tox_callback_conference_connected_cb_method(long conference_number)
+    {
+        Log.i(TAG, "conference_connected_cb:cf_num=" + conference_number);
+    }
+
     static void android_tox_callback_conference_invite_cb_method(long friend_number, int a_TOX_CONFERENCE_TYPE, byte[] cookie_buffer, long cookie_length)
     {
         Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" +
