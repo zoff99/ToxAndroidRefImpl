@@ -2631,6 +2631,8 @@ public class MainActivity extends AppCompatActivity
     
     public static native long[] tox_conference_get_chatlist();
 
+    public static native int tox_conference_get_id(long conference_number, ByteBuffer cookie_buffer);
+
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------

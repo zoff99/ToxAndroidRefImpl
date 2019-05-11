@@ -4104,20 +4104,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1
 {
     size_t res = tox_conference_get_chatlist_size(tox_global);
 
-    if(res < 0)
-    {
-        return (jlong)-1;
-    }
-
     return (jlong)(unsigned long long)res;
-
 }
 
 /**
  * Copy a list of valid conference numbers into the array chatlist. Determine how much space
  * to allocate for the array with the `tox_conference_get_chatlist_size` function.
  */
-// void tox_conference_get_chatlist(const Tox *tox, uint32_t *chatlist);
 
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist(JNIEnv *env, jobject thiz)
@@ -4151,6 +4144,33 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist(J
     }
 
     return result;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv *env, jobject thiz,
+        jlong conference_number, jobject cookie_buffer)
+{
+    uint8_t *cookie_buffer_c = NULL;
+    long capacity = 0;
+
+    if(cookie_buffer == NULL)
+    {
+        return -21;
+    }
+
+    cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
+    bool res = tox_conference_get_id(tox_global, (uint32_t)conference_number, (uint8_t *)cookie_buffer_c);
+
+    if (res == true)
+    {
+        return (jint)0;
+    }
+    else
+    {
+        return (jint)-1;
+    }
 }
 
 
