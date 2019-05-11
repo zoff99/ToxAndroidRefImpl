@@ -627,6 +627,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     char *savedata = malloc(size);
     dbg(9, "update_savedata_file:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
+
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
     char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
@@ -4103,6 +4104,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1size(JNIEnv *env, jobject thiz)
 {
     size_t res = tox_conference_get_chatlist_size(tox_global);
+    dbg(9, "tox_conference_get_chatlist_size=%d", (int)res);
 
     return (jlong)(unsigned long long)res;
 }
