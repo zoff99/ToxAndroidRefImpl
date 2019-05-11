@@ -18,17 +18,18 @@
  */
 buildscript {
     repositories {
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+        google()
+        //maven {
+        //    url 'https://maven.google.com/'
+        //    name 'Google'
+        //}
         maven {
             url "https://jitpack.io"
         }
     }
-    dependencies {
-        classpath files('../gwitness/gwit/libs/gwitness.jar')
-    }
+    //dependencies {
+    //    classpath files('../gwitness/gwit/libs/gwitness.jar')
+    //}
 }
 
 // gradlew -q calculateChecksums|sort
@@ -37,11 +38,11 @@ buildscript {
 // gradlew :app:androidDependencies.
 
 apply plugin: 'com.android.application'
-apply plugin: 'witness'
+// **does not work anymore** // apply plugin: 'witness'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "26.0.3"
+    buildToolsVersion "28.0.3"
     compileOptions.encoding = 'UTF-8'
     // generatedDensities = []
 
@@ -169,90 +170,91 @@ android {
 
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    // compile project(':native-audio-jni')
-    compile project(path: ':native-audio-jni', configuration: 'default')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    // implementation project(':native-audio-jni')
+    implementation project(path: ':native-audio-jni', configuration: 'default')
     //
     //
-    compile('com.mikepenz:materialdrawer:6.0.9@aar') {
+    implementation('com.mikepenz:materialdrawer:6.0.9@aar') {
         transitive = true
         exclude group: 'com.android.support'
         exclude group: 'com.github.bumptech.glide'
     }
     //
-    compile('com.mikepenz:google-material-typeface:3.0.1.3.original@aar') {
+    implementation('com.mikepenz:google-material-typeface:3.0.1.3.original@aar') {
         exclude group: 'com.android.support'
     }
-    compile('com.mikepenz:fontawesome-typeface:5.0.13.0@aar') {
+    implementation('com.mikepenz:fontawesome-typeface:5.0.13.0@aar') {
         exclude group: 'com.android.support'
     }
-    compile('com.mikepenz:material-design-iconic-typeface:2.2.0.5@aar') {
+    implementation('com.mikepenz:material-design-iconic-typeface:2.2.0.5@aar') {
         exclude group: 'com.android.support'
     }
-    compile('com.google.zxing:core:3.3.3') {
+    implementation('com.google.zxing:core:3.3.3') {
         exclude group: 'com.android.support'
     }
-    compile('com.github.gfx.android.orma:orma:5.0.0-rc4') {
+    implementation('com.github.gfx.android.orma:orma:5.0.0-rc4') {
         exclude group: 'com.android.support'
     }
-    compile('com.github.gfx.android.orma:orma-encryption:5.0.0-rc4') {
-        exclude group: 'com.android.support'
-    }
-    //
-    compile('com.github.hotchemi:permissionsdispatcher:3.2.0') {
+    implementation('com.github.gfx.android.orma:orma-encryption:5.0.0-rc4') {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.github.angads25:filepicker:1.1.1') {
+    implementation('com.github.hotchemi:permissionsdispatcher:3.2.0') {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.l4digital.fastscroll:fastscroll:1.1.2') {
+    implementation('com.github.angads25:filepicker:1.1.1') {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.vanniktech:emoji-ios:0.5.1') {
+    implementation('com.l4digital.fastscroll:fastscroll:1.1.2') {
         exclude group: 'com.android.support'
     }
     //
-    compile('com.github.bumptech.glide:glide:4.8.0') {
+    implementation('com.vanniktech:emoji-ios:0.5.1') {
+        exclude group: 'com.android.support'
+    }
+    //
+    implementation('com.github.bumptech.glide:glide:4.8.0') {
         exclude group: 'com.android.support'
     }
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
     //
     //
     //
-    compile 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.23@aar'
+    implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.23@aar'
     //
     //
     //
     //noinspection GradleCompatible
-    compile 'com.android.support:support-v4:27.1.1'
-    compile 'com.android.support:appcompat-v7:27.1.1'
-    compile 'com.android.support:design:27.1.1'
-    compile 'com.android.support:recyclerview-v7:27.1.1'
-    compile 'com.android.support:cardview-v7:27.1.1'
-    compile 'com.android.support.constraint:constraint-layout:1.1.3'
-    compile 'com.android.support:multidex:1.0.3'
-    androidTestCompile 'com.android.support:multidex:1.0.3'
-    androidTestCompile 'com.android.support:multidex-instrumentation:1.0.3'
-    compile 'info.guardianproject.iocipher:IOCipher:0.4'
-    compile 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
-    compile 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
-    compile 'com.google.code.gson:gson:2.8.5'
-    compile 'com.github.medyo:android-about-page:1.2.4'
-    compile 'de.hdodenhof:circleimageview:2.2.0'
-    compile 'me.zhanghai.android.patternlock:library:2.1.2'
-    compile 'com.github.armcha:AutoLinkTextView:0.3.0'
-    compile 'com.github.chrisbanes:PhotoView:2.1.3'
-    compile 'com.squareup.okhttp3:okhttp:3.12.0'
-    compile 'com.daimajia.numberprogressbar:library:1.4@aar'
-    compile 'com.github.lawloretienne:discreteslider:0.0.9'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support:cardview-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.android.support:multidex:1.0.3'
+    androidTestImplementation 'com.android.support:multidex:1.0.3'
+    androidTestImplementation 'com.android.support:multidex-instrumentation:1.0.3'
+    implementation 'info.guardianproject.iocipher:IOCipher:0.4'
+    implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
+    implementation 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.github.medyo:android-about-page:1.2.4'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'me.zhanghai.android.patternlock:library:2.1.2'
+    implementation 'com.github.armcha:AutoLinkTextView:0.3.0'
+    implementation 'com.github.chrisbanes:PhotoView:2.1.3'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.daimajia.numberprogressbar:library:1.4@aar'
+    implementation 'com.github.lawloretienne:discreteslider:0.0.9'
     annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
 }
 
 
+/*
 dependencyVerification {
     verify = [
             'com.zoffcc.applications.trifajni:trifa-jni-lib:35279b1e4f4348212a8c8deeb05b6d60cbbc061e7bacdbcc0ceccb3d8a8d61e3',
@@ -323,4 +325,5 @@ dependencyVerification {
             'org.reactivestreams:reactive-streams:ef867702a614b96eb6c64fb65a8f5e14bdfcabbc1ae056f78a1643f7b79ca0eb',
     ]
 }
+*/
 
