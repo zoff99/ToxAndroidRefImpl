@@ -144,6 +144,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_action
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -2631,7 +2632,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native long[] tox_conference_get_chatlist();
 
-    public static native int tox_conference_get_id(long conference_number, ByteBuffer cookie_buffer, int array_offset);
+    public static native int tox_conference_get_id(long conference_number, ByteBuffer cookie_buffer);
 
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -5065,7 +5066,10 @@ public class MainActivity extends AppCompatActivity
 
         long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
 
-        String conference_identifier = bytes_to_hex(cookie_buffer);
+        // strip first 3 bytes of cookie to get the conference_id.
+        // this is aweful and hardcoded
+        String conference_identifier = bytes_to_hex(
+                Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
 
         Log.i(TAG, "conference_invite_cb:cookie=" + conference_identifier);
 
