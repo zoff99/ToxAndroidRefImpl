@@ -1460,6 +1460,10 @@ void android_tox_callback_conference_invite_cb(uint32_t friend_number, TOX_CONFE
     jnienv2 = jni_getenv();
     jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)length);
 
+    dbg(9, "android_tox_callback_conference_invite_cb:cookie length=%d", (int)length);
+    dbg(9, "android_tox_callback_conference_invite_cb:byte 0=%d", (int)cookie[0]);
+    dbg(9, "android_tox_callback_conference_invite_cb:byte end=%d", (int)cookie[length - 1]);
+
     if(data2 == NULL)
     {
         // return NULL; // out of memory error thrown
@@ -4151,7 +4155,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist(J
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv *env, jobject thiz,
-        jlong conference_number, jobject cookie_buffer)
+        jlong conference_number, jobject cookie_buffer, jint array_offset)
 {
     uint8_t *cookie_buffer_c = NULL;
     long capacity = 0;
@@ -4163,7 +4167,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv 
 
     cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
-    bool res = tox_conference_get_id(tox_global, (uint32_t)conference_number, (uint8_t *)cookie_buffer_c);
+    bool res = tox_conference_get_id(tox_global, (uint32_t)conference_number, (uint8_t *)(cookie_buffer_c + array_offset));
 
     if (res == true)
     {
