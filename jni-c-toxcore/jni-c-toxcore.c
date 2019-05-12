@@ -4155,7 +4155,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist(J
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv *env, jobject thiz,
-        jlong conference_number, jobject cookie_buffer, jint array_offset)
+        jlong conference_number, jobject cookie_buffer)
 {
     uint8_t *cookie_buffer_c = NULL;
     long capacity = 0;
@@ -4167,7 +4167,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv 
 
     cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
-    bool res = tox_conference_get_id(tox_global, (uint32_t)conference_number, (uint8_t *)(cookie_buffer_c + array_offset));
+    bool res = tox_conference_get_id(tox_global, (uint32_t)conference_number, (uint8_t *)cookie_buffer_c);
 
     if (res == true)
     {
