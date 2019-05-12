@@ -77,7 +77,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_COOKIE_LENGTH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FULL_SPEED_SECONDS_AFTER_WENT_ONLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
@@ -829,17 +829,16 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "load conferences at startup: num=" + num_conferences);
 
                 long[] conference_numbers = tox_conference_get_chatlist();
-                ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_COOKIE_LENGTH * 2);
+                ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
 
                 int conf_ = 0;
                 for (conf_ = 0; conf_ < num_conferences; conf_++)
                 {
                     cookie_buf3.clear();
-                    if (tox_conference_get_id(conference_numbers[conf_], cookie_buf3, cookie_buf3.arrayOffset()) == 0)
+                    if (tox_conference_get_id(conference_numbers[conf_], cookie_buf3) == 0)
                     {
-                        byte[] cookie_buffer = new byte[CONFERENCE_COOKIE_LENGTH];
-                        cookie_buf3.position(cookie_buf3.position() + 1);
-                        cookie_buf3.get(cookie_buffer, 0, CONFERENCE_COOKIE_LENGTH);
+                        byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
+                        cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
                         String conference_identifier = bytes_to_hex(cookie_buffer);
                         Log.i(TAG,
                               "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +

@@ -45,6 +45,7 @@ public class TRIFAGlobals
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
     public static final int CONFERENCE_COOKIE_LENGTH = 35;
+    public static final int CONFERENCE_ID_LENGTH = 32;
 
     // ----------
     // https://toxme.io/u/echobot
