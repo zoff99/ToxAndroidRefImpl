@@ -2631,7 +2631,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native long[] tox_conference_get_chatlist();
 
-    public static native int tox_conference_get_id(long conference_number, ByteBuffer cookie_buffer);
+    public static native int tox_conference_get_id(long conference_number, ByteBuffer cookie_buffer, int array_offset);
 
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -5061,14 +5061,18 @@ public class MainActivity extends AppCompatActivity
         ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
         cookie_buf2.put(cookie_buffer);
 
+        Log.i(TAG, "conference_invite_cb:bytebuffer offset=" + cookie_buf2.arrayOffset());
+
         long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
 
         String conference_identifier = bytes_to_hex(cookie_buffer);
 
+        Log.i(TAG, "conference_invite_cb:cookie=" + conference_identifier);
+
         if (conference_num >= 0)
         {
             new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number),
-                                      conference_identifier, a_TOX_CONFERENCE_TYPE);
+                                      conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
         }
         else
         {

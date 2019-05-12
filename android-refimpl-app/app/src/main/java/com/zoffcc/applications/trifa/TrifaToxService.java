@@ -829,23 +829,30 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "load conferences at startup: num=" + num_conferences);
 
                 long[] conference_numbers = tox_conference_get_chatlist();
-                ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_COOKIE_LENGTH);
+                ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_COOKIE_LENGTH * 2);
 
                 int conf_ = 0;
                 for (conf_ = 0; conf_ < num_conferences; conf_++)
                 {
                     cookie_buf3.clear();
-                    if (tox_conference_get_id(conference_numbers[conf_], cookie_buf3) == 0)
+                    if (tox_conference_get_id(conference_numbers[conf_], cookie_buf3, cookie_buf3.arrayOffset()) == 0)
                     {
                         byte[] cookie_buffer = new byte[CONFERENCE_COOKIE_LENGTH];
+                        cookie_buf3.position(cookie_buf3.position() + 1);
                         cookie_buf3.get(cookie_buffer, 0, CONFERENCE_COOKIE_LENGTH);
                         String conference_identifier = bytes_to_hex(cookie_buffer);
                         Log.i(TAG,
-                              "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier);
+                              "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +
+                              " offset=" + cookie_buf3.arrayOffset());
+
+                        final ConferenceDB conf2 = orma.selectFromConferenceDB().toList().get(0);
+                        Log.i(TAG,
+                              "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number +
+                              " " + conf2.name);
 
                         new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
                                                   conference_identifier,
-                                                  ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT.value);
+                                                  ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT.value); // rejoin a saved conference
 
                         try
                         {
