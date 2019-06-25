@@ -52,7 +52,7 @@
 #include <vpx/vpx_image.h>
 #include <sys/mman.h>
 
-#define AV_MEDIACODEC 1
+// #define AV_MEDIACODEC 1
 
 #ifdef AV_MEDIACODEC
 #include <libavcodec/jni.h>
@@ -627,7 +627,6 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     char *savedata = malloc(size);
     dbg(9, "update_savedata_file:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
-
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
     char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
@@ -903,12 +902,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
     }
 
 #ifdef AV_MEDIACODEC
+
     // Required for MediaCodec HW decoder
-	if (av_jni_set_java_vm(jvm, NULL) != 0)
+    if(av_jni_set_java_vm(jvm, NULL) != 0)
     {
     }
-#endif
 
+#endif
     // dbg(0,"++ Found JVM ++");
     return JNI_VERSION_1_6;
 }
@@ -1459,7 +1459,6 @@ void android_tox_callback_conference_invite_cb(uint32_t friend_number, TOX_CONFE
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)length);
-
     dbg(9, "android_tox_callback_conference_invite_cb:cookie length=%d", (int)length);
     dbg(9, "android_tox_callback_conference_invite_cb:byte 0=%d", (int)cookie[0]);
     dbg(9, "android_tox_callback_conference_invite_cb:byte end=%d", (int)cookie[length - 1]);
@@ -1493,7 +1492,7 @@ void android_tox_callback_conference_connected_cb(uint32_t conference_number)
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-                                     android_tox_callback_conference_connected_cb_method, 
+                                     android_tox_callback_conference_connected_cb_method,
                                      (jlong)(unsigned long long)conference_number);
 }
 
@@ -1545,17 +1544,17 @@ void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, 
 
 void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message)
 {
-    if (message == NULL)
-    {
-        return;
-    }
-    
-    if (file == NULL)
+    if(message == NULL)
     {
         return;
     }
 
-    if (func == NULL)
+    if(file == NULL)
+    {
+        return;
+    }
+
+    if(func == NULL)
     {
         return;
     }
@@ -4109,7 +4108,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1
 {
     size_t res = tox_conference_get_chatlist_size(tox_global);
     dbg(9, "tox_conference_get_chatlist_size=%d", (int)res);
-
     return (jlong)(unsigned long long)res;
 }
 
@@ -4169,7 +4167,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv 
     capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
     bool res = tox_conference_get_id(tox_global, (uint32_t)conference_number, (uint8_t *)cookie_buffer_c);
 
-    if (res == true)
+    if(res == true)
     {
         return (jint)0;
     }
