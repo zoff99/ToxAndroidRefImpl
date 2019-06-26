@@ -56,6 +56,9 @@ public class TRIFAGlobals
     //  groupbot@toxme.io
     final static String GROUPBOT_TOXID = "56A1ADE4B65B86BCD51CC73E2CD4E542179F47959FE3E0E21B4B0ACDADE51855D34D34D37CB5";
 
+    final static String GROUPBOT_TOKTOK = "1D9AEBE4AF948E73714AF130B58A9457036FE3133DC86B201DA8E1FB45093E3824B01FCB7CB3";
+
+
     final static boolean ADD_BOTS_ON_STARTUP = true;
     final static boolean DELETE_SQL_AND_VFS_ON_ERROR = false; // true -> will delete all data on any ERROR with SQL and VFS !!!
 

@@ -80,6 +80,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FULL_SPEED_SECONDS_AFTER_WENT_ONLINE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
@@ -816,6 +817,7 @@ public class TrifaToxService extends Service
                     {
                         Log.i(TAG, "need_add_bots:start");
                         add_friend_real(ECHOBOT_TOXID);
+                        add_friend_real(GROUPBOT_TOKTOK);
                         // HINT: Disabled per request JFreegman ---------
                         // add_friend_real(GROUPBOT_TOXID);
                         // ----------------------------------------------
