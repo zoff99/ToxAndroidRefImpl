@@ -942,7 +942,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onResume();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
-            if (PREF__use_H264_hw_encoding) {
+            if (PREF__use_H264_hw_encoding)
+            {
                 prepareEncoder();
             }
         }
@@ -1084,7 +1085,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onPause();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
-            if (PREF__use_H264_hw_encoding) {
+            if (PREF__use_H264_hw_encoding)
+            {
                 releaseEncoder();
             }
         }
