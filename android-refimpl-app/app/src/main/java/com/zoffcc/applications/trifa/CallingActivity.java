@@ -58,6 +58,7 @@ import java.nio.ByteBuffer;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encoding;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
@@ -941,7 +942,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onResume();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
-            prepareEncoder();
+            if (PREF__use_H264_hw_encoding) {
+                prepareEncoder();
+            }
         }
         activity_state = 1;
 
@@ -1081,7 +1084,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onPause();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
-            releaseEncoder();
+            if (PREF__use_H264_hw_encoding) {
+                releaseEncoder();
+            }
         }
         sensor_manager.unregisterListener(this);
         activity_state = 0;

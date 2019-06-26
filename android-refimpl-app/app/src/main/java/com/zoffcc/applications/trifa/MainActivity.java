@@ -341,6 +341,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
+    static boolean PREF__use_H264_hw_encoding = false;
 
     static String versionName = "";
     static int versionCode = -1;
