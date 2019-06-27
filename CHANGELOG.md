@@ -1,5 +1,41 @@
 # Change Log
 
+## [1.0.22](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.22) (2019-06-26)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.21...1.0.22)
+
+**Closed issues:**
+
+- feature request: "text groupchat" [\#102](https://github.com/zoff99/ToxAndroidRefImpl/issues/102)
+
+## [1.0.21](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.21) (2018-11-20)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.20...1.0.21)
+
+**Closed issues:**
+
+- Feature request: copy and share message and flie received [\#93](https://github.com/zoff99/ToxAndroidRefImpl/issues/93)
+
+## [1.0.20](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.20) (2018-11-18)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.19...1.0.20)
+
+**Closed issues:**
+
+- Features list [\#92](https://github.com/zoff99/ToxAndroidRefImpl/issues/92)
+- C compiler failed while compiling coffeecatch.c. [\#91](https://github.com/zoff99/ToxAndroidRefImpl/issues/91)
+- Update ToxCore to 0.2.8. [\#90](https://github.com/zoff99/ToxAndroidRefImpl/issues/90)
+- UI tablet re-work [\#88](https://github.com/zoff99/ToxAndroidRefImpl/issues/88)
+- If you have nobody at your contact list [\#87](https://github.com/zoff99/ToxAndroidRefImpl/issues/87)
+- Let's start a co-working [\#82](https://github.com/zoff99/ToxAndroidRefImpl/issues/82)
+
+## [1.0.19](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.19) (2018-09-19)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.18...1.0.19)
+
+## [1.0.18](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.18) (2018-09-19)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.17...1.0.18)
+
+**Closed issues:**
+
+- Improvement of project structure. [\#81](https://github.com/zoff99/ToxAndroidRefImpl/issues/81)
+
 ## [1.0.17](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.17) (2018-07-23)
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.16...1.0.17)
 
@@ -52,6 +88,7 @@
 **Merged pull requests:**
 
 - add Native Audio for playback [\#40](https://github.com/zoff99/ToxAndroidRefImpl/pull/40) ([zoff99](https://github.com/zoff99))
+- Add friend activity revamped a bit [\#28](https://github.com/zoff99/ToxAndroidRefImpl/pull/28) ([gjedeer](https://github.com/gjedeer))
 
 ## [1.0.12](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.12) (2018-01-05)
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.11...1.0.12)
@@ -70,7 +107,6 @@
 
 **Merged pull requests:**
 
-- Add friend activity revamped a bit [\#28](https://github.com/zoff99/ToxAndroidRefImpl/pull/28) ([gjedeer](https://github.com/gjedeer))
 - Made strings in SetPasswordActivity translatable [\#26](https://github.com/zoff99/ToxAndroidRefImpl/pull/26) ([gjedeer](https://github.com/gjedeer))
 
 ## [1.0.10](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.10) (2017-10-15)
