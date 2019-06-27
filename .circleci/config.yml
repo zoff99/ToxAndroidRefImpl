@@ -19,7 +19,7 @@ jobs:
       - run: pwd; ls -al; id -a
       - run: sudo apt update &&
           sudo apt install -y zip grep
-      - run sudo $(which gem) install github_changelog_generator
+      - run: sudo $(which gem) install github_changelog_generator
 
       - checkout
 
@@ -31,7 +31,6 @@ jobs:
          --token "$CHANGELOG_GEN_TOKEN"
       - run: sudo chmod a+r /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md
       - run: ls -rattlh
-
 
       - store_artifacts:
           path: ~/work/deploy
