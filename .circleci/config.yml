@@ -1,0 +1,37 @@
+---
+version: 2
+
+workflows:
+  version: 2
+  build_linux:
+    jobs:
+      - build
+
+jobs:
+  build:
+    #working_directory: ~/work
+    machine:
+      image: circleci/classic:latest
+    #docker:
+    #  - image: ubuntu:bionic
+
+    steps:
+      - run: pwd; ls -al; id -a
+      - run: sudo apt update &&
+          sudo apt install -y zip grep
+      - run sudo $(which gem) install github_changelog_generator
+
+      - checkout
+
+      - run: sudo $(which ruby) $(which github_changelog_generator) --help ; exit 0
+      - run: sudo $(which ruby) $(which github_changelog_generator)
+         -u "$CIRCLE_PROJECT_USERNAME"
+         -p "$CIRCLE_PROJECT_REPONAME"
+         --exclude-tags "$(git tag -l 'trifajni*'| tr '\n' ',')"
+         --token "$CHANGELOG_GEN_TOKEN"
+      - run: sudo chmod a+r /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md
+      - run: ls -rattlh
+
+      - store_artifacts:
+          path: ~/work/deploy
+destination: deploy
