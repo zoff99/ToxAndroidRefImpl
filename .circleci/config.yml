@@ -32,6 +32,7 @@ jobs:
       - run: sudo chmod a+r /home/ubuntu/"$CIRCLE_PROJECT_REPONAME"/CHANGELOG.md
       - run: ls -rattlh
 
+
       - store_artifacts:
           path: ~/work/deploy
 destination: deploy
