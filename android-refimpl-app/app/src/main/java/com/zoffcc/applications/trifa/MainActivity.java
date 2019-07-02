@@ -6937,15 +6937,15 @@ public class MainActivity extends AppCompatActivity
             byte[] md5_digest = md5_.digest((filesize + ":" + filename_with_path).getBytes());
 
             BigInteger bigInt = new BigInteger(1, md5_digest);
-            String hashtext = bigInt.toString(16);
+            StringBuilder hashtext = new StringBuilder(bigInt.toString(16));
 
             // Now we need to zero pad it if you actually want the full 32 chars.
             while (hashtext.length() < 32)
             {
-                hashtext = "0" + hashtext;
+                hashtext.insert(0, "0");
             }
 
-            ret = hashtext;
+            ret = hashtext.toString();
             // Log.i(TAG, "get_uniq_tmp_filename:ret=" + ret);
         }
         catch (Exception e)
@@ -9111,7 +9111,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-                String copy_text = "";
+                StringBuilder copy_text = new StringBuilder();
                 boolean first = true;
                 Iterator i = selected_messages_text_only.iterator();
                 while (i.hasNext())
@@ -9121,11 +9121,11 @@ public class MainActivity extends AppCompatActivity
                         if (first)
                         {
                             first = false;
-                            copy_text = "" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text;
+                            copy_text = new StringBuilder("" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text);
                         }
                         else
                         {
-                            copy_text = copy_text + "\n" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text;
+                            copy_text.append("\n").append(orma.selectFromMessage().idEq((Long) i.next()).get(0).text);
                         }
                     }
                     catch (Exception e)
@@ -9134,7 +9134,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
-                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text));
+                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text.toString()));
                 Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
 
                 selected_messages.clear();
@@ -9173,7 +9173,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-                String copy_text = "";
+                StringBuilder copy_text = new StringBuilder();
                 boolean first = true;
                 Iterator i = selected_conference_messages.iterator();
                 while (i.hasNext())
@@ -9183,12 +9183,11 @@ public class MainActivity extends AppCompatActivity
                         if (first)
                         {
                             first = false;
-                            copy_text = "" + orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text;
+                            copy_text = new StringBuilder("" + orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text);
                         }
                         else
                         {
-                            copy_text = copy_text + "\n" +
-                                        orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text;
+                            copy_text.append("\n").append(orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text);
                         }
                     }
                     catch (Exception e)
@@ -9197,7 +9196,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
-                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text));
+                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text.toString()));
                 Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
 
                 selected_conference_messages.clear();

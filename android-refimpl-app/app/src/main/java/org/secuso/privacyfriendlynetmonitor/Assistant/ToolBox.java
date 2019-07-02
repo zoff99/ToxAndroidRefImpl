@@ -94,13 +94,13 @@ public class ToolBox
     public static String printExportHexString(byte[] data)
     {
         String hexString = printHexBinary(data);
-        String export = "000000 ";
+        StringBuilder export = new StringBuilder("000000 ");
         for (int i = 0; i + 1 < hexString.length(); i += 2)
         {
-            export += " " + hexString.substring(i, i + 2);
+            export.append(" ").append(hexString.substring(i, i + 2));
         }
-        export += " ......";
-        return export;
+        export.append(" ......");
+        return export.toString();
     }
 
     //Returns active network interfaces
