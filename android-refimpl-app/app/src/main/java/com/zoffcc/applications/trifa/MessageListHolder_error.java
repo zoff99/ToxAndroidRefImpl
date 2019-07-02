@@ -32,14 +32,13 @@ public class MessageListHolder_error extends RecyclerView.ViewHolder
     private static final String TAG = "trifa.MessageListHolder";
 
     private Message message;
-    private Context context;
     EmojiTextViewLinks textView;
 
     public MessageListHolder_error(View itemView, Context c)
     {
         super(itemView);
         Log.i(TAG, "MessageListHolder");
-        this.context = c;
+        Context context = c;
 
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL);

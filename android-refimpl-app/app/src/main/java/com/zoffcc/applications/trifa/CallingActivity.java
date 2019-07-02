@@ -185,7 +185,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
         // set volume control -------------
 
-        mVisible = true;
+        boolean mVisible = true;
         mContentView = (CustomVideoImageView) findViewById(R.id.video_view);
 
         calling_activity_top_viewgroup_vg = (ViewGroup) findViewById(R.id.calling_activity_top_viewgroup);
@@ -874,7 +874,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     //        }
     //    };
 
-    private boolean mVisible;
     //    private final Runnable mHideRunnable = new Runnable()
     //    {
     //        @Override

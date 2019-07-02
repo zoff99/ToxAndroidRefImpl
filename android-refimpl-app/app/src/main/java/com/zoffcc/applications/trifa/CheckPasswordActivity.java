@@ -60,15 +60,13 @@ public class CheckPasswordActivity extends AppCompatActivity
     private View mProgressView;
     private View mLoginFormView;
 
-    private SharedPreferences settings;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_password);
 
-        settings = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         mPasswordView1 = (EditText) findViewById(R.id.password_1);
         mPasswordView1.setOnEditorActionListener(new TextView.OnEditorActionListener()

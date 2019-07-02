@@ -75,7 +75,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     boolean is_selected = false;
     boolean is_system_message = false;
     ImageView img_corner;
-    private boolean have_avatar_for_pubkey = false;
 
     public ConferenceMessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -235,7 +234,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         // int peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
 
 
-        have_avatar_for_pubkey = false;
+        boolean have_avatar_for_pubkey = false;
         // Log.i(TAG, "have_avatar_for_pubkey:00a01:" + have_avatar_for_pubkey);
 
         FriendList fl_temp = null;

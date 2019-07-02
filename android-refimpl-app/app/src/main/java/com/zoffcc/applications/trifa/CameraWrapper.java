@@ -47,12 +47,10 @@ public class CameraWrapper
 {
     private static final String TAG = "CameraWrapper";
     static Camera mCamera;
-    private Camera.Parameters mCameraParamters;
     static Camera.CameraInfo cameraInfo = null;
     private static CameraWrapper mCameraWrapper;
     static int camera_video_rotate_angle = 0;
     private boolean mIsPreviewing = false;
-    private float mPreviewRate = -1.0f;
     public static final int IMAGE_WIDTH = 640; // 1280
     public static final int IMAGE_HEIGHT = 480; // 720
     static byte[] data_new = null;
@@ -215,7 +213,7 @@ public class CameraWrapper
             this.mCamera.setPreviewCallback(null);
             this.mCamera.stopPreview();
             this.mIsPreviewing = false;
-            this.mPreviewRate = -1f;
+            float mPreviewRate = -1f;
             mCamera.setPreviewCallback(null);
             this.mCamera.release();
             mCameraPreviewCallback.reset();
@@ -301,15 +299,15 @@ public class CameraWrapper
             }
 
 
-            this.mCameraParamters = this.mCamera.getParameters();
-            this.mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
-            this.mCameraParamters.setFlashMode("off");
+            Camera.Parameters mCameraParamters = this.mCamera.getParameters();
+            mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
+            mCameraParamters.setFlashMode("off");
 
             try
             {
-                List<Integer> preview_framerates = this.mCameraParamters.getSupportedPreviewFrameRates();
+                List<Integer> preview_framerates = mCameraParamters.getSupportedPreviewFrameRates();
                 Log.i(TAG, "preview_framerates=" + preview_framerates);
-                List<int[]> preview_framerates2 = this.mCameraParamters.getSupportedPreviewFpsRange();
+                List<int[]> preview_framerates2 = mCameraParamters.getSupportedPreviewFpsRange();
                 int i;
                 int j;
                 for (i = 0; i < preview_framerates2.size(); i++)
@@ -325,7 +323,7 @@ public class CameraWrapper
                 if (PREF__set_fps)
                 {
                     Log.i(TAG, "preview_framerates2:SET:setting FPS to 15:START");
-                    this.mCameraParamters.setPreviewFpsRange(15000, 15000);
+                    mCameraParamters.setPreviewFpsRange(15000, 15000);
                     Log.i(TAG, "preview_framerates2:SET:setting FPS to 15:Ready");
                 }
                 else
@@ -340,21 +338,21 @@ public class CameraWrapper
 
             if (PREF__cam_recording_hint)
             {
-                this.mCameraParamters.setRecordingHint(true);
+                mCameraParamters.setRecordingHint(true);
             }
-            this.mCameraParamters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
-            this.mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
-            Log.i(TAG, "preview size before=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
-            this.mCameraParamters.setPreviewSize(IMAGE_WIDTH, IMAGE_HEIGHT);
-            Log.i(TAG, "preview size after 1=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
+            mCameraParamters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
+            mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
+            Log.i(TAG, "preview size before=" + mCameraParamters.getPreviewSize().width + "," + mCameraParamters.getPreviewSize().height);
+            mCameraParamters.setPreviewSize(IMAGE_WIDTH, IMAGE_HEIGHT);
+            Log.i(TAG, "preview size after 1=" + mCameraParamters.getPreviewSize().width + "," + mCameraParamters.getPreviewSize().height);
             this.mCamera.setDisplayOrientation(90); // always 90 ??
-            Log.i(TAG, "preview size after 2=" + this.mCameraParamters.getPreviewSize().width + "," + this.mCameraParamters.getPreviewSize().height);
+            Log.i(TAG, "preview size after 2=" + mCameraParamters.getPreviewSize().width + "," + mCameraParamters.getPreviewSize().height);
 
             mCameraPreviewCallback = new CameraPreviewCallback();
 
             // ------ use buffer ------
 
-            this.mCamera.setParameters(this.mCameraParamters);
+            this.mCamera.setParameters(mCameraParamters);
             Camera.Parameters mCameraParamters2 = this.mCamera.getParameters();
 
             int previewFormat = mCameraParamters2.getPreviewFormat();
@@ -368,7 +366,7 @@ public class CameraWrapper
             Log.i(TAG, "previewFormats:ImageFormat.NV21=" + ImageFormat.NV21);
             Log.i(TAG, "previewFormats:ImageFormat.YUY2=" + ImageFormat.YUY2);
 
-            Camera.Size s = this.mCameraParamters.getPreviewSize();
+            Camera.Size s = mCameraParamters.getPreviewSize();
             mCamera.setPreviewCallbackWithBuffer(mCameraPreviewCallback);    // assign the callback called when a frame is shown by the camera preview (for frame processing)
             // **broken ** // setupCallback((3 * s.width * s.height / 2));
             setupCallback(frame_bytesize);
@@ -377,12 +375,12 @@ public class CameraWrapper
             Log.i(TAG, "previewFormats:999");
             // ------ use buffer ------
 
-            List<String> focusModes = this.mCameraParamters.getSupportedFocusModes();
+            List<String> focusModes = mCameraParamters.getSupportedFocusModes();
             if (focusModes.contains("continuous-video"))
             {
-                this.mCameraParamters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+                mCameraParamters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             }
-            this.mCamera.setParameters(this.mCameraParamters);
+            this.mCamera.setParameters(mCameraParamters);
             try
             {
                 Log.i(TAG, "camera:startPreview:001");

@@ -28,21 +28,16 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
 
     private float oldDist = 1f;
     private float matrixValues[] = {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f};
-    private float scale;
     private float oldEventX = 0;
     private float oldEventY = 0;
     private float oldStartPointX = 0;
     private float oldStartPointY = 0;
     private int mViewWidth = -1;
     private int mViewHeight = -1;
-    private int mBitmapWidth = -1;
-    private int mBitmapHeight = -1;
     private float scaled_mBitmapWidth = 1;
     private float scaled_mBitmapHeight = 1;
     private boolean mDraggable = false;
     private boolean matrix_was_reset = false;
-    private static float MIN_SCALE_BITMAP = 0.0001f;
-    private static float MAX_SCALE_BITMAP = 10.0f;
     private float sum_scale_factor = 1;
 
 
@@ -117,8 +112,8 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
             if (PREF__X_zoom_incoming_video)
             {
 
-                mBitmapWidth = bitmap.getWidth();
-                mBitmapHeight = bitmap.getHeight();
+                int mBitmapWidth = bitmap.getWidth();
+                int mBitmapHeight = bitmap.getHeight();
 
                 if (matrix_was_reset)
                 {
@@ -130,6 +125,8 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
 
                         // System.out.println("__onTouch__:" + "scale_w=" + scale_w + ",scale_h=" + scale_h);
                         float scale = Math.min(scale_h, scale_w);
+                        float MAX_SCALE_BITMAP = 10.0f;
+                        float MIN_SCALE_BITMAP = 0.0001f;
                         if (scale < MIN_SCALE_BITMAP)
                         {
                             scale = MIN_SCALE_BITMAP;
@@ -317,7 +314,7 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
         float midX = (mViewWidth / 2);
         float midY = (mViewHeight / 2);
 
-        scale = newDist / oldDist;
+        float scale = newDist / oldDist;
         // System.out.println("__onTouch__:" + "scf=" + scale);
         boolean do_scale = true;
 
