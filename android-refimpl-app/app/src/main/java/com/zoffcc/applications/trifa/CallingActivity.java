@@ -1299,7 +1299,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         if (wl1 == null)
         {
             wl1 = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                                 "trifa_screen_on");
+                                 "trifa:trifa_screen_on");
         }
 
         try
@@ -1344,7 +1344,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // turn off screen
         if (wl2 == null)
         {
-            wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "trifa_screen_OFF");
+            wl2 = pm.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "trifa:trifa_screen_OFF");
         }
 
 
