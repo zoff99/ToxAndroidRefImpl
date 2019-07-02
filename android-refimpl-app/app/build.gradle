@@ -263,4 +263,8 @@ dependencies {
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
 }
 
-
+// TODO: fix gradle witness again
+dependencyVerification {
+    verify = [
+    ]
+}
