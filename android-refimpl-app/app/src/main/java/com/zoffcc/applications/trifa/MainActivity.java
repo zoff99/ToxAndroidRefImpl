@@ -217,6 +217,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
+@SuppressWarnings("JniMissingFunction")
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity
 {
