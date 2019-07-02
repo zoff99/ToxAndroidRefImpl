@@ -1,7 +1,5 @@
 package com.zoffcc.applications.trifa;
 
-import android.util.Log;
-
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.util.Preconditions;
 

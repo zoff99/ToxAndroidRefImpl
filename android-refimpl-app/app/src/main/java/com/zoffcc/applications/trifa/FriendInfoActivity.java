@@ -37,9 +37,6 @@ import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendInfoActivity extends AppCompatActivity
