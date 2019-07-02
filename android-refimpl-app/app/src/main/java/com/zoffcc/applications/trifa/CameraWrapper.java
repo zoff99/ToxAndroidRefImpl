@@ -161,14 +161,14 @@ public class CameraWrapper
         if (mIsPreviewing)
         {
             Log.i(TAG, "doStartPreview:stopPreview");
-            this.mCamera.stopPreview();
+            mCamera.stopPreview();
             return;
         }
 
         try
         {
             Log.i(TAG, "doStartPreview:setPreviewDisplay");
-            this.mCamera.setPreviewDisplay(holder);
+            mCamera.setPreviewDisplay(holder);
         }
         catch (IOException e)
         {
@@ -189,13 +189,13 @@ public class CameraWrapper
         Log.i(TAG, "doStartPreview()");
         if (mIsPreviewing)
         {
-            this.mCamera.stopPreview();
+            mCamera.stopPreview();
             return;
         }
 
         try
         {
-            this.mCamera.setPreviewTexture(surface);
+            mCamera.setPreviewTexture(surface);
         }
         catch (IOException e)
         {
@@ -207,17 +207,17 @@ public class CameraWrapper
     public void doStopCamera()
     {
         Log.i(TAG, "doStopCamera");
-        if (this.mCamera != null)
+        if (mCamera != null)
         {
             mCameraPreviewCallback.close();
-            this.mCamera.setPreviewCallback(null);
-            this.mCamera.stopPreview();
+            mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
             this.mIsPreviewing = false;
             float mPreviewRate = -1f;
             mCamera.setPreviewCallback(null);
-            this.mCamera.release();
+            mCamera.release();
             mCameraPreviewCallback.reset();
-            this.mCamera = null;
+            mCamera = null;
         }
     }
 
@@ -266,9 +266,9 @@ public class CameraWrapper
 
     private void initCamera()
     {
-        if (this.mCamera != null)
+        if (mCamera != null)
         {
-            this.camera_video_rotate_angle = getRotation();
+            camera_video_rotate_angle = getRotation();
 
             CameraSurfacePreview.mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
             try
@@ -299,7 +299,7 @@ public class CameraWrapper
             }
 
 
-            Camera.Parameters mCameraParamters = this.mCamera.getParameters();
+            Camera.Parameters mCameraParamters = mCamera.getParameters();
             mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
             mCameraParamters.setFlashMode("off");
 
@@ -345,15 +345,15 @@ public class CameraWrapper
             Log.i(TAG, "preview size before=" + mCameraParamters.getPreviewSize().width + "," + mCameraParamters.getPreviewSize().height);
             mCameraParamters.setPreviewSize(IMAGE_WIDTH, IMAGE_HEIGHT);
             Log.i(TAG, "preview size after 1=" + mCameraParamters.getPreviewSize().width + "," + mCameraParamters.getPreviewSize().height);
-            this.mCamera.setDisplayOrientation(90); // always 90 ??
+            mCamera.setDisplayOrientation(90); // always 90 ??
             Log.i(TAG, "preview size after 2=" + mCameraParamters.getPreviewSize().width + "," + mCameraParamters.getPreviewSize().height);
 
             mCameraPreviewCallback = new CameraPreviewCallback();
 
             // ------ use buffer ------
 
-            this.mCamera.setParameters(mCameraParamters);
-            Camera.Parameters mCameraParamters2 = this.mCamera.getParameters();
+            mCamera.setParameters(mCameraParamters);
+            Camera.Parameters mCameraParamters2 = mCamera.getParameters();
 
             int previewFormat = mCameraParamters2.getPreviewFormat();
             int bitsperpixel = ImageFormat.getBitsPerPixel(previewFormat);
@@ -380,11 +380,11 @@ public class CameraWrapper
             {
                 mCameraParamters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             }
-            this.mCamera.setParameters(mCameraParamters);
+            mCamera.setParameters(mCameraParamters);
             try
             {
                 Log.i(TAG, "camera:startPreview:001");
-                this.mCamera.startPreview();
+                mCamera.startPreview();
                 Log.i(TAG, "camera:startPreview:002");
             }
             catch (Exception pe)

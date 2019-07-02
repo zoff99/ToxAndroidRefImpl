@@ -1196,7 +1196,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         int screenHeight = displayMetrics.heightPixels;
         params.width = screenWidth;
         params.height = screenHeight;
-        this.mPreviewRate = (float) screenHeight / (float) screenWidth;
+        mPreviewRate = (float) screenHeight / (float) screenWidth;
         cameraSurfacePreview.setLayoutParams(params);
     }
 
@@ -1207,7 +1207,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         Callstate.camera_opened = true;
-        SurfaceHolder holder = this.cameraSurfacePreview.getSurfaceHolder();
+        SurfaceHolder holder = cameraSurfacePreview.getSurfaceHolder();
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
 

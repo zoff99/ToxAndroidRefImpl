@@ -3304,7 +3304,7 @@ public class MainActivity extends AppCompatActivity
                 // audio_buffer_read_write(sample_count, channels, sampling_rate, true);
                 if (audio_receiver_thread != null)
                 {
-                    if (!audio_receiver_thread.stopped)
+                    if (!AudioReceiver.stopped)
                     {
                         //                    if (android.os.Build.VERSION.SDK_INT >= 23)
                         //                    {
