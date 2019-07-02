@@ -101,11 +101,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         // Log.i(TAG, "have_avatar_for_pubkey:0000:==========================");
 
-        is_system_message = false;
-        if (m.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY))
-        {
-            is_system_message = true;
-        }
+        is_system_message = m.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY);
         // Log.i(TAG, "is_system_message=" + is_system_message + " m.tox_peerpubkey=" + m.tox_peerpubkey);
 
         is_selected = false;
@@ -115,14 +111,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         }
         else
         {
-            if (selected_messages.contains(m.id))
-            {
-                is_selected = true;
-            }
-            else
-            {
-                is_selected = false;
-            }
+            is_selected = selected_messages.contains(m.id);
         }
 
         if (is_selected)

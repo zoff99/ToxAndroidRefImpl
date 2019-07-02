@@ -302,14 +302,7 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
             return;
         }
 
-        if (bitmapWidth > mViewWidth || bimtapHeight > mViewHeight)
-        {
-            mDraggable = true;
-        }
-        else
-        {
-            mDraggable = false;
-        }
+        mDraggable = bitmapWidth > mViewWidth || bimtapHeight > mViewHeight;
 
         float midX = (mViewWidth / 2);
         float midY = (mViewHeight / 2);

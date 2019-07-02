@@ -5168,14 +5168,7 @@ public class MainActivity extends AppCompatActivity
 
         ConferenceMessage m = new ConferenceMessage();
 
-        if (!do_badge_update)
-        {
-            m.is_new = false;
-        }
-        else
-        {
-            m.is_new = true;
-        }
+        m.is_new = do_badge_update;
 
         // m.tox_friendnum = friend_number;
         m.tox_peerpubkey = tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
@@ -8827,14 +8820,7 @@ public class MainActivity extends AppCompatActivity
         Color.colorToHSV(color, hsv);
         // System.out.println("HSV="+hsv[0]+" "+hsv[1]+" "+hsv[2]);
 
-        if (hsv[2] < 0.5)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return !(hsv[2] < 0.5);
     }
 
     public static int lightenColor(int inColor, float inAmount)

@@ -99,14 +99,7 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         }
         else
         {
-            if (selected_messages.contains(m.id))
-            {
-                is_selected = true;
-            }
-            else
-            {
-                is_selected = false;
-            }
+            is_selected = selected_messages.contains(m.id);
         }
 
         if (is_selected)

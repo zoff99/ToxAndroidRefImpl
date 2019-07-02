@@ -92,14 +92,7 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         }
         else
         {
-            if (selected_messages.contains(m.id))
-            {
-                is_selected = true;
-            }
-            else
-            {
-                is_selected = false;
-            }
+            is_selected = selected_messages.contains(m.id);
         }
 
         if (is_selected)

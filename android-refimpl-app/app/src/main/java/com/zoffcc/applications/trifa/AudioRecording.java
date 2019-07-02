@@ -341,14 +341,7 @@ public class AudioRecording extends Thread
                 try
                 {
                     // if (audio_manager_s.isMicrophoneMute())
-                    if (trifa_is_MicrophoneMute)
-                    {
-                        microphone_muted = true;
-                    }
-                    else
-                    {
-                        microphone_muted = false;
-                    }
+                    microphone_muted = trifa_is_MicrophoneMute;
                 }
                 catch (Exception e)
                 {
@@ -385,14 +378,7 @@ public class AudioRecording extends Thread
                             try
                             {
                                 // if (audio_manager_s.isMicrophoneMute())
-                                if (trifa_is_MicrophoneMute)
-                                {
-                                    microphone_muted = true;
-                                }
-                                else
-                                {
-                                    microphone_muted = false;
-                                }
+                                microphone_muted = trifa_is_MicrophoneMute;
                             }
                             catch (Exception e)
                             {

@@ -214,13 +214,7 @@ public class CheckPasswordActivity extends AppCompatActivity
         {
             boolean pass_is_correct = check_password(mPassword1);
 
-            if (!pass_is_correct)
-            {
-                // password seems not correct
-                return false;
-            }
-
-            return true;
+            return pass_is_correct;
         }
 
         @Override

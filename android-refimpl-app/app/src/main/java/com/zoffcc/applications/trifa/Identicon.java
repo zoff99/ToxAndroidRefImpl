@@ -119,14 +119,7 @@ public class Identicon
 
                 // Log.i(TAG, "create_identicon:colorIndex=" + colorIndex);
 
-                if (colorIndex == 0)
-                {
-                    ret.dot_color[row][col] = false;
-                }
-                else
-                {
-                    ret.dot_color[row][col] = true;
-                }
+                ret.dot_color[row][col] = colorIndex != 0;
             }
         }
 

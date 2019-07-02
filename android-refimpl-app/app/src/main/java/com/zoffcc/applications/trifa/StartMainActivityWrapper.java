@@ -84,14 +84,7 @@ public class StartMainActivityWrapper extends AppCompatActivity
             else
             {
                 boolean pw_set_screen_done = settings.getBoolean("PW_SET_SCREEN_DONE", false);
-                if (pw_set_screen_done)
-                {
-                    set_pattern = false;
-                }
-                else
-                {
-                    set_pattern = true;
-                }
+                set_pattern = !pw_set_screen_done;
 
                 if (set_pattern)
                 {
