@@ -78,12 +78,12 @@ bintray {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '27.0.3'
     compileOptions.encoding = 'UTF-8'
 
     defaultConfig {
         versionCode project.maven_artefact_int_version
         versionName "${maven_artefact_version}"
+        minSdkVersion 16
     }
 
     packagingOptions {
