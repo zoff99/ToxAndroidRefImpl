@@ -45,7 +45,7 @@ public class FriendListFragment extends Fragment
     List<FriendList> data_values2 = new ArrayList<FriendList>();
     // FriendlistArrayAdapter a = null;
     static Boolean in_update_data = false;
-    static Boolean in_update_data_lock = false;
+    static final Boolean in_update_data_lock = false;
     //  View view1 = null;
     RecyclerView listingsView = null;
     FriendlistAdapter adapter = null;
