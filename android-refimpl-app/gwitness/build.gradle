@@ -1,6 +1,11 @@
 apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
 
 project.buildDir = 'gwit'
+
+repositories {
+    google()
+}
 
 dependencies {
     compile gradleApi()

@@ -66,9 +66,6 @@ public class AudioReceiver extends Thread
     LoudnessEnhancer lec = null;
     EnvironmentalReverb erv = null;
 
-    private int playBufSize = 0;
-    private int buffer_mem_factor2 = 30;
-
     public AudioReceiver()
     {
         //        try
@@ -116,7 +113,8 @@ public class AudioReceiver extends Thread
 
 
         // ---------- 222 ----------
-        playBufSize = (int) (2 * (sampling_rate_ / buffer_mem_factor2));
+        int buffer_mem_factor2 = 30;
+        int playBufSize = (int) (2 * (sampling_rate_ / buffer_mem_factor2));
         Log.i(TAG, "want_buf_size_in_bytes(1)=" + playBufSize);
         if (playBufSize < buffer_size22)
         {

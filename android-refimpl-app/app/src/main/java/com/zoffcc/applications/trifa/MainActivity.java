@@ -144,6 +144,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_action
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -216,6 +217,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
+@SuppressWarnings("JniMissingFunction")
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity
 {
@@ -223,7 +225,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -340,6 +342,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
+    static boolean PREF__use_H264_hw_encoding = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2626,6 +2629,13 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_conference_send_message(long conference_number, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
     public static native int tox_conference_delete(long conference_number);
+
+    public static native long tox_conference_get_chatlist_size();
+
+    public static native long[] tox_conference_get_chatlist();
+
+    public static native int tox_conference_get_id(long conference_number, ByteBuffer cookie_buffer);
+
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -2785,6 +2795,9 @@ public class MainActivity extends AppCompatActivity
             // not the friend we are in call with now
             return;
         }
+
+        // Log.i(TAG,
+        //      "---> VIDEO_FRAME_RATE_INCOMING w=" + frame_width_px + " h=" + frame_height_px + " ystride=" + ystride);
 
         //        Log.i(TAG,
         //              "toxav_video_receive_frame:from=" + friend_number + " video width=" + frame_width_px + " video height=" +
@@ -3027,7 +3040,19 @@ public class MainActivity extends AppCompatActivity
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_PLAY_DELAY.value)
         {
-            Callstate.play_delay = comm_number;
+            if (comm_number < 0)
+            {
+                Callstate.play_delay = 0;
+            }
+            else if (comm_number > 11000)
+            {
+                Callstate.play_delay = 11000;
+            }
+            else
+            {
+                Callstate.play_delay = comm_number;
+                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
+            }
         }
 
         try
@@ -3279,7 +3304,7 @@ public class MainActivity extends AppCompatActivity
                 // audio_buffer_read_write(sample_count, channels, sampling_rate, true);
                 if (audio_receiver_thread != null)
                 {
-                    if (!audio_receiver_thread.stopped)
+                    if (!AudioReceiver.stopped)
                     {
                         //                    if (android.os.Build.VERSION.SDK_INT >= 23)
                         //                    {
@@ -5025,6 +5050,12 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
+
+    static void android_tox_callback_conference_connected_cb_method(long conference_number)
+    {
+        Log.i(TAG, "conference_connected_cb:cf_num=" + conference_number);
+    }
+
     static void android_tox_callback_conference_invite_cb_method(long friend_number, int a_TOX_CONFERENCE_TYPE, byte[] cookie_buffer, long cookie_length)
     {
         Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" +
@@ -5033,14 +5064,21 @@ public class MainActivity extends AppCompatActivity
         ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
         cookie_buf2.put(cookie_buffer);
 
+        Log.i(TAG, "conference_invite_cb:bytebuffer offset=" + cookie_buf2.arrayOffset());
+
         long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
 
-        String conference_identifier = bytes_to_hex(cookie_buffer);
+        // strip first 3 bytes of cookie to get the conference_id.
+        // this is aweful and hardcoded
+        String conference_identifier = bytes_to_hex(
+                Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
+
+        Log.i(TAG, "conference_invite_cb:cookie=" + conference_identifier);
 
         if (conference_num >= 0)
         {
             new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number),
-                                      conference_identifier, a_TOX_CONFERENCE_TYPE);
+                                      conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
         }
         else
         {
@@ -5061,6 +5099,11 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        MainActivity.update_savedata_file_wrapper(); // join new conference
+
+        // long num_conferences = tox_conference_get_chatlist_size();
+        // Log.i(TAG, "load conferences at startup[2]: num=" + num_conferences);
 
         Log.i(TAG, "conference_invite_cb:res=" + conference_num);
     }
@@ -5125,14 +5168,7 @@ public class MainActivity extends AppCompatActivity
 
         ConferenceMessage m = new ConferenceMessage();
 
-        if (!do_badge_update)
-        {
-            m.is_new = false;
-        }
-        else
-        {
-            m.is_new = true;
-        }
+        m.is_new = do_badge_update;
 
         // m.tox_friendnum = friend_number;
         m.tox_peerpubkey = tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
@@ -6901,15 +6937,15 @@ public class MainActivity extends AppCompatActivity
             byte[] md5_digest = md5_.digest((filesize + ":" + filename_with_path).getBytes());
 
             BigInteger bigInt = new BigInteger(1, md5_digest);
-            String hashtext = bigInt.toString(16);
+            StringBuilder hashtext = new StringBuilder(bigInt.toString(16));
 
             // Now we need to zero pad it if you actually want the full 32 chars.
             while (hashtext.length() < 32)
             {
-                hashtext = "0" + hashtext;
+                hashtext.insert(0, "0");
             }
 
-            ret = hashtext;
+            ret = hashtext.toString();
             // Log.i(TAG, "get_uniq_tmp_filename:ret=" + ret);
         }
         catch (Exception e)
@@ -8784,14 +8820,7 @@ public class MainActivity extends AppCompatActivity
         Color.colorToHSV(color, hsv);
         // System.out.println("HSV="+hsv[0]+" "+hsv[1]+" "+hsv[2]);
 
-        if (hsv[2] < 0.5)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return !(hsv[2] < 0.5);
     }
 
     public static int lightenColor(int inColor, float inAmount)
@@ -9082,7 +9111,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-                String copy_text = "";
+                StringBuilder copy_text = new StringBuilder();
                 boolean first = true;
                 Iterator i = selected_messages_text_only.iterator();
                 while (i.hasNext())
@@ -9092,11 +9121,11 @@ public class MainActivity extends AppCompatActivity
                         if (first)
                         {
                             first = false;
-                            copy_text = "" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text;
+                            copy_text = new StringBuilder("" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text);
                         }
                         else
                         {
-                            copy_text = copy_text + "\n" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text;
+                            copy_text.append("\n").append(orma.selectFromMessage().idEq((Long) i.next()).get(0).text);
                         }
                     }
                     catch (Exception e)
@@ -9105,7 +9134,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
-                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text));
+                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text.toString()));
                 Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
 
                 selected_messages.clear();
@@ -9144,7 +9173,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-                String copy_text = "";
+                StringBuilder copy_text = new StringBuilder();
                 boolean first = true;
                 Iterator i = selected_conference_messages.iterator();
                 while (i.hasNext())
@@ -9154,12 +9183,11 @@ public class MainActivity extends AppCompatActivity
                         if (first)
                         {
                             first = false;
-                            copy_text = "" + orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text;
+                            copy_text = new StringBuilder("" + orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text);
                         }
                         else
                         {
-                            copy_text = copy_text + "\n" +
-                                        orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text;
+                            copy_text.append("\n").append(orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text);
                         }
                     }
                     catch (Exception e)
@@ -9168,7 +9196,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
-                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text));
+                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text.toString()));
                 Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
 
                 selected_conference_messages.clear();
@@ -9426,7 +9454,7 @@ public class MainActivity extends AppCompatActivity
         long new_nospam = (long) random.nextInt() + (1L << 31);
         // Log.i(TAG, "generated NOSPAM=" + new_nospam);
         tox_self_set_nospam(new_nospam);
-        update_savedata_file_wrapper();
+        update_savedata_file_wrapper(); // set new random nospam
         try
         {
             update_toxid_display_s();

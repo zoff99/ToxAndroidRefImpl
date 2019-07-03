@@ -30,7 +30,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
@@ -312,7 +311,7 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
             java.io.File f2 = new java.io.File(message2.filename_fullpath);
             try
             {
-                final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+                @SuppressWarnings("unused") final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
 
                 GlideApp.
                         with(context).

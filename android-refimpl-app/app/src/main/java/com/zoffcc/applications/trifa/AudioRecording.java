@@ -62,7 +62,6 @@ public class AudioRecording extends Thread
     public static long SMAPLINGRATE_TOX = 48000; // 16000;
     static boolean soft_echo_canceller_ready = false;
     final static int milliseconds_audio_samples_max = 120;
-    private int buffer_size = 0;
     static int audio_session_id = -1;
     AutomaticGainControl agc = null;
     AcousticEchoCanceler aec = null;
@@ -190,7 +189,7 @@ public class AudioRecording extends Thread
             /*
              * Initialize buffer to hold continuously recorded audio data, start recording
              */
-                buffer_size = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL, FORMAT);
+                int buffer_size = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL, FORMAT);
 
                 // int buffer_size_M = buffer_size;
 
@@ -342,14 +341,7 @@ public class AudioRecording extends Thread
                 try
                 {
                     // if (audio_manager_s.isMicrophoneMute())
-                    if (trifa_is_MicrophoneMute)
-                    {
-                        microphone_muted = true;
-                    }
-                    else
-                    {
-                        microphone_muted = false;
-                    }
+                    microphone_muted = trifa_is_MicrophoneMute;
                 }
                 catch (Exception e)
                 {
@@ -386,14 +378,7 @@ public class AudioRecording extends Thread
                             try
                             {
                                 // if (audio_manager_s.isMicrophoneMute())
-                                if (trifa_is_MicrophoneMute)
-                                {
-                                    microphone_muted = true;
-                                }
-                                else
-                                {
-                                    microphone_muted = false;
-                                }
+                                microphone_muted = trifa_is_MicrophoneMute;
                             }
                             catch (Exception e)
                             {

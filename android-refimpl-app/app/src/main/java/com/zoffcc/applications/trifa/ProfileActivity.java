@@ -383,7 +383,7 @@ public class ProfileActivity extends AppCompatActivity
                     mystatus_message_edittext.getText().toString().length(), TOX_MAX_STATUS_MESSAGE_LENGTH));
             tox_self_set_name(global_my_name);
             tox_self_set_status_message(global_my_status_message);
-            update_savedata_file_wrapper();
+            update_savedata_file_wrapper(); // after exiting from Profile Activity
         }
         catch (Exception e)
         {

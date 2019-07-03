@@ -41,7 +41,6 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
     private Context context;
 
     private ConferenceMessage getSectionText_message_object = null;
-    private ConferenceMessage getSectionText_message_object2 = null;
     long getSectionText_message_object_ts = -1L;
     long getSectionText_message_object_ts2 = -1L;
     String getSectionText_message_object_ts_string = " ";
@@ -278,7 +277,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
     {
         try
         {
-            getSectionText_message_object2 = messagelistitems.get(position);
+            ConferenceMessage getSectionText_message_object2 = messagelistitems.get(position);
 
             if (getSectionText_message_object2.direction == 0)
             {

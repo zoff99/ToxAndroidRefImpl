@@ -76,8 +76,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 32
-static const char global_version_string[] = "0.99.32";
+#define VERSION_PATCH 33
+static const char global_version_string[] = "0.99.33";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -228,6 +228,7 @@ jmethodID android_tox_callback_file_chunk_request_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_chunk_cb_method = NULL;
 jmethodID android_tox_callback_conference_invite_cb_method = NULL;
+jmethodID android_tox_callback_conference_connected_cb_method = NULL;
 jmethodID android_tox_callback_conference_message_cb_method = NULL;
 jmethodID android_tox_callback_conference_title_cb_method = NULL;
 jmethodID android_tox_callback_conference_peer_name_cb_method = NULL;
@@ -287,6 +288,7 @@ void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, 
 
 void conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE type, const uint8_t *cookie,
                           size_t length, void *user_data);
+void conference_connected_cb(Tox *tox, uint32_t conference_number, void *user_data);
 void conference_message_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number, TOX_MESSAGE_TYPE type,
                            const uint8_t *message, size_t length, void *user_data);
 void conference_title_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number, const uint8_t *title,
@@ -306,7 +308,7 @@ void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_
                         const char *message, void *user_data);
 
 void android_logger(int level, const char *logtext);
-jstring c_safe_string_from_java(char *instr, size_t len);
+jstring c_safe_string_from_java(const char *instr, size_t len);
 // functions -----------
 // functions -----------
 // functions -----------
@@ -576,6 +578,10 @@ void start_filter_audio(uint32_t in_samplerate)
 #endif
 }
 
+/*
+ * input_latency_ms mostly set to "0" (zero)
+ * use frame_duration_ms for cumulative value
+ */
 void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms)
 {
 #ifdef USE_ECHO_CANCELLATION
@@ -820,6 +826,7 @@ void init_tox_callbacks()
     tox_callback_friend_request(tox_global, friend_request_cb);
     tox_callback_friend_message(tox_global, friend_message_cb);
     tox_callback_conference_invite(tox_global, conference_invite_cb);
+    tox_callback_conference_connected(tox_global, conference_connected_cb);
     tox_callback_conference_message(tox_global, conference_message_cb);
     tox_callback_conference_title(tox_global, conference_title_cb);
     tox_callback_conference_peer_name(tox_global, conference_peer_name_cb);
@@ -861,6 +868,7 @@ void init_tox_callbacks()
     tox_callback_file_recv(tox_global, file_recv_cb);
     tox_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
     tox_callback_conference_invite(tox_global, conference_invite_cb);
+    tox_callback_conference_connected(tox_global, conference_connected_cb);
     tox_callback_conference_message(tox_global, conference_message_cb);
     tox_callback_conference_title(tox_global, conference_title_cb);
     tox_callback_conference_peer_name(tox_global, conference_peer_name_cb);
@@ -894,12 +902,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
     }
 
 #ifdef AV_MEDIACODEC
+
     // Required for MediaCodec HW decoder
-	if (av_jni_set_java_vm(jvm, NULL) != 0)
+    if(av_jni_set_java_vm(jvm, NULL) != 0)
     {
     }
-#endif
 
+#endif
     // dbg(0,"++ Found JVM ++");
     return JNI_VERSION_1_6;
 }
@@ -1319,7 +1328,7 @@ void android_tox_callback_file_recv_cb(uint32_t friend_number, uint32_t file_num
     dbg(9, "file_recv_cb:009");
 }
 
-jstring c_safe_string_from_java(char *instr, size_t len)
+jstring c_safe_string_from_java(const char *instr, size_t len)
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
@@ -1450,6 +1459,9 @@ void android_tox_callback_conference_invite_cb(uint32_t friend_number, TOX_CONFE
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)length);
+    dbg(9, "android_tox_callback_conference_invite_cb:cookie length=%d", (int)length);
+    dbg(9, "android_tox_callback_conference_invite_cb:byte 0=%d", (int)cookie[0]);
+    dbg(9, "android_tox_callback_conference_invite_cb:byte end=%d", (int)cookie[length - 1]);
 
     if(data2 == NULL)
     {
@@ -1473,6 +1485,22 @@ void conference_invite_cb(Tox *tox, uint32_t friend_number, TOX_CONFERENCE_TYPE 
 {
     android_tox_callback_conference_invite_cb(friend_number, type, cookie, length);
 }
+
+
+void android_tox_callback_conference_connected_cb(uint32_t conference_number)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_conference_connected_cb_method,
+                                     (jlong)(unsigned long long)conference_number);
+}
+
+void conference_connected_cb(Tox *tox, uint32_t conference_number, void *user_data)
+{
+    android_tox_callback_conference_connected_cb(conference_number);
+}
+
 
 // ------------ Conference [2] ------------
 // ------------ Conference [2] ------------
@@ -1516,11 +1544,29 @@ void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, 
 
 void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message)
 {
+    if(message == NULL)
+    {
+        return;
+    }
+
+    if(file == NULL)
+    {
+        return;
+    }
+
+    if(func == NULL)
+    {
+        return;
+    }
+
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-    jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
-    jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, func);
-    jstring js3 = (*jnienv2)->NewStringUTF(jnienv2, message);
+    // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
+    jstring js1 = c_safe_string_from_java((const char *)file, strlen(file));
+    // jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, func);
+    jstring js2 = c_safe_string_from_java((const char *)func, strlen(func));
+    // jstring js3 = (*jnienv2)->NewStringUTF(jnienv2, message);
+    jstring js3 = c_safe_string_from_java((const char *)message, strlen(message));
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, android_tox_log_cb_method, (int)level, js1,
                                      (jlong)(unsigned long long)line, js2, js3);
     (*jnienv2)->DeleteLocalRef(jnienv2, js1);
@@ -1770,7 +1816,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(
 
     if(filteraudio)
     {
-        set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+        set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
     }
 
 #endif
@@ -1876,7 +1922,8 @@ void android_logger(int level, const char *logtext)
         {
             JNIEnv *jnienv2;
             jnienv2 = jni_getenv();
-            jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
+            // jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, logtext);
+            jstring js2 = c_safe_string_from_java((const char *)logtext, strlen(logtext));
             (*jnienv2)->CallStaticVoidMethod(jnienv2, TrifaToxService_class, logger_method, level, js2);
             (*jnienv2)->DeleteLocalRef(jnienv2, js2);
         }
@@ -2110,6 +2157,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_file_recv_chunk_cb_method", "(JJJ[BJ)V");
     android_tox_callback_conference_invite_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_invite_cb_method", "(JI[BJ)V");
+    android_tox_callback_conference_connected_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_conference_connected_cb_method", "(J)V");
     android_tox_callback_conference_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_conference_message_cb_method", "(JJILjava/lang/String;J)V");
     android_tox_callback_conference_title_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2125,7 +2174,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
     start_filter_audio(recording_samling_rate);
-    set_delay_ms_filter_audio(10, global_audio_frame_duration_ms);
+    set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
     // -------- resumable FTs: not working fully yet, so turn it off --------
     tox_set_filetransfer_resumable(true);
     // tox_set_filetransfer_resumable(false);
@@ -4046,6 +4095,85 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIE
             jstring js1 = c_safe_string_from_java((char *)title, length);
             return js1;
         }
+    }
+}
+
+/**
+ * Return the number of conferences in the Tox instance.
+ * This should be used to determine how much memory to allocate for `tox_conference_get_chatlist`.
+ */
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1size(JNIEnv *env, jobject thiz)
+{
+    size_t res = tox_conference_get_chatlist_size(tox_global);
+    dbg(9, "tox_conference_get_chatlist_size=%d", (int)res);
+    return (jlong)(unsigned long long)res;
+}
+
+/**
+ * Copy a list of valid conference numbers into the array chatlist. Determine how much space
+ * to allocate for the array with the `tox_conference_get_chatlist_size` function.
+ */
+
+JNIEXPORT jlongArray JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist(JNIEnv *env, jobject thiz)
+{
+    size_t numconferences = tox_conference_get_chatlist_size(tox_global);
+    size_t memsize = (numconferences * sizeof(uint32_t));
+    uint32_t *conferences_list = malloc(memsize);
+    uint32_t *conferences_list_iter = conferences_list;
+    jlongArray result;
+    tox_conference_get_chatlist(tox_global, conferences_list);
+    result = (*env)->NewLongArray(env, numconferences);
+
+    if(result == NULL)
+    {
+        // TODO this would be bad!!
+    }
+
+    jlong buffer[numconferences];
+    size_t i = 0;
+
+    for(i=0; i<numconferences; i++)
+    {
+        buffer[i] = (long)conferences_list_iter[i];
+    }
+
+    (*env)->SetLongArrayRegion(env, result, 0, numconferences, buffer);
+
+    if(conferences_list)
+    {
+        free(conferences_list);
+    }
+
+    return result;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv *env, jobject thiz,
+        jlong conference_number, jobject cookie_buffer)
+{
+    uint8_t *cookie_buffer_c = NULL;
+    long capacity = 0;
+
+    if(cookie_buffer == NULL)
+    {
+        return -21;
+    }
+
+    cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
+    bool res = tox_conference_get_id(tox_global, (uint32_t)conference_number, (uint8_t *)cookie_buffer_c);
+
+    if(res == true)
+    {
+        return (jint)0;
+    }
+    else
+    {
+        return (jint)-1;
     }
 }
 

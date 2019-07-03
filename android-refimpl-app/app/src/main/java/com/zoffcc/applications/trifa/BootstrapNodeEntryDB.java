@@ -220,7 +220,7 @@ public class BootstrapNodeEntryDB
             char[] buffer = new char[1024];
             int chars_read;
 
-            String response_text = "";
+            StringBuilder response_text = new StringBuilder();
 
             // read until stream closes
             while ((chars_read = from_server.read(buffer)) != -1)
@@ -233,12 +233,12 @@ public class BootstrapNodeEntryDB
                     if (buffer[j] == '\n')
                     {
                         // System.out.println();
-                        response_text = response_text + "\n";
+                        response_text.append("\n");
                     }
                     else
                     {
                         // System.out.print(buffer[j]);
-                        response_text = response_text + buffer[j];
+                        response_text.append(buffer[j]);
                     }
                 }
                 // System.out.flush();

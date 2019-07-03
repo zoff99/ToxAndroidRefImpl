@@ -3,12 +3,14 @@ package org.whispersystems.witness
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedArtifact
 
 import java.security.MessageDigest
 
 class WitnessPluginExtension {
     List verify
+    String configuration
 }
 
 class WitnessPlugin implements Plugin<Project> {
@@ -31,9 +33,15 @@ class WitnessPlugin implements Plugin<Project> {
                     String name  = parts.get(1)
                     String hash  = parts.get(2)
 
-                    ResolvedArtifact dependency = project.configurations.compile.resolvedConfiguration.resolvedArtifacts.find {
+                    def artifacts = allArtifacts(project).findAll {
                         return it.name.equals(name) && it.moduleVersion.id.group.equals(group)
                     }
+
+                    if (artifacts.size() > 1) {
+                        throw new InvalidUserDataException("Multiple artifacts found for $group:$name, ${artifacts.size()} found")
+                    }
+
+                    ResolvedArtifact dependency = artifacts.find()
 
                     println "Verifying " + group + ":" + name
 
@@ -47,11 +55,17 @@ class WitnessPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('calculateChecksums') << {
+        project.task('calculateChecksums').doLast {
             println "dependencyVerification {"
+
+            def configurationName = project.dependencyVerification.configuration
+            if (configurationName != null) {
+                println "    configuration = '$configurationName'"
+            }
+
             println "    verify = ["
 
-            project.configurations.compile.resolvedConfiguration.resolvedArtifacts.each {
+            allArtifacts(project).each {
                 dep ->
                     println "        '" + dep.moduleVersion.id.group+ ":" + dep.name + ":" + calculateSha256(dep.file) + "',"
             }
@@ -60,5 +74,11 @@ class WitnessPlugin implements Plugin<Project> {
             println "}"
         }
     }
-}
 
+    private static Set<ResolvedArtifact> allArtifacts(Project project) {
+        def configurationName = project.dependencyVerification.configuration
+        project.configurations
+                .findAll { config -> config.name =~ configurationName }
+                .collectMany { it.resolvedConfiguration.resolvedArtifacts }
+    }
+}

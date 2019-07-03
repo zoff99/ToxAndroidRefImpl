@@ -39,15 +39,9 @@ import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
-import static com.zoffcc.applications.trifa.MessageListActivity.amode;
-import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 
 public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -91,14 +85,7 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
         }
         else
         {
-            if (selected_messages.contains(m.id))
-            {
-                is_selected = true;
-            }
-            else
-            {
-                is_selected = false;
-            }
+            is_selected = selected_messages.contains(m.id);
         }
 
         if (is_selected)

@@ -75,11 +75,11 @@
             android:layout_toRightOf="@id/f_user_status_icon"
             android:ellipsize="marquee"
             android:fontFamily="monospace"
-            android:maxLines="1"
             android:paddingRight="5dp"
             android:text="this is my status message long line this is my status message long line this is my status message long line"
             android:textSize="11sp"
-            android:typeface="monospace"/>
+            android:typeface="monospace"
+            android:singleLine="true" />
 
         <TextView
             android:id="@+id/f_name"

@@ -34,6 +34,7 @@ import android.widget.RemoteViews;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -45,14 +46,17 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelis
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
+import static com.zoffcc.applications.trifa.MainActivity.conference_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
 import static com.zoffcc.applications.trifa.MainActivity.get_toxconnection_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.new_or_updated_conference;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
 import static com.zoffcc.applications.trifa.MainActivity.receiver2;
@@ -60,6 +64,9 @@ import static com.zoffcc.applications.trifa.MainActivity.set_all_conferences_ina
 import static com.zoffcc.applications.trifa.MainActivity.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist_size;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
@@ -70,8 +77,10 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FULL_SPEED_SECONDS_AFTER_WENT_ONLINE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
@@ -466,6 +475,8 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "stop_tox_fg:002");
                 stop_me = true;
 
+                MainActivity.update_savedata_file_wrapper(); // save on tox shutdown
+
                 ToxServiceThread.interrupt();
                 Log.i(TAG, "stop_tox_fg:003");
                 try
@@ -806,11 +817,60 @@ public class TrifaToxService extends Service
                     {
                         Log.i(TAG, "need_add_bots:start");
                         add_friend_real(ECHOBOT_TOXID);
+                        add_friend_real(GROUPBOT_TOKTOK);
                         // HINT: Disabled per request JFreegman ---------
                         // add_friend_real(GROUPBOT_TOXID);
                         // ----------------------------------------------
                         set_g_opts("ADD_BOTS_ON_STARTUP_done", "true");
                         Log.i(TAG, "need_add_bots=true (INSERT)");
+                    }
+                }
+
+
+                long num_conferences = tox_conference_get_chatlist_size();
+                Log.i(TAG, "load conferences at startup: num=" + num_conferences);
+
+                long[] conference_numbers = tox_conference_get_chatlist();
+                ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
+
+                int conf_ = 0;
+                for (conf_ = 0; conf_ < num_conferences; conf_++)
+                {
+                    cookie_buf3.clear();
+                    if (tox_conference_get_id(conference_numbers[conf_], cookie_buf3) == 0)
+                    {
+                        byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
+                        cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
+                        String conference_identifier = bytes_to_hex(cookie_buffer);
+                        Log.i(TAG,
+                              "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +
+                              " offset=" + cookie_buf3.arrayOffset());
+
+                        final ConferenceDB conf2 = orma.selectFromConferenceDB().toList().get(0);
+                        Log.i(TAG,
+                              "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number +
+                              " " + conf2.name);
+
+                        new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
+                                                  conference_identifier,
+                                                  ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT.value); // rejoin a saved conference
+
+                        try
+                        {
+                            if (conference_message_list_activity != null)
+                            {
+                                if (conference_message_list_activity.get_current_conf_id().equals(
+                                        conference_identifier))
+                                {
+                                    conference_message_list_activity.set_conference_connection_status_icon();
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
                     }
                 }
 
@@ -975,7 +1035,9 @@ public class TrifaToxService extends Service
                 }
 
             }
-        };
+        }
+
+        ;
 
         ToxServiceThread.start();
     }

@@ -42,8 +42,6 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     private final List<Message> messagelistitems;
     private Context context;
-    private Message getSectionText_message_object = null;
-    private Message getSectionText_message_object2 = null;
     long getSectionText_message_object_ts = -1L;
     long getSectionText_message_object_ts2 = -1L;
     String getSectionText_message_object_ts_string = " ";
@@ -442,7 +440,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     {
         try
         {
-            getSectionText_message_object = messagelistitems.get(position);
+            Message getSectionText_message_object = messagelistitems.get(position);
 
             if (getSectionText_message_object.direction == 0)
             {
@@ -484,7 +482,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     {
         try
         {
-            getSectionText_message_object2 = messagelistitems.get(position);
+            Message getSectionText_message_object2 = messagelistitems.get(position);
 
             if (getSectionText_message_object2.direction == 0)
             {

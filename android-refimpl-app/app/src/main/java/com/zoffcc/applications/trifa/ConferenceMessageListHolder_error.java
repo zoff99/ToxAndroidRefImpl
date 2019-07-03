@@ -64,14 +64,7 @@ public class ConferenceMessageListHolder_error extends RecyclerView.ViewHolder
         }
         else
         {
-            if (selected_messages.contains(m.id))
-            {
-                is_selected = true;
-            }
-            else
-            {
-                is_selected = false;
-            }
+            is_selected = selected_messages.contains(m.id);
         }
 
         if (is_selected)

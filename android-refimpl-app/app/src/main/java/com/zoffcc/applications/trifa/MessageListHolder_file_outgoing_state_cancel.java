@@ -35,7 +35,6 @@ import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,14 +56,8 @@ import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
-import static com.zoffcc.applications.trifa.MessageListActivity.amode;
-import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 
 public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -131,14 +124,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         }
         else
         {
-            if (selected_messages.contains(m.id))
-            {
-                is_selected = true;
-            }
-            else
-            {
-                is_selected = false;
-            }
+            is_selected = selected_messages.contains(m.id);
         }
 
         if (is_selected)

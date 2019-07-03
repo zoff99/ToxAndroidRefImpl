@@ -41,7 +41,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -75,7 +74,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     boolean is_selected = false;
     boolean is_system_message = false;
     ImageView img_corner;
-    private boolean have_avatar_for_pubkey = false;
 
     public ConferenceMessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -102,11 +100,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         // Log.i(TAG, "have_avatar_for_pubkey:0000:==========================");
 
-        is_system_message = false;
-        if (m.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY))
-        {
-            is_system_message = true;
-        }
+        is_system_message = m.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY);
         // Log.i(TAG, "is_system_message=" + is_system_message + " m.tox_peerpubkey=" + m.tox_peerpubkey);
 
         is_selected = false;
@@ -116,14 +110,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         }
         else
         {
-            if (selected_messages.contains(m.id))
-            {
-                is_selected = true;
-            }
-            else
-            {
-                is_selected = false;
-            }
+            is_selected = selected_messages.contains(m.id);
         }
 
         if (is_selected)
@@ -235,7 +222,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         // int peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
 
 
-        have_avatar_for_pubkey = false;
+        boolean have_avatar_for_pubkey = false;
         // Log.i(TAG, "have_avatar_for_pubkey:00a01:" + have_avatar_for_pubkey);
 
         FriendList fl_temp = null;

@@ -45,6 +45,7 @@ public class FriendListFragment extends Fragment
     List<FriendList> data_values2 = new ArrayList<FriendList>();
     // FriendlistArrayAdapter a = null;
     static Boolean in_update_data = false;
+    static final Boolean in_update_data_lock = false;
     //  View view1 = null;
     RecyclerView listingsView = null;
     FriendlistAdapter adapter = null;
@@ -319,7 +320,7 @@ public class FriendListFragment extends Fragment
             {
                 try
                 {
-                    synchronized (in_update_data)
+                    synchronized (in_update_data_lock)
                     {
                         if (in_update_data == true)
                         {
