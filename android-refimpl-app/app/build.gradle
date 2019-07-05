@@ -130,7 +130,7 @@ android {
     lintOptions {
         abortOnError false
         absolutePaths false
-        lintConfig file("lint.xml")
+        // lintConfig file("lint.xml")
         showAll true
         textReport true
         xmlReport true
