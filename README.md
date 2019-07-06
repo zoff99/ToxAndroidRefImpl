@@ -16,7 +16,7 @@ Build Status
 Get in touch
 =
 * <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
-* <a href="https://matrix.to/#/#freenode_#tox:matrix.org">Join Toxuser Channel</a><br>
+* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Join Tox IRC Channel</a><br>
 
 Compile in Android Studio
 =
