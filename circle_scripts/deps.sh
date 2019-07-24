@@ -594,20 +594,21 @@ if [ "$full""x" == "1x" ]; then
         --install-dir "$_toolchain_"/x86 --api 12 --force   
 
 
-    if [ "$build_yasm""x" == "1x" ]; then
-    # --- YASM ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
-    cd $_s_/yasm/;autoreconf -fi
-    rm -Rf "$_BLD_"
-    mkdir -p "$_BLD_"
-    cd "$_BLD_";$_s_/yasm/configure --prefix="$_toolchain_"/x86/sysroot/usr \
-        --disable-shared --disable-soname-versions --host=x86 \
-        --with-sysroot="$_toolchain_"/x86/sysroot
-    cd "$_BLD_";make -j $_CPUS_ || exit 1
-    cd "$_BLD_";make install
-    # --- YASM ---
-    fi
+#    if [ "$build_yasm""x" == "1x" ]; then
+#    # --- YASM ---
+#    cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
+#    cd $_s_/yasm/;autoreconf -fi
+#    rm -Rf "$_BLD_"
+#    mkdir -p "$_BLD_"
+#    cd "$_BLD_";$_s_/yasm/configure --prefix="$_toolchain_"/x86/sysroot/usr \
+#        --disable-shared --disable-soname-versions --host=x86 \
+#        --with-sysroot="$_toolchain_"/x86/sysroot
+#    cd "$_BLD_";make -j $_CPUS_ || exit 1
+#    cd "$_BLD_";make install
+#    # --- YASM ---
+#    fi
 
+    redirect_cmd apt-get install $qqq -y --force-yes yasm
 
 
     # --- LIBAV ---
