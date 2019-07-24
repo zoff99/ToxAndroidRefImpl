@@ -379,14 +379,14 @@ rm -Rf $_s_/trifa_src
 mkdir -p $_s_/jni-c-toxcore
 mkdir -p $_s_/trifa_src
 
-git clone https://github.com/zoff99/ToxAndroidRefImpl $_s_/trifa_src
-cd $_s_/trifa_src
-git checkout "zoff99/dev003"
+ls -al /home/work/
+echo "++++++++"
+ls -al /home/work/ToxAndroidRefImpl/
+
+rsync -av /home/work/ToxAndroidRefImpl/ $_s_/trifa_src
 
 pwd
 pwd
-
-# rsync -av /home/zoff/github/trifa001/ToxAndroidRefImpl/jni-c-toxcore/ ./jni-c-toxcore/ 
 
 cp -av $_s_/trifa_src/jni-c-toxcore $_s_/
 # ----- get the source -----
