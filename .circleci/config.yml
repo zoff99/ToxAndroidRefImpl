@@ -13,7 +13,7 @@ jobs:
     #machine:
     #  image: circleci/classic:latest
     docker:
-      - image: ubuntu:yakkety
+      - image: ubuntu:16.04
 
     steps:
       - run: &apt_install
