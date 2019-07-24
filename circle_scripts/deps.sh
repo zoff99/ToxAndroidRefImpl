@@ -110,6 +110,7 @@ mkdir -p $_SRC_
 mkdir -p $_INST_
 
 
+export ORIG_PATH_=$PATH
 
 
 export _SDK_="$_INST_/sdk"
@@ -124,7 +125,7 @@ export CF3=" -funsafe-math-optimizations -ffast-math "
 # ---- arm -----
 export AND_TOOLCHAIN_ARCH="arm"
 export AND_TOOLCHAIN_ARCH2="arm-linux-androideabi"
-export AND_PATH="$_toolchain_/arm-linux-androideabi/bin:$PATH"
+export AND_PATH="$_toolchain_/arm-linux-androideabi/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
 export AND_GCC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-gcc"
@@ -133,7 +134,8 @@ export AND_READELF="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi
 export AND_ARTEFACT_DIR="arm"
 
 
-export PATH="$_SDK_"/tools/bin:$PATH
+
+export PATH="$_SDK_"/tools/bin:$ORIG_PATH_
 
 export ANDROID_NDK_HOME="$_NDK_"
 export ANDROID_HOME="$_SDK_"
@@ -494,7 +496,7 @@ export CF3=" -funsafe-math-optimizations -ffast-math "
 # ---- arm -----
 export AND_TOOLCHAIN_ARCH="x86"
 export AND_TOOLCHAIN_ARCH2="x86"
-export AND_PATH="$_toolchain_/x86/bin:$PATH"
+export AND_PATH="$_toolchain_/x86/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/x86/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/x86/bin/i686-linux-android-clang"
 export AND_GCC="$_toolchain_/x86/bin/i686-linux-android-gcc"
@@ -502,8 +504,7 @@ export AND_CXX="$_toolchain_/x86/bin/i686-linux-android-clang++"
 export AND_READELF="$_toolchain_/x86/bin/i686-linux-android-readelf"
 export AND_ARTEFACT_DIR="x86"
 
-
-export PATH="$_SDK_"/tools/bin:$PATH
+export PATH="$_SDK_"/tools/bin:$ORIG_PATH_
 
 export ANDROID_NDK_HOME="$_NDK_"
 export ANDROID_HOME="$_SDK_"
@@ -683,6 +684,7 @@ if [ "$full""x" == "1x" ]; then
         --disable-opencl --enable-static \
         --disable-avs --disable-cli --enable-pic \
         --host=i686-linux-android \
+        --disable-asm \
         --sysroot="$_toolchain_"/x86/sysroot
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
