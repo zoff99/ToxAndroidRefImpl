@@ -1,0 +1,42 @@
+---
+version: 2
+
+workflows:
+  version: 2
+  build_linux:
+    jobs:
+      - build
+
+jobs:
+  build:
+    working_directory: ~/work
+    #machine:
+    #  image: circleci/classic:latest
+    docker:
+      - image: ubuntu:yakkety
+
+    steps:
+      - run: &apt_install
+          apt update &&
+          apt install -y --no-install-recommends
+            clang
+            cmake
+            libconfig-dev
+            libgtest-dev
+            ninja-build
+            pkg-config
+            zip grep file ca-certificates autotools-dev autoconf automake
+            git bc wget rsync cmake make pkg-config yasm libtool
+            libasound2-dev libv4l-dev ssh gzip tar
+            coreutils
+      - checkout
+      - restore_cache:
+          key: ctc-library-dependencies-v1-{{ .Branch }}
+
+      - run: mkdir -p ~/work/deploy
+      - run: if [ -e build_dir ]; then export oo="cache" ; else export oo="" ; fi ; mkdir -p build_dir ; cd build_dir ; pwd ; ls -al ; bash ../circle_scripts/deps.sh "$oo"
+      - run: cd build_dir ; bash ../circle_scripts/ctoxcore.sh '../'
+
+      - save_cache:
+          paths: [ "~/work/build_dir" ]
+          key: ctc-library-dependencies-v1-{{ .Branch }}
