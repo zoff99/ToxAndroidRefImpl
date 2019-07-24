@@ -11,6 +11,7 @@ numcpus_=$(nproc)
 quiet_=0
 full="1"
 download_full="1"
+build_yasm="1"
 ## ----------------------
 
 
@@ -223,6 +224,7 @@ if [ "$full""x" == "1x" ]; then
         --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
 
 
+    if [ "$build_yasm""x" == "1x" ]; then
     # --- YASM ---
     cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
     cd $_s_/yasm/;autoreconf -fi
@@ -234,7 +236,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
     # --- YASM ---
-
+    fi
 
 
 
@@ -388,11 +390,11 @@ rm -Rf $_s_/trifa_src
 mkdir -p $_s_/jni-c-toxcore
 mkdir -p $_s_/trifa_src
 
-ls -al /home/work/
+ls -al /root/work/
 echo "++++++++"
-ls -al /home/work/ToxAndroidRefImpl/
+ls -al /root/work/ToxAndroidRefImpl/
 
-rsync -av /home/work/ToxAndroidRefImpl/ $_s_/trifa_src/
+rsync -av /root/work/ToxAndroidRefImpl/ $_s_/trifa_src/
 
 pwd
 pwd
