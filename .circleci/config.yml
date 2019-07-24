@@ -26,8 +26,8 @@ jobs:
             ninja-build
             pkg-config
             zip grep file ca-certificates autotools-dev autoconf automake
-            git bc wget rsync cmake make pkg-config yasm libtool
-            libasound2-dev libv4l-dev ssh gzip tar
+            git bc wget rsync cmake make pkg-config libtool
+            ssh gzip tar
             coreutils
       - checkout
       - restore_cache:
