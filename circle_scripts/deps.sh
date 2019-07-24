@@ -608,7 +608,28 @@ if [ "$full""x" == "1x" ]; then
 #    # --- YASM ---
 #    fi
 
-    redirect_cmd apt-get install $qqq -y --force-yes yasm
+#    redirect_cmd apt-get install $qqq -y --force-yes yasm
+
+
+
+    # --- NASM ---
+    cd $_s_
+    rm -Rf nasm
+    git clone http://repo.or.cz/nasm.git
+    cd $_s_/nasm
+    git checkout nasm-2.13.03
+    ./autogen.sh
+    ./configure --prefix=/
+    make -j12
+    # seems man pages are not always built. but who needs those
+    touch nasm.1
+    touch ndisasm.1
+    make install
+    type -a nasm
+    nasm --version
+    # --- NASM ---
+
+
 
 
     # --- LIBAV ---
