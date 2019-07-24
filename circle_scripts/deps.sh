@@ -381,25 +381,11 @@ cd "$_BLD_";make install
 
 
 # ----- get the source -----
-
-echo "+++++++++++++++++++++++++++++++"
-set -x
-
 rm -Rf $_s_/jni-c-toxcore
 rm -Rf $_s_/trifa_src
 mkdir -p $_s_/jni-c-toxcore
 mkdir -p $_s_/trifa_src
-
-ls -al /root/work/
-echo "++++++++"
-ls -al /root/work/ToxAndroidRefImpl/
-
-rsync -av /root/work/ToxAndroidRefImpl/ $_s_/trifa_src/
-
-pwd
-pwd
-
-cp -av $_s_/trifa_src/jni-c-toxcore $_s_/
+cp -av /root/work/jni-c-toxcore $_s_/
 # ----- get the source -----
 
 
