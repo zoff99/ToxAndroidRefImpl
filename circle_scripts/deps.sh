@@ -16,13 +16,16 @@ download_full="1"
 
 
 _HOME2_=$(dirname $0)
-# _HOME2_="/workspace"
-export WRKSPACEDIR="$_HOME2_""/workspace/"
-export CIRCLE_ARTIFACTS="$_HOME2_""/artefacts/"
-
 export _HOME2_
 _HOME_=$(cd $_HOME2_;pwd)
 export _HOME_
+
+echo "_HOME_=$_HOME_"
+export WRKSPACEDIR="$_HOME_""/workspace/"
+export CIRCLE_ARTIFACTS="$_HOME_""/artefacts/"
+mkdir -p $WRKSPACEDIR
+mkdir -p $CIRCLE_ARTIFACTS
+
 
 export qqq=""
 
@@ -374,6 +377,9 @@ cd "$_BLD_";make install
 
 # ----- get the source -----
 
+echo "+++++++++++++++++++++++++++++++"
+set -x
+
 rm -Rf $_s_/jni-c-toxcore
 rm -Rf $_s_/trifa_src
 mkdir -p $_s_/jni-c-toxcore
@@ -383,7 +389,7 @@ ls -al /home/work/
 echo "++++++++"
 ls -al /home/work/ToxAndroidRefImpl/
 
-rsync -av /home/work/ToxAndroidRefImpl/ $_s_/trifa_src
+rsync -av /home/work/ToxAndroidRefImpl/ $_s_/trifa_src/
 
 pwd
 pwd
