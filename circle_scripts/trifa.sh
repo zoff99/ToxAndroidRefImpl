@@ -452,7 +452,7 @@ ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
 cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
-
+# --> /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so
 
 
 #### ARM build ###############################################
