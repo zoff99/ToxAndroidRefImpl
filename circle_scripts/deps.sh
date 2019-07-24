@@ -242,7 +242,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1
+    cd $_s_/libav/; git checkout n4.1.4
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
