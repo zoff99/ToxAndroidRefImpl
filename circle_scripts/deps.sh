@@ -15,12 +15,15 @@ download_full="1"
 
 
 
-_HOME2_=$(dirname $0)
-export _HOME2_
-_HOME_=$(cd $_HOME2_;pwd)
-export _HOME_
+#_HOME2_=$(dirname $0)
+#export _HOME2_
+#_HOME_=$(cd $_HOME2_;pwd)
+#export _HOME_
 
+_HOME_="/root/work/"
+export _HOME_
 echo "_HOME_=$_HOME_"
+
 export WRKSPACEDIR="$_HOME_""/workspace/"
 export CIRCLE_ARTIFACTS="$_HOME_""/artefacts/"
 mkdir -p $WRKSPACEDIR
