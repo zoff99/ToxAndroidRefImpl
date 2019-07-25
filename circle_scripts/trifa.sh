@@ -253,6 +253,7 @@ ls -al ~/
 jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androiddebugkey
 
 ls -al ~/
+find . -name zipalign
 $_SDK_/build-tools/23.0.3/zipalign -v 4 app-signed.apk app-signed-aligned.apk
 
 ls -al ~/
