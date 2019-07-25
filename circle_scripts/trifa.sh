@@ -258,7 +258,10 @@ type -a jarsigner
 
 ls -al ~/
 find . -name zipalign
-$_SDK_/build-tools/23.0.3/zipalign -v 4 app-signed.apk app-signed-aligned.apk
+ls -al ./work/trifa_inst/sdk/build-tools/23.0.3/zipalign
+ls -al $_SDK_/build-tools/23.0.3/zipalign
+cd ~/
+$_SDK_/build-tools/23.0.3/zipalign -v 4 ~/app-signed.apk ~/app-signed-aligned.apk
 
 ls -al ~/
 pwd
