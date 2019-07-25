@@ -8,7 +8,7 @@ START_TIME=$SECONDS
 
 ## ----------------------
 numcpus_=$(nproc)
-quiet_=0
+quiet_=1
 full="1"
 download_full="1"
 build_yasm="1"
