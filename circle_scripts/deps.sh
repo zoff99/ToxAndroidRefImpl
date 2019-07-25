@@ -602,17 +602,17 @@ if [ "$full""x" == "1x" ]; then
         # --- YASM ---
         cd $_s_
         rm -Rf yasm
-        cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
-        cd $_s_/yasm/;autoreconf -fi
-        rm -Rf "$_BLD_"
-        mkdir -p "$_BLD_"
-        cd "$_BLD_";$_s_/yasm/configure --prefix="$_toolchain_"/x86/sysroot/usr \
-            --disable-shared --disable-soname-versions --host=x86 \
-            --with-sysroot="$_toolchain_"/x86/sysroot
-        cd "$_BLD_";make -j $_CPUS_ || exit 1
-        cd "$_BLD_";make install
-        echo $PATH
-        type -a yasm
+#        cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
+#        cd $_s_/yasm/;autoreconf -fi
+#        rm -Rf "$_BLD_"
+#        mkdir -p "$_BLD_"
+#        cd "$_BLD_";$_s_/yasm/configure --prefix="$_toolchain_"/x86/sysroot/usr \
+#            --disable-shared --disable-soname-versions --host=x86 \
+#            --with-sysroot="$_toolchain_"/x86/sysroot
+#        cd "$_BLD_";make -j $_CPUS_ || exit 1
+#        cd "$_BLD_";make install
+#        echo $PATH
+#        type -a yasm
         # --- YASM ---
     fi
 
@@ -656,6 +656,7 @@ if [ "$full""x" == "1x" ]; then
         --sysroot="$_toolchain_"/x86/sysroot \
         --extra-cflags="$ECFLAGS" \
         --extra-ldflags="$ELDFLAGS" \
+        --disable-asm \
         --disable-shared --enable-static \
         --enable-pthreads \
         --disable-symver \
@@ -711,9 +712,11 @@ if [ "$full""x" == "1x" ]; then
           --disable-examples \
           --disable-unit-tests \
           --target=x86-android-gcc \
+          --disable-mmx --disable-sse \
+          --disable-sse2 --disable-sse3 --disable-ssse3 --disable-sse4_1 \
+          --disable-runtime_cpu_detect \
           --size-limit=16384x16384 \
-          --enable-onthefly-bitpacking \
-          --enable-runtime-cpu-detect \
+          --disable-onthefly-bitpacking \
           --enable-realtime-only \
           --enable-multi-res-encoding \
           --enable-temporal-denoising
