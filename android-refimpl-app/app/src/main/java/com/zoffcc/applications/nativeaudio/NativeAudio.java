@@ -23,7 +23,6 @@ import com.zoffcc.applications.trifa.AudioRecording;
 
 import java.nio.ByteBuffer;
 
-import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
 
 public class NativeAudio
@@ -52,23 +51,15 @@ public class NativeAudio
 
         native_audio_engine_down = true;
 
-        try
-        {
-            Thread.sleep(100);
-        }
-        catch (Exception e)
-        {
-        }
-
         // if (isPlaying() == 1)
-        {
+        //{
             NativeAudio.StopPCM16();
-        }
+        //}
 
         // if (isRecording() == 1)
-        {
+        //{
             NativeAudio.StopREC();
-        }
+        //}
         NativeAudio.shutdownEngine();
 
         NativeAudio.createEngine(n_audio_in_buffer_max_count);
