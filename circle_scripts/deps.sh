@@ -684,8 +684,10 @@ if [ "$full""x" == "1x" ]; then
         --disable-opencl --enable-static \
         --disable-avs --disable-cli --enable-pic \
         --host=i686-linux-android \
-        --disable-asm \
         --sysroot="$_toolchain_"/x86/sysroot
+
+#        --disable-asm \
+
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
     # --- X264 ---
