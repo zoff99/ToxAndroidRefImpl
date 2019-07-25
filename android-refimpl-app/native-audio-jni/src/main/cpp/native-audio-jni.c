@@ -64,7 +64,7 @@
 #include <android/asset_manager_jni.h>
 
 const char *LOGTAG = "trifa.nativeaudio";
-#define DEBUG_NATIVE_AUDIO_DEEP 1 // define to activate full debug logging
+// #define DEBUG_NATIVE_AUDIO_DEEP 1 // define to activate full debug logging
 
 // -----------------------------
 JavaVM *cachedJVM = NULL;
