@@ -251,6 +251,9 @@ fi
 
 ls -al ~/
 jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androiddebugkey
+type -a apksigner
+type -a jarsigner
+# apksigner sign --ks keystore.jks --key key.pk8 --cert cert.x509.pem app-name.apk
 
 ls -al ~/
 find . -name zipalign
