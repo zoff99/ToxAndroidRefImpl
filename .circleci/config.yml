@@ -30,13 +30,13 @@ jobs:
             ssh gzip tar
             coreutils
       - checkout
-      - restore_cache:
-          key: ctc-library-dependencies-v1-{{ .Branch }}
+      #- restore_cache:
+      #    key: ctc-library-dependencies-v2-{{ .Branch }}
 
       - run: mkdir -p ~/work/deploy
       - run: if [ -e build_dir ]; then export oo="cache" ; else export oo="" ; fi ; mkdir -p build_dir ; cd build_dir ; pwd ; ls -al ; bash ../circle_scripts/deps.sh "$oo"
       - run: cd build_dir ; bash ../circle_scripts/trifa.sh '../'
 
-      - save_cache:
-          paths: [ "~/work/build_dir" ]
-          key: ctc-library-dependencies-v1-{{ .Branch }}
+      #- save_cache:
+      #    paths: [ "~/work/build_dir" ]
+      #    key: ctc-library-dependencies-v2-{{ .Branch }}
