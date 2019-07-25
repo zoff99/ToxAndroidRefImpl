@@ -149,10 +149,10 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
+        redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
 
         cd $WRKSPACEDIR
-        curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+        redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
     fi
 
     cd $WRKSPACEDIR
@@ -161,10 +161,10 @@ if [ "$full""x" == "1x" ]; then
         > sdk.zip.sha256
     sha256sum -c sdk.zip.sha256 || exit 1
     # --- verfiy SDK package ---
-    unzip sdk.zip
+    redirect_cmd unzip sdk.zip
     mkdir -p "$_SDK_"
     mv -v tools "$_SDK_"/
-    yes | "$_SDK_"/tools/bin/sdkmanager --licenses
+    yes | "$_SDK_"/tools/bin/sdkmanager --licenses > /dev/null 2>&1
 
     # Install Android Build Tool and Libraries ------------------------------
     # Install Android Build Tool and Libraries ------------------------------
@@ -172,13 +172,13 @@ if [ "$full""x" == "1x" ]; then
     $ANDROID_HOME/tools/bin/sdkmanager --update
     ANDROID_VERSION=26
     ANDROID_BUILD_TOOLS_VERSION=26.0.2
-    $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
         "platforms;android-${ANDROID_VERSION}" \
         "platform-tools"
     ANDROID_VERSION=25
-    $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
     ANDROID_BUILD_TOOLS_VERSION=25.0.0
-    $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
 
     echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
     echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
@@ -200,7 +200,7 @@ if [ "$full""x" == "1x" ]; then
         > android-ndk-r13b-linux-x86_64.zip.sha256
     sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
     # --- verfiy NDK package ---
-    unzip android-ndk-r13b-linux-x86_64.zip
+    redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
     rm -Rf "$_NDK_"
     mv -v android-ndk-r13b "$_NDK_"
 
@@ -222,7 +222,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     mkdir -p "$PKG_CONFIG_PATH"
-    $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
+    redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
         --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
 
 
@@ -518,10 +518,10 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
+        redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
 
         cd $WRKSPACEDIR
-        curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+        redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
     fi
 
     cd $WRKSPACEDIR
@@ -530,24 +530,24 @@ if [ "$full""x" == "1x" ]; then
         > sdk.zip.sha256
     sha256sum -c sdk.zip.sha256 || exit 1
     # --- verfiy SDK package ---
-    unzip sdk.zip
+    redirect_cmd unzip sdk.zip
     mkdir -p "$_SDK_"
     mv -v tools "$_SDK_"/
-    yes | "$_SDK_"/tools/bin/sdkmanager --licenses
+    yes | "$_SDK_"/tools/bin/sdkmanager --licenses > /dev/null 2>&1
 
     # Install Android Build Tool and Libraries ------------------------------
     # Install Android Build Tool and Libraries ------------------------------
     # Install Android Build Tool and Libraries ------------------------------
-    $ANDROID_HOME/tools/bin/sdkmanager --update
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager --update
     ANDROID_VERSION=26
     ANDROID_BUILD_TOOLS_VERSION=26.0.2
     $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
         "platforms;android-${ANDROID_VERSION}" \
         "platform-tools"
     ANDROID_VERSION=25
-    $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
     ANDROID_BUILD_TOOLS_VERSION=25.0.0
-    $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
 
     echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
     echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
@@ -569,7 +569,7 @@ if [ "$full""x" == "1x" ]; then
         > android-ndk-r13b-linux-x86_64.zip.sha256
     sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
     # --- verfiy NDK package ---
-    unzip android-ndk-r13b-linux-x86_64.zip
+    redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
     rm -Rf "$_NDK_"
     mv -v android-ndk-r13b "$_NDK_"
 
@@ -591,7 +591,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     mkdir -p "$PKG_CONFIG_PATH"
-    $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
+    redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
         --install-dir "$_toolchain_"/x86 --api 12 --force   
 
 
