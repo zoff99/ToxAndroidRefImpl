@@ -454,8 +454,11 @@ ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
 cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
-# --> /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so
+$READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
+$READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
+$READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
+# --> /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so
 
 #### ARM build ###############################################
 
@@ -848,6 +851,10 @@ ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
 cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/x86/
+
+$READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
+$READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
+$READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 # --> /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so
 
