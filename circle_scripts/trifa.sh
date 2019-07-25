@@ -9,7 +9,6 @@ START_TIME=$SECONDS
 ## ----------------------
 numcpus_=$(nproc)
 quiet_=1
-full="1"
 download_full="1"
 ## ----------------------
 
@@ -87,67 +86,66 @@ mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
-if [ "$full""x" == "1x" ]; then
 
-    if [ "$download_full""x" == "1x" ]; then
-        cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
-
-        cd $WRKSPACEDIR
-        redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
-    fi
+if [ "$download_full""x" == "1x" ]; then
+    cd $WRKSPACEDIR
+    redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
 
     cd $WRKSPACEDIR
-    # --- verfiy SDK package ---
-    echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
-        > sdk.zip.sha256
-    sha256sum -c sdk.zip.sha256 || exit 1
-    # --- verfiy SDK package ---
-    redirect_cmd unzip sdk.zip
-    mkdir -p "$_SDK_"
-    mv -v tools "$_SDK_"/
-    yes | "$_SDK_"/tools/bin/sdkmanager --licenses > /dev/null 2>&1
+    redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+fi
 
-    # Install Android Build Tool and Libraries ------------------------------
-    # Install Android Build Tool and Libraries ------------------------------
-    # Install Android Build Tool and Libraries ------------------------------
-    $ANDROID_HOME/tools/bin/sdkmanager --update
-    ANDROID_VERSION=26
-    ANDROID_BUILD_TOOLS_VERSION=26.0.2
-    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
-        "platforms;android-${ANDROID_VERSION}" \
-        "platform-tools"
-    ANDROID_VERSION=25
-    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
-    ANDROID_BUILD_TOOLS_VERSION=25.0.0
-    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+cd $WRKSPACEDIR
+# --- verfiy SDK package ---
+echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
+    > sdk.zip.sha256
+sha256sum -c sdk.zip.sha256 || exit 1
+# --- verfiy SDK package ---
+redirect_cmd unzip sdk.zip
+mkdir -p "$_SDK_"
+mv -v tools "$_SDK_"/
+yes | "$_SDK_"/tools/bin/sdkmanager --licenses > /dev/null 2>&1
 
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3"
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
-    # -- why is this not just called "cmake" ? --
-    # cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
-    # -- why is this not just called "cmake" ? --
-    # Install Android Build Tool and Libraries ------------------------------
-    # Install Android Build Tool and Libraries ------------------------------
-    # Install Android Build Tool and Libraries
+# Install Android Build Tool and Libraries ------------------------------
+# Install Android Build Tool and Libraries ------------------------------
+# Install Android Build Tool and Libraries ------------------------------
+$ANDROID_HOME/tools/bin/sdkmanager --update
+ANDROID_VERSION=26
+ANDROID_BUILD_TOOLS_VERSION=26.0.2
+redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+    "platforms;android-${ANDROID_VERSION}" \
+    "platform-tools"
+ANDROID_VERSION=25
+redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
+ANDROID_BUILD_TOOLS_VERSION=25.0.0
+redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
 
-
-    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
-    chmod u+x $_HOME_/pp
-    rm -Rf "$_s_"
-    mkdir -p "$_s_"
+echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
+echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
+echo y | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3"
+echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
+# -- why is this not just called "cmake" ? --
+# cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
+echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
+# -- why is this not just called "cmake" ? --
+# Install Android Build Tool and Libraries ------------------------------
+# Install Android Build Tool and Libraries ------------------------------
+# Install Android Build Tool and Libraries
 
 
-    ## ------- init vars ------- ##
-    ## ------- init vars ------- ##
-    ## ------- init vars ------- ##
-    . $_HOME_/pp
-    ## ------- init vars ------- ##
-    ## ------- init vars ------- ##
-    ## ------- init vars ------- ##
+echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
+chmod u+x $_HOME_/pp
+rm -Rf "$_s_"
+mkdir -p "$_s_"
+
+
+## ------- init vars ------- ##
+## ------- init vars ------- ##
+## ------- init vars ------- ##
+. $_HOME_/pp
+## ------- init vars ------- ##
+## ------- init vars ------- ##
+## ------- init vars ------- ##
 
 
 
