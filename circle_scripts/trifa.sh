@@ -44,8 +44,8 @@ redirect_cmd() {
 
 echo $_HOME_
 
-export _SRC_=$_HOME_/trifa/build/
-export _INST_=$_HOME_/trifa/inst/
+export _SRC_=$_HOME_/trifa_build/
+export _INST_=$_HOME_/trifa_inst/
 
 echo $_SRC_
 echo $_INST_
@@ -61,6 +61,7 @@ export ORIG_PATH_=$PATH
 
 
 export _SDK_="$_INST_/sdk"
+export _NDK_="$_INST_/ndk/"
 export _BLD_="$_SRC_/build/"
 export _CPUS_=$numcpus_
 
@@ -102,6 +103,11 @@ echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip'
 sha256sum -c sdk.zip.sha256 || exit 1
 # --- verfiy SDK package ---
 redirect_cmd unzip sdk.zip
+
+# -- clean SDK dir --
+rm -Rf "$_SDK_"
+# -- clean SDK dir --
+
 mkdir -p "$_SDK_"
 mv -v tools "$_SDK_"/
 yes | "$_SDK_"/tools/bin/sdkmanager --licenses > /dev/null 2>&1
@@ -131,6 +137,19 @@ echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries
+
+
+
+cd $WRKSPACEDIR
+# --- verfiy NDK package ---
+echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' \
+    > android-ndk-r13b-linux-x86_64.zip.sha256
+sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
+# --- verfiy NDK package ---
+redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
+rm -Rf "$_NDK_"
+mv -v android-ndk-r13b "$_NDK_"
+
 
 
 echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
@@ -192,7 +211,10 @@ cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so $_s_/trifa_sr
   ls -al app/build/outputs/apk/
   find ./ -name '*.apk'
   mkdir -p app/build/outputs/apk/
-  cp -av ./app/build/outputs/apk/app-release-unsigned.apk ../app/build/outputs/apk/
+  cp -av ./app/build/outputs/apk/release/app-release-unsigned.apk ./app/build/outputs/apk/
+  
+  
+  ls -hal $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk
 # ----------- show generated apk file -----------
 
 
