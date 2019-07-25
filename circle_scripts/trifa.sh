@@ -55,6 +55,7 @@ echo "installing more system packages ..."
 redirect_cmd apt-get install $qqq -y --force-yes qrencode
 redirect_cmd apt-get install $qqq -y --force-yes p7zip-full
 redirect_cmd apt-get install $qqq -y --force-yes astyle
+redirect_cmd apt-get install $qqq -y --force-yes pax-utils
 
 echo $_HOME_
 
@@ -200,6 +201,11 @@ cp -av /root/work/android-refimpl-app $_s_/trifa_src/
 cp -av /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so $_s_/trifa_src/android-refimpl-app/app/nativelibs/armeabi-v7a/
 cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86/
 
+echo "###### ---------- ARM --------------------"
+scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/armeabi-v7a//libjni-c-toxcore.so
+echo "###### ---------- X86 --------------------"
+scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86//libjni-c-toxcore.so
+echo "###### ------------------------------"
 
 # ----- get the source -----
 
