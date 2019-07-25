@@ -41,6 +41,20 @@ redirect_cmd() {
 
 
 
+echo "installing system packages ..."
+
+redirect_cmd apt-get update $qqq
+
+redirect_cmd apt-get install $qqq -y --force-yes lsb-release
+system__=$(lsb_release -i|cut -d ':' -f2|sed -e 's#\s##g')
+version__=$(lsb_release -r|cut -d ':' -f2|sed -e 's#\s##g')
+echo "compiling on: $system__ $version__"
+
+echo "installing more system packages ..."
+
+redirect_cmd apt-get install $qqq -y --force-yes qrencode
+redirect_cmd apt-get install $qqq -y --force-yes p7zip-full
+redirect_cmd apt-get install $qqq -y --force-yes astyle
 
 echo $_HOME_
 
@@ -81,6 +95,9 @@ export PATH="$_SDK_"/tools/bin:$ORIG_PATH_
 
 export ANDROID_NDK_HOME="$_NDK_"
 export ANDROID_HOME="$_SDK_"
+
+export CLASS_P="com.zoffcc.applications.trifa"
+export START_INTENT_P="com.zoffcc.applications.trifa.StartMainActivityWrapper"
 
 
 mkdir -p $_toolchain_
@@ -123,6 +140,8 @@ redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOO
     "platform-tools"
 ANDROID_VERSION=25
 redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
+ANDROID_BUILD_TOOLS_VERSION=23.0.3
+redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
 ANDROID_BUILD_TOOLS_VERSION=25.0.0
 redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
 
@@ -216,6 +235,39 @@ cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so $_s_/trifa_sr
   
   ls -hal $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk
 # ----------- show generated apk file -----------
+
+
+
+zip -d $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk META-INF/\*     # remove signature !!
+cp -av $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk ~/app.apk
+cd ~/
+echo xxxxxxrm -f ~/.android/debug.keystore
+ls -al ~/.android/debug.keystore
+if [ ! -f ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
+    echo "*** generating new signer key ***"
+    echo "*** generating new signer key ***"
+    keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
+fi
+
+ls -al ~/
+jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androiddebugkey
+
+ls -al ~/
+$_SDK_/build-tools/23.0.3/zipalign -v 4 app-signed.apk app-signed-aligned.apk
+
+ls -al ~/
+pwd
+
+ls -al
+cp -av app-signed-aligned.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk
+
+
+##   also make apk files with different names for each build (for individual downloads)
+cp -av $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk
+##   qr code to scan with your phone to directly download the apk file (for convenience)
+qrencode -o $CIRCLE_ARTIFACTS/QR_apk.png 'https://circle-artifacts.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'/artifacts/'${CIRCLE_NODE_INDEX}'/tmp/'`basename $CIRCLE_ARTIFACTS`'/'"${CIRCLE_PROJECT_REPONAME}_circleci_$CIRCLE_SHA1.apk" ; exit 0
+##   qr code to go directly to the aritfacts (to scan with phone)
+qrencode -o $CIRCLE_ARTIFACTS/QR_artifacts.png 'https://circleci.com/gh/'${CIRCLE_PROJECT_USERNAME}'/'${CIRCLE_PROJECT_REPONAME}'/'${CIRCLE_BUILD_NUM}'#artifacts' ; exit 0
 
 
 
