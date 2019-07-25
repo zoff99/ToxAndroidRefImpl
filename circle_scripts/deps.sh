@@ -469,8 +469,8 @@ cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/arm
 
 echo $_HOME_
 
-export _SRC_=$_HOME_/build/
-export _INST_=$_HOME_/inst/
+export _SRC_=$_HOME_/x86_build/
+export _INST_=$_HOME_/x86_inst/
 
 echo $_SRC_
 echo $_INST_
