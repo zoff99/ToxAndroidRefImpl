@@ -260,8 +260,12 @@ ls -al ~/
 find . -name zipalign
 ls -al ./work/trifa_inst/sdk/build-tools/23.0.3/zipalign
 ls -al $_SDK_/build-tools/23.0.3/zipalign
+file $_SDK_/build-tools/23.0.3/zipalign
+ls -al $_SDK_/build-tools/27.0.3/zipalign
+file $_SDK_/build-tools/27.0.3/zipalign
 cd ~/
-$_SDK_/build-tools/23.0.3/zipalign -v 4 ~/app-signed.apk ~/app-signed-aligned.apk
+# HINT: zipalign is a 32bit binary?
+$_SDK_/build-tools/27.0.3/zipalign -v 4 ~/app-signed.apk ~/app-signed-aligned.apk
 
 ls -al ~/
 pwd
