@@ -260,7 +260,7 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     cd $_s_/trifa_src/android-refimpl-app/
     ls -al ./gradlew
 
-    if [[ "$current_tag""x"  =~ ^trifajni-.* ]] ; then
+    if [[ "$current_git_tag""x"  =~ ^trifajni-.* ]] ; then
         echo "############### ------------ ###################"
         echo "############### ------------ ###################"
         echo "trying to upload artefact to bintray ..."
