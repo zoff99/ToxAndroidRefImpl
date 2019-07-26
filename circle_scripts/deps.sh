@@ -865,6 +865,9 @@ $READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 
 
+ls -hal $CIRCLE_ARTIFACTS/android/libs/armeabi/libjni-c-toxcore.so || exit 1
+ls -hal $CIRCLE_ARTIFACTS/android/libs/x86/libjni-c-toxcore.so || exit 1
+
 
 pwd
 
