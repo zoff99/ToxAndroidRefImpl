@@ -196,6 +196,13 @@ mkdir -p $_s_/jni-c-toxcore
 mkdir -p $_s_/trifa_src
 
 cd /root/work/ ; current_git_tag=$(git describe --tags --exact-match 2> /dev/null)
+echo "##########################################"
+echo "##########################################"
+echo "##########################################"
+echo "current_git_tag: $current_git_tag"
+echo "##########################################"
+echo "##########################################"
+echo "##########################################"
 
 # copy the source ----------
 cp -av /root/work/android-refimpl-app $_s_/trifa_src/
