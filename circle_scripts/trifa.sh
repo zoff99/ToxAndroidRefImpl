@@ -272,7 +272,7 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
 # --------- bintray artefact -------------
 # --------- show generated aar file -----------
     cd $_s_/trifa_src/android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/
-    cd ~ ; find ./ -name '*.aar'
+    cd ~ ; find ./ -name '*.aar' | grep 'trifa-jni'
 
     unzip -t ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar
     sha256sum ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar
