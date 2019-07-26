@@ -206,6 +206,7 @@ echo "##########################################"
 
 # copy the source ----------
 cp -av /root/work/android-refimpl-app $_s_/trifa_src/
+cp -av /root/work/jni-c-toxcore $_s_/trifa_src/
 # copy JNI libs ------------
 cp -av /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so $_s_/trifa_src/android-refimpl-app/app/nativelibs/armeabi-v7a/
 cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86/
@@ -253,15 +254,25 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     cd $_s_/trifa_src/android-refimpl-app/
     ls -al ./gradlew
 
-    if [[ "$current_tag""x"  =~ ^trifajni-.* ]] ; then echo aaa ;fi
+    if [[ "$current_tag""x"  =~ ^trifajni-.* ]] ; then
+        echo "############### ------------ ###################"
+        echo "############### ------------ ###################"
+        echo "trying to upload artefact to bintray ..."
+        echo "############### ------------ ###################"
+        echo "############### ------------ ###################"
         ./gradlew :jnilib:bintrayUpload --info || exit 1
+        echo "############### ------------ ###################"
+        echo "############### ------------ ###################"
+        echo "trying to upload artefact to bintray ... DONE"
+        echo "############### ------------ ###################"
+        echo "############### ------------ ###################"
     fi
 
     find ~/.m2/repository -type f -exec ls -al {} \;
 # --------- bintray artefact -------------
 # --------- show generated aar file -----------
     cd $_s_/trifa_src/android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/
-    cd ~ ; find ./ -name '*.aar'
+    cd ~ ; find ./ -name '*.aar' | grep 'trifa-jni'
 
     unzip -t ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar
     sha256sum ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar
