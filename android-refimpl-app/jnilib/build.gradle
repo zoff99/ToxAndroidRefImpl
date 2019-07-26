@@ -91,6 +91,19 @@ android {
         exclude 'LICENSE.txt'
     }
 
+    lintOptions {
+        abortOnError false
+        absolutePaths false
+        // lintConfig file("lint.xml")
+        showAll false
+        textReport false
+        xmlReport false
+        htmlReport false
+        // textOutput file("lint-report.txt")
+        // htmlOutput file("lint-report.html")
+        // xmlOutput file("lint-report.xml")
+    }
+
     compileOptions {
         encoding "UTF-8"
     }
