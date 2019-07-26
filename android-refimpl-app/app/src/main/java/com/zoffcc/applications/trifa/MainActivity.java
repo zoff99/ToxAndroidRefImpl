@@ -2631,6 +2631,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native int toxav_video_send_frame(long friendnum, int frame_width_px, int frame_height_px);
 
+    public static native int toxav_video_send_frame_h264(long friendnum, int frame_width_px, int frame_height_px, long data_len);
+
     public static native int toxav_option_set(long friendnum, long a_TOXAV_OPTIONS_OPTION, long value);
 
     public static native void set_av_call_status(int status);
