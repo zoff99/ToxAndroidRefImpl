@@ -232,8 +232,14 @@ cd $_s_/trifa_src/android-refimpl-app/
 pwd
 ls -al
 chmod a+rx ./gradlew
-./gradlew :app:dependencies
-./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
+if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
+    echo "not building TRIfA app! -> maven branch"
+    :
+else
+    echo "Building TRIfA app"
+    ./gradlew :app:dependencies
+    ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
+fi
 # --------- GRADLE - build app -------------
 
 
@@ -254,7 +260,7 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     cd $_s_/trifa_src/android-refimpl-app/
     ls -al ./gradlew
 
-    if [[ "$current_tag""x"  =~ ^trifajni-.* ]] ; then
+    if [[ "$current_git_tag""x"  =~ ^trifajni-.* ]] ; then
         echo "############### ------------ ###################"
         echo "############### ------------ ###################"
         echo "trying to upload artefact to bintray ..."
@@ -266,6 +272,8 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
         echo "trying to upload artefact to bintray ... DONE"
         echo "############### ------------ ###################"
         echo "############### ------------ ###################"
+    else
+        echo "not uploading artefact to bintray!! -> not maven branch"
     fi
 
     find ~/.m2/repository -type f -exec ls -al {} \;
@@ -279,13 +287,14 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     cat ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.pom
     cat ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/maven-metadata-local.xml
 
-    # cd $_s_/trifa_src/android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar
-    # cd $_s_/trifa_src/android-refimpl-app/ ; sha256sum ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar
-    # cd $_s_/trifa_src/android-refimpl-app/ ; cp -av ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar $CIRCLE_ARTIFACTS/
 
-    sha256sum /root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.24/trifa-jni-lib-1.0.24.aar
-    cp -av /root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.24/trifa-jni-lib-1.0.24.aar $CIRCLE_ARTIFACTS/
-    ls -hal /root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.24/trifa-jni-lib-1.0.24.aar || exit 1
+    cd $_s_/trifa_src/android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar
+    cd $_s_/trifa_src/android-refimpl-app/ ; sha256sum ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar
+    cd $_s_/trifa_src/android-refimpl-app/ ; cp -av ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar $CIRCLE_ARTIFACTS/
+    cd $_s_/trifa_src/android-refimpl-app/ ; ls -hal ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar || exit 1
+
+    # cp -av ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar $CIRCLE_ARTIFACTS/
+    # ls -hal ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar || exit 1
 fi
 # --------- show generated aar file -----------
 
