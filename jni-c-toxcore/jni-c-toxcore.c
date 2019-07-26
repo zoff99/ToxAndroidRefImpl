@@ -4231,6 +4231,19 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv *env
 
 
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(JNIEnv *env, jobject thiz,
+        jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len)
+{
+    TOXAV_ERR_SEND_FRAME error;
+
+    bool res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                      (uint16_t)frame_height_px,
+                                      (uint8_t *)video_buffer_2, (uint32_t)data_len, &error);
+    return (jint)error;
+}
+
+
 // reverse the order of the U and V planes ---------------
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1uv_1reversed(JNIEnv *env, jobject thiz,
@@ -4286,6 +4299,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv
     // dbg(9, "toxav_video_send_frame:res=%d,error=%d", (int)res, (int)error);
     return (jint)error;
 }
+
 
 
 /**
