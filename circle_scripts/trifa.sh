@@ -195,6 +195,8 @@ rm -Rf $_s_/trifa_src
 mkdir -p $_s_/jni-c-toxcore
 mkdir -p $_s_/trifa_src
 
+cd /root/work/ ; current_git_tag=$(git describe --tags --exact-match 2> /dev/null)
+
 # copy the source ----------
 cp -av /root/work/android-refimpl-app $_s_/trifa_src/
 # copy JNI libs ------------
@@ -243,9 +245,12 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     cd $_s_/trifa_src/android-refimpl-app/ ; ./gradlew :jnilib:install --info
     cd $_s_/trifa_src/android-refimpl-app/
     ls -al ./gradlew
-    ./gradlew :jnilib:bintrayUpload --info
 
-    find ~/.m2/repository -type f -exec ls -al {} \; ; exit 0
+    if [[ "$current_tag""x"  =~ ^trifajni-.* ]] ; then echo aaa ;fi
+        ./gradlew :jnilib:bintrayUpload --info || exit 1
+    fi
+
+    find ~/.m2/repository -type f -exec ls -al {} \;
 # --------- bintray artefact -------------
 # --------- show generated aar file -----------
     cd $_s_/trifa_src/android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/
@@ -289,7 +294,9 @@ if [ "$CIRCLE_BRANCH""x" != "zoff99/maven_artefactx" ]; then
     zip -d $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk META-INF/\*     # remove signature !!
     cp -av $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk ~/app.apk
     cd ~/
+    # remove the "xxxxxx" in fron the of the "rm -f" to create a new debug signing key!! --------------
     echo xxxxxxrm -f ~/.android/debug.keystore
+    # remove the "xxxxxx" in fron the of the "rm -f" to create a new debug signing key!! --------------
     ls -al ~/.android/debug.keystore
     if [ ! -f ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
         echo "*** generating new signer key ***"
@@ -320,6 +327,8 @@ if [ "$CIRCLE_BRANCH""x" != "zoff99/maven_artefactx" ]; then
 
     ls -al
     cp -av app-signed-aligned.apk $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk
+
+    ls -hal $CIRCLE_ARTIFACTS/${CIRCLE_PROJECT_REPONAME}.apk || exit 1
 
 
     ##   also make apk files with different names for each build (for individual downloads)
