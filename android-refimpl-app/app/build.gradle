@@ -154,8 +154,8 @@ android {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 10023
-        versionName "1.0.23"
+        versionCode 10024
+        versionName "1.0.24"
 
         renderscriptTargetApi 26
         renderscriptSupportModeEnabled true
@@ -241,7 +241,7 @@ dependencies {
     //
     //
     //
-    implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.24@aar'
+    implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.25@aar'
     //
     //
     //
