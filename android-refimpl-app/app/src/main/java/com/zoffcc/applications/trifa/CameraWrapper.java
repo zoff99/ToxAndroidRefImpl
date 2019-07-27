@@ -699,12 +699,12 @@ public class CameraWrapper
                         }
 
                         /*
-                        * YUV420 frame with width * height
-                        *
-                        * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
-                        * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
-                        * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
-                        */
+                         * YUV420 frame with width * height
+                         *
+                         * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
+                         * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
+                         * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
+                         */
                         int y_layer_size = (int) camera_preview_size2.width * camera_preview_size2.height;
                         int u_layer_size = (int) (camera_preview_size2.width / 2) * (camera_preview_size2.height / 2);
                         int v_layer_size = (int) (camera_preview_size2.width / 2) * (camera_preview_size2.height / 2);
