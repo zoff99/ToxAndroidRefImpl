@@ -228,14 +228,23 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$build_yasm""x" == "1x" ]; then
     # --- YASM ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
+    cd $_s_
+    rm -Rf yasm
+    git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
     cd $_s_/yasm/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";$_s_/yasm/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
         --disable-shared --disable-soname-versions --host=arm-linux-androideabi \
         --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
-    cd "$_BLD_";make -j $_CPUS_ || exit 1
+    cd "$_BLD_"
+    make -j1
+    ret_=$?
+    if [ $ret -ne 0 ]; then
+        sleep 10
+        make clean
+        make -j1 || exit 1
+    fi
     cd "$_BLD_";make install
     # --- YASM ---
     fi
