@@ -32,6 +32,9 @@ import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -141,6 +144,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static View video_box_right_top_01 = null;
     private MediaCodec.BufferInfo mBufferInfo;
     private MediaCodec mEncoder;
+    private static MediaPlayer mMediaPlayer = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -384,8 +389,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                     Thread.sleep(100);
                                     // set slide back to prev. position
                                     quality_slider.setPosition(prev_position);
-                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_revert:" +
-                                               quality_slider.getPosition());
+                                    Log.i(TAG,
+                                          "setOnDiscreteSliderChangeListener:pos_revert:" + quality_slider.getPosition());
                                 }
                                 catch (Exception e)
                                 {
@@ -562,6 +567,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             accept_button.setVisibility(View.GONE);
             camera_toggle_button.setVisibility(View.VISIBLE);
             mute_button.setVisibility(View.VISIBLE);
+
+            stop_ringtone();
         }
         else
         {
@@ -569,6 +576,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             accept_button.setVisibility(View.VISIBLE);
             camera_toggle_button.setVisibility(View.GONE);
             mute_button.setVisibility(View.GONE);
+
+            start_ringtone();
         }
 
         if (active_camera_type == FRONT_CAMERA_USED)
@@ -691,9 +700,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             mute_button.setVisibility(View.VISIBLE);
 
                             Callstate.call_start_timestamp = System.currentTimeMillis();
-                            String a = "" +
-                                       (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) +
-                                       "s";
+                            String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
                             top_text_line_str2 = a;
                             update_top_text_line();
 
@@ -809,8 +816,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     if ((top_text_line_str3 != "") || (top_text_line_str4 != ""))
                     {
                         top_text_line.setText(
-                                top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" +
-                                top_text_line_str4);
+                                top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" + top_text_line_str4);
                     }
                     else
                     {
@@ -1091,6 +1097,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
         sensor_manager.unregisterListener(this);
         activity_state = 0;
+
+        stop_ringtone();
 
         try
         {
@@ -1641,6 +1649,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         set_max_video_bitrate();
         set_av_latency();
 
+        stop_ringtone();
+
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -1952,6 +1962,56 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 Log.d(TAG, "releaseEncoder:already released");
             }
+        }
+    }
+
+    static void stop_ringtone()
+    {
+        try
+        {
+            mMediaPlayer.stop();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            mMediaPlayer.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    void start_ringtone()
+    {
+        try
+        {
+            Uri ringtone_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setDataSource(getApplicationContext(), ringtone_uri);
+            final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager.getStreamVolume(AudioManager.STREAM_RING) != 0)
+            {
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
+                mMediaPlayer.setLooping(true);
+                try
+                {
+                    mMediaPlayer.prepare();
+                }
+                catch (Exception e1)
+                {
+                    e1.printStackTrace();
+                }
+                mMediaPlayer.start();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

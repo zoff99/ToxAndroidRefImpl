@@ -21,6 +21,11 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -65,6 +70,11 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_avatar_icons_delete;
     Button button_update_nodelist;
     Button button_reset_nodelist;
+    Button button_test_notification;
+    Button button_test_ringtone;
+
+    Boolean button_test_ringtone_start = true;
+    MediaPlayer mMediaPlayer = null;
 
     TextView text_sqlstats = null;
 
@@ -94,6 +104,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_avatar_icons_delete = (Button) findViewById(R.id.button_avatar_icons_delete);
         button_update_nodelist = (Button) findViewById(R.id.button_update_nodelist);
         button_reset_nodelist = (Button) findViewById(R.id.button_reset_nodelist);
+        button_test_notification = (Button) findViewById(R.id.button_test_notification);
+        button_test_ringtone = (Button) findViewById(R.id.button_test_ringtone);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -285,48 +297,141 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+
+        button_test_notification.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    //play notification sound
+                    Uri ringtone_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtone_uri);
+                    ringtone.play();
+
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        button_test_ringtone.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (button_test_ringtone_start == true)
+                {
+                    button_test_ringtone_start = false;
+                    button_test_ringtone.setText("-- stop Ringtone --");
+
+                    try
+                    {
+                        Uri ringtone_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                        mMediaPlayer = new MediaPlayer();
+                        mMediaPlayer.setDataSource(getApplicationContext(), ringtone_uri);
+                        final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        if (audioManager.getStreamVolume(AudioManager.STREAM_RING) != 0)
+                        {
+                            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
+                            mMediaPlayer.setLooping(true);
+                            try
+                            {
+                                mMediaPlayer.prepare();
+                            }
+                            catch (Exception e1)
+                            {
+                                e1.printStackTrace();
+                            }
+                            mMediaPlayer.start();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                    button_test_ringtone_start = true;
+                    button_test_ringtone.setText("test Ringtone sound");
+                    try
+                    {
+                        mMediaPlayer.stop();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    try
+                    {
+                        mMediaPlayer.release();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+
         String num_msgs = "*ERROR*";
         try
+
         {
             num_msgs = "" + orma.selectFromMessage().count();
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
         }
 
         String num_confmsgs = "*ERROR*";
         try
+
         {
             num_confmsgs = "" + orma.selectFromConferenceMessage().count();
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
         }
 
         String num_dbfriends = "*ERROR*";
         try
+
         {
             num_dbfriends = "" + orma.selectFromFriendList().count();
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
         }
 
         String num_dbconfs = "*ERROR*";
         try
+
         {
             num_dbconfs = "" + orma.selectFromConferenceDB().count();
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
         }
 
         String vfs_size = "*ERROR*";
         try
+
         {
             String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
             File database_dir = new File(new File(dbFile).getParent());
@@ -334,23 +439,27 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
         }
 
         String dbmain_size = "*ERROR*";
         try
+
         {
             String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
             File database_dir = new File(new File(dbs_path).getParent());
             dbmain_size = files_and_sizes_in_dir(database_dir);
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
         }
 
-        text_sqlstats.setText("Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " + num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
+        text_sqlstats.setText(
+                "Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " + num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
 
         maint_handler_s = maint_handler;
     }
@@ -522,6 +631,40 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
     }
 
+    @Override
+    public void onPause()
+    {
+        button_test_ringtone_start = true;
+        try
+        {
+            button_test_ringtone.setText("test Ringtone sound");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            mMediaPlayer.stop();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            mMediaPlayer.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        super.onPause();
+    }
+
     public static String files_and_sizes_in_dir(File directory)
     {
         StringBuilder ret = new StringBuilder("Files:");
@@ -547,7 +690,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         }
                         else
                         {
-                            ret.append("\n").append(file.getName()).append("\t").append(file.length() / 1024 / 1024).append(" MBytes");
+                            ret.append("\n").append(file.getName()).append("\t").append(
+                                    file.length() / 1024 / 1024).append(" MBytes");
                         }
                         size_sum = size_sum + file.length();
                         Log.i(TAG, "files_and_sizes_in_dir:size_sum=" + size_sum);
