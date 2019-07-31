@@ -19,8 +19,17 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -49,14 +58,18 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_udp_nodes_into_db;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
+import static com.zoffcc.applications.trifa.MainActivity.NOTIFICATION_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.channelId_newmessage_sound_and_vibrate;
 import static com.zoffcc.applications.trifa.MainActivity.delete_vfs_file;
+import static com.zoffcc.applications.trifa.MainActivity.notification;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MaintenanceActivity extends AppCompatActivity implements StrongBuilder.Callback<OkHttpClient>
 {
     private static final String TAG = "trifa.MaintActy";
+
 
     Button button_clear_glide_cache;
     Button button_sql_vacuum;
@@ -65,6 +78,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_avatar_icons_delete;
     Button button_update_nodelist;
     Button button_reset_nodelist;
+    Button button_test_notification;
+    Button button_test_ringtone;
 
     TextView text_sqlstats = null;
 
@@ -94,6 +109,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_avatar_icons_delete = (Button) findViewById(R.id.button_avatar_icons_delete);
         button_update_nodelist = (Button) findViewById(R.id.button_update_nodelist);
         button_reset_nodelist = (Button) findViewById(R.id.button_reset_nodelist);
+        button_test_notification = (Button) findViewById(R.id.button_test_notification);
+        button_test_ringtone = (Button) findViewById(R.id.button_test_ringtone);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -269,7 +286,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         button_reset_nodelist.setOnClickListener(new View.OnClickListener()
         {
-            @Override
+            //@Override
             public void onClick(View v)
             {
                 try
@@ -284,6 +301,111 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 }
             }
         });
+
+        button_test_notification.setOnClickListener(new View.OnClickListener()
+    {
+        //@Override
+        public void onClick(View v)
+        {
+            try
+            {
+                //play test notofication sound
+                //play test ringtone sound
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+                r.play();
+
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+        }
+    });
+
+        button_test_ringtone.setOnClickListener(new View.OnClickListener()
+        {
+            private Context context;
+
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+
+                    //play test ringtone sound
+                    //works but only plays ringtone once .islooping doesent seem to work
+                    Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                    Ringtone ringer = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
+                    ringer.setStreamType(2);
+                    //ringer.setLooping(true);
+                    ringer.play();
+
+
+
+                    //signal method no sound
+                    /*MediaPlayer ringer = new MediaPlayer();
+
+                    //mediaPlayer.setOnErrorListener(new MediaPlayerErrorListener());
+                    ringer.setDataSource(context, ringtoneUri);
+                    //ringer.prepare();
+                    ringer.setLooping(true);
+                    ringer.setAudioStreamType(AudioManager.STREAM_RING);
+
+                    ringer.start();
+                    //ringer.play();*/
+
+
+                    /////going to try and build a notification with ringtone
+                    //nope default way requires api versions 21 and newer
+                    /*
+                    //NotificationChannel channel = new NotificationChannel("Incoming Calls", TELEPHONY_SERVICE,
+                      //      NotificationManager.IMPORTANCE_HIGH);
+                    // other channel setup stuff goes here.
+
+                    // We'll use the default system ringtone for our incoming call notification channel.  You can
+                    // use your own audio resource here.
+                    Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                    channel.setSound(ringtoneUri, new AudioAttributes.Builder()
+                            // Setting the AudioAttributes is important as it identifies the purpose of your
+                            // notification sound.
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build());
+
+                    NotificationManager mgr = getSystemService(NotificationManager.class);
+                    mgr.createNotificationChannel(channel);
+*/
+
+
+
+                    //ringer.setLooping(true);
+
+
+
+                    //Uri ringtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                    /*
+                    MediaPlayer mediaPlayer = new MediaPlayer();
+                    this.context  = context.getApplicationContext();
+                    mediaPlayer.setDataSource( context.getApplicationContext(), ringtone);
+                    mediaPlayer.setLooping(true);
+                    //mediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
+                    mediaPlayer.start();
+                    */
+                    //Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                    //MediaPlayer player = MediaPlayer.create(this, notification);
+                    //player.setLooping(true);
+                    //player.start();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
 
         String num_msgs = "*ERROR*";
         try

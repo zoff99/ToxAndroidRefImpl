@@ -32,6 +32,10 @@ import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -81,6 +85,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRA
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_LOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_MED;
+import static java.lang.Boolean.TRUE;
 
 public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback, SensorEventListener
 {
@@ -95,6 +100,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static ViewGroup calling_activity_top_viewgroup_vg;
     static ImageView caller_avatar_view;
     static ImageButton accept_button = null;
+
     ImageButton decline_button = null;
     static ImageButton camera_toggle_button = null;
     static ImageButton mute_button = null;
@@ -141,6 +147,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static View video_box_right_top_01 = null;
     private MediaCodec.BufferInfo mBufferInfo;
     private MediaCodec mEncoder;
+    //create ringtone manager
+    private static boolean isRingging;
+    //private static Uri ringtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+    //private static Ringtone ringer = RingtoneManager.getRingtone(getApplicationContext(), ringtone);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -677,6 +687,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         {
                             Callstate.accepted_call = 1;
 
+                            //stop ringing ringtone
+
                             Log.i(TAG, "answer button pressed");
                             toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                          GLOBAL_AUDIO_BITRATE,
@@ -1171,6 +1183,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         Thread openThread = new Thread()
         {
+            private Context context;
+
             @Override
             public void run()
             {
@@ -1178,6 +1192,59 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 Log.i(TAG, "active_camera_type(01)=" + active_camera_type);
                 CameraWrapper.camera_preview_size2 = null;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
+                //start ringing
+
+                Uri ringtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), ringtone);
+
+                isRingging = false;
+
+                while(isRingging)
+                {
+                 if(!r.isPlaying()) {
+                     r.play();
+                 }
+
+                }
+
+                //if(!isRingging)
+                    //r.stop();
+
+
+
+
+
+                /*
+                Uri ringtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                MediaPlayer mediaPlayer = new MediaPlayer();
+                this.context  = context.getApplicationContext();
+                try{
+                    mediaPlayer.setDataSource( context.getApplicationContext(), ringtone);
+                }
+                catch (Exception e)
+                {
+
+                }
+                 */
+
+              /*  Uri ringtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+               // MediaPlayer player = MediaPlayer.create(this, ringtone);
+
+               Ringtone ringer = RingtoneManager.getRingtone(getApplicationContext(), ringtone);
+                //ringer.setLooping(TRUE);
+                ringer.play();
+                //ringer.setAudioAttributes( ringer.getAudioAttributes());
+                */
+
+                //activating looping ringtone sound
+                /*
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                MediaPlayer player = MediaPlayer.create(this, notification);
+                player.setLooping(true);
+                player.start();
+                */
+                
+
             }
         };
         openThread.start();
@@ -1640,6 +1707,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         set_max_video_bitrate();
         set_av_latency();
+        isRingging = false;
 
         Runnable myRunnable = new Runnable()
         {
