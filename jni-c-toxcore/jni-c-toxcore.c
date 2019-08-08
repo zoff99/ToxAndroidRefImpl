@@ -3663,6 +3663,49 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1wrap(JNIEnv *env
     }
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1message_1pubkey(JNIEnv *env, jobject thiz,
+        jobject raw_message_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return -1;
+    }
+
+    if(pubkey_buffer == NULL)
+    {
+        return -2;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    uint8_t *pubkey_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, pubkey_buffer);
+    long pubkey_buffer_capacity = (*env)->GetDirectBufferCapacity(env, pubkey_buffer);
+    jstring result;
+
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
+    bool res = tox_messagev2_get_sync_message_pubkey(raw_message_buffer_c, public_key);
+
+    if(res == false)
+    {
+        result = (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+    }
+    else
+    {
+        char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1]; // need this wrong size for next call
+        CLEAR(tox_id_hex);
+        toxid_bin_to_hex(public_key, tox_id_hex);
+        tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+        result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
+    }
+
+    return result;
+}
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1id(JNIEnv *env, jobject thiz,
