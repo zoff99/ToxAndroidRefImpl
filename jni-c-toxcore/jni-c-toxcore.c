@@ -3669,19 +3669,18 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1messa
 {
     if(raw_message_buffer == NULL)
     {
-        return -1;
+        return (jstring)NULL;
     }
 
     if(pubkey_buffer == NULL)
     {
-        return -2;
+        return (jstring)NULL;
     }
+
+    jstring result = NULL;
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
     long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
-    uint8_t *pubkey_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, pubkey_buffer);
-    long pubkey_buffer_capacity = (*env)->GetDirectBufferCapacity(env, pubkey_buffer);
-    jstring result;
 
     if(tox_global == NULL)
     {
