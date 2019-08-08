@@ -1044,7 +1044,8 @@ void android_tox_callback_friend_lossless_packet_cb(uint32_t friend_number, cons
     (*jnienv2)->DeleteLocalRef(jnienv2, data2);
 }
 
-void friend_friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data)
+void friend_friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length,
+                                      void *user_data)
 {
     android_tox_callback_friend_lossless_packet_cb(friend_number, data, length);
 }
@@ -3075,11 +3076,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEn
 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1lossless_1packet(JNIEnv *env, jobject thiz,
-        jlong friend_number, jobject data, jint data_length)
+        jlong friend_number, jbyteArray data, jint data_length)
 {
+    jbyte *data2 = (*env)->GetByteArrayElements(env, data, 0);
     TOX_ERR_FRIEND_CUSTOM_PACKET error;
     uint32_t res = tox_friend_send_lossless_packet(tox_global, (uint32_t)friend_number, (const uint8_t *)data2,
-                                           (size_t)data_length, &error);
+                   (size_t)data_length, &error);
+    (*env)->ReleaseByteArrayElements(env, data, data2, JNI_ABORT); /* abort to not copy back contents */
 
     if(error != 0)
     {
