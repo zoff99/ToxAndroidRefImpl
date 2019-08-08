@@ -30,7 +30,7 @@ Compile in Android Studio
 
 Development Snapshot Version (Android)
 =
-the latest Development Snapshot can be downloaded from CircleCI, [here](https://circleci.com/api/v1.1/project/github/zoff99/ToxAndroidRefImpl/latest/artifacts/0/artifacts/ToxAndroidRefImpl.apk?filter=successful&branch=zoff99%2Fdev003)
+the latest Development Snapshot can be downloaded from CircleCI, [here](https://circleci.com/api/v1.1/project/github/zoff99/ToxAndroidRefImpl/latest/artifacts/0/artefacts/ToxAndroidRefImpl.apk?filter=successful&branch=zoff99%2Fdev003)
 
 <!--
 <img src="https://circleci.com/api/v1/project/zoff99/ToxAndroidRefImpl/latest/artifacts/0/$CIRCLE_ARTIFACTS/capture_app_running_2.png?filter=successful&branch=zoff99%2Fdev003" width="148">
