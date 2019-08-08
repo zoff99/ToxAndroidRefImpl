@@ -76,8 +76,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 33
-static const char global_version_string[] = "0.99.33";
+#define VERSION_PATCH 34
+static const char global_version_string[] = "0.99.34";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -215,6 +215,7 @@ uint8_t global_av_call_active = 0;
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_name_cb_method = NULL;
 jmethodID android_tox_callback_friend_status_message_cb_method = NULL;
+jmethodID android_tox_callback_friend_lossless_packet_cb_method = NULL;
 jmethodID android_tox_callback_friend_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_typing_cb_method = NULL;
@@ -222,6 +223,7 @@ jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_v2_cb_method = NULL;
+jmethodID android_tox_callback_friend_sync_message_v2_cb_method = NULL;
 jmethodID android_tox_callback_friend_read_receipt_message_v2_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_control_cb_method = NULL;
 jmethodID android_tox_callback_file_chunk_request_cb_method = NULL;
@@ -267,6 +269,7 @@ void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void 
 
 void friend_name_cb(Tox *tox, uint32_t friend_number, const uint8_t *name, size_t length, void *user_data);
 void friend_status_message_cb(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data);
+void friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data);
 void friend_status_cb(Tox *tox, uint32_t friend_number, TOX_USER_STATUS status, void *user_data);
 void friend_connection_status_cb(Tox *tox, uint32_t friend_number, TOX_CONNECTION connection_status, void *user_data);
 void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data);
@@ -275,6 +278,7 @@ void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *messa
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length,
                        void *user_data);
 void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len);
+void friend_sync_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len);
 void friend_read_receipt_message_v2_cb(Tox *tox, uint32_t friend_number, uint32_t ts_sec, const uint8_t *msgid);
 
 void file_recv_control_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control,
@@ -816,6 +820,7 @@ void init_tox_callbacks()
     tox_callback_self_connection_status(tox_global, tox_utils_self_connection_status_cb);
     tox_utils_callback_friend_connection_status(tox_global, friend_connection_status_cb);
     tox_callback_friend_connection_status(tox_global, tox_utils_friend_connection_status_cb);
+    tox_utils_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
     tox_callback_friend_lossless_packet(tox_global, tox_utils_friend_lossless_packet_cb);
     tox_utils_callback_file_recv_control(tox_global, file_recv_control_cb);
     tox_callback_file_recv_control(tox_global, tox_utils_file_recv_control_cb);
@@ -826,6 +831,7 @@ void init_tox_callbacks()
     tox_utils_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
     tox_callback_file_recv_chunk(tox_global, tox_utils_file_recv_chunk_cb);
     tox_utils_callback_friend_message_v2(tox_global, friend_message_v2_cb);
+    tox_utils_callback_friend_sync_message_v2(tox_global, friend_sync_message_v2_cb);
     tox_utils_callback_friend_read_receipt_message_v2(tox_global, friend_read_receipt_message_v2_cb);
     // -------- _callbacks_ --------
 #else
@@ -854,7 +860,6 @@ void init_tox_callbacks()
     tox_callback_conference_namelist_change(tox_global, conference_namelist_change_cb);
 #endif
     // tox_callback_friend_lossy_packet(tox_global, friend_lossy_packet_cb);
-    // tox_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
     // -------- _callbacks_ --------
 #endif
 }
@@ -1012,6 +1017,36 @@ void android_tox_callback_friend_status_message_cb(uint32_t friend_number, const
 void friend_status_message_cb(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data)
 {
     android_tox_callback_friend_status_message_cb(friend_number, message, length);
+}
+
+void android_tox_callback_friend_lossless_packet_cb(uint32_t friend_number, const uint8_t *data, size_t length)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)length);
+
+    if(data2 == NULL)
+    {
+        // TODO: catch this OOM error!!
+        // return; // out of memory error thrown
+    }
+
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    (*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)length, (const jbyte *)data);
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_friend_lossless_packet_cb_method,
+                                     (jlong)(unsigned long long)friend_number,
+                                     data2,
+                                     (jlong)(unsigned long long)length);
+    (*jnienv2)->DeleteLocalRef(jnienv2, data2);
+}
+
+void friend_friend_lossless_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data)
+{
+    android_tox_callback_friend_friend_lossless_cb(friend_number, data, length);
 }
 
 void android_tox_callback_friend_status_cb(uint32_t friend_number, TOX_USER_STATUS status)
@@ -1218,6 +1253,90 @@ void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_m
 {
     android_tox_callback_friend_message_v2_cb(friend_number, raw_message, raw_message_len);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, const uint8_t *raw_message,
+        size_t raw_message_len)
+{
+#ifdef TOX_MESSAGE_V2_ACTIVE
+    uint8_t *message_text = calloc(1, raw_message_len);
+
+    if(message_text)
+    {
+        JNIEnv *jnienv2;
+        jnienv2 = jni_getenv();
+        jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)raw_message_len);
+
+        if(data2 == NULL)
+        {
+            // TODO: catch this OOM error!!
+            // return; // out of memory error thrown
+        }
+
+        // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+        // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+        (*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)raw_message_len, (const jbyte *)raw_message);
+        // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+        // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+        uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
+        uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
+        uint32_t text_length = 0;
+        bool res = tox_messagev2_get_sync_message_text(raw_message,
+                   (uint32_t)raw_message_len, message_text, &text_length);
+
+        if(text_length > 0)
+        {
+            JNIEnv *jnienv2;
+            jnienv2 = jni_getenv();
+            jstring js1 = c_safe_string_from_java((char *)message_text, text_length);
+            // TODO: give back also the raw message bytes!
+            (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                             android_tox_callback_friend_sync_message_v2_cb_method,
+                                             (jlong)(unsigned long long)friend_number,
+                                             js1,
+                                             (jlong)(unsigned long long)text_length,
+                                             (jlong)ts_sec,
+                                             (jlong)ts_ms,
+                                             data2,
+                                             (jlong)(unsigned long long)raw_message_len
+                                            );
+            (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+        }
+
+        (*jnienv2)->DeleteLocalRef(jnienv2, data2);
+        free(message_text);
+    }
+
+#endif
+}
+
+
+void friend_sync_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
+{
+    android_tox_callback_friend_sync_message_v2_cb(friend_number, raw_message, raw_message_len);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
         size_t length)
@@ -2107,6 +2226,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_friend_name_cb_method", "(JLjava/lang/String;J)V");
     android_tox_callback_friend_status_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_status_message_cb_method", "(JLjava/lang/String;J)V");
+    android_tox_callback_friend_lossless_packet_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_friend_lossless_packet_cb_method", "(J[BJ)V");
     android_tox_callback_friend_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_status_cb_method", "(JI)V");
     android_tox_callback_friend_connection_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2121,6 +2242,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
     android_tox_callback_friend_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
+    android_tox_callback_friend_sync_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_friend_sync_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
     android_tox_callback_friend_read_receipt_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_read_receipt_message_v2_cb_method", "(JJ[B)V");
     android_tox_callback_file_recv_control_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
