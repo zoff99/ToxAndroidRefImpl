@@ -1046,7 +1046,7 @@ void android_tox_callback_friend_lossless_packet_cb(uint32_t friend_number, cons
 
 void friend_friend_lossless_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data)
 {
-    android_tox_callback_friend_friend_lossless_cb(friend_number, data, length);
+    android_tox_callback_friend_lossless_cb(friend_number, data, length);
 }
 
 void android_tox_callback_friend_status_cb(uint32_t friend_number, TOX_USER_STATUS status)
