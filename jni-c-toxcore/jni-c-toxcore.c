@@ -1044,9 +1044,9 @@ void android_tox_callback_friend_lossless_packet_cb(uint32_t friend_number, cons
     (*jnienv2)->DeleteLocalRef(jnienv2, data2);
 }
 
-void friend_friend_lossless_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data)
+void friend_friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data)
 {
-    android_tox_callback_friend_lossless_cb(friend_number, data, length);
+    android_tox_callback_friend_lossless_packet_cb(friend_number, data, length);
 }
 
 void android_tox_callback_friend_status_cb(uint32_t friend_number, TOX_USER_STATUS status)
@@ -1254,18 +1254,6 @@ void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_m
     android_tox_callback_friend_message_v2_cb(friend_number, raw_message, raw_message_len);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, const uint8_t *raw_message,
         size_t raw_message_len)
 {
@@ -1326,17 +1314,6 @@ void friend_sync_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *
 {
     android_tox_callback_friend_sync_message_v2_cb(friend_number, raw_message, raw_message_len);
 }
-
-
-
-
-
-
-
-
-
-
-
 
 void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
         size_t length)
@@ -3092,6 +3069,26 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEn
     else
     {
         dbg(9, "tox_friend_send_message");
+        return (jlong)(unsigned long long)res;
+    }
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1lossless_1packet(JNIEnv *env, jobject thiz,
+        jlong friend_number, jobject data, jint data_length)
+{
+    TOX_ERR_FRIEND_CUSTOM_PACKET error;
+    uint32_t res = tox_friend_send_lossless_packet(tox_global, (uint32_t)friend_number, (const uint8_t *)data2,
+                                           (size_t)data_length, &error);
+
+    if(error != 0)
+    {
+        dbg(9, "tox_friend_send_lossless_packet:ERROR:%d", (int)error);
+        return (jlong)-99;
+    }
+    else
+    {
+        dbg(9, "tox_friend_send_lossless_packet");
         return (jlong)(unsigned long long)res;
     }
 }
