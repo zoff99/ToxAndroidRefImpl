@@ -2543,6 +2543,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native String tox_self_get_status_message();
 
+    public static native int tox_friend_send_lossless_packet(long friend_number, @NonNull byte[] data, int data_length);
+
     public static native int tox_file_control(long friend_number, long file_number, int a_TOX_FILE_CONTROL);
 
     public static native int tox_hash(ByteBuffer hash_buffer, ByteBuffer data_buffer, long data_length);
@@ -2566,6 +2568,8 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_messagev2_get_message_id(ByteBuffer raw_message_buffer, ByteBuffer msgid_buffer);
 
     public static native int tox_messagev2_get_message_text(ByteBuffer raw_message_buffer, long raw_message_len, int is_alter_msg, long alter_type, ByteBuffer message_text_buffer);
+
+    public static native String tox_messagev2_get_sync_message_pubkey(ByteBuffer raw_message_buffer);
 
     public static native int tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
 
@@ -3825,7 +3829,6 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
-
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
     {
         // Log.i(TAG,
@@ -4047,6 +4050,15 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    static void android_tox_callback_friend_lossless_packet_cb_method(long friend_number, byte[] data, long length)
+    {
+        Log.i(TAG, "friend_lossless_packet_cb:fn=" +friend_number+" len="+length+" data="+ bytes_to_hex(data));
+    }
+
+    static void android_tox_callback_friend_sync_message_v2_cb(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
+    {
+       Log.i(TAG, "friend_sync_message_v2_cb:fn=" +friend_number+" len="+length+" text="+ friend_message);
+    }
 
     // --- incoming message ---
     // --- incoming message ---
