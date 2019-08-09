@@ -3863,8 +3863,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv *en
     cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
     dbg(0, "tox_conference_join:cookie length=%d", (int)capacity);
-    dbg(0, "tox_conference_join:cookie length=%d", (int)cookie_buffer_c[0]);
-    dbg(0, "tox_conference_join:cookie length=%d", (int)cookie_buffer_c[cookie_length - 1]);
+    dbg(0, "tox_conference_join:cookie start byte=%d", (int)cookie_buffer_c[0]);
+    dbg(0, "tox_conference_join:cookie end byte=%d", (int)cookie_buffer_c[cookie_length - 1]);
 
     char tox_id_hex[cookie_length*2 + 1];
     CLEAR(tox_id_hex);
