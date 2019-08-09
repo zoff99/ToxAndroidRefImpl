@@ -3862,6 +3862,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv *en
 
     cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
+    dbg(0, "tox_conference_join:cookie length=%d", (int)capacity);
     TOX_ERR_CONFERENCE_JOIN error;
     uint32_t res = tox_conference_join(tox_global, (uint32_t)friend_number, cookie_buffer_c, (size_t)cookie_length, &error);
 
@@ -3899,6 +3900,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv *en
         }
         else
         {
+            dbg(0, "tox_conference_join:*OTHER ERROR*");
             return (jlong)-99;
         }
     }

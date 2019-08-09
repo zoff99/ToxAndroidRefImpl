@@ -4974,53 +4974,73 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "conference_connected_cb:cf_num=" + conference_number);
     }
 
-    static void android_tox_callback_conference_invite_cb_method(long friend_number, int a_TOX_CONFERENCE_TYPE, byte[] cookie_buffer, long cookie_length)
+    static void android_tox_callback_conference_invite_cb_method(final long friend_number, final int a_TOX_CONFERENCE_TYPE, final byte[] cookie_buffer, final long cookie_length)
     {
+
         Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" + cookie_length + " cookie=" + bytes_to_hex(cookie_buffer));
-
-        ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
-        cookie_buf2.put(cookie_buffer);
-
-        Log.i(TAG, "conference_invite_cb:bytebuffer offset=" + cookie_buf2.arrayOffset());
-
-        long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
-
-        // strip first 3 bytes of cookie to get the conference_id.
-        // this is aweful and hardcoded
-        String conference_identifier = bytes_to_hex(Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
-
-        Log.i(TAG, "conference_invite_cb:cookie=" + conference_identifier);
-
-        if (conference_num >= 0)
-        {
-            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number), conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
-        }
-        else
-        {
-            Log.i(TAG, "conference_invite_cb:error=" + conference_num + " joining conference");
-        }
 
         try
         {
-            if (conference_message_list_activity != null)
+            Thread t = new Thread()
             {
-                if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
+                @Override
+                public void run()
                 {
-                    conference_message_list_activity.set_conference_connection_status_icon();
+                    ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
+                    cookie_buf2.put(cookie_buffer);
+
+                    Log.i(TAG, "conference_invite_cb:bytebuffer offset=" + cookie_buf2.arrayOffset());
+
+                    long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
+                    Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);
+
+
+                    // strip first 3 bytes of cookie to get the conference_id.
+                    // this is aweful and hardcoded
+                    String conference_identifier = bytes_to_hex(Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
+
+                    Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
+
+                    if (conference_num >= 0)
+                    {
+                        new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number), conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
+                    }
+                    else
+                    {
+                        Log.i(TAG, "conference_invite_cb:error=" + conference_num + " joining conference");
+                    }
+
+                    try
+                    {
+                        if (conference_message_list_activity != null)
+                        {
+                            if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
+                            {
+                                conference_message_list_activity.set_conference_connection_status_icon();
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    MainActivity.update_savedata_file_wrapper(); // join new conference
+
+                    // long num_conferences = tox_conference_get_chatlist_size();
+                    // Log.i(TAG, "load conferences at startup[2]: num=" + num_conferences);
+
+                    Log.i(TAG, "conference_invite_cb:res=" + conference_num);
+
                 }
-            }
+            };
+            t.start();
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Log.i(TAG, "callback_conference_invite_cb:EET1:" + e.getMessage());
         }
 
-        MainActivity.update_savedata_file_wrapper(); // join new conference
-
-        // long num_conferences = tox_conference_get_chatlist_size();
-        // Log.i(TAG, "load conferences at startup[2]: num=" + num_conferences);
-
-        Log.i(TAG, "conference_invite_cb:res=" + conference_num);
     }
 
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
@@ -5314,6 +5334,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_peer_name_cb_method(long conference_number, long peer_number, String name, long name_length)
     {
+        Log.i(TAG, "conference_peer_name_cb:cf_num=" + conference_number);
+
         try
         {
             ConferenceDB conf_temp = null;
@@ -5447,6 +5469,9 @@ public class MainActivity extends AppCompatActivity
     {
         // TODO: write me ...
         // update all peers in this conference        
+
+        Log.i(TAG, "conference_peer_list_changed_cb:cf_num=" + conference_number);
+
         try
         {
             ConferenceDB conf_temp = null;
@@ -5499,6 +5524,7 @@ public class MainActivity extends AppCompatActivity
     {
         // Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
         // TODO: update peer status
+        Log.i(TAG, "conference_namelist_change_cb:cf_num=" + conference_number);
 
         try
         {
