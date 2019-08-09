@@ -4979,67 +4979,67 @@ public class MainActivity extends AppCompatActivity
 
         Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" + cookie_length + " cookie=" + bytes_to_hex(cookie_buffer));
 
-        try
-        {
-            Thread t = new Thread()
-            {
-                @Override
-                public void run()
+    //try
+    //{
+        //Thread t = new Thread()
+        //{
+           // @Override
+            //public void run()
+            //{
+                ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
+                cookie_buf2.put(cookie_buffer);
+
+                Log.i(TAG, "conference_invite_cb:bytebuffer offset=" + cookie_buf2.arrayOffset());
+
+                long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
+                Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);
+
+
+                // strip first 3 bytes of cookie to get the conference_id.
+                // this is aweful and hardcoded
+                String conference_identifier = bytes_to_hex(Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
+
+                Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
+
+                if (conference_num >= 0)
                 {
-                    ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
-                    cookie_buf2.put(cookie_buffer);
+                    new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number), conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
+                }
+                else
+                {
+                    Log.i(TAG, "conference_invite_cb:error=" + conference_num + " joining conference");
+                }
 
-                    Log.i(TAG, "conference_invite_cb:bytebuffer offset=" + cookie_buf2.arrayOffset());
-
-                    long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
-                    Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);
-
-
-                    // strip first 3 bytes of cookie to get the conference_id.
-                    // this is aweful and hardcoded
-                    String conference_identifier = bytes_to_hex(Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
-
-                    Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
-
-                    if (conference_num >= 0)
+                try
+                {
+                    if (conference_message_list_activity != null)
                     {
-                        new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number), conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
-                    }
-                    else
-                    {
-                        Log.i(TAG, "conference_invite_cb:error=" + conference_num + " joining conference");
-                    }
-
-                    try
-                    {
-                        if (conference_message_list_activity != null)
+                        if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
                         {
-                            if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
-                            {
-                                conference_message_list_activity.set_conference_connection_status_icon();
-                            }
+                            conference_message_list_activity.set_conference_connection_status_icon();
                         }
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    MainActivity.update_savedata_file_wrapper(); // join new conference
-
-                    // long num_conferences = tox_conference_get_chatlist_size();
-                    // Log.i(TAG, "load conferences at startup[2]: num=" + num_conferences);
-
-                    Log.i(TAG, "conference_invite_cb:res=" + conference_num);
-
                 }
-            };
-            t.start();
-        }
-        catch (Exception e)
-        {
-            Log.i(TAG, "callback_conference_invite_cb:EET1:" + e.getMessage());
-        }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                MainActivity.update_savedata_file_wrapper(); // join new conference
+
+                // long num_conferences = tox_conference_get_chatlist_size();
+                // Log.i(TAG, "load conferences at startup[2]: num=" + num_conferences);
+
+                Log.i(TAG, "conference_invite_cb:res=" + conference_num);
+
+          //  }
+       // };
+       // t.start();
+   // }
+    //catch (Exception e)
+    //{
+     //   Log.i(TAG, "callback_conference_invite_cb:EET1:" + e.getMessage());
+    //}
 
     }
 
