@@ -15,6 +15,10 @@ build_yasm="1"
 ## ----------------------
 
 
+## set this to make c-toxcore log more verbose -------------
+export DEBUG_TOXCORE_LOGGING=" -DMIN_LOGGER_LEVEL=1 "
+## set this to make c-toxcore log more verbose -------------
+
 
 #_HOME2_=$(dirname $0)
 #export _HOME2_
@@ -379,7 +383,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS="-D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
+    CFLAGS=" $DEBUG_TOXCORE_LOGGING -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
     --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
     --disable-soname-versions --host=arm-linux-androideabi \
     --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot \
@@ -775,12 +779,11 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
-
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS="-D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
+    CFLAGS=" $DEBUG_TOXCORE_LOGGING -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
     --prefix="$_toolchain_"/x86/sysroot/usr \
     --disable-soname-versions --host=x86 \
     --with-sysroot="$_toolchain_"/x86/sysroot \
