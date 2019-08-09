@@ -1044,7 +1044,7 @@ void android_tox_callback_friend_lossless_packet_cb(uint32_t friend_number, cons
     (*jnienv2)->DeleteLocalRef(jnienv2, data2);
 }
 
-void friend_friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length,
+void friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length,
                                       void *user_data)
 {
     android_tox_callback_friend_lossless_packet_cb(friend_number, data, length);
