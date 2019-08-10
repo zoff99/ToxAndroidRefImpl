@@ -1258,6 +1258,9 @@ void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_m
 void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, const uint8_t *raw_message,
         size_t raw_message_len)
 {
+
+    dbg(9, "friend_sync_message_v2_cb:fn=%d", (int)friend_number);
+
 #ifdef TOX_MESSAGE_V2_ACTIVE
     uint8_t *message_text = calloc(1, raw_message_len);
 
