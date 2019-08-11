@@ -4057,7 +4057,19 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
     {
-       Log.i(TAG, "friend_sync_message_v2_cb:fn=" +friend_number+" len="+length+" text="+ friend_message);
+        Log.i(TAG, "friend_sync_message_v2_cb:fn=" +friend_number+" len="+length+" text="+ friend_message+ " rawmsg="+bytes_to_hex(raw_message));
+
+        ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) raw_message_length);
+        raw_message_buf.put(raw_message, 0, (int) raw_message_length);
+
+        ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+        tox_messagev2_get_message_id(raw_message_buf, msg_id_buffer);
+        String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit());
+        Log.i(TAG, "friend_sync_message_v2_cb:MSGv2HASH=" + msg_id_as_hex_string);
+
+        String real_sender_as_hex_string = tox_messagev2_get_sync_message_pubkey(raw_message_buf);
+        Log.i(TAG, "friend_sync_message_v2_cb:real sender pubkey=" + real_sender_as_hex_string);
+
     }
 
     // --- incoming message ---
