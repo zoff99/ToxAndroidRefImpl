@@ -8588,6 +8588,48 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static boolean friend_as_own_relay_in_db(String friend_public_key)
+    {
+        boolean ret=false;
+
+        try
+        {
+            final List <FriendList> fl = orma.selectFromFriendList().
+                    tox_public_key_stringEq(friend_public_key).toList();
+
+
+            if (fl.size() == 1)
+            {
+                // add relay to DB table
+                RelayListDB new_relay = new RelayListDB();
+                new_relay.own_relay = true;
+                new_relay.TOX_CONNECTION=fl.get(0).TOX_CONNECTION;
+                new_relay.TOX_CONNECTION_on_off=fl.get(0).TOX_CONNECTION_on_off;
+                new_relay.last_online_timestamp=fl.get(0).last_online_timestamp;
+                new_relay.tox_public_key_string=friend_public_key;
+                //
+                orma.insertIntoRelayListDB(new_relay);
+                Log.i(TAG, "friend_as_relay_own_in_db:+ADD own relay+");
+
+                // friend exists -> update
+                orma.updateFriendList().
+                        tox_public_key_stringEq(friend_public_key).
+                        is_relay(true).
+                        execute();
+
+                Log.i(TAG, "friend_as_relay_own_in_db:+UPDATE friend+");
+
+                ret=true;
+            }
+        }
+        catch (Exception e1)
+        {
+            Log.i(TAG, "friend_as_relay_own_in_db:EE3:" + e1.getMessage());
+        }
+
+        return ret;
+    }
+
     static void new_or_updated_conference(long conference_number, String who_invited_public_key, String conference_identifier, int conference_type)
     {
         try

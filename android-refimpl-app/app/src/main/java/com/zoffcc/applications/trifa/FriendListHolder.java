@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
+import static com.zoffcc.applications.trifa.MainActivity.friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
@@ -598,6 +599,67 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         dialog.show();
     }
 
+    public void show_confirm_addrelay_dialog(final View view, final FriendList f2)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("add as Relay?");
+        builder.setMessage("Do you want to add this Friend as your Relay?");
+
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+
+                          if ( friend_as_own_relay_in_db(f2.tox_public_key_string))
+                          {
+                              // load all friends into data list ---
+                              Log.i(TAG, "onMenuItemClick:6");
+                              try
+                              {
+                                  if (friend_list_fragment != null)
+                                  {
+                                      // reload friendlist
+                                      friend_list_fragment.add_all_friends_clear(200);
+                                  }
+                              }
+                              catch (Exception e)
+                              {
+                                  e.printStackTrace();
+                              }
+
+                              Log.i(TAG, "onMenuItemClick:7");
+                              // load all friends into data list ---
+                          }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
+                        }
+                    }
+                };
+                // TODO: use own handler
+                if (view.getHandler() != null)
+                {
+                    view.getHandler().post(myRunnable);
+                }
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     @Override
     public boolean onLongClick(final View v)
     {
@@ -624,6 +686,10 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         intent.putExtra("friendnum", friend_num_temp_safety);
                         v.getContext().startActivity(intent);
                         // show friend info page -----------------
+                        break;
+                    case R.id.item_add_toxproxy:
+                        show_confirm_addrelay_dialog(v, f2);
+                        // add as ToxProxy relay -----------------
                         break;
                     case R.id.item_delete:
                         // delete friend -----------------

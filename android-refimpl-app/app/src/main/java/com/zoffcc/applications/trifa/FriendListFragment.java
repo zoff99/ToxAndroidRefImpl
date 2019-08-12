@@ -122,6 +122,12 @@ public class FriendListFragment extends Fragment
         {
             final FriendList f = c.friend_item;
 
+            if (f.is_relay==true)
+            {
+                // do not update anything if this is a relay
+                return;
+            }
+
             // Log.i(TAG, "modify_friend:start");
             Runnable myRunnable = new Runnable()
             {
@@ -253,6 +259,7 @@ public class FriendListFragment extends Fragment
             // reload friendlist
             Log.i(TAG, "onResume:AA");
             List<FriendList> fl = orma.selectFromFriendList().
+                    is_relayNotEq(true).
                     orderByTOX_CONNECTION_on_offDesc().
                     orderByNotification_silentAsc().
                     orderByLast_online_timestampDesc().
@@ -334,6 +341,7 @@ public class FriendListFragment extends Fragment
                             adapter.clear_items(); // clears friends AND conferences!!
 
                             List<FriendList> fl = orma.selectFromFriendList().
+                                    is_relayNotEq(true).
                                     orderByTOX_CONNECTION_on_offDesc().
                                     orderByNotification_silentAsc().
                                     orderByLast_online_timestampDesc().
