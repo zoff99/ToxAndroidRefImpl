@@ -1309,7 +1309,7 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
                                              data2,
                                              (jlong)(unsigned long long)raw_message_len,
                                              data3,
-                                             (jlong)(unsigned long long)text_length,
+                                             (jlong)(unsigned long long)text_length
                                             );
         }
 
