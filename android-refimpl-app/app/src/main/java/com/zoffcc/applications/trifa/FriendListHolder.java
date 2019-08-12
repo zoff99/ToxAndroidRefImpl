@@ -640,6 +640,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                               Log.i(TAG, "onMenuItemClick:7");
                               // load all friends into data list ---
                           }
+
+                          send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
+
                         }
                         catch (Exception e)
                         {
@@ -653,8 +656,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 {
                     view.getHandler().post(myRunnable);
                 }
-
-                send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
             }
         });
 
