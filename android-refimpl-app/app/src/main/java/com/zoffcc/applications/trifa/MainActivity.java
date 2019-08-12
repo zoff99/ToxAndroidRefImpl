@@ -145,6 +145,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_acti
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -8551,6 +8552,32 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             return conference_identifier;
+        }
+    }
+
+    static void send_all_friend_pubkeys_to_relay(String relay_public_key_string)
+    {
+        List<FriendList> fl = orma.selectFromFriendList().
+                is_relayNotEq(true).
+                orderByTOX_CONNECTION_on_offDesc().
+                orderByNotification_silentAsc().
+                orderByLast_online_timestampDesc().
+                toList();
+
+        if (fl != null)
+        {
+            if (fl.size() > 0)
+            {
+                int i = 0;
+                long friend_num = tox_friend_by_public_key__wrapper(relay_public_key_string);
+                for (i = 0; i < fl.size(); i++)
+                {
+                    FriendList n = fl.get(i);
+                    byte[] data=hex_to_bytes("FF"+n.tox_public_key_string);
+                    data[0] = (byte)CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
+                    tox_friend_send_lossless_packet(friend_num,data,TOX_PUBLIC_KEY_SIZE+1);
+                }
+            }
         }
     }
 

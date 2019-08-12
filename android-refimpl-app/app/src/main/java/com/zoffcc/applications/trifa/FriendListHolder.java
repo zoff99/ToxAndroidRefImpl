@@ -52,6 +52,7 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messa
 import static com.zoffcc.applications.trifa.MainActivity.friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.send_all_friend_pubkeys_to_relay;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
@@ -618,8 +619,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     {
                         try
                         {
-                            // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-
+                          // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
                           if ( friend_as_own_relay_in_db(f2.tox_public_key_string))
                           {
                               // load all friends into data list ---
@@ -653,6 +653,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 {
                     view.getHandler().post(myRunnable);
                 }
+
+                send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
             }
         });
 

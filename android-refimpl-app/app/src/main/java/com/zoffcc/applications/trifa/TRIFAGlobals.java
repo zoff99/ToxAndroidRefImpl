@@ -171,8 +171,22 @@ public class TRIFAGlobals
         {
             this.value = value;
         }
+    }
 
 
+    public static enum CONTROL_PROXY_MESSAGE_TYPE
+    {
+        CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY(200),
+        CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND(201),
+        CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT(202),
+        CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH(203);
+
+        public int value;
+
+        private CONTROL_PROXY_MESSAGE_TYPE(int value)
+        {
+            this.value = value;
+        }
     }
 
 }
