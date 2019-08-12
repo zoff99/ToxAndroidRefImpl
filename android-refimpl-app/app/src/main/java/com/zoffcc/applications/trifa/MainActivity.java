@@ -4056,9 +4056,9 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_lossless_packet_cb:fn=" +friend_number+" len="+length+" data="+ bytes_to_hex(data));
     }
 
-    static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
+    static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length,byte[] raw_data, long raw_data_length)
     {
-        Log.i(TAG, "friend_sync_message_v2_cb:fn=" +friend_number+" len="+length+" text="+ friend_message+ " rawmsg="+bytes_to_hex(raw_message));
+        Log.i(TAG, "friend_sync_message_v2_cb:fn=" +friend_number+ " rawmsg="+bytes_to_hex(raw_message));
 
         ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) raw_message_length);
         raw_message_buf.put(raw_message, 0, (int) raw_message_length);
