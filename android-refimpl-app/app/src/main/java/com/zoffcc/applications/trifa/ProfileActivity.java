@@ -58,8 +58,10 @@ import static android.graphics.Color.WHITE;
 import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_file;
+import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
+import static com.zoffcc.applications.trifa.MainActivity.remove_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.set_new_random_nospam_value;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
@@ -82,6 +84,7 @@ public class ProfileActivity extends AppCompatActivity
     EditText mystatus_message_edittext = null;
     Button new_nospam_button = null;
     Button copy_toxid_button = null;
+    Button remove_own_relay_button = null;
     ImageView my_identicon_imageview = null;
 
     static Handler profile_handler_s = null;
@@ -101,6 +104,7 @@ public class ProfileActivity extends AppCompatActivity
         my_identicon_imageview = (ImageView) findViewById(R.id.my_identicon_imageview);
 
         new_nospam_button = (Button) findViewById(R.id.new_nospam_button);
+        remove_own_relay_button = (Button) findViewById(R.id.remove_relay_button);
         copy_toxid_button = (Button) findViewById(R.id.copy_toxid_button);
 
         new_nospam_button.setOnClickListener(new View.OnClickListener()
@@ -116,6 +120,38 @@ public class ProfileActivity extends AppCompatActivity
                     // ---- change display to the new ToxID ----
                     update_toxid_display();
                     // ---- change display to the new ToxID ----
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        remove_own_relay_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    remove_own_relay_in_db();
+
+                    // load all friends into data list ---
+                    Log.i(TAG, "onMenuItemClick:6");
+                    try
+                    {
+                        if (friend_list_fragment != null)
+                        {
+                            // reload friendlist
+                            friend_list_fragment.add_all_friends_clear(200);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                 }
                 catch (Exception e)
                 {

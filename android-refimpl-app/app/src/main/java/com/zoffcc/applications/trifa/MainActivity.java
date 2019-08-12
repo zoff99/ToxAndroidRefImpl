@@ -8630,6 +8630,40 @@ public class MainActivity extends AppCompatActivity
         return ret;
     }
 
+    static boolean remove_own_relay_in_db()
+    {
+        boolean ret=false;
+
+        try
+        {
+            final List <RelayListDB> rl = orma.selectFromRelayListDB().
+                    own_relayEq(true).toList();
+
+
+            if (rl.size() == 1)
+            {
+                orma.deleteFromRelayListDB().
+                        tox_public_key_stringEq(rl.get(0).tox_public_key_string).execute();
+
+                // friend exists -> update
+                orma.updateFriendList().
+                        tox_public_key_stringEq(rl.get(0).tox_public_key_string).
+                        is_relay(false).
+                        execute();
+
+                Log.i(TAG, "remove_own_relay_in_db:+UPDATE friend+");
+
+                ret=true;
+            }
+        }
+        catch (Exception e1)
+        {
+            Log.i(TAG, "remove_own_relay_in_db:EE3:" + e1.getMessage());
+        }
+
+        return ret;
+    }
+
     static void new_or_updated_conference(long conference_number, String who_invited_public_key, String conference_identifier, int conference_type)
     {
         try
