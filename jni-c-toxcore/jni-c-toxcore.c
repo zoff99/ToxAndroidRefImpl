@@ -2232,7 +2232,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_tox_callback_friend_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
     android_tox_callback_friend_sync_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
-            "android_tox_callback_friend_sync_message_v2_cb_method", "(JJJ[BJ)V");
+            "android_tox_callback_friend_sync_message_v2_cb_method", "(JJJ[BJ[BJ)V");
     android_tox_callback_friend_read_receipt_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_read_receipt_message_v2_cb_method", "(JJ[B)V");
     android_tox_callback_file_recv_control_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
