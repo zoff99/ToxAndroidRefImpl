@@ -1262,9 +1262,9 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
     dbg(9, "friend_sync_message_v2_cb:fn=%d", (int)friend_number);
 
 #ifdef TOX_MESSAGE_V2_ACTIVE
-    uint8_t *message_text = calloc(1, raw_message_len);
+    uint8_t *message_data = calloc(1, raw_message_len);
 
-    if(message_text)
+    if(message_data)
     {
         JNIEnv *jnienv2;
         jnienv2 = jni_getenv();
@@ -1290,11 +1290,11 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
         // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
         uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
         uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
-        uint32_t text_length = 0;
-        bool res = tox_messagev2_get_sync_message_text(raw_message,
-                   (uint32_t)raw_message_len, message_text, &text_length);
+        uint32_t data_length = 0;
+        bool res = tox_messagev2_get_sync_message_data(raw_message,
+                   (uint32_t)raw_message_len, message_data, &data_length);
 
-        (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)message_text, (const jbyte *)text_length);
+        (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)message_data, (const jbyte *)data_length);
 
         if(raw_message_len > 0)
         {
@@ -1309,13 +1309,13 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
                                              data2,
                                              (jlong)(unsigned long long)raw_message_len,
                                              data3,
-                                             (jlong)(unsigned long long)text_length
+                                             (jlong)(unsigned long long)data_length
                                             );
         }
 
         (*jnienv2)->DeleteLocalRef(jnienv2, data2);
         (*jnienv2)->DeleteLocalRef(jnienv2, data3);
-        free(message_text);
+        free(message_data);
     }
 
 #endif
@@ -3709,6 +3709,35 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1messa
     }
 
     return result;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1message_1type(JNIEnv *env, jobject thiz,
+        jobject raw_message_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return (jlong)-1;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    uint32_t result = tox_messagev2_get_sync_message_type(raw_message_buffer_c);
+
+    if(res == UINT32_MAX)
+    {
+        return (jlong)-3;
+    }
+    else
+    {
+        return (jlong)result;
+    }
 }
 
 JNIEXPORT jint JNICALL
