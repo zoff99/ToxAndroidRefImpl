@@ -3730,7 +3730,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1messa
 
     uint32_t result = tox_messagev2_get_sync_message_type(raw_message_buffer_c);
 
-    if(res == UINT32_MAX)
+    if(result == UINT32_MAX)
     {
         return (jlong)-3;
     }
