@@ -1294,7 +1294,7 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
         bool res = tox_messagev2_get_sync_message_data(raw_message,
                    (uint32_t)raw_message_len, message_data, &data_length);
 
-        (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)message_data, (const jbyte *)data_length);
+        (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)data_length, (const jbyte *)message_data);
 
         if(raw_message_len > 0)
         {
