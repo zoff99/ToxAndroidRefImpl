@@ -110,11 +110,13 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2568,9 +2570,15 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_messagev2_get_message_id(ByteBuffer raw_message_buffer, ByteBuffer msgid_buffer);
 
-    public static native int tox_messagev2_get_message_text(ByteBuffer raw_message_buffer, long raw_message_len, int is_alter_msg, long alter_type, ByteBuffer message_text_buffer);
+    public static native long tox_messagev2_get_ts_sec(ByteBuffer raw_message_buffer);
+
+    public static native long tox_messagev2_get_ts_ms(ByteBuffer raw_message_buffer);
+
+    public static native long tox_messagev2_get_message_text(ByteBuffer raw_message_buffer, long raw_message_len, int is_alter_msg, long alter_type, ByteBuffer message_text_buffer);
 
     public static native String tox_messagev2_get_sync_message_pubkey(ByteBuffer raw_message_buffer);
+
+    public static native long tox_messagev2_get_sync_message_type(ByteBuffer raw_message_buffer);
 
     public static native int tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
 
@@ -4058,7 +4066,11 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length,byte[] raw_data, long raw_data_length)
     {
-        Log.i(TAG, "friend_sync_message_v2_cb:fn=" +friend_number+ " rawmsg="+bytes_to_hex(raw_message));
+        Log.i(TAG, "friend_sync_message_v2_cb:fn=" +friend_number+ " full rawmsg    ="+bytes_to_hex(raw_message));
+        Log.i(TAG, "friend_sync_message_v2_cb:fn=" +friend_number+ " wrapped rawdata="+bytes_to_hex(raw_data));
+
+        ByteBuffer raw_message_buf_wrapped = ByteBuffer.allocateDirect((int) raw_data_length);
+        raw_message_buf_wrapped.put(raw_data, 0, (int) raw_data_length);
 
         ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) raw_message_length);
         raw_message_buf.put(raw_message, 0, (int) raw_message_length);
@@ -4071,6 +4083,36 @@ public class MainActivity extends AppCompatActivity
         String real_sender_as_hex_string = tox_messagev2_get_sync_message_pubkey(raw_message_buf);
         Log.i(TAG, "friend_sync_message_v2_cb:real sender pubkey=" + real_sender_as_hex_string);
 
+        long msgv2_type = tox_messagev2_get_sync_message_type(raw_message_buf);
+        Log.i(TAG, "friend_sync_message_v2_cb:msg type=" + msgv2_type);
+
+
+        ByteBuffer msg_id_buffer_wrapped = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+        tox_messagev2_get_message_id(raw_message_buf_wrapped, msg_id_buffer_wrapped);
+        String msg_id_as_hex_string_wrapped = bytesToHex(msg_id_buffer_wrapped.array(), msg_id_buffer_wrapped.arrayOffset(), msg_id_buffer_wrapped.limit());
+        Log.i(TAG, "friend_sync_message_v2_cb:MSGv2HASH=" + msg_id_as_hex_string_wrapped);
+
+
+        long msg_wrapped_sec= tox_messagev2_get_ts_sec(raw_message_buf_wrapped);
+        long msg_wrapped_ms= tox_messagev2_get_ts_ms(raw_message_buf_wrapped);
+        Log.i(TAG, "friend_sync_message_v2_cb:sec=" + msg_wrapped_sec+" ms="+msg_wrapped_ms);
+
+        ByteBuffer msg_text_buffer_wrapped = ByteBuffer.allocateDirect((int)raw_data_length);
+        long text_length = tox_messagev2_get_message_text(raw_message_buf_wrapped,raw_data_length,0,0,msg_text_buffer_wrapped);
+
+        String wrapped_msg_text_as_string = "";
+        try
+        {
+            wrapped_msg_text_as_string = new String(msg_text_buffer_wrapped.array(),msg_text_buffer_wrapped.arrayOffset(),(int)text_length, "UTF-8");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String msg_text_as_hex_string_wrapped = bytesToHex(msg_text_buffer_wrapped.array(), msg_text_buffer_wrapped.arrayOffset(), msg_text_buffer_wrapped.limit());
+        Log.i(TAG, "friend_sync_message_v2_cb:len="+text_length+" wrapped msg text str=" + wrapped_msg_text_as_string);
+        Log.i(TAG, "friend_sync_message_v2_cb:wrapped msg text hex=" + msg_text_as_hex_string_wrapped);
     }
 
     // --- incoming message ---

@@ -3803,7 +3803,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1ms(JNIE
 }
 
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1text(JNIEnv *env, jobject thiz,
         jobject raw_message_buffer, jlong raw_message_len,
         jint is_alter_msg,
@@ -3832,11 +3832,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
 
     if(res == true)
     {
-        return 0;
+        return (long)text_length;
     }
     else
     {
-        return 1;
+        return -3;
     }
 }
 
