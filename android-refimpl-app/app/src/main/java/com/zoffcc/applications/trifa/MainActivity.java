@@ -4084,7 +4084,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_sync_message_v2_cb:real sender pubkey=" + real_sender_as_hex_string);
 
         long msgv2_type = tox_messagev2_get_sync_message_type(raw_message_buf);
-        Log.i(TAG, "friend_sync_message_v2_cb:msg type=" + msgv2_type);
+        Log.i(TAG, "friend_sync_message_v2_cb:msg type=" + ToxVars.TOX_FILE_KIND.value_str((int)msgv2_type));
 
 
         ByteBuffer msg_id_buffer_wrapped = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
