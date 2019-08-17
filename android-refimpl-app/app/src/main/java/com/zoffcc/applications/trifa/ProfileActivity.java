@@ -59,7 +59,9 @@ import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.have_own_relay;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.remove_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
@@ -85,6 +87,7 @@ public class ProfileActivity extends AppCompatActivity
     Button new_nospam_button = null;
     Button copy_toxid_button = null;
     Button remove_own_relay_button = null;
+    TextView my_relay_toxid_textview = null;
     ImageView my_identicon_imageview = null;
 
     static Handler profile_handler_s = null;
@@ -105,6 +108,7 @@ public class ProfileActivity extends AppCompatActivity
 
         new_nospam_button = (Button) findViewById(R.id.new_nospam_button);
         remove_own_relay_button = (Button) findViewById(R.id.remove_relay_button);
+        my_relay_toxid_textview = (TextView) findViewById(R.id.my_relay_toxid_textview);
         copy_toxid_button = (Button) findViewById(R.id.copy_toxid_button);
 
         new_nospam_button.setOnClickListener(new View.OnClickListener()
@@ -128,37 +132,58 @@ public class ProfileActivity extends AppCompatActivity
             }
         });
 
-        remove_own_relay_button.setOnClickListener(new View.OnClickListener()
+        if (have_own_relay())
         {
-            @Override
-            public void onClick(View v)
+            remove_own_relay_button.setText("remove own Relay");
+            remove_own_relay_button.setActivated(true);
+            remove_own_relay_button.setOnClickListener(new View.OnClickListener()
             {
-                try
+                @Override
+                public void onClick(View v)
                 {
-                    remove_own_relay_in_db();
-
-                    // load all friends into data list ---
-                    Log.i(TAG, "onMenuItemClick:6");
                     try
                     {
-                        if (friend_list_fragment != null)
+                        remove_own_relay_in_db();
+
+                        // load all friends into data list ---
+                        Log.i(TAG, "onMenuItemClick:6");
+                        try
                         {
-                            // reload friendlist
-                            friend_list_fragment.add_all_friends_clear(200);
+                            if (friend_list_fragment != null)
+                            {
+                                // reload friendlist
+                                friend_list_fragment.add_all_friends_clear(200);
+                            }
                         }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
-
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+            });
+            my_relay_toxid_textview.setText(get_own_relay_pubkey());
+            my_relay_toxid_textview.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            remove_own_relay_button.setText("- no Relay set -");
+            remove_own_relay_button.setActivated(false);
+            my_relay_toxid_textview.setText("--");
+            my_relay_toxid_textview.setVisibility(View.INVISIBLE);
+            try
+            {
+                my_relay_toxid_textview.setVisibility(View.GONE);
             }
-        });
+            catch (Exception e1)
+            {
+            }
+        }
 
         copy_toxid_button.setOnClickListener(new View.OnClickListener()
         {

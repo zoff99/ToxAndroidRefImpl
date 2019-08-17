@@ -43,6 +43,10 @@ public class RelayListDB
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long last_online_timestamp = -1L;
 
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
+    @Nullable
+    String tox_public_key_string_of_owner = "";
+
     static RelayListDB deep_copy(RelayListDB in)
     {
         RelayListDB out = new RelayListDB();
@@ -51,6 +55,7 @@ public class RelayListDB
         out.TOX_CONNECTION_on_off = in.TOX_CONNECTION_on_off;
         out.own_relay = in.own_relay;
         out.last_online_timestamp = in.last_online_timestamp;
+        out.tox_public_key_string_of_owner = in.tox_public_key_string_of_owner;
 
         return out;
     }
@@ -60,12 +65,14 @@ public class RelayListDB
     {
         try
         {
-        return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) +
-               ", own_relay="+ own_relay +
-               ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_CONNECTION_on_off=" +
-               TOX_CONNECTION_on_off  + ", last_online_timestamp=" + last_online_timestamp;
+            return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) +
+                   ", ownder_pubkey=" + tox_public_key_string_of_owner.substring(0, 4) +
+                   ", own_relay=" + own_relay +
+                   ", TOX_CONNECTION=" + TOX_CONNECTION +
+                   ", TOX_CONNECTION_on_off=" + TOX_CONNECTION_on_off
+                   + ", last_online_timestamp=" + last_online_timestamp;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return "*Exception*";
         }

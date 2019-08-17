@@ -47,7 +47,13 @@ public class FriendList
     int TOX_CONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    int TOX_CONNECTION_real; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
+
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_CONNECTION_on_off; // 0 --> offline, 1 --> online
+
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    int TOX_CONNECTION_on_off_real; // 0 --> offline, 1 --> online
 
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_USER_STATUS; // 0 --> NONE, 1 --> online AWAY, 2 --> online BUSY
@@ -81,7 +87,9 @@ public class FriendList
         out.name = in.name;
         out.status_message = in.status_message;
         out.TOX_CONNECTION = in.TOX_CONNECTION;
+        out.TOX_CONNECTION_real = in.TOX_CONNECTION_real;
         out.TOX_CONNECTION_on_off = in.TOX_CONNECTION_on_off;
+        out.TOX_CONNECTION_on_off_real = in.TOX_CONNECTION_on_off_real;
         out.TOX_USER_STATUS = in.TOX_USER_STATUS;
         out.avatar_filename = in.avatar_filename;
         out.avatar_pathname = in.avatar_pathname;
