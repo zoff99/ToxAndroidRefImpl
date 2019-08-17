@@ -135,7 +135,6 @@ public class ProfileActivity extends AppCompatActivity
         if (have_own_relay())
         {
             remove_own_relay_button.setText("remove own Relay");
-            remove_own_relay_button.setActivated(true);
             remove_own_relay_button.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -173,7 +172,6 @@ public class ProfileActivity extends AppCompatActivity
         else
         {
             remove_own_relay_button.setText("- no Relay set -");
-            remove_own_relay_button.setActivated(false);
             my_relay_toxid_textview.setText("--");
             my_relay_toxid_textview.setVisibility(View.INVISIBLE);
             try
