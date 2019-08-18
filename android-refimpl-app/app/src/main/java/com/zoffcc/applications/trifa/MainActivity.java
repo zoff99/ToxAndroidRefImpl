@@ -150,6 +150,7 @@ import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -3614,6 +3615,18 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_lossless_packet_cb_method(long friend_number, byte[] data, long length)
     {
         Log.i(TAG, "friend_lossless_packet_cb:fn=" + friend_number + " len=" + length + " data=" + bytes_to_hex(data));
+        if (length > 0)
+        {
+            if (data[0] == (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value)
+            {
+                if (length == (TOX_PUBLIC_KEY_SIZE + 1))
+                {
+                    Log.i(TAG, "friend_lossless_packet_cb:recevied CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND");
+                    String friend_pubkey = bytes_to_hex(data).substring(2);
+                    Log.i(TAG, "friend_lossless_packet_cb:recevied pubkey:"+ friend_pubkey);
+                }
+            }
+        }
     }
 
     static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length, byte[] raw_data, long raw_data_length)
@@ -7067,8 +7080,7 @@ public class MainActivity extends AppCompatActivity
                 f.TOX_CONNECTION = 0;
                 f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
                 // set name as the last 5 char of the publickey (until we get a proper name)
-                f.name = friend_public_key.substring(friend_public_key.length() - 5,
-                                                     friend_public_key.length());
+                f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
                 f.avatar_pathname = null;
                 f.avatar_filename = null;
 
