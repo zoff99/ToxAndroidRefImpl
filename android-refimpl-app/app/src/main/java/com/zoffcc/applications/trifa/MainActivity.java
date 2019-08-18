@@ -3377,101 +3377,8 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_request:friend:" + friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2) +
                    " friend request message:" + friend_request_message);
 
-        final String friend_public_key__final = friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2);
-
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    // toxcore needs this!!
-                    Thread.sleep(120);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                // ---- auto add all friends ----
-                // ---- auto add all friends ----
-                // ---- auto add all friends ----
-                long friendnum = tox_friend_add_norequest(friend_public_key__final); // add friend
-
-                try
-                {
-                    Thread.sleep(20);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-                update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
-
-                final FriendList f = new FriendList();
-                f.tox_public_key_string = friend_public_key__final;
-                f.TOX_USER_STATUS = 0;
-                f.TOX_CONNECTION = 0;
-                f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
-                // set name as the last 5 char of the publickey (until we get a proper name)
-                f.name = friend_public_key__final.substring(friend_public_key__final.length() - 5,
-                                                            friend_public_key__final.length());
-                f.avatar_pathname = null;
-                f.avatar_filename = null;
-
-                try
-                {
-                    Log.i(TAG, "friend_request:insert:001:f=" + f);
-                    long res = orma.insertIntoFriendList(f);
-                    Log.i(TAG, "friend_request:insert:002:res=" + res);
-                }
-                catch (android.database.sqlite.SQLiteConstraintException e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "friend_request:insert:EE1:" + e.getMessage());
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "friend_request:insert:EE2:" + e.getMessage());
-                }
-
-                if (friend_list_fragment != null)
-                {
-                    Log.i(TAG, "friend_request:003");
-                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = true;
-                    cc.friend_item = f;
-                    friend_list_fragment.modify_friend(cc, cc.is_friend);
-                }
-
-                // ---- auto add all friends ----
-                // ---- auto add all friends ----
-                // ---- auto add all friends ----
-
-                try
-                {
-                    Thread.sleep(100);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                if (PREF__U_keep_nospam == false)
-                {
-                    // ---- set new random nospam value after each added friend ----
-                    // ---- set new random nospam value after each added friend ----
-                    // ---- set new random nospam value after each added friend ----
-                    set_new_random_nospam_value();
-                    // ---- set new random nospam value after each added friend ----
-                    // ---- set new random nospam value after each added friend ----
-                    // ---- set new random nospam value after each added friend ----
-                }
-            }
-        };
-        t.start();
+        String friend_public_key__ = friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2);
+        add_friend_to_system(friend_public_key__, false);
     }
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
@@ -7120,6 +7027,104 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "set_friend_avatar:EE:" + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    static void add_friend_to_system(final String friend_public_key, boolean as_friends_relay)
+    {
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    // toxcore needs this!!
+                    Thread.sleep(120);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                // ---- auto add all friends ----
+                // ---- auto add all friends ----
+                // ---- auto add all friends ----
+                long friendnum = tox_friend_add_norequest(friend_public_key); // add friend
+
+                try
+                {
+                    Thread.sleep(20);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
+
+                final FriendList f = new FriendList();
+                f.tox_public_key_string = friend_public_key;
+                f.TOX_USER_STATUS = 0;
+                f.TOX_CONNECTION = 0;
+                f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
+                // set name as the last 5 char of the publickey (until we get a proper name)
+                f.name = friend_public_key.substring(friend_public_key.length() - 5,
+                                                     friend_public_key.length());
+                f.avatar_pathname = null;
+                f.avatar_filename = null;
+
+                try
+                {
+                    Log.i(TAG, "friend_request:insert:001:f=" + f);
+                    long res = orma.insertIntoFriendList(f);
+                    Log.i(TAG, "friend_request:insert:002:res=" + res);
+                }
+                catch (android.database.sqlite.SQLiteConstraintException e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "friend_request:insert:EE1:" + e.getMessage());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "friend_request:insert:EE2:" + e.getMessage());
+                }
+
+                if (friend_list_fragment != null)
+                {
+                    Log.i(TAG, "friend_request:003");
+                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                    cc.is_friend = true;
+                    cc.friend_item = f;
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
+
+                // ---- auto add all friends ----
+                // ---- auto add all friends ----
+                // ---- auto add all friends ----
+
+                try
+                {
+                    Thread.sleep(100);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                if (PREF__U_keep_nospam == false)
+                {
+                    // ---- set new random nospam value after each added friend ----
+                    // ---- set new random nospam value after each added friend ----
+                    // ---- set new random nospam value after each added friend ----
+                    set_new_random_nospam_value();
+                    // ---- set new random nospam value after each added friend ----
+                    // ---- set new random nospam value after each added friend ----
+                    // ---- set new random nospam value after each added friend ----
+                }
+            }
+        };
+        t.start();
+
     }
 
     static void update_display_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
