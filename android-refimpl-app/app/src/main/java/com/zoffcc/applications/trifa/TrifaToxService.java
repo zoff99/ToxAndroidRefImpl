@@ -51,6 +51,7 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.conference_message_list_activity;
+import static com.zoffcc.applications.trifa.MainActivity.get_combined_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
@@ -664,7 +665,9 @@ public class TrifaToxService extends Service
                     {
                         // get the real "live" connection status of this friend
                         // the value in the database may be old (and wrong)
-                        f.TOX_CONNECTION = tox_friend_get_connection_status(MainActivity.friends[fc]);
+                        int status_new = tox_friend_get_connection_status(MainActivity.friends[fc]);
+                        int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
+                        f.TOX_CONNECTION = combined_connection_status_;
                         f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
                     }
                     catch (Exception e)

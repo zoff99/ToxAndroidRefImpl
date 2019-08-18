@@ -2091,346 +2091,6 @@ public class MainActivity extends AppCompatActivity
         super.onNewIntent(i);
     }
 
-    static FriendList main_get_friend(long friendnum)
-    {
-
-        String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
-        // Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
-
-        FriendList f;
-        List<FriendList> fl = orma.selectFromFriendList().
-                tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                toList();
-
-        // Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
-
-        if (fl.size() > 0)
-        {
-            f = fl.get(0);
-            // Log.i(TAG, "main_get_friend:f=" + f);
-        }
-        else
-        {
-            f = null;
-        }
-
-        return f;
-    }
-
-    static int is_friend_online(long friendnum)
-    {
-        try
-        {
-            return (orma.selectFromFriendList().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                    toList().get(0).TOX_CONNECTION);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    static boolean is_conference_active(String conference_identifier)
-    {
-        try
-        {
-            return (orma.selectFromConferenceDB().
-                    conference_identifierEq(conference_identifier).
-                    toList().get(0).conference_active);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    synchronized static void set_all_friends_offline()
-    {
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    orma.updateFriendList().
-                            TOX_CONNECTION(0).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                }
-
-                try
-                {
-                    orma.updateFriendList().
-                            last_online_timestampEq(LAST_ONLINE_TIMSTAMP_ONLINE_NOW).
-                            last_online_timestamp(System.currentTimeMillis()).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                }
-
-                // ------ DEBUG ------
-                // ------ set all friends to "never" seen online ------
-                // ------ DEBUG ------
-                // try
-                // {
-                //     orma.updateFriendList().
-                //             last_online_timestamp(LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE).
-                //             execute();
-                // }
-                // catch (Exception e)
-                // {
-                // }
-                // ------ DEBUG ------
-                // ------ set all friends to "never" seen online ------
-                // ------ DEBUG ------
-
-
-                try
-                {
-                    friend_list_fragment.set_all_friends_to_offline();
-                }
-                catch (Exception e)
-                {
-                }
-            }
-        };
-        t.start();
-    }
-
-    synchronized static void update_friend_in_db(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_string(f.tox_public_key_string).
-                name(f.name).
-                status_message(f.status_message).
-                TOX_CONNECTION(f.TOX_CONNECTION).
-                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
-                TOX_USER_STATUS(f.TOX_USER_STATUS).
-                execute();
-    }
-
-    synchronized static void update_friend_in_db_status_message(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                status_message(f.status_message).
-                execute();
-    }
-
-    synchronized static void update_friend_in_db_status(FriendList f)
-    {
-        // Log.i(TAG, "update_friend_in_db_status:f=" + f);
-
-        int numrows = orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                TOX_USER_STATUS(f.TOX_USER_STATUS).
-                execute();
-
-        Log.i(TAG, "update_friend_in_db_status:numrows=" + numrows);
-
-    }
-
-    synchronized static void update_friend_in_db_connection_status(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                TOX_CONNECTION(f.TOX_CONNECTION).
-                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
-                execute();
-    }
-
-    synchronized static void update_friend_in_db_connection_status_real(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                TOX_CONNECTION(f.TOX_CONNECTION_real).
-                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off_real).
-                execute();
-    }
-
-    synchronized static void update_friend_in_db_last_online_timestamp(FriendList f)
-    {
-        // Log.i(TAG, "update_friend_in_db_last_online_timestamp");
-        try
-        {
-            orma.updateFriendList().
-                    tox_public_key_stringEq(f.tox_public_key_string).
-                    last_online_timestamp(f.last_online_timestamp).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    synchronized static void update_friend_in_db_name(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                name(f.name).
-                execute();
-    }
-
-    synchronized static void update_message_in_db(final Message m)
-    {
-        final Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    orma.updateMessage().
-                            idEq(m.id).
-                            read(m.read).
-                            text(m.text).
-                            sent_timestamp(m.sent_timestamp).
-                            rcvd_timestamp(m.rcvd_timestamp).
-                            filename_fullpath(m.filename_fullpath).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-        t.start();
-    }
-
-    static void update_message_in_db_filename_fullpath_friendnum_and_filenum(long friend_number, long file_number, String filename_fullpath)
-    {
-        try
-        {
-            long ft_id = orma.selectFromFiletransfer().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    and().file_numberEq(file_number).orderByIdDesc().get(0).id;
-
-            update_message_in_db_filename_fullpath_from_id(orma.selectFromMessage().
-                    filetransfer_idEq(ft_id).and().
-                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    get(0).id, filename_fullpath);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_message_in_db_filename_fullpath_from_id(long msg_id, String filename_fullpath)
-    {
-        try
-        {
-            orma.updateMessage().idEq(msg_id).filename_fullpath(filename_fullpath).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_message_in_db_filename_fullpath(final Message m)
-    {
-        try
-        {
-            orma.updateMessage().
-                    idEq(m.id).
-                    filename_fullpath(m.filename_fullpath).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_message_in_db_read_rcvd_timestamp_rawmsgbytes(final Message m)
-    {
-        try
-        {
-            orma.updateMessage().
-                    idEq(m.id).
-                    read(m.read).
-                    raw_msgv2_bytes(m.raw_msgv2_bytes).
-                    rcvd_timestamp(m.rcvd_timestamp).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void change_notification(int a_TOXCONNECTION)
-    {
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash_app_java(1);
-        // crash_app_C();
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-
-        Log.i(TAG, "change_notification");
-        final int a_TOXCONNECTION_f = a_TOXCONNECTION;
-        try
-        {
-            Thread t = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    long counter = 0;
-                    while (tox_service_fg == null)
-                    {
-                        counter++;
-                        if (counter > 10)
-                        {
-                            break;
-                        }
-                        // Log.i(TAG, "change_notification:sleep");
-
-                        try
-                        {
-                            Thread.sleep(100);
-                        }
-                        catch (Exception e)
-                        {
-                            // e.printStackTrace();
-                        }
-                    }
-                    Log.i(TAG, "change_notification:change");
-                    try
-                    {
-                        tox_service_fg.change_notification_fg(a_TOXCONNECTION_f);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            t.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void onBackPressed()
     {
@@ -5959,6 +5619,346 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+    }
+
+    static FriendList main_get_friend(long friendnum)
+    {
+
+        String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
+        // Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
+
+        FriendList f;
+        List<FriendList> fl = orma.selectFromFriendList().
+                tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                toList();
+
+        // Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
+
+        if (fl.size() > 0)
+        {
+            f = fl.get(0);
+            // Log.i(TAG, "main_get_friend:f=" + f);
+        }
+        else
+        {
+            f = null;
+        }
+
+        return f;
+    }
+
+    static int is_friend_online(long friendnum)
+    {
+        try
+        {
+            return (orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0).TOX_CONNECTION);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    static boolean is_conference_active(String conference_identifier)
+    {
+        try
+        {
+            return (orma.selectFromConferenceDB().
+                    conference_identifierEq(conference_identifier).
+                    toList().get(0).conference_active);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    synchronized static void set_all_friends_offline()
+    {
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    orma.updateFriendList().
+                            TOX_CONNECTION(0).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                }
+
+                try
+                {
+                    orma.updateFriendList().
+                            last_online_timestampEq(LAST_ONLINE_TIMSTAMP_ONLINE_NOW).
+                            last_online_timestamp(System.currentTimeMillis()).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                }
+
+                // ------ DEBUG ------
+                // ------ set all friends to "never" seen online ------
+                // ------ DEBUG ------
+                // try
+                // {
+                //     orma.updateFriendList().
+                //             last_online_timestamp(LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE).
+                //             execute();
+                // }
+                // catch (Exception e)
+                // {
+                // }
+                // ------ DEBUG ------
+                // ------ set all friends to "never" seen online ------
+                // ------ DEBUG ------
+
+
+                try
+                {
+                    friend_list_fragment.set_all_friends_to_offline();
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+        t.start();
+    }
+
+    synchronized static void update_friend_in_db(FriendList f)
+    {
+        orma.updateFriendList().
+                tox_public_key_string(f.tox_public_key_string).
+                name(f.name).
+                status_message(f.status_message).
+                TOX_CONNECTION(f.TOX_CONNECTION).
+                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
+                TOX_USER_STATUS(f.TOX_USER_STATUS).
+                execute();
+    }
+
+    synchronized static void update_friend_in_db_status_message(FriendList f)
+    {
+        orma.updateFriendList().
+                tox_public_key_stringEq(f.tox_public_key_string).
+                status_message(f.status_message).
+                execute();
+    }
+
+    synchronized static void update_friend_in_db_status(FriendList f)
+    {
+        // Log.i(TAG, "update_friend_in_db_status:f=" + f);
+
+        int numrows = orma.updateFriendList().
+                tox_public_key_stringEq(f.tox_public_key_string).
+                TOX_USER_STATUS(f.TOX_USER_STATUS).
+                execute();
+
+        Log.i(TAG, "update_friend_in_db_status:numrows=" + numrows);
+
+    }
+
+    synchronized static void update_friend_in_db_connection_status(FriendList f)
+    {
+        orma.updateFriendList().
+                tox_public_key_stringEq(f.tox_public_key_string).
+                TOX_CONNECTION(f.TOX_CONNECTION).
+                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
+                execute();
+    }
+
+    synchronized static void update_friend_in_db_connection_status_real(FriendList f)
+    {
+        orma.updateFriendList().
+                tox_public_key_stringEq(f.tox_public_key_string).
+                TOX_CONNECTION(f.TOX_CONNECTION_real).
+                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off_real).
+                execute();
+    }
+
+    synchronized static void update_friend_in_db_last_online_timestamp(FriendList f)
+    {
+        // Log.i(TAG, "update_friend_in_db_last_online_timestamp");
+        try
+        {
+            orma.updateFriendList().
+                    tox_public_key_stringEq(f.tox_public_key_string).
+                    last_online_timestamp(f.last_online_timestamp).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    synchronized static void update_friend_in_db_name(FriendList f)
+    {
+        orma.updateFriendList().
+                tox_public_key_stringEq(f.tox_public_key_string).
+                name(f.name).
+                execute();
+    }
+
+    synchronized static void update_message_in_db(final Message m)
+    {
+        final Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    orma.updateMessage().
+                            idEq(m.id).
+                            read(m.read).
+                            text(m.text).
+                            sent_timestamp(m.sent_timestamp).
+                            rcvd_timestamp(m.rcvd_timestamp).
+                            filename_fullpath(m.filename_fullpath).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        t.start();
+    }
+
+    static void update_message_in_db_filename_fullpath_friendnum_and_filenum(long friend_number, long file_number, String filename_fullpath)
+    {
+        try
+        {
+            long ft_id = orma.selectFromFiletransfer().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    and().file_numberEq(file_number).orderByIdDesc().get(0).id;
+
+            update_message_in_db_filename_fullpath_from_id(orma.selectFromMessage().
+                    filetransfer_idEq(ft_id).and().
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    get(0).id, filename_fullpath);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void update_message_in_db_filename_fullpath_from_id(long msg_id, String filename_fullpath)
+    {
+        try
+        {
+            orma.updateMessage().idEq(msg_id).filename_fullpath(filename_fullpath).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void update_message_in_db_filename_fullpath(final Message m)
+    {
+        try
+        {
+            orma.updateMessage().
+                    idEq(m.id).
+                    filename_fullpath(m.filename_fullpath).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void update_message_in_db_read_rcvd_timestamp_rawmsgbytes(final Message m)
+    {
+        try
+        {
+            orma.updateMessage().
+                    idEq(m.id).
+                    read(m.read).
+                    raw_msgv2_bytes(m.raw_msgv2_bytes).
+                    rcvd_timestamp(m.rcvd_timestamp).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void change_notification(int a_TOXCONNECTION)
+    {
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash_app_java(1);
+        // crash_app_C();
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+        // crash -----------------
+
+        Log.i(TAG, "change_notification");
+        final int a_TOXCONNECTION_f = a_TOXCONNECTION;
+        try
+        {
+            Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    long counter = 0;
+                    while (tox_service_fg == null)
+                    {
+                        counter++;
+                        if (counter > 10)
+                        {
+                            break;
+                        }
+                        // Log.i(TAG, "change_notification:sleep");
+
+                        try
+                        {
+                            Thread.sleep(100);
+                        }
+                        catch (Exception e)
+                        {
+                            // e.printStackTrace();
+                        }
+                    }
+                    Log.i(TAG, "change_notification:change");
+                    try
+                    {
+                        tox_service_fg.change_notification_fg(a_TOXCONNECTION_f);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public static void update_friend_connection_status_helper(int a_TOX_CONNECTION, FriendList f, boolean from_relay)
