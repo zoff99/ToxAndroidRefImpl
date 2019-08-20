@@ -3691,6 +3691,201 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG,
               "friend_sync_message_v2_cb:len=" + text_length + " wrapped msg text str=" + wrapped_msg_text_as_string);
         Log.i(TAG, "friend_sync_message_v2_cb:wrapped msg text hex=" + msg_text_as_hex_string_wrapped);
+
+        receive_proxy_friend_message(tox_friend_by_public_key__wrapper(real_sender_as_hex_string),wrapped_msg_text_as_string);
+    }
+
+    static void receive_proxy_friend_message(long friend_number, String friend_message)
+    {
+        // Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
+
+        // if message list for this friend is open, then don't do notification and "new" badge
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        // Log.i(TAG, "noti_and_badge:001:" + message_list_activity);
+        if (message_list_activity != null)
+        {
+            // Log.i(TAG, "noti_and_badge:002:" + message_list_activity.get_current_friendnum() + ":" + friend_number);
+            if (message_list_activity.get_current_friendnum() == friend_number)
+            {
+                // Log.i(TAG, "noti_and_badge:003:");
+                // no notifcation and no badge update
+                do_notification = false;
+                do_badge_update = false;
+            }
+        }
+
+        Message m = new Message();
+
+        if (!do_badge_update)
+        {
+            Log.i(TAG, "noti_and_badge:004a:");
+            m.is_new = false;
+        }
+        else
+        {
+            Log.i(TAG, "noti_and_badge:004b:");
+            m.is_new = true;
+        }
+
+        // m.tox_friendnum = friend_number;
+        m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
+        m.direction = 0; // msg received
+        m.TOX_MESSAGE_TYPE = 0;
+        m.read = false;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.rcvd_timestamp = System.currentTimeMillis();
+        m.rcvd_timestamp_ms = 0;
+        m.sent_timestamp = System.currentTimeMillis();
+        m.sent_timestamp_ms = 0;
+        m.text = friend_message;
+        m.msg_version = 0;
+
+        if (message_list_activity != null)
+        {
+            if (message_list_activity.get_current_friendnum() == friend_number)
+            {
+                insert_into_message_db(m, true);
+            }
+            else
+            {
+                insert_into_message_db(m, false);
+            }
+        }
+        else
+        {
+            insert_into_message_db(m, false);
+        }
+
+        try
+        {
+            // update "new" status on friendlist fragment
+            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+            if (friend_list_fragment != null)
+            {
+                if (f != null)
+                {
+                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                    cc.is_friend = true;
+                    cc.friend_item = f;
+                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                }
+            }
+
+            if (f.notification_silent)
+            {
+                do_notification = false;
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
+        }
+
+        if (do_notification)
+        {
+            Log.i(TAG, "noti_and_badge:005:");
+
+            // start "new" notification
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // allow notification every n seconds
+                        if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) <
+                            System.currentTimeMillis())
+                        {
+
+                            if (PREF__notification)
+                            {
+                                Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
+
+                                Intent notificationIntent = new Intent(context_s, StartMainActivityWrapper.class);
+                                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0,
+                                                                                        notificationIntent, 0);
+
+                                // -- notification ------------------
+                                // -- notification ------------------
+                                NotificationCompat.Builder b;
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                                {
+                                    if ((PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound_and_vibrate);
+                                    }
+                                    else if ((PREF__notification_sound) && (!PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound);
+                                    }
+                                    else if ((!PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_vibrate);
+                                    }
+                                    else
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_silent);
+                                    }
+                                }
+                                else
+                                {
+                                    b = new NotificationCompat.Builder(context_s);
+                                }
+                                b.setContentIntent(pendingIntent);
+                                b.setSmallIcon(R.drawable.circle_orange);
+                                b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                                Uri default_notification_sound = RingtoneManager.getDefaultUri(
+                                        RingtoneManager.TYPE_NOTIFICATION);
+
+                                if (PREF__notification_sound)
+                                {
+                                    b.setSound(default_notification_sound);
+                                }
+
+                                if (PREF__notification_vibrate)
+                                {
+                                    long[] vibrate_pattern = {100, 300};
+                                    b.setVibrate(vibrate_pattern);
+                                }
+
+                                b.setContentTitle("TRIfA");
+                                b.setAutoCancel(true);
+                                b.setContentText("new Message");
+
+                                Notification notification3 = b.build();
+                                nmn3.notify(Notification_new_message_ID, notification3);
+                                // -- notification ------------------
+                                // -- notification ------------------
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            try
+            {
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
     }
 
     // --- incoming message ---
