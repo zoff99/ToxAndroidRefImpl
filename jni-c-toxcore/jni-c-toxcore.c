@@ -4027,6 +4027,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1type(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    if (tox_global == NULL)
+    {
+        return (jint)-2;
+    }
+    
     TOX_ERR_CONFERENCE_GET_TYPE error;
     TOX_CONFERENCE_TYPE type = tox_conference_get_type(tox_global, (uint32_t)conference_number, &error);
 
@@ -4045,6 +4050,12 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
+    if (tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    
     jstring result;
     uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
     TOX_ERR_CONFERENCE_PEER_QUERY error;
@@ -4074,6 +4085,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1count(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    if (tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+    
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     uint32_t res = tox_conference_peer_count(tox_global, (uint32_t)conference_number, &error);
 
@@ -4110,6 +4126,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name_1size(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
+    if (tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     size_t res = tox_conference_peer_get_name_size(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, &error);
 
@@ -4206,6 +4227,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title_1size(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    if (tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
     TOX_ERR_CONFERENCE_TITLE error;
     size_t res = tox_conference_get_title_size(tox_global, (uint32_t)conference_number, &error);
 
@@ -4253,6 +4279,11 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    if (tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
     TOX_ERR_CONFERENCE_TITLE error;
     size_t length = tox_conference_get_title_size(tox_global, (uint32_t)conference_number, &error);
 
@@ -4335,6 +4366,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv *env, jobject thiz,
         jlong conference_number, jobject cookie_buffer)
 {
+    if (tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
     uint8_t *cookie_buffer_c = NULL;
     long capacity = 0;
 
