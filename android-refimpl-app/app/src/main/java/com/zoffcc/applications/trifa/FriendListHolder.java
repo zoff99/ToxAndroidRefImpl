@@ -160,7 +160,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             f_last_online_timestamp.setText("");
         }
 
-
         if (fl.notification_silent)
         {
             final Drawable d_notification = new IconicsDrawable(context).
@@ -652,30 +651,30 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     {
                         try
                         {
-                          // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-                          if ( set_friend_as_own_relay_in_db(f2.tox_public_key_string))
-                          {
-                              // load all friends into data list ---
-                              Log.i(TAG, "onMenuItemClick:6");
-                              try
-                              {
-                                  if (friend_list_fragment != null)
-                                  {
-                                      // reload friendlist
-                                      friend_list_fragment.add_all_friends_clear(200);
-                                  }
-                              }
-                              catch (Exception e)
-                              {
-                                  e.printStackTrace();
-                              }
+                            // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                            if (set_friend_as_own_relay_in_db(f2.tox_public_key_string))
+                            {
+                                // load all friends into data list ---
+                                Log.i(TAG, "onMenuItemClick:6");
+                                try
+                                {
+                                    if (friend_list_fragment != null)
+                                    {
+                                        // reload friendlist
+                                        friend_list_fragment.add_all_friends_clear(200);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
 
-                              Log.i(TAG, "onMenuItemClick:7");
-                              // load all friends into data list ---
-                          }
+                                Log.i(TAG, "onMenuItemClick:7");
+                                // load all friends into data list ---
+                            }
 
-                          send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
-                          send_relay_pubkey_to_all_friends(f2.tox_public_key_string);
+                            send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
+                            send_relay_pubkey_to_all_friends(f2.tox_public_key_string);
                         }
                         catch (Exception e)
                         {

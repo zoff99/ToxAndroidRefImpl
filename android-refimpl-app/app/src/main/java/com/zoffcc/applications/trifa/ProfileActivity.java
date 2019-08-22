@@ -159,6 +159,24 @@ public class ProfileActivity extends AppCompatActivity
                             e.printStackTrace();
                         }
 
+                        my_relay_toxid_textview.setVisibility(View.INVISIBLE);
+                        remove_own_relay_button.setVisibility(View.INVISIBLE);
+
+                        try
+                        {
+                            remove_own_relay_button.setVisibility(View.GONE);
+                        }
+                        catch (Exception e1)
+                        {
+                        }
+                        try
+                        {
+                            my_relay_toxid_textview.setVisibility(View.GONE);
+                        }
+                        catch (Exception e1)
+                        {
+                        }
+
                     }
                     catch (Exception e)
                     {
@@ -172,6 +190,15 @@ public class ProfileActivity extends AppCompatActivity
         else
         {
             remove_own_relay_button.setText("- no Relay set -");
+            remove_own_relay_button.setVisibility(View.INVISIBLE);
+            try
+            {
+                remove_own_relay_button.setVisibility(View.GONE);
+            }
+            catch (Exception e1)
+            {
+            }
+
             my_relay_toxid_textview.setText("--");
             my_relay_toxid_textview.setVisibility(View.INVISIBLE);
             try
@@ -330,8 +357,7 @@ public class ProfileActivity extends AppCompatActivity
             String color_chksum = "<font color=\"#006600\">";
             String ec = "</font>";
             mytoxid_textview.setText(Html.fromHtml(
-                    color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum +
-                    my_chksum_temp + ec));
+                    color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum + my_chksum_temp + ec));
         }
         catch (WriterException e)
         {
