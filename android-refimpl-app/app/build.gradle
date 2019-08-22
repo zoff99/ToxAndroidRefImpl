@@ -17,8 +17,6 @@
  * Boston, MA  02110-1301, USA.
  */
 
-import java.security.MessageDigest
-
 buildscript {
     repositories {
         google()
@@ -32,12 +30,14 @@ buildscript {
 }
 
 // gradlew -q calculateChecksums|sort
+// ./gradlew -q --configure-on-demand app:calculateChecksums
 //
 // gradlew :app:dependencies
 // gradlew :app:androidDependencies.
 
 apply plugin: 'com.android.application'
 apply plugin: 'witness'
+apply from: 'witness.gradle'
 
 android {
     compileSdkVersion 27
@@ -271,8 +271,3 @@ dependencies {
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
 }
 
-// TODO: fix gradle witness again
-dependencyVerification {
-    verify = [
-    ]
-}

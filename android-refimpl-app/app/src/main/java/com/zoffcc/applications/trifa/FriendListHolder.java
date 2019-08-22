@@ -49,7 +49,8 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
-import static com.zoffcc.applications.trifa.MainActivity.friend_as_own_relay_in_db;
+import static com.zoffcc.applications.trifa.MainActivity.send_relay_pubkey_to_all_friends;
+import static com.zoffcc.applications.trifa.MainActivity.set_friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.MainActivity.is_any_relay;
@@ -651,30 +652,30 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     {
                         try
                         {
-                            // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-                            if (friend_as_own_relay_in_db(f2.tox_public_key_string))
-                            {
-                                // load all friends into data list ---
-                                Log.i(TAG, "onMenuItemClick:6");
-                                try
-                                {
-                                    if (friend_list_fragment != null)
-                                    {
-                                        // reload friendlist
-                                        friend_list_fragment.add_all_friends_clear(200);
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
+                          // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                          if ( set_friend_as_own_relay_in_db(f2.tox_public_key_string))
+                          {
+                              // load all friends into data list ---
+                              Log.i(TAG, "onMenuItemClick:6");
+                              try
+                              {
+                                  if (friend_list_fragment != null)
+                                  {
+                                      // reload friendlist
+                                      friend_list_fragment.add_all_friends_clear(200);
+                                  }
+                              }
+                              catch (Exception e)
+                              {
+                                  e.printStackTrace();
+                              }
 
-                                Log.i(TAG, "onMenuItemClick:7");
-                                // load all friends into data list ---
-                            }
+                              Log.i(TAG, "onMenuItemClick:7");
+                              // load all friends into data list ---
+                          }
 
-                            send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
-
+                          send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
+                          send_relay_pubkey_to_all_friends(f2.tox_public_key_string);
                         }
                         catch (Exception e)
                         {
