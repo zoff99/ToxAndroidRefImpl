@@ -19,3 +19,5 @@ convert_nodes_file/nodes.c
 convert_nodes_file/nodes.json
 android-refimpl-app/app/.idea/
 android-refimpl-app/app/local.properties
+android-refimpl-app/gwitness/gwit/reports/
+android-refimpl-app/gwitness/gwit/pluginUnderTestMetadata/
