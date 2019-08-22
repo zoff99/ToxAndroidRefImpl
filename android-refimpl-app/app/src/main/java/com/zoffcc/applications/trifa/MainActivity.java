@@ -3172,8 +3172,9 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (!is_any_relay(f.tox_public_key_string))
                         {
+                            send_relay_pubkey_to_friend(get_own_relay_pubkey(), f.tox_public_key_string);
                             send_friend_pubkey_to_relay(get_own_relay_pubkey(), f.tox_public_key_string);
-                            Log.i(TAG, "send friend pubkey to relday");
+                            Log.i(TAG, "send friend pubkey to relay");
                         }
                     }
                 }
@@ -3456,7 +3457,9 @@ public class MainActivity extends AppCompatActivity
         //receive_proxy_friend_message(tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
         //                             wrapped_msg_text_as_string);
 
-        receive_incoming_message(2, tox_friend_by_public_key__wrapper(real_sender_as_hex_string), wrapped_msg_text_as_string, raw_message, raw_message_length, real_sender_as_hex_string);
+        receive_incoming_message(2, tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
+                                 wrapped_msg_text_as_string, raw_message, raw_message_length,
+                                 real_sender_as_hex_string);
 
     }
 
@@ -3697,7 +3700,8 @@ public class MainActivity extends AppCompatActivity
             // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
 
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                    tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(msg_id_as_hex_string).count();
+                    tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
+                    msg_id_as_hex_string).count();
             if (already_have_message > 0)
             {
                 // it's a double send, ignore it
@@ -3929,7 +3933,8 @@ public class MainActivity extends AppCompatActivity
             // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
 
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                    tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(msg_id_as_hex_string).count();
+                    tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
+                    msg_id_as_hex_string).count();
             if (already_have_message > 0)
             {
                 // it's a double send, ignore it
@@ -9208,7 +9213,20 @@ public class MainActivity extends AppCompatActivity
         long friend_num = tox_friend_by_public_key__wrapper(relay_public_key_string);
         byte[] data = hex_to_bytes("FF" + friend_pubkey);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
-        tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
+        Log.d(TAG, "send_friend_pubkey_to_relay:data=" + data);
+        int result = tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
+        Log.d(TAG, "send_friend_pubkey_to_relay:res=" + result);
+    }
+
+    static void send_relay_pubkey_to_friend(String relay_public_key_string, String friend_pubkey)
+    {
+        int i = 0;
+        long friend_num = tox_friend_by_public_key__wrapper(friend_pubkey);
+        byte[] data = hex_to_bytes("FF" + relay_public_key_string);
+        data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
+        Log.d(TAG, "send_relay_pubkey_to_friend:data=" + data);
+        int result = tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
+        Log.d(TAG, "send_relay_pubkey_to_friend:res=" + result);
     }
 
     static boolean have_own_relay()
