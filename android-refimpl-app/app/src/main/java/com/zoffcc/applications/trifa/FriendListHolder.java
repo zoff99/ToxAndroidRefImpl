@@ -51,7 +51,10 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filet
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.MainActivity.friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.get_relay_for_friend;
+import static com.zoffcc.applications.trifa.MainActivity.is_any_relay;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.main_get_friend;
 import static com.zoffcc.applications.trifa.MainActivity.send_all_friend_pubkeys_to_relay;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
@@ -81,6 +84,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private ImageView imageView;
     private ImageView imageView2;
     private ImageView f_notification;
+    private ImageView f_relay_icon;
     private TextView f_last_online_timestamp;
     static ProgressDialog progressDialog = null;
 
@@ -116,6 +120,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.f_avatar_icon);
         imageView = (ImageView) itemView.findViewById(R.id.f_status_icon);
         imageView2 = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
+        f_relay_icon = (ImageView) itemView.findViewById(R.id.f_relay_icon);
         f_notification = (ImageView) itemView.findViewById(R.id.f_notification);
         f_last_online_timestamp = (TextView) itemView.findViewById(R.id.f_last_online_timestamp);
     }
@@ -357,6 +362,33 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         else
         {
             imageView2.setImageResource(R.drawable.circle_red);
+        }
+
+        String relay_ = get_relay_for_friend(fl.tox_public_key_string);
+
+        if (relay_ != null)
+        {
+            FriendList relay_fl = main_get_friend(tox_friend_by_public_key__wrapper(relay_));
+            if (relay_fl != null)
+            {
+                if (relay_fl.TOX_USER_STATUS == 0)
+                {
+                    f_relay_icon.setImageResource(R.drawable.circle_green);
+                }
+                else if (relay_fl.TOX_USER_STATUS == 1)
+                {
+                    f_relay_icon.setImageResource(R.drawable.circle_orange);
+                }
+                else
+                {
+                    f_relay_icon.setImageResource(R.drawable.circle_red);
+                }
+                f_relay_icon.setVisibility(View.VISIBLE);
+            }
+        }
+        else
+        {
+            f_relay_icon.setVisibility(View.INVISIBLE);
         }
 
         try
@@ -619,29 +651,29 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     {
                         try
                         {
-                          // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-                          if ( friend_as_own_relay_in_db(f2.tox_public_key_string))
-                          {
-                              // load all friends into data list ---
-                              Log.i(TAG, "onMenuItemClick:6");
-                              try
-                              {
-                                  if (friend_list_fragment != null)
-                                  {
-                                      // reload friendlist
-                                      friend_list_fragment.add_all_friends_clear(200);
-                                  }
-                              }
-                              catch (Exception e)
-                              {
-                                  e.printStackTrace();
-                              }
+                            // long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                            if (friend_as_own_relay_in_db(f2.tox_public_key_string))
+                            {
+                                // load all friends into data list ---
+                                Log.i(TAG, "onMenuItemClick:6");
+                                try
+                                {
+                                    if (friend_list_fragment != null)
+                                    {
+                                        // reload friendlist
+                                        friend_list_fragment.add_all_friends_clear(200);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
 
-                              Log.i(TAG, "onMenuItemClick:7");
-                              // load all friends into data list ---
-                          }
+                                Log.i(TAG, "onMenuItemClick:7");
+                                // load all friends into data list ---
+                            }
 
-                          send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
+                            send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
 
                         }
                         catch (Exception e)
