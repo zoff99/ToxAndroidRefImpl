@@ -91,11 +91,15 @@ cd
 mkdir -p ./astyle_check/
 cd ./astyle_check/
 
-cp -a /root/work/android-refimpl-app ./astyle_check/ || exit 1
+cp -av /root/work/android-refimpl-app ./astyle_check/ || exit 1
 cp -av /root/work/jni-c-toxcore ./astyle_check/ || exit 1
+cp -a /root/work/.git ./astyle_check/ || exit 1
+
+ls -al /root/work/astyle/astylerc  || exit 1
 
 cd ./astyle_check/
-ls -al /root/work/astyle/astylerc  || exit 1
+ls -al
+
 SOURCES=`find android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa -name '*.java'|sort`;
 "$astyle_bin" -n --options=/root/work/astyle/astylerc jni-c-toxcore/jni-c-toxcore.c $SOURCES
 git --no-pager diff
