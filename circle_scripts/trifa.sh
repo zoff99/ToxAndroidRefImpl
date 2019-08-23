@@ -90,12 +90,14 @@ export astyle_bin="$(pwd)/astyle"
 cd
 mkdir -p ./astyle_check/
 cd ./astyle_check/
-cp -av $_s_/trifa_src/android-refimpl-app ./astyle_check/
-cp -av $_s_/trifa_src/jni-c-toxcore ./astyle_check/
+
+cp -a /root/work/android-refimpl-app ./astyle_check/ || exit 1
+cp -av /root/work/jni-c-toxcore ./astyle_check/ || exit 1
+
 cd ./astyle_check/
-ls -al ./astyle/astylerc
+ls -al /root/work/astyle/astylerc  || exit 1
 SOURCES=`find android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa -name '*.java'|sort`;
-"$astyle_bin" -n --options=./astyle/astylerc jni-c-toxcore/jni-c-toxcore.c $SOURCES
+"$astyle_bin" -n --options=/root/work/astyle/astylerc jni-c-toxcore/jni-c-toxcore.c $SOURCES
 git --no-pager diff
 git diff | cat > $CIRCLE_ARTIFACTS/astyle_check.patch 2>&1
 # --------- check code style -----------
