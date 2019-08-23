@@ -78,7 +78,7 @@ dependencyVerification {
         'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.25:trifa-jni-lib-1.0.25.aar:1c265e391ebf7b522b8883f5bb43e28127931f046ed2a47d0d6d7240952011dc',
         'commons-codec:commons-codec:1.9:commons-codec-1.9.jar:ad19d2601c3abf0b946b5c3a4113e226a8c1e3305e395b90013b78dd94a723ce',
         'commons-logging:commons-logging:1.2:commons-logging-1.2.jar:daddea1ea0be0f56978ab3006b8ac92834afeefbd9b7e4e6316fca57df0fa636',
-        'de.hdodenhof:circleimageview:2.2.0:circleimageview-2.2.0.aar:ac34761dcd5036229ac1ffed6b5b1bef722ad5b097a2c8bba1c5ed2cd4b5c82b',
+        'de.hdodenhof:circleimageview:2.2.0:circleimageview-2.2.0.aar:bc34761dcd5036229ac1ffed6b5b1bef722ad5b097a2c8bba1c5ed2cd4b5c82b',
         'info.guardianproject.iocipher:IOCipher:0.4:IOCipher-0.4.aar:ab7da0f23e256a2ced9492c73e37812c26e7beccc1a99815e6d65a75728ba6d3',
         'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1:netcipher-okhttp3-2.0.0-alpha1.jar:548b24763c57d273e1e3650e9974644f91c6a79350961905476456b6a485c905',
         'info.guardianproject.netcipher:netcipher:2.0.0-beta1:netcipher-2.0.0-beta1.jar:ea12ebfc601ac8b6c5d2227367f971ee1059f3901b7791bd291b65dcefb53e5a',
