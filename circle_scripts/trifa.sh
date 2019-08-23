@@ -54,7 +54,6 @@ echo "installing more system packages ..."
 
 redirect_cmd apt-get install $qqq -y --force-yes qrencode
 redirect_cmd apt-get install $qqq -y --force-yes p7zip-full
-redirect_cmd apt-get install $qqq -y --force-yes astyle
 redirect_cmd apt-get install $qqq -y --force-yes pax-utils
 
 echo $_HOME_
@@ -300,6 +299,32 @@ fi
 
 
 
+# --------- check code style -----------
+cd
+mkdir -p ./astyle_compile/
+cd ./astyle_compile/
+wget -O astyle.tgz https://downloads.sourceforge.net/project/astyle/astyle/astyle%203.1/astyle_3.1_linux.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fastyle%2Ffiles%2Fastyle%2Fastyle%25203.1%2Fastyle_3.1_linux.tar.gz%2Fdownload
+tar -xzvf astyle.tgz > /dev/null 2>&1
+mkdir -p build_astyle > /dev/null 2>&1
+cd build_astyle/ > /dev/null 2>&1
+cmake ../astyle/
+make -j$(nproc)
+
+export astyle_bin="$(pwd)/astyle"
+"$astyle_bin" --version
+
+cd
+mkdir -p ./astyle_check/
+cd ./astyle_check/
+cp -av $_s_/trifa_src/android-refimpl-app ./astyle_check/
+cp -av $_s_/trifa_src/jni-c-toxcore ./astyle_check/
+cd ./astyle_check/
+ls -al ./astyle/astylerc
+SOURCES=`find android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa -name '*.java'|sort`;
+"$astyle_bin" -n --options=./astyle/astylerc jni-c-toxcore/jni-c-toxcore.c $SOURCES
+git --no-pager diff
+git diff | cat > $CIRCLE_ARTIFACTS/astyle_check.patch 2>&1
+# --------- check code style -----------
 
 
 
