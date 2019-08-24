@@ -3366,7 +3366,7 @@ public class MainActivity extends AppCompatActivity
                                                                           TOX_PUBLIC_KEY_SIZE * 2) + " friend request message:" + friend_request_message);
 
         String friend_public_key__ = friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2);
-        add_friend_to_system(friend_public_key__, false);
+        add_friend_to_system(friend_public_key__, false, null);
     }
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
@@ -3387,19 +3387,8 @@ public class MainActivity extends AppCompatActivity
                     String relay_pubkey = bytes_to_hex(data).substring(2);
                     Log.i(TAG, "friend_lossless_packet_cb:recevied pubkey:" + relay_pubkey);
 
-                    // add relay for friend to DB
-                    add_or_update_friend_relay(relay_pubkey.toUpperCase(),
-                                               tox_friend_get_public_key__wrapper(friend_number));
-
-                    // update friendlist on screen
-                    try
-                    {
-                        friend_list_fragment.add_all_friends_clear(10);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+                    add_friend_to_system(relay_pubkey.toUpperCase(), true,
+                                         tox_friend_get_public_key__wrapper(friend_number));
                 }
             }
         }
@@ -6621,7 +6610,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void add_friend_to_system(final String friend_public_key, boolean as_friends_relay)
+    static void add_friend_to_system(final String friend_public_key, final boolean as_friends_relay, final String owner_public_key)
     {
         Thread t = new Thread()
         {
@@ -6642,6 +6631,7 @@ public class MainActivity extends AppCompatActivity
                 // ---- auto add all friends ----
                 // ---- auto add all friends ----
                 long friendnum = tox_friend_add_norequest(friend_public_key); // add friend
+                Log.d(TAG, "add_friend_to_system:fnum add=" + friendnum);
 
                 try
                 {
@@ -6680,13 +6670,33 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "friend_request:insert:EE2:" + e.getMessage());
                 }
 
-                if (friend_list_fragment != null)
+                if (as_friends_relay)
                 {
-                    Log.i(TAG, "friend_request:003");
-                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = true;
-                    cc.friend_item = f;
-                    friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    // add relay for friend to DB
+                    Log.d(TAG, "add_friend_to_system:add_or_update_friend_relay");
+                    add_or_update_friend_relay(friend_public_key, owner_public_key);
+
+                    // update friendlist on screen
+                    try
+                    {
+                        friend_list_fragment.add_all_friends_clear(10);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+
+                    if (friend_list_fragment != null)
+                    {
+                        Log.i(TAG, "friend_request:003");
+                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                        cc.is_friend = true;
+                        cc.friend_item = f;
+                        friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    }
                 }
 
                 // ---- auto add all friends ----
@@ -8515,11 +8525,13 @@ public class MainActivity extends AppCompatActivity
     {
         if (relay_public_key_string == null)
         {
+            Log.d(TAG,"add_or_update_friend_relay:ret01");
             return;
         }
 
         if (friend_pubkey == null)
         {
+            Log.d(TAG,"add_or_update_friend_relay:ret02");
             return;
         }
 
