@@ -53,7 +53,6 @@ import static com.zoffcc.applications.trifa.MainActivity.send_relay_pubkey_to_al
 import static com.zoffcc.applications.trifa.MainActivity.set_friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.get_relay_for_friend;
-import static com.zoffcc.applications.trifa.MainActivity.is_any_relay;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.main_get_friend;
 import static com.zoffcc.applications.trifa.MainActivity.send_all_friend_pubkeys_to_relay;
@@ -82,8 +81,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private TextView statusText;
     private TextView unread_count;
     private de.hdodenhof.circleimageview.CircleImageView avatar;
-    private ImageView imageView;
-    private ImageView imageView2;
+    private ImageView f_status_icon;
+    private ImageView f_user_status_icon;
     private ImageView f_notification;
     private ImageView f_relay_icon;
     private TextView f_last_online_timestamp;
@@ -119,8 +118,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         statusText = (TextView) itemView.findViewById(R.id.f_status_message);
         unread_count = (TextView) itemView.findViewById(R.id.f_unread_count);
         avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.f_avatar_icon);
-        imageView = (ImageView) itemView.findViewById(R.id.f_status_icon);
-        imageView2 = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
+        f_status_icon = (ImageView) itemView.findViewById(R.id.f_status_icon);
+        f_user_status_icon = (ImageView) itemView.findViewById(R.id.f_user_status_icon);
         f_relay_icon = (ImageView) itemView.findViewById(R.id.f_relay_icon);
         f_notification = (ImageView) itemView.findViewById(R.id.f_notification);
         f_last_online_timestamp = (TextView) itemView.findViewById(R.id.f_last_online_timestamp);
@@ -341,28 +340,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             e.printStackTrace();
         }
 
-
-        if (fl.TOX_CONNECTION == 0)
-        {
-            imageView.setImageResource(R.drawable.circle_red);
-        }
-        else
-        {
-            imageView.setImageResource(R.drawable.circle_green);
-        }
-
-        if (fl.TOX_USER_STATUS == 0)
-        {
-            imageView2.setImageResource(R.drawable.circle_green);
-        }
-        else if (fl.TOX_USER_STATUS == 1)
-        {
-            imageView2.setImageResource(R.drawable.circle_orange);
-        }
-        else
-        {
-            imageView2.setImageResource(R.drawable.circle_red);
-        }
+        f_status_icon.setVisibility(View.VISIBLE);
+        f_relay_icon.setVisibility(View.INVISIBLE);
 
         String relay_ = get_relay_for_friend(fl.tox_public_key_string);
 
@@ -375,27 +354,58 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             Log.d(TAG, "002 relay_fl=" + relay_fl + " fnum=" + fnum_);
             if (relay_fl != null)
             {
-                if (relay_fl.TOX_USER_STATUS == 0)
+                if (fl.TOX_CONNECTION_real == 0)
                 {
-                    f_relay_icon.setImageResource(R.drawable.circle_green);
-                }
-                else if (relay_fl.TOX_USER_STATUS == 1)
-                {
-                    f_relay_icon.setImageResource(R.drawable.circle_orange);
+                    f_status_icon.setImageResource(R.drawable.circle_red);
                 }
                 else
                 {
+                    f_status_icon.setImageResource(R.drawable.circle_green);
+                }
+                Log.d(TAG, "003 relay_fl=" + relay_fl);
+
+                if (fl.TOX_CONNECTION == 0)
+                {
                     f_relay_icon.setImageResource(R.drawable.circle_red);
                 }
+                else
+                {
+                    f_relay_icon.setImageResource(R.drawable.circle_green);
+                }
+
+                f_status_icon.setVisibility(View.VISIBLE);
                 f_relay_icon.setVisibility(View.VISIBLE);
-                Log.d(TAG, "003 relay_fl=" + relay_fl);
             }
+        }
+        else // friend has no relay
+        {
+            Log.d(TAG, "004");
+
+            if (fl.TOX_CONNECTION == 0)
+            {
+                f_status_icon.setImageResource(R.drawable.circle_red);
+            }
+            else
+            {
+                f_status_icon.setImageResource(R.drawable.circle_green);
+            }
+
+        }
+
+
+        if (fl.TOX_USER_STATUS == 0)
+        {
+            f_user_status_icon.setImageResource(R.drawable.circle_green);
+        }
+        else if (fl.TOX_USER_STATUS == 1)
+        {
+            f_user_status_icon.setImageResource(R.drawable.circle_orange);
         }
         else
         {
-            f_relay_icon.setVisibility(View.INVISIBLE);
-            Log.d(TAG, "004");
+            f_user_status_icon.setImageResource(R.drawable.circle_red);
         }
+
 
         try
         {
