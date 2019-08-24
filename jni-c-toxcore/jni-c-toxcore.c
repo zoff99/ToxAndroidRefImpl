@@ -1045,7 +1045,7 @@ void android_tox_callback_friend_lossless_packet_cb(uint32_t friend_number, cons
 }
 
 void friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length,
-                                      void *user_data)
+                               void *user_data)
 {
     android_tox_callback_friend_lossless_packet_cb(friend_number, data, length);
 }
@@ -1258,9 +1258,7 @@ void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_m
 void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, const uint8_t *raw_message,
         size_t raw_message_len)
 {
-
     dbg(9, "friend_sync_message_v2_cb:fn=%d", (int)friend_number);
-
 #ifdef TOX_MESSAGE_V2_ACTIVE
     uint8_t *message_data = calloc(1, raw_message_len);
 
@@ -1293,7 +1291,6 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
         uint32_t data_length = 0;
         bool res = tox_messagev2_get_sync_message_data(raw_message,
                    (uint32_t)raw_message_len, message_data, &data_length);
-
         (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)data_length, (const jbyte *)message_data);
 
         if(raw_message_len > 0)
@@ -3905,7 +3902,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv *en
     // dbg(0, "tox_conference_join:cookie length=%d", (int)capacity);
     // dbg(0, "tox_conference_join:cookie start byte=%d", (int)cookie_buffer_c[0]);
     // dbg(0, "tox_conference_join:cookie end byte=%d", (int)cookie_buffer_c[cookie_length - 1]);
-
     TOX_ERR_CONFERENCE_JOIN error;
     uint32_t res = tox_conference_join(tox_global, (uint32_t)friend_number, cookie_buffer_c, (size_t)cookie_length, &error);
 
@@ -4027,11 +4023,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1type(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
-    if (tox_global == NULL)
+    if(tox_global == NULL)
     {
         return (jint)-2;
     }
-    
+
     TOX_ERR_CONFERENCE_GET_TYPE error;
     TOX_CONFERENCE_TYPE type = tox_conference_get_type(tox_global, (uint32_t)conference_number, &error);
 
@@ -4050,12 +4046,11 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
-    if (tox_global == NULL)
+    if(tox_global == NULL)
     {
         return (jstring)NULL;
     }
 
-    
     jstring result;
     uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
     TOX_ERR_CONFERENCE_PEER_QUERY error;
@@ -4085,11 +4080,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1count(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
-    if (tox_global == NULL)
+    if(tox_global == NULL)
     {
         return (jlong)-99;
     }
-    
+
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     uint32_t res = tox_conference_peer_count(tox_global, (uint32_t)conference_number, &error);
 
@@ -4126,7 +4121,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name_1size(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
-    if (tox_global == NULL)
+    if(tox_global == NULL)
     {
         return (jlong)-99;
     }
@@ -4227,7 +4222,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title_1size(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
-    if (tox_global == NULL)
+    if(tox_global == NULL)
     {
         return (jlong)-99;
     }
@@ -4279,7 +4274,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
-    if (tox_global == NULL)
+    if(tox_global == NULL)
     {
         return (jstring)NULL;
     }
@@ -4366,7 +4361,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv *env, jobject thiz,
         jlong conference_number, jobject cookie_buffer)
 {
-    if (tox_global == NULL)
+    if(tox_global == NULL)
     {
         return (jint)-99;
     }
