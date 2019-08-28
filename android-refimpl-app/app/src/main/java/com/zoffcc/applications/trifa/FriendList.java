@@ -111,7 +111,8 @@ public class FriendList
                ", is_relay=" + is_relay +
                ", name=" + name + ", status_message=" +
                status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_CONNECTION_on_off=" +
-               TOX_CONNECTION_on_off + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
+               TOX_CONNECTION_on_off +", TOX_CONNECTION_real=" +
+               TOX_CONNECTION_real + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
                ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
                sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name;
         }

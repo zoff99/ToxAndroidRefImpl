@@ -5297,11 +5297,18 @@ public class MainActivity extends AppCompatActivity
 
     synchronized static void update_friend_in_db_connection_status_real(FriendList f)
     {
+        try
+        {
         orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
-                TOX_CONNECTION(f.TOX_CONNECTION_real).
-                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off_real).
+                TOX_CONNECTION_real(f.TOX_CONNECTION_real).
+                TOX_CONNECTION_on_off_real(f.TOX_CONNECTION_on_off_real).
                 execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     synchronized static void update_friend_in_db_last_online_timestamp(FriendList f)
@@ -9676,10 +9683,13 @@ public class MainActivity extends AppCompatActivity
     /*************************************************************************/
     public static send_message_result tox_friend_send_message_wrapper(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message)
     {
+        Log.d(TAG,"tox_friend_send_message_wrapper:" + friendnum);
         long friendnum_to_use = friendnum;
         FriendList f = main_get_friend(friendnum);
+        Log.d(TAG,"tox_friend_send_message_wrapper:f=" + f);
         if (f != null)
         {
+            Log.d(TAG,"tox_friend_send_message_wrapper:f conn" + f.TOX_CONNECTION_real);
             if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
             {
                 String relay_pubkey = get_relay_for_friend(f.tox_public_key_string);
@@ -9687,6 +9697,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     // friend has a relay
                     friendnum_to_use =  tox_friend_by_public_key__wrapper(relay_pubkey);
+                    Log.d(TAG,"tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
                 }
             }
         }
@@ -9701,6 +9712,9 @@ public class MainActivity extends AppCompatActivity
         long t_sec = (System.currentTimeMillis() / 1000);
         long res = tox_util_friend_send_message_v2(friendnum_to_use, a_TOX_MESSAGE_TYPE, t_sec, message, message.length(),
                                                    raw_message_buf, raw_message_length_buf, msg_id_buffer);
+
+        Log.d(TAG,"tox_friend_send_message_wrapper:res=" + res);
+
         int raw_message_length_int = raw_message_length_buf.
                 array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
                 array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
