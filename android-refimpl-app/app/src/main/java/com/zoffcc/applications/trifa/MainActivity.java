@@ -5196,6 +5196,16 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     orma.updateFriendList().
+                            TOX_CONNECTION_real(0).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                }
+
+                try
+                {
+                    orma.updateFriendList().
                             last_online_timestampEq(LAST_ONLINE_TIMSTAMP_ONLINE_NOW).
                             last_online_timestamp(System.currentTimeMillis()).
                             execute();
@@ -5545,13 +5555,13 @@ public class MainActivity extends AppCompatActivity
             if (a_TOX_CONNECTION == TOX_CONNECTION_NONE.value)
             {
                 // ******** friend going offline ********
-                Log.i(TAG, "friend going offline:" + System.currentTimeMillis());
+                Log.i(TAG, "friend_connection_status:friend going offline:" + System.currentTimeMillis());
             }
             else
             {
                 went_online = true;
                 // ******** friend coming online ********
-                Log.i(TAG, "friend coming online:" + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
+                Log.i(TAG, "friend_connection_status:friend coming online:" + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
             }
         }
 
@@ -5560,7 +5570,7 @@ public class MainActivity extends AppCompatActivity
 
         if (went_online)
         {
-            Log.i(TAG, "friend status seems: ONLINE");
+            Log.i(TAG, "friend_connection_status:friend status seems: ONLINE");
 
             f.TOX_CONNECTION = a_TOX_CONNECTION;
             f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
@@ -5612,11 +5622,11 @@ public class MainActivity extends AppCompatActivity
             int status_new = a_TOX_CONNECTION;
             int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
 
-            Log.i(TAG, "friend status combined con status:" + combined_connection_status_);
+            Log.i(TAG, "friend_connection_status:friend status combined con status:" + combined_connection_status_);
 
             if (get_toxconnection_wrapper(combined_connection_status_) == TOX_CONNECTION_NONE.value)
             {
-                Log.i(TAG, "friend status combined: OFFLINE");
+                Log.i(TAG, "friend_connection_status:friend status combined: OFFLINE");
 
                 f.TOX_CONNECTION = combined_connection_status_;
                 f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
