@@ -220,6 +220,16 @@ import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
+/*
+
+first actually relayed message via ToxProxy
+
+2019-08-28 22:20:43.286148 [D] friend_message_v2_cb:
+fn=1 res=1 msg=🍔👍😜👍😜 @%\4äö ubnc Ovid n JB von in BK ni ubvzv8 ctcitccccccizzvvcvvv        u  tiigi gig i g35667u 6 66
+
+
+ */
+
 @SuppressWarnings("JniMissingFunction")
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity
@@ -9661,8 +9671,26 @@ public class MainActivity extends AppCompatActivity
         String raw_message_buf_hex;
     }
 
+    /*************************************************************************/
+    /* this function now really sends a 1:1 to a friend (or a friends relay) */
+    /*************************************************************************/
     public static send_message_result tox_friend_send_message_wrapper(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message)
     {
+        long friendnum_to_use = friendnum;
+        FriendList f = main_get_friend(friendnum);
+        if (f != null)
+        {
+            if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
+            {
+                String relay_pubkey = get_relay_for_friend(f.tox_public_key_string);
+                if (relay_pubkey != null)
+                {
+                    // friend has a relay
+                    friendnum_to_use =  tox_friend_by_public_key__wrapper(relay_pubkey);
+                }
+            }
+        }
+
         send_message_result result = new send_message_result();
 
         ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) TOX_MAX_FILETRANSFER_SIZE_MSGV2);
@@ -9671,7 +9699,7 @@ public class MainActivity extends AppCompatActivity
 
         // use msg V2 API Call
         long t_sec = (System.currentTimeMillis() / 1000);
-        long res = tox_util_friend_send_message_v2(friendnum, a_TOX_MESSAGE_TYPE, t_sec, message, message.length(),
+        long res = tox_util_friend_send_message_v2(friendnum_to_use, a_TOX_MESSAGE_TYPE, t_sec, message, message.length(),
                                                    raw_message_buf, raw_message_length_buf, msg_id_buffer);
         int raw_message_length_int = raw_message_length_buf.
                 array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.

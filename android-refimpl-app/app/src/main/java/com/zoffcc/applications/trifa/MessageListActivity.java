@@ -623,6 +623,7 @@ public class MessageListActivity extends AppCompatActivity
         }
     }
 
+    /* HINT: send a message to a friend */
     synchronized public void send_message_onclick(View view)
     {
         // Log.i(TAG,"send_message_onclick:---start");
