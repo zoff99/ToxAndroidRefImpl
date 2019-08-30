@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
+import static com.zoffcc.applications.trifa.MainActivity.have_own_relay;
 import static com.zoffcc.applications.trifa.MainActivity.send_relay_pubkey_to_all_friends;
 import static com.zoffcc.applications.trifa.MainActivity.set_friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
@@ -739,8 +740,11 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         // show friend info page -----------------
                         break;
                     case R.id.item_add_toxproxy:
-                        show_confirm_addrelay_dialog(v, f2);
-                        // add as ToxProxy relay -----------------
+                        if (!have_own_relay())
+                        {
+                            show_confirm_addrelay_dialog(v, f2);
+                            // add as ToxProxy relay -----------------
+                        }
                         break;
                     case R.id.item_delete:
                         // delete friend -----------------
@@ -751,7 +755,17 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 return true;
             }
         });
+
         menu.inflate(R.menu.menu_friendlist_item);
+        MenuItem add_toxproxy_item = menu.getMenu().findItem(R.id.item_add_toxproxy);
+        if (have_own_relay())
+        {
+            add_toxproxy_item.setVisible(false);
+        }
+        else
+        {
+            add_toxproxy_item.setVisible(true);
+        }
         menu.show();
 
         return true;
