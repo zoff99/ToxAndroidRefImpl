@@ -8318,12 +8318,17 @@ public class MainActivity extends AppCompatActivity
         return packageInfo_s;
     }
 
-    static void get_network_connections()
+    static String get_network_connections()
     {
-        if (DEBUG_show_net_connection)
+        try
         {
             Detector.updateReportMap();
-            Collector.updateReports();
+            return Collector.updateReports();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "*ERROR getting network connections*";
         }
     }
 

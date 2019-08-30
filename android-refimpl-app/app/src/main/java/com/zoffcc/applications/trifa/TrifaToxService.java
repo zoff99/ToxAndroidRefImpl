@@ -185,8 +185,7 @@ public class TrifaToxService extends Service
                         b.setColor(Color.parseColor("#04b431"));
                     }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
-
-                    get_network_connections();
+                    // get_network_connections();
                 }
                 else // if (a_TOXCONNECTION__f == 2)
                 {
@@ -197,8 +196,7 @@ public class TrifaToxService extends Service
                         b.setColor(Color.parseColor("#04b431"));
                     }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
-
-                    get_network_connections();
+                    // get_network_connections();
                 }
             }
         }

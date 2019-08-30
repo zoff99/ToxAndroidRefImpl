@@ -59,6 +59,7 @@ import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
 import static com.zoffcc.applications.trifa.MainActivity.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.have_own_relay;
@@ -89,6 +90,7 @@ public class ProfileActivity extends AppCompatActivity
     Button remove_own_relay_button = null;
     TextView my_relay_toxid_textview = null;
     ImageView my_identicon_imageview = null;
+    TextView mytox_network_connections = null;
 
     static Handler profile_handler_s = null;
     Identicon.Identicon_data id_data = null;
@@ -110,6 +112,9 @@ public class ProfileActivity extends AppCompatActivity
         remove_own_relay_button = (Button) findViewById(R.id.remove_relay_button);
         my_relay_toxid_textview = (TextView) findViewById(R.id.my_relay_toxid_textview);
         copy_toxid_button = (Button) findViewById(R.id.copy_toxid_button);
+
+        mytox_network_connections = (TextView) findViewById(R.id.mytox_network_connections);
+        mytox_network_connections.setText(get_network_connections());
 
         new_nospam_button.setOnClickListener(new View.OnClickListener()
         {
@@ -169,6 +174,7 @@ public class ProfileActivity extends AppCompatActivity
                         catch (Exception e1)
                         {
                         }
+
                         try
                         {
                             my_relay_toxid_textview.setVisibility(View.GONE);
