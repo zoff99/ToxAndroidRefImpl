@@ -3075,14 +3075,7 @@ public class MainActivity extends AppCompatActivity
         {
             f.name = friend_name;
             update_friend_in_db_name(f);
-            if (friend_list_fragment != null)
-            {
-                Log.i(TAG, "friend_alias_name:003");
-                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = true;
-                cc.friend_item = f;
-                friend_list_fragment.modify_friend(cc, cc.is_friend);
-            }
+            update_single_friend_in_friendlist_view(f);
         }
 
     }
@@ -3096,13 +3089,7 @@ public class MainActivity extends AppCompatActivity
         {
             f.status_message = status_message;
             update_friend_in_db_status_message(f);
-            if (friend_list_fragment != null)
-            {
-                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = true;
-                cc.friend_item = f;
-                friend_list_fragment.modify_friend(cc, cc.is_friend);
-            }
+            update_single_friend_in_friendlist_view(f);
         }
     }
 
@@ -3141,10 +3128,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 Log.i(TAG, "friend_status:004");
-                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = true;
-                cc.friend_item = f;
-                friend_list_fragment.modify_friend(cc, cc.is_friend);
+                update_single_friend_in_friendlist_view(f);
                 Log.i(TAG, "friend_status:004");
             }
             catch (Exception e)
@@ -3210,6 +3194,8 @@ public class MainActivity extends AppCompatActivity
                 f.TOX_CONNECTION_on_off_real = get_toxconnection_wrapper(f.TOX_CONNECTION);
                 update_friend_in_db_connection_status_real(f);
             }
+
+            update_single_friend_in_friendlist_view(f);
         }
 
     }
@@ -10596,6 +10582,24 @@ public class MainActivity extends AppCompatActivity
                 }
             }
 
+        }
+    }
+
+    static void update_single_friend_in_friendlist_view(final FriendList f)
+    {
+        try
+        {
+            if (friend_list_fragment != null)
+            {
+                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                cc.is_friend = true;
+                cc.friend_item = f;
+                friend_list_fragment.modify_friend(cc, cc.is_friend);
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
