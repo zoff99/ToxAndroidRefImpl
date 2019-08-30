@@ -23,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -69,6 +70,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ON
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -407,6 +410,25 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             f_user_status_icon.setImageResource(R.drawable.circle_red);
         }
 
+        try
+        {
+            if (fl.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
+            {
+                avatar.setBorderColor(Color.parseColor("#40000000"));
+            }
+            else if (fl.TOX_CONNECTION_real == TOX_CONNECTION_TCP.value)
+            {
+                avatar.setBorderColor(Color.parseColor("#FFCE00"));
+            }
+            else // UDP
+            {
+                avatar.setBorderColor(Color.parseColor("#04B431"));
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
         try
         {
