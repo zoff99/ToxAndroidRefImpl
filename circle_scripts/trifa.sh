@@ -196,8 +196,6 @@ mkdir -p $_s_/jni-c-toxcore
 mkdir -p $_s_/trifa_src
 
 cd /root/work/
-git log --pretty=oneline
-git status
 git describe
 git describe --tags --exact-match
 current_git_tag=$(git describe --tags --exact-match 2> /dev/null)
