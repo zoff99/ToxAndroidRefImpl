@@ -68,6 +68,7 @@ import android.support.v8.renderscript.Element;
 import android.support.v8.renderscript.RenderScript;
 import android.support.v8.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.v8.renderscript.Type;
+import android.telecom.Conference;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -3098,11 +3099,6 @@ public class MainActivity extends AppCompatActivity
         // Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
 
         FriendList f = main_get_friend(friend_number);
-        if (f != null)
-        {
-            // Log.i(TAG, "friend_status:f=" + f);
-            Log.i(TAG, "friend_status:1:f.TOX_USER_STATUS=" + f.TOX_USER_STATUS);
-        }
 
         if (f != null)
         {
@@ -3125,17 +3121,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "friend_status:EE1:" + e.getMessage());
             }
 
-            try
-            {
-                Log.i(TAG, "friend_status:004");
-                update_single_friend_in_friendlist_view(f);
-                Log.i(TAG, "friend_status:004");
-            }
-            catch (Exception e)
-            {
-                // e.printStackTrace();
-                Log.i(TAG, "friend_status:EE2:" + e.getMessage());
-            }
+            update_single_friend_in_friendlist_view(f);
         }
     }
 
@@ -3194,8 +3180,6 @@ public class MainActivity extends AppCompatActivity
                 f.TOX_CONNECTION_on_off_real = get_toxconnection_wrapper(f.TOX_CONNECTION);
                 update_friend_in_db_connection_status_real(f);
             }
-
-            update_single_friend_in_friendlist_view(f);
         }
 
     }
@@ -3875,13 +3859,7 @@ public class MainActivity extends AppCompatActivity
             {
                 // update "new" status on friendlist fragment
                 FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = true;
-                cc.friend_item = f2;
-                if (friend_list_fragment != null)
-                {
-                    friend_list_fragment.modify_friend(cc, cc.is_friend);
-                }
+                update_single_friend_in_friendlist_view(f2);
             }
             catch (Exception e)
             {
@@ -4385,26 +4363,7 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
         }
 
-        try
-        {
-            // update "new" status on friendlist fragment (for this conference)
-            if (friend_list_fragment != null)
-            {
-                if (conf_temp != null)
-                {
-                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = false;
-                    cc.conference_item = conf_temp;
-                    friend_list_fragment.modify_friend(cc, cc.is_friend);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
-        }
-
+        update_single_conference_in_friendlist_view(conf_temp);
 
         if (do_notification)
         {
@@ -4547,33 +4506,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "get_conference_title_from_confid:EE:3:" + e2.getMessage());
             }
 
-
-            // update friendlist fragment (for this conference)
-            if (friend_list_fragment != null)
-            {
-                // ConferenceDB conf_temp = null;
-                //
-                //                try
-                //                {
-                //                    // TODO: cache me!!
-                //                    conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                //                            and().
-                //                            conference_activeEq(true).
-                //                            get(0);
-                //                }
-                //                catch (Exception e)
-                //                {
-                //                    e.printStackTrace();
-                //                }
-
-                if (conf_temp2 != null)
-                {
-                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = false;
-                    cc.conference_item = conf_temp2;
-                    friend_list_fragment.modify_friend(cc, cc.is_friend);
-                }
-            }
+            update_single_conference_in_friendlist_view(conf_temp2);
         }
         catch (Exception e)
         {
@@ -5018,15 +4951,8 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 // update conferenc item -------
-                if (friend_list_fragment != null)
-                {
-                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = false;
-                    cc.conference_item = conf_temp;
-                    friend_list_fragment.modify_friend(cc, cc.is_friend);
-                }
+                update_single_conference_in_friendlist_view(conf_temp);
                 // update conferenc item -------
-
 
                 if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT.value)
                 {
@@ -5551,10 +5477,7 @@ public class MainActivity extends AppCompatActivity
                     main_handler_s.post(myRunnable);
                 }
             }
-        }
 
-        if (f.TOX_CONNECTION != a_TOX_CONNECTION)
-        {
             if (a_TOX_CONNECTION == TOX_CONNECTION_NONE.value)
             {
                 // ******** friend going offline ********
@@ -5595,29 +5518,7 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            try
-            {
-                if (friend_list_fragment != null)
-                {
-                    // TODO: dirty hack, make better
-                    final boolean sorted_reload = true;
-                    if (!sorted_reload)
-                    {
-                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                        cc.is_friend = true;
-                        cc.friend_item = f;
-                        friend_list_fragment.modify_friend(cc, cc.is_friend);
-                    }
-                    else
-                    {
-                        friend_list_fragment.add_all_friends_clear(0);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            add_all_friends_clear_wrapper(0);
         }
         else // went offline -------------------
         {
@@ -5651,33 +5552,12 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
 
-                try
-                {
-                    if (friend_list_fragment != null)
-                    {
-                        // TODO: dirty hack, make better
-                        final boolean sorted_reload = true;
-                        if (!sorted_reload)
-                        {
-                            CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                            cc.is_friend = true;
-                            cc.friend_item = f;
-                            friend_list_fragment.modify_friend(cc, cc.is_friend);
-                        }
-                        else
-                        {
-                            friend_list_fragment.add_all_friends_clear(0);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                add_all_friends_clear_wrapper(0);
             }
             else
             {
                 Log.i(TAG, "friend or relay offline, combined still ONLINE");
+                update_single_friend_in_friendlist_view(f);
             }
         }
 
@@ -6690,26 +6570,11 @@ public class MainActivity extends AppCompatActivity
                     add_or_update_friend_relay(friend_public_key, owner_public_key);
 
                     // update friendlist on screen
-                    try
-                    {
-                        friend_list_fragment.add_all_friends_clear(10);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+                    add_all_friends_clear_wrapper(10);
                 }
                 else
                 {
-
-                    if (friend_list_fragment != null)
-                    {
-                        Log.i(TAG, "friend_request:003");
-                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                        cc.is_friend = true;
-                        cc.friend_item = f;
-                        friend_list_fragment.modify_friend(cc, cc.is_friend);
-                    }
+                    update_single_friend_in_friendlist_view(f);
                 }
 
                 // ---- auto add all friends ----
@@ -7570,27 +7435,7 @@ public class MainActivity extends AppCompatActivity
                 // e.printStackTrace();
             }
 
-            try
-            {
-                if (friend_list_fragment != null)
-                {
-                    Log.i(TAG, "add_friend_real:add:001:friendnum=" + friendnum);
-                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = true;
-                    cc.friend_item = f;
-                    friend_list_fragment.modify_friend(cc, cc.is_friend);
-                    Log.i(TAG, "add_friend_real:add:002:friendnum=" + friendnum);
-                }
-                else
-                {
-                    Log.i(TAG, "add_friend_real:add:003:no friend_list_fragment yet!!");
-                }
-            }
-            catch (Exception e)
-            {
-                Log.i(TAG, "add_friend_real:EE1:" + e.getMessage());
-                e.printStackTrace();
-            }
+            update_single_friend_in_friendlist_view(f);
         }
 
         if (friendnum == -1)
@@ -9991,16 +9836,7 @@ public class MainActivity extends AppCompatActivity
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                if (friend_list_fragment != null)
-                {
-                    if (f != null)
-                    {
-                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                        cc.is_friend = true;
-                        cc.friend_item = f;
-                        friend_list_fragment.modify_friend(cc, cc.is_friend);
-                    }
-                }
+                update_single_friend_in_friendlist_view(f);
 
                 if (f.notification_silent)
                 {
@@ -10224,16 +10060,7 @@ public class MainActivity extends AppCompatActivity
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                if (friend_list_fragment != null)
-                {
-                    if (f != null)
-                    {
-                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                        cc.is_friend = true;
-                        cc.friend_item = f;
-                        friend_list_fragment.modify_friend(cc, cc.is_friend);
-                    }
-                }
+                update_single_friend_in_friendlist_view(f);
 
                 if (f.notification_silent)
                 {
@@ -10457,16 +10284,7 @@ public class MainActivity extends AppCompatActivity
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                if (friend_list_fragment != null)
-                {
-                    if (f != null)
-                    {
-                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                        cc.is_friend = true;
-                        cc.friend_item = f;
-                        friend_list_fragment.modify_friend(cc, cc.is_friend);
-                    }
-                }
+                update_single_friend_in_friendlist_view(f);
 
                 if (f.notification_silent)
                 {
@@ -10585,6 +10403,21 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static void add_all_friends_clear_wrapper(int delay)
+    {
+        try
+        {
+            if (friend_list_fragment != null)
+            {
+                friend_list_fragment.add_all_friends_clear(delay);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     static void update_single_friend_in_friendlist_view(final FriendList f)
     {
         try
@@ -10600,6 +10433,20 @@ public class MainActivity extends AppCompatActivity
         catch(Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    static void update_single_conference_in_friendlist_view(final ConferenceDB conf)
+    {
+        if (friend_list_fragment != null)
+        {
+            if (conf != null)
+            {
+                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                cc.is_friend = false;
+                cc.conference_item = conf;
+                friend_list_fragment.modify_friend(cc, cc.is_friend);
+            }
         }
     }
 
