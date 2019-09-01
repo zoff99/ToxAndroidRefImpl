@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -47,7 +48,7 @@ public class FriendListFragment extends Fragment
     static Boolean in_update_data = false;
     static final Boolean in_update_data_lock = false;
     //  View view1 = null;
-    RecyclerView listingsView = null;
+    com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     FriendlistAdapter adapter = null;
 
     @Override
@@ -63,10 +64,11 @@ public class FriendListFragment extends Fragment
         List<CombinedFriendsAndConferences> data_values = new ArrayList<CombinedFriendsAndConferences>();
         data_values.clear();
 
-        listingsView = (RecyclerView) view1.findViewById(R.id.rv_list);
+        listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view1.findViewById(R.id.rv_list);
         listingsView.getRecycledViewPool().clear();
-        listingsView.setHasFixedSize(true);
         listingsView.setLayoutManager(new LinearLayoutManager(view1.getContext()));
+        listingsView.setItemAnimator(new DefaultItemAnimator());
+        listingsView.setHasFixedSize(true);
 
         adapter = new FriendlistAdapter(view1.getContext(), data_values);
         Log.i(TAG, "onCreateView:adapter=" + adapter);
