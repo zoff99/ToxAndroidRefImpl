@@ -152,7 +152,7 @@ android {
 
     defaultConfig {
         applicationId "com.zoffcc.applications.trifa"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 10025
         versionName "1.0.25"
