@@ -1660,6 +1660,7 @@ public class MainActivity extends AppCompatActivity
     // ------- for runtime permissions -------
 
     // this is NOT a crpytographically secure random string generator!!
+    // it should only be used to generate status messages or tox user strings to be sort of uniq
     static String getRandomString(final int sizeOfRandomString)
     {
         final Random random = new Random();
