@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__notification = true;
     static final int MIN_AUDIO_SAMPLINGRATE_OUT = 48000;
     static int PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
-    static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092";
+    static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092"; // this is just a dummy, this value is not used!
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
     static int PREF__higher_video_quality = 1;
