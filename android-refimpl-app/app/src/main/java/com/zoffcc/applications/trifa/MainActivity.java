@@ -5491,12 +5491,12 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        f.last_online_timestamp = System.currentTimeMillis();
-        update_friend_in_db_last_online_timestamp(f);
-
         if (went_online)
         {
             Log.i(TAG, "friend_connection_status:friend status seems: ONLINE");
+
+            f.last_online_timestamp = LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+            update_friend_in_db_last_online_timestamp(f);
 
             f.TOX_CONNECTION = a_TOX_CONNECTION;
             f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
@@ -5531,6 +5531,9 @@ public class MainActivity extends AppCompatActivity
             if (get_toxconnection_wrapper(combined_connection_status_) == TOX_CONNECTION_NONE.value)
             {
                 Log.i(TAG, "friend_connection_status:friend status combined: OFFLINE");
+
+                f.last_online_timestamp = System.currentTimeMillis();
+                update_friend_in_db_last_online_timestamp(f);
 
                 f.TOX_CONNECTION = combined_connection_status_;
                 f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
@@ -8502,9 +8505,6 @@ public class MainActivity extends AppCompatActivity
     {
         List<FriendList> fl = orma.selectFromFriendList().
                 is_relayNotEq(true).
-                orderByTOX_CONNECTION_on_offDesc().
-                orderByNotification_silentAsc().
-                orderByLast_online_timestampDesc().
                 toList();
 
         if (fl != null)
@@ -8529,9 +8529,6 @@ public class MainActivity extends AppCompatActivity
     {
         List<FriendList> fl = orma.selectFromFriendList().
                 is_relayNotEq(true).
-                orderByTOX_CONNECTION_on_offDesc().
-                orderByNotification_silentAsc().
-                orderByLast_online_timestampDesc().
                 toList();
 
         if (fl != null)
