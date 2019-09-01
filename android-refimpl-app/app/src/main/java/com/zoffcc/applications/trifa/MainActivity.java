@@ -227,7 +227,6 @@ first actually relayed message via ToxProxy
 2019-08-28 22:20:43.286148 [D] friend_message_v2_cb:
 fn=1 res=1 msg=🍔👍😜👍😜 @%\4äö ubnc Ovid n JB von in BK ni ubvzv8 ctcitccccccizzvvcvvv        u  tiigi gig i g35667u 6 66
 
-
  */
 
 @SuppressWarnings("JniMissingFunction")
