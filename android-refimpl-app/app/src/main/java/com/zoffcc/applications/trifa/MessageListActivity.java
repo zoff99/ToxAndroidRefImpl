@@ -770,10 +770,14 @@ public class MessageListActivity extends AppCompatActivity
                                 m.msg_id_hash = result.msg_hash_hex;
                                 m.msg_version = 1; // msgV2 message
                             }
+
                             if (!result.raw_message_buf_hex.equalsIgnoreCase(""))
                             {
+                                // save raw message bytes of this v2 msg into the database
+                                // we need it if we want to resend it later
                                 m.raw_msgv2_bytes = result.raw_message_buf_hex;
                             }
+
                             long row_id = insert_into_message_db(m, true);
                             m.id = row_id;
                             // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3=" + m.msg_id_hash);
