@@ -454,7 +454,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                     getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             misc_button.setImageDrawable(d2a);
 
-                            // send misc. message to friend
+                            // send misc. message to friend, and do NOT save to DB
                             MainActivity.send_message_result result = tox_friend_send_message_wrapper(
                                     tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
                                     PREF__X_misc_button_msg);
