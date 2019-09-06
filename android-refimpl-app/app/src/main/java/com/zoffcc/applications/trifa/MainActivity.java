@@ -251,7 +251,6 @@ public class MainActivity extends AppCompatActivity
     static boolean native_lib_loaded = false;
     static boolean native_audio_lib_loaded = false;
     static String app_files_directory = "";
-    final static boolean DEBUG_show_net_connection = false;
     // static boolean stop_me = false;
     // static Thread ToxServiceThread = null;
     Handler main_handler = null;
