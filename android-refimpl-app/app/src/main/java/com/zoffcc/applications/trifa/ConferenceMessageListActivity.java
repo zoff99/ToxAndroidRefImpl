@@ -68,6 +68,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -494,6 +495,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         int res = tox_conference_send_message(get_conference_num_from_confid(conf_id), 0, msg);
                         Log.i(TAG, "tox_conference_send_message:result=" + res + " m=" + m);
+                        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
                         if (res > -1)
                         {

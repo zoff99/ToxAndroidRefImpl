@@ -36,6 +36,7 @@ import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListFragment extends Fragment
@@ -206,6 +207,8 @@ public class MessageListFragment extends Fragment
     @Override
     public void onResume()
     {
+        global_showing_messageview = true;
+
         Log.i(TAG, "onResume");
         super.onResume();
 
@@ -260,6 +263,7 @@ public class MessageListFragment extends Fragment
         Log.i(TAG, "onPause");
         super.onPause();
 
+        global_showing_messageview = false;
         MainActivity.message_list_fragment = null;
     }
 

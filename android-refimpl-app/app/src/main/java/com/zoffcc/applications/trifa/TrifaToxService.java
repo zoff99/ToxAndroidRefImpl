@@ -54,7 +54,6 @@ import static com.zoffcc.applications.trifa.MainActivity.conference_message_list
 import static com.zoffcc.applications.trifa.MainActivity.get_combined_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
-import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
 import static com.zoffcc.applications.trifa.MainActivity.get_toxconnection_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.new_or_updated_conference;
@@ -80,7 +79,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.FULL_SPEED_SECONDS_AFTER_WENT_ONLINE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
@@ -88,12 +87,14 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_B
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_NODES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_offline_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
 
 public class TrifaToxService extends Service
@@ -665,7 +666,8 @@ public class TrifaToxService extends Service
                         // get the real "live" connection status of this friend
                         // the value in the database may be old (and wrong)
                         int status_new = tox_friend_get_connection_status(MainActivity.friends[fc]);
-                        int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
+                        int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string,
+                                                                                         status_new);
                         f.TOX_CONNECTION = combined_connection_status_;
                         f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
                     }
@@ -901,12 +903,87 @@ public class TrifaToxService extends Service
                             if (PREF__X_battery_saving_mode)
                             {
                                 if ((global_self_connection_status !=
-                                     ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value) && (Callstate.state == 0))
+                                     ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value) &&
+                                    (!global_showing_messageview) && (Callstate.state == 0))
                                 {
                                     if ((global_self_last_went_online_timestamp +
-                                         FULL_SPEED_SECONDS_AFTER_WENT_ONLINE * 1000) < System.currentTimeMillis())
+                                         SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
+                                        System.currentTimeMillis())
                                     {
-                                        Thread.sleep(TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE); // sleep longer!!
+                                        if ((global_last_activity_for_battery_savings_ts +
+                                             SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
+                                            System.currentTimeMillis())
+                                        {
+                                            Log.i(TAG, "entering BATTERY SAVINGS MODE ...");
+
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            change_notification(0); // set to offline
+                                            set_all_friends_offline();
+                                            set_all_conferences_inactive();
+                                            // so that the app knows we went offline
+                                            global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+
+                                            Thread.sleep(30 * 1000);
+                                            MainActivity.tox_iterate();
+
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            change_notification(0); // set to offline
+                                            set_all_friends_offline();
+                                            set_all_conferences_inactive();
+                                            // so that the app knows we went offline
+                                            global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+
+                                            Log.i(TAG, "entering BATTERY SAVINGS MODE ... 30s");
+
+                                            Thread.sleep(30 * 1000);
+                                            MainActivity.tox_iterate();
+
+                                            Log.i(TAG, "entering BATTERY SAVINGS MODE ... 60s");
+
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            change_notification(0); // set to offline
+                                            set_all_friends_offline();
+                                            set_all_conferences_inactive();
+                                            // so that the app knows we went offline
+                                            global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+                                            // --------------- set everything to offline ---------------
+
+                                            long sleep_in_sec =
+                                                    (TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE - (60 * 1000)) / 1000;
+
+                                            int ii = 0;
+                                            for (ii = 0; ii < sleep_in_sec; ii++)
+                                            {
+                                                if (global_showing_messageview)
+                                                {
+                                                    // if the user opens the message view -> go online, to be able to send messages
+                                                    Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
+                                                    break;
+                                                }
+                                                Thread.sleep(1000); // sleep very long!!
+                                            }
+
+                                            Log.i(TAG, "finish BATTERY SAVINGS MODE, connecting again");
+
+                                        }
+                                        else
+                                        {
+                                            Thread.sleep(tox_iteration_interval_ms);
+                                        }
                                     }
                                     else
                                     {
@@ -1001,37 +1078,45 @@ public class TrifaToxService extends Service
 
 
                 try
+
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
+
                 {
                     e.printStackTrace();
                 }
 
                 try
+
                 {
                     NativeAudio.shutdownEngine();
                 }
                 catch (Exception e)
+
                 {
                     e.printStackTrace();
                 }
 
                 try
+
                 {
                     MainActivity.tox_kill();
                 }
                 catch (Exception e)
+
                 {
                     e.printStackTrace();
                 }
 
                 try
+
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
+
                 {
                     e.printStackTrace();
                 }

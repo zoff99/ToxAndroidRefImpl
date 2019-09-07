@@ -33,10 +33,12 @@ public class TRIFAGlobals
     static int global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
     static long global_self_last_went_online_timestamp = -1;
     static long global_self_last_went_offline_timestamp = -1;
+    static long global_last_activity_for_battery_savings_ts = -1;
+    static boolean global_showing_messageview = false;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
-    static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 60; // 60 secs.
-    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 2000; // 2 secs.
+    static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 120; // x secs.
+    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = (60 * 1000) * 10; // 10 min. in milliseconds
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
