@@ -147,6 +147,7 @@ import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -10601,7 +10602,7 @@ public class MainActivity extends AppCompatActivity
                     // delay sending of msg receipt for 50 seconds
                     try
                     {
-                        Thread.sleep(50 * 1000);
+                        Thread.sleep(DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS * 1000);
                     }
                     catch (Exception e)
                     {
