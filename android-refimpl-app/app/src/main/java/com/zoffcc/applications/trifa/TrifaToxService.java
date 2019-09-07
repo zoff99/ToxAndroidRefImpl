@@ -519,6 +519,56 @@ public class TrifaToxService extends Service
         Log.i(TAG, "stop_tox_fg:099");
     }
 
+    void load_and_add_all_conferences()
+    {
+        long num_conferences = tox_conference_get_chatlist_size();
+        Log.i(TAG, "load conferences at startup: num=" + num_conferences);
+
+        long[] conference_numbers = tox_conference_get_chatlist();
+        ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
+
+        int conf_ = 0;
+        for (conf_ = 0; conf_ < num_conferences; conf_++)
+
+        {
+            cookie_buf3.clear();
+            if (tox_conference_get_id(conference_numbers[conf_], cookie_buf3) == 0)
+            {
+                byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
+                cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
+                String conference_identifier = bytes_to_hex(cookie_buffer);
+                Log.i(TAG, "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +
+                           " offset=" + cookie_buf3.arrayOffset());
+
+                final ConferenceDB conf2 = orma.selectFromConferenceDB().toList().get(0);
+                Log.i(TAG,
+                      "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number + " " +
+                      conf2.name);
+
+                new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
+                                          conference_identifier,
+                                          ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT.value); // rejoin a saved conference
+
+                try
+                {
+                    if (conference_message_list_activity != null)
+                    {
+                        if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
+                        {
+                            conference_message_list_activity.set_conference_connection_status_icon();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
+    }
+
     void tox_thread_start_fg()
     {
         Log.i(TAG, "tox_thread_start_fg");
@@ -831,52 +881,7 @@ public class TrifaToxService extends Service
                 }
 
 
-                long num_conferences = tox_conference_get_chatlist_size();
-                Log.i(TAG, "load conferences at startup: num=" + num_conferences);
-
-                long[] conference_numbers = tox_conference_get_chatlist();
-                ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
-
-                int conf_ = 0;
-                for (conf_ = 0; conf_ < num_conferences; conf_++)
-                {
-                    cookie_buf3.clear();
-                    if (tox_conference_get_id(conference_numbers[conf_], cookie_buf3) == 0)
-                    {
-                        byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
-                        cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
-                        String conference_identifier = bytes_to_hex(cookie_buffer);
-                        Log.i(TAG,
-                              "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +
-                              " offset=" + cookie_buf3.arrayOffset());
-
-                        final ConferenceDB conf2 = orma.selectFromConferenceDB().toList().get(0);
-                        Log.i(TAG,
-                              "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number +
-                              " " + conf2.name);
-
-                        new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
-                                                  conference_identifier,
-                                                  ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT.value); // rejoin a saved conference
-
-                        try
-                        {
-                            if (conference_message_list_activity != null)
-                            {
-                                if (conference_message_list_activity.get_current_conf_id().equals(
-                                        conference_identifier))
-                                {
-                                    conference_message_list_activity.set_conference_connection_status_icon();
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }
+                load_and_add_all_conferences();
 
                 global_self_last_went_offline_timestamp = System.currentTimeMillis();
                 Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp +
@@ -928,7 +933,13 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
 
-                                            Thread.sleep(30 * 1000);
+                                            try
+                                            {
+                                                Thread.sleep(30 * 1000);
+                                            }
+                                            catch (Exception es)
+                                            {
+                                            }
                                             MainActivity.tox_iterate();
 
                                             // --------------- set everything to offline ---------------
@@ -945,7 +956,13 @@ public class TrifaToxService extends Service
 
                                             Log.i(TAG, "entering BATTERY SAVINGS MODE ... 30s");
 
-                                            Thread.sleep(30 * 1000);
+                                            try
+                                            {
+                                                Thread.sleep(30 * 1000);
+                                            }
+                                            catch (Exception es)
+                                            {
+                                            }
                                             MainActivity.tox_iterate();
 
                                             Log.i(TAG, "entering BATTERY SAVINGS MODE ... 60s");
@@ -962,10 +979,10 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
 
-                                            long sleep_in_sec =
-                                                    (TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE - (60 * 1000)) / 1000;
+                                            long sleep_in_sec = TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
                                             // add some random value, so that the sleep is not always exactly the same
-                                            sleep_in_sec = sleep_in_sec + (int) (Math.random() * 5000d);
+                                            sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
+                                            sleep_in_sec = sleep_in_sec / 1000;
 
                                             int ii = 0;
                                             for (ii = 0; ii < sleep_in_sec; ii++)
@@ -976,10 +993,34 @@ public class TrifaToxService extends Service
                                                     Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
                                                     break;
                                                 }
-                                                Thread.sleep(1000); // sleep very long!!
+
+                                                try
+                                                {
+                                                    Thread.sleep(1000); // sleep very long!!
+                                                }
+                                                catch (Exception es)
+                                                {
+                                                }
+
                                             }
 
                                             Log.i(TAG, "finish BATTERY SAVINGS MODE, connecting again");
+
+                                            // load conferences again
+                                            load_and_add_all_conferences();
+
+                                            // now iterate very fast a few times, to get online quicker?
+                                            for (ii = 0; ii < 50; ii++)
+                                            {
+                                                try
+                                                {
+                                                    Thread.sleep(4);
+                                                }
+                                                catch (Exception es)
+                                                {
+                                                }
+                                                MainActivity.tox_iterate();
+                                            }
 
                                         }
                                         else
