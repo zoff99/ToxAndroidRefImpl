@@ -924,6 +924,7 @@ public class TrifaToxService extends Service
                                         {
                                             Log.i(TAG, "entering BATTERY SAVINGS MODE ...");
 
+
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
@@ -937,22 +938,12 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
 
-                                            for (int ii = 0; ii < 10; ii++)
+                                            try
                                             {
-                                                if (global_showing_messageview)
-                                                {
-                                                    // if the user opens the message view -> go online, to be able to send messages
-                                                    Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
-                                                    break;
-                                                }
-
-                                                try
-                                                {
-                                                    Thread.sleep(3 * 1000);
-                                                }
-                                                catch (Exception es)
-                                                {
-                                                }
+                                                Thread.sleep(30 * 1000);
+                                            }
+                                            catch (Exception es)
+                                            {
                                             }
                                             MainActivity.tox_iterate();
 
@@ -970,22 +961,12 @@ public class TrifaToxService extends Service
 
                                             Log.i(TAG, "entering BATTERY SAVINGS MODE ... 30s");
 
-                                            for (int ii = 0; ii < 10; ii++)
+                                            try
                                             {
-                                                if (global_showing_messageview)
-                                                {
-                                                    // if the user opens the message view -> go online, to be able to send messages
-                                                    Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
-                                                    break;
-                                                }
-
-                                                try
-                                                {
-                                                    Thread.sleep(3 * 1000);
-                                                }
-                                                catch (Exception es)
-                                                {
-                                                }
+                                                Thread.sleep(30 * 1000);
+                                            }
+                                            catch (Exception es)
+                                            {
                                             }
                                             MainActivity.tox_iterate();
 
@@ -998,6 +979,7 @@ public class TrifaToxService extends Service
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
+                                            global_self_last_went_offline_timestamp = System.currentTimeMillis();
                                             global_self_connection_status = TOX_CONNECTION_NONE.value;
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
@@ -1031,14 +1013,21 @@ public class TrifaToxService extends Service
                                             // load conferences again
                                             load_and_add_all_conferences();
 
-                                            bootstrapping = true;
-                                            change_notification(0); // set to bootstrap
                                             // bootstrap_single_wrapper("127.3.2.1",9988, "AAA236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9FFF");
                                             int TOX_CONNECTION_a = tox_self_get_connection_status();
-                                            change_notification(TOX_CONNECTION_a); // set to real connection status
                                             if (TOX_CONNECTION_a == TOX_CONNECTION_NONE.value)
                                             {
+                                                bootstrapping = true;
+                                                global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                                                change_notification(TOX_CONNECTION_a); // set to real connection status
                                                 bootstrap_me();
+                                            }
+                                            else
+                                            {
+                                                bootstrapping = false;
+                                                global_self_last_went_online_timestamp = System.currentTimeMillis();
+                                                global_self_last_went_offline_timestamp = -1;
+                                                change_notification(TOX_CONNECTION_a); // set to real connection status
                                             }
                                         }
                                         else
