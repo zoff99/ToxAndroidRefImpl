@@ -937,12 +937,22 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
 
-                                            try
+                                            for (int ii = 0; ii < 10; ii++)
                                             {
-                                                Thread.sleep(30 * 1000);
-                                            }
-                                            catch (Exception es)
-                                            {
+                                                if (global_showing_messageview)
+                                                {
+                                                    // if the user opens the message view -> go online, to be able to send messages
+                                                    Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
+                                                    break;
+                                                }
+
+                                                try
+                                                {
+                                                    Thread.sleep(3 * 1000);
+                                                }
+                                                catch (Exception es)
+                                                {
+                                                }
                                             }
                                             MainActivity.tox_iterate();
 
@@ -960,12 +970,22 @@ public class TrifaToxService extends Service
 
                                             Log.i(TAG, "entering BATTERY SAVINGS MODE ... 30s");
 
-                                            try
+                                            for (int ii = 0; ii < 10; ii++)
                                             {
-                                                Thread.sleep(30 * 1000);
-                                            }
-                                            catch (Exception es)
-                                            {
+                                                if (global_showing_messageview)
+                                                {
+                                                    // if the user opens the message view -> go online, to be able to send messages
+                                                    Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
+                                                    break;
+                                                }
+
+                                                try
+                                                {
+                                                    Thread.sleep(3 * 1000);
+                                                }
+                                                catch (Exception es)
+                                                {
+                                                }
                                             }
                                             MainActivity.tox_iterate();
 
@@ -988,8 +1008,7 @@ public class TrifaToxService extends Service
                                             sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
                                             sleep_in_sec = sleep_in_sec / 1000;
 
-                                            int ii = 0;
-                                            for (ii = 0; ii < sleep_in_sec; ii++)
+                                            for (int ii = 0; ii < sleep_in_sec; ii++)
                                             {
                                                 if (global_showing_messageview)
                                                 {
@@ -1005,7 +1024,6 @@ public class TrifaToxService extends Service
                                                 catch (Exception es)
                                                 {
                                                 }
-
                                             }
 
                                             Log.i(TAG, "finish BATTERY SAVINGS MODE, connecting again");
