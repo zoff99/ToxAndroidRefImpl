@@ -964,6 +964,8 @@ public class TrifaToxService extends Service
 
                                             long sleep_in_sec =
                                                     (TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE - (60 * 1000)) / 1000;
+                                            // add some random value, so that the sleep is not always exactly the same
+                                            sleep_in_sec = sleep_in_sec + (int) (Math.random() * 5000d);
 
                                             int ii = 0;
                                             for (ii = 0; ii < sleep_in_sec; ii++)
