@@ -2188,11 +2188,13 @@ public class MainActivity extends AppCompatActivity
 
     public static native String get_my_toxid();
 
-    public static native void bootstrap();
+    // *UNUSED* public static native void bootstrap();
 
     public static native int add_tcp_relay_single(String ip, String key_hex, long port);
 
     public static native int bootstrap_single(String ip, String key_hex, long port);
+
+    public static native int tox_self_get_connection_status();
 
     public static native void init_tox_callbacks();
 
@@ -5525,7 +5527,9 @@ public class MainActivity extends AppCompatActivity
                             // e.printStackTrace();
                         }
                     }
+
                     Log.i(TAG, "change_notification:change");
+
                     try
                     {
                         tox_service_fg.change_notification_fg(a_TOXCONNECTION_f);

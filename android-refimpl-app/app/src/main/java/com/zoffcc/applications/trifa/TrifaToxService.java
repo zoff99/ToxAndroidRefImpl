@@ -46,6 +46,7 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelis
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.bootstrap_single_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
@@ -69,6 +70,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chat
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message;
@@ -96,6 +98,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_o
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 
 public class TrifaToxService extends Service
 {
@@ -500,7 +503,7 @@ public class TrifaToxService extends Service
                 set_all_conferences_inactive();
 
                 // so that the app knows we went offline
-                global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                global_self_connection_status = TOX_CONNECTION_NONE.value;
 
                 is_tox_started = false;
 
@@ -908,7 +911,7 @@ public class TrifaToxService extends Service
                             if (PREF__X_battery_saving_mode)
                             {
                                 if ((global_self_connection_status !=
-                                     ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value) &&
+                                     TOX_CONNECTION_NONE.value) &&
                                     (!global_showing_messageview) && (Callstate.state == 0))
                                 {
                                     if ((global_self_last_went_online_timestamp +
@@ -928,7 +931,8 @@ public class TrifaToxService extends Service
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
-                                            global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                                            global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                                            global_self_connection_status = TOX_CONNECTION_NONE.value;
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
@@ -949,7 +953,7 @@ public class TrifaToxService extends Service
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
-                                            global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                                            global_self_connection_status = TOX_CONNECTION_NONE.value;
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
@@ -974,7 +978,7 @@ public class TrifaToxService extends Service
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
-                                            global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                                            global_self_connection_status = TOX_CONNECTION_NONE.value;
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
@@ -1009,19 +1013,15 @@ public class TrifaToxService extends Service
                                             // load conferences again
                                             load_and_add_all_conferences();
 
-                                            // now iterate very fast a few times, to get online quicker?
-                                            for (ii = 0; ii < 50; ii++)
+                                            bootstrapping = true;
+                                            change_notification(0); // set to bootstrap
+                                            // bootstrap_single_wrapper("127.3.2.1",9988, "AAA236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9FFF");
+                                            int TOX_CONNECTION_a = tox_self_get_connection_status();
+                                            change_notification(TOX_CONNECTION_a); // set to real connection status
+                                            if (TOX_CONNECTION_a == TOX_CONNECTION_NONE.value)
                                             {
-                                                try
-                                                {
-                                                    Thread.sleep(4);
-                                                }
-                                                catch (Exception es)
-                                                {
-                                                }
-                                                MainActivity.tox_iterate();
+                                                bootstrap_me();
                                             }
-
                                         }
                                         else
                                         {
@@ -1047,7 +1047,7 @@ public class TrifaToxService extends Service
 
 
                         // ----------
-                        if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value)
+                        if (global_self_connection_status == TOX_CONNECTION_NONE.value)
                         {
                             if (HAVE_INTERNET_CONNECTIVITY)
                             {
@@ -1240,7 +1240,7 @@ public class TrifaToxService extends Service
             while (i2.hasNext())
             {
                 ee = (BootstrapNodeEntryDB) i2.next();
-                int bootstrap_result = MainActivity.bootstrap_single_wrapper(ee.ip, ee.port, ee.key_hex);
+                int bootstrap_result = bootstrap_single_wrapper(ee.ip, ee.port, ee.key_hex);
                 Log.i(TAG, "bootstrap_single:res=" + bootstrap_result);
 
                 if (bootstrap_result == 0)
