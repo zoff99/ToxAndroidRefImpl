@@ -99,7 +99,7 @@ public class Message
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String msg_id_hash = null; // 32bit hash, used for MessageV2 Messages! and otherwise NULL
+    String msg_id_hash = null; // 32byte hash, used for MessageV2 Messages! and otherwise NULL
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable

@@ -3461,19 +3461,22 @@ public class MainActivity extends AppCompatActivity
             //                             wrapped_msg_text_as_string);
 
             receive_incoming_message(2, tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
-                                     wrapped_msg_text_as_string, raw_message, raw_message_length,
-                                     real_sender_as_hex_string);
+                                     wrapped_msg_text_as_string, raw_data, raw_data_length, real_sender_as_hex_string);
 
         }
         else if (msgv2_type == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
         {
             // we got an "msg receipt" from the relay
 
+            Log.i(TAG, "friend_sync_message_v2_cb:TOX_FILE_KIND_MESSAGEV2_ANSWER");
 
             final String message_id_hash_as_hex_string = msg_id_as_hex_string_wrapped;
 
             try
             {
+                Log.i(TAG, "friend_sync_message_v2_cb:message_id_hash_as_hex_string=" + message_id_hash_as_hex_string +
+                           " friendpubkey=" + real_sender_as_hex_string);
+
                 final Message m = orma.selectFromMessage().
                         msg_id_hashEq(message_id_hash_as_hex_string).
                         tox_friendpubkeyEq(real_sender_as_hex_string).
@@ -5201,6 +5204,26 @@ public class MainActivity extends AppCompatActivity
                 {
                     orma.updateFriendList().
                             TOX_CONNECTION_real(0).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                }
+
+                try
+                {
+                    orma.updateFriendList().
+                            TOX_CONNECTION_on_off(0).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                }
+
+                try
+                {
+                    orma.updateFriendList().
+                            TOX_CONNECTION_on_off_real(0).
                             execute();
                 }
                 catch (Exception e)
@@ -9678,8 +9701,8 @@ public class MainActivity extends AppCompatActivity
             result.raw_message_buf_hex = bytesToHex(raw_message_buf.array(), raw_message_buf.arrayOffset(),
                                                     raw_message_length_int);
 
-            // Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
-            //           result.raw_message_buf_hex);
+            Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
+                       result.raw_message_buf_hex);
 
             return result;
         }
@@ -10319,9 +10342,11 @@ public class MainActivity extends AppCompatActivity
             long ts_sec = tox_messagev2_get_ts_sec(raw_message_buf);
             long ts_ms = tox_messagev2_get_ts_ms(raw_message_buf);
 
+            Log.i(TAG, "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:raw_msg=" + bytes_to_hex(raw_message));
+
             String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
                                                      msg_id_buffer.limit());
-            // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
+            Log.i(TAG, "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
 
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
                     tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
@@ -10330,7 +10355,7 @@ public class MainActivity extends AppCompatActivity
             {
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
-                send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
+                send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
                 return;
             }
 
@@ -10366,7 +10391,8 @@ public class MainActivity extends AppCompatActivity
             m.msg_version = 1;
             m.msg_id_hash = msg_id_as_hex_string;
 
-            Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
+            Log.i(TAG,
+                  "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
 
             if (message_list_activity != null)
             {
@@ -10385,7 +10411,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             // send message receipt v2 to the relay
-            send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
+            send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
 
             try
             {
@@ -10511,7 +10537,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private static void send_friend_msg_receipt_v2_wrapper(long friend_number, int msg_type, ByteBuffer msg_id_buffer)
+    private static void send_friend_msg_receipt_v2_wrapper(final long friend_number, final int msg_type, final ByteBuffer msg_id_buffer)
     {
         // (msg_type == 1) msgV2 direct message
         // (msg_type == 2) msgV2 relay message
@@ -10538,9 +10564,80 @@ public class MainActivity extends AppCompatActivity
         }
         else if (msg_type == 2)
         {
-            // send message receipt v2 to the relay
-            long t_sec_receipt = (System.currentTimeMillis() / 1000);
-            tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
+            // send message receipt v2
+            final long t_sec_receipt = (System.currentTimeMillis() / 1000);
+
+            final Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    // delay sending of msg receipt for 50 seconds
+                    try
+                    {
+                        Thread.sleep(50 * 1000);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    // send msg receipt on main thread
+                    final Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(),
+                                                                         msg_id_buffer.arrayOffset(),
+                                                                         msg_id_buffer.limit());
+                                Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
+                                           msg_id_as_hex_string);
+
+                                try
+                                {
+                                    tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
+
+                                    try
+                                    {
+                                        String relay_for_friend = get_relay_for_friend(
+                                                tox_friend_get_public_key__wrapper(friend_number));
+                                        if (relay_for_friend != null)
+                                        {
+                                            // if friend has a relay, send the "msg receipt" also to the relay. just to be sure.
+                                            tox_util_friend_send_msg_receipt_v2(
+                                                    tox_friend_by_public_key__wrapper(relay_for_friend), t_sec_receipt,
+                                                    msg_id_buffer);
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
+                    if (main_handler_s != null)
+                    {
+                        main_handler_s.post(myRunnable);
+                    }
+                }
+            };
+            t.start();
         }
     }
 
