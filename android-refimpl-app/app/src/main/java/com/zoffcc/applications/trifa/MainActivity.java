@@ -10603,10 +10603,10 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void run()
                 {
-                    // delay sending of msg receipt for 50 seconds
+                    // delay sending of msg receipt for x milliseconds
                     try
                     {
-                        Thread.sleep(DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS * 1000);
+                        Thread.sleep(DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS);
                     }
                     catch (Exception e)
                     {
