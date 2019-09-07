@@ -2411,6 +2411,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv *e
                    passphrase_j));
 }
 
+
 // -----------------
 // -----------------
 // -----------------
@@ -2576,6 +2577,18 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
     return result;
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1connection_1status(JNIEnv *env, jobject thiz)
+{
+    if(tox_global == NULL)
+    {
+        dbg(9, "tox_self_get_connection_status:NULL:1");
+        return (jint)TOX_CONNECTION_NONE;
+    }
+
+    return (jint)(tox_self_get_connection_status(tox_global));
+}
 
 void Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(JNIEnv *env, jobject thiz)
 {
