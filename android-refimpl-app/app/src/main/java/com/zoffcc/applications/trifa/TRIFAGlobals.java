@@ -37,14 +37,14 @@ public class TRIFAGlobals
     static boolean global_showing_messageview = false;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
-    final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 120; // x secs.
-    final static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = (60 * 1000) * 10; // 10 min. in milliseconds
-
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
     static boolean HAVE_INTERNET_CONNECTIVITY = true;
-    final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS = 1000 * 60 * 2; // bootstrap again after 2 minutes offline
+    final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =
+            1000 * 60 * 2; // bootstrap again after 2 minutes offline
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = true;
+    final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 120; // x secs.
+    static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
     public static final int CONFERENCE_COOKIE_LENGTH = 35;
@@ -180,10 +180,8 @@ public class TRIFAGlobals
 
     public static enum CONTROL_PROXY_MESSAGE_TYPE
     {
-        CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY(175),
-        CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND(176),
-        CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT(177),
-        CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH(178);
+        CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY(175), CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND(
+            176), CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT(177), CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH(178);
 
         public int value;
 

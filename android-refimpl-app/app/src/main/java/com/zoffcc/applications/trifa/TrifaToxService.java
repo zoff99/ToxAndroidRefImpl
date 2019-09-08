@@ -48,6 +48,7 @@ import info.guardianproject.iocipher.VirtualFileSystem;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.bootstrap_single_wrapper;
@@ -84,6 +85,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DEBUG_BATTERY_OPTIMIZATION_LOGGING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
@@ -91,7 +93,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_NODES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
@@ -970,7 +971,7 @@ public class TrifaToxService extends Service
                                             {
                                                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
                                                                                        System.currentTimeMillis() +
-                                                                                       TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE +
+                                                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
                                                                                        (int) (Math.random() * 15000d) +
                                                                                        5000, sender);
                                             }
@@ -1038,7 +1039,7 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
 
-                                            long sleep_in_sec = TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
+                                            long sleep_in_sec = BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
                                             // add some random value, so that the sleep is not always exactly the same
                                             sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
                                             sleep_in_sec = sleep_in_sec / 1000;
@@ -1153,6 +1154,8 @@ public class TrifaToxService extends Service
                             }
                         }
 
+                        // set the used value to the new value
+                        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
 
                         // ----------
                         if (global_self_connection_status == TOX_CONNECTION_NONE.value)

@@ -343,6 +343,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__fps_half = true;
     static boolean PREF__conference_show_system_messages = false;
     static boolean PREF__X_battery_saving_mode = false;
+    static int PREF__X_battery_saving_timeout = 15; // in minutes
     static boolean PREF__X_misc_button_enabled = false;
     static String PREF__X_misc_button_msg = "t"; // TODO: hardcoded for now!
     static boolean PREF__U_keep_nospam = false;
@@ -602,6 +603,23 @@ public class MainActivity extends AppCompatActivity
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
+
+        try
+        {
+            if (settings.getString("X_battery_saving_timeout", "15").compareTo("15") == 0)
+            {
+                PREF__X_battery_saving_timeout = 15;
+            }
+            else
+            {
+                PREF__X_battery_saving_timeout = Integer.parseInt(settings.getString("X_battery_saving_timeout", "15"));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__X_battery_saving_timeout = 15;
+        }
 
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
         if (tmp1)
@@ -1878,6 +1896,24 @@ public class MainActivity extends AppCompatActivity
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
+
+        try
+        {
+            if (settings.getString("X_battery_saving_timeout", "15").compareTo("15") == 0)
+            {
+                PREF__X_battery_saving_timeout = 15;
+            }
+            else
+            {
+                PREF__X_battery_saving_timeout = Integer.parseInt(settings.getString("X_battery_saving_timeout", "15"));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__X_battery_saving_timeout = 15;
+        }
+
 
         try
         {
