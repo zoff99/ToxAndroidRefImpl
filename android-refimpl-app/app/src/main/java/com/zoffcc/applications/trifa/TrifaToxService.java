@@ -1,6 +1,6 @@
 /**
  * [TRIfA], Java part of Tox Reference Implementation for Android
- * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * Copyright (C) 2017 - 2019 Zoff <zoff@zoff.cc>
  * <p>
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -85,6 +85,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.DEBUG_BATTERY_OPTIMIZATION_LOGGING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
@@ -580,21 +581,24 @@ public class TrifaToxService extends Service
 
     static void write_debug_file(String filename)
     {
-        File sdCard = Environment.getExternalStorageDirectory();
-        File dir = new File(sdCard.getAbsolutePath() + "/trifa/debug/");
-        dir.mkdirs();
-        String filename2 = long_date_time_format(System.currentTimeMillis()) + "_" + filename;
-        File file = new File(dir, filename2);
+        if (DEBUG_BATTERY_OPTIMIZATION_LOGGING)
+        {
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File(sdCard.getAbsolutePath() + "/trifa/debug/");
+            dir.mkdirs();
+            String filename2 = long_date_time_format(System.currentTimeMillis()) + "_" + filename;
+            File file = new File(dir, filename2);
 
-        try
-        {
-            FileOutputStream f = new FileOutputStream(file);
-            f.write(1);
-            f.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            try
+            {
+                FileOutputStream f = new FileOutputStream(file);
+                f.write(1);
+                f.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
