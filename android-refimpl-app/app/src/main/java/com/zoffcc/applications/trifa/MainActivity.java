@@ -8325,7 +8325,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-            return "*ERROR getting network connections*";
+            return "ERROR_getting_network_connections";
         }
     }
 
@@ -8338,7 +8338,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-            return "*Datetime ERROR*";
+            return "_Datetime_ERROR_";
         }
     }
 
@@ -8351,7 +8351,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
-            return "*Datetime ERROR*";
+            return "_Datetime_ERROR_";
         }
     }
 

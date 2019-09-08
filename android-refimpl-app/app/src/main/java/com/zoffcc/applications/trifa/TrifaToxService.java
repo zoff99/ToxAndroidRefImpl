@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -27,6 +28,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -34,6 +36,8 @@ import android.widget.RemoteViews;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Iterator;
@@ -56,6 +60,7 @@ import static com.zoffcc.applications.trifa.MainActivity.get_combined_connection
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.get_toxconnection_wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.new_or_updated_conference;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
@@ -81,9 +86,9 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_NODES;
@@ -114,6 +119,7 @@ public class TrifaToxService extends Service
     static boolean is_tox_started = false;
     static boolean global_toxid_text_set = false;
     static boolean TOX_SERVICE_STARTED = false;
+    static Thread trifa_service_thread = null;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -572,6 +578,26 @@ public class TrifaToxService extends Service
 
     }
 
+    static void write_debug_file(String filename)
+    {
+        File sdCard = Environment.getExternalStorageDirectory();
+        File dir = new File(sdCard.getAbsolutePath() + "/trifa/debug/");
+        dir.mkdirs();
+        String filename2 = long_date_time_format(System.currentTimeMillis()) + "_" + filename;
+        File file = new File(dir, filename2);
+
+        try
+        {
+            FileOutputStream f = new FileOutputStream(file);
+            f.write(1);
+            f.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     void tox_thread_start_fg()
     {
         Log.i(TAG, "tox_thread_start_fg");
@@ -910,8 +936,7 @@ public class TrifaToxService extends Service
                         {
                             if (PREF__X_battery_saving_mode)
                             {
-                                if ((global_self_connection_status !=
-                                     TOX_CONNECTION_NONE.value) &&
+                                if ((global_self_connection_status != TOX_CONNECTION_NONE.value) &&
                                     (!global_showing_messageview) && (Callstate.state == 0))
                                 {
                                     if ((global_self_last_went_online_timestamp +
@@ -923,6 +948,30 @@ public class TrifaToxService extends Service
                                             System.currentTimeMillis())
                                         {
                                             Log.i(TAG, "entering BATTERY SAVINGS MODE ...");
+                                            TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__enter");
+
+                                            trifa_service_thread = Thread.currentThread();
+
+                                            // ---------------------------------------------------------
+                                            Intent intentWakeFullBroacastReceiver = new Intent(getApplicationContext(),
+                                                                                               WakeupAlarmReceiver.class);
+                                            PendingIntent sender = PendingIntent.getBroadcast(getApplicationContext(),
+                                                                                              1001,
+                                                                                              intentWakeFullBroacastReceiver,
+                                                                                              0);
+                                            AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(
+                                                    getApplicationContext().ALARM_SERVICE);
+                                            //MARSHMALLOW OR ABOVE
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                            {
+                                                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                                                                                       System.currentTimeMillis() +
+                                                                                       TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE +
+                                                                                       (int) (Math.random() * 15000d) +
+                                                                                       5000, sender);
+                                            }
+
+                                            // ---------------------------------------------------------
 
 
                                             // --------------- set everything to offline ---------------
@@ -989,6 +1038,11 @@ public class TrifaToxService extends Service
                                             // add some random value, so that the sleep is not always exactly the same
                                             sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
                                             sleep_in_sec = sleep_in_sec / 1000;
+                                            sleep_in_sec = sleep_in_sec / 10; // now in 10s of seconds!!
+
+                                            Log.i(TAG,
+                                                  "entering BATTERY SAVINGS MODE ... sleep for " + (10 * sleep_in_sec) +
+                                                  "s");
 
                                             for (int ii = 0; ii < sleep_in_sec; ii++)
                                             {
@@ -996,22 +1050,61 @@ public class TrifaToxService extends Service
                                                 {
                                                     // if the user opens the message view -> go online, to be able to send messages
                                                     Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
+                                                    TrifaToxService.write_debug_file(
+                                                            "BATTERY_SAVINGS_MODE__finish__msgview");
                                                     break;
                                                 }
 
                                                 try
                                                 {
-                                                    Thread.sleep(1000); // sleep very long!!
+                                                    Thread.sleep(10 * 1000); // sleep very long!!
+                                                    //Log.i(TAG,
+                                                    //      "BATTERY SAVINGS MODE (sleep " + ii + "/" + sleep_in_sec +
+                                                    //      ")");
                                                 }
                                                 catch (Exception es)
                                                 {
+                                                    TrifaToxService.write_debug_file(
+                                                            "BATTERY_SAVINGS_MODE__finish__interrupted");
+                                                    break;
                                                 }
                                             }
 
                                             Log.i(TAG, "finish BATTERY SAVINGS MODE, connecting again");
+                                            TrifaToxService.write_debug_file(
+                                                    "BATTERY_SAVINGS_MODE__finish__connecting");
 
                                             // load conferences again
                                             load_and_add_all_conferences();
+
+                                            // iterate a few times ---------------------
+                                            MainActivity.tox_iterate();
+                                            try
+                                            {
+                                                Thread.sleep(10);
+                                            }
+                                            catch (Exception es)
+                                            {
+                                            }
+                                            MainActivity.tox_iterate();
+                                            try
+                                            {
+                                                Thread.sleep(10);
+                                            }
+                                            catch (Exception es)
+                                            {
+                                            }
+                                            MainActivity.tox_iterate();
+                                            try
+                                            {
+                                                Thread.sleep(10);
+                                            }
+                                            catch (Exception es)
+                                            {
+                                            }
+                                            // iterate a few times ---------------------
+
+                                            trifa_service_thread = null;
 
                                             // bootstrap_single_wrapper("127.3.2.1",9988, "AAA236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9FFF");
                                             int TOX_CONNECTION_a = tox_self_get_connection_status();
@@ -1021,6 +1114,8 @@ public class TrifaToxService extends Service
                                                 global_self_last_went_offline_timestamp = System.currentTimeMillis();
                                                 change_notification(TOX_CONNECTION_a); // set to real connection status
                                                 bootstrap_me();
+                                                TrifaToxService.write_debug_file(
+                                                        "BATTERY_SAVINGS_MODE__finish__bootstrapping");
                                             }
                                             else
                                             {
@@ -1028,6 +1123,8 @@ public class TrifaToxService extends Service
                                                 global_self_last_went_online_timestamp = System.currentTimeMillis();
                                                 global_self_last_went_offline_timestamp = -1;
                                                 change_notification(TOX_CONNECTION_a); // set to real connection status
+                                                TrifaToxService.write_debug_file(
+                                                        "BATTERY_SAVINGS_MODE__finish__already_online");
                                             }
                                         }
                                         else
