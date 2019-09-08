@@ -95,7 +95,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                 }
             });
             aboutPage.addItem(e001);
-            aboutPage.setDescription("TRIfa a Tox Client for Android\nVersion: " + MainActivity.versionName);
+            aboutPage.setDescription("TRIfA a Tox Client for Android\nVersion: " + MainActivity.versionName);
 
             Element tox_link = new Element();
             tox_link.setTitle("What is Tox?");
