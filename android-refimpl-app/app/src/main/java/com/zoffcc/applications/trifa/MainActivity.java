@@ -3444,7 +3444,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " full rawmsg    =" + bytes_to_hex(raw_message));
         Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " wrapped rawdata=" + bytes_to_hex(raw_data));
 
-        ByteBuffer raw_message_buf_wrapped = ByteBuffer.allocateDirect((int) raw_data_length);
+        final ByteBuffer raw_message_buf_wrapped = ByteBuffer.allocateDirect((int) raw_data_length);
         raw_message_buf_wrapped.put(raw_data, 0, (int) raw_data_length);
 
         ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) raw_message_length);
@@ -3542,8 +3542,11 @@ public class MainActivity extends AppCompatActivity
                         {
                             try
                             {
+                                long msg_wrapped_sec = tox_messagev2_get_ts_sec(raw_message_buf_wrapped);
+                                long msg_wrapped_ms = tox_messagev2_get_ts_ms(raw_message_buf_wrapped);
+
                                 m.raw_msgv2_bytes = "";
-                                m.rcvd_timestamp = System.currentTimeMillis();
+                                m.rcvd_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
                                 m.read = true;
                                 update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
                                 m.resend_count = 2;
