@@ -45,6 +45,9 @@ public class TRIFAGlobals
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = true;
     final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 120; // x secs.
     static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
+    static int BATTERY_OPTIMIZATION_LAST_SLEEP1 = -1;
+    static int BATTERY_OPTIMIZATION_LAST_SLEEP2 = -1;
+    static int BATTERY_OPTIMIZATION_LAST_SLEEP3 = -1;
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
     public static final int CONFERENCE_COOKIE_LENGTH = 35;
