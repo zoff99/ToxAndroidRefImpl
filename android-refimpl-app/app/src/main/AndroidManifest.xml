@@ -188,7 +188,7 @@
             android:exported="false">
         </service>
 
-        <receiver android:name="WakeupAlarmReceiver">
+        <receiver android:name="WakeupAlarmReceiver" android:enabled="true">
 
             <intent-filter>
                 <action android:name="com.zoffcc.applications.trifa.TOXSERVICE_ALARM">

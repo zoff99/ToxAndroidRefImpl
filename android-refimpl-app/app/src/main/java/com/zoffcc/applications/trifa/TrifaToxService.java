@@ -30,6 +30,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -960,20 +961,46 @@ public class TrifaToxService extends Service
                                             // ---------------------------------------------------------
                                             Intent intentWakeFullBroacastReceiver = new Intent(getApplicationContext(),
                                                                                                WakeupAlarmReceiver.class);
-                                            PendingIntent sender = PendingIntent.getBroadcast(getApplicationContext(),
-                                                                                              1001,
-                                                                                              intentWakeFullBroacastReceiver,
-                                                                                              0);
+                                            intentWakeFullBroacastReceiver.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+                                            PendingIntent alarmIntent = PendingIntent.getBroadcast(
+                                                    getApplicationContext(), 1001, intentWakeFullBroacastReceiver, PendingIntent.FLAG_CANCEL_CURRENT);
                                             AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(
                                                     getApplicationContext().ALARM_SERVICE);
-                                            //MARSHMALLOW OR ABOVE
+
+
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                                             {
-                                                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-                                                                                       System.currentTimeMillis() +
-                                                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                                                       (int) (Math.random() * 15000d) +
-                                                                                       5000, sender);
+                                                alarmManager.setExactAndAllowWhileIdle(
+                                                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                                        SystemClock.elapsedRealtime() +
+                                                        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                        (int) (Math.random() * 15000d) + 5000, alarmIntent);
+                                            }
+                                            else
+                                            {
+                                                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                                                      SystemClock.elapsedRealtime() +
+                                                                      BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                                      (int) (Math.random() * 15000d) + 5000,
+                                                                      alarmIntent);
+                                            }
+
+
+                                            //MARSHMALLOW OR ABOVE
+                                            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                            {
+                                                //alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                                                //                                       System.currentTimeMillis() +
+                                                //                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                //                                       (int) (Math.random() * 15000d) +
+                                                //                                       5000, alarmIntent);
+
+                                                //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                                //                                 SystemClock.elapsedRealtime() +
+                                                //                                 AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                                                //                                 AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                                                //                                 alarmIntent);
+
                                             }
 
                                             // ---------------------------------------------------------
