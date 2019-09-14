@@ -30,7 +30,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -144,7 +143,7 @@ public class TrifaToxService extends Service
         start_me();
     }
 
-    void change_notification_fg(int a_TOXCONNECTION)
+    void change_notification_fg(int a_TOXCONNECTION, String message)
     {
         Log.i(TAG, "change_notification_fg");
 
@@ -171,7 +170,7 @@ public class TrifaToxService extends Service
             {
                 b.setColor(Color.parseColor("#ffce00"));
             }
-            notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping");
+            notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping" + " " + message);
         }
         else
         {
@@ -185,7 +184,7 @@ public class TrifaToxService extends Service
                 {
                     b.setColor(Color.parseColor("#ff0000"));
                 }
-                notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
+                notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE" + " " + message);
             }
             else
             {
@@ -197,7 +196,7 @@ public class TrifaToxService extends Service
                     {
                         b.setColor(Color.parseColor("#04b431"));
                     }
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]");
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]" + " " + message);
                     // get_network_connections();
                 }
                 else // if (a_TOXCONNECTION__f == 2)
@@ -208,7 +207,7 @@ public class TrifaToxService extends Service
                     {
                         b.setColor(Color.parseColor("#04b431"));
                     }
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]");
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]" + " " + message);
                     // get_network_connections();
                 }
             }
@@ -505,7 +504,7 @@ public class TrifaToxService extends Service
 
                 stop_me = false; // reset flag again!
                 Log.i(TAG, "stop_tox_fg:007");
-                change_notification(0); // set to offline
+                change_notification(0, ""); // set to offline
                 Log.i(TAG, "stop_tox_fg:008");
                 set_all_friends_offline();
                 Log.i(TAG, "set_all_conferences_inactive:003");
@@ -855,7 +854,7 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "bootrapping:set to true[1]");
                     try
                     {
-                        tox_service_fg.change_notification_fg(0); // set notification to "bootstrapping"
+                        tox_service_fg.change_notification_fg(0, ""); // set notification to "bootstrapping"
                     }
                     catch (Exception e)
                     {
@@ -963,23 +962,40 @@ public class TrifaToxService extends Service
                                                                                                WakeupAlarmReceiver.class);
                                             intentWakeFullBroacastReceiver.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
                                             PendingIntent alarmIntent = PendingIntent.getBroadcast(
-                                                    getApplicationContext(), 1001, intentWakeFullBroacastReceiver, PendingIntent.FLAG_CANCEL_CURRENT);
+                                                    getApplicationContext(), 1001, intentWakeFullBroacastReceiver,
+                                                    PendingIntent.FLAG_CANCEL_CURRENT);
                                             AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(
                                                     getApplicationContext().ALARM_SERVICE);
 
 
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                                             {
-                                                alarmManager.setExactAndAllowWhileIdle(
-                                                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                                        SystemClock.elapsedRealtime() +
-                                                        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                        (int) (Math.random() * 15000d) + 5000, alarmIntent);
+                                                //alarmManager.setExactAndAllowWhileIdle(
+                                                //        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                                //        SystemClock.elapsedRealtime() +
+                                                //        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                //        (int) (Math.random() * 15000d) + 5000, alarmIntent);
+
+                                                Log.i(TAG, "get BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
+                                                           BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS);
+
+
+                                                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                                                                                       System.currentTimeMillis() +
+                                                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                                                       (int) (Math.random() * 15000d) +
+                                                                                       5000, alarmIntent);
                                             }
                                             else
                                             {
-                                                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                                                      SystemClock.elapsedRealtime() +
+                                                //alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                                //                      SystemClock.elapsedRealtime() +
+                                                //                      BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                //                      (int) (Math.random() * 15000d) + 5000,
+                                                //                      alarmIntent);
+
+                                                alarmManager.setExact(AlarmManager.RTC_WAKEUP,
+                                                                      System.currentTimeMillis() +
                                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
                                                                       (int) (Math.random() * 15000d) + 5000,
                                                                       alarmIntent);
@@ -1009,7 +1025,9 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0); // set to offline
+                                            change_notification(0, "sleep: " +
+                                                                   (int) (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) /
+                                                                   60); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1031,7 +1049,9 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0); // set to offline
+                                            change_notification(0, "sleep: " +
+                                                                   (int) (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) /
+                                                                   60); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1056,7 +1076,9 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0); // set to offline
+                                            change_notification(0, "sleep: " +
+                                                                   (int) (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) /
+                                                                   60); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1144,7 +1166,8 @@ public class TrifaToxService extends Service
                                             {
                                                 bootstrapping = true;
                                                 global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                                                change_notification(TOX_CONNECTION_a); // set to real connection status
+                                                change_notification(TOX_CONNECTION_a,
+                                                                    ""); // set to real connection status
                                                 bootstrap_me();
                                                 TrifaToxService.write_debug_file(
                                                         "BATTERY_SAVINGS_MODE__finish__bootstrapping");
@@ -1154,10 +1177,18 @@ public class TrifaToxService extends Service
                                                 bootstrapping = false;
                                                 global_self_last_went_online_timestamp = System.currentTimeMillis();
                                                 global_self_last_went_offline_timestamp = -1;
-                                                change_notification(TOX_CONNECTION_a); // set to real connection status
+                                                change_notification(TOX_CONNECTION_a,
+                                                                    ""); // set to real connection status
                                                 TrifaToxService.write_debug_file(
                                                         "BATTERY_SAVINGS_MODE__finish__already_online");
                                             }
+
+
+                                            // set the used value to the new value
+                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
+                                            Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                       " PREF__X_battery_saving_timeout:" + PREF__X_battery_saving_timeout);
+
                                         }
                                         else
                                         {
@@ -1181,9 +1212,6 @@ public class TrifaToxService extends Service
                             }
                         }
 
-                        // set the used value to the new value
-                        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
-
                         // ----------
                         if (global_self_connection_status == TOX_CONNECTION_NONE.value)
                         {
@@ -1201,8 +1229,10 @@ public class TrifaToxService extends Service
                                         Log.i(TAG, "bootrapping:set to true[2]");
                                         try
                                         {
-                                            tox_service_fg.change_notification_fg(
-                                                    0); // set notification to "bootstrapping"
+                                            tox_service_fg.change_notification_fg(0, "sleep: " +
+                                                                                     (int) (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                                            1000) /
+                                                                                     60); // set notification to "bootstrapping"
                                         }
                                         catch (Exception e)
                                         {

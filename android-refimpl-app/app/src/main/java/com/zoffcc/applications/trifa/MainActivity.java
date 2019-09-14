@@ -613,6 +613,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 PREF__X_battery_saving_timeout = Integer.parseInt(settings.getString("X_battery_saving_timeout", "15"));
+                Log.i(TAG, "PREF__X_battery_saving_timeout:1:=" + PREF__X_battery_saving_timeout);
             }
         }
         catch (Exception e)
@@ -1906,6 +1907,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 PREF__X_battery_saving_timeout = Integer.parseInt(settings.getString("X_battery_saving_timeout", "15"));
+                Log.i(TAG, "PREF__X_battery_saving_timeout:2:=" + PREF__X_battery_saving_timeout);
             }
         }
         catch (Exception e)
@@ -3116,7 +3118,7 @@ public class MainActivity extends AppCompatActivity
 
         // -- notification ------------------
         // -- notification ------------------
-        change_notification(a_TOX_CONNECTION);
+        change_notification(a_TOX_CONNECTION, "");
         // -- notification ------------------
         // -- notification ------------------
     }
@@ -5523,7 +5525,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void change_notification(int a_TOXCONNECTION)
+    static void change_notification(int a_TOXCONNECTION, final String message)
     {
         // crash -----------------
         // crash -----------------
@@ -5571,7 +5573,7 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
-                        tox_service_fg.change_notification_fg(a_TOXCONNECTION_f);
+                        tox_service_fg.change_notification_fg(a_TOXCONNECTION_f, message);
                     }
                     catch (Exception e)
                     {
