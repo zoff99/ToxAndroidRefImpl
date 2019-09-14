@@ -551,13 +551,12 @@ public class TrifaToxService extends Service
                 byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
                 cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
                 String conference_identifier = bytes_to_hex(cookie_buffer);
-                Log.i(TAG, "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +
-                           " offset=" + cookie_buf3.arrayOffset());
+                Log.i(TAG,
+                      "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier + " offset=" + cookie_buf3.arrayOffset());
 
                 final ConferenceDB conf2 = orma.selectFromConferenceDB().toList().get(0);
                 Log.i(TAG,
-                      "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number + " " +
-                      conf2.name);
+                      "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number + " " + conf2.name);
 
                 new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
                                           conference_identifier,
@@ -852,8 +851,8 @@ public class TrifaToxService extends Service
                 {
                     bootstrapping = true;
                     global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                    Log.i(TAG, "global_self_last_went_offline_timestamp[1]=" + global_self_last_went_offline_timestamp +
-                               " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
+                    Log.i(TAG,
+                          "global_self_last_went_offline_timestamp[1]=" + global_self_last_went_offline_timestamp + " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
                     Log.i(TAG, "bootrapping:set to true[1]");
                     try
                     {
@@ -921,8 +920,8 @@ public class TrifaToxService extends Service
                 load_and_add_all_conferences();
 
                 global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp +
-                           " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
+                Log.i(TAG,
+                      "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp + " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
 
 
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -944,24 +943,16 @@ public class TrifaToxService extends Service
                         {
                             if (PREF__X_battery_saving_mode)
                             {
-                                if ((global_self_connection_status != TOX_CONNECTION_NONE.value) &&
-                                    (!global_showing_messageview) && (Callstate.state == 0))
+                                if ((global_self_connection_status != TOX_CONNECTION_NONE.value) && (!global_showing_messageview) && (Callstate.state == 0))
                                 {
-                                    if ((global_self_last_went_online_timestamp +
-                                         SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
-                                        System.currentTimeMillis())
+                                    if ((global_self_last_went_online_timestamp + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) < System.currentTimeMillis())
                                     {
-                                        if ((global_last_activity_for_battery_savings_ts +
-                                             SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
-                                            System.currentTimeMillis())
+                                        if ((global_last_activity_for_battery_savings_ts + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) < System.currentTimeMillis())
                                         {
                                             // set the used value to the new value
-                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS =
-                                                    PREF__X_battery_saving_timeout * 1000 * 60;
-                                            Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
-                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                       " PREF__X_battery_saving_timeout:" +
-                                                       PREF__X_battery_saving_timeout);
+                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
+                                            Log.i(TAG,
+                                                  "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS + " PREF__X_battery_saving_timeout:" + PREF__X_battery_saving_timeout);
 
 
                                             Log.i(TAG, "entering BATTERY SAVINGS MODE ...");
@@ -991,15 +982,13 @@ public class TrifaToxService extends Service
                                                 //        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
                                                 //        (int) (Math.random() * 15000d) + 5000, alarmIntent);
 
-                                                Log.i(TAG, "get BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
-                                                           BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS);
+                                                Log.i(TAG,
+                                                      "get BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS);
 
 
                                                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-                                                                                       System.currentTimeMillis() +
-                                                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                                                       (int) (Math.random() * 15000d) +
-                                                                                       5000, alarmIntent);
+                                                                                       System.currentTimeMillis() + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS + (int) (Math.random() * 15000d) + 5000,
+                                                                                       alarmIntent);
                                             }
                                             else
                                             {
@@ -1010,9 +999,7 @@ public class TrifaToxService extends Service
                                                 //                      alarmIntent);
 
                                                 alarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                                                                      System.currentTimeMillis() +
-                                                                      BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                                      (int) (Math.random() * 15000d) + 5000,
+                                                                      System.currentTimeMillis() + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS + (int) (Math.random() * 15000d) + 5000,
                                                                       alarmIntent);
                                             }
 
@@ -1040,13 +1027,8 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 +
-                                                                   ")"); // set to offline
+                                            change_notification(0,
+                                                                "sleep: " + (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) + "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" + BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" + BATTERY_OPTIMIZATION_LAST_SLEEP3 + ")"); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1068,13 +1050,8 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 +
-                                                                   ")"); // set to offline
+                                            change_notification(0,
+                                                                "sleep: " + (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) + "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" + BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" + BATTERY_OPTIMIZATION_LAST_SLEEP3 + ")"); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1099,13 +1076,8 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 +
-                                                                   ")"); // set to offline
+                                            change_notification(0,
+                                                                "sleep: " + (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) + "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" + BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" + BATTERY_OPTIMIZATION_LAST_SLEEP3 + ")"); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1122,8 +1094,7 @@ public class TrifaToxService extends Service
                                             sleep_in_sec = sleep_in_sec / 10; // now in 10s of seconds!!
 
                                             Log.i(TAG,
-                                                  "entering BATTERY SAVINGS MODE ... sleep for " + (10 * sleep_in_sec) +
-                                                  "s");
+                                                  "entering BATTERY SAVINGS MODE ... sleep for " + (10 * sleep_in_sec) + "s");
 
                                             for (int ii = 0; ii < sleep_in_sec; ii++)
                                             {
@@ -1213,22 +1184,17 @@ public class TrifaToxService extends Service
 
                                             BATTERY_OPTIMIZATION_LAST_SLEEP3 = BATTERY_OPTIMIZATION_LAST_SLEEP2;
                                             BATTERY_OPTIMIZATION_LAST_SLEEP2 = BATTERY_OPTIMIZATION_LAST_SLEEP1;
-                                            BATTERY_OPTIMIZATION_LAST_SLEEP1 = (int) (System.currentTimeMillis() -
-                                                                                      current_timestamp_);
-                                            if ((BATTERY_OPTIMIZATION_LAST_SLEEP1 < 0) ||
-                                                (BATTERY_OPTIMIZATION_LAST_SLEEP1 > (3 * 3600 * 1000)))
+                                            BATTERY_OPTIMIZATION_LAST_SLEEP1 = (int) ((System.currentTimeMillis() - current_timestamp_) / 1000 / 60);
+                                            if ((BATTERY_OPTIMIZATION_LAST_SLEEP1 < 0) || (BATTERY_OPTIMIZATION_LAST_SLEEP1 > (3 * 3600 * 1000)))
                                             {
                                                 BATTERY_OPTIMIZATION_LAST_SLEEP1 = -1;
                                             }
 
 
                                             // set the used value to the new value
-                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS =
-                                                    PREF__X_battery_saving_timeout * 1000 * 60;
-                                            Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
-                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                       " PREF__X_battery_saving_timeout:" +
-                                                       PREF__X_battery_saving_timeout);
+                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
+                                            Log.i(TAG,
+                                                  "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS + " PREF__X_battery_saving_timeout:" + PREF__X_battery_saving_timeout);
 
                                         }
                                         else
@@ -1260,8 +1226,7 @@ public class TrifaToxService extends Service
                             {
                                 if (global_self_last_went_offline_timestamp != -1)
                                 {
-                                    if (global_self_last_went_offline_timestamp +
-                                        TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS < System.currentTimeMillis())
+                                    if (global_self_last_went_offline_timestamp + TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS < System.currentTimeMillis())
                                     {
                                         Log.i(TAG, "offline and we have internet connectivity --> bootstrap again ...");
                                         global_self_last_went_offline_timestamp = System.currentTimeMillis();
@@ -1270,15 +1235,8 @@ public class TrifaToxService extends Service
                                         Log.i(TAG, "bootrapping:set to true[2]");
                                         try
                                         {
-                                            tox_service_fg.change_notification_fg(0, "sleep: " +
-                                                                                     (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                                             1000) / 60) + "min (" +
-                                                                                     BATTERY_OPTIMIZATION_LAST_SLEEP1 +
-                                                                                     "/" +
-                                                                                     BATTERY_OPTIMIZATION_LAST_SLEEP2 +
-                                                                                     "/" +
-                                                                                     BATTERY_OPTIMIZATION_LAST_SLEEP3 +
-                                                                                     ")"); // set notification to "bootstrapping"
+                                            tox_service_fg.change_notification_fg(0,
+                                                                                  "sleep: " + (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) + "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" + BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" + BATTERY_OPTIMIZATION_LAST_SLEEP3 + ")"); // set notification to "bootstrapping"
                                         }
                                         catch (Exception e)
                                         {
