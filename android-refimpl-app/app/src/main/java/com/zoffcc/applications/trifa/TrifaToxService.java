@@ -1026,8 +1026,8 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             change_notification(0, "sleep: " +
-                                                                   (int) (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) /
-                                                                   60); // set to offline
+                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                           1000) / 60) + "min"); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1050,8 +1050,8 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             change_notification(0, "sleep: " +
-                                                                   (int) (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) /
-                                                                   60); // set to offline
+                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                           1000) / 60) + "min"); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1077,8 +1077,8 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             change_notification(0, "sleep: " +
-                                                                   (int) (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) /
-                                                                   60); // set to offline
+                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                           1000) / 60) + "min"); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1185,9 +1185,12 @@ public class TrifaToxService extends Service
 
 
                                             // set the used value to the new value
-                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
-                                            Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                       " PREF__X_battery_saving_timeout:" + PREF__X_battery_saving_timeout);
+                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS =
+                                                    PREF__X_battery_saving_timeout * 1000 * 60;
+                                            Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
+                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                       " PREF__X_battery_saving_timeout:" +
+                                                       PREF__X_battery_saving_timeout);
 
                                         }
                                         else
@@ -1230,9 +1233,9 @@ public class TrifaToxService extends Service
                                         try
                                         {
                                             tox_service_fg.change_notification_fg(0, "sleep: " +
-                                                                                     (int) (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                                            1000) /
-                                                                                     60); // set notification to "bootstrapping"
+                                                                                     (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                                             1000) / 60) +
+                                                                                     "min"); // set notification to "bootstrapping"
                                         }
                                         catch (Exception e)
                                         {
