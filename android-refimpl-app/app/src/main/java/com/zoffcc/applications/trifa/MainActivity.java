@@ -8383,6 +8383,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static String long_date_time_format_or_empty(long timestamp_in_millis)
+    {
+        try
+        {
+            return df_date_time_long.format(new Date(timestamp_in_millis));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     static String only_date_time_format(long timestamp_in_millis)
     {
         try

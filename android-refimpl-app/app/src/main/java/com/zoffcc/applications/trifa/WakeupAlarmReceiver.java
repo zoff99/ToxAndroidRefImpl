@@ -22,20 +22,72 @@ package com.zoffcc.applications.trifa;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
+import android.util.Log;
 
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 
 public class WakeupAlarmReceiver extends BroadcastReceiver
 {
+    private static final String TAG = "trifa.WakeupAlrmRcvr";
+    private static PowerManager.WakeLock wakeup_wakelock;
+
     @Override
     public void onReceive(Context context, Intent intent2)
     {
-        System.out.println("AlarmReceiver:" + "onReceive");
-        TrifaToxService.write_debug_file("AlarmReceiver_onReceive");
-        if (trifa_service_thread != null)
+        if (wakeup_wakelock == null)
         {
-            trifa_service_thread.interrupt();
-            TrifaToxService.write_debug_file("AlarmReceiver_interrupt");
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            wakeup_wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "trifa:trifa_wakeup_lock");
         }
+
+        final Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                if (!wakeup_wakelock.isHeld())
+                {
+                    wakeup_wakelock.acquire();
+                    Log.i(TAG, "acquiring wakelock");
+                    TrifaToxService.write_debug_file("AlarmReceiver_aq_wakelock");
+                }
+
+                try
+                {
+                    Log.i(TAG, "AlarmReceiver:" + "onReceive");
+                    TrifaToxService.write_debug_file("AlarmReceiver_onReceive");
+
+                    if (trifa_service_thread != null)
+                    {
+                        trifa_service_thread.interrupt();
+                        TrifaToxService.write_debug_file("AlarmReceiver_interrupt");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    Thread.sleep(20 * 1000); // keep wakelock for 20 seconds
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                if (wakeup_wakelock.isHeld())
+                {
+                    Log.i(TAG, "releasing wakelock");
+                    TrifaToxService.write_debug_file("AlarmReceiver_rl_wakelock");
+                    wakeup_wakelock.release();
+                }
+                wakeup_wakelock = null;
+            }
+        };
+        t.start();
+
     }
 }
