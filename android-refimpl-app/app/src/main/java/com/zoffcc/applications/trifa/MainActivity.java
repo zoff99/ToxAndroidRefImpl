@@ -5460,7 +5460,10 @@ public class MainActivity extends AppCompatActivity
                             idEq(m.id).
                             text(m.text).
                             sent_timestamp(m.sent_timestamp).
+                            msg_version(m.msg_version).
                             filename_fullpath(m.filename_fullpath).
+                            raw_msgv2_bytes(m.raw_msgv2_bytes).
+                            msg_id_hash(m.msg_id_hash).
                             execute();
                 }
                 catch (Exception e)
