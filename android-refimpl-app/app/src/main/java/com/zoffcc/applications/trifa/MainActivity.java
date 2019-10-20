@@ -5447,6 +5447,32 @@ public class MainActivity extends AppCompatActivity
         t.start();
     }
 
+    synchronized static void update_message_in_db_no_read_recvedts(final Message m)
+    {
+        final Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    orma.updateMessage().
+                            idEq(m.id).
+                            text(m.text).
+                            sent_timestamp(m.sent_timestamp).
+                            filename_fullpath(m.filename_fullpath).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        t.start();
+    }
+
+
     static void update_message_in_db_filename_fullpath_friendnum_and_filenum(long friend_number, long file_number, String filename_fullpath)
     {
         try
@@ -5502,6 +5528,21 @@ public class MainActivity extends AppCompatActivity
                     read(m.read).
                     raw_msgv2_bytes(m.raw_msgv2_bytes).
                     rcvd_timestamp(m.rcvd_timestamp).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void update_message_in_db_messageid(final Message m)
+    {
+        try
+        {
+            orma.updateMessage().
+                    idEq(m.id).
+                    message_id(m.message_id).
                     execute();
         }
         catch (Exception e)
@@ -9727,6 +9768,7 @@ public class MainActivity extends AppCompatActivity
         boolean msg_v2;
         String msg_hash_hex;
         String raw_message_buf_hex;
+        long error_num;
     }
 
     /*************************************************************************/
@@ -9776,6 +9818,8 @@ public class MainActivity extends AppCompatActivity
 
         // Log.i(TAG,
         //      "tox_friend_send_message_wrapper:message=" + message + " res=" + res + " len=" + raw_message_length_int);
+
+        result.error_num = res;
 
         if (res == -9999)
         {

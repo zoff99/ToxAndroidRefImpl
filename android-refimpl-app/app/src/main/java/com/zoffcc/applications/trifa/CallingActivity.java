@@ -70,7 +70,6 @@ import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -455,11 +454,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             misc_button.setImageDrawable(d2a);
 
                             // send misc. message to friend, and do NOT save to DB
-                            MainActivity.send_message_result result = tox_friend_send_message_wrapper(
-                                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
-                                    PREF__X_misc_button_msg);
-                            long res = result.msg_num;
-                            Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res);
+                            // TODO: use new functions to send the message
+                            //
+                            //MainActivity.send_message_result result = tox_friend_send_message_wrapper(
+                            //        tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
+                            //        PREF__X_misc_button_msg);
+                            //long res = result.msg_num;
+                            //Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res);
                         }
                         catch (Exception e)
                         {
