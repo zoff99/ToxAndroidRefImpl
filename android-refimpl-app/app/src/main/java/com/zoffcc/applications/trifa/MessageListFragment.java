@@ -96,6 +96,7 @@ public class MessageListFragment extends Fragment
                 data_values = orma.selectFromMessage().tox_friendpubkeyEq(
                         tox_friend_get_public_key__wrapper(current_friendnum)).
                         orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
                         toList();
                 Log.i(TAG, "loading data:001");
                 // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
@@ -305,6 +306,7 @@ public class MessageListFragment extends Fragment
                 adapter.add_list_clear(orma.selectFromMessage().
                         tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
                         orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
                         toList());
                 Log.i(TAG, "data_values:005c");
             }
