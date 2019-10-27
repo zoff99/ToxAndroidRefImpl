@@ -62,6 +62,7 @@ import static com.zoffcc.applications.trifa.MainActivity.get_friend_name_from_pu
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.get_toxconnection_wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.hex_to_bytes;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format_or_empty;
@@ -89,6 +90,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
+import static com.zoffcc.applications.trifa.MainActivity.tox_util_friend_resend_message_v2;
 import static com.zoffcc.applications.trifa.MainActivity.update_message_in_db_messageid;
 import static com.zoffcc.applications.trifa.MainActivity.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.MainActivity.update_message_in_db_resend_count;
@@ -136,6 +138,7 @@ public class TrifaToxService extends Service
     static boolean TOX_SERVICE_STARTED = false;
     static Thread trifa_service_thread = null;
     static long last_resend_pending_messages_ms = -1;
+    static long last_resend_pending_messages2_ms = -1;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -1431,6 +1434,78 @@ public class TrifaToxService extends Service
                                 Log.i(TAG, "send_pending_1-on-1_messages:v1:EE:" + e.getMessage());
                             }
                             // loop through all pending outgoing 1-on-1 text messages --------------
+
+                        }
+
+                        if ((last_resend_pending_messages2_ms + (120 * 1000)) < System.currentTimeMillis())
+                        {
+                            // Log.i(TAG, "send_pending_1-on-1_messages 2 ============================================");
+                            last_resend_pending_messages2_ms = System.currentTimeMillis();
+
+
+                            // loop through all pending outgoing 1-on-1 text messages V2 (resend the resend) --------------
+                            try
+                            {
+                                final int max_resend_count_per_iteration = 10;
+                                int cur_resend_count_per_iteration = 0;
+
+                                List<Message> m_v1 = orma.selectFromMessage().
+                                        directionEq(1).
+                                        resend_countEq(1).
+                                        msg_versionEq(1).
+                                        readEq(false).
+                                        orderBySent_timestampAsc().
+                                        toList();
+
+                                if (m_v1.size() > 0)
+                                {
+                                    Iterator<Message> ii = m_v1.iterator();
+                                    while (ii.hasNext())
+                                    {
+                                        Message m_resend_v2 = ii.next();
+
+                                        if (is_friend_online(
+                                                tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey)) == 0)
+                                        {
+                                            continue;
+                                        }
+
+                                        Log.i(TAG, "send_pending_1-on-1_messages:v2:fname=" +
+                                                   get_friend_name_from_pubkey(m_resend_v2.tox_friendpubkey) + " m=" +
+                                                   m_resend_v2.text);
+
+                                        // m_resend_v2.raw_msgv2_bytes
+
+                                        final int raw_data_length = (m_resend_v2.raw_msgv2_bytes.length() / 2);
+                                        byte[] raw_msg_resend_data = hex_to_bytes(m_resend_v2.raw_msgv2_bytes);
+
+                                        ByteBuffer msg_text_buffer_resend_v2 = ByteBuffer.allocateDirect(
+                                                raw_data_length);
+                                        msg_text_buffer_resend_v2.put(raw_msg_resend_data, 0, (int) raw_data_length);
+
+                                        int res = tox_util_friend_resend_message_v2(
+                                                tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey),
+                                                msg_text_buffer_resend_v2, raw_data_length);
+
+                                        Log.i(TAG, "send_pending_1-on-1_messages:v2:res=" + res);
+
+                                        cur_resend_count_per_iteration++;
+
+                                        if (cur_resend_count_per_iteration >= max_resend_count_per_iteration)
+                                        {
+                                            break;
+                                        }
+
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "send_pending_1-on-1_messages:v1:EE:" + e.getMessage());
+                            }
+                            // loop through all pending outgoing 1-on-1 text messages V2 (resend the resend) --------------
+
 
                         }
                     }
