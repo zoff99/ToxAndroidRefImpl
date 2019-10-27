@@ -70,6 +70,7 @@ import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.get_friend_name_from_pubkey;
+import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_filetransfer_db;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
@@ -80,6 +81,7 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
+import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -415,6 +417,36 @@ public class MessageListActivity extends AppCompatActivity
             friendnum = friendnum_prev;
             Log.i(TAG, "onResume:001:friendnum=" + friendnum);
         }
+
+        // ----- convert old messages which did not contain a sent timestamp -----
+        try
+        {
+            boolean need_migrate_old_msg_date = true;
+
+            if (get_g_opts("MIGRATE_OLD_MSG_DATE_done") != null)
+            {
+                if (get_g_opts("MIGRATE_OLD_MSG_DATE_done").equals("true"))
+                {
+                    need_migrate_old_msg_date = false;
+                }
+            }
+
+            if (need_migrate_old_msg_date == true)
+            {
+                orma.getConnection().execSQL(
+                        "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" + " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" + " and msg_version='0'");
+                Log.i(TAG, "onCreate:migrate_old_msg_date");
+
+                // now remember that we did that, and don't do it again
+                set_g_opts("MIGRATE_OLD_MSG_DATE_done", "true");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onCreate:migrate_old_msg_date:EE:" + e.getMessage());
+        }
+        // ----- convert old messages which did not contain a sent timestamp -----
 
         message_list_activity = this;
     }
@@ -1133,8 +1165,8 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     CallingActivity.top_text_line_str2 = "0s";
                                     update_top_text_line();
-                                    Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled +
-                                               " f_video_enabled=" + f_video_enabled);
+                                    Log.i(TAG,
+                                          "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled + " f_video_enabled=" + f_video_enabled);
 
                                     Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
                                     Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
