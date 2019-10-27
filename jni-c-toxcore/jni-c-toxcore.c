@@ -2907,12 +2907,17 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1messa
     long capacity = 0;
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    if(capacity < raw_msg_len)
+    {
+        return (jint)-4;
+    }
+
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     bool res = tox_util_friend_resend_message_v2(tox_global, (uint32_t) friend_number,
                (const uint8_t *)raw_message_buffer_c,
                (const uint32_t)raw_msg_len,
                &error);
-    (*env)->ReleaseStringUTFChars(env, raw_message_buffer, raw_message_buffer_c);
 
     if(res == false)
     {
