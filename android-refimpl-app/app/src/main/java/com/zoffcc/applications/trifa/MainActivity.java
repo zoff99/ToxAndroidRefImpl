@@ -3293,7 +3293,7 @@ public class MainActivity extends AppCompatActivity
         final String message_id_hash_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
                                                                 msg_id_buffer.limit());
 
-        // Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
+        Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
 
         try
         {
@@ -3306,6 +3306,8 @@ public class MainActivity extends AppCompatActivity
 
             if (m != null)
             {
+                Log.i(TAG, "receipt_message_v2_cb:msgid found");
+
                 Runnable myRunnable = new Runnable()
                 {
                     @Override
@@ -3337,6 +3339,10 @@ public class MainActivity extends AppCompatActivity
                 {
                     main_handler_s.post(myRunnable);
                 }
+            }
+            else
+            {
+                Log.i(TAG, "receipt_message_v2_cb:msgid *NOT* found");
             }
 
         }
