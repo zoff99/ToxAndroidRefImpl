@@ -434,7 +434,9 @@ public class MessageListActivity extends AppCompatActivity
             if (need_migrate_old_msg_date == true)
             {
                 orma.getConnection().execSQL(
-                        "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" + " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" + " and msg_version='0'");
+                        "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
+                        " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
+                        " and msg_version='0'");
                 Log.i(TAG, "onCreate:migrate_old_msg_date");
 
                 // now remember that we did that, and don't do it again
@@ -447,6 +449,39 @@ public class MessageListActivity extends AppCompatActivity
             Log.i(TAG, "onCreate:migrate_old_msg_date:EE:" + e.getMessage());
         }
         // ----- convert old messages which did not contain a sent timestamp -----
+
+
+        // ----- convert filetransfer messages which did not contain a sent timestamp -----
+        try
+        {
+            boolean need_migrate_old_ft_date = true;
+
+            if (get_g_opts("MIGRATE_OLD_FT_DATE_done") != null)
+            {
+                if (get_g_opts("MIGRATE_OLD_FT_DATE_done").equals("true"))
+                {
+                    need_migrate_old_ft_date = false;
+                }
+            }
+
+            if (need_migrate_old_ft_date == true)
+            {
+                orma.getConnection().execSQL(
+                        "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
+                        " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
+                        " and TRIFA_MESSAGE_TYPE ='1'");
+                Log.i(TAG, "onCreate:migrate_old_ft_date");
+
+                // now remember that we did that, and don't do it again
+                set_g_opts("MIGRATE_OLD_FT_DATE_done", "true");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onCreate:migrate_old_ft_date:EE:" + e.getMessage());
+        }
+        // ----- convert filetransfer messages which did not contain a sent timestamp -----
 
         message_list_activity = this;
     }
@@ -1165,8 +1200,8 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     CallingActivity.top_text_line_str2 = "0s";
                                     update_top_text_line();
-                                    Log.i(TAG,
-                                          "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled + " f_video_enabled=" + f_video_enabled);
+                                    Log.i(TAG, "CALL_OUT:001:friendnum=" + fn + " f_audio_enabled=" + f_audio_enabled +
+                                               " f_video_enabled=" + f_video_enabled);
 
                                     Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
                                     Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
