@@ -107,6 +107,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_NODES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
@@ -1359,6 +1360,7 @@ public class TrifaToxService extends Service
 
                                 List<Message> m_v1 = orma.selectFromMessage().
                                         directionEq(1).
+                                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
                                         resend_countEq(0).
                                         readEq(false).
                                         orderBySent_timestampAsc().
@@ -1451,6 +1453,7 @@ public class TrifaToxService extends Service
 
                                 List<Message> m_v1 = orma.selectFromMessage().
                                         directionEq(1).
+                                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
                                         resend_countEq(1).
                                         msg_versionEq(1).
                                         readEq(false).
