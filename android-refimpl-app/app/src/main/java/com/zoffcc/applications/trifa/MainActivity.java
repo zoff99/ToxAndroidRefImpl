@@ -3980,6 +3980,7 @@ public class MainActivity extends AppCompatActivity
             m.ft_accepted = false;
             m.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
             m.rcvd_timestamp = System.currentTimeMillis();
+            m.sent_timestamp = m.rcvd_timestamp;
             m.text = filename + "\n" + file_size + " bytes";
 
             long new_msg_id = -1;
