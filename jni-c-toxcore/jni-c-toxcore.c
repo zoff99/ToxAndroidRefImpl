@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <dirent.h>
+#include <math.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -210,6 +211,8 @@ uint32_t recording_samling_rate = 48000;
 int16_t global_audio_frame_duration_ms = 60;
 uint8_t global_av_call_active = 0;
 
+int audio_play_volume_percent_c = 10;
+float volumeMultiplier = -20.0f;
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -300,6 +303,10 @@ void conference_title_cb(Tox *tox, uint32_t conference_number, uint32_t peer_num
 
 void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
                              const uint8_t *name, size_t length, void *user_data);
+
+void change_audio_volume_pcm_null(int16_t *buf, size_t buf_size_bytes);
+void change_audio_volume_pcm(int16_t *buf, size_t num_samples);
+
 
 #if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
 void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data);
@@ -1740,7 +1747,25 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
     if((audio_buffer_pcm_2 != NULL) && (pcm != NULL))
     {
         memcpy((void *)audio_buffer_pcm_2, (void *)pcm, (size_t)(sample_count * channels * 2));
+
+        // ------------ change PCM volume here ------------
+        if ((sample_count > 0) && (channels > 0))
+        {
+            if (audio_play_volume_percent_c < 100)
+            {
+                if (audio_play_volume_percent_c == 0)
+                {
+                    change_audio_volume_pcm_null((int16_t *)audio_buffer_pcm_2, (size_t)(sample_count * channels * 2));
+                }
+                else
+                {
+                    change_audio_volume_pcm((int16_t *)audio_buffer_pcm_2, (size_t)(sample_count * channels));
+                }
+            }
+        }
+        // ------------ change PCM volume here ------------
     }
+
 
 #ifdef USE_ECHO_CANCELLATION
 
@@ -1790,6 +1815,39 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1av_1call_1status(JNIEnv *en
 {
     global_av_call_active = (uint8_t)status;
 }
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1play_1volume_1percent(JNIEnv *env, jclass clazz, jint volume_percent)
+{
+    if ((volume_percent >= 0) && (volume_percent <= 100))
+    {
+        audio_play_volume_percent_c = volume_percent;
+    }
+
+    //volume in dB 0db = unity gain, no attenuation, full amplitude signal
+    //           -20db = 10x attenuation, significantly more quiet
+    //*// float volumeLevelDb = -((float)((100 - volume_percent) / 5)) + 0.0001f;
+    //*// const float VOLUME_REFERENCE = 1.0f;
+    //*// volumeMultiplier = (VOLUME_REFERENCE * pow(10, (volumeLevelDb / 20.f)));
+
+    volumeMultiplier = ((float)audio_play_volume_percent_c / 100.0f);
+
+    // dbg(9, "set_audio_play_volume_percent:vol=%d mul=%f", volume_percent, volumeMultiplier);
+}
+
+void change_audio_volume_pcm_null(int16_t *buf, size_t buf_size_bytes)
+{
+    memset(buf, 0, buf_size_bytes);
+}
+
+void change_audio_volume_pcm(int16_t *buf, size_t num_samples)
+{
+    for (size_t i = 0; i < num_samples; i++)
+    {
+        buf[i] = buf[i] * volumeMultiplier;
+    }
+}
+
 
 // ----- get video buffer from Java -----
 // ----- get video buffer from Java -----
