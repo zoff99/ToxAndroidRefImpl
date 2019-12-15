@@ -358,6 +358,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
     static boolean PREF__use_H264_hw_encoding = false;
+    static int PREF__audio_play_volume_percent = 60;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2399,6 +2400,8 @@ public class MainActivity extends AppCompatActivity
     public static native int toxav_option_set(long friendnum, long a_TOXAV_OPTIONS_OPTION, long value);
 
     public static native void set_av_call_status(int status);
+
+    public static native void set_audio_play_volume_percent(int volume_percent);
 
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 

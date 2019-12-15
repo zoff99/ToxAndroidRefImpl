@@ -61,6 +61,7 @@ import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encoding;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
@@ -68,6 +69,7 @@ import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
+import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
@@ -163,6 +165,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             initializeScreenshotSecurity(this);
         }
 
+        try
+        {
+            set_audio_play_volume_percent(PREF__audio_play_volume_percent);
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
+
         trifa_is_MicrophoneMute = false;
         ca = this;
 
@@ -208,9 +219,62 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         volume_slider_seekbar_01 = (SeekBar) findViewById(R.id.volume_slider_seekbar);
 
+        try
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            {
+                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent, true);
+            }
+            else
+            {
+                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
+            }
+        }
+        catch(Exception ee)
+        {
+            try
+            {
+                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
+            }
+            catch(Exception ee2)
+            {
+            }
+        }
+
         box_right_volumeslider_01 = (View) findViewById(R.id.video_box_right_volumeslider_01);
         box_right_volumeslider_01.setVisibility(View.VISIBLE);
         box_right_volumeslider_01.setAlpha(0.1f);
+
+        volume_slider_seekbar_01.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        {
+            @Override
+            public void onProgressChanged(SeekBar s, int progress_value, boolean from_user)
+            {
+                if ((progress_value >= 0) && (progress_value <= 100))
+                {
+                    PREF__audio_play_volume_percent = progress_value;
+                    try
+                    {
+                        set_audio_play_volume_percent(PREF__audio_play_volume_percent);
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
+            }
+        });
+
 
         try
         {
@@ -237,7 +301,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         right_top_text_3 = (TextView) findViewById(R.id.right_top_text_3);
         right_top_text_4 = (TextView) findViewById(R.id.right_top_text_4);
         right_left_text_1 = (TextView) findViewById(R.id.right_left_text_1);
-        quality_slider = (com.etiennelawlor.discreteslider.library.ui.DiscreteSlider) findViewById(R.id.quality_slider);
+        quality_slider = (DiscreteSlider) findViewById(R.id.quality_slider);
         text_vq_low = (TextView) findViewById(R.id.text_vq_low);
         text_vq_med = (TextView) findViewById(R.id.text_vq_med);
         text_vq_high = (TextView) findViewById(R.id.text_vq_high);
