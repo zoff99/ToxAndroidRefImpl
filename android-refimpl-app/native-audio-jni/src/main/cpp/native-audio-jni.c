@@ -134,7 +134,8 @@ static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
 // ----- function defs ------
 void
-Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNIEnv *env, jobject clazz, jobject buffer,
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNIEnv *env,
+                                                                             jclass clazz, jobject buffer,
                                                                              jlong buffer_size_in_bytes, jint num);
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env, jclass clazz, jint bufnum);
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isPlaying(JNIEnv *env, jclass clazz);
@@ -186,8 +187,6 @@ int android_find_class_global(char *name, jclass *ret)
 }
 
 // --------------------------
-
-
 
 // this callback handler is called every time a buffer finishes recording
 void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
@@ -596,9 +595,8 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
 }
 
 
-
 void Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNIEnv *env,
-                                                                                  jobject clazz,
+                                                                                  jclass clazz,
                                                                                   jobject buffer,
                                                                                   jlong buffer_size_in_bytes,
                                                                                   jint num) {
@@ -611,7 +609,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffe
 }
 
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env, jclass clazz,
-                                                                    jint bufnum) {
+                                                                    jint bufnum)
+{
     if (playing_state == _SHUTDOWN)
     {
         return -1;
@@ -629,6 +628,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         {
             return -2;
         }
+
         // enque the buffer
         SLresult result;
         playing_state = _PLAYING;
@@ -666,7 +666,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 }
 
 void
-Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1rec_1buffer(JNIEnv *env, jobject clazz,
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1rec_1buffer(JNIEnv *env,
+                                                                                  jclass clazz,
                                                                                   jobject buffer,
                                                                                   jlong buffer_size_in_bytes, jint num)
 {
