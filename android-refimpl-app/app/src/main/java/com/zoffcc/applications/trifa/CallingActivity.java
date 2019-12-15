@@ -49,6 +49,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.etiennelawlor.discreteslider.library.ui.DiscreteSlider;
@@ -59,7 +60,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encoding;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
@@ -132,6 +132,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     TextView right_top_text_3 = null;
     TextView right_top_text_4 = null;
     TextView right_left_text_1 = null;
+    View box_right_volumeslider_01 = null;
+    SeekBar volume_slider_seekbar_01 = null;
     static int activity_state = 0;
     com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
     int quality_slider_position = 0;
@@ -203,6 +205,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         video_box_self_preview_01.setVisibility(View.INVISIBLE);
         video_box_left_top_01.setVisibility(View.INVISIBLE);
         video_box_right_top_01.setVisibility(View.INVISIBLE);
+
+        volume_slider_seekbar_01 = (SeekBar) findViewById(R.id.volume_slider_seekbar);
+
+        box_right_volumeslider_01 = (View) findViewById(R.id.video_box_right_volumeslider_01);
+        box_right_volumeslider_01.setVisibility(View.VISIBLE);
+        box_right_volumeslider_01.setAlpha(0.1f);
 
         try
         {
@@ -388,8 +396,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                     Thread.sleep(100);
                                     // set slide back to prev. position
                                     quality_slider.setPosition(prev_position);
-                                    Log.i(TAG,
-                                          "setOnDiscreteSliderChangeListener:pos_revert:" + quality_slider.getPosition());
+                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_revert:" +
+                                               quality_slider.getPosition());
                                 }
                                 catch (Exception e)
                                 {
@@ -701,7 +709,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             mute_button.setVisibility(View.VISIBLE);
 
                             Callstate.call_start_timestamp = System.currentTimeMillis();
-                            String a = "" + (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) + "s";
+                            String a = "" +
+                                       (int) ((Callstate.call_start_timestamp - Callstate.call_init_timestamp) / 1000) +
+                                       "s";
                             top_text_line_str2 = a;
                             update_top_text_line();
 
@@ -817,7 +827,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     if ((top_text_line_str3 != "") || (top_text_line_str4 != ""))
                     {
                         top_text_line.setText(
-                                top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" + top_text_line_str4);
+                                top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" +
+                                top_text_line_str4);
                     }
                     else
                     {
