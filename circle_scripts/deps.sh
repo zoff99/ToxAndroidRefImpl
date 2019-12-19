@@ -257,7 +257,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout n4.2.1
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -299,8 +299,8 @@ if [ "$full""x" == "1x" ]; then
 
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
-    cd $_s_;git clone git://git.videolan.org/x264.git
-    cd $_s_/x264/; git checkout 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_;git clone https://code.videolan.org/videolan/x264.git
+    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -316,7 +316,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch=v1.8.1 https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
@@ -653,7 +653,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout n4.2.1
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -696,8 +696,8 @@ if [ "$full""x" == "1x" ]; then
 
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
-    cd $_s_;git clone git://git.videolan.org/x264.git
-    cd $_s_/x264/; git checkout 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_;git clone https://code.videolan.org/videolan/x264.git
+    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -715,7 +715,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch=v1.8.1 https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
