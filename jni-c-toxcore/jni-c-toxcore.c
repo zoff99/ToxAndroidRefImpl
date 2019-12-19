@@ -1826,11 +1826,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1play_1volume_1percen
 
     //volume in dB 0db = unity gain, no attenuation, full amplitude signal
     //           -20db = 10x attenuation, significantly more quiet
-    //*// float volumeLevelDb = -((float)((100 - volume_percent) / 5)) + 0.0001f;
-    //*// const float VOLUME_REFERENCE = 1.0f;
-    //*// volumeMultiplier = (VOLUME_REFERENCE * pow(10, (volumeLevelDb / 20.f)));
+    // ** // float volumeLevelDb = -((float)((100 - volume_percent) / 5)) + 0.0001f;
+    // ** // const float VOLUME_REFERENCE = 1.0f;
+    // ** // volumeMultiplier = (VOLUME_REFERENCE * pow(10, (volumeLevelDb / 20.f)));
 
-    volumeMultiplier = ((float)audio_play_volume_percent_c / 100.0f);
+    float volumeLevelDb = ((float)volume_percent / 100.0f) - 1.0f;
+    volumeMultiplier = powf(20, volumeLevelDb);
+
+    // ** // volumeMultiplier = ((float)audio_play_volume_percent_c / 100.0f);
 
     // dbg(9, "set_audio_play_volume_percent:vol=%d mul=%f", volume_percent, volumeMultiplier);
 }
