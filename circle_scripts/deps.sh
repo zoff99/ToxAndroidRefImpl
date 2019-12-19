@@ -316,7 +316,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.1 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
@@ -715,7 +715,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.1 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
