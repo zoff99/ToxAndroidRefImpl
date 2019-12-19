@@ -675,8 +675,15 @@ public class TrifaToxService extends Service
                 global_my_toxid = my_tox_id_local;
                 if (tox_self_get_name_size() > 0)
                 {
-                    global_my_name = tox_self_get_name().substring(0, (int) tox_self_get_name_size());
-                    // Log.i(TAG, "AAA:003:" + global_my_name + " size=" + tox_self_get_name_size());
+                    String tmp_name = tox_self_get_name();
+                    if (tmp_name != null)
+                    {
+                        if (tmp_name.length() > 0)
+                        {
+                            global_my_name = tmp_name;
+                            // Log.i(TAG, "AAA:003:" + global_my_name + " size=" + tox_self_get_name_size());
+                        }
+                    }
                 }
                 else
                 {
@@ -689,9 +696,15 @@ public class TrifaToxService extends Service
 
                 if (tox_self_get_status_message_size() > 0)
                 {
-                    global_my_status_message = tox_self_get_status_message().substring(0,
-                                                                                       (int) tox_self_get_status_message_size());
-                    // Log.i(TAG, "AAA:008:" + global_my_status_message + " size=" + tox_self_get_status_message_size());
+                    String tmp_status = tox_self_get_status_message();
+                    if (tmp_status != null)
+                    {
+                        if (tmp_status.length() > 0)
+                        {
+                            global_my_status_message = tmp_status;
+                            // Log.i(TAG, "AAA:008:" + global_my_status_message + " size=" + tox_self_get_status_message_size());
+                        }
+                    }
                 }
                 else
                 {
