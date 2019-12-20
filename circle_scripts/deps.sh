@@ -242,12 +242,12 @@ if [ "$full""x" == "1x" ]; then
         --disable-shared --disable-soname-versions --host=arm-linux-androideabi \
         --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
     cd "$_BLD_"
-    make -j1
+    make -j $_CPUS_
     ret_=$?
     if [ $ret -ne 0 ]; then
         sleep 10
         make clean
-        make -j1 || exit 1
+        make -j $_CPUS_ || exit 1
     fi
     cd "$_BLD_";make install
     # --- YASM ---
@@ -778,6 +778,7 @@ cd $_s_;rm -Rf c-toxcore
 
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
+
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
