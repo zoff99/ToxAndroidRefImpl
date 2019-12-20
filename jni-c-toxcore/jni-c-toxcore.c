@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <dirent.h>
+#include <math.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -76,8 +77,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 34
-static const char global_version_string[] = "0.99.34";
+#define VERSION_PATCH 35
+static const char global_version_string[] = "0.99.35";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -210,6 +211,8 @@ uint32_t recording_samling_rate = 48000;
 int16_t global_audio_frame_duration_ms = 60;
 uint8_t global_av_call_active = 0;
 
+int audio_play_volume_percent_c = 10;
+float volumeMultiplier = -20.0f;
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -300,6 +303,10 @@ void conference_title_cb(Tox *tox, uint32_t conference_number, uint32_t peer_num
 
 void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
                              const uint8_t *name, size_t length, void *user_data);
+
+void change_audio_volume_pcm_null(int16_t *buf, size_t buf_size_bytes);
+void change_audio_volume_pcm(int16_t *buf, size_t num_samples);
+
 
 #if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
 void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data);
@@ -1740,7 +1747,25 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
     if((audio_buffer_pcm_2 != NULL) && (pcm != NULL))
     {
         memcpy((void *)audio_buffer_pcm_2, (void *)pcm, (size_t)(sample_count * channels * 2));
+
+        // ------------ change PCM volume here ------------
+        if ((sample_count > 0) && (channels > 0))
+        {
+            if (audio_play_volume_percent_c < 100)
+            {
+                if (audio_play_volume_percent_c == 0)
+                {
+                    change_audio_volume_pcm_null((int16_t *)audio_buffer_pcm_2, (size_t)(sample_count * channels * 2));
+                }
+                else
+                {
+                    change_audio_volume_pcm((int16_t *)audio_buffer_pcm_2, (size_t)(sample_count * channels));
+                }
+            }
+        }
+        // ------------ change PCM volume here ------------
     }
+
 
 #ifdef USE_ECHO_CANCELLATION
 
@@ -1790,6 +1815,42 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1av_1call_1status(JNIEnv *en
 {
     global_av_call_active = (uint8_t)status;
 }
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1play_1volume_1percent(JNIEnv *env, jclass clazz, jint volume_percent)
+{
+    if ((volume_percent >= 0) && (volume_percent <= 100))
+    {
+        audio_play_volume_percent_c = volume_percent;
+    }
+
+    //volume in dB 0db = unity gain, no attenuation, full amplitude signal
+    //           -20db = 10x attenuation, significantly more quiet
+    // ** // float volumeLevelDb = -((float)((100 - volume_percent) / 5)) + 0.0001f;
+    // ** // const float VOLUME_REFERENCE = 1.0f;
+    // ** // volumeMultiplier = (VOLUME_REFERENCE * pow(10, (volumeLevelDb / 20.f)));
+
+    float volumeLevelDb = ((float)volume_percent / 100.0f) - 1.0f;
+    volumeMultiplier = powf(20, volumeLevelDb);
+
+    // ** // volumeMultiplier = ((float)audio_play_volume_percent_c / 100.0f);
+
+    // dbg(9, "set_audio_play_volume_percent:vol=%d mul=%f", volume_percent, volumeMultiplier);
+}
+
+void change_audio_volume_pcm_null(int16_t *buf, size_t buf_size_bytes)
+{
+    memset(buf, 0, buf_size_bytes);
+}
+
+void change_audio_volume_pcm(int16_t *buf, size_t num_samples)
+{
+    for (size_t i = 0; i < num_samples; i++)
+    {
+        buf[i] = buf[i] * volumeMultiplier;
+    }
+}
+
 
 // ----- get video buffer from Java -----
 // ----- get video buffer from Java -----
@@ -2411,6 +2472,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv *e
                    passphrase_j));
 }
 
+
 // -----------------
 // -----------------
 // -----------------
@@ -2576,6 +2638,18 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
     return result;
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1connection_1status(JNIEnv *env, jobject thiz)
+{
+    if(tox_global == NULL)
+    {
+        dbg(9, "tox_self_get_connection_status:NULL:1");
+        return (jint)TOX_CONNECTION_NONE;
+    }
+
+    return (jint)(tox_self_get_connection_status(tox_global));
+}
 
 void Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(JNIEnv *env, jobject thiz)
 {
@@ -2894,12 +2968,17 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1messa
     long capacity = 0;
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    if(capacity < raw_msg_len)
+    {
+        return (jint)-4;
+    }
+
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     bool res = tox_util_friend_resend_message_v2(tox_global, (uint32_t) friend_number,
                (const uint8_t *)raw_message_buffer_c,
                (const uint32_t)raw_msg_len,
                &error);
-    (*env)->ReleaseStringUTFChars(env, raw_message_buffer, raw_message_buffer_c);
 
     if(res == false)
     {
@@ -4697,6 +4776,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC(JNIEnv *env, jobject t
 // ----------- produce a Crash to test Crash Detector -----------
 // ----------- produce a Crash to test Crash Detector -----------
 // ----------- produce a Crash to test Crash Detector -----------
+
 
 
 
