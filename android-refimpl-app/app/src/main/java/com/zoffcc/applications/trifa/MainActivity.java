@@ -139,6 +139,8 @@ import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
+import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
+import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
@@ -357,7 +359,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
-    static boolean PREF__use_H264_hw_encoding = false;
+    static boolean PREF__use_H264_hw_encoding = true;
     static int PREF__audio_play_volume_percent = 60;
 
     static String versionName = "";
@@ -10827,6 +10829,70 @@ public class MainActivity extends AppCompatActivity
                 cc.conference_item = conf;
                 friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
+        }
+    }
+
+    static void reverse_u_and_v_planes(byte[] buf, int frame_width_px, int frame_height_px)
+    {
+        // TODO: make this less slow and aweful!
+        try
+        {
+            int pos = 0;
+            int start = frame_width_px * frame_height_px;
+            int off = (frame_width_px * frame_height_px) / 4;
+            int start2 = start + off;
+            byte b = 0;
+            for (pos = 0; pos < off; pos++)
+            {
+                b = buf[start + pos];
+                buf[start + pos] = buf[start2 + pos];
+                buf[start2 + pos] = b;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static int toxav_video_send_frame_uv_reversed_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
+    {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding))
+        {
+            reverse_u_and_v_planes(buf, frame_width_px, frame_height_px);
+            feed_h264_encoder(buf, frame_width_px, frame_height_px);
+            byte[] buf_out = fetch_from_h264_encoder();
+            if (buf_out != null)
+            {
+                MainActivity.video_buffer_2.rewind();
+                MainActivity.video_buffer_2.put(buf_out);
+                toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
+            }
+            return 0;
+        }
+        else
+        {
+            return toxav_video_send_frame_uv_reversed(friendnum, frame_width_px, frame_height_px);
+        }
+    }
+
+    static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
+    {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding))
+        {
+            feed_h264_encoder(buf, frame_width_px, frame_height_px);
+            byte[] buf_out = fetch_from_h264_encoder();
+            if (buf_out != null)
+            {
+                MainActivity.video_buffer_2.rewind();
+                MainActivity.video_buffer_2.put(buf_out);
+                toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
+            }
+            return 0;
+        }
+        else
+        {
+            return toxav_video_send_frame(friendnum, frame_width_px, frame_height_px);
         }
     }
 

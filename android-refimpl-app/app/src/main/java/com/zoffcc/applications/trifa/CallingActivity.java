@@ -138,17 +138,23 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     SeekBar volume_slider_seekbar_01 = null;
     static int activity_state = 0;
     com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
-    int quality_slider_position = 0;
+    static int quality_slider_position = 0;
     TextView text_vq_low = null;
     TextView text_vq_med = null;
     TextView text_vq_high = null;
     static View video_box_self_preview_01 = null;
     static View video_box_left_top_01 = null;
     static View video_box_right_top_01 = null;
-    private MediaCodec.BufferInfo mBufferInfo;
-    private MediaCodec mEncoder;
+    final static String MIME_TYPE = "video/avc";   // H.264 Advanced Video Coding
+    final static int FRAME_RATE = 15;              // ~15fps
+    final static int IFRAME_INTERVAL = 5;          // 5 seconds between I-frames
+    private static MediaCodec.BufferInfo mBufferInfo;
+    private static MediaCodec mEncoder;
     private static MediaPlayer mMediaPlayer = null;
-
+    private static MediaFormat video_encoder_format = null;
+    private static int video_encoder_width = 64;
+    private static int video_encoder_height = 64;
+    private static int v_bitrate_bits_per_second = 20 * 1000; // video bitrate <n> bps, in bits per second
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -230,13 +236,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
             }
         }
-        catch(Exception ee)
+        catch (Exception ee)
         {
             try
             {
                 volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
             }
-            catch(Exception ee2)
+            catch (Exception ee2)
             {
             }
         }
@@ -1765,10 +1771,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
 
     /* Use this method to provide YUV420 buffers for encoding */
-    public void feedEncoder(byte[] buf)
+    public static void feed_h264_encoder(byte[] buf, int frame_width_px, int frame_height_px)
     {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
         {
+            int v_bitrate_bps = VIDEO_ENCODER_MAX_BITRATE_LOW * 1000;
+
+            if (quality_slider_position == 2)
+            {
+                v_bitrate_bps = VIDEO_ENCODER_MAX_BITRATE_HIGH * 1000;
+            }
+            else if (quality_slider_position == 1)
+            {
+                v_bitrate_bps = VIDEO_ENCODER_MAX_BITRATE_MED * 1000;
+            }
+            else
+            {
+
+            }
+
+            reconfigure_h264_encoder(v_bitrate_bps, frame_width_px, frame_height_px);
+
             /* Find an unallocated input buffer to store food */
             try
             {
@@ -1782,7 +1805,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     inputBuffer.clear();
                     inputBuffer.put(buf);
                     /* Enqueue buffer */
-                    Log.d(TAG, "feedEncoder:Enqueued input index: " + inputBufferIndex);
+                    Log.d(TAG, "feed_h264_encoder:Enqueued input index: " + inputBufferIndex);
 
                     long ptsUsec = computePresentationTime(1); // TODO: make good
                     mEncoder.queueInputBuffer(inputBufferIndex, 0, buf.length, ptsUsec, 0);
@@ -1790,7 +1813,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             catch (Exception e)
             {
-                Log.d(TAG, "feedEncoder:Get free buffer failed");
+                Log.d(TAG, "feed_h264_encoder:Get free buffer failed");
             }
         }
         else
@@ -1800,11 +1823,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     }
 
 
-    public byte[] fetchFromEncoder()
+    public static byte[] fetch_from_h264_encoder()
     {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
         {
-
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             int encoderStatus = mEncoder.dequeueOutputBuffer(info,
                                                              1000); // Dequeue an output buffer, block at most "timeoutUs" microseconds.
@@ -1812,19 +1834,20 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER)
             {
                 // no output available yet
-                Log.d(TAG, "fetchFromEncoder:no output from encoder available");
+                Log.d(TAG, "fetch_from_h264_encoder:no output from encoder available");
                 return null;
             }
             else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
             {
                 // not expected for an encoder
                 MediaFormat newFormat = mEncoder.getOutputFormat();
-                Log.d(TAG, "fetchFromEncoder:encoder output format changed: " + newFormat);
+                Log.d(TAG, "fetch_from_h264_encoder:encoder output video_encoder_format changed: " + newFormat);
                 return null;
             }
             else if (encoderStatus < 0)
             {
-                Log.d(TAG, "fetchFromEncoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
+                Log.d(TAG,
+                      "fetch_from_h264_encoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
                 return null;
             }
             else // encoderStatus >= 0
@@ -1833,12 +1856,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 ByteBuffer compressed = mEncoder.getOutputBuffer(encoderStatus);
                 if (compressed == null)
                 {
-                    Log.d(TAG, "fetchFromEncoder:encoderOutputBuffer " + encoderStatus + " was null");
+                    Log.d(TAG, "fetch_from_h264_encoder:encoderOutputBuffer " + encoderStatus + " was null");
                     return null;
                 }
                 else
                 {
-                    Log.d(TAG, "fetchFromEncoder:Dequeue output index: " + encoderStatus);
+                    Log.d(TAG, "fetch_from_h264_encoder:Dequeue output index: " + encoderStatus);
                     // It's usually necessary to adjust the ByteBuffer values to match BufferInfo.
                     compressed.position(info.offset);
                     compressed.limit(info.offset + info.size);
@@ -1853,8 +1876,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         // Codec config info.  Only expected on first packet.  One way to
                         // handle this is to manually stuff the data into the MediaFormat
                         // and pass that to configure().  We do that here to exercise the API.
-                        //**// MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
-                        //**// format.setByteBuffer("csd-0", compressed);
+                        //**// MediaFormat video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
+                        //**// video_encoder_format.setByteBuffer("csd-0", compressed);
                     }
                     else
                     {
@@ -1884,31 +1907,50 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         return 132 + frameIndex * 1000000 / FRAME_RATE;
     }
 
+    static void reconfigure_h264_encoder(int bitrate_bits_per_second, int width, int height)
+    {
+        if ((video_encoder_width != width) || (video_encoder_height != height) || (v_bitrate_bits_per_second != bitrate_bits_per_second))
+        {
+            releaseEncoder();
+            video_encoder_width = width;
+            video_encoder_height = height;
+            v_bitrate_bits_per_second = bitrate_bits_per_second;
+            Log.d(TAG, "reconfigure_h264_encoder:vbrate: " + v_bitrate_bits_per_second);
+            prepareEncoder();
+        }
+        // else
+        // {
+        //     if (v_bitrate_bits_per_second != bitrate_bits_per_second)
+        //     {
+        //         v_bitrate_bits_per_second = bitrate_bits_per_second;
+        //         video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
+        //     }
+        // }
+    }
+
     /**
      * Configures the H264 encoder
      */
-    void prepareEncoder()
+    static void prepareEncoder()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
 
             mBufferInfo = new MediaCodec.BufferInfo();
+            video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, video_encoder_width, video_encoder_height);
+            video_encoder_format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
+                                            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
+            // video_encoder_format.setInteger(MediaFormat.KEY_COLOR_STANDARD, COLOR_STANDARD_BT601_PAL);
+            video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
+            video_encoder_format.setInteger(MediaFormat.KEY_BITRATE_MODE,
+                                            MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            video_encoder_format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
+            video_encoder_format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+            video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 1);
+            video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+            video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3);
 
-            // parameters for the encoder
-            final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-            final int FRAME_RATE = 15;               // 15fps
-            final int IFRAME_INTERVAL = 5;          // 5 seconds between I-frames
-            final int mBitRate = 1000000; // video bitrate 5kbps, in bits per second
-
-            MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, 480, 640);
-
-            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate);
-            format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
-            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
-            format.setInteger(MediaFormat.KEY_LATENCY, 1);
-            format.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
-            Log.d(TAG, "prepareEncoder:format: " + format);
+            Log.d(TAG, "prepareEncoder:video_encoder_format: " + video_encoder_format);
 
             try
             {
@@ -1920,16 +1962,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 e.printStackTrace();
                 Log.d(TAG, "prepareEncoder:EE1: " + e.getMessage());
             }
-            mEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            mEncoder.configure(video_encoder_format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mEncoder.start();
         }
     }
 
-
     /**
      * Extracts all pending data from the encoder.
      */
-    private void drainEncoder()
+    private static void drainEncoder()
     {
         final int TIMEOUT_USEC = 10000;
         Log.d(TAG, "drainEncoder:start");
@@ -1951,7 +1992,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 // should happen before receiving buffers, and should only happen once
                 MediaFormat newFormat = mEncoder.getOutputFormat();
-                Log.d(TAG, "drainEncoder:encoder output format changed: " + newFormat);
+                Log.d(TAG, "drainEncoder:encoder output video_encoder_format changed: " + newFormat);
 
             }
             else if (encoderStatus < 0)
@@ -1997,7 +2038,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     /**
      * Releases encoder resources.  May be called after partial / failed initialization.
      */
-    private void releaseEncoder()
+    private static void releaseEncoder()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
