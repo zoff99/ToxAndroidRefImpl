@@ -84,6 +84,7 @@ android {
     defaultConfig {
         versionCode project.maven_artefact_int_version
         versionName "${maven_artefact_version}"
+        minSdkVersion 16
     }
 
     packagingOptions {
