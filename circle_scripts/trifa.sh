@@ -54,6 +54,7 @@ echo "installing more system packages ..."
 
 redirect_cmd apt-get install $qqq -y --force-yes qrencode
 redirect_cmd apt-get install $qqq -y --force-yes p7zip-full
+redirect_cmd apt-get install $qqq -y --force-yes astyle
 redirect_cmd apt-get install $qqq -y --force-yes pax-utils
 
 echo $_HOME_
@@ -234,7 +235,10 @@ rm -Rf $_s_/trifa_src
 mkdir -p $_s_/jni-c-toxcore
 mkdir -p $_s_/trifa_src
 
-cd /root/work/ ; current_git_tag=$(git describe --tags --exact-match 2> /dev/null)
+cd /root/work/
+git describe
+git describe --tags --exact-match
+current_git_tag=$(git describe --tags --exact-match 2> /dev/null)
 echo "##########################################"
 echo "##########################################"
 echo "##########################################"
@@ -336,6 +340,9 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     # ls -hal ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar || exit 1
 fi
 # --------- show generated aar file -----------
+
+
+
 
 
 
