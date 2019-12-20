@@ -2,11 +2,15 @@
 
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath "com.android.tools.build:gradle-experimental:0.9.3"
+        classpath "com.gradle:build-scan-plugin:1.13.4"
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.4'
+
+        classpath 'com.android.tools.build:gradle:3.3.2'
+        // classpath "com.android.tools.build:gradle-experimental:0.11.1"
 
         // used to generate a POM file
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
@@ -22,16 +26,10 @@ plugins {
 
 allprojects {
     repositories {
+        google()
         jcenter()
         maven {
             url "https://jitpack.io"
         }
-        maven {
-            url "https://maven.google.com"
-        }
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
