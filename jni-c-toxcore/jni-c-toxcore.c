@@ -1779,10 +1779,13 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
         filteraudio_incompatible_2 = 1;
     }
 
-    if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
-            && (filteraudio_incompatible_2 == 0))
+    if (sample_count > 0)
     {
-        pass_audio_output(filteraudio, pcm, (unsigned int)sample_count);
+        if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
+                && (filteraudio_incompatible_2 == 0))
+        {
+            pass_audio_output(filteraudio, pcm, (unsigned int)sample_count);
+        }
     }
 
 #endif
@@ -2187,7 +2190,7 @@ void *thread_video_av(void *data)
             //usleep((av_iterate_interval / 2) * 1000);
             if(global_av_call_active == 1)
             {
-                usleep(8 * 1000);
+                usleep(5 * 1000);
             }
             else
             {
@@ -4713,10 +4716,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
         // TODO: need some locking here!
 
-        if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
-                && (filteraudio_incompatible_2 == 0))
+        if (sample_count > 0)
         {
-            filter_audio(filteraudio, pcm, (unsigned int)sample_count);
+            if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
+                    && (filteraudio_incompatible_2 == 0))
+            {
+                filter_audio(filteraudio, pcm, (unsigned int)sample_count);
+            }
         }
 
 #endif
