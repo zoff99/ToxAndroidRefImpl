@@ -243,6 +243,7 @@ jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_video_receive_frame_h264_cb_method = NULL;
 jmethodID android_toxav_callback_call_state_cb_method = NULL;
 jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
 jmethodID android_toxav_callback_audio_receive_frame_cb_method = NULL;
@@ -1810,6 +1811,18 @@ void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint1
                                     );
 }
 
+
+void android_toxav_callback_video_receive_frame_h264_cb(uint32_t friend_number, uint32_t buf_size)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_video_receive_frame_h264_cb_method, (jlong)(unsigned long long)friend_number,
+                                     (jlong)(unsigned long long)buf_size
+                                    );
+}
+
+
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1av_1call_1status(JNIEnv *env, jobject thiz, jint status)
 {
@@ -2032,6 +2045,22 @@ void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t w
 
     android_toxav_callback_video_receive_frame_cb(friend_number, width, height, ystride, ustride, vstride);
 }
+
+void toxav_video_receive_frame_h264_cb_(ToxAV *av, uint32_t friend_number, const uint8_t *buf,
+                                        const uint32_t buf_size, void *user_data)
+{
+    if(video_buffer_1 != NULL)
+    {
+        if((buf) && (buf_size > 0))
+        {
+            memset(video_buffer_1, 0, video_buffer_1_size);
+            memcpy(video_buffer_1, buf, (size_t)(buf_size));
+        }
+    }
+
+    android_toxav_callback_video_receive_frame_h264_cb(friend_number, buf_size);
+}
+
 
 void android_toxav_callback_call_cb(uint32_t friend_number, bool audio_enabled, bool video_enabled)
 {
@@ -2363,6 +2392,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_video_receive_frame_cb_method", "(JJJJJJ)V");
     toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
+    android_toxav_callback_video_receive_frame_h264_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_toxav_callback_video_receive_frame_h264_cb_method", "(JJ)V");
+    toxav_callback_video_receive_frame_h264(tox_av_global, toxav_video_receive_frame_h264_cb_, &mytox_CC);
     android_toxav_callback_call_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_call_state_cb_method", "(JI)V");
     toxav_callback_call_state(tox_av_global, toxav_call_state_cb_, &mytox_CC);
