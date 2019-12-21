@@ -32,6 +32,9 @@ import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +49,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.etiennelawlor.discreteslider.library.ui.DiscreteSlider;
@@ -56,8 +60,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_msg;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encoding;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
@@ -65,9 +69,9 @@ import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
+import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -130,17 +134,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     TextView right_top_text_3 = null;
     TextView right_top_text_4 = null;
     TextView right_left_text_1 = null;
+    View box_right_volumeslider_01 = null;
+    SeekBar volume_slider_seekbar_01 = null;
     static int activity_state = 0;
     com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
-    int quality_slider_position = 0;
+    static int quality_slider_position = 0;
     TextView text_vq_low = null;
     TextView text_vq_med = null;
     TextView text_vq_high = null;
     static View video_box_self_preview_01 = null;
     static View video_box_left_top_01 = null;
     static View video_box_right_top_01 = null;
-    private MediaCodec.BufferInfo mBufferInfo;
-    private MediaCodec mEncoder;
+    final static String MIME_TYPE = "video/avc";   // H.264 Advanced Video Coding
+    final static int FRAME_RATE = 15;              // ~15fps
+    final static int IFRAME_INTERVAL = 5;          // 5 seconds between I-frames
+    private static MediaCodec.BufferInfo mBufferInfo;
+    private static MediaCodec mEncoder;
+    private static MediaPlayer mMediaPlayer = null;
+    private static MediaFormat video_encoder_format = null;
+    private static int video_encoder_width = 64;
+    private static int video_encoder_height = 64;
+    private static int v_bitrate_bits_per_second = 20 * 1000; // video bitrate <n> bps, in bits per second
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -155,6 +169,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             // prevent screenshots and also dont show the window content in recent activity screen
             initializeScreenshotSecurity(this);
+        }
+
+        try
+        {
+            set_audio_play_volume_percent(PREF__audio_play_volume_percent);
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
         }
 
         trifa_is_MicrophoneMute = false;
@@ -200,6 +223,65 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         video_box_left_top_01.setVisibility(View.INVISIBLE);
         video_box_right_top_01.setVisibility(View.INVISIBLE);
 
+        volume_slider_seekbar_01 = (SeekBar) findViewById(R.id.volume_slider_seekbar);
+
+        try
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            {
+                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent, true);
+            }
+            else
+            {
+                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
+            }
+        }
+        catch (Exception ee)
+        {
+            try
+            {
+                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
+            }
+            catch (Exception ee2)
+            {
+            }
+        }
+
+        box_right_volumeslider_01 = (View) findViewById(R.id.video_box_right_volumeslider_01);
+        box_right_volumeslider_01.setVisibility(View.VISIBLE);
+        box_right_volumeslider_01.setAlpha(0.1f);
+
+        volume_slider_seekbar_01.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        {
+            @Override
+            public void onProgressChanged(SeekBar s, int progress_value, boolean from_user)
+            {
+                if ((progress_value >= 0) && (progress_value <= 100))
+                {
+                    PREF__audio_play_volume_percent = progress_value;
+                    try
+                    {
+                        set_audio_play_volume_percent(PREF__audio_play_volume_percent);
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
+            }
+        });
+
+
         try
         {
             final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
@@ -225,7 +307,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         right_top_text_3 = (TextView) findViewById(R.id.right_top_text_3);
         right_top_text_4 = (TextView) findViewById(R.id.right_top_text_4);
         right_left_text_1 = (TextView) findViewById(R.id.right_left_text_1);
-        quality_slider = (com.etiennelawlor.discreteslider.library.ui.DiscreteSlider) findViewById(R.id.quality_slider);
+        quality_slider = (DiscreteSlider) findViewById(R.id.quality_slider);
         text_vq_low = (TextView) findViewById(R.id.text_vq_low);
         text_vq_med = (TextView) findViewById(R.id.text_vq_med);
         text_vq_high = (TextView) findViewById(R.id.text_vq_high);
@@ -449,12 +531,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                     getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             misc_button.setImageDrawable(d2a);
 
-                            // send misc. message to friend
-                            MainActivity.send_message_result result = tox_friend_send_message_wrapper(
-                                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
-                                    PREF__X_misc_button_msg);
-                            long res = result.msg_num;
-                            Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res);
+                            // send misc. message to friend, and do NOT save to DB
+                            // TODO: use new functions to send the message
+                            //
+                            //MainActivity.send_message_result result = tox_friend_send_message_wrapper(
+                            //        tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), 0,
+                            //        PREF__X_misc_button_msg);
+                            //long res = result.msg_num;
+                            //Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res);
                         }
                         catch (Exception e)
                         {
@@ -562,6 +646,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             accept_button.setVisibility(View.GONE);
             camera_toggle_button.setVisibility(View.VISIBLE);
             mute_button.setVisibility(View.VISIBLE);
+
+            stop_ringtone();
         }
         else
         {
@@ -569,6 +655,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             accept_button.setVisibility(View.VISIBLE);
             camera_toggle_button.setVisibility(View.GONE);
             mute_button.setVisibility(View.GONE);
+
+            start_ringtone();
         }
 
         if (active_camera_type == FRONT_CAMERA_USED)
@@ -1091,6 +1179,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
         sensor_manager.unregisterListener(this);
         activity_state = 0;
+
+        stop_ringtone();
 
         try
         {
@@ -1641,6 +1731,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         set_max_video_bitrate();
         set_av_latency();
 
+        stop_ringtone();
+
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -1679,10 +1771,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
 
     /* Use this method to provide YUV420 buffers for encoding */
-    public void feedEncoder(byte[] buf)
+    public static void feed_h264_encoder(byte[] buf, int frame_width_px, int frame_height_px)
     {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
         {
+            int v_bitrate_bps = VIDEO_ENCODER_MAX_BITRATE_LOW * 1000;
+
+            if (quality_slider_position == 2)
+            {
+                v_bitrate_bps = VIDEO_ENCODER_MAX_BITRATE_HIGH * 1000;
+            }
+            else if (quality_slider_position == 1)
+            {
+                v_bitrate_bps = VIDEO_ENCODER_MAX_BITRATE_MED * 1000;
+            }
+            else
+            {
+
+            }
+
+            reconfigure_h264_encoder(v_bitrate_bps, frame_width_px, frame_height_px);
+
             /* Find an unallocated input buffer to store food */
             try
             {
@@ -1696,7 +1805,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     inputBuffer.clear();
                     inputBuffer.put(buf);
                     /* Enqueue buffer */
-                    Log.d(TAG, "feedEncoder:Enqueued input index: " + inputBufferIndex);
+                    Log.d(TAG, "feed_h264_encoder:Enqueued input index: " + inputBufferIndex);
 
                     long ptsUsec = computePresentationTime(1); // TODO: make good
                     mEncoder.queueInputBuffer(inputBufferIndex, 0, buf.length, ptsUsec, 0);
@@ -1704,7 +1813,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             catch (Exception e)
             {
-                Log.d(TAG, "feedEncoder:Get free buffer failed");
+                Log.d(TAG, "feed_h264_encoder:Get free buffer failed");
             }
         }
         else
@@ -1714,11 +1823,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     }
 
 
-    public byte[] fetchFromEncoder()
+    public static byte[] fetch_from_h264_encoder()
     {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
         {
-
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             int encoderStatus = mEncoder.dequeueOutputBuffer(info,
                                                              1000); // Dequeue an output buffer, block at most "timeoutUs" microseconds.
@@ -1726,19 +1834,20 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER)
             {
                 // no output available yet
-                Log.d(TAG, "fetchFromEncoder:no output from encoder available");
+                Log.d(TAG, "fetch_from_h264_encoder:no output from encoder available");
                 return null;
             }
             else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
             {
                 // not expected for an encoder
                 MediaFormat newFormat = mEncoder.getOutputFormat();
-                Log.d(TAG, "fetchFromEncoder:encoder output format changed: " + newFormat);
+                Log.d(TAG, "fetch_from_h264_encoder:encoder output video_encoder_format changed: " + newFormat);
                 return null;
             }
             else if (encoderStatus < 0)
             {
-                Log.d(TAG, "fetchFromEncoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
+                Log.d(TAG,
+                      "fetch_from_h264_encoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
                 return null;
             }
             else // encoderStatus >= 0
@@ -1747,12 +1856,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 ByteBuffer compressed = mEncoder.getOutputBuffer(encoderStatus);
                 if (compressed == null)
                 {
-                    Log.d(TAG, "fetchFromEncoder:encoderOutputBuffer " + encoderStatus + " was null");
+                    Log.d(TAG, "fetch_from_h264_encoder:encoderOutputBuffer " + encoderStatus + " was null");
                     return null;
                 }
                 else
                 {
-                    Log.d(TAG, "fetchFromEncoder:Dequeue output index: " + encoderStatus);
+                    Log.d(TAG, "fetch_from_h264_encoder:Dequeue output index: " + encoderStatus);
                     // It's usually necessary to adjust the ByteBuffer values to match BufferInfo.
                     compressed.position(info.offset);
                     compressed.limit(info.offset + info.size);
@@ -1767,8 +1876,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         // Codec config info.  Only expected on first packet.  One way to
                         // handle this is to manually stuff the data into the MediaFormat
                         // and pass that to configure().  We do that here to exercise the API.
-                        //**// MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
-                        //**// format.setByteBuffer("csd-0", compressed);
+                        //**// MediaFormat video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
+                        //**// video_encoder_format.setByteBuffer("csd-0", compressed);
                     }
                     else
                     {
@@ -1798,31 +1907,50 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         return 132 + frameIndex * 1000000 / FRAME_RATE;
     }
 
+    static void reconfigure_h264_encoder(int bitrate_bits_per_second, int width, int height)
+    {
+        if ((video_encoder_width != width) || (video_encoder_height != height) || (v_bitrate_bits_per_second != bitrate_bits_per_second))
+        {
+            releaseEncoder();
+            video_encoder_width = width;
+            video_encoder_height = height;
+            v_bitrate_bits_per_second = bitrate_bits_per_second;
+            Log.d(TAG, "reconfigure_h264_encoder:vbrate: " + v_bitrate_bits_per_second);
+            prepareEncoder();
+        }
+        // else
+        // {
+        //     if (v_bitrate_bits_per_second != bitrate_bits_per_second)
+        //     {
+        //         v_bitrate_bits_per_second = bitrate_bits_per_second;
+        //         video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
+        //     }
+        // }
+    }
+
     /**
      * Configures the H264 encoder
      */
-    void prepareEncoder()
+    static void prepareEncoder()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
 
             mBufferInfo = new MediaCodec.BufferInfo();
+            video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, video_encoder_width, video_encoder_height);
+            video_encoder_format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
+                                            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
+            // video_encoder_format.setInteger(MediaFormat.KEY_COLOR_STANDARD, COLOR_STANDARD_BT601_PAL);
+            video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
+            video_encoder_format.setInteger(MediaFormat.KEY_BITRATE_MODE,
+                                            MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            video_encoder_format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
+            video_encoder_format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+            video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 1);
+            video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+            video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3);
 
-            // parameters for the encoder
-            final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-            final int FRAME_RATE = 15;               // 15fps
-            final int IFRAME_INTERVAL = 5;          // 5 seconds between I-frames
-            final int mBitRate = 1000000; // video bitrate 5kbps, in bits per second
-
-            MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, 480, 640);
-
-            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-            format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate);
-            format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
-            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
-            format.setInteger(MediaFormat.KEY_LATENCY, 1);
-            format.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
-            Log.d(TAG, "prepareEncoder:format: " + format);
+            Log.d(TAG, "prepareEncoder:video_encoder_format: " + video_encoder_format);
 
             try
             {
@@ -1834,16 +1962,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 e.printStackTrace();
                 Log.d(TAG, "prepareEncoder:EE1: " + e.getMessage());
             }
-            mEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+            mEncoder.configure(video_encoder_format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mEncoder.start();
         }
     }
 
-
     /**
      * Extracts all pending data from the encoder.
      */
-    private void drainEncoder()
+    private static void drainEncoder()
     {
         final int TIMEOUT_USEC = 10000;
         Log.d(TAG, "drainEncoder:start");
@@ -1865,7 +1992,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 // should happen before receiving buffers, and should only happen once
                 MediaFormat newFormat = mEncoder.getOutputFormat();
-                Log.d(TAG, "drainEncoder:encoder output format changed: " + newFormat);
+                Log.d(TAG, "drainEncoder:encoder output video_encoder_format changed: " + newFormat);
 
             }
             else if (encoderStatus < 0)
@@ -1911,7 +2038,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     /**
      * Releases encoder resources.  May be called after partial / failed initialization.
      */
-    private void releaseEncoder()
+    private static void releaseEncoder()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
@@ -1952,6 +2079,56 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 Log.d(TAG, "releaseEncoder:already released");
             }
+        }
+    }
+
+    static void stop_ringtone()
+    {
+        try
+        {
+            mMediaPlayer.stop();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            mMediaPlayer.release();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    void start_ringtone()
+    {
+        try
+        {
+            Uri ringtone_uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setDataSource(getApplicationContext(), ringtone_uri);
+            final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager.getStreamVolume(AudioManager.STREAM_RING) != 0)
+            {
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
+                mMediaPlayer.setLooping(true);
+                try
+                {
+                    mMediaPlayer.prepare();
+                }
+                catch (Exception e1)
+                {
+                    e1.printStackTrace();
+                }
+                mMediaPlayer.start();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

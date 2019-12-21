@@ -11,3 +11,13 @@
 /android-refimpl-app.externalNativeBuild
 android-refimpl-app/app/nativelibs/armeabi/libjni-c-toxcore.so
 android-refimpl-app/app/nativelibs/armeabi-v7a/libjni-c-toxcore.so
+android-refimpl-app/app/nativelibs/x86/libjni-c-toxcore.so
+android-refimpl-app/app/lint-report.html
+android-refimpl-app/app/lint-report.txt
+android-refimpl-app/app/lint-report.xml
+convert_nodes_file/nodes.c
+convert_nodes_file/nodes.json
+android-refimpl-app/app/.idea/
+android-refimpl-app/app/local.properties
+android-refimpl-app/gwitness/gwit/reports/
+android-refimpl-app/gwitness/gwit/pluginUnderTestMetadata/

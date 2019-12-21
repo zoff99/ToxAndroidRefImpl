@@ -26,10 +26,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.l4digital.fastscroll.FastScroller;
+
 import java.util.Iterator;
 import java.util.List;
 
-public class FriendlistAdapter extends RecyclerView.Adapter
+public class FriendlistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
     private static final String TAG = "trifa.FriendlistAdapter";
 
@@ -206,5 +208,12 @@ public class FriendlistAdapter extends RecyclerView.Adapter
         }
 
         return found_item;
+    }
+
+    @Override
+    public String getSectionText(int position)
+    {
+        // set fastscroller bluble text
+        return " ";
     }
 }

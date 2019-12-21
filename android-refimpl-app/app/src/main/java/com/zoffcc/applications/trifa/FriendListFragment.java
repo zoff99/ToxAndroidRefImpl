@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -47,7 +48,7 @@ public class FriendListFragment extends Fragment
     static Boolean in_update_data = false;
     static final Boolean in_update_data_lock = false;
     //  View view1 = null;
-    RecyclerView listingsView = null;
+    com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     FriendlistAdapter adapter = null;
 
     @Override
@@ -63,10 +64,11 @@ public class FriendListFragment extends Fragment
         List<CombinedFriendsAndConferences> data_values = new ArrayList<CombinedFriendsAndConferences>();
         data_values.clear();
 
-        listingsView = (RecyclerView) view1.findViewById(R.id.rv_list);
+        listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view1.findViewById(R.id.rv_list);
         listingsView.getRecycledViewPool().clear();
-        listingsView.setHasFixedSize(true);
         listingsView.setLayoutManager(new LinearLayoutManager(view1.getContext()));
+        listingsView.setItemAnimator(new DefaultItemAnimator());
+        listingsView.setHasFixedSize(true);
 
         adapter = new FriendlistAdapter(view1.getContext(), data_values);
         Log.i(TAG, "onCreateView:adapter=" + adapter);
@@ -121,6 +123,12 @@ public class FriendListFragment extends Fragment
         if (is_friend)
         {
             final FriendList f = c.friend_item;
+
+            if (f.is_relay==true)
+            {
+                // do not update anything if this is a relay
+                return;
+            }
 
             // Log.i(TAG, "modify_friend:start");
             Runnable myRunnable = new Runnable()
@@ -250,60 +258,135 @@ public class FriendListFragment extends Fragment
 
         try
         {
-            // reload friendlist
-            Log.i(TAG, "onResume:AA");
-            List<FriendList> fl = orma.selectFromFriendList().
-                    orderByTOX_CONNECTION_on_offDesc().
-                    orderByNotification_silentAsc().
-                    orderByLast_online_timestampDesc().
-                    toList();
-
-            if (fl != null)
+            boolean SORT_CORRECTLY = true;
+            if (SORT_CORRECTLY != true)
             {
-                Log.i(TAG, "onResume:fl.size=" + fl.size());
-                if (fl.size() > 0)
+                try
                 {
-                    int i = 0;
-                    for (i = 0; i < fl.size(); i++)
+                    // reload friendlist
+                    Log.i(TAG, "onResume:AA");
+                    List<FriendList> fl = orma.selectFromFriendList().
+                            is_relayNotEq(true).
+                            orderByTOX_CONNECTION_on_offDesc().
+                            orderByNotification_silentAsc().
+                            orderByLast_online_timestampDesc().
+                            toList();
+
+                    if (fl != null)
                     {
-                        FriendList n = deep_copy(fl.get(i));
-                        final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                        cc.is_friend = true;
-                        cc.friend_item = n;
-                        modify_friend(cc, cc.is_friend);
-                        // Log.i(TAG, "onResume:modify_friend:" + n);
+                        Log.i(TAG, "onResume:fl.size=" + fl.size());
+                        if (fl.size() > 0)
+                        {
+                            int i = 0;
+                            for (i = 0; i < fl.size(); i++)
+                            {
+                                FriendList n = deep_copy(fl.get(i));
+                                final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                                cc.is_friend = true;
+                                cc.friend_item = n;
+                                modify_friend(cc, cc.is_friend);
+                                // Log.i(TAG, "onResume:modify_friend:" + n);
+                            }
+                        }
                     }
+
+                    // reload conferences
+                    List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                            orderByConference_activeDesc().
+                            orderByNotification_silentAsc().
+                            toList();
+
+                    if (confs != null)
+                    {
+                        if (confs.size() > 0)
+                        {
+                            int i = 0;
+                            for (i = 0; i < confs.size(); i++)
+                            {
+                                ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
+                                CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                cfac.is_friend = false;
+                                cfac.conference_item = n;
+                                modify_friend(cfac, cfac.is_friend);
+                                // Log.i(TAG, "onResume:modify_friend:" + n);
+                            }
+                        }
+                    }
+
+                    Log.i(TAG, "onResume:BB");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
             }
-
-            // reload conferences
-            List<ConferenceDB> confs = orma.selectFromConferenceDB().
-                    orderByConference_activeDesc().
-                    orderByNotification_silentAsc().
-                    toList();
-
-            if (confs != null)
+            else
             {
-                if (confs.size() > 0)
-                {
-                    int i = 0;
-                    for (i = 0; i < confs.size(); i++)
-                    {
-                        ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
-                        CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                        cfac.is_friend = false;
-                        cfac.conference_item = n;
-                        modify_friend(cfac, cfac.is_friend);
-                        // Log.i(TAG, "onResume:modify_friend:" + n);
-                    }
-                }
+                add_all_friends_clear(1);
             }
-
-            Log.i(TAG, "onResume:BB");
         }
-        catch (Exception e)
+        catch(Exception ee)
         {
-            e.printStackTrace();
+            ee.printStackTrace();
+
+            try
+            {
+                // reload friendlist
+                Log.i(TAG, "onResume:AA");
+                List<FriendList> fl = orma.selectFromFriendList().
+                        is_relayNotEq(true).
+                        orderByTOX_CONNECTION_on_offDesc().
+                        orderByNotification_silentAsc().
+                        orderByLast_online_timestampDesc().
+                        toList();
+
+                if (fl != null)
+                {
+                    Log.i(TAG, "onResume:fl.size=" + fl.size());
+                    if (fl.size() > 0)
+                    {
+                        int i = 0;
+                        for (i = 0; i < fl.size(); i++)
+                        {
+                            FriendList n = deep_copy(fl.get(i));
+                            final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                            cc.is_friend = true;
+                            cc.friend_item = n;
+                            modify_friend(cc, cc.is_friend);
+                            // Log.i(TAG, "onResume:modify_friend:" + n);
+                        }
+                    }
+                }
+
+                // reload conferences
+                List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                        orderByConference_activeDesc().
+                        orderByNotification_silentAsc().
+                        toList();
+
+                if (confs != null)
+                {
+                    if (confs.size() > 0)
+                    {
+                        int i = 0;
+                        for (i = 0; i < confs.size(); i++)
+                        {
+                            ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
+                            CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                            cfac.is_friend = false;
+                            cfac.conference_item = n;
+                            modify_friend(cfac, cfac.is_friend);
+                            // Log.i(TAG, "onResume:modify_friend:" + n);
+                        }
+                    }
+                }
+
+                Log.i(TAG, "onResume:BB");
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
 
         MainActivity.friend_list_fragment = this;
@@ -334,6 +417,7 @@ public class FriendListFragment extends Fragment
                             adapter.clear_items(); // clears friends AND conferences!!
 
                             List<FriendList> fl = orma.selectFromFriendList().
+                                    is_relayNotEq(true).
                                     orderByTOX_CONNECTION_on_offDesc().
                                     orderByNotification_silentAsc().
                                     orderByLast_online_timestampDesc().

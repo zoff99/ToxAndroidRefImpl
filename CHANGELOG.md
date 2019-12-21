@@ -1,8 +1,26 @@
 # Change Log
 
-## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.22...HEAD)
+## [1.0.25](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.25) (2019-07-31)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.24...1.0.25)
+
+**Closed issues:**
+
+- crash because jni-c-toxcore.so  not match! [\#105](https://github.com/zoff99/ToxAndroidRefImpl/issues/105)
+- Another person suddenly appeared in a private chat. [\#104](https://github.com/zoff99/ToxAndroidRefImpl/issues/104)
+- no ringtone on incoming call [\#96](https://github.com/zoff99/ToxAndroidRefImpl/issues/96)
+- build from source [\#95](https://github.com/zoff99/ToxAndroidRefImpl/issues/95)
+- trifa does not release microphone lock upon call end [\#57](https://github.com/zoff99/ToxAndroidRefImpl/issues/57)
+
+**Merged pull requests:**
+
+- Add .editorconfig file [\#27](https://github.com/zoff99/ToxAndroidRefImpl/pull/27) ([gjedeer](https://github.com/gjedeer))
+
+## [1.0.24](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.24) (2019-07-27)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.23...1.0.24)
+
+## [1.0.23](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.23) (2019-07-03)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.22...1.0.23)
 
 **Closed issues:**
 
@@ -171,5 +189,3 @@
 - updates [\#4](https://github.com/zoff99/ToxAndroidRefImpl/pull/4) ([zoff99](https://github.com/zoff99))
 - updates [\#3](https://github.com/zoff99/ToxAndroidRefImpl/pull/3) ([zoff99](https://github.com/zoff99))
 - updates [\#1](https://github.com/zoff99/ToxAndroidRefImpl/pull/1) ([zoff99](https://github.com/zoff99))
-
-

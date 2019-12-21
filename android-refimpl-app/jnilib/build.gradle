@@ -28,8 +28,8 @@ apply plugin: 'com.jfrog.bintray'
  *
  *
  */
-def maven_artefact_version = '1.0.24'
-project.ext.set("maven_artefact_int_version", 10024)
+def maven_artefact_version = '1.0.26'
+project.ext.set("maven_artefact_int_version", 10026)
 /*
  *
  *
@@ -78,6 +78,7 @@ bintray {
 
 android {
     compileSdkVersion 25
+    buildToolsVersion "25.0.3"
     compileOptions.encoding = 'UTF-8'
 
     defaultConfig {
@@ -89,6 +90,19 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'LICENSE.txt'
+    }
+
+    lintOptions {
+        abortOnError false
+        absolutePaths false
+        // lintConfig file("lint.xml")
+        showAll false
+        textReport false
+        xmlReport false
+        htmlReport false
+        // textOutput file("lint-report.txt")
+        // htmlOutput file("lint-report.html")
+        // xmlOutput file("lint-report.xml")
     }
 
     compileOptions {

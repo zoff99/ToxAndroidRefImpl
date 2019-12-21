@@ -47,7 +47,13 @@ public class FriendList
     int TOX_CONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    int TOX_CONNECTION_real; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
+
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_CONNECTION_on_off; // 0 --> offline, 1 --> online
+
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    int TOX_CONNECTION_on_off_real; // 0 --> offline, 1 --> online
 
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     int TOX_USER_STATUS; // 0 --> NONE, 1 --> online AWAY, 2 --> online BUSY
@@ -70,6 +76,10 @@ public class FriendList
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long last_online_timestamp = -1L;
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    @Nullable
+    boolean is_relay = false;
+
     static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();
@@ -77,7 +87,9 @@ public class FriendList
         out.name = in.name;
         out.status_message = in.status_message;
         out.TOX_CONNECTION = in.TOX_CONNECTION;
+        out.TOX_CONNECTION_real = in.TOX_CONNECTION_real;
         out.TOX_CONNECTION_on_off = in.TOX_CONNECTION_on_off;
+        out.TOX_CONNECTION_on_off_real = in.TOX_CONNECTION_on_off_real;
         out.TOX_USER_STATUS = in.TOX_USER_STATUS;
         out.avatar_filename = in.avatar_filename;
         out.avatar_pathname = in.avatar_pathname;
@@ -85,6 +97,7 @@ public class FriendList
         out.sort = in.sort;
         out.last_online_timestamp = in.last_online_timestamp;
         out.alias_name = in.alias_name;
+        out.is_relay=in.is_relay;
 
         return out;
     }
@@ -94,9 +107,12 @@ public class FriendList
     {
         try
         {
-        return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) + ", name=" + name + ", status_message=" +
+        return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) +
+               ", is_relay=" + is_relay +
+               ", name=" + name + ", status_message=" +
                status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_CONNECTION_on_off=" +
-               TOX_CONNECTION_on_off + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
+               TOX_CONNECTION_on_off +", TOX_CONNECTION_real=" +
+               TOX_CONNECTION_real + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
                ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
                sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name;
         }

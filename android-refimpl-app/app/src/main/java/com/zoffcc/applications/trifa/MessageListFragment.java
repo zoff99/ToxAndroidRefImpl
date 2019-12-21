@@ -36,6 +36,7 @@ import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListFragment extends Fragment
@@ -89,8 +90,14 @@ public class MessageListFragment extends Fragment
             if (orma != null)
             {
                 // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+                // -------------------------------------------------
+                // HINT: here ordering of messages is applied !!
+                // -------------------------------------------------
                 data_values = orma.selectFromMessage().tox_friendpubkeyEq(
-                        tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+                        tox_friend_get_public_key__wrapper(current_friendnum)).
+                        orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
+                        toList();
                 Log.i(TAG, "loading data:001");
                 // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
                 // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
@@ -206,6 +213,8 @@ public class MessageListFragment extends Fragment
     @Override
     public void onResume()
     {
+        global_showing_messageview = true;
+
         Log.i(TAG, "onResume");
         super.onResume();
 
@@ -260,6 +269,7 @@ public class MessageListFragment extends Fragment
         Log.i(TAG, "onPause");
         super.onPause();
 
+        global_showing_messageview = false;
         MainActivity.message_list_fragment = null;
     }
 
@@ -289,8 +299,15 @@ public class MessageListFragment extends Fragment
                     data_values.clear();
                 }
                 Log.i(TAG, "data_values:005b");
-                adapter.add_list_clear(orma.selectFromMessage().tox_friendpubkeyEq(
-                        tox_friend_get_public_key__wrapper(current_friendnum)).toList());
+
+                // -------------------------------------------------
+                // HINT: this one does not respect ordering?!
+                // -------------------------------------------------
+                adapter.add_list_clear(orma.selectFromMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
+                        toList());
                 Log.i(TAG, "data_values:005c");
             }
             Log.i(TAG, "data_values:005d");

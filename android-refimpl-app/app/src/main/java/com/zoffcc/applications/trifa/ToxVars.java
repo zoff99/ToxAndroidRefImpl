@@ -868,7 +868,11 @@ public class ToxVars
          * When file_size is set to 0 in the transfer request it means that the client
          * has no avatar.
          */
-        TOX_FILE_KIND_AVATAR(1);
+        TOX_FILE_KIND_AVATAR(1),
+        TOX_FILE_KIND_MESSAGEV2_SEND(2),
+        TOX_FILE_KIND_MESSAGEV2_ANSWER(3),
+        TOX_FILE_KIND_MESSAGEV2_ALTER(4),
+        TOX_FILE_KIND_MESSAGEV2_SYNC(5);
 
         public int value;
 
@@ -877,6 +881,34 @@ public class ToxVars
             this.value = value;
         }
 
+        public static String value_str(int value)
+        {
+            if (value == TOX_FILE_KIND_DATA.value)
+            {
+                return "TOX_FILE_KIND_DATA";
+            }
+            else if (value == TOX_FILE_KIND_AVATAR.value)
+            {
+                return "TOX_FILE_KIND_AVATAR";
+            }
+            else if (value == TOX_FILE_KIND_MESSAGEV2_SEND.value)
+            {
+                return "TOX_FILE_KIND_MESSAGEV2_SEND";
+            }
+            else if (value == TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+            {
+                return "TOX_FILE_KIND_MESSAGEV2_ANSWER";
+            }
+            else if (value == TOX_FILE_KIND_MESSAGEV2_ALTER.value)
+            {
+                return "TOX_FILE_KIND_MESSAGEV2_ALTER";
+            }
+            else if (value == TOX_FILE_KIND_MESSAGEV2_SYNC.value)
+            {
+                return "TOX_FILE_KIND_MESSAGEV2_SYNC";
+            }
+            return "UNKNOWN";
+        }
 
     }
 

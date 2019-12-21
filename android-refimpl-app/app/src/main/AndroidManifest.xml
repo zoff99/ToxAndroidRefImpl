@@ -145,9 +145,9 @@
             android:name=".ShareActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:excludeFromRecents="true"
+            android:label="@string/title_activity_share"
             android:launchMode="singleTask"
             android:noHistory="true"
-            android:label="@string/title_activity_share"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
@@ -187,6 +187,15 @@
             android:enabled="true"
             android:exported="false">
         </service>
+
+        <receiver android:name="WakeupAlarmReceiver" android:enabled="true">
+
+            <intent-filter>
+                <action android:name="com.zoffcc.applications.trifa.TOXSERVICE_ALARM">
+                </action>
+            </intent-filter>
+
+        </receiver>
 
         <provider
             android:name=".GenericFileProvider"

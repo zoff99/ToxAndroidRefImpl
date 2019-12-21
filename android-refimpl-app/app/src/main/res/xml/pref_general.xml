@@ -34,7 +34,7 @@
         android:title="@string/pref_title_fps_half"/>
 
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="set_fps"
         android:summary="@string/pref_description_set_fps"
         android:title="@string/pref_title_set_fps"/>
@@ -126,6 +126,17 @@
             android:key="X_battery_saving_mode"
             android:summary="@string/pref_description_X_battery_saving_mode"
             android:title="@string/pref_title_X_battery_saving_mode"/>
+
+        <ListPreference
+            android:defaultValue="15"
+            android:dependency="X_battery_saving_mode"
+            android:entries="@array/X_battery_saving_timeout_titles"
+            android:entryValues="@array/X_battery_saving_timeout_values"
+            android:key="X_battery_saving_timeout"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="@string/pref_description_X_battery_saving_timeout"
+            android:title="@string/pref_title_X_battery_saving_timeout"/>
 
         <SwitchPreference
             android:defaultValue="false"

@@ -99,7 +99,7 @@ public class Message
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String msg_id_hash = null; // 32bit hash, used for MessageV2 Messages! and otherwise NULL
+    String msg_id_hash = null; // 32byte hash, used for MessageV2 Messages! and otherwise NULL
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
@@ -107,6 +107,9 @@ public class Message
 
     @Column(indexed = true, defaultExpr = "0")
     int msg_version; // 0 -> old Message, 1 -> for MessageV2 Message
+
+    @Column(indexed = true, defaultExpr = "2")
+    int resend_count; // 2 -> do not resend msg anymore, 0 or 1 -> resend count
 
     static Message deep_copy(Message in)
     {
@@ -134,6 +137,7 @@ public class Message
         out.msg_id_hash = in.msg_id_hash;
         out.msg_version = in.msg_version;
         out.raw_msgv2_bytes = in.raw_msgv2_bytes;
+        out.resend_count = in.resend_count;
 
         return out;
     }
@@ -147,6 +151,6 @@ public class Message
                ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
                ", send_retries=" + send_retries + ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath +
                ", is_new=" + is_new + ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version +
-               ", raw_msgv2_bytes=" + "xxxxxx";
+               ", resend_count=" + resend_count + ", raw_msgv2_bytes=" + "xxxxxx";
     }
 }

@@ -33,19 +33,27 @@ public class TRIFAGlobals
     static int global_self_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
     static long global_self_last_went_online_timestamp = -1;
     static long global_self_last_went_offline_timestamp = -1;
+    static long global_last_activity_for_battery_savings_ts = -1;
+    static long global_self_last_entered_battery_saving_timestamp = -1;
+    static boolean global_showing_messageview = false;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
-
-    static int FULL_SPEED_SECONDS_AFTER_WENT_ONLINE = 60; // 60 secs.
-    static int TOX_ITERATE_MILLIS_IN_BATTERY_SAVINGS_MODE = 2000; // 2 secs.
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
     static boolean HAVE_INTERNET_CONNECTIVITY = true;
-    static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS = 1000 * 60 * 2; // bootstrap again after 2 minutes offline
+    final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =
+            1000 * 60 * 2; // bootstrap again after 2 minutes offline
+    final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;
+    final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 120; // x secs.
+    static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
+    static int BATTERY_OPTIMIZATION_LAST_SLEEP1 = -1;
+    static int BATTERY_OPTIMIZATION_LAST_SLEEP2 = -1;
+    static int BATTERY_OPTIMIZATION_LAST_SLEEP3 = -1;
 
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
     public static final int CONFERENCE_COOKIE_LENGTH = 35;
     public static final int CONFERENCE_ID_LENGTH = 32;
+    public static final int DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS = 4 * 1000; // 4 sec.
 
     // ----------
     // https://toxme.io/u/echobot
@@ -171,8 +179,20 @@ public class TRIFAGlobals
         {
             this.value = value;
         }
+    }
 
 
+    public static enum CONTROL_PROXY_MESSAGE_TYPE
+    {
+        CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY(175), CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND(
+            176), CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT(177), CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH(178);
+
+        public int value;
+
+        private CONTROL_PROXY_MESSAGE_TYPE(int value)
+        {
+            this.value = value;
+        }
     }
 
 }

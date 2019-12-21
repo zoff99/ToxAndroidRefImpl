@@ -51,11 +51,35 @@ public class NativeAudio
 
         native_audio_engine_down = true;
 
-        if (isPlaying() == 1)
+        try
         {
+            Thread.sleep(10);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
+        // if (isPlaying() == 1)
+        //{
             NativeAudio.StopPCM16();
+        //}
+
+        // if (isRecording() == 1)
+        //{
             NativeAudio.StopREC();
-            NativeAudio.shutdownEngine();
+        //}
+        NativeAudio.shutdownEngine();
+
+        System.out.println("restartNativeAudioPlayEngine:startup ...");
+
+        try
+        {
+            Thread.sleep(10);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
         }
 
         NativeAudio.createEngine(n_audio_in_buffer_max_count);
@@ -70,7 +94,7 @@ public class NativeAudio
         }
 
         native_audio_engine_down = false;
-
+        NativeAudio.StartREC();
     }
 
     // ------- DEBUG -------

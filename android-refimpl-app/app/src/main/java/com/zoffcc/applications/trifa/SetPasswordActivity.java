@@ -113,7 +113,9 @@ public class SetPasswordActivity extends AppCompatActivity
 
     void auto_create_password()
     {
-        // TODO: bad, make better
+        // this does NOT need to be crpytographically secure, since it will be saved cleartext
+        // it is just used if the user does not want to set a real password
+
         // create new key -------------
         String key = getRandomString(LEN_TRIFA_AUTOGEN_PASSWORD);
         settings.edit().putString("DB_secrect_key", key).commit();

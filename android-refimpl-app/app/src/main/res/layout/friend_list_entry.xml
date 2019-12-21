@@ -42,16 +42,29 @@
             app:civ_border_color="#40000000"
             app:civ_border_width="2dp"/>
 
-        <ImageView
-            android:id="@+id/f_status_icon"
+        <RelativeLayout
             android:layout_width="18dp"
-            android:layout_height="fill_parent"
+            android:layout_marginRight="6dip"
+            android:id="@+id/f_status_container"
+            android:layout_toRightOf="@id/f_avatar_icon"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
-            android:layout_marginRight="6dip"
-            android:layout_toRightOf="@id/f_avatar_icon"
-            android:scaleType="centerInside"
-            android:src="@drawable/circle_red"/>
+            android:layout_height="fill_parent">
+            <ImageView
+                android:id="@+id/f_status_icon"
+                android:layout_width="18dp"
+                android:layout_height="fill_parent"
+                android:scaleType="centerInside"
+                android:src="@drawable/circle_red"/>
+            <ImageView
+                android:id="@+id/f_relay_icon"
+                android:layout_marginLeft="4dip"
+                android:visibility="invisible"
+                android:layout_width="10dp"
+                android:layout_height="fill_parent"
+                android:scaleType="centerInside"
+                android:src="@drawable/circle_red"/>
+        </RelativeLayout>
 
         <ImageView
             android:id="@+id/f_user_status_icon"
@@ -60,7 +73,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
             android:layout_marginRight="6dip"
-            android:layout_toRightOf="@id/f_status_icon"
+            android:layout_toRightOf="@id/f_status_container"
             android:scaleType="centerInside"
             android:src="@drawable/circle_green"/>
 

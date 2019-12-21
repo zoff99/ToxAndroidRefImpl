@@ -122,6 +122,32 @@
                     android:typeface="monospace"/>
             </LinearLayout>
 
+            <Button
+                android:id="@+id/remove_relay_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="5dp"
+                android:text="remove own Relay"/>
+
+            <TextView
+                android:id="@+id/my_relay_toxid_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="7dp"
+                android:fontFamily="monospace"
+                android:gravity="fill_horizontal"
+                android:paddingBottom="15dp"
+                android:paddingTop="12dp"
+                android:text="TOXID94583458340958309458093850934805830583085389053095DUMMY"
+                android:textAlignment="gravity"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:typeface="monospace"/>
 
             <Button
                 android:id="@+id/new_nospam_button"
@@ -160,7 +186,6 @@
                 android:layout_marginTop="5dp"
                 android:text="copy ToxID"/>
 
-
             <ImageView
                 android:id="@+id/mytoxid_imageview"
                 android:layout_width="match_parent"
@@ -192,6 +217,23 @@
                 android:paddingBottom="15dp"
                 android:paddingTop="15dp"
                 android:src="@mipmap/ic_launcher_round"/>
+
+            <TextView
+                android:id="@+id/mytox_network_connections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="7dp"
+                android:fontFamily="monospace"
+                android:gravity="fill_horizontal"
+                android:paddingBottom="15dp"
+                android:paddingTop="12dp"
+                android:text="*error getting active network connections*"
+                android:textAlignment="gravity"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:typeface="monospace"/>
 
 
         </LinearLayout>

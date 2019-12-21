@@ -270,6 +270,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
     @Override
     public String getSectionText(int position)
     {
+        // set fastscroller bluble text
         return " ";
     }
 

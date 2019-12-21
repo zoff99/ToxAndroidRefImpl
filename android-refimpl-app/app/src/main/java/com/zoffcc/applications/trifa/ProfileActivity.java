@@ -58,8 +58,13 @@ import static android.graphics.Color.WHITE;
 import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_file;
+import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
+import static com.zoffcc.applications.trifa.MainActivity.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.MainActivity.have_own_relay;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
+import static com.zoffcc.applications.trifa.MainActivity.remove_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.set_new_random_nospam_value;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
@@ -82,7 +87,10 @@ public class ProfileActivity extends AppCompatActivity
     EditText mystatus_message_edittext = null;
     Button new_nospam_button = null;
     Button copy_toxid_button = null;
+    Button remove_own_relay_button = null;
+    TextView my_relay_toxid_textview = null;
     ImageView my_identicon_imageview = null;
+    TextView mytox_network_connections = null;
 
     static Handler profile_handler_s = null;
     Identicon.Identicon_data id_data = null;
@@ -101,7 +109,12 @@ public class ProfileActivity extends AppCompatActivity
         my_identicon_imageview = (ImageView) findViewById(R.id.my_identicon_imageview);
 
         new_nospam_button = (Button) findViewById(R.id.new_nospam_button);
+        remove_own_relay_button = (Button) findViewById(R.id.remove_relay_button);
+        my_relay_toxid_textview = (TextView) findViewById(R.id.my_relay_toxid_textview);
         copy_toxid_button = (Button) findViewById(R.id.copy_toxid_button);
+
+        mytox_network_connections = (TextView) findViewById(R.id.mytox_network_connections);
+        mytox_network_connections.setText(get_network_connections());
 
         new_nospam_button.setOnClickListener(new View.OnClickListener()
         {
@@ -123,6 +136,85 @@ public class ProfileActivity extends AppCompatActivity
                 }
             }
         });
+
+        if (have_own_relay())
+        {
+            remove_own_relay_button.setText("remove own Relay");
+            remove_own_relay_button.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    try
+                    {
+                        remove_own_relay_in_db();
+
+                        // load all friends into data list ---
+                        Log.i(TAG, "onMenuItemClick:6");
+                        try
+                        {
+                            if (friend_list_fragment != null)
+                            {
+                                // reload friendlist
+                                friend_list_fragment.add_all_friends_clear(200);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        my_relay_toxid_textview.setVisibility(View.INVISIBLE);
+                        remove_own_relay_button.setVisibility(View.INVISIBLE);
+
+                        try
+                        {
+                            remove_own_relay_button.setVisibility(View.GONE);
+                        }
+                        catch (Exception e1)
+                        {
+                        }
+
+                        try
+                        {
+                            my_relay_toxid_textview.setVisibility(View.GONE);
+                        }
+                        catch (Exception e1)
+                        {
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            my_relay_toxid_textview.setText(get_own_relay_pubkey());
+            my_relay_toxid_textview.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            remove_own_relay_button.setText("- no Relay set -");
+            remove_own_relay_button.setVisibility(View.INVISIBLE);
+            try
+            {
+                remove_own_relay_button.setVisibility(View.GONE);
+            }
+            catch (Exception e1)
+            {
+            }
+
+            my_relay_toxid_textview.setText("--");
+            my_relay_toxid_textview.setVisibility(View.INVISIBLE);
+            try
+            {
+                my_relay_toxid_textview.setVisibility(View.GONE);
+            }
+            catch (Exception e1)
+            {
+            }
+        }
 
         copy_toxid_button.setOnClickListener(new View.OnClickListener()
         {
@@ -271,8 +363,7 @@ public class ProfileActivity extends AppCompatActivity
             String color_chksum = "<font color=\"#006600\">";
             String ec = "</font>";
             mytoxid_textview.setText(Html.fromHtml(
-                    color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum +
-                    my_chksum_temp + ec));
+                    color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum + my_chksum_temp + ec));
         }
         catch (WriterException e)
         {

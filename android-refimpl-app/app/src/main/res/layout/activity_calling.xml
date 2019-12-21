@@ -30,7 +30,6 @@
 
 
         <FrameLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -143,6 +142,38 @@
                         android:layout_marginTop="5dp"
                         android:elevation="2dp"
                         android:src="@null"/>
+
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/video_box_right_volumeslider_01"
+                android:layout_width="300dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center|right"
+                android:elevation="2dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginRight="45dp"
+                android:background="@null">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:elevation="2dp"
+                    android:background="@null"
+                    android:orientation="vertical">
+
+                    <SeekBar
+                        android:id="@+id/volume_slider_seekbar"
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/md_grey_900"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:elevation="8dp"
+                        android:progress="5"/>
 
                 </LinearLayout>
             </FrameLayout>

@@ -70,6 +70,7 @@ import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.get_friend_name_from_pubkey;
+import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_filetransfer_db;
 import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
@@ -80,6 +81,7 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
+import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -416,6 +418,71 @@ public class MessageListActivity extends AppCompatActivity
             Log.i(TAG, "onResume:001:friendnum=" + friendnum);
         }
 
+        // ----- convert old messages which did not contain a sent timestamp -----
+        try
+        {
+            boolean need_migrate_old_msg_date = true;
+
+            if (get_g_opts("MIGRATE_OLD_MSG_DATE_done") != null)
+            {
+                if (get_g_opts("MIGRATE_OLD_MSG_DATE_done").equals("true"))
+                {
+                    need_migrate_old_msg_date = false;
+                }
+            }
+
+            if (need_migrate_old_msg_date == true)
+            {
+                orma.getConnection().execSQL(
+                        "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
+                        " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
+                        " and msg_version='0'");
+                Log.i(TAG, "onCreate:migrate_old_msg_date");
+
+                // now remember that we did that, and don't do it again
+                set_g_opts("MIGRATE_OLD_MSG_DATE_done", "true");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onCreate:migrate_old_msg_date:EE:" + e.getMessage());
+        }
+        // ----- convert old messages which did not contain a sent timestamp -----
+
+
+        // ----- convert filetransfer messages which did not contain a sent timestamp -----
+        try
+        {
+            boolean need_migrate_old_ft_date = true;
+
+            if (get_g_opts("MIGRATE_OLD_FT_DATE_done") != null)
+            {
+                if (get_g_opts("MIGRATE_OLD_FT_DATE_done").equals("true"))
+                {
+                    need_migrate_old_ft_date = false;
+                }
+            }
+
+            if (need_migrate_old_ft_date == true)
+            {
+                orma.getConnection().execSQL(
+                        "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
+                        " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
+                        " and TRIFA_MESSAGE_TYPE ='1'");
+                Log.i(TAG, "onCreate:migrate_old_ft_date");
+
+                // now remember that we did that, and don't do it again
+                set_g_opts("MIGRATE_OLD_FT_DATE_done", "true");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onCreate:migrate_old_ft_date:EE:" + e.getMessage());
+        }
+        // ----- convert filetransfer messages which did not contain a sent timestamp -----
+
         message_list_activity = this;
     }
 
@@ -623,164 +690,191 @@ public class MessageListActivity extends AppCompatActivity
         }
     }
 
+
+    public void send_attatchment(View view)
+    {
+        String msg = "";
+        if (is_friend_online(friendnum) != 0)
+        {
+            // add attachement ------------
+            // add attachement ------------
+
+            stop_self_typing_indicator_s();
+
+            if (FILE_PICK_METHOD == 1)
+            {
+                // Method 1 ----------------
+                // Method 1 ----------------
+                // Method 1 ----------------
+                DialogProperties properties = new DialogProperties();
+                properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                properties.selection_type = DialogConfigs.FILE_SELECT;
+                properties.root = new java.io.File("/");
+                properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                properties.extensions = null;
+                // TODO: hardcoded is always bad
+                // properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF", "zip", "ZIP", "avi", "AVI", "mp4", "MP4"};
+                FilePickerDialog dialog = new FilePickerDialog(this, properties);
+                dialog.setTitle("Select File");
+
+                dialog.setDialogSelectionListener(new DialogSelectionListener()
+                {
+                    @Override
+                    public void onSelectedFilePaths(String[] files)
+                    {
+                        try
+                        {
+                            Log.i(TAG, "select_file:" + files);
+                            final String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
+                            final String src_filename = new File(files[0]).getName();
+                            Log.i(TAG, "select_file:p=" + src_path + " f=" + src_filename);
+
+                            final Thread t = new Thread()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    add_outgoing_file(src_path, src_filename);
+                                }
+                            };
+                            t.start();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "select_file:EE1:" + e.getMessage());
+                        }
+                    }
+                });
+                dialog.show();
+                // Method 1 ----------------
+                // Method 1 ----------------
+                // Method 1 ----------------
+            }
+            else
+            {
+                // Method 2 ----------------
+                // Method 2 ----------------
+                // Method 2 ----------------
+                //                        Log.i(TAG, "add_file:001");
+                //                        Intent intent_file1 = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                //                        Log.i(TAG, "add_file:002");
+                //                        try
+                //                        {
+                //                            startActivityForResult(intent_file1, MEDIAPICK_ID_001);
+                //                        }
+                //                        catch (Exception e)
+                //                        {
+                //                            e.printStackTrace();
+                //                            Log.i(TAG, "add_file:EE:" + e.getMessage());
+                //                        }
+                //                        Log.i(TAG, "add_file:003");
+
+
+                // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+                // browser.
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+                // Filter to only show results that can be "opened", such as a
+                // file (as opposed to a list of contacts or timezones)
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                // Filter to show only images, using the image MIME data type.
+                // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+                // To search for all documents available via installed storage providers,
+                // it would be "*/*".
+                // intent.setType("image/*");
+                intent.setType("*/*");
+
+                startActivityForResult(intent, MEDIAPICK_ID_001);
+
+
+                // Method 2 ----------------
+                // Method 2 ----------------
+                // Method 2 ----------------
+            }
+            // add attachement ------------
+            // add attachement ------------
+        }
+    }
+
+    /* HINT: send a message to a friend */
     synchronized public void send_message_onclick(View view)
     {
-        // Log.i(TAG,"send_message_onclick:---start");
+        Log.i(TAG, "send_message_onclick:---start");
 
         String msg = "";
         try
         {
-            if (is_friend_online(friendnum) != 0)
+            if (attachemnt_instead_of_send)
             {
-                if (attachemnt_instead_of_send)
+                send_attatchment(view);
+            }
+            else
+            {
+                // send typed message to friend
+                msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(),
+                                                                                      ml_new_message.getText().toString().length()));
+
+                Message m = new Message();
+                m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
+                m.direction = 1; // msg sent
+                m.TOX_MESSAGE_TYPE = 0;
+                m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                m.rcvd_timestamp = 0L;
+                m.is_new = false; // own messages are always "not new"
+                m.sent_timestamp = System.currentTimeMillis();
+                m.read = false;
+                m.text = msg;
+                m.msg_version = 0;
+                m.resend_count = 0; // we have tried to resend this message "0" times
+
+                if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
-                    // add attachement ------------
-                    // add attachement ------------
+                    MainActivity.send_message_result result = tox_friend_send_message_wrapper(friendnum, 0, msg);
+                    long res = result.msg_num;
+                    Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res + " m=" + m);
 
-                    stop_self_typing_indicator_s();
-
-                    if (FILE_PICK_METHOD == 1)
+                    if (res > -1) // sending was OK
                     {
-                        // Method 1 ----------------
-                        // Method 1 ----------------
-                        // Method 1 ----------------
-                        DialogProperties properties = new DialogProperties();
-                        properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                        properties.selection_type = DialogConfigs.FILE_SELECT;
-                        properties.root = new java.io.File("/");
-                        properties.error_dir = new java.io.File(
-                                Environment.getExternalStorageDirectory().getAbsolutePath());
-                        properties.offset = new java.io.File(
-                                Environment.getExternalStorageDirectory().getAbsolutePath());
-                        properties.extensions = null;
-                        // TODO: hardcoded is always bad
-                        // properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF", "zip", "ZIP", "avi", "AVI", "mp4", "MP4"};
-                        FilePickerDialog dialog = new FilePickerDialog(this, properties);
-                        dialog.setTitle("Select File");
-
-                        dialog.setDialogSelectionListener(new DialogSelectionListener()
+                        m.message_id = res;
+                        if (!result.msg_hash_hex.equalsIgnoreCase(""))
                         {
-                            @Override
-                            public void onSelectedFilePaths(String[] files)
-                            {
-                                try
-                                {
-                                    Log.i(TAG, "select_file:" + files);
-                                    final String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
-                                    final String src_filename = new File(files[0]).getName();
-                                    Log.i(TAG, "select_file:p=" + src_path + " f=" + src_filename);
+                            // msgV2 message -----------
+                            m.msg_id_hash = result.msg_hash_hex;
+                            m.msg_version = 1;
+                            // msgV2 message -----------
+                        }
 
-                                    final Thread t = new Thread()
-                                    {
-                                        @Override
-                                        public void run()
-                                        {
-                                            add_outgoing_file(src_path, src_filename);
-                                        }
-                                    };
-                                    t.start();
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                    Log.i(TAG, "select_file:EE1:" + e.getMessage());
-                                }
-                            }
-                        });
-                        dialog.show();
-                        // Method 1 ----------------
-                        // Method 1 ----------------
-                        // Method 1 ----------------
+                        if (!result.raw_message_buf_hex.equalsIgnoreCase(""))
+                        {
+                            // save raw message bytes of this v2 msg into the database
+                            // we need it if we want to resend it later
+                            m.raw_msgv2_bytes = result.raw_message_buf_hex;
+                        }
+
+                        m.resend_count = 1; // we sent the message successfully
+
+                        long row_id = insert_into_message_db(m, true);
+                        m.id = row_id;
+                        // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3=" + m.msg_id_hash);
+                        // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3raw=" + m.raw_msgv2_bytes);
+                        ml_new_message.setText("");
+
+                        stop_self_typing_indicator_s();
                     }
                     else
                     {
-                        // Method 2 ----------------
-                        // Method 2 ----------------
-                        // Method 2 ----------------
-                        //                        Log.i(TAG, "add_file:001");
-                        //                        Intent intent_file1 = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        //                        Log.i(TAG, "add_file:002");
-                        //                        try
-                        //                        {
-                        //                            startActivityForResult(intent_file1, MEDIAPICK_ID_001);
-                        //                        }
-                        //                        catch (Exception e)
-                        //                        {
-                        //                            e.printStackTrace();
-                        //                            Log.i(TAG, "add_file:EE:" + e.getMessage());
-                        //                        }
-                        //                        Log.i(TAG, "add_file:003");
+                        // sending was NOT ok
 
+                        Log.i(TAG, "tox_friend_send_message_wrapper:store pending message" + m);
 
-                        // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
-                        // browser.
-                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-
-                        // Filter to only show results that can be "opened", such as a
-                        // file (as opposed to a list of contacts or timezones)
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-                        // Filter to show only images, using the image MIME data type.
-                        // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
-                        // To search for all documents available via installed storage providers,
-                        // it would be "*/*".
-                        // intent.setType("image/*");
-                        intent.setType("*/*");
-
-                        startActivityForResult(intent, MEDIAPICK_ID_001);
-
-
-                        // Method 2 ----------------
-                        // Method 2 ----------------
-                        // Method 2 ----------------
-                    }
-                    // add attachement ------------
-                    // add attachement ------------
-                }
-                else
-                {
-                    // send typed message to friend
-                    msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(),
-                                                                                          ml_new_message.getText().toString().length()));
-
-                    Message m = new Message();
-                    m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
-                    m.direction = 1; // msg sent
-                    m.TOX_MESSAGE_TYPE = 0;
-                    m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
-                    m.rcvd_timestamp = 0L;
-                    m.is_new = false; // own messages are always "not new"
-                    m.sent_timestamp = System.currentTimeMillis();
-                    m.read = false;
-                    m.text = msg;
-                    m.msg_version = 0;
-
-                    if ((msg != null) && (!msg.equalsIgnoreCase("")))
-                    {
-                        MainActivity.send_message_result result = tox_friend_send_message_wrapper(friendnum, 0, msg);
-                        long res = result.msg_num;
-                        // Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res + " m=" + m);
-
-                        if (res > -1) // sending was OK
-                        {
-                            m.message_id = res;
-                            if (!result.msg_hash_hex.equalsIgnoreCase(""))
-                            {
-                                m.msg_id_hash = result.msg_hash_hex;
-                                m.msg_version = 1; // msgV2 message
-                            }
-                            if (!result.raw_message_buf_hex.equalsIgnoreCase(""))
-                            {
-                                m.raw_msgv2_bytes = result.raw_message_buf_hex;
-                            }
-                            long row_id = insert_into_message_db(m, true);
-                            m.id = row_id;
-                            // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3=" + m.msg_id_hash);
-                            // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3raw=" + m.raw_msgv2_bytes);
-                            ml_new_message.setText("");
-
-                            stop_self_typing_indicator_s();
-                        }
+                        m.message_id = -1;
+                        long row_id = insert_into_message_db(m, true);
+                        m.id = row_id;
+                        ml_new_message.setText("");
+                        stop_self_typing_indicator_s();
                     }
                 }
             }

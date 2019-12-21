@@ -438,6 +438,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     @Override
     public String getSectionText(int position)
     {
+        // set fastscroller bluble text
         try
         {
             Message getSectionText_message_object = messagelistitems.get(position);

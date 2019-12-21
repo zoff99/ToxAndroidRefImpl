@@ -1,6 +1,6 @@
 /**
  * [TRIfA], JNI part of Tox Reference Implementation for Android
- * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * Copyright (C) 2017 - 2019 Zoff <zoff@zoff.cc>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <dirent.h>
+#include <math.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -76,8 +77,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 33
-static const char global_version_string[] = "0.99.33";
+#define VERSION_PATCH 35
+static const char global_version_string[] = "0.99.35";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -210,11 +211,14 @@ uint32_t recording_samling_rate = 48000;
 int16_t global_audio_frame_duration_ms = 60;
 uint8_t global_av_call_active = 0;
 
+int audio_play_volume_percent_c = 10;
+float volumeMultiplier = -20.0f;
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_name_cb_method = NULL;
 jmethodID android_tox_callback_friend_status_message_cb_method = NULL;
+jmethodID android_tox_callback_friend_lossless_packet_cb_method = NULL;
 jmethodID android_tox_callback_friend_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_typing_cb_method = NULL;
@@ -222,6 +226,7 @@ jmethodID android_tox_callback_friend_read_receipt_cb_method = NULL;
 jmethodID android_tox_callback_friend_request_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_cb_method = NULL;
 jmethodID android_tox_callback_friend_message_v2_cb_method = NULL;
+jmethodID android_tox_callback_friend_sync_message_v2_cb_method = NULL;
 jmethodID android_tox_callback_friend_read_receipt_message_v2_cb_method = NULL;
 jmethodID android_tox_callback_file_recv_control_cb_method = NULL;
 jmethodID android_tox_callback_file_chunk_request_cb_method = NULL;
@@ -238,6 +243,7 @@ jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_video_receive_frame_h264_cb_method = NULL;
 jmethodID android_toxav_callback_call_state_cb_method = NULL;
 jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
 jmethodID android_toxav_callback_audio_receive_frame_cb_method = NULL;
@@ -267,6 +273,7 @@ void self_connection_status_cb(Tox *tox, TOX_CONNECTION connection_status, void 
 
 void friend_name_cb(Tox *tox, uint32_t friend_number, const uint8_t *name, size_t length, void *user_data);
 void friend_status_message_cb(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data);
+void friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length, void *user_data);
 void friend_status_cb(Tox *tox, uint32_t friend_number, TOX_USER_STATUS status, void *user_data);
 void friend_connection_status_cb(Tox *tox, uint32_t friend_number, TOX_CONNECTION connection_status, void *user_data);
 void friend_typing_cb(Tox *tox, uint32_t friend_number, bool is_typing, void *user_data);
@@ -275,6 +282,7 @@ void friend_request_cb(Tox *tox, const uint8_t *public_key, const uint8_t *messa
 void friend_message_cb(Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length,
                        void *user_data);
 void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len);
+void friend_sync_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len);
 void friend_read_receipt_message_v2_cb(Tox *tox, uint32_t friend_number, uint32_t ts_sec, const uint8_t *msgid);
 
 void file_recv_control_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, TOX_FILE_CONTROL control,
@@ -296,6 +304,10 @@ void conference_title_cb(Tox *tox, uint32_t conference_number, uint32_t peer_num
 
 void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
                              const uint8_t *name, size_t length, void *user_data);
+
+void change_audio_volume_pcm_null(int16_t *buf, size_t buf_size_bytes);
+void change_audio_volume_pcm(int16_t *buf, size_t num_samples);
+
 
 #if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
 void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data);
@@ -687,8 +699,8 @@ int bin_id_to_string(const char *bin_id, size_t bin_id_size, char *output, size_
 
 void bootstrap_real(Tox *tox)
 {
-#if 1
-    // these nodes seem to be faster!!
+#if 0
+    // OLD
     DHT_node nodes[] =
     {
         {"178.62.250.138",             33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
@@ -705,55 +717,31 @@ void bootstrap_real(Tox *tox)
         {"biribiri.org",               33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67", {0}}
     };
 #else
-    // more nodes here, but video with TCP sucks
+    // current bootstrap nodes
     DHT_node nodes[] =
     {
-        {"178.62.250.138",             33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
-        {"136.243.141.187",             443,  "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39", {0}},
-        {"185.14.30.213",               443,  "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
-        {"biribiri.org",33445,"F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67", {0}},
-        {"nodes.tox.chat",33445,"6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E", {0}},
-        {"130.133.110.14",33445,"461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F", {0}},
-        {"205.185.116.116",33445,"A179B09749AC826FF01F37A9613F6B57118AE014D4196A0E1105A98F93A54702", {0}},
-        {"198.98.51.198",33445,"1D5A5F2F5D6233058BF0259B09622FB40B482E4FA0931EB8FD3AB8E7BF7DAF6F", {0}},
-        {"108.61.165.198",33445,"8E7D0B859922EF569298B4D261A8CCB5FEA14FB91ED412A7603A585A25698832", {0}},
-        {"194.249.212.109",33445,"3CEE1F054081E7A011234883BC4FC39F661A55B73637A5AC293DDF1251D9432B", {0}},
-        {"185.25.116.107",33445,"DA4E4ED4B697F2E9B000EEFE3A34B554ACD3F45F5C96EAEA2516DD7FF9AF7B43", {0}},
-        {"5.189.176.217",5190,"2B2137E094F743AC8BD44652C55F41DFACC502F125E99E4FE24D40537489E32F", {0}},
-        {"217.182.143.254",2306,"7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147", {0}},
-        {"104.223.122.15",33445,"0FB96EEBFB1650DDB52E70CF773DDFCABE25A95CC3BB50FC251082E4B63EF82A", {0}},
+        {"85.172.30.117",33445,"8E7D0B859922EF569298B4D261A8CCB5FEA14FB91ED412A7603A585A25698832", {0}},
         {"tox.verdict.gg",33445,"1C5293AEF2114717547B39DA8EA6F1E331E5E358B35F9B6B5F19317911C5F976", {0}},
-        {"d4rk4.ru",1813,"53737F6D47FA6BD2808F378E339AF45BF86F39B64E79D6D491C53A1D522E7039", {0}},
-        {"104.233.104.126",33445,"EDEE8F2E839A57820DE3DA4156D88350E53D4161447068A3457EE8F59F362414", {0}},
-        {"51.254.84.212",33445,"AEC204B9A4501412D5F0BB67D9C81B5DB3EE6ADA64122D32A3E9B093D544327D", {0}},
-        {"88.99.133.52",33445,"2D320F971EF2CA18004416C2AAE7BA52BF7949DB34EA8E2E21AF67BD367BE211", {0}},
-        {"185.58.206.164",33445,"24156472041E5F220D1FA11D9DF32F7AD697D59845701CDD7BE7D1785EB9DB39", {0}},
-        {"92.54.84.70",33445,"5625A62618CB4FCA70E147A71B29695F38CC65FF0CBD68AD46254585BE564802", {0}},
-        {"195.93.190.6",33445,"FB4CE0DDEFEED45F26917053E5D24BDDA0FA0A3D83A672A9DA2375928B37023D", {0}},
-        {"tox.uplinklabs.net",33445,"1A56EA3EDF5DF4C0AEABBF3C2E4E603890F87E983CAC8A0D532A335F2C6E3E1F", {0}},
-        {"toxnode.nek0.net",33445,"20965721D32CE50C3E837DD75B33908B33037E6225110BFF209277AEAF3F9639", {0}},
-        {"95.215.44.78",33445,"672DBE27B4ADB9D5FB105A6BB648B2F8FDB89B3323486A7A21968316E012023C", {0}},
         {"163.172.136.118",33445,"2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
-        {"sorunome.de",33445,"02807CF4F8BB8FB390CC3794BDF1E8449E9A8392C5D3F2200019DA9F1E812E46", {0}},
-        {"37.97.185.116",33445,"E59A0E71ADA20D35BD1B0957059D7EF7E7792B3D680AE25C6F4DBBA09114D165", {0}},
-        {"193.124.186.205",5228,"9906D65F2A4751068A59D30505C5FC8AE1A95E0843AE9372EAFA3BAB6AC16C2C", {0}},
-        {"80.87.193.193",33445,"B38255EE4B054924F6D79A5E6E5889EC94B6ADF6FE9906F97A3D01E3D083223A", {0}},
-        {"initramfs.io",33445,"3F0A45A268367C1BEA652F258C85F4A66DA76BCAA667A49E770BCC4917AB6A25", {0}},
-        {"hibiki.eve.moe",33445,"D3EB45181B343C2C222A5BCF72B760638E15ED87904625AAD351C594EEFAE03E", {0}},
-        {"tox.deadteam.org",33445,"C7D284129E83877D63591F14B3F658D77FF9BA9BA7293AEB2BDFBFE1A803AF47", {0}},
+        {"78.46.73.141",33445,"02807CF4F8BB8FB390CC3794BDF1E8449E9A8392C5D3F2200019DA9F1E812E46", {0}},
+        {"tox.initramfs.io",33445,"3F0A45A268367C1BEA652F258C85F4A66DA76BCAA667A49E770BCC4917AB6A25", {0}},
         {"46.229.52.198",33445,"813C8F4187833EF0655B10F7752141A352248462A567529A38B6BBF73E979307", {0}},
-        {"node.tox.ngc.network",33445,"A856243058D1DE633379508ADCAFCF944E40E1672FF402750EF712E30C42012A", {0}},
-        {"144.217.86.39",33445,"7E5668E0EE09E19F320AD47902419331FFEE147BB3606769CFBE921A2A2FD34C", {0}},
+        {"tox.neuland.technology",33445,"15E9C309CFCB79FDDF0EBA057DABB49FE15F3803B1BFF06536AE2E5BA5E4690E", {0}},
+        {"144.217.167.73",33445,"7E5668E0EE09E19F320AD47902419331FFEE147BB3606769CFBE921A2A2FD34C", {0}},
+        {"tox.abilinski.com",33445,"10C00EB250C3233E343E2AEBA07115A5C28920E9C8D29492F6D00B29049EDC7E", {0}},
+        {"37.48.122.22",33445,"1B5A8AB25FFFB66620A531C4646B47F0F32B74C547B30AF8BD8266CA50A3AB59", {0}},
+        {"tox.novg.net",33445,"D527E5847F8330D628DAB1814F0A422F6DC9D0A300E6C357634EE2DA88C35463", {0}},
+        {"95.31.18.227",33445,"257744DBF57BE3E117FE05D145B5F806089428D4DCE4E3D0D50616AA16D9417E", {0}},
         {"185.14.30.213",443,"2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
-        {"77.37.160.178",33440,"CE678DEAFA29182EFD1B0C5B9BC6999E5A20B50A1A6EC18B91C8EBB591712416", {0}},
-        {"85.21.144.224",33445,"8F738BBC8FA9394670BCAB146C67A507B9907C8E564E28C2B59BEBB2FF68711B", {0}},
-        {"tox.natalenko.name",33445,"1CB6EBFD9D85448FA70D3CAE1220B76BF6FCE911B46ACDCF88054C190589650B", {0}},
-        {"37.187.122.30",33445,"BEB71F97ED9C99C04B8489BB75579EB4DC6AB6F441B603D63533122F1858B51D", {0}},
-        {"completelyunoriginal.moe",33445,"FBC7DED0B0B662D81094D91CC312D6CDF12A7B16C7FFB93817143116B510C13E", {0}},
-        {"136.243.141.187",443,"6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39", {0}},
-        {"tox.abilinski.com",33445,"0E9D7FEE2AA4B42A4C18FE81C038E32FFD8D907AAA7896F05AA76C8D31A20065", {0}},
-        {"95.215.46.114",33445,"5823FB947FF24CF83DDFAC3F3BAA18F96EA2018B16CC08429CB97FA502F40C23", {0}},
-        {"51.15.54.207",33445,"1E64DBA45EC810C0BF3A96327DC8A9D441AB262C14E57FCE11ECBCE355305239", {0}}
+        {"185.14.30.213",3389,"2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
+        {"198.199.98.108",33445,"BEF0CFB37AF874BD17B9A8F9FE64C75521DB95A37D33C5BDB00E9CF58659C04F", {0}},
+        {"52.53.185.100",33445,"A04F5FE1D006871588C8EC163676458C1EC75B20B4A147433D271E1E85DAF839", {0}},
+        {"tox.kurnevsky.net",33445,"82EF82BA33445A1F91A7DB27189ECFC0C013E06E3DA71F588ED692BED625EC23", {0}},
+        {"116.196.77.132",443,"040326E850DDCB49B1B2D9E3E2789D425774E4C5D783A55C09A024D05D2A8A66", {0}},
+        {"116.196.77.132",33445,"040326E850DDCB49B1B2D9E3E2789D425774E4C5D783A55C09A024D05D2A8A66", {0}},
+        {"116.196.77.132",3389,"040326E850DDCB49B1B2D9E3E2789D425774E4C5D783A55C09A024D05D2A8A66", {0}},
+        {"87.118.126.207",33445,"0D303B1778CA102035DA01334E7B1855A45C3EFBC9A83B9D916FFDEBC6DD3B2E", {0}},
+        {"81.169.136.229",33445,"D031DAC44F00464D3C9636F9850BF0064BC37FEB55789A13B6F59052CAE8A958", {0}}
     };
 #endif
 
@@ -840,6 +828,7 @@ void init_tox_callbacks()
     tox_callback_self_connection_status(tox_global, tox_utils_self_connection_status_cb);
     tox_utils_callback_friend_connection_status(tox_global, friend_connection_status_cb);
     tox_callback_friend_connection_status(tox_global, tox_utils_friend_connection_status_cb);
+    tox_utils_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
     tox_callback_friend_lossless_packet(tox_global, tox_utils_friend_lossless_packet_cb);
     tox_utils_callback_file_recv_control(tox_global, file_recv_control_cb);
     tox_callback_file_recv_control(tox_global, tox_utils_file_recv_control_cb);
@@ -850,6 +839,7 @@ void init_tox_callbacks()
     tox_utils_callback_file_recv_chunk(tox_global, file_recv_chunk_cb);
     tox_callback_file_recv_chunk(tox_global, tox_utils_file_recv_chunk_cb);
     tox_utils_callback_friend_message_v2(tox_global, friend_message_v2_cb);
+    tox_utils_callback_friend_sync_message_v2(tox_global, friend_sync_message_v2_cb);
     tox_utils_callback_friend_read_receipt_message_v2(tox_global, friend_read_receipt_message_v2_cb);
     // -------- _callbacks_ --------
 #else
@@ -878,7 +868,6 @@ void init_tox_callbacks()
     tox_callback_conference_namelist_change(tox_global, conference_namelist_change_cb);
 #endif
     // tox_callback_friend_lossy_packet(tox_global, friend_lossy_packet_cb);
-    // tox_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
     // -------- _callbacks_ --------
 #endif
 }
@@ -1036,6 +1025,37 @@ void android_tox_callback_friend_status_message_cb(uint32_t friend_number, const
 void friend_status_message_cb(Tox *tox, uint32_t friend_number, const uint8_t *message, size_t length, void *user_data)
 {
     android_tox_callback_friend_status_message_cb(friend_number, message, length);
+}
+
+void android_tox_callback_friend_lossless_packet_cb(uint32_t friend_number, const uint8_t *data, size_t length)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)length);
+
+    if(data2 == NULL)
+    {
+        // TODO: catch this OOM error!!
+        // return; // out of memory error thrown
+    }
+
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    (*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)length, (const jbyte *)data);
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_friend_lossless_packet_cb_method,
+                                     (jlong)(unsigned long long)friend_number,
+                                     data2,
+                                     (jlong)(unsigned long long)length);
+    (*jnienv2)->DeleteLocalRef(jnienv2, data2);
+}
+
+void friend_lossless_packet_cb(Tox *tox, uint32_t friend_number, const uint8_t *data, size_t length,
+                               void *user_data)
+{
+    android_tox_callback_friend_lossless_packet_cb(friend_number, data, length);
 }
 
 void android_tox_callback_friend_status_cb(uint32_t friend_number, TOX_USER_STATUS status)
@@ -1241,6 +1261,75 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uin
 void friend_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
 {
     android_tox_callback_friend_message_v2_cb(friend_number, raw_message, raw_message_len);
+}
+
+void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, const uint8_t *raw_message,
+        size_t raw_message_len)
+{
+    dbg(9, "friend_sync_message_v2_cb:fn=%d", (int)friend_number);
+#ifdef TOX_MESSAGE_V2_ACTIVE
+    uint8_t *message_data = calloc(1, raw_message_len);
+
+    if(message_data)
+    {
+        JNIEnv *jnienv2;
+        jnienv2 = jni_getenv();
+        jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)raw_message_len);
+        jbyteArray data3 = (*jnienv2)->NewByteArray(jnienv2, (int)raw_message_len);
+
+        if(data2 == NULL)
+        {
+            // TODO: catch this OOM error!!
+            // return; // out of memory error thrown
+        }
+
+        if(data3 == NULL)
+        {
+            // TODO: catch this OOM error!!
+            // return; // out of memory error thrown
+        }
+
+        // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+        // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+        (*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)raw_message_len, (const jbyte *)raw_message);
+        // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+        // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+        uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
+        uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
+        uint32_t data_length = 0;
+        bool res = tox_messagev2_get_sync_message_data(raw_message,
+                   (uint32_t)raw_message_len, message_data, &data_length);
+        (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)data_length, (const jbyte *)message_data);
+
+        if(raw_message_len > 0)
+        {
+            JNIEnv *jnienv2;
+            jnienv2 = jni_getenv();
+            // TODO: give back also the raw message bytes!
+            (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                             android_tox_callback_friend_sync_message_v2_cb_method,
+                                             (jlong)(unsigned long long)friend_number,
+                                             (jlong)ts_sec,
+                                             (jlong)ts_ms,
+                                             data2,
+                                             (jlong)(unsigned long long)raw_message_len,
+                                             data3,
+                                             (jlong)(unsigned long long)data_length
+                                            );
+        }
+
+        (*jnienv2)->DeleteLocalRef(jnienv2, data2);
+        (*jnienv2)->DeleteLocalRef(jnienv2, data3);
+        free(message_data);
+    }
+
+#endif
+}
+
+
+void friend_sync_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *raw_message, size_t raw_message_len)
+{
+    android_tox_callback_friend_sync_message_v2_cb(friend_number, raw_message, raw_message_len);
 }
 
 void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
@@ -1659,7 +1748,25 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
     if((audio_buffer_pcm_2 != NULL) && (pcm != NULL))
     {
         memcpy((void *)audio_buffer_pcm_2, (void *)pcm, (size_t)(sample_count * channels * 2));
+
+        // ------------ change PCM volume here ------------
+        if ((sample_count > 0) && (channels > 0))
+        {
+            if (audio_play_volume_percent_c < 100)
+            {
+                if (audio_play_volume_percent_c == 0)
+                {
+                    change_audio_volume_pcm_null((int16_t *)audio_buffer_pcm_2, (size_t)(sample_count * channels * 2));
+                }
+                else
+                {
+                    change_audio_volume_pcm((int16_t *)audio_buffer_pcm_2, (size_t)(sample_count * channels));
+                }
+            }
+        }
+        // ------------ change PCM volume here ------------
     }
+
 
 #ifdef USE_ECHO_CANCELLATION
 
@@ -1704,11 +1811,59 @@ void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint1
                                     );
 }
 
+
+void android_toxav_callback_video_receive_frame_h264_cb(uint32_t friend_number, uint32_t buf_size)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_video_receive_frame_h264_cb_method, (jlong)(unsigned long long)friend_number,
+                                     (jlong)(unsigned long long)buf_size
+                                    );
+}
+
+
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1av_1call_1status(JNIEnv *env, jobject thiz, jint status)
 {
     global_av_call_active = (uint8_t)status;
 }
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1play_1volume_1percent(JNIEnv *env, jclass clazz, jint volume_percent)
+{
+    if ((volume_percent >= 0) && (volume_percent <= 100))
+    {
+        audio_play_volume_percent_c = volume_percent;
+    }
+
+    //volume in dB 0db = unity gain, no attenuation, full amplitude signal
+    //           -20db = 10x attenuation, significantly more quiet
+    // ** // float volumeLevelDb = -((float)((100 - volume_percent) / 5)) + 0.0001f;
+    // ** // const float VOLUME_REFERENCE = 1.0f;
+    // ** // volumeMultiplier = (VOLUME_REFERENCE * pow(10, (volumeLevelDb / 20.f)));
+
+    float volumeLevelDb = ((float)volume_percent / 100.0f) - 1.0f;
+    volumeMultiplier = powf(20, volumeLevelDb);
+
+    // ** // volumeMultiplier = ((float)audio_play_volume_percent_c / 100.0f);
+
+    // dbg(9, "set_audio_play_volume_percent:vol=%d mul=%f", volume_percent, volumeMultiplier);
+}
+
+void change_audio_volume_pcm_null(int16_t *buf, size_t buf_size_bytes)
+{
+    memset(buf, 0, buf_size_bytes);
+}
+
+void change_audio_volume_pcm(int16_t *buf, size_t num_samples)
+{
+    for (size_t i = 0; i < num_samples; i++)
+    {
+        buf[i] = buf[i] * volumeMultiplier;
+    }
+}
+
 
 // ----- get video buffer from Java -----
 // ----- get video buffer from Java -----
@@ -1890,6 +2045,22 @@ void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t w
 
     android_toxav_callback_video_receive_frame_cb(friend_number, width, height, ystride, ustride, vstride);
 }
+
+void toxav_video_receive_frame_h264_cb_(ToxAV *av, uint32_t friend_number, const uint8_t *buf,
+                                        const uint32_t buf_size, void *user_data)
+{
+    if(video_buffer_1 != NULL)
+    {
+        if((buf) && (buf_size > 0))
+        {
+            memset(video_buffer_1, 0, video_buffer_1_size);
+            memcpy(video_buffer_1, buf, (size_t)(buf_size));
+        }
+    }
+
+    android_toxav_callback_video_receive_frame_h264_cb(friend_number, buf_size);
+}
+
 
 void android_toxav_callback_call_cb(uint32_t friend_number, bool audio_enabled, bool video_enabled)
 {
@@ -2131,6 +2302,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_friend_name_cb_method", "(JLjava/lang/String;J)V");
     android_tox_callback_friend_status_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_status_message_cb_method", "(JLjava/lang/String;J)V");
+    android_tox_callback_friend_lossless_packet_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_friend_lossless_packet_cb_method", "(J[BJ)V");
     android_tox_callback_friend_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_status_cb_method", "(JI)V");
     android_tox_callback_friend_connection_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2145,6 +2318,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J)V");
     android_tox_callback_friend_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
+    android_tox_callback_friend_sync_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_friend_sync_message_v2_cb_method", "(JJJ[BJ[BJ)V");
     android_tox_callback_friend_read_receipt_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_read_receipt_message_v2_cb_method", "(JJ[B)V");
     android_tox_callback_file_recv_control_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2217,6 +2392,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_video_receive_frame_cb_method", "(JJJJJJ)V");
     toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
+    android_toxav_callback_video_receive_frame_h264_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_toxav_callback_video_receive_frame_h264_cb_method", "(JJ)V");
+    toxav_callback_video_receive_frame_h264(tox_av_global, toxav_video_receive_frame_h264_cb_, &mytox_CC);
     android_toxav_callback_call_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_call_state_cb_method", "(JI)V");
     toxav_callback_call_state(tox_av_global, toxav_call_state_cb_, &mytox_CC);
@@ -2325,6 +2503,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv *e
     COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz,
                    passphrase_j));
 }
+
 
 // -----------------
 // -----------------
@@ -2491,6 +2670,18 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
     return result;
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1connection_1status(JNIEnv *env, jobject thiz)
+{
+    if(tox_global == NULL)
+    {
+        dbg(9, "tox_self_get_connection_status:NULL:1");
+        return (jint)TOX_CONNECTION_NONE;
+    }
+
+    return (jint)(tox_self_get_connection_status(tox_global));
+}
 
 void Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(JNIEnv *env, jobject thiz)
 {
@@ -2809,12 +3000,17 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1messa
     long capacity = 0;
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    if(capacity < raw_msg_len)
+    {
+        return (jint)-4;
+    }
+
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     bool res = tox_util_friend_resend_message_v2(tox_global, (uint32_t) friend_number,
                (const uint8_t *)raw_message_buffer_c,
                (const uint32_t)raw_msg_len,
                &error);
-    (*env)->ReleaseStringUTFChars(env, raw_message_buffer, raw_message_buffer_c);
 
     if(res == false)
     {
@@ -2993,6 +3189,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEn
     else
     {
         dbg(9, "tox_friend_send_message");
+        return (jlong)(unsigned long long)res;
+    }
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1lossless_1packet(JNIEnv *env, jobject thiz,
+        jlong friend_number, jbyteArray data, jint data_length)
+{
+    jbyte *data2 = (*env)->GetByteArrayElements(env, data, 0);
+    TOX_ERR_FRIEND_CUSTOM_PACKET error;
+    uint32_t res = tox_friend_send_lossless_packet(tox_global, (uint32_t)friend_number, (const uint8_t *)data2,
+                   (size_t)data_length, &error);
+    (*env)->ReleaseByteArrayElements(env, data, data2, JNI_ABORT); /* abort to not copy back contents */
+
+    if(error != 0)
+    {
+        dbg(9, "tox_friend_send_lossless_packet:ERROR:%d", (int)error);
+        return (jlong)-99;
+    }
+    else
+    {
+        dbg(9, "tox_friend_send_lossless_packet");
         return (jlong)(unsigned long long)res;
     }
 }
@@ -3564,6 +3782,71 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1wrap(JNIEnv *env
     }
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1message_1pubkey(JNIEnv *env, jobject thiz,
+        jobject raw_message_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    jstring result = NULL;
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
+    bool res = tox_messagev2_get_sync_message_pubkey(raw_message_buffer_c, public_key);
+
+    if(res == false)
+    {
+        result = (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+    }
+    else
+    {
+        char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1]; // need this wrong size for next call
+        CLEAR(tox_id_hex);
+        toxid_bin_to_hex(public_key, tox_id_hex);
+        tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+        result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
+    }
+
+    return result;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1message_1type(JNIEnv *env, jobject thiz,
+        jobject raw_message_buffer)
+{
+    if(raw_message_buffer == NULL)
+    {
+        return (jlong)-1;
+    }
+
+    uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
+    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    uint32_t result = tox_messagev2_get_sync_message_type(raw_message_buffer_c);
+
+    if(result == UINT32_MAX)
+    {
+        return (jlong)-3;
+    }
+    else
+    {
+        return (jlong)result;
+    }
+}
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1id(JNIEnv *env, jobject thiz,
@@ -3628,7 +3911,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1ms(JNIE
 }
 
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1text(JNIEnv *env, jobject thiz,
         jobject raw_message_buffer, jlong raw_message_len,
         jint is_alter_msg,
@@ -3657,11 +3940,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
 
     if(res == true)
     {
-        return 0;
+        return (long)text_length;
     }
     else
     {
-        return 1;
+        return -3;
     }
 }
 
@@ -3727,6 +4010,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv *en
 
     cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
+    // dbg(0, "tox_conference_join:cookie length=%d", (int)capacity);
+    // dbg(0, "tox_conference_join:cookie start byte=%d", (int)cookie_buffer_c[0]);
+    // dbg(0, "tox_conference_join:cookie end byte=%d", (int)cookie_buffer_c[cookie_length - 1]);
     TOX_ERR_CONFERENCE_JOIN error;
     uint32_t res = tox_conference_join(tox_global, (uint32_t)friend_number, cookie_buffer_c, (size_t)cookie_length, &error);
 
@@ -3764,6 +4050,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv *en
         }
         else
         {
+            dbg(0, "tox_conference_join:*OTHER ERROR*");
             return (jlong)-99;
         }
     }
@@ -3847,6 +4134,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1type(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    if(tox_global == NULL)
+    {
+        return (jint)-2;
+    }
+
     TOX_ERR_CONFERENCE_GET_TYPE error;
     TOX_CONFERENCE_TYPE type = tox_conference_get_type(tox_global, (uint32_t)conference_number, &error);
 
@@ -3865,6 +4157,11 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
     jstring result;
     uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
     TOX_ERR_CONFERENCE_PEER_QUERY error;
@@ -3894,6 +4191,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1count(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     uint32_t res = tox_conference_peer_count(tox_global, (uint32_t)conference_number, &error);
 
@@ -3930,6 +4232,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name_1size(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     size_t res = tox_conference_peer_get_name_size(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, &error);
 
@@ -4026,6 +4333,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title_1size(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
     TOX_ERR_CONFERENCE_TITLE error;
     size_t res = tox_conference_get_title_size(tox_global, (uint32_t)conference_number, &error);
 
@@ -4073,6 +4385,11 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
     TOX_ERR_CONFERENCE_TITLE error;
     size_t length = tox_conference_get_title_size(tox_global, (uint32_t)conference_number, &error);
 
@@ -4155,6 +4472,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv *env, jobject thiz,
         jlong conference_number, jobject cookie_buffer)
 {
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
     uint8_t *cookie_buffer_c = NULL;
     long capacity = 0;
 
@@ -4310,6 +4632,21 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv
     // dbg(9, "toxav_video_send_frame:res=%d,error=%d", (int)res, (int)error);
     return (jint)error;
 }
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(JNIEnv *env, jobject thiz,
+        jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len)
+{
+    TOXAV_ERR_SEND_FRAME error;
+    bool res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                        (uint16_t)frame_height_px,
+                                        (uint8_t *)video_buffer_2,
+                                        (uint32_t)data_len, &error);
+
+    return (jint)error;
+}
+
 
 
 /**

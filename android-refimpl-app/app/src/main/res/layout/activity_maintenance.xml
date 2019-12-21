@@ -95,6 +95,26 @@
                 android:text="reset Bootstrapnodes to default"
                 android:textSize="14sp"/>
 
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_test_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="test Notification sound"
+                android:textSize="14sp"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_test_ringtone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="test Ringtone sound"
+                android:textSize="14sp"/>
+
             <TextView
                 android:id="@+id/text_sqlstats"
                 android:layout_width="match_parent"

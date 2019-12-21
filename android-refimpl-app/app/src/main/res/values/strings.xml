@@ -171,6 +171,26 @@
         <item>20</item>
     </string-array>
 
+    <string name="pref_title_X_battery_saving_timeout">Offline Time in Batterysavings mode</string>
+    <string name="pref_description_X_battery_saving_timeout">Default setting is 15 minutes</string>
+    <string-array name="X_battery_saving_timeout_titles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="X_battery_saving_timeout_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
 
     <string-array name="list_preference_entries">
         <item>Entry 1</item>
