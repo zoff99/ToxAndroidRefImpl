@@ -171,6 +171,26 @@
         <item>20</item>
     </string-array>
 
+    <string name="pref_title_X_battery_saving_timeout">省电模式下的离线时间</string>
+    <string name="pref_description_X_battery_saving_timeout">默认设置为 15 分钟</string>
+    <string-array name="X_battery_saving_timeout_titles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="X_battery_saving_timeout_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
 
     <string-array name="list_preference_entries">
         <item>项目 1</item>
