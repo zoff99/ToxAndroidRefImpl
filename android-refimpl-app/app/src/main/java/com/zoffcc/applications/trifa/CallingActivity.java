@@ -1040,7 +1040,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (PREF__use_H264_hw_encoding)
             {
                 prepareEncoder();
-                prepareDecoder();
+                // prepareDecoder();
             }
         }
         activity_state = 1;
@@ -1184,7 +1184,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (PREF__use_H264_hw_encoding)
             {
                 releaseEncoder();
-                releaseDecoder_h264();
+                // releaseDecoder_h264();
             }
         }
         sensor_manager.unregisterListener(this);
