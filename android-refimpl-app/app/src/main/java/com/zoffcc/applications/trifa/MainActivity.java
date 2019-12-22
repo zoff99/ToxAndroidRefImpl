@@ -391,6 +391,7 @@ public class MainActivity extends AppCompatActivity
     static Allocation alloc_in = null;
     static Allocation alloc_out = null;
     static Bitmap video_frame_image = null;
+    static boolean video_frame_image_valid = false;
     static int buffer_size_in_bytes = 0;
     // YUV conversion -------
 
@@ -2174,6 +2175,7 @@ public class MainActivity extends AppCompatActivity
 
         if (video_frame_image != null)
         {
+            video_frame_image_valid = false;
             video_frame_image.recycle();
             video_frame_image = null;
         }
@@ -2216,6 +2218,7 @@ public class MainActivity extends AppCompatActivity
         // --------- works !!!!! ---------
 
         video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
+        video_frame_image_valid = true;
     }
     // -- this is for incoming video --
     // -- this is for incoming video --
@@ -2595,10 +2598,13 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            alloc_in.copyFrom(video_buffer_1.array());
-            yuvToRgb.setInput(alloc_in);
-            yuvToRgb.forEach(alloc_out);
-            alloc_out.copyTo(video_frame_image);
+            if (video_frame_image_valid == true)
+            {
+                alloc_in.copyFrom(video_buffer_1.array());
+                yuvToRgb.setInput(alloc_in);
+                yuvToRgb.forEach(alloc_out);
+                alloc_out.copyTo(video_frame_image);
+            }
         }
         catch (Exception e)
         {
@@ -2612,7 +2618,10 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    CallingActivity.mContentView.setBitmap(video_frame_image);
+                    if (video_frame_image_valid == true)
+                    {
+                        CallingActivity.mContentView.setBitmap(video_frame_image);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -2825,7 +2834,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 Callstate.play_delay = comm_number;
-                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
+                // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
             }
         }
 
@@ -10893,7 +10902,8 @@ public class MainActivity extends AppCompatActivity
 
     static int toxav_video_send_frame_uv_reversed_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
     {
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding))
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding) &&
+            (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
             reverse_u_and_v_planes(buf, frame_width_px, frame_height_px);
             feed_h264_encoder(buf, frame_width_px, frame_height_px);
@@ -10910,7 +10920,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
                     {
-                        Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
+                        // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
 
                         MainActivity.video_buffer_2.rewind();
                         MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
@@ -10937,7 +10947,8 @@ public class MainActivity extends AppCompatActivity
 
     static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
     {
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding))
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding) &&
+            (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
             feed_h264_encoder(buf, frame_width_px, frame_height_px);
             h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
@@ -10953,7 +10964,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
                     {
-                        Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:2");
+                        // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:2");
 
                         MainActivity.video_buffer_2.rewind();
                         MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
