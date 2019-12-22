@@ -103,6 +103,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+import com.zoffcc.applications.trifa.CallingActivity.h264_decoder_output_data;
+import com.zoffcc.applications.trifa.CallingActivity.h264_encoder_output_data;
 
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
@@ -139,11 +141,16 @@ import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
+import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_decoder;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
+import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_decoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
+import static com.zoffcc.applications.trifa.CallingActivity.global_sps_pps_nal_unit_bytes;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
+import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
+import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
@@ -342,7 +349,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview buffer size!!
     static boolean PREF__set_fps = false;
-    static boolean PREF__fps_half = true;
+    static boolean PREF__fps_half = false;
     static boolean PREF__conference_show_system_messages = false;
     static boolean PREF__X_battery_saving_mode = false;
     static int PREF__X_battery_saving_timeout = 15; // in minutes
@@ -355,7 +362,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__X_eac_delay_ms = 60;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int PREF__X_audio_recording_frame_size = 60; // !! 120 seems to work best somehow !!
+    static int PREF__X_audio_recording_frame_size = 40; // !! 120 seems to work also !!
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
@@ -598,7 +605,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__fps_half = settings.getBoolean("fps_half", true);
+        PREF__fps_half = settings.getBoolean("fps_half", false);
         PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
         PREF__set_fps = settings.getBoolean("set_fps", false);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
@@ -868,12 +875,12 @@ public class MainActivity extends AppCompatActivity
         try
         {
             PREF__X_audio_recording_frame_size = Integer.parseInt(
-                    settings.getString("X_audio_recording_frame_size", "" + 60));
+                    settings.getString("X_audio_recording_frame_size", "" + 40));
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__X_audio_recording_frame_size = 60;
+            PREF__X_audio_recording_frame_size = 40;
         }
         // prefs ----------
 
@@ -1892,7 +1899,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__fps_half = settings.getBoolean("fps_half", true);
+        PREF__fps_half = settings.getBoolean("fps_half", false);
         PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
         PREF__set_fps = settings.getBoolean("set_fps", false);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
@@ -2051,12 +2058,12 @@ public class MainActivity extends AppCompatActivity
         try
         {
             PREF__X_audio_recording_frame_size = Integer.parseInt(
-                    settings.getString("X_audio_recording_frame_size", "" + 60));
+                    settings.getString("X_audio_recording_frame_size", "" + 40));
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__X_audio_recording_frame_size = 60;
+            PREF__X_audio_recording_frame_size = 40;
         }
 
         // prefs ----------
@@ -2617,6 +2624,30 @@ public class MainActivity extends AppCompatActivity
         if (main_handler_s != null)
         {
             main_handler_s.post(myRunnable);
+        }
+    }
+
+    static void android_toxav_callback_video_receive_frame_h264_cb_method(long friend_number, long buf_size)
+    {
+        // HINT: Disabled. this is now handled by c-toxcore. how nice.
+        if (1 == 2)
+        {
+            Log.i(TAG, "callback_video_receive_frame_h264_cb:arrayOffset=" + video_buffer_1.arrayOffset());
+            int off = video_buffer_1.arrayOffset();
+
+            Log.i(TAG, "callback_video_receive_frame_h264_cb:video_buffer_1:" +
+                       video_buffer_1.array()[off + ((int) buf_size) - 4] + " " +
+                       video_buffer_1.array()[off + ((int) buf_size) - 3] + " " +
+                       video_buffer_1.array()[off + ((int) buf_size) - 2] + " " +
+                       video_buffer_1.array()[off + ((int) buf_size) - 1]);
+
+            feed_h264_decoder(video_buffer_1.array(), buf_size, off);
+            h264_decoder_output_data buf_decoder_out = fetch_from_h264_decoder();
+            if (buf_decoder_out.data != null)
+            {
+                Log.i(TAG, "callback_video_receive_frame_h264_cb:decoded_data:len=" + buf_decoder_out.data.length +
+                           " data=" + buf_decoder_out.data);
+            }
         }
     }
 
@@ -10851,8 +10882,13 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
+    }
+
+    static void save_sps_pps_nal(byte[] sps_pps_nal_unit_bytes)
+    {
+        global_sps_pps_nal_unit_bytes = sps_pps_nal_unit_bytes;
     }
 
     static int toxav_video_send_frame_uv_reversed_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
@@ -10861,9 +10897,32 @@ public class MainActivity extends AppCompatActivity
         {
             reverse_u_and_v_planes(buf, frame_width_px, frame_height_px);
             feed_h264_encoder(buf, frame_width_px, frame_height_px);
-            byte[] buf_out = fetch_from_h264_encoder();
+            h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
+            byte[] buf_out = h264_out_data.data;
             if (buf_out != null)
             {
+                if (h264_out_data.sps_pps != null)
+                {
+                    save_sps_pps_nal(h264_out_data.sps_pps);
+                }
+
+                if (global_sps_pps_nal_unit_bytes != null)
+                {
+                    if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                    {
+                        Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
+
+                        MainActivity.video_buffer_2.rewind();
+                        MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
+                        toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                                    global_sps_pps_nal_unit_bytes.length);
+
+                        send_sps_pps_every_x_frames_current = 0;
+                    }
+
+                    send_sps_pps_every_x_frames_current++;
+                }
+
                 MainActivity.video_buffer_2.rewind();
                 MainActivity.video_buffer_2.put(buf_out);
                 toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
@@ -10881,9 +10940,32 @@ public class MainActivity extends AppCompatActivity
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding))
         {
             feed_h264_encoder(buf, frame_width_px, frame_height_px);
-            byte[] buf_out = fetch_from_h264_encoder();
+            h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
+            byte[] buf_out = h264_out_data.data;
             if (buf_out != null)
             {
+                if (h264_out_data.sps_pps != null)
+                {
+                    save_sps_pps_nal(h264_out_data.sps_pps);
+                }
+
+                if (global_sps_pps_nal_unit_bytes != null)
+                {
+                    if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                    {
+                        Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:2");
+
+                        MainActivity.video_buffer_2.rewind();
+                        MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
+                        toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                                    global_sps_pps_nal_unit_bytes.length);
+
+                        send_sps_pps_every_x_frames_current = 0;
+                    }
+
+                    send_sps_pps_every_x_frames_current++;
+                }
+
                 MainActivity.video_buffer_2.rewind();
                 MainActivity.video_buffer_2.put(buf_out);
                 toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);

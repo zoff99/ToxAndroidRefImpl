@@ -59,6 +59,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
@@ -155,6 +156,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static int video_encoder_width = 64;
     private static int video_encoder_height = 64;
     private static int v_bitrate_bits_per_second = 20 * 1000; // video bitrate <n> bps, in bits per second
+    public static byte[] global_sps_pps_nal_unit_bytes = null;
+    public static int send_sps_pps_every_x_frames_current = 0;
+    public static int send_sps_pps_every_x_frames = 20;
+
+    private static MediaCodec.BufferInfo mBufferInfo_h264_decoder;
+    private static MediaCodec mDecoder_h264;
+    private static MediaFormat video_decoder_h264_format = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -1032,6 +1040,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (PREF__use_H264_hw_encoding)
             {
                 prepareEncoder();
+                prepareDecoder();
             }
         }
         activity_state = 1;
@@ -1175,6 +1184,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (PREF__use_H264_hw_encoding)
             {
                 releaseEncoder();
+                releaseDecoder_h264();
             }
         }
         sensor_manager.unregisterListener(this);
@@ -1769,8 +1779,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
     }
 
+    // ------------ H264 EN-coder ------------
+    // ------------ H264 EN-coder ------------
+    // ------------ H264 EN-coder ------------
 
     /* Use this method to provide YUV420 buffers for encoding */
+    static class h264_encoder_output_data
+    {
+        byte[] data;
+        byte[] sps_pps;
+    }
+
     public static void feed_h264_encoder(byte[] buf, int frame_width_px, int frame_height_px)
     {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
@@ -1785,10 +1804,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 v_bitrate_bps = VIDEO_ENCODER_MAX_BITRATE_MED * 1000;
             }
-            else
-            {
-
-            }
 
             reconfigure_h264_encoder(v_bitrate_bps, frame_width_px, frame_height_px);
 
@@ -1800,12 +1815,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 if (inputBufferIndex >= 0)
                 {
                     /* Get input buffer and fill it with our input */
-                    ByteBuffer inputBuffer = null;
-                    inputBuffer = mEncoder.getInputBuffer(inputBufferIndex);
+                    ByteBuffer inputBuffer = mEncoder.getInputBuffer(inputBufferIndex);
                     inputBuffer.clear();
                     inputBuffer.put(buf);
                     /* Enqueue buffer */
-                    Log.d(TAG, "feed_h264_encoder:Enqueued input index: " + inputBufferIndex);
+                    // Log.d(TAG, "feed_h264_encoder:Enqueued input index: " + inputBufferIndex);
 
                     long ptsUsec = computePresentationTime(1); // TODO: make good
                     mEncoder.queueInputBuffer(inputBufferIndex, 0, buf.length, ptsUsec, 0);
@@ -1822,33 +1836,58 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
     }
 
-
-    public static byte[] fetch_from_h264_encoder()
+    public static h264_encoder_output_data fetch_from_h264_encoder()
     {
+        h264_encoder_output_data ret = new h264_encoder_output_data();
+        ret.data = null;
+        ret.sps_pps = null;
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
         {
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-            int encoderStatus = mEncoder.dequeueOutputBuffer(info,
-                                                             1000); // Dequeue an output buffer, block at most "timeoutUs" microseconds.
+            int encoderStatus = MediaCodec.INFO_TRY_AGAIN_LATER;
+
+            try
+            {
+                if (mEncoder == null)
+                {
+                    return ret;
+                }
+                encoderStatus = mEncoder.dequeueOutputBuffer(info,
+                                                             10000); // Dequeue an output buffer, block at most "timeoutUs" microseconds.
+            }
+            catch (Exception e)
+            {
+                // e.printStackTrace();
+                return ret;
+            }
 
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER)
             {
                 // no output available yet
-                Log.d(TAG, "fetch_from_h264_encoder:no output from encoder available");
-                return null;
+                // Log.d(TAG, "fetch_from_h264_encoder:no output from encoder available");
+                return ret;
             }
             else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
             {
                 // not expected for an encoder
+                Log.d(TAG, "fetch_from_h264_encoder:old_format: " + video_encoder_format);
                 MediaFormat newFormat = mEncoder.getOutputFormat();
-                Log.d(TAG, "fetch_from_h264_encoder:encoder output video_encoder_format changed: " + newFormat);
-                return null;
+                Log.d(TAG, "fetch_from_h264_encoder:new_format: " + newFormat);
+                ByteBuffer csd0 = newFormat.getByteBuffer("csd-0");
+                ByteBuffer csd1 = newFormat.getByteBuffer("csd-1");
+                System.out.println("fetch_from_h264_encoder:csd-0:len=" + csd0.limit());
+                System.out.println("fetch_from_h264_encoder:csd-1:len=" + csd1.limit());
+
+                video_encoder_format = newFormat;
+
+                return ret;
             }
             else if (encoderStatus < 0)
             {
-                Log.d(TAG,
-                      "fetch_from_h264_encoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
-                return null;
+                // Log.d(TAG,
+                //      "fetch_from_h264_encoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
+                return ret;
             }
             else // encoderStatus >= 0
             {
@@ -1856,12 +1895,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 ByteBuffer compressed = mEncoder.getOutputBuffer(encoderStatus);
                 if (compressed == null)
                 {
-                    Log.d(TAG, "fetch_from_h264_encoder:encoderOutputBuffer " + encoderStatus + " was null");
-                    return null;
+                    // Log.d(TAG, "fetch_from_h264_encoder:encoderOutputBuffer " + encoderStatus + " was null");
+                    return ret;
                 }
                 else
                 {
-                    Log.d(TAG, "fetch_from_h264_encoder:Dequeue output index: " + encoderStatus);
+                    // Log.d(TAG, "fetch_from_h264_encoder:Dequeue output index: " + encoderStatus);
                     // It's usually necessary to adjust the ByteBuffer values to match BufferInfo.
                     compressed.position(info.offset);
                     compressed.limit(info.offset + info.size);
@@ -1870,7 +1909,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     compressed.get(arr);
                     compressed.position(info.offset);
 
-
                     if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)
                     {
                         // Codec config info.  Only expected on first packet.  One way to
@@ -1878,6 +1916,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         // and pass that to configure().  We do that here to exercise the API.
                         //**// MediaFormat video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
                         //**// video_encoder_format.setByteBuffer("csd-0", compressed);
+                        //
+                        // --> "csd-0" or SPS/PPS data
+                        //
+                        ret.sps_pps = arr;
+                        System.out.println(
+                                "fetch_from_h264_encoder:SPS_PPS:len=" + arr.length + " data=" + arr.toString());
                     }
                     else
                     {
@@ -1886,7 +1930,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     /* Release MediaCodec buffer */
                     mEncoder.releaseOutputBuffer(encoderStatus, false);
-                    return arr;
+                    ret.data = arr;
+                    return ret;
                 }
             }
         }
@@ -1895,7 +1940,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             // TODO: do something here?
         }
 
-        return null;
+        return ret;
     }
 
     /**
@@ -1909,7 +1954,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     static void reconfigure_h264_encoder(int bitrate_bits_per_second, int width, int height)
     {
-        if ((video_encoder_width != width) || (video_encoder_height != height) || (v_bitrate_bits_per_second != bitrate_bits_per_second))
+        if ((video_encoder_width != width) || (video_encoder_height != height) ||
+            (v_bitrate_bits_per_second != bitrate_bits_per_second))
         {
             releaseEncoder();
             video_encoder_width = width;
@@ -1946,9 +1992,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                             MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
             video_encoder_format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
             video_encoder_format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
-            video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 1);
-            video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
-            video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3);
+            //**// video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 1);
+            // video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
+            // video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3);
 
             Log.d(TAG, "prepareEncoder:video_encoder_format: " + video_encoder_format);
 
@@ -1993,7 +2039,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // should happen before receiving buffers, and should only happen once
                 MediaFormat newFormat = mEncoder.getOutputFormat();
                 Log.d(TAG, "drainEncoder:encoder output video_encoder_format changed: " + newFormat);
-
             }
             else if (encoderStatus < 0)
             {
@@ -2026,7 +2071,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                 mEncoder.releaseOutputBuffer(encoderStatus, false);
 
-                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0)
+                if ((mBufferInfo.flags & BUFFER_FLAG_END_OF_STREAM) != 0)
                 {
                     Log.w(TAG, "drainEncoder:reached end of stream unexpectedly");
                     break;      // out of while
@@ -2081,6 +2126,311 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         }
     }
+
+    // ------------ H264 EN-coder ------------
+    // ------------ H264 EN-coder ------------
+    // ------------ H264 EN-coder ------------
+
+
+    // ------------ H264 Decoder ------------
+    // ------------ H264 Decoder ------------
+    // ------------ H264 Decoder ------------
+
+    public static void feed_h264_decoder(final byte[] buf, final long buf_size, final int offset)
+    {
+        if ((buf != null) && (buf_size > 0))
+        {
+            if (buf_size > 30)
+            {
+                Log.d(TAG,
+                      "feed_h264_decoder:buf=: " + buf[offset + 0] + " " + buf[offset + 1] + " " + buf[offset + 2] +
+                      " " + buf[offset + 3] + " " + buf[offset + 4] + " " + buf[offset + 5] + " H " +
+                      buf[offset + (int) buf_size - 2] + " " + buf[offset + (int) buf_size - 1]);
+            }
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+            {
+                /* Find an unallocated input buffer to store food */
+                try
+                {
+                    int inputBufferIndex = mDecoder_h264.dequeueInputBuffer(
+                            0); // This method will return immediately if timeoutUs == 0
+                    if (inputBufferIndex >= 0)
+                    {
+                        /* Get input buffer and fill it with our input */
+                        ByteBuffer inputBuffer = mDecoder_h264.getInputBuffer(inputBufferIndex);
+                        inputBuffer.clear();
+                        inputBuffer.put(buf);
+                        /* Enqueue buffer */
+                        Log.d(TAG, "feed_h264_decoder:Enqueued input index: " + inputBufferIndex);
+
+                        long ptsUsec = computePresentationTime(1); // TODO: make good
+                        mDecoder_h264.queueInputBuffer(inputBufferIndex, offset, (int) buf_size, ptsUsec, 0);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.d(TAG, "feed_h264_decoder:Get free buffer failed");
+                }
+            }
+            else
+            {
+                // TODO: do something here?
+            }
+        }
+    }
+
+    static class h264_decoder_output_data
+    {
+        byte[] data;
+        int frame_width;
+        int frame_height;
+    }
+
+    public static h264_decoder_output_data fetch_from_h264_decoder()
+    {
+        h264_decoder_output_data ret = new h264_decoder_output_data();
+        ret.data = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+            int decoderStatus = MediaCodec.INFO_TRY_AGAIN_LATER;
+
+            try
+            {
+                if (mDecoder_h264 == null)
+                {
+                    return ret;
+                }
+                decoderStatus = mDecoder_h264.dequeueOutputBuffer(info,
+                                                                  10000); // Dequeue an output buffer, block at most "timeoutUs" microseconds.
+            }
+            catch (Exception e)
+            {
+                // e.printStackTrace();
+                Log.d(TAG, "fetch_from_h264_decoder:dequeueOutputBuffer:EE:" + e.getMessage());
+                return ret;
+            }
+
+            if (info.flags == BUFFER_FLAG_END_OF_STREAM)
+            {
+                Log.d(TAG, "fetch_from_h264_decoder:flags: BUFFER_FLAG_END_OF_STREAM");
+            }
+            else
+            {
+                Log.d(TAG, "fetch_from_h264_decoder:flags: " + info.flags);
+            }
+
+            if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER)
+            {
+                // no output available yet
+                Log.d(TAG, "fetch_from_h264_decoder:no output from decoder available");
+                return ret;
+            }
+            else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
+            {
+                // not expected for an decoder
+                Log.d(TAG, "fetch_from_h264_decoder:old_format: " + video_decoder_h264_format);
+                MediaFormat newFormat = mDecoder_h264.getOutputFormat();
+                Log.d(TAG, "fetch_from_h264_decoder:new_format: " + newFormat);
+                ByteBuffer csd0 = newFormat.getByteBuffer("csd-0");
+                ByteBuffer csd1 = newFormat.getByteBuffer("csd-1");
+                System.out.println("fetch_from_h264_decoder:csd-0:len=" + csd0.limit());
+                System.out.println("fetch_from_h264_decoder:csd-1:len=" + csd1.limit());
+
+                video_decoder_h264_format = newFormat;
+
+                return ret;
+            }
+            else if (decoderStatus < 0)
+            {
+                // Log.d(TAG,
+                //      "fetch_from_h264_decoder:unexpected result from decoder.dequeueOutputBuffer: " + decoderStatus);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                {
+                    Log.d(TAG, "fetch_from_h264_decoder:getMetrics=" + mDecoder_h264.getMetrics());
+                }
+
+                return ret;
+            }
+            else // encoderStatus >= 0
+            {
+                /* Compressed frame is ready! */
+                ByteBuffer compressed = mDecoder_h264.getOutputBuffer(decoderStatus);
+                if (compressed == null)
+                {
+                    Log.d(TAG, "fetch_from_h264_decoder:decoderOutputBuffer " + decoderStatus + " was null");
+                    return ret;
+                }
+                else
+                {
+                    Log.d(TAG, "fetch_from_h264_decoder:Dequeue output index: " + decoderStatus);
+                    // It's usually necessary to adjust the ByteBuffer values to match BufferInfo.
+                    compressed.position(info.offset);
+                    compressed.limit(info.offset + info.size);
+                    /* Copy to byte array for further processing */
+                    byte[] arr = new byte[compressed.remaining()];
+                    compressed.get(arr);
+                    compressed.position(info.offset);
+
+                    /* Release MediaCodec buffer */
+                    mDecoder_h264.releaseOutputBuffer(decoderStatus, false);
+                    ret.data = arr;
+                    return ret;
+                }
+            }
+        }
+        else
+        {
+            // TODO: do something here?
+        }
+
+        return ret;
+    }
+
+    /**
+     * Configures the H264 decoder
+     */
+    static void prepareDecoder()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+            mBufferInfo_h264_decoder = new MediaCodec.BufferInfo();
+            video_decoder_h264_format = MediaFormat.createVideoFormat(MIME_TYPE, 480, 640);
+
+            // byte[] header_sps = {0x00, 0x00, 0x00, 0x01, 0x67, 0x42, (byte) 0x80, 0x0C, (byte) 0xE4, 0x40, (byte) 0xA0, (byte) 0xFD, 0x00, (byte) 0xDA, 0x14, 0x26, (byte) 0xA0};
+            // byte[] header_pps = {0x00, 0x00, 0x00, 0x01, 0x68, (byte) 0xCE, 0x38, (byte) 0x80};
+            // video_decoder_h264_format.setByteBuffer("csd-0", ByteBuffer.wrap(header_sps));
+            // video_decoder_h264_format.setByteBuffer("csd-1", ByteBuffer.wrap(header_pps));
+            // video_decoder_h264_format.setInteger(MediaFormat.KEY_BIT_RATE, 10 * 1000);
+            // video_decoder_h264_format.setInteger(MediaFormat.KEY_FRAME_RATE, 15);
+            Log.d(TAG, "prepareDecoder:video_decoder_format: " + video_decoder_h264_format);
+
+            try
+            {
+                mDecoder_h264 = MediaCodec.createDecoderByType(MIME_TYPE);
+                Log.d(TAG, "prepareDecoder:SUCCESS: " + mDecoder_h264.getCodecInfo());
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                Log.d(TAG, "prepareDecoder:EE1: " + e.getMessage());
+            }
+            mDecoder_h264.configure(video_decoder_h264_format, null, null, 0);
+            mDecoder_h264.start();
+        }
+    }
+
+    /**
+     * Extracts all pending data from the decoder.
+     */
+    private static void drainDecoder_h264()
+    {
+        final int TIMEOUT_USEC = 10000;
+        Log.d(TAG, "drainDecoder_h264:start");
+
+        ByteBuffer[] decoderOutputBuffers = mDecoder_h264.getOutputBuffers();
+        while (true)
+        {
+            int decoderStatus = mDecoder_h264.dequeueOutputBuffer(mBufferInfo_h264_decoder, TIMEOUT_USEC);
+            if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER)
+            {
+                break;      // out of while
+            }
+            else if (decoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED)
+            {
+                // not expected for an encoder
+                decoderOutputBuffers = mDecoder_h264.getOutputBuffers();
+            }
+            else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
+            {
+                // should happen before receiving buffers, and should only happen once
+                MediaFormat newFormat = mDecoder_h264.getOutputFormat();
+                Log.d(TAG, "drainEncoder:decoder output video_encoder_format changed: " + newFormat);
+            }
+            else if (decoderStatus < 0)
+            {
+                Log.w(TAG, "drainEncoder:unexpected result from decoder.dequeueOutputBuffer: " + decoderStatus);
+                // let's ignore it
+            }
+            else
+            {
+                ByteBuffer decodedData = decoderOutputBuffers[decoderStatus];
+                if (decodedData == null)
+                {
+                    throw new RuntimeException("drainEncoder:decoderOutputBuffer " + decoderStatus + " was null");
+                }
+
+                if ((mBufferInfo_h264_decoder.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)
+                {
+                    // The codec config data was pulled out and fed to the muxer when we got
+                    // the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
+                    Log.d(TAG, "drainEncoder:ignoring BUFFER_FLAG_CODEC_CONFIG");
+                    mBufferInfo_h264_decoder.size = 0;
+                }
+
+                mDecoder_h264.releaseOutputBuffer(decoderStatus, false);
+
+                if ((mBufferInfo_h264_decoder.flags & BUFFER_FLAG_END_OF_STREAM) != 0)
+                {
+                    Log.w(TAG, "drainEncoder:reached end of stream unexpectedly");
+                    break;      // out of while
+                }
+            }
+        }
+    }
+
+    /**
+     * Releases decoder resources.  May be called after partial / failed initialization.
+     */
+    private static void releaseDecoder_h264()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+            Log.d(TAG, "releaseDecoder_h264:start ...");
+            if (mDecoder_h264 != null)
+            {
+                try
+                {
+                    drainDecoder_h264();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    mDecoder_h264.stop();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    mDecoder_h264.release();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                mDecoder_h264 = null;
+                Log.d(TAG, "releaseDecoder_h264:SUCCESS");
+            }
+            else
+            {
+                Log.d(TAG, "releaseDecoder_h264:already released");
+            }
+        }
+    }
+
+    // ------------ H264 Decoder ------------
+    // ------------ H264 Decoder ------------
+    // ------------ H264 Decoder ------------
 
     static void stop_ringtone()
     {
