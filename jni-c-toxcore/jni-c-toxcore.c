@@ -53,7 +53,7 @@
 #include <vpx/vpx_image.h>
 #include <sys/mman.h>
 
-// #define AV_MEDIACODEC 1
+#define AV_MEDIACODEC 1
 
 #ifdef AV_MEDIACODEC
 #include <libavcodec/jni.h>
@@ -2056,8 +2056,21 @@ void toxav_video_receive_frame_h264_cb_(ToxAV *av, uint32_t friend_number, const
     {
         if((buf) && (buf_size > 0))
         {
-            memset(video_buffer_1, 0, video_buffer_1_size);
+            // memset(video_buffer_1, 0, video_buffer_1_size);
             memcpy(video_buffer_1, buf, (size_t)(buf_size));
+            if (buf_size > 8)
+            {
+                dbg(9, "v_receive_frame_h264_cb:size=%d", buf_size);
+                dbg(9, "v_receive_frame_h264_cb:%d %d %d %d %d %d h %d %d",
+                    video_buffer_1[0],
+                    video_buffer_1[1],
+                    video_buffer_1[2],
+                    video_buffer_1[3],
+                    video_buffer_1[4],
+                    video_buffer_1[5],
+                    video_buffer_1[buf_size-2],
+                    video_buffer_1[buf_size-1]);
+            }
         }
     }
 
@@ -2395,9 +2408,16 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_video_receive_frame_cb_method", "(JJJJJJ)V");
     toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
+
+    // --------------------
+    // --------------------
     android_toxav_callback_video_receive_frame_h264_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_video_receive_frame_h264_cb_method", "(JJ)V");
-    toxav_callback_video_receive_frame_h264(tox_av_global, toxav_video_receive_frame_h264_cb_, &mytox_CC);
+    // toxav_callback_video_receive_frame_h264(tox_av_global, toxav_video_receive_frame_h264_cb_, &mytox_CC);
+    // --------------------
+    // --------------------
+
+
     android_toxav_callback_call_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_call_state_cb_method", "(JI)V");
     toxav_callback_call_state(tox_av_global, toxav_call_state_cb_, &mytox_CC);
