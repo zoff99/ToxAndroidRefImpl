@@ -147,8 +147,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static View video_box_left_top_01 = null;
     static View video_box_right_top_01 = null;
     final static String MIME_TYPE = "video/avc";   // H.264 Advanced Video Coding
-    final static int FRAME_RATE = 15;              // ~15fps
-    final static int IFRAME_INTERVAL = 5;          // 5 seconds between I-frames
+    final static int FRAME_RATE = 25;              // ~25fps
+    final static int IFRAME_INTERVAL = 6;          // 6 seconds between I-frames
     private static MediaCodec.BufferInfo mBufferInfo;
     private static MediaCodec mEncoder;
     private static MediaPlayer mMediaPlayer = null;
@@ -1894,7 +1894,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     /* Enqueue buffer */
                     // Log.d(TAG, "feed_h264_encoder:Enqueued input index: " + inputBufferIndex);
 
-                    long ptsUsec = computePresentationTime(1); // TODO: make good
+                    long ptsUsec = computePresentationTime();
                     mEncoder.queueInputBuffer(inputBufferIndex, 0, buf.length, ptsUsec, 0);
                 }
             }
@@ -2019,10 +2019,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     /**
      * Generates the presentation time for frame N, in microseconds.
      */
-    private static long computePresentationTime(int frameIndex)
+    private static long computePresentationTime()
     {
-        final int FRAME_RATE = 15;
-        return 132 + frameIndex * 1000000 / FRAME_RATE;
+        // Log.i(TAG, "computePresentationTime:" + (System.currentTimeMillis() * 1000));
+        return (System.currentTimeMillis() * 1000);
     }
 
     static void reconfigure_h264_encoder(int bitrate_bits_per_second, int width, int height)
@@ -2055,6 +2055,42 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
 
+            /**
+             {
+             mime=video/avc,
+             width=480,
+             height=640,
+             bitrate=120000,
+             max-bitrate=120000,
+             frame-rate=25,
+             opaque_handle=0,
+             csd-0=java.nio.HeapByteBuffer[pos=0 lim=13 cap=13]
+             csd-1=java.nio.HeapByteBuffer[pos=0 lim=8 cap=8],
+             vendor.rtc-ext-enc-base-layer-pid=0,
+             vendor.rtc-ext-enc-bitrate-mode=120000,
+             vendor.rtc-ext-enc-caps-ltr.max-count=4,
+             vendor.rtc-ext-enc-caps-preprocess.max-downscale-factor=0,
+             vendor.rtc-ext-enc-caps-preprocess.rotation=0,
+             vendor.rtc-ext-enc-caps-temporal-layers.max-b-count=6,
+             vendor.rtc-ext-enc-caps-temporal-layers.max-p-count=7,
+             vendor.rtc-ext-enc-caps-vt-driver-version.number=180315
+             vendor.rtc-ext-enc-custom-profile-level.level=1,
+             vendor.rtc-ext-enc-custom-profile-level.profile=1,
+             vendor.rtc-ext-enc-low-latency.enable=0,
+             vendor.rtc-ext-enc-ltr-count.num-ltr-frames=0,
+             vendor.rtc-ext-enc-sar.height=0,
+             vendor.rtc-ext-enc-sar.width=0,
+             vendor.rtc-ext-enc-slice.spacing=0,
+             vendor.sec-ext-enc-qp-range.B-maxQP=50,
+             vendor.sec-ext-enc-qp-range.B-minQP=5,
+             vendor.sec-ext-enc-qp-range.I-maxQP=50,
+             vendor.sec-ext-enc-qp-range.I-minQP=5,
+             vendor.sec-ext-enc-qp-range.P-maxQP=50,
+             vendor.sec-ext-enc-qp-range.P-minQP=5,
+             }
+              *
+              */
+
             mBufferInfo = new MediaCodec.BufferInfo();
             video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, video_encoder_width, video_encoder_height);
             video_encoder_format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
@@ -2077,6 +2113,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             video_encoder_format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
             //
             // -----------------------------------------------------------------------------
+
+            // -- vendor extensions --
+            // video_encoder_format.setInteger("vendor.rtc-ext-enc-low-latency.enable",1);
+            // video_encoder_format.setInteger("vendor.rtc-ext-enc-caps-temporal-layers.max-b-count",1);
+            // video_encoder_format.setInteger("vendor.rtc-ext-enc-caps-temporal-layers.max-p-count",1);
+            // -- vendor extensions --
+
             video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
             video_encoder_format.setInteger(MediaFormat.KEY_BITRATE_MODE,
                                             MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
@@ -2099,6 +2142,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             mEncoder.configure(video_encoder_format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mEncoder.start();
+
+            // feed 2 dummy frame for less latency ----------------------------------------
+            // int size_dummy = (video_encoder_width * video_encoder_width) * 3 / 2;
+            // byte[] buf_dummy = new byte[size_dummy];
+            // feed_h264_encoder(buf_dummy, video_encoder_width, video_encoder_height);
+            // feed_h264_encoder(buf_dummy, video_encoder_width, video_encoder_height);
+            // feed 2 dummy frame for less latency ----------------------------------------
         }
     }
 
@@ -2253,7 +2303,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         /* Enqueue buffer */
                         Log.d(TAG, "feed_h264_decoder:Enqueued input index: " + inputBufferIndex);
 
-                        long ptsUsec = computePresentationTime(1); // TODO: make good
+                        long ptsUsec = computePresentationTime(); // TODO: make good
                         mDecoder_h264.queueInputBuffer(inputBufferIndex, offset, (int) buf_size, ptsUsec, 0);
                     }
                 }
