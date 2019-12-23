@@ -163,6 +163,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static MediaCodec.BufferInfo mBufferInfo_h264_decoder;
     private static MediaCodec mDecoder_h264;
     private static MediaFormat video_decoder_h264_format = null;
+    private DetectHeadset dh = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -171,7 +172,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
 
+        dh = new DetectHeadset(this);
+
         setContentView(R.layout.activity_calling);
+
+        top_text_line = (TextView) findViewById(R.id.top_text_line);
+        accept_button = (ImageButton) findViewById(R.id.accept_button);
+        decline_button = (ImageButton) findViewById(R.id.decline_button);
+        camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
+        mute_button = (ImageButton) findViewById(R.id.mute_button);
+        audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
+        misc_button = (ImageButton) findViewById(R.id.misc_button);
+        misc_button_pad = (TextView) findViewById(R.id.misc_button_pad);
 
         if (PREF__window_security)
         {
@@ -213,6 +225,36 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         catch (Exception ee)
         {
             ee.printStackTrace();
+        }
+
+        // Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        // audio_device_icon.setImageDrawable(null);
+        audio_device_icon.setVisibility(View.VISIBLE);
+
+        try
+        {
+            if (dh._Detect())
+            {
+                // headset plugged in
+                Log.i(TAG, "onReceive:headset:plugged in");
+                manager.setSpeakerphoneOn(false);
+                manager.setWiredHeadsetOn(true);
+                Callstate.audio_device = 1;
+                Callstate.audio_speaker = false;
+                update_audio_device_icon();
+                manager.setBluetoothScoOn(false);
+            }
+            else
+            {
+                audio_device_icon.setImageDrawable(null);
+                Log.i(TAG, "onReceive:headset:setImageDrawable:null1");
+            }
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+            audio_device_icon.setImageDrawable(null);
+            Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
         }
         // set volume control -------------
 
@@ -525,15 +567,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-        top_text_line = (TextView) findViewById(R.id.top_text_line);
-        accept_button = (ImageButton) findViewById(R.id.accept_button);
-        decline_button = (ImageButton) findViewById(R.id.decline_button);
-        camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
-        mute_button = (ImageButton) findViewById(R.id.mute_button);
-        audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
-        misc_button = (ImageButton) findViewById(R.id.misc_button);
-        misc_button_pad = (TextView) findViewById(R.id.misc_button_pad);
-
         if (PREF__X_misc_button_enabled)
         {
             misc_button.setVisibility(View.VISIBLE);
@@ -600,9 +633,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             misc_button.setVisibility(View.GONE);
             misc_button_pad.setVisibility(View.GONE);
         }
-
-        // Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        audio_device_icon.setImageDrawable(null);
 
         final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(
                 Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
@@ -1570,7 +1600,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     try
                     {
-                        if (!audio_manager_s.isWiredHeadsetOn())
+                        if (!dh._Detect())
                         {
                             AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                             audioManager.setSpeakerphoneOn(false);
@@ -1659,7 +1689,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     try
                     {
-                        if (!audio_manager_s.isWiredHeadsetOn())
+                        if (!dh._Detect())
                         {
                             audio_manager_s.setSpeakerphoneOn(true);
                             Log.i(TAG, "onSensorChanged:setSpeakerphoneOn(true)");
@@ -1737,12 +1767,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
+                    Log.i(TAG, "update_audio_device_icon:enter");
+
                     if (Callstate.audio_device == 0)
                     {
+                        Log.i(TAG, "update_audio_device_icon:clear");
                         audio_device_icon.setImageDrawable(null);
                     }
                     else if (Callstate.audio_device == 1)
                     {
+                        Log.i(TAG, "update_audio_device_icon:headset");
                         Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(
                                 Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(
                                 80);
@@ -1750,6 +1784,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     }
                     else if (Callstate.audio_device == 2)
                     {
+                        Log.i(TAG, "update_audio_device_icon:bluetooth");
                         Drawable d4 = new IconicsDrawable(ca).icon(
                                 GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
                                 ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
@@ -1757,11 +1792,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     }
                     else // audio_device == ??
                     {
+                        Log.i(TAG, "update_audio_device_icon:null");
                         audio_device_icon.setImageDrawable(null);
                     }
                 }
                 catch (Exception e)
                 {
+                    Log.i(TAG, "update_audio_device_icon:EE:" + e.getMessage());
                 }
             }
         };

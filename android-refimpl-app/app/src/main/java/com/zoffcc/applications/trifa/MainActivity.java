@@ -129,6 +129,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
@@ -264,6 +265,7 @@ public class MainActivity extends AppCompatActivity
     static String app_files_directory = "";
     // static boolean stop_me = false;
     // static Thread ToxServiceThread = null;
+    static Semaphore semaphore_videoout_bitmap = new Semaphore(1);
     Handler main_handler = null;
     static Handler main_handler_s = null;
     static Context context_s = null;
@@ -2168,6 +2170,20 @@ public class MainActivity extends AppCompatActivity
     // -- this is for incoming video --
     static void allocate_video_buffer_1(int frame_width_px1, int frame_height_px1, long ystride, long ustride, long vstride)
     {
+        try
+        {
+            //Log.i("semaphore_01","acquire:01");
+            semaphore_videoout_bitmap.acquire();
+            //Log.i("semaphore_01","acquire:01:OK");
+        }
+        catch (InterruptedException e)
+        {
+            //Log.i("semaphore_01","release:01");
+            semaphore_videoout_bitmap.release();
+            //Log.i("semaphore_01","release:01:OK");
+            return;
+        }
+
         if (video_buffer_1 != null)
         {
             video_buffer_1 = null;
@@ -2176,7 +2192,10 @@ public class MainActivity extends AppCompatActivity
         if (video_frame_image != null)
         {
             video_frame_image_valid = false;
-            video_frame_image.recycle();
+            if (!video_frame_image.isRecycled())
+            {
+                video_frame_image.recycle();
+            }
             video_frame_image = null;
         }
 
@@ -2218,7 +2237,19 @@ public class MainActivity extends AppCompatActivity
         // --------- works !!!!! ---------
 
         video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
-        video_frame_image_valid = true;
+        if (video_frame_image == null)
+        {
+            video_frame_image_valid = false;
+            video_buffer_1 = null;
+        }
+        else
+        {
+            video_frame_image_valid = true;
+        }
+
+        //Log.i("semaphore_01","release:02");
+        semaphore_videoout_bitmap.release();
+        //Log.i("semaphore_01","relase:02:OK");
     }
     // -- this is for incoming video --
     // -- this is for incoming video --
@@ -2598,17 +2629,47 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            if (video_frame_image_valid == true)
+            try
+            {
+                //Log.i("semaphore_01","acquire:05");
+                semaphore_videoout_bitmap.acquire();
+                //Log.i("semaphore_01","acquire:05:OK");
+            }
+            catch (InterruptedException e)
+            {
+                //Log.i("semaphore_01","release:05");
+                semaphore_videoout_bitmap.release();
+                //Log.i("semaphore_01","release:05:OK");
+                return;
+            }
+
+            if ((video_frame_image_valid == true) && (video_frame_image != null))
             {
                 alloc_in.copyFrom(video_buffer_1.array());
                 yuvToRgb.setInput(alloc_in);
                 yuvToRgb.forEach(alloc_out);
-                alloc_out.copyTo(video_frame_image);
+                if (!video_frame_image.isRecycled())
+                {
+                    alloc_out.copyTo(video_frame_image);
+                }
             }
+
+            //Log.i("semaphore_01","release:06");
+            semaphore_videoout_bitmap.release();
+            //Log.i("semaphore_01","release:06:OK");
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            try
+            {
+                //Log.i("semaphore_01","release:07");
+                semaphore_videoout_bitmap.release();
+                //Log.i("semaphore_01","release:07:OK");
+            }
+            catch(Exception e2)
+            {
+            }
         }
 
         Runnable myRunnable = new Runnable()
@@ -2618,14 +2679,35 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
+                    try
+                    {
+                        //Log.i("semaphore_01","acquire:08");
+                        semaphore_videoout_bitmap.acquire();
+                        //Log.i("semaphore_01","acquire:08:OK");
+                    }
+                    catch (InterruptedException e)
+                    {
+                        //Log.i("semaphore_01","release:08");
+                        semaphore_videoout_bitmap.release();
+                        //Log.i("semaphore_01","release:08:OK");
+                        return;
+                    }
+
                     if (video_frame_image_valid == true)
                     {
                         CallingActivity.mContentView.setBitmap(video_frame_image);
                     }
+
+                    //Log.i("semaphore_01","release:09");
+                    semaphore_videoout_bitmap.release();
+                    //Log.i("semaphore_01","release:09:OK");
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                    //Log.i("semaphore_01","release:10");
+                    semaphore_videoout_bitmap.release();
+                    //Log.i("semaphore_01","release:10:OK");
                 }
             }
         };

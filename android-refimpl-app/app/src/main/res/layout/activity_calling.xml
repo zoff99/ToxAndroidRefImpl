@@ -73,7 +73,7 @@
             <FrameLayout
                 android:id="@+id/video_box_right_top_01"
                 android:layout_width="125dp"
-                android:layout_height="125dp"
+                android:layout_height="145dp"
                 android:layout_gravity="top|right"
                 android:layout_marginTop="5dp"
                 android:background="@null">
@@ -135,12 +135,12 @@
 
                     <ImageView
                         android:id="@+id/audio_device_icon"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_gravity="right"
                         android:layout_marginRight="5dp"
-                        android:layout_marginTop="5dp"
-                        android:elevation="2dp"
+                        android:layout_marginTop="6dp"
+                        android:elevation="10dp"
                         android:src="@null"/>
 
                 </LinearLayout>
