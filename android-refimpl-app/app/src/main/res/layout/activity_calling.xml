@@ -149,7 +149,7 @@
             <FrameLayout
                 android:id="@+id/video_box_right_volumeslider_01"
                 android:layout_width="300dp"
-                android:layout_height="100dp"
+                android:layout_height="160dp"
                 android:layout_gravity="center|right"
                 android:elevation="2dp"
                 android:layout_marginTop="0dp"
@@ -158,7 +158,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:elevation="2dp"
                     android:background="@null"
@@ -169,7 +169,7 @@
                         android:layout_gravity="center"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@color/md_grey_900"
+                        android:background="@null"
                         android:indeterminate="false"
                         android:max="100"
                         android:elevation="8dp"

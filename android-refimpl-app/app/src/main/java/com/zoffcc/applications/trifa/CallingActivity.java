@@ -259,6 +259,42 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         box_right_volumeslider_01.setVisibility(View.VISIBLE);
         box_right_volumeslider_01.setAlpha(0.1f);
 
+        volume_slider_seekbar_01.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                // Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:action:" + event.getAction());
+
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        box_right_volumeslider_01.setAlpha(0.1f);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
+                         (event.getAction() == MotionEvent.ACTION_CANCEL))
+                {
+                    try
+                    {
+                        box_right_volumeslider_01.setAlpha(1.0f);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                return false;
+            }
+        });
+
         volume_slider_seekbar_01.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
         {
             @Override
