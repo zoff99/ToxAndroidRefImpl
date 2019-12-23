@@ -1811,7 +1811,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             try
             {
                 int inputBufferIndex = mEncoder.dequeueInputBuffer(
-                        0); // This method will return immediately if timeoutUs == 0
+                        500); // This method will return immediately if timeoutUs == 0
                 if (inputBufferIndex >= 0)
                 {
                     /* Get input buffer and fill it with our input */
@@ -1854,7 +1854,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     return ret;
                 }
                 encoderStatus = mEncoder.dequeueOutputBuffer(info,
-                                                             10000); // Dequeue an output buffer, block at most "timeoutUs" microseconds.
+                                                             1000); // Dequeue an output buffer, block at most "timeoutUs" microseconds.
             }
             catch (Exception e)
             {
@@ -1987,12 +1987,28 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             video_encoder_format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                                             MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
             // video_encoder_format.setInteger(MediaFormat.KEY_COLOR_STANDARD, COLOR_STANDARD_BT601_PAL);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                video_encoder_format.setInteger(MediaFormat.KEY_PRIORITY, 0); // 0: realtime priority
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            {
+                video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 0);
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                video_encoder_format.setInteger(MediaFormat.KEY_OPERATING_RATE, 25);
+            }
+            // -----------------------------------------------------------------------------
+            // HINT: https://stackoverflow.com/questions/21284874/illegal-state-exception-when-calling-mediacodec-configure
+            video_encoder_format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
+            //
+            // -----------------------------------------------------------------------------
             video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
             video_encoder_format.setInteger(MediaFormat.KEY_BITRATE_MODE,
                                             MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
             video_encoder_format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
             video_encoder_format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
-            //**// video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 1);
             // video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
             // video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3);
 

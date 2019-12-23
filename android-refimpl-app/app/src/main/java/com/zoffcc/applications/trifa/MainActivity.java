@@ -10902,41 +10902,51 @@ public class MainActivity extends AppCompatActivity
 
     static int toxav_video_send_frame_uv_reversed_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
     {
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding) &&
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
             reverse_u_and_v_planes(buf, frame_width_px, frame_height_px);
             feed_h264_encoder(buf, frame_width_px, frame_height_px);
-            h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
-            byte[] buf_out = h264_out_data.data;
-            if (buf_out != null)
+
+            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:--------------------------");
+            for (int jj = 0; jj < 2; jj++)
             {
-                if (h264_out_data.sps_pps != null)
+                h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
+                byte[] buf_out = h264_out_data.data;
+                if (buf_out != null)
                 {
-                    save_sps_pps_nal(h264_out_data.sps_pps);
-                }
-
-                if (global_sps_pps_nal_unit_bytes != null)
-                {
-                    if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                    if (h264_out_data.sps_pps != null)
                     {
-                        // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
-
-                        MainActivity.video_buffer_2.rewind();
-                        MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
-                        toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
-                                                    global_sps_pps_nal_unit_bytes.length);
-
-                        send_sps_pps_every_x_frames_current = 0;
+                        save_sps_pps_nal(h264_out_data.sps_pps);
                     }
 
-                    send_sps_pps_every_x_frames_current++;
-                }
+                    if (global_sps_pps_nal_unit_bytes != null)
+                    {
+                        if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                        {
+                            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
 
-                MainActivity.video_buffer_2.rewind();
-                MainActivity.video_buffer_2.put(buf_out);
-                toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
+                            MainActivity.video_buffer_2.rewind();
+                            MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
+                            toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                                        global_sps_pps_nal_unit_bytes.length);
+
+                            send_sps_pps_every_x_frames_current = 0;
+                        }
+
+                        send_sps_pps_every_x_frames_current++;
+                    }
+
+                    MainActivity.video_buffer_2.rewind();
+                    MainActivity.video_buffer_2.put(buf_out);
+                    toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
+                }
+                else
+                {
+                    // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:buf_out==null:#" + jj);
+                }
             }
+
             return 0;
         }
         else
@@ -10947,39 +10957,47 @@ public class MainActivity extends AppCompatActivity
 
     static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
     {
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) && (PREF__use_H264_hw_encoding) &&
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
             feed_h264_encoder(buf, frame_width_px, frame_height_px);
-            h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
-            byte[] buf_out = h264_out_data.data;
-            if (buf_out != null)
+
+            for (int jj = 0; jj < 2; jj++)
             {
-                if (h264_out_data.sps_pps != null)
+                h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
+                byte[] buf_out = h264_out_data.data;
+                if (buf_out != null)
                 {
-                    save_sps_pps_nal(h264_out_data.sps_pps);
-                }
-
-                if (global_sps_pps_nal_unit_bytes != null)
-                {
-                    if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                    if (h264_out_data.sps_pps != null)
                     {
-                        // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:2");
-
-                        MainActivity.video_buffer_2.rewind();
-                        MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
-                        toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
-                                                    global_sps_pps_nal_unit_bytes.length);
-
-                        send_sps_pps_every_x_frames_current = 0;
+                        save_sps_pps_nal(h264_out_data.sps_pps);
                     }
 
-                    send_sps_pps_every_x_frames_current++;
-                }
+                    if (global_sps_pps_nal_unit_bytes != null)
+                    {
+                        if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                        {
+                            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:2");
 
-                MainActivity.video_buffer_2.rewind();
-                MainActivity.video_buffer_2.put(buf_out);
-                toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
+                            MainActivity.video_buffer_2.rewind();
+                            MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
+                            toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                                        global_sps_pps_nal_unit_bytes.length);
+
+                            send_sps_pps_every_x_frames_current = 0;
+                        }
+
+                        send_sps_pps_every_x_frames_current++;
+                    }
+
+                    MainActivity.video_buffer_2.rewind();
+                    MainActivity.video_buffer_2.put(buf_out);
+                    toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
+                }
+                else
+                {
+                    // Log.i(TAG, "toxav_video_send_frame_wrapper:buf_out==null");
+                }
             }
             return 0;
         }
