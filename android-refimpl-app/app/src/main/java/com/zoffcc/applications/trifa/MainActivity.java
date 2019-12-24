@@ -138,6 +138,7 @@ import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -319,10 +320,11 @@ public class MainActivity extends AppCompatActivity
     static String temp_string_a = "";
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
-    final static int audio_in_buffer_max_count = 8; // how many out play buffers?
+    final static int audio_in_buffer_max_count = 2; // how many out play buffers? [we are now only using buffer "0" !!]
     final static int audio_out_buffer_mult = 8;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
+    public static long[] audio_buffer_2_ts = new long[n_audio_in_buffer_max_count];
     static ByteBuffer audio_buffer_play = null;
     static int audio_buffer_play_length = 0;
     static int[] audio_buffer_2_read_length = new int[audio_in_buffer_max_count];
@@ -2938,6 +2940,8 @@ public class MainActivity extends AppCompatActivity
         //      "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
         //      " " + channels + " " + sampling_rate);
 
+        // long timestamp_audio_frame = System.currentTimeMillis();
+
         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
@@ -3044,25 +3048,6 @@ public class MainActivity extends AppCompatActivity
                 audio_buffer_2[0].position(0);
                 int incoming_bytes = (int) ((sample_count * channels) * 2);
 
-                //                System.out.println("NativeAudioPlay:000a:size="+ incoming_bytes +
-                //                                   " offset="+audio_buffer_2[0].arrayOffset() +
-                //                                   " limit="+audio_buffer_2[0].limit() +
-                //                                   " bytes=" +
-                //                                   audio_buffer_2[0].get(0) + " " +
-                //                                   audio_buffer_2[0].get(1) + " " +
-                //                                   audio_buffer_2[0].get(2) + " " +
-                //                                   audio_buffer_2[0].get(3) + " " +
-                //                                   audio_buffer_2[0].get(4) + " " +
-                //                                   audio_buffer_2[0].get(5) + " " +
-                //                                   audio_buffer_2[0].get(6) + " " +
-                //                                   audio_buffer_2[0].get(7) + " " +
-                //                                   audio_buffer_2[0].get(8) + " " +
-                //                                   audio_buffer_2[0].get(9) + " " +
-                //                                   audio_buffer_2[0].get(10) + " " +
-                //                                   audio_buffer_2[0].get(11) + " " +
-                //                                   audio_buffer_2[0].get(12)
-                //                                   );
-
                 if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
                 {
                     int remain_bytes = incoming_bytes - (NativeAudio.n_buf_size_in_bytes -
@@ -3075,6 +3060,8 @@ public class MainActivity extends AppCompatActivity
                                                                           Math.min(incoming_bytes,
                                                                                    NativeAudio.n_buf_size_in_bytes -
                                                                                    NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]));
+
+                    // audio_buffer_2_ts[NativeAudio.n_cur_buf] = timestamp_audio_frame;
 
                     // Log.i(TAG, "audio_play:NativeAudio:put 1:remain_bytes=" + remain_bytes);
 
@@ -3090,7 +3077,7 @@ public class MainActivity extends AppCompatActivity
                         //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(2) + " ");
 
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
-                        if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
+                        if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
                         {
                             NativeAudio.n_cur_buf = 0;
                         }
@@ -3126,7 +3113,7 @@ public class MainActivity extends AppCompatActivity
                         //                                           NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].get(12) + " ");
 
 
-                        if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
+                        if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
                         {
                             NativeAudio.n_cur_buf = 0;
                         }
@@ -3152,7 +3139,7 @@ public class MainActivity extends AppCompatActivity
                 else
                 {
                     NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
-                    if (NativeAudio.n_cur_buf + 1 >= NativeAudio.n_audio_in_buffer_max_count)
+                    if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
                     {
                         NativeAudio.n_cur_buf = 0;
                     }
@@ -3164,33 +3151,6 @@ public class MainActivity extends AppCompatActivity
                 }
 
             } // PREF__use_native_audio_play -----
-            else
-            {
-                // audio_buffer_read_write(sample_count, channels, sampling_rate, true);
-                if (audio_receiver_thread != null)
-                {
-                    if (!AudioReceiver.stopped)
-                    {
-                        //                    if (android.os.Build.VERSION.SDK_INT >= 23)
-                        //                    {
-                        //                        // AudioTrack.write() called with invalid size (3840) value
-                        //                        audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0, (int) ((sample_count * channels) * 2), AudioTrack.WRITE_NON_BLOCKING);
-                        //                    }
-                        if (android.os.Build.VERSION.SDK_INT >= 21)
-                        {
-                            // AudioTrack.write() called with invalid size (3840) value
-                            audio_buffer_2[0].position(0);
-                            audio_receiver_thread.track.write(audio_buffer_2[0], (int) ((sample_count * channels) * 2),
-                                                              AudioTrack.WRITE_NON_BLOCKING);
-                        }
-                        else
-                        {
-                            audio_receiver_thread.track.write(audio_buffer_2[0].array(), 0,
-                                                              (int) ((sample_count * channels) * 2));
-                        }
-                    }
-                }
-            }
         }
         catch (Exception e)
         {
@@ -8033,86 +7993,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         return result;
-    }
-
-    synchronized static boolean audio_buffer_read_write(long sample_count, int channels, long sampling_rate, boolean write)
-    {
-        if (write)
-        {
-            // Log.i(TAG, "audio_buffer_read_write:write:START");
-            int j = 0;
-            if (audio_in_buffer_element_count < audio_in_buffer_max_count)
-            {
-                if (audio_in_buffer_element_count > 0)
-                {
-                    for (j = 0; j < audio_in_buffer_element_count; j++)
-                    {
-                        audio_buffer_2[audio_in_buffer_element_count - 1 - j].rewind();
-                        audio_buffer_2[audio_in_buffer_element_count - j].rewind();
-                        // Log.i(TAG, "audio_play:write:buffer size src=" + audio_buffer_2[audio_in_buffer_element_count - 1 - j].limit());
-                        // Log.i(TAG, "audio_play:write:buffer pos src=" + audio_buffer_2[audio_in_buffer_element_count - 1 - j].position());
-                        // Log.i(TAG, "audio_play:write:buffer size dst=" + audio_buffer_2[audio_in_buffer_element_count - j].limit());
-                        // Log.i(TAG, "audio_play:write:buffer pos dst=" + audio_buffer_2[audio_in_buffer_element_count - j].position());
-                        // audio_buffer_2[audio_in_buffer_element_count - j].put(audio_buffer_2[audio_in_buffer_element_count - 1 - j].array());
-                        audio_buffer_2[audio_in_buffer_element_count - j].put(
-                                audio_buffer_2[audio_in_buffer_element_count - 1 - j].array(), 0,
-                                AudioReceiver.buffer_size);
-                        audio_buffer_2[audio_in_buffer_element_count - j].rewind();
-                        audio_buffer_2_read_length[audio_in_buffer_element_count - j] = audio_buffer_2_read_length[
-                                audio_in_buffer_element_count - 1 - j];
-                        // Log.i(TAG, "audio_play:write:mv " + (audio_in_buffer_element_count - 1 - j + " -> " + (audio_in_buffer_element_count - j)));
-                    }
-                }
-                // Log.i(TAG, "audio_play:write:set buffer 0:len=" + sample_count);
-                audio_buffer_2_read_length[0] = (int) (sample_count * channels * 2);
-                audio_in_buffer_element_count++;
-                // Log.i(TAG, "audio_play:write:element count new=" + audio_in_buffer_element_count);
-                // Log.i(TAG, "audio_play:write:element count new=" + audio_in_buffer_element_count);
-
-                // wake up audio thread -----------
-                try
-                {
-                    audio_thread.interrupt();
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "audio_buffer_read_write:write:wake up audio thread:EE:" + e.getMessage());
-                }
-                // wake up audio thread -----------
-            }
-            else
-            {
-                Log.i(TAG, "audio_buffer_read_write:write:* buffer FULL *");
-            }
-
-            // Log.i(TAG, "audio_buffer_read_write:write:END");
-
-            return true;
-        }
-        else // read
-        {
-            // Log.i(TAG, "audio_buffer_read_write:READ:START");
-
-            if (audio_in_buffer_element_count > 0)
-            {
-                // Log.i(TAG, "audio_play:read:load buffer " + (audio_in_buffer_element_count - 1) + ":len=" + audio_buffer_2_read_length[audio_in_buffer_element_count - 1]);
-
-                audio_buffer_play.rewind();
-                audio_buffer_play.put(audio_buffer_2[audio_in_buffer_element_count - 1].array(), 0,
-                                      AudioReceiver.buffer_size);
-                audio_buffer_play_length = audio_buffer_2_read_length[audio_in_buffer_element_count - 1];
-                audio_in_buffer_element_count--;
-                // Log.i(TAG, "audio_play:read:element count new=" + audio_in_buffer_element_count);
-
-                // Log.i(TAG, "audio_buffer_read_write:READ:END01");
-
-                return true;
-            }
-
-            // Log.i(TAG, "audio_buffer_read_write:READ:END02");
-
-            return false;
-        }
     }
 
     static int add_tcp_relay_single_wrapper(String ip, long port, String key_hex)

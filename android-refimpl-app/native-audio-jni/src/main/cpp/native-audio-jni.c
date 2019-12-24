@@ -107,7 +107,7 @@ static SLPlayItf bqPlayerPlay;
 static SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
 static SLEffectSendItf bqPlayerEffectSend;
 static SLMuteSoloItf bqPlayerMuteSolo;
-static SLVolumeItf bqPlayerVolume;
+//*//static SLVolumeItf bqPlayerVolume;
 static SLmilliHertz bqPlayerSampleRate = 0;
 static short *resampleBuf = NULL;
 
@@ -131,16 +131,23 @@ static SLRecordItf recorderRecord;
 static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
 
-
 // ----- function defs ------
 void
 Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNIEnv *env,
-                                                                             jclass clazz, jobject buffer,
-                                                                             jlong buffer_size_in_bytes, jint num);
-jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env, jclass clazz, jint bufnum);
+                                                                             jclass clazz,
+                                                                             jobject buffer,
+                                                                             jlong buffer_size_in_bytes,
+                                                                             jint num);
+
+jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env, jclass clazz,
+                                                                    jint bufnum);
+
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isPlaying(JNIEnv *env, jclass clazz);
+
 jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *env, jclass clazz);
+
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isRecording(JNIEnv *env, jclass clazz);
+
 jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopREC(JNIEnv *env, jclass clazz);
 // ----- function defs ------
 
@@ -224,7 +231,8 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         SLresult result = (*bq)->Enqueue(bq, nextBuffer, (SLuint32) nextSize);
         if (result != SL_RESULT_SUCCESS)
         {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:A006:Enqueue:ERR:result=%d", (int)result);
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                                "bqRecorderCallback:A006:Enqueue:ERR:result=%d", (int) result);
         }
         (void) result;
 
@@ -317,7 +325,8 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 }
 
 // create the engine and output mix objects
-void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *env, jclass clazz, jint num_bufs)
+void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *env, jclass clazz,
+                                                                       jint num_bufs)
 {
     SLresult result;
 
@@ -328,11 +337,14 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *e
 
     // find java methods ------------
     NativeAudio_class = NULL;
-    android_find_class_global("com/zoffcc/applications/nativeaudio/NativeAudio", &NativeAudio_class);
-    rec_buffer_ready_method = (*env)->GetStaticMethodID(env, NativeAudio_class, "rec_buffer_ready", "(I)V");
+    android_find_class_global("com/zoffcc/applications/nativeaudio/NativeAudio",
+                              &NativeAudio_class);
+    rec_buffer_ready_method = (*env)->GetStaticMethodID(env, NativeAudio_class, "rec_buffer_ready",
+                                                        "(I)V");
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine:class=%p", NativeAudio_class);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine:method=%p", rec_buffer_ready_method);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine:method=%p",
+                        rec_buffer_ready_method);
     // find java methods ------------
 
 
@@ -366,11 +378,13 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *e
 
 // create buffer queue audio player
 void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudioPlayer(JNIEnv *env,
-                                                                                       jclass clazz, jint sampleRate,
+                                                                                       jclass clazz,
+                                                                                       jint sampleRate,
                                                                                        jint channels,
                                                                                        jint num_bufs)
 {
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:start:engineEngine=%p", engineEngine);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:start:engineEngine=%p", engineEngine);
 
     SLresult result;
     if (sampleRate >= 0)
@@ -390,7 +404,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     }
 
     // configure audio source
-    SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, (SLuint32) num_bufs};
+    SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
+                                                       (SLuint32) num_bufs};
 
     SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, (SLuint32) channels, SL_SAMPLINGRATE_44_1,
                                    SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
@@ -416,15 +431,15 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
      *     fast audio does not support when SL_IID_EFFECTSEND is required, skip it
      *     for fast audio case
      */
-#define  num_params  3
+#define  num_params  2
     const SLInterfaceID ids[num_params] = {SL_IID_BUFFERQUEUE,
                                            SL_IID_VOLUME,
-                                           SL_IID_ANDROIDCONFIGURATION,
+                                           /* SL_IID_ANDROIDCONFIGURATION, */
             /*SL_IID_EFFECTSEND,*/
             /*SL_IID_MUTESOLO,*/};
     const SLboolean req[num_params] = {SL_BOOLEAN_TRUE,
                                        SL_BOOLEAN_TRUE,
-                                       SL_BOOLEAN_TRUE,
+                                       /* SL_BOOLEAN_TRUE, */
             /*SL_BOOLEAN_TRUE,*/
             /*SL_BOOLEAN_TRUE,*/};
 
@@ -433,33 +448,62 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
 
+#if 0
     // ----------------------------------------------------------
     // Code for working with ear speaker by setting stream type to STREAM_VOICE ??
     SLAndroidConfigurationItf playerConfig;
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_ANDROIDCONFIGURATION, &playerConfig);
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_ANDROIDCONFIGURATION,
+                                             &playerConfig);
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_001=%d SL_RESULT_SUCCESS=%d",
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:res_001=%d SL_RESULT_SUCCESS=%d",
                         (int) result, (int) SL_RESULT_SUCCESS);
 
     if (SL_RESULT_SUCCESS == result)
     {
         // SLint32 streamType = SL_ANDROID_STREAM_MEDIA;
         SLint32 streamType = SL_ANDROID_STREAM_VOICE;
-        result = (*playerConfig)->SetConfiguration(playerConfig, SL_ANDROID_KEY_STREAM_TYPE, &streamType,
+        result = (*playerConfig)->SetConfiguration(playerConfig, SL_ANDROID_KEY_STREAM_TYPE,
+                                                   &streamType,
                                                    sizeof(SLint32));
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_002=%d", (int) result);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_002=%d",
+                            (int) result);
+
+
+        SLuint32 presetValue2 = SL_ANDROID_PERFORMANCE_LATENCY;
+        (*playerConfig)->SetConfiguration(playerConfig,
+                                          SL_ANDROID_KEY_PERFORMANCE_MODE,
+                                          &presetValue2,
+                                          sizeof(SLuint32));
+
+        // -- read what values where actually set --
+        SLuint32 presetRetrieved = SL_ANDROID_RECORDING_PRESET_NONE;
+        SLuint32 presetSize = 2 * sizeof(SLuint32); // intentionally too big
+        (*playerConfig)->GetConfiguration(playerConfig,
+                                          SL_ANDROID_KEY_PERFORMANCE_MODE,
+                                          &presetSize, (void *) &presetRetrieved);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "createBufferQueueAudioPlayer:performance_mode=%u",
+                            presetRetrieved);
+
+        // -- read what values where actually set --
+
     }
     // ----------------------------------------------------------
 
+#endif
+
     // realize the player
     result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_Realize=%d SL_RESULT_SUCCESS=%d",
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:res_Realize=%d SL_RESULT_SUCCESS=%d",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
     // get the play interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerPlay);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_003=%d SL_RESULT_SUCCESS=%d",
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:res_003=%d SL_RESULT_SUCCESS=%d",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
@@ -467,25 +511,31 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     // get the buffer queue interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
                                              &bqPlayerBufferQueue);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_005=%d SL_RESULT_SUCCESS=%d",
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:res_005=%d SL_RESULT_SUCCESS=%d",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
     // register callback on the buffer queue
     result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, NULL);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_005a=%d SL_RESULT_SUCCESS=%d",
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:res_005a=%d SL_RESULT_SUCCESS=%d",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
+#if 0
     // get the volume interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_006=%d SL_RESULT_SUCCESS=%d",
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:res_006=%d SL_RESULT_SUCCESS=%d",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
+#endif
 
     // set the player's state
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createBufferQueueAudioPlayer:res_007=%d SL_RESULT_SUCCESS=%d PAUSED",
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:res_007=%d SL_RESULT_SUCCESS=%d PAUSED",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
@@ -496,7 +546,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
 
 // create audio recorder: recorder is not in fast path
 void
-Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv *env, jclass clazz, jint sampleRate,
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv *env, jclass clazz,
+                                                                         jint sampleRate,
                                                                          jint num_bufs)
 {
     SLresult result;
@@ -527,9 +578,11 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
     }
 
     // configure audio sink
-    SLDataLocator_AndroidSimpleBufferQueue loc_bq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, (SLuint32) num_rec_bufs};
+    SLDataLocator_AndroidSimpleBufferQueue loc_bq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
+                                                     (SLuint32) num_rec_bufs};
 
-    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, (SLuint32) channels, (SLuint32) rec_samplerate,
+    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, (SLuint32) channels,
+                                   (SLuint32) rec_samplerate,
                                    SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
                                    SL_SPEAKER_FRONT_CENTER, SL_BYTEORDER_LITTLEENDIAN};
 
@@ -537,10 +590,16 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
 
     // create audio recorder
     // (requires the RECORD_AUDIO permission)
-    const SLInterfaceID id[2] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE, SL_IID_ANDROIDCONFIGURATION};
-    const SLboolean req[2] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
+    const SLInterfaceID id[1] = {
+                                    SL_IID_ANDROIDSIMPLEBUFFERQUEUE
+                                    /* SL_IID_ANDROIDCONFIGURATION */
+                                };
+    const SLboolean req[1] = {
+                                SL_BOOLEAN_TRUE
+                                /* SL_BOOLEAN_TRUE */
+                             };
     result = (*engineEngine)->CreateAudioRecorder(engineEngine, &recorderObject, &audioSrc,
-                                                  &audioSnk, 2, id, req);
+                                                  &audioSnk, 1, id, req);
 
     if (SL_RESULT_SUCCESS != result)
     {
@@ -548,7 +607,7 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
         return;
     }
 
-
+#if 0
     // Configure the voice recognition preset which has no
     // signal processing for lower latency.
     SLAndroidConfigurationItf inputConfig;
@@ -558,13 +617,39 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
 
     if (SL_RESULT_SUCCESS == result)
     {
-        SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION;
+        SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_UNPROCESSED; // SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION
         (*inputConfig)->SetConfiguration(inputConfig,
                                          SL_ANDROID_KEY_RECORDING_PRESET,
                                          &presetValue,
                                          sizeof(SLuint32));
-    }
 
+        SLuint32 presetValue2 = SL_ANDROID_PERFORMANCE_LATENCY;
+        (*inputConfig)->SetConfiguration(inputConfig,
+                                         SL_ANDROID_KEY_PERFORMANCE_MODE,
+                                         &presetValue2,
+                                         sizeof(SLuint32));
+
+        // -- read what values where actually set --
+        SLuint32 presetRetrieved = SL_ANDROID_RECORDING_PRESET_NONE;
+        SLuint32 presetSize = 2 * sizeof(SLuint32); // intentionally too big
+        (*inputConfig)->GetConfiguration(inputConfig,
+                                         SL_ANDROID_KEY_RECORDING_PRESET,
+                                         &presetSize, (void *) &presetRetrieved);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:record_preset=%u",
+                            presetRetrieved);
+
+        presetRetrieved = SL_ANDROID_RECORDING_PRESET_NONE;
+        presetSize = 2 * sizeof(SLuint32); // intentionally too big
+        (*inputConfig)->GetConfiguration(inputConfig,
+                                         SL_ANDROID_KEY_PERFORMANCE_MODE,
+                                         &presetSize, (void *) &presetRetrieved);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:performance_mode=%u",
+                            presetRetrieved);
+
+        // -- read what values where actually set --
+
+    }
+#endif
 
     // realize the audio recorder
     result = (*recorderObject)->Realize(recorderObject, SL_BOOLEAN_FALSE);
@@ -579,11 +664,13 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
     assert(SL_RESULT_SUCCESS == result);
 
     // get the buffer queue interface
-    result = (*recorderObject)->GetInterface(recorderObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &recorderBufferQueue);
+    result = (*recorderObject)->GetInterface(recorderObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+                                             &recorderBufferQueue);
     assert(SL_RESULT_SUCCESS == result);
 
     // register callback on the buffer queue
-    result = (*recorderBufferQueue)->RegisterCallback(recorderBufferQueue, bqRecorderCallback, NULL);
+    result = (*recorderBufferQueue)->RegisterCallback(recorderBufferQueue, bqRecorderCallback,
+                                                      NULL);
     assert(SL_RESULT_SUCCESS == result);
 
     rec_buf_pointer_start = 0;
@@ -599,7 +686,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffe
                                                                                   jclass clazz,
                                                                                   jobject buffer,
                                                                                   jlong buffer_size_in_bytes,
-                                                                                  jint num) {
+                                                                                  jint num)
+{
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
 
@@ -632,10 +720,12 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         // enque the buffer
         SLresult result;
         playing_state = _PLAYING;
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, (SLuint32) nextSize);
+        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
+                                                 (SLuint32) nextSize);
         if (SL_RESULT_SUCCESS != result)
         {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "PlayPCM16:1:Enqueue:ERR:result=%d", result);
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "PlayPCM16:1:Enqueue:ERR:result=%d",
+                                result);
             return -2;
         }
         else
@@ -669,12 +759,14 @@ void
 Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1rec_1buffer(JNIEnv *env,
                                                                                   jclass clazz,
                                                                                   jobject buffer,
-                                                                                  jlong buffer_size_in_bytes, jint num)
+                                                                                  jlong buffer_size_in_bytes,
+                                                                                  jint num)
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_JNI_audio_rec_buffer:num=%d, len=%d", (int) num,
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_JNI_audio_rec_buffer:num=%d, len=%d",
+                        (int) num,
                         (int) buffer_size_in_bytes);
 
     audio_rec_buffer[num] = (uint8_t *) (*jnienv2)->GetDirectBufferAddress(jnienv2, buffer);
@@ -705,7 +797,7 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopREC(JNIEnv *en
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:SET:002:_STOPPED");
     rec_state = _STOPPED;
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StopREC, state=%d", (int)rec_state);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StopREC, state=%d", (int) rec_state);
 
 #if 0
     if (recorderRecord != NULL)
@@ -755,7 +847,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
     nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A001:max_num_bufs=%d,bs=%d,bn=%d",
-                        (int) num_rec_bufs, (int) rec_buf_pointer_start, (int) rec_buf_pointer_next);
+                        (int) num_rec_bufs, (int) rec_buf_pointer_start,
+                        (int) rec_buf_pointer_next);
 
     if (nextSize > 0)
     {
@@ -771,18 +864,22 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
         result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
 
         // enque the buffer
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:1:Enqueue -> %d", rec_buf_pointer_next);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:1:Enqueue -> %d",
+                            rec_buf_pointer_next);
         result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
         if (SL_RESULT_SUCCESS != result)
         {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:02:result=%d", (int)result);
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:02:result=%d",
+                                (int) result);
             return -2;
         }
 
         rec_buf_pointer_next++;
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-01:max_num_bufs=%d,bs=%d,bn=%d",
-                            (int) num_rec_bufs, (int) rec_buf_pointer_start, (int) rec_buf_pointer_next);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "StartREC:A003:ENQU-01:max_num_bufs=%d,bs=%d,bn=%d",
+                            (int) num_rec_bufs, (int) rec_buf_pointer_start,
+                            (int) rec_buf_pointer_next);
 
         if (num_rec_bufs > 1)
         {
@@ -796,17 +893,20 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
                 if (nextSize > 0)
                 {
                     // enque the buffer
-                    result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
+                    result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer,
+                                                             nextSize);
                     if (SL_RESULT_SUCCESS != result)
                     {
-                        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:07:result=%d", (int)result);
+                        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:07:result=%d",
+                                            (int) result);
                     }
 
                     rec_buf_pointer_next++;
 
                     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                                         "StartREC:A003:ENQU-02:max_num_bufs=%d,bs=%d,bn=%d,jj=%d",
-                                        (int) num_rec_bufs, (int) rec_buf_pointer_start, (int) rec_buf_pointer_next,
+                                        (int) num_rec_bufs, (int) rec_buf_pointer_start,
+                                        (int) rec_buf_pointer_next,
                                         (int) jj);
 
                 }
@@ -849,7 +949,8 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *
     // set the player's state
     SLresult result;
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "player_state:res_007=%d SL_RESULT_SUCCESS=%d STOPPED",
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "player_state:res_007=%d SL_RESULT_SUCCESS=%d STOPPED",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
@@ -868,7 +969,6 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *
 }
 
 
-
 // shut down the native audio system
 void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv *env, jclass clazz)
 {
@@ -884,7 +984,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         SLresult result;
         result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
         (void) result;
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "player_state:res_009=%d SL_RESULT_SUCCESS=%d STOPPED",
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "player_state:res_009=%d SL_RESULT_SUCCESS=%d STOPPED",
                             (int) result, (int) SL_RESULT_SUCCESS);
     }
     else
@@ -918,7 +1019,15 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         bqPlayerBufferQueue = NULL;
         bqPlayerEffectSend = NULL;
         bqPlayerMuteSolo = NULL;
-        bqPlayerVolume = NULL;
+        //*//bqPlayerVolume = NULL;
+    }
+
+    // destroy output mix object, and invalidate all associated interfaces
+    if (outputMixObject != NULL)
+    {
+        (*outputMixObject)->Destroy(outputMixObject);
+        outputMixObject = NULL;
+        // outputMixEnvironmentalReverb = NULL;
     }
 
     // destroy audio recorder object, and invalidate all associated interfaces
@@ -928,15 +1037,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         recorderObject = NULL;
         recorderRecord = NULL;
         recorderBufferQueue = NULL;
-    }
-
-
-    // destroy output mix object, and invalidate all associated interfaces
-    if (outputMixObject != NULL)
-    {
-        (*outputMixObject)->Destroy(outputMixObject);
-        outputMixObject = NULL;
-        // outputMixEnvironmentalReverb = NULL;
     }
 
     // destroy engine object, and invalidate all associated interfaces

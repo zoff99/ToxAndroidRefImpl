@@ -165,128 +165,6 @@ public class AudioRecording extends Thread
                     NativeAudio.n_rec_bytes_in_buffer[i] = 0;
                 }
             }
-            else
-            {
-                int min_sampling_rate = -1;
-                // try user set min freq first
-                min_sampling_rate = getMinSupportedSampleRate(PREF__min_audio_samplingrate_out);
-                Log.i(TAG, "Running Audio Thread [OUT]:try sampling rate:1:" + min_sampling_rate);
-                if (min_sampling_rate == -1)
-                {
-                    // ok, now try also with 8kHz
-                    min_sampling_rate = getMinSupportedSampleRate(8000);
-                    Log.i(TAG, "Running Audio Thread [OUT]:try sampling rate:2:" + min_sampling_rate);
-                }
-
-                if (min_sampling_rate != -1)
-                {
-                    RECORDING_RATE = min_sampling_rate;
-                }
-                SMAPLINGRATE_TOX = RECORDING_RATE;
-                Log.i(TAG, "Running Audio Thread [OUT]:using sampling rate:" + RECORDING_RATE + " kHz (min=" +
-                           min_sampling_rate + ")");
-
-            /*
-             * Initialize buffer to hold continuously recorded audio data, start recording
-             */
-                int buffer_size = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL, FORMAT);
-
-                // int buffer_size_M = buffer_size;
-
-                // ---------- 222 ----------
-                int want_buf_size_in_bytes = (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 *
-                                                    2); // (int) (2 * (RECORDING_RATE / buffer_mem_factor));
-                Log.i(TAG, "want_buf_size_in_bytes(1)=" + want_buf_size_in_bytes);
-
-                _recBuffer = ByteBuffer.allocateDirect(
-                        (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2)); // Max 120 ms @ 48 kHz
-                // _recBuffer = ByteBuffer.allocateDirect((want_buf_size_in_bytes)); // Max 10 ms @ 48 kHz
-                _tempBufRec = new byte[(int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 *
-                                              2)]; // [want_buf_size_in_bytes];
-                int recBufSize = (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 *
-                                        2); // buffer_size * buf_multiplier;
-
-                // _bufferedRecSamples = RECORDING_RATE / 200;
-                // ---------- 222 ----------
-                Log.i(TAG, "want_buf_size_in_bytes(2)=" + want_buf_size_in_bytes);
-                Log.i(TAG, "getMinBufferSize buffer_size=" + buffer_size + " recBufSize=" + recBufSize);
-
-                set_JNI_audio_buffer(_recBuffer);
-
-                if (PREF__audiosource == 1)
-                {
-                    recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL,
-                                               FORMAT, recBufSize);
-                }
-                else
-                {
-                    recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, RECORDING_RATE, CHANNEL,
-                                               FORMAT, recBufSize);
-                }
-                // recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDING_RATE, CHANNEL, FORMAT, recBufSize);
-                audio_session_id = recorder.getAudioSessionId();
-
-                if (PREF__use_audio_rec_effects)
-                {
-
-                    Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:===============================");
-                    agc = null;
-                    try
-                    {
-                        Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:isAvailable:" +
-                                   AutomaticGainControl.isAvailable());
-                        agc = AutomaticGainControl.create(audio_session_id);
-                        int res = agc.setEnabled(true);
-                        Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:setEnabled:" + res + " audio_session_id=" +
-                                   audio_session_id);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "Audio Thread [OUT]:EE1:" + e.getMessage());
-                    }
-                    Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:===============================");
-
-                    Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:===============================");
-                    aec = null;
-                    try
-                    {
-                        Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:isAvailable:" +
-                                   AcousticEchoCanceler.isAvailable());
-                        aec = AcousticEchoCanceler.create(audio_session_id);
-                        int res = aec.setEnabled(true);
-                        Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:setEnabled:" + res + " audio_session_id=" +
-                                   audio_session_id);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "Audio Thread [OUT]:EE2:" + e.getMessage());
-                    }
-                    Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:===============================");
-
-
-                    Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:===============================");
-                    aec = null;
-                    try
-                    {
-                        Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:isAvailable:" + NoiseSuppressor.isAvailable());
-                        np = NoiseSuppressor.create(audio_session_id);
-                        int res = np.setEnabled(true);
-                        Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:setEnabled:" + res + " audio_session_id=" +
-                                   audio_session_id);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "Audio Thread [OUT]:EE2:" + e.getMessage());
-                    }
-                    Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:===============================");
-
-                }
-
-                recorder.startRecording();
-            }
         }
         catch (Exception e)
         {
@@ -348,117 +226,6 @@ public class AudioRecording extends Thread
                     microphone_muted = false;
                 }
             }
-        }
-        else
-        {
-
-            while (!stopped)
-            {
-                try
-                {
-                    // only send audio frame if call has started
-                    // Log.i(TAG, "Callstate.tox_call_state=" + Callstate.tox_call_state);
-                    if (!((Callstate.tox_call_state == 0) || (Callstate.tox_call_state == 1) ||
-                          (Callstate.tox_call_state == 2)))
-                    {
-                        if (Callstate.my_audio_enabled == 1)
-                        {
-                            readBytes = recorder.read(_tempBufRec, 0, want_to_read_bytes);
-
-                            // Log.i(TAG,
-                            //      "audio buffer:" + "readBytes=" + readBytes + " _tempBufRec.length=" + _tempBufRec.length +
-                            //      " buffer_size=" + buffer_size + " want_to_read_bytes=" + want_to_read_bytes +
-                            //      " CHANNELS_TOX=" + CHANNELS_TOX);
-
-                            if (readBytes != want_to_read_bytes)
-                            {
-                                Log.i(TAG, "audio buffer:" + "ERROR:readBytes != _tempBufRec.length");
-                            }
-
-                            try
-                            {
-                                // if (audio_manager_s.isMicrophoneMute())
-                                microphone_muted = trifa_is_MicrophoneMute;
-                            }
-                            catch (Exception e)
-                            {
-                                microphone_muted = false;
-                            }
-
-                            // TODO: workaround. sometimes mute button does not mute mic? find a real fix
-                            if (!microphone_muted)
-                            {
-                                if (PREF__audiorec_asynctask)
-                                {
-                                    new send_audio_frame_to_toxcore(readBytes).execute();
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        if (native_audio_engine_down == false)
-                                        {
-                                            _recBuffer.rewind();
-                                            _recBuffer.put(_tempBufRec);
-                                            audio_send_res2 = toxav_audio_send_frame(
-                                                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                    (long) (readBytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                                            if (audio_send_res2 != 0)
-                                            {
-                                                Log.i(TAG, "audio:res=" + audio_send_res2 + ":" +
-                                                           ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res2));
-                                            }
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                        Log.i(TAG, "audio:EE8:" + e.getMessage());
-                                        Log.i(TAG, "audio:EE9:" + _recBuffer.limit() + " <-> " + _tempBufRec.length +
-                                                   " <-> " + readBytes);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "Audio Thread [OUT]:EE3:" + e.getMessage());
-                }
-            }
-
-            try
-            {
-                agc.release();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "Audio Thread [OUT]:EE4:" + e.getMessage());
-            }
-
-            try
-            {
-                aec.release();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "Audio Thread [OUT]:EE5:" + e.getMessage());
-            }
-
-            try
-            {
-                recorder.stop();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            recorder.release();
         }
 
         finished = true;
@@ -607,24 +374,24 @@ public class AudioRecording extends Thread
      */
     int getMinSupportedSampleRate(int min_rate)
     {
-    /*
-     * Valid Audio Sample rates
-     *
-     * @see <a
-     * href="http://en.wikipedia.org/wiki/Sampling_%28signal_processing%29"
-     * >Wikipedia</a>
-     */
+        /*
+         * Valid Audio Sample rates
+         *
+         * @see <a
+         * href="http://en.wikipedia.org/wiki/Sampling_%28signal_processing%29"
+         * >Wikipedia</a>
+         */
         int validSampleRates[];
         validSampleRates = new int[]{8000, 16000, 22050,
                 //
                 32000, 37800, 44056, 44100, 47250, 48000, 50000, 50400,
                 //
                 88200, 96000, 176400, 192000, 352800, 2822400, 5644800};
-    /*
-     * Selecting default audio input source for recording since
-     * AudioFormat.CHANNEL_CONFIGURATION_DEFAULT is deprecated and selecting
-     * default encoding format.
-     */
+        /*
+         * Selecting default audio input source for recording since
+         * AudioFormat.CHANNEL_CONFIGURATION_DEFAULT is deprecated and selecting
+         * default encoding format.
+         */
         for (int i = 0; i < validSampleRates.length; i++)
         {
             if (validSampleRates[i] >= min_rate)

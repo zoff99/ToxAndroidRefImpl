@@ -19,17 +19,20 @@
 
 package com.zoffcc.applications.nativeaudio;
 
+import android.util.Log;
+
 import com.zoffcc.applications.trifa.AudioRecording;
 
 import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
+import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_ts;
 
 public class NativeAudio
 {
     private static final String TAG = "trifa.NativeAudio";
 
-    public static final int n_audio_in_buffer_max_count = 5;
+    public static final int n_audio_in_buffer_max_count = 10;
     public static ByteBuffer[] n_audio_buffer = new ByteBuffer[n_audio_in_buffer_max_count];
     public static int n_cur_buf = 0;
     public static int n_buf_size_in_bytes = 0;
@@ -37,13 +40,39 @@ public class NativeAudio
     public static int sampling_rate = 44100;
     public static int channel_count = 2;
 
-    public static final int n_rec_audio_in_buffer_max_count = 5;
+    public static final int n_rec_audio_in_buffer_max_count = 10;
     public static ByteBuffer[] n_rec_audio_buffer = new ByteBuffer[n_rec_audio_in_buffer_max_count];
     public static int n_rec_cur_buf = 0;
     public static int n_rec_buf_size_in_bytes = 0;
     public static int[] n_rec_bytes_in_buffer = new int[n_rec_audio_in_buffer_max_count];
 
     public static boolean native_audio_engine_down = false;
+
+    /**
+     * problem switching to audio only
+     *
+     * com.zoffcc.applications.trifa I/trifa.CallingActivity: onSensorChanged:--> EAR
+     * com.zoffcc.applications.trifa I/trifa.ToxService: I:setting filteraudio_active=0
+     * com.zoffcc.applications.trifa I/trifa.CallingActivity: onSensorChanged:setMode(AudioManager.MODE_IN_COMMUNICATION)
+     * com.zoffcc.applications.trifa I/trifa.CallingActivity: turnOffScreen
+     * com.zoffcc.applications.trifa I/trifa.CallingActivity: onSensorChanged:turnOffScreen()
+     * com.zoffcc.applications.trifa I/System.out: AVCS:VOICE:1
+     * com.zoffcc.applications.trifa I/trifa.nativeaudio: player_state:res_011=0 SL_RESULT_SUCCESS=0 PAUSED
+     * com.zoffcc.applications.trifa W/AudioSystem: AudioPolicyService server died!
+     * com.zoffcc.applications.trifa W/AudioSystem: AudioFlinger server died!
+     * com.zoffcc.applications.trifa W/AudioRecord: dead IAudioRecord, creating a new one from obtainBuffer()
+     * com.zoffcc.applications.trifa I/ServiceManager: Waiting for service media.audio_policy...
+     * com.zoffcc.applications.trifa I/ServiceManager: Waiting for service media.audio_flinger...
+     * com.zoffcc.applications.trifa I/ServiceManager: Waiting for service media.audio_policy...
+     * com.zoffcc.applications.trifa D/AudioSystem: make AudioPortCallbacksEnabled to TRUE
+     * com.zoffcc.applications.trifa E/AudioRecord: AudioFlinger could not create record track, status: -22
+     * com.zoffcc.applications.trifa W/AudioRecord: restoreRecord_l() failed status -22
+     * com.zoffcc.applications.trifa E/AudioRecord: Error -22 obtaining an audio buffer, giving up.
+     * com.zoffcc.applications.trifa D/SensorManager: Proximity, val = 8.0  [far]
+     * com.zoffcc.applications.trifa I/trifa.CallingActivity: onSensorChanged:--> speaker
+     * com.zoffcc.applications.trifa I/trifa.ToxService: I:setting filteraudio_active=1
+     *
+     */
 
     public static void restartNativeAudioPlayEngine(int sampleRate, int channels)
     {
@@ -62,12 +91,12 @@ public class NativeAudio
 
         // if (isPlaying() == 1)
         //{
-            NativeAudio.StopPCM16();
+        NativeAudio.StopPCM16();
         //}
 
         // if (isRecording() == 1)
         //{
-            NativeAudio.StopREC();
+        NativeAudio.StopREC();
         //}
         NativeAudio.shutdownEngine();
 
@@ -111,6 +140,12 @@ public class NativeAudio
             // Log.i(TAG, "rec_buffer_ready:002");
             new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num).execute();
         }
+    }
+
+    public static int PlayPCM16_(int buf_num)
+    {
+        Log.i(TAG, "PlayPCM16_:play_delay=" + (System.currentTimeMillis() - audio_buffer_2_ts[buf_num]));
+        return PlayPCM16(buf_num);
     }
 
     /**
