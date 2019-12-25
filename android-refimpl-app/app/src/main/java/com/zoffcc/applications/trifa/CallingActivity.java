@@ -23,6 +23,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
@@ -40,6 +41,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -66,6 +68,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encoding;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__video_play_delay_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
@@ -137,9 +140,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     TextView right_top_text_4 = null;
     TextView right_left_text_1 = null;
     View box_right_volumeslider_01 = null;
-    SeekBar volume_slider_seekbar_01 = null;
+    static SeekBar volume_slider_seekbar_01 = null;
     View box_right_video_add_delay_slider_01 = null;
     SeekBar video_add_delay_slider_seekbar_01 = null;
+    static TextView video_add_delay_slider_infotext_01 = null;
     static int activity_state = 0;
     com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
     static int quality_slider_position = 0;
@@ -172,7 +176,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     protected void onCreate(Bundle savedInstanceState)
     {
         // startActivity called from non-Activity context
-
         Log.i(TAG, "onCreate:01");
 
         if (Build.VERSION.SDK_INT >= 27)
@@ -202,6 +205,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         setContentView(R.layout.activity_calling);
 
+        SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        PREF__video_play_delay_ms = settings_cs1.getInt("video_play_delay_ms", 0);
+        Log.i(TAG, "pref:get:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
+        PREF__audio_play_volume_percent = settings_cs1.getInt("audio_play_volume_percent", 100);
+        Log.i(TAG, "pref:get:PREF__audio_play_volume_percent=" + PREF__audio_play_volume_percent);
+
         top_text_line = (TextView) findViewById(R.id.top_text_line);
         accept_button = (ImageButton) findViewById(R.id.accept_button);
         decline_button = (ImageButton) findViewById(R.id.decline_button);
@@ -215,15 +224,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             // prevent screenshots and also dont show the window content in recent activity screen
             initializeScreenshotSecurity(this);
-        }
-
-        try
-        {
-            set_audio_play_volume_percent(PREF__audio_play_volume_percent);
-        }
-        catch (Exception ee)
-        {
-            ee.printStackTrace();
         }
 
         trifa_is_MicrophoneMute = false;
@@ -301,28 +301,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         volume_slider_seekbar_01 = (SeekBar) findViewById(R.id.volume_slider_seekbar);
         video_add_delay_slider_seekbar_01 = (SeekBar) findViewById(R.id.video_add_delay_slider_seekbar);
-
-        try
-        {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            {
-                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent, true);
-            }
-            else
-            {
-                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
-            }
-        }
-        catch (Exception ee)
-        {
-            try
-            {
-                volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
-            }
-            catch (Exception ee2)
-            {
-            }
-        }
+        video_add_delay_slider_infotext_01 = (TextView) findViewById(R.id.video_add_delay_slider_infotext);
 
         box_right_volumeslider_01 = (View) findViewById(R.id.video_box_right_volumeslider_01);
         box_right_volumeslider_01.setVisibility(View.VISIBLE);
@@ -379,6 +358,19 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     catch (Exception ee)
                     {
                         ee.printStackTrace();
+                    }
+                    try
+                    {
+                        SharedPreferences settings_cs2 = PreferenceManager.getDefaultSharedPreferences(
+                                getApplicationContext());
+                        settings_cs2.edit().putInt("audio_play_volume_percent",
+                                                   PREF__audio_play_volume_percent).apply();
+                        Log.i(TAG, "pref:set:PREF__audio_play_volume_percent=" + PREF__audio_play_volume_percent);
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                        Log.i(TAG, "pref:set:PREF__audio_play_volume_percent:EE:" + ee.getMessage());
                     }
                 }
             }
@@ -464,17 +456,24 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             @Override
             public void onProgressChanged(SeekBar s, int progress_value, boolean from_user)
             {
-                if ((progress_value >= 0) && (progress_value <= 300))
+                if ((progress_value >= 0) && (progress_value <= 100))
                 {
                     try
                     {
+                        PREF__video_play_delay_ms = progress_value * 12;
                         toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                          ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
-                                         progress_value);
+                                         PREF__video_play_delay_ms);
+                        video_add_delay_slider_infotext_01.setText("Video Delay: " + PREF__video_play_delay_ms + " ms");
+                        SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
+                                getApplicationContext());
+                        settings_cs1.edit().putInt("video_play_delay_ms", PREF__video_play_delay_ms).apply();
+                        Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
                     }
                     catch (Exception ee)
                     {
                         ee.printStackTrace();
+                        Log.i(TAG, "pref:set:PREF__video_play_delay_ms:EE:" + ee.getMessage());
                     }
                 }
             }
@@ -982,6 +981,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             top_text_line_str2 = a;
                             update_top_text_line();
 
+                            Log.i(TAG,"on_call_started_actions:01");
                             on_call_started_actions();
                         }
                     }
@@ -1936,6 +1936,64 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         callactivity_handler_s.post(myRunnable);
     }
 
+    static void set_video_delay_ms()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value, PREF__video_play_delay_ms);
+                    video_add_delay_slider_infotext_01.setText("Video Delay: " + PREF__video_play_delay_ms + " ms");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        };
+        CallingActivity.callactivity_handler_s.post(myRunnable);
+    }
+
+    static void set_audio_play_volume()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                    {
+                        volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent, true);
+                    }
+                    else
+                    {
+                        volume_slider_seekbar_01.setProgress(PREF__audio_play_volume_percent);
+                    }
+                }
+                catch (Exception ee)
+                {
+                    ee.printStackTrace();
+                }
+
+                try
+                {
+                    set_audio_play_volume_percent(PREF__audio_play_volume_percent);
+                }
+                catch (Exception ee)
+                {
+                    ee.printStackTrace();
+                }
+            }
+        };
+        CallingActivity.callactivity_handler_s.post(myRunnable);
+    }
 
     // actions to take when a call starts by:
     // a) accepting an incoming call
@@ -1944,7 +2002,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         set_max_video_bitrate();
         set_av_latency();
-
+        set_video_delay_ms();
+        set_audio_play_volume();
         stop_ringtone();
 
         Runnable myRunnable = new Runnable()

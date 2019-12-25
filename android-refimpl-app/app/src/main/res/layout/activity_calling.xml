@@ -188,6 +188,18 @@
                 android:layout_marginRight="45dp"
                 android:background="@null">
 
+                <TextView
+                    android:id="@+id/video_add_delay_slider_infotext"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:elevation="8dp"
+                    android:gravity="center_horizontal"
+                    android:text="Video delay: 0 ms"
+                    android:layout_gravity="bottom"
+                    android:textColor="@color/md_green_600"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

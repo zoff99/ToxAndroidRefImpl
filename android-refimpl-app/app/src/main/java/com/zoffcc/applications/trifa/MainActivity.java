@@ -372,7 +372,8 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
     static boolean PREF__use_H264_hw_encoding = true;
-    static int PREF__audio_play_volume_percent = 60;
+    static int PREF__audio_play_volume_percent = 100;
+    static int PREF__video_play_delay_ms = 0;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2793,6 +2794,7 @@ public class MainActivity extends AppCompatActivity
                 };
                 CallingActivity.callactivity_handler_s.post(myRunnable);
 
+                Log.i(TAG,"on_call_started_actions:02");
                 on_call_started_actions();
             }
             else if ((a_TOXAV_FRIEND_CALL_STATE & (2)) > 0)
