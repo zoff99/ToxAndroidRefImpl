@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -170,9 +171,32 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // startActivity called from non-Activity context
+
+        Log.i(TAG, "onCreate:01");
+
+        if (Build.VERSION.SDK_INT >= 27)
+        {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+            KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+            if (keyguardManager != null)
+            {
+                keyguardManager.requestDismissKeyguard(this, null);
+            }
+        }
+        else
+        {
+
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        }
+
         super.onCreate(savedInstanceState);
+
+        Log.i(TAG, "onCreate:02");
 
         dh = new DetectHeadset(this);
 
@@ -369,7 +393,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
             }
         });
-
 
 
         try
@@ -993,6 +1016,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 return true;
             }
         });
+
+        Log.i(TAG, "onCreate:99");
+
     }
 
     public static void set_av_latency()
@@ -1200,6 +1226,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     protected void onResume()
     {
+        Log.i(TAG, "onResume:01");
+
         super.onResume();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
@@ -1283,6 +1311,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }, 1000);
         // update call time every second -----------
 
+        Log.i(TAG, "onResume:99");
     }
 
     void toggle_camera()
@@ -1432,7 +1461,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     protected void onStart()
     {
-        Log.i(TAG, "onStart");
+        Log.i(TAG, "onStart:01");
         super.onStart();
 
         Thread openThread = new Thread()
@@ -1447,6 +1476,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         };
         openThread.start();
+
+        Log.i(TAG, "onStart:99");
     }
 
     private void initUI()

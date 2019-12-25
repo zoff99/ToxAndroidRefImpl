@@ -31,6 +31,7 @@
         android:xlargeScreens="true"/>
 
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -83,6 +84,10 @@
             android:name=".CallingActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_calling"
+            android:showWhenLocked="true"
+            android:showOnLockScreen="true"
+            android:showForAllUsers="true"
+            android:turnScreenOn="true"
             android:launchMode="singleTask"
             android:theme="@style/FullscreenTheme">
         </activity>

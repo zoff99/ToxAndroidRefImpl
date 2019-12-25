@@ -72,6 +72,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -2546,7 +2547,7 @@ public class MainActivity extends AppCompatActivity
                         VIDEO_FRAME_RATE_INCOMING = 0;
                         last_video_frame_received = -1;
                         MainActivity.set_av_call_status(Callstate.state);
-                        Intent intent = new Intent(context_s, CallingActivity.class);
+                        Intent intent = new Intent(context_s.getApplicationContext(), CallingActivity.class);
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         Callstate.friend_alias_name = get_friend_name_from_pubkey(Callstate.friend_pubkey);
                         Callstate.other_audio_enabled = f_audio_enabled;
