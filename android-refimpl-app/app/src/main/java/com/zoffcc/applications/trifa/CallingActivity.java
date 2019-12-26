@@ -142,7 +142,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     View box_right_volumeslider_01 = null;
     static SeekBar volume_slider_seekbar_01 = null;
     View box_right_video_add_delay_slider_01 = null;
-    SeekBar video_add_delay_slider_seekbar_01 = null;
+    static SeekBar video_add_delay_slider_seekbar_01 = null;
     static TextView video_add_delay_slider_infotext_01 = null;
     static int activity_state = 0;
     com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
@@ -166,6 +166,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     public static byte[] global_sps_pps_nal_unit_bytes = null;
     public static int send_sps_pps_every_x_frames_current = 0;
     public static int send_sps_pps_every_x_frames = 20;
+    private static float slider_alpha = 0.4f;
 
     private static MediaCodec.BufferInfo mBufferInfo_h264_decoder;
     private static MediaCodec mDecoder_h264;
@@ -305,7 +306,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         box_right_volumeslider_01 = (View) findViewById(R.id.video_box_right_volumeslider_01);
         box_right_volumeslider_01.setVisibility(View.VISIBLE);
-        box_right_volumeslider_01.setAlpha(0.1f);
+        box_right_volumeslider_01.setAlpha(slider_alpha);
 
         volume_slider_seekbar_01.setOnTouchListener(new View.OnTouchListener()
         {
@@ -318,7 +319,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        box_right_volumeslider_01.setAlpha(0.1f);
+                        box_right_volumeslider_01.setAlpha(slider_alpha);
                     }
                     catch (Exception e)
                     {
@@ -387,31 +388,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         });
 
 
-        try
-        {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            {
-                video_add_delay_slider_seekbar_01.setProgress(0, true);
-            }
-            else
-            {
-                video_add_delay_slider_seekbar_01.setProgress(0);
-            }
-        }
-        catch (Exception ee)
-        {
-            try
-            {
-                video_add_delay_slider_seekbar_01.setProgress(0);
-            }
-            catch (Exception ee2)
-            {
-            }
-        }
-
         box_right_video_add_delay_slider_01 = (View) findViewById(R.id.video_box_right_video_add_delay_slider_01);
         box_right_video_add_delay_slider_01.setVisibility(View.VISIBLE);
-        box_right_video_add_delay_slider_01.setAlpha(0.1f);
+        box_right_video_add_delay_slider_01.setAlpha(slider_alpha);
 
 
         video_add_delay_slider_seekbar_01.setOnTouchListener(new View.OnTouchListener()
@@ -425,7 +404,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        box_right_video_add_delay_slider_01.setAlpha(0.1f);
+                        box_right_video_add_delay_slider_01.setAlpha(slider_alpha);
                     }
                     catch (Exception e)
                     {
@@ -622,6 +601,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         update_bitrates();
         update_fps();
         update_call_time();
+        set_video_delay_ms();
+        set_audio_play_volume();
 
         quality_slider.setPosition(quality_slider_position);
 
@@ -981,7 +962,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             top_text_line_str2 = a;
                             update_top_text_line();
 
-                            Log.i(TAG,"on_call_started_actions:01");
+                            Log.i(TAG, "on_call_started_actions:01");
                             on_call_started_actions();
                         }
                     }
@@ -1946,12 +1927,29 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 try
                 {
                     toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value, PREF__video_play_delay_ms);
+                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
+                                     PREF__video_play_delay_ms);
                     video_add_delay_slider_infotext_01.setText("Video Delay: " + PREF__video_play_delay_ms + " ms");
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                }
+
+                try
+                {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                    {
+                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 12), true);
+                    }
+                    else
+                    {
+                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 12));
+                    }
+                }
+                catch (Exception ee)
+                {
+                    ee.printStackTrace();
                 }
 
             }
