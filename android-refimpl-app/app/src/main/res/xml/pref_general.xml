@@ -28,7 +28,7 @@
         android:title="@string/pref_title_higher_video_quality"/>
 
     <SwitchPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="fps_half"
         android:summary="@string/pref_description_fps_half"
         android:title="@string/pref_title_fps_half"/>

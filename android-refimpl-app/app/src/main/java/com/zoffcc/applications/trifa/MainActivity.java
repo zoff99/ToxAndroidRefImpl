@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview buffer size!!
     static boolean PREF__set_fps = false;
-    static boolean PREF__fps_half = false;
+    static boolean PREF__fps_half = true;
     static boolean PREF__conference_show_system_messages = false;
     static boolean PREF__X_battery_saving_mode = false;
     static int PREF__X_battery_saving_timeout = 15; // in minutes
@@ -612,7 +612,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__fps_half = settings.getBoolean("fps_half", false);
+        PREF__fps_half = settings.getBoolean("fps_half", true);
         PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
         PREF__set_fps = settings.getBoolean("set_fps", false);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
@@ -1906,7 +1906,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__fps_half = settings.getBoolean("fps_half", false);
+        PREF__fps_half = settings.getBoolean("fps_half", true);
         PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
         PREF__set_fps = settings.getBoolean("set_fps", false);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);

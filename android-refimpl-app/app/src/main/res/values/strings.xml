@@ -72,10 +72,10 @@
     <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
 
     <string name="pref_title_fps_half">lower fps</string>
-    <string name="pref_description_fps_half">Video Framerate 7fps instead of 15fps</string>
+    <string name="pref_description_fps_half">Video Framerate 1/2 : so 12fps instead of 25fps</string>
 
     <string name="pref_title_set_fps">set fps</string>
-    <string name="pref_description_set_fps">try to set wanted [15fps] video framerate, this may crash on some phones</string>
+    <string name="pref_description_set_fps">try to set 15fps video framerate, this may crash on some phones</string>
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">John Smith</string>
