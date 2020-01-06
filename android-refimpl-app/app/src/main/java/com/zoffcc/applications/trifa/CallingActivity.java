@@ -160,8 +160,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static MediaCodec mEncoder;
     private static MediaPlayer mMediaPlayer = null;
     private static MediaFormat video_encoder_format = null;
-    private static int video_encoder_width = 64;
-    private static int video_encoder_height = 64;
+    private static int video_encoder_width = 640;
+    private static int video_encoder_height = 480;
     private static int v_bitrate_bits_per_second = 20 * 1000; // video bitrate <n> bps, in bits per second
     public static byte[] global_sps_pps_nal_unit_bytes = null;
     public static int send_sps_pps_every_x_frames_current = 0;
@@ -2281,20 +2281,30 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             mBufferInfo = new MediaCodec.BufferInfo();
             video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, video_encoder_width, video_encoder_height);
-            video_encoder_format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                                            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
+
+            try
+            {
+                mEncoder = MediaCodec.createEncoderByType(MIME_TYPE);
+                Log.d(TAG, "prepareEncoder:SUCCESS: " + mEncoder.getCodecInfo());
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                Log.d(TAG, "prepareEncoder:EE1: " + e.getMessage());
+            }
+
             // video_encoder_format.setInteger(MediaFormat.KEY_COLOR_STANDARD, COLOR_STANDARD_BT601_PAL);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             {
-                video_encoder_format.setInteger(MediaFormat.KEY_PRIORITY, 0); // 0: realtime priority
+                //++//video_encoder_format.setInteger(MediaFormat.KEY_PRIORITY, 0); // 0: realtime priority
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             {
-                video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 0);
+                //++//video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 0);
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             {
-                video_encoder_format.setInteger(MediaFormat.KEY_OPERATING_RATE, 25);
+                //++//video_encoder_format.setInteger(MediaFormat.KEY_OPERATING_RATE, 25);
             }
             // -----------------------------------------------------------------------------
             // HINT: https://stackoverflow.com/questions/21284874/illegal-state-exception-when-calling-mediacodec-configure
@@ -2309,34 +2319,79 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             // -- vendor extensions --
 
             video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
-            video_encoder_format.setInteger(MediaFormat.KEY_BITRATE_MODE,
-                                            MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            //++//video_encoder_format.setInteger(MediaFormat.KEY_BITRATE_MODE,
+            //++//                                MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
             video_encoder_format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
             video_encoder_format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
-            // video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
             // video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3);
 
             Log.d(TAG, "prepareEncoder:video_encoder_format: " + video_encoder_format);
 
-            try
+
+            MediaCodecInfo.CodecCapabilities capabilities = mEncoder.getCodecInfo().getCapabilitiesForType(MIME_TYPE);
+            int selectedColorFormat = 0;
+            for (int i = 0; i < capabilities.colorFormats.length && selectedColorFormat == 0; i++)
             {
-                mEncoder = MediaCodec.createEncoderByType(MIME_TYPE);
-                Log.d(TAG, "prepareEncoder:SUCCESS: " + mEncoder.getCodecInfo());
+                int format = capabilities.colorFormats[i];
+                switch (format)
+                {
+                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible:
+                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
+                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
+                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
+                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
+                    case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
+                    case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:
+                        selectedColorFormat = format;
+                        Log.i(TAG, "prepareEncoder:using format [" + i + "] " + format);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:Unsupported color format [" + i + "] " + format);
+                        break;
+                }
             }
-            catch (IOException e)
+
+            if (selectedColorFormat != 0)
             {
-                e.printStackTrace();
-                Log.d(TAG, "prepareEncoder:EE1: " + e.getMessage());
+                video_encoder_format.setInteger(MediaFormat.KEY_COLOR_FORMAT, selectedColorFormat);
+
             }
+            else
+            {
+                video_encoder_format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
+                                                MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
+            }
+
+/*
+            int selectedProfile = 0;
+            for (int i = 0; i < capabilities.profileLevels.length && selectedProfile == 0; i++)
+            {
+                MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
+                switch (l.profile)
+                {
+                    case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh:
+                        selectedProfile = l.profile;
+                        Log.i(TAG, "prepareEncoder:using AVC profile " + l);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:Unsupported AVC profile " + l);
+                        break;
+                }
+            }
+
+            if (selectedProfile != 0)
+            {
+                video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, selectedProfile);
+
+            }
+            else
+            {
+            }
+*/
+
             mEncoder.configure(video_encoder_format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mEncoder.start();
 
-            // feed 2 dummy frame for less latency ----------------------------------------
-            // int size_dummy = (video_encoder_width * video_encoder_width) * 3 / 2;
-            // byte[] buf_dummy = new byte[size_dummy];
-            // feed_h264_encoder(buf_dummy, video_encoder_width, video_encoder_height);
-            // feed_h264_encoder(buf_dummy, video_encoder_width, video_encoder_height);
-            // feed 2 dummy frame for less latency ----------------------------------------
         }
     }
 
