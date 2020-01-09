@@ -368,7 +368,7 @@ if [ "$CIRCLE_BRANCH""x" != "zoff99/maven_artefactx" ]; then
     echo xxxxxxrm -f ~/.android/debug.keystore
     # remove the "xxxxxx" in fron the of the "rm -f" to create a new debug signing key!! --------------
     ls -al ~/.android/debug.keystore
-    if [ ! -f ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
+    if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
         echo "*** generating new signer key ***"
         echo "*** generating new signer key ***"
         keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
