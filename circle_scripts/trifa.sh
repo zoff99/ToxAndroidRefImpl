@@ -267,6 +267,16 @@ echo "###### ------------------------------"
 
 
 
+# ----- debug signing key -----
+cd ~/
+ls -al ~/.android/debug.keystore
+if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
+    echo rm -f ~/.android/debug.keystore
+    echo "*** generating new signer key ***"
+    echo "*** generating new signer key ***"
+    keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
+fi
+# ----- debug signing key -----
 
 
 
@@ -364,15 +374,6 @@ if [ "$CIRCLE_BRANCH""x" != "zoff99/maven_artefactx" ]; then
     zip -d $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk META-INF/\*     # remove signature !!
     cp -av $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk ~/app.apk
     cd ~/
-    # remove the "xxxxxx" in fron the of the "rm -f" to create a new debug signing key!! --------------
-    echo xxxxxxrm -f ~/.android/debug.keystore
-    # remove the "xxxxxx" in fron the of the "rm -f" to create a new debug signing key!! --------------
-    ls -al ~/.android/debug.keystore
-    if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
-        echo "*** generating new signer key ***"
-        echo "*** generating new signer key ***"
-        keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
-    fi
 
     ls -al ~/
     jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androiddebugkey
