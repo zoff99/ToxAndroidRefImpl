@@ -271,9 +271,9 @@ echo "###### ------------------------------"
 cd ~/
 ls -al ~/.android/debug.keystore
 if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
-    echo rm -f ~/.android/debug.keystore
     echo "*** generating new signer key ***"
     echo "*** generating new signer key ***"
+    rm -f ~/.android/debug.keystore
     keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
 fi
 # ----- debug signing key -----
