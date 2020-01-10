@@ -56,7 +56,6 @@ public class CameraWrapper
     public static final int IMAGE_HEIGHT = 480; // 720
     static byte[] data_new = null;
     static byte[] data_new2 = null;
-    static boolean mirror_cam_image = false; // mirror the camera image
     private CameraPreviewCallback mCameraPreviewCallback;
     // private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
@@ -289,7 +288,7 @@ public class CameraWrapper
             // TODO: ------ DEBUG --------
             // TODO: ------ DEBUG --------
             // TODO: ------ DEBUG --------
-            camera_video_rotate_angle = 0;
+            // camera_video_rotate_angle = 0;
             // TODO: ------ DEBUG --------
             // TODO: ------ DEBUG --------
             // TODO: ------ DEBUG --------
@@ -340,7 +339,7 @@ public class CameraWrapper
 
                 switch (format)
                 {
-                    case ImageFormat.NV21: // this is preferred
+                    case ImageFormat.YV12: // this is preferred
                         selectedCameraPreviewFormat = format;
                         Log.i(TAG, "SupportedPreviewFormats:using Preview format [" + i + "] " + format);
                         break;
@@ -353,14 +352,14 @@ public class CameraWrapper
 
             if (selectedCameraPreviewFormat == 0)
             {
-                // if NV21 is not supported then try YV12
+                // if YV12 is not supported then try NV21
                 for (int i = 0; i < camera_preview_formats.size() && selectedCameraPreviewFormat == 0; i++)
                 {
                     int format = camera_preview_formats.get(i);
 
                     switch (format)
                     {
-                        case ImageFormat.YV12:
+                        case ImageFormat.NV21:
                             selectedCameraPreviewFormat = format;
                             Log.i(TAG, "SupportedPreviewFormats:2:using Preview format [" + i + "] " + format);
                             break;
@@ -374,8 +373,8 @@ public class CameraWrapper
 
             if (selectedCameraPreviewFormat == 0)
             {
-                mCameraParamters.setPreviewFormat(ImageFormat.NV21); // order here is Y-V-U !!
-                Log.i(TAG, "SupportedPreviewFormats:set default format NV21");
+                mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
+                Log.i(TAG, "SupportedPreviewFormats:set default format YV12");
             }
             else
             {
@@ -533,72 +532,38 @@ public class CameraWrapper
                         }
                         else
                         {
-                            // Log.i(TAG, "onPreviewFrame:sending video:YUV420 data bytes=" + data.length + " rotation=" + CameraWrapper.camera_video_rotate_angle);
                             if (CameraWrapper.camera_video_rotate_angle == 90)
                             {
                                 data_new = rotateYUV420Degree90(data, camera_preview_size2.width,
                                                                 camera_preview_size2.height);
 
-                                if (mirror_cam_image)
+
+                                MainActivity.video_buffer_2.rewind();
+                                MainActivity.video_buffer_2.put(data_new);
+
+                                if (PREF__UV_reversed)
                                 {
-                                    data_new2 = flipYUV420Horizontal(data_new, camera_preview_size2.height,
-                                                                     camera_preview_size2.width);
-                                    MainActivity.video_buffer_2.rewind();
-                                    MainActivity.video_buffer_2.put(data_new2);
+                                    video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(data_new,
+                                                                                                             tox_friend_by_public_key__wrapper(
+                                                                                                                     Callstate.friend_pubkey),
+                                                                                                             camera_preview_size2.height,
+                                                                                                             camera_preview_size2.width);
 
-                                    if (PREF__UV_reversed)
+                                    if (video_send_res != 0)
                                     {
-                                        video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(
-                                                data_new2, tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                camera_preview_size2.height, camera_preview_size2.width);
-
-                                        if (video_send_res != 0)
-                                        {
-                                            Log.i(TAG, "video:001:res=" + video_send_res + ":" +
-                                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(video_send_res));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        MainActivity.toxav_video_send_frame_wrapper(data_new2,
-                                                                                    tox_friend_by_public_key__wrapper(
-                                                                                            Callstate.friend_pubkey),
-                                                                                    camera_preview_size2.height,
-                                                                                    camera_preview_size2.width);
-
-                                        if (video_send_res != 0)
-                                        {
-                                            Log.i(TAG, "video:002:res=" + video_send_res + ":" +
-                                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(video_send_res));
-                                        }
+                                        Log.i(TAG, "video:004:res=" + video_send_res + ":" +
+                                                   ToxVars.TOXAV_ERR_SEND_FRAME.value_str(video_send_res));
                                     }
                                 }
                                 else
                                 {
-                                    MainActivity.video_buffer_2.rewind();
-                                    MainActivity.video_buffer_2.put(data_new);
-
-                                    if (PREF__UV_reversed)
-                                    {
-                                        video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(
-                                                data_new, tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                camera_preview_size2.height, camera_preview_size2.width);
-
-                                        if (video_send_res != 0)
-                                        {
-                                            Log.i(TAG, "video:004:res=" + video_send_res + ":" +
-                                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(video_send_res));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        MainActivity.toxav_video_send_frame_wrapper(data_new,
-                                                                                    tox_friend_by_public_key__wrapper(
-                                                                                            Callstate.friend_pubkey),
-                                                                                    camera_preview_size2.height,
-                                                                                    camera_preview_size2.width);
-                                    }
+                                    MainActivity.toxav_video_send_frame_wrapper(data_new,
+                                                                                tox_friend_by_public_key__wrapper(
+                                                                                        Callstate.friend_pubkey),
+                                                                                camera_preview_size2.height,
+                                                                                camera_preview_size2.width);
                                 }
+
                             }
                             else if (CameraWrapper.camera_video_rotate_angle == 270)
                             {
@@ -609,63 +574,35 @@ public class CameraWrapper
                                 data_new = rotateYUV420Degree90(data_new2, camera_preview_size2.width,
                                                                 camera_preview_size2.height);
 
-                                if (mirror_cam_image)
+                                MainActivity.video_buffer_2.rewind();
+                                MainActivity.video_buffer_2.put(data_new);
+
+                                if (PREF__UV_reversed)
                                 {
-                                    data_new2 = flipYUV420Horizontal(data_new, camera_preview_size2.height,
-                                                                     camera_preview_size2.width);
-                                    MainActivity.video_buffer_2.rewind();
-                                    MainActivity.video_buffer_2.put(data_new2);
+                                    video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(data_new,
+                                                                                                             tox_friend_by_public_key__wrapper(
+                                                                                                                     Callstate.friend_pubkey),
+                                                                                                             camera_preview_size2.height,
+                                                                                                             camera_preview_size2.width);
 
-                                    if (PREF__UV_reversed)
+                                    if (video_send_res != 0)
                                     {
-                                        video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(
-                                                data_new2, tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                camera_preview_size2.height, camera_preview_size2.width);
-
-                                        if (video_send_res != 0)
-                                        {
-                                            Log.i(TAG, "video:005:res=" + video_send_res + ":" +
-                                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(video_send_res));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        MainActivity.toxav_video_send_frame_wrapper(data_new2,
-                                                                                    tox_friend_by_public_key__wrapper(
-                                                                                            Callstate.friend_pubkey),
-                                                                                    camera_preview_size2.height,
-                                                                                    camera_preview_size2.width);
+                                        Log.i(TAG, "video:006:res=" + video_send_res + ":" +
+                                                   ToxVars.TOXAV_ERR_SEND_FRAME.value_str(video_send_res));
                                     }
                                 }
                                 else
                                 {
-                                    MainActivity.video_buffer_2.rewind();
-                                    MainActivity.video_buffer_2.put(data_new);
-
-                                    if (PREF__UV_reversed)
-                                    {
-                                        video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(
-                                                data_new, tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                camera_preview_size2.height, camera_preview_size2.width);
-
-                                        if (video_send_res != 0)
-                                        {
-                                            Log.i(TAG, "video:006:res=" + video_send_res + ":" +
-                                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(video_send_res));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        MainActivity.toxav_video_send_frame_wrapper(data_new,
-                                                                                    tox_friend_by_public_key__wrapper(
-                                                                                            Callstate.friend_pubkey),
-                                                                                    camera_preview_size2.height,
-                                                                                    camera_preview_size2.width);
-                                    }
+                                    MainActivity.toxav_video_send_frame_wrapper(data_new,
+                                                                                tox_friend_by_public_key__wrapper(
+                                                                                        Callstate.friend_pubkey),
+                                                                                camera_preview_size2.height,
+                                                                                camera_preview_size2.width);
                                 }
                             }
                             else if (CameraWrapper.camera_video_rotate_angle == 180)
                             {
+
                                 data_new = rotateYUV420Degree90(data, camera_preview_size2.width,
                                                                 camera_preview_size2.height);
                                 data_new2 = rotateYUV420Degree90(data_new, camera_preview_size2.height,
@@ -898,7 +835,7 @@ public class CameraWrapper
                         Log.i(TAG,
                               "onPreviewFrame:YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" +
                               buffer_size_in_bytes2);
-                        MainActivity.video_buffer_2 = ByteBuffer.allocateDirect(buffer_size_in_bytes2 + 1);
+                        MainActivity.video_buffer_2 = ByteBuffer.allocateDirect((2 * buffer_size_in_bytes2) + 1);
                         MainActivity.set_JNI_video_buffer2(MainActivity.video_buffer_2, camera_preview_size2.width,
                                                            camera_preview_size2.height);
                     }
@@ -1011,5 +948,57 @@ public class CameraWrapper
         return yuv;
     }
 
+    private byte[] rotateNV21_working(final byte[] yuv, final int width, final int height, final int rotation2)
+    {
+        if (rotation2 == 0)
+        {
+            return yuv;
+        }
+
+        int rotation = rotation2;
+
+        if (rotation2 % 90 != 0 || rotation2 < 0 || rotation2 > 270)
+        {
+            // throw new IllegalArgumentException("0 <= rotation < 360, rotation % 90 == 0");
+            rotation = 0;
+        }
+
+        if (rotation == 0)
+        {
+            return yuv;
+        }
+
+        final byte[] output = new byte[yuv.length];
+        final int frameSize = width * height;
+        final boolean swap = rotation % 180 != 0;
+        final boolean xflip = rotation % 270 != 0;
+        final boolean yflip = rotation >= 180;
+
+        for (int j = 0; j < height; j++)
+        {
+            for (int i = 0; i < width; i++)
+            {
+                final int yIn = j * width + i;
+                final int uIn = frameSize + (j >> 1) * width + (i & ~1);
+                final int vIn = uIn + 1;
+
+                final int wOut = swap ? height : width;
+                final int hOut = swap ? width : height;
+                final int iSwapped = swap ? j : i;
+                final int jSwapped = swap ? i : j;
+                final int iOut = xflip ? wOut - iSwapped - 1 : iSwapped;
+                final int jOut = yflip ? hOut - jSwapped - 1 : jSwapped;
+
+                final int yOut = jOut * wOut + iOut;
+                final int uOut = frameSize + (jOut >> 1) * wOut + (iOut & ~1);
+                final int vOut = uOut + 1;
+
+                output[yOut] = (byte) (0xff & yuv[yIn]);
+                output[uOut] = (byte) (0xff & yuv[uIn]);
+                output[vOut] = (byte) (0xff & yuv[vIn]);
+            }
+        }
+        return output;
+    }
 
 }

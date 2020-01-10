@@ -45,6 +45,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.YuvImage;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -10653,7 +10654,7 @@ public class MainActivity extends AppCompatActivity
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
-            // reverse_u_and_v_planes(buf, frame_width_px, frame_height_px);
+            reverse_u_and_v_planes(buf, frame_width_px, frame_height_px);
             feed_h264_encoder(buf, frame_width_px, frame_height_px);
 
             // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:--------------------------");
