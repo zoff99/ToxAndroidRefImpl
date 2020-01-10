@@ -373,6 +373,8 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
     static boolean PREF__use_H264_hw_encoding = true;
+    static String PREF__CAMERA_GET_PREVIEWFORMAT = "YV12"; // "NV21";
+    static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
     static int PREF__video_play_delay_ms = 0;
 
@@ -2151,7 +2153,12 @@ public class MainActivity extends AppCompatActivity
 
             if (!video_frame_image.isRecycled())
             {
-                video_frame_image.recycle();
+                Log.i(TAG, "video_frame_image.recycle:start");
+                if (!PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP)
+                {
+                    video_frame_image.recycle();
+                }
+                Log.i(TAG, "video_frame_image.recycle:end");
             }
 
             video_frame_image = null;
@@ -10649,13 +10656,69 @@ public class MainActivity extends AppCompatActivity
         global_sps_pps_nal_unit_bytes = sps_pps_nal_unit_bytes;
     }
 
-    static int toxav_video_send_frame_uv_reversed_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
+    public static byte[] YV12totoNV12(byte[] input, byte[] output, int width, int height)
+    {
+        final int frameSize = width * height;
+        final int qFrameSize = frameSize / 4;
+        System.arraycopy(input, 0, output, 0, frameSize); // Y
+        for (int i = 0; i < qFrameSize; i++)
+        {
+            output[frameSize + i * 2] = input[frameSize + i + qFrameSize]; // Cb (U)
+            output[frameSize + i * 2 + 1] = input[frameSize + i]; // Cr (V)
+        }
+        return output;
+    }
+
+    public static byte[] YV12toNV21(final byte[] input, final byte[] output, final int width, final int height)
+    {
+
+        final int size = width * height;
+        final int quarter = size / 4;
+        final int vPosition = size; // This is where V starts
+        final int uPosition = size + quarter; // This is where U starts
+
+        System.arraycopy(input, 0, output, 0, size); // Y is same
+
+        for (int i = 0; i < quarter; i++)
+        {
+            output[size + i * 2] = input[vPosition + i]; // For NV21, V first
+            output[size + i * 2 + 1] = input[uPosition + i]; // For Nv21, U second
+        }
+        return output;
+    }
+
+    // the color transform, @see http://stackoverflow.com/questions/15739684/mediacodec-and-camera-color-space-incorrect
+    public static byte[] NV21toNV12(byte[] input, byte[] output, int width, int height)
+    {
+        final int frameSize = width * height;
+        final int qFrameSize = frameSize / 4;
+        System.arraycopy(input, 0, output, 0, frameSize); // Y
+        for (int i = 0; i < qFrameSize; i++)
+        {
+            output[frameSize + i * 2] = input[frameSize + i * 2 + 1]; // Cb (U)
+            output[frameSize + i * 2 + 1] = input[frameSize + i * 2]; // Cr (V)
+        }
+        return output;
+    }
+
+    static int toxav_video_send_frame_uv_reversed_wrapper(byte[] buf2, long friendnum, int frame_width_px, int frame_height_px)
     {
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
-            reverse_u_and_v_planes(buf, frame_width_px, frame_height_px);
-            feed_h264_encoder(buf, frame_width_px, frame_height_px);
+            if (PREF__CAMERA_GET_PREVIEWFORMAT == "YV12")
+            {
+                byte[] buf = new byte[buf2.length];
+                buf = YV12totoNV12(buf2, buf, frame_width_px, frame_height_px);
+                feed_h264_encoder(buf, frame_width_px, frame_height_px);
+            }
+            else // (PREF__CAMERA_GET_PREVIEWFORMAT == "NV21")
+            {
+                byte[] buf = new byte[buf2.length];
+                buf = NV21toNV12(buf2, buf, frame_width_px, frame_height_px);
+                // reverse_u_and_v_planes(buf2, frame_width_px, frame_height_px);
+                feed_h264_encoder(buf, frame_width_px, frame_height_px);
+            }
 
             // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:--------------------------");
             for (int jj = 0; jj < 2; jj++)

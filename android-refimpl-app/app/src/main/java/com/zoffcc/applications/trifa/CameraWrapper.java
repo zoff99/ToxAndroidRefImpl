@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__CAMERA_GET_PREVIEWFORMAT;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hint;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__fps_half;
@@ -382,6 +383,7 @@ public class CameraWrapper
             }
 
             mCameraParamters.setFlashMode("off");
+            mCameraParamters.setRotation(0);
 
             try
             {
@@ -434,10 +436,17 @@ public class CameraWrapper
             Log.i(TAG, "preview size after 2=" + mCameraParamters.getPreviewSize().width + "," +
                        mCameraParamters.getPreviewSize().height);
 
-            if (mCameraParamters.isVideoStabilizationSupported())
+            //if (mCameraParamters.isVideoStabilizationSupported())
+            //{
+            //    mCameraParamters.setVideoStabilization(true);
+            //}
+
+            List<String> focusModes = mCameraParamters.getSupportedFocusModes();
+            if (focusModes.contains(android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
             {
-                mCameraParamters.setVideoStabilization(true);
+                mCameraParamters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             }
+
 
             mCameraPreviewCallback = new CameraPreviewCallback();
             // ------ use buffer ------
@@ -465,14 +474,8 @@ public class CameraWrapper
             mCameraPreviewCallback.reset();
             Log.i(TAG, "previewFormats:999");
             // ------ use buffer ------
-            List<String> focusModes = mCameraParamters.getSupportedFocusModes();
 
-            if (focusModes.contains(android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
-            {
-                mCameraParamters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
-            }
-
-            mCamera.setParameters(mCameraParamters);
+            // mCamera.setParameters(mCameraParamters);
 
             try
             {
@@ -534,9 +537,18 @@ public class CameraWrapper
                         {
                             if (CameraWrapper.camera_video_rotate_angle == 90)
                             {
-                                data_new = rotateYUV420Degree90(data, camera_preview_size2.width,
-                                                                camera_preview_size2.height);
-
+                                if (PREF__CAMERA_GET_PREVIEWFORMAT == "YV12")
+                                {
+                                    data_new = new byte[data.length];
+                                    data_new = YV12rotate90(data, data_new, camera_preview_size2.width,
+                                                            camera_preview_size2.height);
+                                }
+                                else
+                                {
+                                    data_new = new byte[data.length];
+                                    data_new = NV21rotate90(data, data_new, camera_preview_size2.width,
+                                                            camera_preview_size2.height);
+                                }
 
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new);
@@ -567,12 +579,19 @@ public class CameraWrapper
                             }
                             else if (CameraWrapper.camera_video_rotate_angle == 270)
                             {
-                                data_new = rotateYUV420Degree90(data, camera_preview_size2.width,
-                                                                camera_preview_size2.height);
-                                data_new2 = rotateYUV420Degree90(data_new, camera_preview_size2.height,
-                                                                 camera_preview_size2.width);
-                                data_new = rotateYUV420Degree90(data_new2, camera_preview_size2.width,
-                                                                camera_preview_size2.height);
+
+                                if (PREF__CAMERA_GET_PREVIEWFORMAT == "YV12")
+                                {
+                                    data_new = new byte[data.length];
+                                    data_new = YV12rotate270(data, data_new, camera_preview_size2.width,
+                                                            camera_preview_size2.height);
+                                }
+                                else
+                                {
+                                    data_new = new byte[data.length];
+                                    data_new = NV21rotate270(data, data_new, camera_preview_size2.width,
+                                                            camera_preview_size2.height);
+                                }
 
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new);
@@ -602,11 +621,20 @@ public class CameraWrapper
                             }
                             else if (CameraWrapper.camera_video_rotate_angle == 180)
                             {
+                                if (PREF__CAMERA_GET_PREVIEWFORMAT == "YV12")
+                                {
+                                    data_new2 = new byte[data.length];
+                                    data_new2 = YV12rotate180(data, data_new2, camera_preview_size2.width,
+                                                             camera_preview_size2.height);
+                                }
+                                else
+                                {
+                                    data_new2 = new byte[data.length];
+                                    data_new2 = NV21rotate180(data, data_new2, camera_preview_size2.width,
+                                                             camera_preview_size2.height);
+                                }
 
-                                data_new = rotateYUV420Degree90(data, camera_preview_size2.width,
-                                                                camera_preview_size2.height);
-                                data_new2 = rotateYUV420Degree90(data_new, camera_preview_size2.height,
-                                                                 camera_preview_size2.width);
+
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new2);
 
@@ -862,140 +890,153 @@ public class CameraWrapper
         }
     }
 
-    private byte[] flipYUV420Horizontal(byte[] data, int imageWidth, int imageHeight)
+    public static byte[] NV21rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
-        byte[] yuv = new byte[imageWidth * imageHeight * 3 / 2];
-        // flip the Y plane
-        int i = 0; // start of Y plane
-
-        for (int y = 0; y < imageHeight; y++)
-        {
-            for (int x = imageWidth - 1; x >= 0; x--)
-            {
-                yuv[i] = data[y * imageWidth + x];
-                i++;
-            }
-        }
-
-        // flip the U+V plane at the same time
-        int w = (imageWidth / 2);
-        int h = (imageHeight / 2);
-        i = (imageWidth * imageHeight); // start of U plane
-        int i_2 = (imageWidth * imageHeight) + (w * h); // start of V plane
-        int offset = i;
-        int offset_2 = i_2;
-
-        for (int y = 0; y < h; y++)
-        {
-            for (int x = w - 1; x >= 0; x--)
-            {
-                yuv[i] = data[offset + (y * w + x)];
-                i++;
-                yuv[i_2] = data[offset_2 + (y * w + x)];
-                i_2++;
-            }
-        }
-
-        return yuv;
-    }
-
-    private byte[] rotateYUV420Degree90(byte[] data, int imageWidth, int imageHeight)
-    {
-        byte[] yuv = new byte[imageWidth * imageHeight * 3 / 2];
         // Rotate the Y luma
-        int i = 0; // start of Y plane
-
+        int i = 0;
         for (int x = 0; x < imageWidth; x++)
         {
             for (int y = imageHeight - 1; y >= 0; y--)
             {
-                yuv[i] = data[y * imageWidth + x];
-                i++;
+                output[i++] = data[y * imageWidth + x];
             }
         }
-
-        //        // Rotate the U and V color components (interleaved)
-        //        i = imageWidth * imageHeight * 3 / 2 - 1;
-        //        for (int x = imageWidth - 1; x > 0; x = x - 2)
-        //        {
-        //            for (int y = 0; y < imageHeight / 2; y++)
-        //            {
-        //                yuv[i] = data[(imageWidth * imageHeight) + (y * imageWidth) + x];
-        //                i--;
-        //                yuv[i] = data[(imageWidth * imageHeight) + (y * imageWidth) + (x - 1)];
-        //                i--;
-        //            }
-        //        }
-        // Rotate the U+V plane at the same time
-        int w = (imageWidth / 2);
-        int h = (imageHeight / 2);
-        i = (imageWidth * imageHeight); // start of U plane
-        int i_2 = (imageWidth * imageHeight) + (w * h); // start of V plane
-        int offset = i;
-        int offset_2 = i_2;
-
-        for (int x = 0; x < w; x++)
+        // Rotate the U and V color components
+        int size = imageWidth * imageHeight;
+        i = size * 3 / 2 - 1;
+        for (int x = imageWidth - 1; x > 0; x = x - 2)
         {
-            for (int y = h - 1; y >= 0; y--)
+            for (int y = 0; y < imageHeight / 2; y++)
             {
-                yuv[i] = data[offset + (y * w + x)];
-                i++;
-                yuv[i_2] = data[offset_2 + (y * w + x)];
-                i_2++;
+                output[i--] = data[size + (y * imageWidth) + x];
+                output[i--] = data[size + (y * imageWidth) + (x - 1)];
             }
         }
-
-        return yuv;
+        return output;
     }
 
-    private byte[] rotateNV21_working(final byte[] yuv, final int width, final int height, final int rotation2)
+    public static byte[] NV21rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
-        if (rotation2 == 0)
+        int count = 0;
+        for (int i = imageWidth * imageHeight - 1; i >= 0; i--)
         {
-            return yuv;
+            output[count] = data[i];
+            count++;
         }
-
-        int rotation = rotation2;
-
-        if (rotation2 % 90 != 0 || rotation2 < 0 || rotation2 > 270)
+        for (int i = imageWidth * imageHeight * 3 / 2 - 1; i >= imageWidth * imageHeight; i -= 2)
         {
-            // throw new IllegalArgumentException("0 <= rotation < 360, rotation % 90 == 0");
-            rotation = 0;
+            output[count++] = data[i - 1];
+            output[count++] = data[i];
         }
+        return output;
+    }
 
-        if (rotation == 0)
+    public static byte[] NV21rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    {
+        // Rotate the Y luma
+        int i = 0;
+        for (int x = imageWidth - 1; x >= 0; x--)
         {
-            return yuv;
-        }
-
-        final byte[] output = new byte[yuv.length];
-        final int frameSize = width * height;
-        final boolean swap = rotation % 180 != 0;
-        final boolean xflip = rotation % 270 != 0;
-        final boolean yflip = rotation >= 180;
-
-        for (int j = 0; j < height; j++)
-        {
-            for (int i = 0; i < width; i++)
+            for (int y = 0; y < imageHeight; y++)
             {
-                final int yIn = j * width + i;
-                final int uIn = frameSize + (j >> 1) * width + (i & ~1);
-                final int vIn = uIn + 1;
+                output[i++] = data[y * imageWidth + x];
+            }
+        }
 
-                final int wOut = swap ? height : width;
-                final int hOut = swap ? width : height;
-                final int iSwapped = swap ? j : i;
-                final int jSwapped = swap ? i : j;
-                final int iOut = xflip ? wOut - iSwapped - 1 : iSwapped;
-                final int jOut = yflip ? hOut - jSwapped - 1 : jSwapped;
+        // Rotate the U and V color components
+        i = imageWidth * imageHeight;
+        int uvHeight = imageHeight / 2;
+        for (int x = imageWidth - 1; x >= 0; x -= 2)
+        {
+            for (int y = imageHeight; y < uvHeight + imageHeight; y++)
+            {
+                output[i++] = data[y * imageWidth + x - 1];
+                output[i++] = data[y * imageWidth + x];
+            }
+        }
+        return output;
+    }
 
-                final int yOut = jOut * wOut + iOut;
-                final int uOut = frameSize + (jOut >> 1) * wOut + (iOut & ~1);
-                final int vOut = uOut + 1;
 
-                output[yOut] = (byte) (0xff & yuv[yIn]);
-                output[uOut] = (byte) (0xff & yuv[uIn]);
-                output[vOut] = (byte) (0xff & yuv[vIn]);
+    public static byte[] YV12rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    {
+        // Rotate the Y luma
+        int i = 0;
+        for (int x = 0; x < imageWidth; x++)
+        {
+            for (int y = imageHeight - 1; y >= 0; y--)
+            {
+                output[i++] = data[y * imageWidth + x];
+            }
+        }
+        final int size = imageWidth * imageHeight;
+        final int colorSize = size / 4;
+        final int colorHeight = colorSize / imageWidth;
+        // Rotate the U and V color components
+        for (int x = 0; x < imageWidth / 2; x++)
+        {
+            for (int y = colorHeight - 1; y >= 0; y--)
+            {
+                //V
+                output[i + colorSize] = data[colorSize + size + (imageWidth * y) + x + (imageWidth / 2)];
+                output[i + colorSize + 1] = data[colorSize + size + (imageWidth * y) + x];
+                //U
+                output[i++] = data[size + (imageWidth * y) + x + (imageWidth / 2)];
+                output[i++] = data[size + (imageWidth * y) + x];
+            }
+        }
+        return output;
+    }
+
+    public static byte[] YV12rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    {
+        int count = 0;
+        final int size = imageWidth * imageHeight;
+        for (int i = size - 1; i >= 0; i--)
+        {
+            output[count++] = data[i];
+        }
+        final int midColorSize = size / 4;
+        //U
+        for (int i = size + midColorSize - 1; i >= size; i--)
+        {
+            output[count++] = data[i];
+        }
+        //V
+        for (int i = data.length - 1; i >= imageWidth * imageHeight + midColorSize; i--)
+        {
+            output[count++] = data[i];
+        }
+        return output;
+    }
+
+    public static byte[] YV12rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    {
+        // Rotate the Y luma
+        int i = 0;
+        for (int x = imageWidth - 1; x >= 0; x--)
+        {
+            for (int y = 0; y < imageHeight; y++)
+            {
+                output[i++] = data[y * imageWidth + x];
+            }
+        }
+
+        // Rotate the U and V color components
+        final int size = imageWidth * imageHeight;
+        final int colorSize = size / 4;
+        final int colorHeight = colorSize / imageWidth;
+
+        for (int x = 0; x < imageWidth / 2; x++)
+        {
+            for (int y = 0; y < colorHeight; y++)
+            {
+                //V
+                output[i + colorSize] = data[colorSize + size + (imageWidth * y) - x + (imageWidth / 2) - 1];
+                output[i + colorSize + 1] = data[colorSize + size + (imageWidth * y) - x + imageWidth - 1];
+                //U
+                output[i++] = data[size + (imageWidth * y) - x + (imageWidth / 2) - 1];
+                output[i++] = data[size + (imageWidth * y) - x + imageWidth - 1];
             }
         }
         return output;

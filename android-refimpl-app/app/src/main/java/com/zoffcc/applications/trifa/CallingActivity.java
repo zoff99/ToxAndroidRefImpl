@@ -2280,7 +2280,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
              */
 
             mBufferInfo = new MediaCodec.BufferInfo();
+            Log.d(TAG, "prepareEncoder:before:w,h:" + video_encoder_width + "," + video_encoder_height);
             video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, video_encoder_width, video_encoder_height);
+            Log.d(TAG, "prepareEncoder:after:w,h:" + video_encoder_width + "," + video_encoder_height);
 
             try
             {
@@ -2330,12 +2332,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             MediaCodecInfo.CodecCapabilities capabilities = mEncoder.getCodecInfo().getCapabilitiesForType(MIME_TYPE);
             int selectedColorFormat = 0;
+
             for (int i = 0; i < capabilities.colorFormats.length && selectedColorFormat == 0; i++)
             {
                 int format = capabilities.colorFormats[i];
                 switch (format)
                 {
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible:
+                        selectedColorFormat = format;
+                        Log.i(TAG, "prepareEncoder:1:using format [" + i + "] " + format);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:1:Unsupported color format [" + i + "] " + format);
+                        break;
+                }
+            }
+
+            for (int i = 0; i < capabilities.colorFormats.length && selectedColorFormat == 0; i++)
+            {
+                int format = capabilities.colorFormats[i];
+                switch (format)
+                {
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
@@ -2343,10 +2360,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:
                         selectedColorFormat = format;
-                        Log.i(TAG, "prepareEncoder:using format [" + i + "] " + format);
+                        Log.i(TAG, "prepareEncoder:2:using format [" + i + "] " + format);
                         break;
                     default:
-                        Log.i(TAG, "prepareEncoder:Unsupported color format [" + i + "] " + format);
+                        Log.i(TAG, "prepareEncoder:2:Unsupported color format [" + i + "] " + format);
                         break;
                 }
             }
@@ -2362,6 +2379,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                                 MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
             }
 
+            Log.i(TAG, "prepareEncoder:mEncoder.getName=" + mEncoder.getName());
+
 /*
             int selectedProfile = 0;
             for (int i = 0; i < capabilities.profileLevels.length && selectedProfile == 0; i++)
@@ -2369,7 +2388,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
                 switch (l.profile)
                 {
-                    case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh:
+                    case MediaCodecInfo.CodecProfileLevel.AVCProfileConstrainedBaseline:
+                        // case MediaCodecInfo.CodecProfileLevel.AVCProfileConstrainedBaseline:
                         selectedProfile = l.profile;
                         Log.i(TAG, "prepareEncoder:using AVC profile " + l);
                         break;
@@ -2381,8 +2401,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             if (selectedProfile != 0)
             {
-                video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, selectedProfile);
-
+                // video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, selectedProfile);
+                // video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel31);
             }
             else
             {
