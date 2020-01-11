@@ -88,6 +88,7 @@
             android:showOnLockScreen="true"
             android:showForAllUsers="true"
             android:turnScreenOn="true"
+            android:screenOrientation="portrait"
             android:launchMode="singleTask"
             android:theme="@style/FullscreenTheme">
         </activity>
