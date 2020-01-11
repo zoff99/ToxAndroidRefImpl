@@ -6,6 +6,16 @@
         android:summary="@string/pref_description_video_uv_reversed"
         android:title="@string/pref_title_video_uv_reversed"/>
 
+    <ListPreference
+        android:defaultValue="YV12"
+        android:entries="@array/pref_camera_get_preview_format_titles"
+        android:entryValues="@array/pref_camera_get_preview_format_values"
+        android:key="camera_get_preview_format"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="@string/pref_description_camera_get_preview_format"
+        android:title="@string/pref_title_camera_get_preview_format"/>
+
     <!--<SwitchPreference-->
     <!--android:defaultValue="true"-->
     <!--android:key="software_echo_cancel"-->

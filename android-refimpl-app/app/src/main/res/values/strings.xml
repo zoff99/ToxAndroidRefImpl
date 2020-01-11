@@ -52,6 +52,17 @@
         <item>2</item>
     </string-array>
 
+    <string name="pref_title_camera_get_preview_format">Camera Preview Format</string>
+    <string name="pref_description_camera_get_preview_format">Camera Preview Format seems to be in the wrong format on some phones</string>
+    <string-array name="pref_camera_get_preview_format_titles">
+        <item>default: YV12</item>
+        <item>some phones: NV21</item>
+    </string-array>
+    <string-array name="pref_camera_get_preview_format_values">
+        <item>YV12</item>
+        <item>NV21</item>
+    </string-array>
+
     <string name="pref_title_higher_audio_quality">Audio Quality</string>
     <string name="pref_description_higher_audio_quality">Use better Audio quality.\nChange needs RESTART!</string>
     <string-array name="pref_higher_audio_quality_titles">

@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
     static boolean PREF__use_H264_hw_encoding = true;
-    static String PREF__CAMERA_GET_PREVIEWFORMAT = "YV12"; // "NV21";
+    static String PREF__camera_get_preview_format = "YV12"; // "YV12"; // "NV21";
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
     static int PREF__video_play_delay_ms = 0;
@@ -861,6 +861,8 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             PREF__X_audio_recording_frame_size = 40;
         }
+
+        PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 
         // prefs ----------
         PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
@@ -2027,6 +2029,8 @@ public class MainActivity extends AppCompatActivity
             PREF__X_audio_recording_frame_size = 40;
         }
 
+        PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
+
         // prefs ----------
 
         try
@@ -2153,12 +2157,12 @@ public class MainActivity extends AppCompatActivity
 
             if (!video_frame_image.isRecycled())
             {
-                Log.i(TAG, "video_frame_image.recycle:start");
                 if (!PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP)
                 {
+                    Log.i(TAG, "video_frame_image.recycle:start");
                     video_frame_image.recycle();
+                    Log.i(TAG, "video_frame_image.recycle:end");
                 }
-                Log.i(TAG, "video_frame_image.recycle:end");
             }
 
             video_frame_image = null;
@@ -10706,17 +10710,16 @@ public class MainActivity extends AppCompatActivity
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
-            if (PREF__CAMERA_GET_PREVIEWFORMAT == "YV12")
+            if (PREF__camera_get_preview_format.equals("YV12"))
             {
                 byte[] buf = new byte[buf2.length];
                 buf = YV12totoNV12(buf2, buf, frame_width_px, frame_height_px);
                 feed_h264_encoder(buf, frame_width_px, frame_height_px);
             }
-            else // (PREF__CAMERA_GET_PREVIEWFORMAT == "NV21")
+            else // (PREF__camera_get_preview_format == "NV21")
             {
                 byte[] buf = new byte[buf2.length];
                 buf = NV21toNV12(buf2, buf, frame_width_px, frame_height_px);
-                // reverse_u_and_v_planes(buf2, frame_width_px, frame_height_px);
                 feed_h264_encoder(buf, frame_width_px, frame_height_px);
             }
 

@@ -1210,6 +1210,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Log.i(TAG, "onResume:01");
 
         super.onResume();
+
+        try
+        {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+            MainActivity.PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
             if (PREF__use_H264_hw_encoding)
@@ -2338,12 +2349,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 int format = capabilities.colorFormats[i];
                 switch (format)
                 {
-                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible:
+                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
                         selectedColorFormat = format;
-                        Log.i(TAG, "prepareEncoder:1:using format [" + i + "] " + format);
+                        Log.i(TAG, "prepareEncoder:1a:using format [" + i + "] " + format);
                         break;
                     default:
-                        Log.i(TAG, "prepareEncoder:1:Unsupported color format [" + i + "] " + format);
+                        Log.i(TAG, "prepareEncoder:1a:Unsupported color format [" + i + "] " + format);
+                        break;
+                }
+            }
+
+            for (int i = 0; i < capabilities.colorFormats.length && selectedColorFormat == 0; i++)
+            {
+                int format = capabilities.colorFormats[i];
+                switch (format)
+                {
+                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible:
+                        selectedColorFormat = format;
+                        Log.i(TAG, "prepareEncoder:1b:using format [" + i + "] " + format);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:1b:Unsupported color format [" + i + "] " + format);
                         break;
                 }
             }
@@ -2355,7 +2381,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
-                    case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
+                    // case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:

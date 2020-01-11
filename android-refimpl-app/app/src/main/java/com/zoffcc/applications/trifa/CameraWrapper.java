@@ -33,9 +33,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.MainActivity.PREF__CAMERA_GET_PREVIEWFORMAT;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hint;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__camera_get_preview_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__fps_half;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__set_fps;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
@@ -334,20 +334,23 @@ public class CameraWrapper
             List<Integer> camera_preview_formats = mCameraParamters.getSupportedPreviewFormats();
             int selectedCameraPreviewFormat = 0;
 
-            for (int i = 0; i < camera_preview_formats.size() && selectedCameraPreviewFormat == 0; i++)
+            if (PREF__camera_get_preview_format.equals("YV12"))
             {
-                int format = camera_preview_formats.get(i);
-
-                switch (format)
+                for (int i = 0; i < camera_preview_formats.size() && selectedCameraPreviewFormat == 0; i++)
                 {
-                    case ImageFormat.YV12: // this is preferred
-                        selectedCameraPreviewFormat = format;
-                        Log.i(TAG, "SupportedPreviewFormats:using Preview format [" + i + "] " + format);
-                        break;
+                    int format = camera_preview_formats.get(i);
 
-                    default:
-                        Log.i(TAG, "SupportedPreviewFormats:Unsupported Preview format [" + i + "] " + format);
-                        break;
+                    switch (format)
+                    {
+                        case ImageFormat.YV12: // this is preferred
+                            selectedCameraPreviewFormat = format;
+                            Log.i(TAG, "SupportedPreviewFormats:using Preview format [" + i + "] " + format);
+                            break;
+
+                        default:
+                            Log.i(TAG, "SupportedPreviewFormats:Unsupported Preview format [" + i + "] " + format);
+                            break;
+                    }
                 }
             }
 
@@ -447,7 +450,6 @@ public class CameraWrapper
                 mCameraParamters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             }
 
-
             mCameraPreviewCallback = new CameraPreviewCallback();
             // ------ use buffer ------
             mCamera.setParameters(mCameraParamters);
@@ -537,7 +539,7 @@ public class CameraWrapper
                         {
                             if (CameraWrapper.camera_video_rotate_angle == 90)
                             {
-                                if (PREF__CAMERA_GET_PREVIEWFORMAT == "YV12")
+                                if (PREF__camera_get_preview_format.equals("YV12"))
                                 {
                                     data_new = new byte[data.length];
                                     data_new = YV12rotate90(data, data_new, camera_preview_size2.width,
@@ -580,17 +582,17 @@ public class CameraWrapper
                             else if (CameraWrapper.camera_video_rotate_angle == 270)
                             {
 
-                                if (PREF__CAMERA_GET_PREVIEWFORMAT == "YV12")
+                                if (PREF__camera_get_preview_format.equals("YV12"))
                                 {
                                     data_new = new byte[data.length];
                                     data_new = YV12rotate270(data, data_new, camera_preview_size2.width,
-                                                            camera_preview_size2.height);
+                                                             camera_preview_size2.height);
                                 }
                                 else
                                 {
                                     data_new = new byte[data.length];
                                     data_new = NV21rotate270(data, data_new, camera_preview_size2.width,
-                                                            camera_preview_size2.height);
+                                                             camera_preview_size2.height);
                                 }
 
                                 MainActivity.video_buffer_2.rewind();
@@ -621,17 +623,17 @@ public class CameraWrapper
                             }
                             else if (CameraWrapper.camera_video_rotate_angle == 180)
                             {
-                                if (PREF__CAMERA_GET_PREVIEWFORMAT == "YV12")
+                                if (PREF__camera_get_preview_format.equals("YV12"))
                                 {
                                     data_new2 = new byte[data.length];
                                     data_new2 = YV12rotate180(data, data_new2, camera_preview_size2.width,
-                                                             camera_preview_size2.height);
+                                                              camera_preview_size2.height);
                                 }
                                 else
                                 {
                                     data_new2 = new byte[data.length];
                                     data_new2 = NV21rotate180(data, data_new2, camera_preview_size2.width,
-                                                             camera_preview_size2.height);
+                                                              camera_preview_size2.height);
                                 }
 
 
