@@ -216,6 +216,7 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
 
                             if (img_w > img_h)
                             {
+                                // TODO: this is NOT correct yet!!
                                 scale_up = (float) (mViewHeight / 2) / (float) (mViewWidth / 2);
                                 Log.i(TAG, "scale=" + scale_up + " " + img_w + " " + img_h + " " + mViewHeight + " " +
                                            mViewWidth);
