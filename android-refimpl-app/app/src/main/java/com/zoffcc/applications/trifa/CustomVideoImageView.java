@@ -9,11 +9,13 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import static com.zoffcc.applications.trifa.CallingActivity.device_orientation;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_zoom_incoming_video;
+import static com.zoffcc.applications.trifa.MainActivity.semaphore_videoout_bitmap;
 
 public class CustomVideoImageView extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener
 {
-    private Matrix matrix = new Matrix();
+    private static Matrix matrix = new Matrix();
     private Matrix savedMatrix = new Matrix();
 
     static final int NONE = 0;
@@ -37,7 +39,7 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
     private float scaled_mBitmapWidth = 1;
     private float scaled_mBitmapHeight = 1;
     private boolean mDraggable = false;
-    private boolean matrix_was_reset = false;
+    private static boolean matrix_was_reset = false;
     private float sum_scale_factor = 1;
 
 
@@ -105,62 +107,118 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
         }
     }
 
+    public static void video_output_orentation_update()
+    {
+        matrix.reset();
+        matrix_was_reset = true;
+    }
+
     public void setBitmap(Bitmap bitmap)
     {
         if (bitmap != null)
         {
-            if (PREF__X_zoom_incoming_video)
+            if (!bitmap.isRecycled())
             {
-
-                int mBitmapWidth = bitmap.getWidth();
-                int mBitmapHeight = bitmap.getHeight();
-
-                if (matrix_was_reset)
+                if (PREF__X_zoom_incoming_video)
                 {
-                    try
+                    if (matrix_was_reset)
                     {
-
-                        float scale_h = (float) mViewHeight / (float) mBitmapHeight;
-                        float scale_w = (float) mViewWidth / (float) mBitmapWidth;
-
-                        // System.out.println("__onTouch__:" + "scale_w=" + scale_w + ",scale_h=" + scale_h);
-                        float scale = Math.min(scale_h, scale_w);
-                        float MAX_SCALE_BITMAP = 10.0f;
-                        float MIN_SCALE_BITMAP = 0.0001f;
-                        if (scale < MIN_SCALE_BITMAP)
+                        try
                         {
-                            scale = MIN_SCALE_BITMAP;
+                            int mBitmapWidth = bitmap.getWidth();
+                            int mBitmapHeight = bitmap.getHeight();
+
+                            float scale_h = (float) mViewHeight / (float) mBitmapHeight;
+                            float scale_w = (float) mViewWidth / (float) mBitmapWidth;
+
+                            // System.out.println("__onTouch__:" + "scale_w=" + scale_w + ",scale_h=" + scale_h);
+                            float scale = Math.min(scale_h, scale_w);
+                            float MAX_SCALE_BITMAP = 10.0f;
+                            float MIN_SCALE_BITMAP = 0.0001f;
+                            if (scale < MIN_SCALE_BITMAP)
+                            {
+                                scale = MIN_SCALE_BITMAP;
+                            }
+                            else if (scale > MAX_SCALE_BITMAP)
+                            {
+                                scale = MAX_SCALE_BITMAP;
+                            }
+
+                            sum_scale_factor = 1;
+
+                            scaled_mBitmapWidth = (float) mBitmapWidth * scale;
+                            scaled_mBitmapHeight = (float) mBitmapHeight * scale;
+
+                            mBitmapMiddlePoint.x = (mViewWidth / 2) - ((int) scaled_mBitmapWidth / 2);
+                            mBitmapMiddlePoint.y = (mViewHeight / 2) - ((int) scaled_mBitmapHeight / 2);
+
+                            System.out.println("__onTouch__:" + "001:" + scale + ":" + mBitmapMiddlePoint.x + "," +
+                                               mBitmapMiddlePoint.y + ":bm=" + mBitmapWidth + "," + mBitmapHeight +
+                                               ":view=" + mViewWidth + "," + mViewHeight);
+
+                            matrix.postTranslate(mBitmapMiddlePoint.x, mBitmapMiddlePoint.y);
+                            matrix_was_reset = false;
                         }
-                        else if (scale > MAX_SCALE_BITMAP)
+                        catch (Exception e)
                         {
-                            scale = MAX_SCALE_BITMAP;
+                            e.printStackTrace();
                         }
-
-                        sum_scale_factor = 1;
-
-                        scaled_mBitmapWidth = (float) mBitmapWidth * scale;
-                        scaled_mBitmapHeight = (float) mBitmapHeight * scale;
-
-                        mBitmapMiddlePoint.x = (mViewWidth / 2) - ((int) scaled_mBitmapWidth / 2);
-                        mBitmapMiddlePoint.y = (mViewHeight / 2) - ((int) scaled_mBitmapHeight / 2);
-
-                        System.out.println("__onTouch__:" + "001:" + scale + ":" + mBitmapMiddlePoint.x + "," +
-                                           mBitmapMiddlePoint.y + ":bm=" + mBitmapWidth + "," + mBitmapHeight +
-                                           ":view=" + mViewWidth + "," + mViewHeight);
-
-                        matrix.postTranslate(mBitmapMiddlePoint.x, mBitmapMiddlePoint.y);
-                        matrix_was_reset = false;
                     }
-                    catch (Exception e)
+
+                    this.setImageMatrix(matrix);
+                }
+                else
+                {
+                    if (matrix_was_reset)
                     {
-                        e.printStackTrace();
+                        try
+                        {
+                            mBitmapMiddlePoint.x = (mViewWidth / 2) - 2;
+                            mBitmapMiddlePoint.y = (mViewHeight / 2) - 2;
+
+                            int rot_needed = 0;
+
+                            if (device_orientation == 90)
+                            {
+                                System.out.println("rot_dev:270");
+                                rot_needed = 270;
+                            }
+                            else if (device_orientation == 270)
+                            {
+                                System.out.println("rot_dev:90");
+                                rot_needed = 90;
+                            }
+                            else if (device_orientation == 180)
+                            {
+                                System.out.println("rot_dev:180");
+                                rot_needed = 180;
+                            }
+                            else
+                            {
+                                System.out.println("rot_dev:0");
+                                rot_needed = 0;
+                            }
+
+                            this.setScaleX(1.5f);
+                            this.setScaleY(1.5f);
+                            this.setRotation(rot_needed);
+
+                            matrix_was_reset = false;
+                        }
+                        catch (Exception e)
+                        {
+                            // e.printStackTrace();
+                            // System.out.println("rot_dev:ERR:" + e.getMessage());
+                        }
                     }
                 }
 
-                this.setImageMatrix(matrix);
-            }
 
-            setImageBitmap(bitmap);
+                if (!bitmap.isRecycled())
+                {
+                    setImageBitmap(bitmap);
+                }
+            }
         }
     }
 

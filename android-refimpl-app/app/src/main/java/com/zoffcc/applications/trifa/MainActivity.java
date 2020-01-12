@@ -2605,12 +2605,11 @@ public class MainActivity extends AppCompatActivity
 
             if ((video_frame_image_valid == true) && (video_frame_image != null))
             {
-                alloc_in.copyFrom(video_buffer_1.array());
-                yuvToRgb.setInput(alloc_in);
-                yuvToRgb.forEach(alloc_out);
-
                 if (!video_frame_image.isRecycled())
                 {
+                    alloc_in.copyFrom(video_buffer_1.array());
+                    yuvToRgb.setInput(alloc_in);
+                    yuvToRgb.forEach(alloc_out);
                     alloc_out.copyTo(video_frame_image);
                 }
             }

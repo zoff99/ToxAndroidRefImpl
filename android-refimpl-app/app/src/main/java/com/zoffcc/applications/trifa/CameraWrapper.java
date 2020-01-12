@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.CallingActivity.device_orientation;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hint;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__camera_get_preview_format;
@@ -232,7 +233,7 @@ public class CameraWrapper
         }
     }
 
-    private int getRotation()
+    static int getRotation()
     {
         Log.i(TAG, "[sum]================");
         Display display = CallingActivity.ca.getWindowManager().getDefaultDisplay();
@@ -259,10 +260,28 @@ public class CameraWrapper
                 break;
         }
 
+        Log.i(TAG, "cam:getRotation:[display]degrees:1:=" + degrees);
+
+        // now compensate for device orientation
+        if (device_orientation == 90)
+        {
+            degrees = degrees + 270;
+        }
+        else if (device_orientation == 270)
+        {
+            degrees = degrees + 90;
+        }
+        else if (device_orientation == 180)
+        {
+            degrees = degrees + 180;
+        }
+
+        Log.i(TAG, "cam:getRotation:[display]degrees:2:=" + degrees);
+
         if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
         {
             result = (cameraInfo.orientation + degrees) % 360;
-            Log.i(TAG, "[FRONT CAMERA] tmp=" + (cameraInfo.orientation + degrees) + " result=" + result);
+            Log.i(TAG, "cam:getRotation:[FRONT CAMERA] tmp=" + (cameraInfo.orientation + degrees) + " result=" + result);
             // result = (360 - result) % 360;    // compensate the mirror
         }
         else
@@ -270,10 +289,11 @@ public class CameraWrapper
             result = (cameraInfo.orientation - degrees + 360) % 360;
         }
 
-        Log.i(TAG, "[camera]cameraInfo.orientation=" + cameraInfo.orientation);
-        Log.i(TAG, "[display]degrees=" + degrees);
-        Log.i(TAG, "[sum]result=" + result);
-        Log.i(TAG, "[sum]================");
+
+        Log.i(TAG, "cam:getRotation:[camera]cameraInfo.orientation=" + cameraInfo.orientation);
+        Log.i(TAG, "cam:getRotation:[display]degrees=" + degrees);
+        Log.i(TAG, "cam:getRotation:[sum]result=" + result);
+        Log.i(TAG, "cam:getRotation:[sum]================");
         return result;
     }
 

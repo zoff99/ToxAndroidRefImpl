@@ -63,6 +63,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
+import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
+import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
@@ -130,6 +132,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static AudioReceiver audio_receiver_thread = null;
     private SensorManager sensor_manager = null;
     private Sensor proximity_sensor = null;
+    private Sensor accelerometer_sensor = null;
+    static int device_orientation = 0;
     PowerManager pm = null;
     PowerManager.WakeLock wl1 = null;
     PowerManager.WakeLock wl2 = null;
@@ -232,6 +236,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         proximity_sensor = sensor_manager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        accelerometer_sensor = sensor_manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
         callactivity_handler = new Handler(getMainLooper());
@@ -1232,6 +1237,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         activity_state = 1;
 
         sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensor_manager.registerListener(this, accelerometer_sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         try
         {
@@ -1852,6 +1858,65 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 }
             }
         }
+        else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        {
+            try
+            {
+                if (event.values.length > 2)
+                {
+                    //Log.d(TAG, "onSensorChanged: x=" + event.values[0] + "  y=" + event.values[1] + "  z=" +
+                    //           event.values[2]);
+
+                    float x = event.values[0];
+                    float y = event.values[1];
+
+                    if (x < 5 && x > -5 && y > 5)
+                    {
+                        if (device_orientation != 0)
+                        {
+                            device_orientation = 0;
+                            //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
+                            CameraWrapper.camera_video_rotate_angle = getRotation();
+                            video_output_orentation_update();
+                        }
+                    }
+                    else if (x < -5 && y < 5 && y > -5)
+                    {
+                        if (device_orientation != 90)
+                        {
+                            device_orientation = 90;
+                            //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
+                            CameraWrapper.camera_video_rotate_angle = getRotation();
+                            video_output_orentation_update();
+                        }
+                    }
+                    else if (x < 5 && x > -5 && y < -5)
+                    {
+                        if (device_orientation != 180)
+                        {
+                            device_orientation = 180;
+                            //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
+                            CameraWrapper.camera_video_rotate_angle = getRotation();
+                            video_output_orentation_update();
+                        }
+                    }
+                    else if (x > 5 && y < 5 && y > -5)
+                    {
+                        if (device_orientation != 270)
+                        {
+                            device_orientation = 270;
+                            //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
+                            CameraWrapper.camera_video_rotate_angle = getRotation();
+                            video_output_orentation_update();
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -2381,7 +2446,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
-                    // case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
+                        // case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
                     case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:
