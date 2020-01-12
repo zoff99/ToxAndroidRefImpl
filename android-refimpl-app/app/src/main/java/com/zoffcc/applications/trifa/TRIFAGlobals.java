@@ -101,10 +101,9 @@ public class TRIFAGlobals
     final static int VIDEO_ENCODER_MAX_QUANTIZER_HIGH = 10;
 
     final static int VIDEO_ENCODER_MAX_BITRATE_LOW = 120;
-    final static int VIDEO_ENCODER_MAX_BITRATE_MED = 200;
-    final static int VIDEO_ENCODER_MAX_BITRATE_HIGH = 900;
+    final static int VIDEO_ENCODER_MAX_BITRATE_MED = 250;
+    final static int VIDEO_ENCODER_MAX_BITRATE_HIGH = 1800;
 
-    final static int GLOBAL_MAX_VIDEO_BITRATE = 1600;
     final static int GLOBAL_MIN_VIDEO_BITRATE = 100;
     final static int GLOBAL_MIN_AUDIO_BITRATE = 6; // allowed values: (xx>=6) && (xx<=510)
 
