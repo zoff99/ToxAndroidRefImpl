@@ -2472,33 +2472,155 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             Log.i(TAG, "prepareEncoder:mEncoder.getName=" + mEncoder.getName());
 
-/*
+
+            capabilities = mEncoder.getCodecInfo().getCapabilitiesForType(MIME_TYPE);
             int selectedProfile = 0;
+
+            // https://en.wikipedia.org/wiki/Advanced_Video_Coding
+            for (int i = 0; i < capabilities.profileLevels.length && selectedProfile == 0; i++)
+            {
+                MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
+                switch (l.profile)
+                {
+                    case MediaCodecInfo.CodecProfileLevel.AVCProfileExtended:
+                        selectedProfile = l.profile;
+                        Log.i(TAG, "prepareEncoder:1:using AVC profile " + l);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:1:Unsupported AVC profile " + l);
+                        break;
+                }
+            }
+
+            // https://en.wikipedia.org/wiki/Advanced_Video_Coding
+            for (int i = 0; i < capabilities.profileLevels.length && selectedProfile == 0; i++)
+            {
+                MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
+                switch (l.profile)
+                {
+                    case MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline:
+                        selectedProfile = l.profile;
+                        Log.i(TAG, "prepareEncoder:2:using AVC profile " + l);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:2:Unsupported AVC profile " + l);
+                        break;
+                }
+            }
+
+            // https://en.wikipedia.org/wiki/Advanced_Video_Coding
             for (int i = 0; i < capabilities.profileLevels.length && selectedProfile == 0; i++)
             {
                 MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
                 switch (l.profile)
                 {
                     case MediaCodecInfo.CodecProfileLevel.AVCProfileConstrainedBaseline:
-                        // case MediaCodecInfo.CodecProfileLevel.AVCProfileConstrainedBaseline:
                         selectedProfile = l.profile;
-                        Log.i(TAG, "prepareEncoder:using AVC profile " + l);
+                        Log.i(TAG, "prepareEncoder:3:using AVC profile " + l);
                         break;
                     default:
-                        Log.i(TAG, "prepareEncoder:Unsupported AVC profile " + l);
+                        Log.i(TAG, "prepareEncoder:3:Unsupported AVC profile " + l);
                         break;
                 }
             }
 
             if (selectedProfile != 0)
             {
-                // video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, selectedProfile);
-                // video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel31);
+                video_encoder_format.setInteger(MediaFormat.KEY_PROFILE, selectedProfile);
             }
             else
             {
             }
-*/
+
+            capabilities = mEncoder.getCodecInfo().getCapabilitiesForType(MIME_TYPE);
+            int selectedLevel = 0;
+
+            // https://en.wikipedia.org/wiki/Advanced_Video_Coding
+            for (int i = 0; i < capabilities.profileLevels.length && selectedLevel == 0; i++)
+            {
+                MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
+                switch (l.level)
+                {
+                    case MediaCodecInfo.CodecProfileLevel.AVCLevel4:
+                        selectedLevel = l.profile;
+                        Log.i(TAG, "prepareEncoder:1:using AVC level " + l);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:1:Unsupported AVC level " + l);
+                        break;
+                }
+            }
+
+            // https://en.wikipedia.org/wiki/Advanced_Video_Coding
+            for (int i = 0; i < capabilities.profileLevels.length && selectedLevel == 0; i++)
+            {
+                MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
+                switch (l.level)
+                {
+                    case MediaCodecInfo.CodecProfileLevel.AVCLevel32:
+                        selectedLevel = l.profile;
+                        Log.i(TAG, "prepareEncoder:2:using AVC level " + l);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:2:Unsupported AVC level " + l);
+                        break;
+                }
+            }
+
+            // https://en.wikipedia.org/wiki/Advanced_Video_Coding
+            for (int i = 0; i < capabilities.profileLevels.length && selectedLevel == 0; i++)
+            {
+                MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
+                switch (l.level)
+                {
+                    case MediaCodecInfo.CodecProfileLevel.AVCLevel31:
+                        selectedLevel = l.profile;
+                        Log.i(TAG, "prepareEncoder:3:using AVC level " + l);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:3:Unsupported AVC level " + l);
+                        break;
+                }
+            }
+
+            // https://en.wikipedia.org/wiki/Advanced_Video_Coding
+            for (int i = 0; i < capabilities.profileLevels.length && selectedLevel == 0; i++)
+            {
+                MediaCodecInfo.CodecProfileLevel l = capabilities.profileLevels[i];
+                switch (l.level)
+                {
+                    case MediaCodecInfo.CodecProfileLevel.AVCLevel3:
+                        selectedLevel = l.profile;
+                        Log.i(TAG, "prepareEncoder:4:using AVC level " + l);
+                        break;
+                    default:
+                        Log.i(TAG, "prepareEncoder:4:Unsupported AVC level " + l);
+                        break;
+                }
+            }
+
+            if (selectedLevel != 0)
+            {
+                if (selectedProfile == MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline)
+                {
+                    if (selectedLevel < MediaCodecInfo.CodecProfileLevel.AVCLevel3)
+                    {
+                        video_encoder_format.setInteger(MediaFormat.KEY_LEVEL,
+                                                        MediaCodecInfo.CodecProfileLevel.AVCLevel3);
+                    }
+                    else
+                    {
+                        video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, selectedLevel);
+                    }
+                }
+                else
+                {
+                    video_encoder_format.setInteger(MediaFormat.KEY_LEVEL, selectedLevel);
+                }
+            }
+            else
+            {
+            }
 
             mEncoder.configure(video_encoder_format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mEncoder.start();
