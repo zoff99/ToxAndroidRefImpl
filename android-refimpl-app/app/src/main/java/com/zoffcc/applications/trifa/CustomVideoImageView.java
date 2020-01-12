@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -15,6 +16,7 @@ import static com.zoffcc.applications.trifa.MainActivity.semaphore_videoout_bitm
 
 public class CustomVideoImageView extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener
 {
+    private static final String TAG = "trifa.CustomVImgVw";
     private static Matrix matrix = new Matrix();
     private Matrix savedMatrix = new Matrix();
 
@@ -93,11 +95,11 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
     {
         super.onSizeChanged(w, h, oldw, oldh);
 
+        mViewWidth = w;
+        mViewHeight = h;
+
         if (PREF__X_zoom_incoming_video)
         {
-            mViewWidth = w;
-            mViewHeight = h;
-
             matrix.reset();
             savedMatrix.reset();
             sum_scale_factor = 1;
@@ -173,9 +175,6 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
                     {
                         try
                         {
-                            mBitmapMiddlePoint.x = (mViewWidth / 2) - 2;
-                            mBitmapMiddlePoint.y = (mViewHeight / 2) - 2;
-
                             int rot_needed = 0;
 
                             if (device_orientation == 90)
@@ -199,8 +198,30 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
                                 rot_needed = 0;
                             }
 
-                            this.setScaleX(1.5f);
-                            this.setScaleY(1.5f);
+                            float scale_up = 1.0f;
+
+                            int img_w = bitmap.getWidth();
+                            int img_h = bitmap.getHeight();
+
+                            if ((rot_needed == 0) || (rot_needed == 180))
+                            {
+
+                            }
+                            else
+                            {
+                                int tmp = img_w;
+                                img_w = img_h;
+                                img_h = tmp;
+                            }
+
+                            if (img_w > img_h)
+                            {
+                                scale_up = (float) (mViewHeight / 2) / (float) (mViewWidth / 2);
+                                Log.i(TAG, "scale=" + scale_up + " " + img_w + " " + img_h + " " + mViewHeight + " " +
+                                           mViewWidth);
+                                this.setScaleX(scale_up);
+                                this.setScaleY(scale_up);
+                            }
                             this.setRotation(rot_needed);
 
                             matrix_was_reset = false;
