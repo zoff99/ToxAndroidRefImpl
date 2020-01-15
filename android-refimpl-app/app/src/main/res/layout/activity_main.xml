@@ -86,7 +86,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="55dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -95,7 +95,7 @@
                     <TextView
                         android:id="@+id/main_maintext"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:text="..."
