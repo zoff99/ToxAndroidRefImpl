@@ -220,8 +220,8 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
                                 scale_up = (float) (mViewHeight / 2) / (float) (mViewWidth / 2);
                                 Log.i(TAG, "scale=" + scale_up + " " + img_w + " " + img_h + " " + mViewHeight + " " +
                                            mViewWidth);
-                                this.setScaleX(scale_up);
-                                this.setScaleY(scale_up);
+                                //****// this.setScaleX(scale_up);
+                                //****// this.setScaleY(scale_up);
                             }
                             this.setRotation(rot_needed);
 
