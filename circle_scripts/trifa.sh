@@ -268,22 +268,13 @@ echo "###### ------------------------------"
 
 
 # ----- debug signing key -----
-
-## to create a new key ##
-## to create a new key ##
-## to create a new key ##
-rm -f ~/.android/debug.keystore
-## to create a new key ##
-## to create a new key ##
-## to create a new key ##
-
 cd ~/
 ls -al ~/.android/debug.keystore
 if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
     echo "*** generating new signer key ***"
     echo "*** generating new signer key ***"
     rm -f ~/.android/debug.keystore
-    keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androidXdebugkey -keypass android -dname "CN=AXndroid DXebug,O=AXndroid,C=US"
+    keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
 fi
 # ----- debug signing key -----
 
@@ -385,7 +376,7 @@ if [ "$CIRCLE_BRANCH""x" != "zoff99/maven_artefactx" ]; then
     cd ~/
 
     ls -al ~/
-    jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androidXdebugkey
+    jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androiddebugkey
     type -a apksigner
     type -a jarsigner
     # apksigner sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey --out app-signed.apk app.apk
