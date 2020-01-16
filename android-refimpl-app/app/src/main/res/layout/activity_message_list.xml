@@ -50,9 +50,10 @@
 
         <TextView
             android:id="@+id/ml_maintext"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1000"
             android:padding="10dp"
             android:text="Name"
             android:textColor="@android:color/primary_text_light"
@@ -72,6 +73,7 @@
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
             android:layout_margin="7dp"
+            android:layout_weight="0"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:onClick="start_call_to_friend"
