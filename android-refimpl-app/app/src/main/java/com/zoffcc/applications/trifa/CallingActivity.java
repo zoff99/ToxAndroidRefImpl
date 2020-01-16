@@ -64,6 +64,8 @@ import java.nio.ByteBuffer;
 
 import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_start_ts;
+import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
@@ -172,6 +174,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     public static int send_sps_pps_every_x_frames_current = 0;
     public static int send_sps_pps_every_x_frames = 20;
     private static float slider_alpha = 0.4f;
+    static boolean camera_toggle_button_pressed = false;
 
     private static MediaCodec.BufferInfo mBufferInfo_h264_decoder;
     private static MediaCodec mDecoder_h264;
@@ -900,6 +903,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         camera_toggle_button.setImageDrawable(d2a);
                     }
 
+                    camera_toggle_button_pressed = true;
+                    Log.i(TAG, "camera_toggle_button_pressed[press start]=" + camera_toggle_button_pressed);
                     final Thread toggle_thread = new Thread()
                     {
                         @Override
@@ -907,13 +912,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         {
                             try
                             {
-                                Thread.sleep(20);
+                                Thread.sleep(30);
                             }
                             catch (Exception e)
                             {
                                 // e.printStackTrace();
                             }
                             toggle_camera();
+                            camera_toggle_button_pressed = false;
+                            Log.i(TAG, "camera_toggle_button_pressed[press end]=" + camera_toggle_button_pressed);
                         }
                     };
                     toggle_thread.start();
@@ -1462,6 +1469,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         Log.i(TAG, "onStart:01");
         super.onStart();
+        final CallingActivity c_this = this;
 
         Thread openThread = new Thread()
         {
@@ -1472,6 +1480,55 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 Log.i(TAG, "active_camera_type(01)=" + active_camera_type);
                 CameraWrapper.camera_preview_size2 = null;
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
+
+                // wait for 1 seconds to actually get a camera preview. if not, restart camera
+                int WAIT_SECONDS = 1;
+                long startup_ts = System.currentTimeMillis();
+                for (int j = 0; j < 100 * WAIT_SECONDS; j++)
+                {
+                    // Log.i(TAG, "onStart:01:ts=" + camera_preview_call_back_ts_first_frame + " " +
+                    //            camera_preview_call_back_start_ts);
+
+                    if (camera_toggle_button_pressed == true)
+                    {
+                        break;
+                    }
+
+                    if (camera_preview_call_back_ts_first_frame > startup_ts)
+                    {
+                        Log.i(TAG, "onStart:01:ts:got a frame");
+                        // ok we got a video frame from the camera
+                        break;
+                    }
+
+                    try
+                    {
+                        Thread.sleep(10);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                try
+                {
+                    if (camera_toggle_button_pressed != true)
+                    {
+                        Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restarting ...");
+                        reinit_camera(c_this);
+                    }
+                    else
+                    {
+                        Log.i(TAG, "onStart:01:ts:camera toggle button pressed");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restart:EE:" + e.getMessage());
+                    e.printStackTrace();
+                }
+
             }
         };
         openThread.start();
@@ -1506,6 +1563,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         Callstate.camera_opened = true;
         SurfaceHolder holder = cameraSurfacePreview.getSurfaceHolder();
+        Log.i(TAG, "cameraHasOpened:holder=" + holder);
+        Log.i(TAG, "cameraHasOpened:CameraWrapper.getInstance()=" + CameraWrapper.getInstance());
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
 

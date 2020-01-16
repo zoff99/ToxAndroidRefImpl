@@ -20,9 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.graphics.ImageFormat;
-import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.media.MediaCodecInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Display;
@@ -63,6 +61,8 @@ public class CameraWrapper
     static Camera.Size camera_preview_size2 = null;
     int video_send_res = 0;
     boolean use_frame = true;
+    static long camera_preview_call_back_ts_first_frame = -1;
+    static long camera_preview_call_back_start_ts = -1;
 
     public interface CamOpenOverCallback
     {
@@ -90,7 +90,7 @@ public class CameraWrapper
 
     public void doOpenCamera_wrapper(CamOpenOverCallback callback, boolean front_camera)
     {
-        Log.i(TAG, "Camera open....");
+        Log.i(TAG, "doOpenCamera_wrapper:Camera open....");
         int numCameras = Camera.getNumberOfCameras();
         int camera_type = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
@@ -100,19 +100,25 @@ public class CameraWrapper
         }
 
         cameraInfo = new Camera.CameraInfo();
+        Log.i(TAG, "doOpenCamera_wrapper:numCameras=" + numCameras);
 
         for (int i = 0; i < numCameras; i++)
         {
+            Log.i(TAG, "doOpenCamera_wrapper:check camera num " + i);
             Camera.getCameraInfo(i, cameraInfo);
 
             if (cameraInfo.facing == camera_type)
             {
                 try
                 {
+                    Log.i(TAG, "doOpenCamera_wrapper:Camera.open " + i);
                     mCamera = Camera.open(i);
+                    Log.i(TAG, "doOpenCamera_wrapper:Camera.open " + i + " done:" + mCamera);
                 }
                 catch (Exception e)
                 {
+                    Log.i(TAG, "doOpenCamera_wrapper:check camera num " + i + " EE1:" + e.getMessage());
+
                     e.printStackTrace();
 
                     try
@@ -143,7 +149,7 @@ public class CameraWrapper
         {
             try
             {
-                Log.d(TAG, "this camera (" + front_camera + ") type found; opening default");
+                Log.d(TAG, "doOpenCamera_wrapper:this_camera (" + front_camera + ") type found; opening default");
                 mCamera = Camera.open();    // opens first back-facing camera
             }
             catch (Exception e)
@@ -155,10 +161,10 @@ public class CameraWrapper
 
         if (mCamera == null)
         {
-            throw new RuntimeException("Unable to open camera");
+            throw new RuntimeException("doOpenCamera_wrapper:Unable to open camera");
         }
 
-        Log.i(TAG, "Camera open over....");
+        Log.i(TAG, "doOpenCamera_wrapper:Camera open finished");
         callback.cameraHasOpened();
     }
 
@@ -193,6 +199,7 @@ public class CameraWrapper
         initCamera();
     }
 
+    /*
     public void doStartPreview(SurfaceTexture surface, float previewRate)
     {
         Log.i(TAG, "doStartPreview()");
@@ -214,6 +221,7 @@ public class CameraWrapper
 
         initCamera();
     }
+    */
 
     public void doStopCamera()
     {
@@ -225,7 +233,6 @@ public class CameraWrapper
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
             this.mIsPreviewing = false;
-            float mPreviewRate = -1f;
             mCamera.setPreviewCallback(null);
             mCamera.release();
             mCameraPreviewCallback.reset();
@@ -281,7 +288,8 @@ public class CameraWrapper
         if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
         {
             result = (cameraInfo.orientation + degrees) % 360;
-            Log.i(TAG, "cam:getRotation:[FRONT CAMERA] tmp=" + (cameraInfo.orientation + degrees) + " result=" + result);
+            Log.i(TAG,
+                  "cam:getRotation:[FRONT CAMERA] tmp=" + (cameraInfo.orientation + degrees) + " result=" + result);
             // result = (360 - result) % 360;    // compensate the mirror
         }
         else
@@ -299,10 +307,12 @@ public class CameraWrapper
 
     private void initCamera()
     {
+        Log.i(TAG, "initCamera:camera:startPreview:initCamera:start");
+
         if (mCamera != null)
         {
             camera_video_rotate_angle = getRotation();
-            Log.i(TAG, "camera_video_rotate_angle=" + camera_video_rotate_angle);
+            Log.i(TAG, "initCamera:camera_video_rotate_angle=" + camera_video_rotate_angle);
             // TODO: ------ DEBUG --------
             // TODO: ------ DEBUG --------
             // TODO: ------ DEBUG --------
@@ -324,9 +334,9 @@ public class CameraWrapper
 
                 for (j = 0; j < CameraSurfacePreview.mSupportedPreviewSizes.size(); j++)
                 {
-                    Log.i(TAG,
-                          "SupportedPreviewSizes=" + CameraSurfacePreview.mSupportedPreviewSizes.get(j).width + "x" +
-                          CameraSurfacePreview.mSupportedPreviewSizes.get(j).height);
+                    Log.i(TAG, "initCamera:SupportedPreviewSizes=" +
+                               CameraSurfacePreview.mSupportedPreviewSizes.get(j).width + "x" +
+                               CameraSurfacePreview.mSupportedPreviewSizes.get(j).height);
                 }
             }
             catch (Exception e)
@@ -342,12 +352,13 @@ public class CameraWrapper
 
                 for (j = 0; j < pfs.size(); j++)
                 {
-                    Log.i(TAG, "SupportedPreviewFormats=" + pfs.get(j));
+                    Log.i(TAG, "initCamera:SupportedPreviewFormats=" + pfs.get(j));
                 }
             }
             catch (Exception e)
             {
                 e.printStackTrace();
+                Log.i(TAG, "initCamera:camera:startPreview:EEE:" + e.getMessage());
             }
 
             Camera.Parameters mCameraParamters = mCamera.getParameters();
@@ -364,11 +375,12 @@ public class CameraWrapper
                     {
                         case ImageFormat.YV12: // this is preferred
                             selectedCameraPreviewFormat = format;
-                            Log.i(TAG, "SupportedPreviewFormats:using Preview format [" + i + "] " + format);
+                            Log.i(TAG, "initCamera:SupportedPreviewFormats:using Preview format [" + i + "] " + format);
                             break;
 
                         default:
-                            Log.i(TAG, "SupportedPreviewFormats:Unsupported Preview format [" + i + "] " + format);
+                            Log.i(TAG, "initCamera:SupportedPreviewFormats:Unsupported Preview format [" + i + "] " +
+                                       format);
                             break;
                     }
                 }
@@ -385,11 +397,13 @@ public class CameraWrapper
                     {
                         case ImageFormat.NV21:
                             selectedCameraPreviewFormat = format;
-                            Log.i(TAG, "SupportedPreviewFormats:2:using Preview format [" + i + "] " + format);
+                            Log.i(TAG,
+                                  "initCamera:SupportedPreviewFormats:2:using Preview format [" + i + "] " + format);
                             break;
 
                         default:
-                            Log.i(TAG, "SupportedPreviewFormats:2:Unsupported Preview format [" + i + "] " + format);
+                            Log.i(TAG, "initCamera:SupportedPreviewFormats:2:Unsupported Preview format [" + i + "] " +
+                                       format);
                             break;
                     }
                 }
@@ -398,7 +412,7 @@ public class CameraWrapper
             if (selectedCameraPreviewFormat == 0)
             {
                 mCameraParamters.setPreviewFormat(ImageFormat.YV12); // order here is Y-V-U !!
-                Log.i(TAG, "SupportedPreviewFormats:set default format YV12");
+                Log.i(TAG, "initCamera:SupportedPreviewFormats:set default format YV12");
             }
             else
             {
@@ -411,31 +425,32 @@ public class CameraWrapper
             try
             {
                 List<Integer> preview_framerates = mCameraParamters.getSupportedPreviewFrameRates();
-                Log.i(TAG, "preview_framerates=" + preview_framerates);
+                Log.i(TAG, "initCamera:preview_framerates=" + preview_framerates);
                 List<int[]> preview_framerates2 = mCameraParamters.getSupportedPreviewFpsRange();
                 int i;
                 int j;
 
                 for (i = 0; i < preview_framerates2.size(); i++)
                 {
-                    Log.i(TAG, "preview_framerates2[" + i + "]=" + preview_framerates2.get(i).length);
+                    Log.i(TAG, "initCamera:preview_framerates2[" + i + "]=" + preview_framerates2.get(i).length);
 
                     for (j = 0; j < preview_framerates2.get(i).length; j++)
                     {
-                        Log.i(TAG, "preview_framerates2[" + i + "," + j + "]=" + preview_framerates2.get(i)[j]);
+                        Log.i(TAG,
+                              "initCamera:preview_framerates2[" + i + "," + j + "]=" + preview_framerates2.get(i)[j]);
                     }
                 }
 
                 // HINT: this crashes some devices
                 if (PREF__set_fps)
                 {
-                    Log.i(TAG, "preview_framerates2:SET:setting FPS to 15:START");
+                    Log.i(TAG, "initCamera:preview_framerates2:SET:setting FPS to 15:START");
                     mCameraParamters.setPreviewFpsRange(15000, 15000);
-                    Log.i(TAG, "preview_framerates2:SET:setting FPS to 15:Ready");
+                    Log.i(TAG, "initCamera:preview_framerates2:SET:setting FPS to 15:Ready");
                 }
                 else
                 {
-                    Log.i(TAG, "preview_framerates2:SET:not setting FPS");
+                    Log.i(TAG, "initCamera:preview_framerates2:SET:not setting FPS");
                 }
             }
             catch (Exception e)
@@ -450,13 +465,13 @@ public class CameraWrapper
 
             mCameraParamters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
             mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
-            Log.i(TAG, "preview size before=" + mCameraParamters.getPreviewSize().width + "," +
+            Log.i(TAG, "initCamera:preview size before=" + mCameraParamters.getPreviewSize().width + "," +
                        mCameraParamters.getPreviewSize().height);
             mCameraParamters.setPreviewSize(IMAGE_WIDTH, IMAGE_HEIGHT);
-            Log.i(TAG, "preview size after 1=" + mCameraParamters.getPreviewSize().width + "," +
+            Log.i(TAG, "initCamera:preview size after 1=" + mCameraParamters.getPreviewSize().width + "," +
                        mCameraParamters.getPreviewSize().height);
             mCamera.setDisplayOrientation(90); // always 90 ??
-            Log.i(TAG, "preview size after 2=" + mCameraParamters.getPreviewSize().width + "," +
+            Log.i(TAG, "initCamera:preview size after 2=" + mCameraParamters.getPreviewSize().width + "," +
                        mCameraParamters.getPreviewSize().height);
 
             //if (mCameraParamters.isVideoStabilizationSupported())
@@ -480,13 +495,15 @@ public class CameraWrapper
             Camera.Size camerasize = mCameraParamters2.getPreviewSize();
             int frame_bytesize = (int) (((float) mCameraParamters.getPreviewSize().width *
                                          (float) mCameraParamters.getPreviewSize().height) * byteperpixel);
-            Log.i(TAG, "bitsperpixel=" + bitsperpixel + " byteperpixel=" + byteperpixel + " frame_bytesize=" +
-                       frame_bytesize);
-            Log.i(TAG, "previewFormat=" + previewFormat + " camerasize.w=" + mCameraParamters.getPreviewSize().width +
-                       " camerasize.h=" + mCameraParamters.getPreviewSize().height);
-            Log.i(TAG, "previewFormats:ImageFormat.YV12=" + ImageFormat.YV12);
-            Log.i(TAG, "previewFormats:ImageFormat.NV21=" + ImageFormat.NV21);
-            Log.i(TAG, "previewFormats:ImageFormat.YUY2=" + ImageFormat.YUY2);
+            Log.i(TAG,
+                  "initCamera:bitsperpixel=" + bitsperpixel + " byteperpixel=" + byteperpixel + " frame_bytesize=" +
+                  frame_bytesize);
+            Log.i(TAG, "initCamera:previewFormat=" + previewFormat + " camerasize.w=" +
+                       mCameraParamters.getPreviewSize().width + " camerasize.h=" +
+                       mCameraParamters.getPreviewSize().height);
+            Log.i(TAG, "initCamera:previewFormats:ImageFormat.YV12=" + ImageFormat.YV12);
+            Log.i(TAG, "initCamera:previewFormats:ImageFormat.NV21=" + ImageFormat.NV21);
+            Log.i(TAG, "initCamera:previewFormats:ImageFormat.YUY2=" + ImageFormat.YUY2);
             Camera.Size s = mCameraParamters.getPreviewSize();
             mCamera.setPreviewCallbackWithBuffer(
                     mCameraPreviewCallback);    // assign the callback called when a frame is shown by the camera preview (for frame processing)
@@ -494,24 +511,28 @@ public class CameraWrapper
             setupCallback(frame_bytesize);
             // mCamera.addCallbackBuffer(new byte[3 * s.width * s.height / 2]);  // create a reusable buffer for the data passed to onPreviewFrame call (in order to avoid GC)
             mCameraPreviewCallback.reset();
-            Log.i(TAG, "previewFormats:999");
+            Log.i(TAG, "initCamera:previewFormats:999");
             // ------ use buffer ------
 
             // mCamera.setParameters(mCameraParamters);
 
             try
             {
-                Log.i(TAG, "camera:startPreview:001");
+                Log.i(TAG, "initCamera:camera:startPreview:001");
                 mCamera.startPreview();
-                Log.i(TAG, "camera:startPreview:002");
+                Log.i(TAG, "initCamera:camera:startPreview:002");
             }
             catch (Exception pe)
             {
                 pe.printStackTrace();
-                Log.i(TAG, "camera:startPreview:EE:" + pe.getMessage());
+                Log.i(TAG, "initCamera:camera:startPreview:EE:" + pe.getMessage());
             }
 
             this.mIsPreviewing = true;
+        }
+        else
+        {
+            Log.i(TAG, "initCamera:camera:startPreview:mCamera==NULL");
         }
     }
 
@@ -800,10 +821,16 @@ public class CameraWrapper
         {
             Log.i(TAG, "CameraPreviewCallback");
             // videoEncoder = new VideoEncoderFromBuffer(CameraWrapper.IMAGE_WIDTH, CameraWrapper.IMAGE_HEIGHT);
+            // HINT: save timestamp here, and if there is no buffercallback within 5 seconds, reopen the camera again!
+            camera_preview_call_back_ts_first_frame = -1;
         }
 
         public void reset()
         {
+            camera_preview_call_back_ts_first_frame = -1;
+            camera_preview_call_back_start_ts = System.currentTimeMillis();
+
+            Log.i(TAG, "CameraPreviewCallback:reset");
             if (myProccesImageOnBackground != null)
             {
                 myProccesImageOnBackground.cancel(true);
@@ -812,6 +839,10 @@ public class CameraWrapper
 
         void close()
         {
+            camera_preview_call_back_ts_first_frame = -1;
+            camera_preview_call_back_start_ts = -1;
+
+            Log.i(TAG, "CameraPreviewCallback:close");
             try
             {
                 // videoEncoder.close();
@@ -832,6 +863,12 @@ public class CameraWrapper
             }
             else
             {
+                if (camera_preview_call_back_ts_first_frame == -1)
+                {
+                    camera_preview_call_back_ts_first_frame = System.currentTimeMillis();
+                    camera_preview_call_back_start_ts = -1;
+                }
+
                 if (camera_preview_size2 == null)
                 {
                     try

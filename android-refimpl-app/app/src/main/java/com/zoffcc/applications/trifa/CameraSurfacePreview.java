@@ -145,13 +145,15 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
 
     public static int convertDpToPixels(float dp, Context context)
     {
-        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                                                 context.getResources().getDisplayMetrics());
         return px;
     }
 
     public static int convertSpToPixels(float sp, Context context)
     {
-        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp,
+                                                 context.getResources().getDisplayMetrics());
         return px;
     }
 
@@ -163,15 +165,9 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
         // setMeasuredDimension(width, height);
 
-        // HINT: TODO: 120x160 has to match up with camera resolution and
-        //       camera_surfaceview in acticty_calling.xml
-        //       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        width = convertDpToPixels(120, getContext());
-        height = convertDpToPixels(160, getContext());
-        // HINT: TODO: 120x160 has to match up with camera resolution and
-        //       camera_surfaceview in acticty_calling.xml
-        //       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
+        // TODO: HINT: mSupportedPreviewSizes here is always NULL, because it gets only set after we get here
+        //             hard code 640x480 for now. 3g networks can't handle too much more anyways when moving around
         if (mSupportedPreviewSizes != null)
         {
             // mPreviewSize = getOptimalPreviewSize_1(mSupportedPreviewSizes, width, height);
@@ -179,6 +175,20 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
             mPreviewSize = getOptimalPreviewSize_2(mSupportedPreviewSizes, width, height);
             Log.i(TAG, "mOptimalPreviewSize(2)=" + mPreviewSize.width + "," + mPreviewSize.height);
         }
+
+        // HINT: TODO: 120x160 has to match up with camera resolution and
+        //       camera_surfaceview in acticty_calling.xml
+        //       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+        width = convertDpToPixels(120, getContext());
+        height = convertDpToPixels(160, getContext());
+        setMeasuredDimension(width, height);
+        if (2 == 1 + 1)
+        {
+            return;
+        }
+        // HINT: TODO: 120x160 has to match up with camera resolution and
+        //       camera_surfaceview in acticty_calling.xml
+        //       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
         if (mPreviewSize != null)
         {
@@ -192,7 +202,8 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
                 ratio = (float) mPreviewSize.width / (float) mPreviewSize.height;
             }
 
-            Log.i(TAG, "raio=" + ratio + " w=" + width + " h=" + height + " wmin=" + widthMeasureSpec + " hmin=" + heightMeasureSpec);
+            Log.i(TAG, "ratio=" + ratio + " w=" + width + " h=" + height + " wmin=" + widthMeasureSpec + " hmin=" +
+                       heightMeasureSpec);
 
             // One of these methods should be used, second method squishes preview slightly
             setMeasuredDimension(width, (int) (width * ratio));
@@ -227,25 +238,25 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
         Log.i(TAG, "surfaceChanged...");
-//        try
-//        {
-//            CameraWrapper.mCamera.startPreview();
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//            Log.i(TAG, "surfaceChanged:EE1:" + e.getMessage());
-//        }
-//
-//        try
-//        {
-//            CameraWrapper.mCamera.startPreview();
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//            Log.i(TAG, "surfaceChanged:EE2:" + e.getMessage());
-//        }
+        //        try
+        //        {
+        //            CameraWrapper.mCamera.startPreview();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //            Log.i(TAG, "surfaceChanged:EE1:" + e.getMessage());
+        //        }
+        //
+        //        try
+        //        {
+        //            CameraWrapper.mCamera.startPreview();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //            Log.i(TAG, "surfaceChanged:EE2:" + e.getMessage());
+        //        }
     }
 
     @Override
