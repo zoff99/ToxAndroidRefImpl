@@ -1,12 +1,12 @@
-<LinearLayout android:id="@+id/calling_activity_top_viewgroup"
-              xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="#000000"
-              android:orientation="vertical"
-              tools:context="com.zoffcc.applications.trifa.CallingActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/calling_activity_top_viewgroup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical"
+    tools:context="com.zoffcc.applications.trifa.CallingActivity">
 
     <!--android:background="#0277bd"-->
 
@@ -18,7 +18,7 @@
         android:text="xxxxxxxx"
         android:textAlignment="center"
         android:textColor="@color/md_grey_400"
-        android:textSize="22sp"/>
+        android:textSize="22sp" />
 
 
     <LinearLayout
@@ -38,7 +38,7 @@
                 android:id="@+id/video_view"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/black"/>
+                android:background="@android:color/black" />
 
             <FrameLayout
                 android:id="@+id/video_box_left_top_01"
@@ -65,7 +65,7 @@
                         android:text="1m 20s"
                         android:textColor="@color/md_grey_400"
                         android:textSize="18sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                 </LinearLayout>
             </FrameLayout>
@@ -73,7 +73,7 @@
             <FrameLayout
                 android:id="@+id/video_box_right_top_01"
                 android:layout_width="125dp"
-                android:layout_height="145dp"
+                android:layout_height="245dp"
                 android:layout_gravity="top|right"
                 android:layout_marginTop="5dp"
                 android:background="@null">
@@ -91,7 +91,7 @@
                         android:text="O:VP8 4000 kbit/s"
                         android:textColor="@color/md_green_700"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/right_top_text_1b"
@@ -101,7 +101,7 @@
                         android:text="I:VP8 4000 kbit/s"
                         android:textColor="@color/md_green_700"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/right_top_text_2"
@@ -111,7 +111,7 @@
                         android:text="A 350 kbit/s"
                         android:textColor="@color/md_red_700"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/right_top_text_3"
@@ -121,7 +121,7 @@
                         android:text="IN   0 fps"
                         android:textColor="@color/md_green_700"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/right_top_text_4"
@@ -131,17 +131,17 @@
                         android:text="Out 0 fps"
                         android:textColor="@color/md_red_700"
                         android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/audio_device_icon"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_gravity="right"
-                        android:layout_marginRight="5dp"
                         android:layout_marginTop="6dp"
+                        android:layout_marginRight="5dp"
                         android:elevation="10dp"
-                        android:src="@null"/>
+                        android:src="@null" />
 
                 </LinearLayout>
             </FrameLayout>
@@ -151,29 +151,29 @@
                 android:layout_width="300dp"
                 android:layout_height="160dp"
                 android:layout_gravity="center|right"
-                android:elevation="2dp"
                 android:layout_marginTop="0dp"
                 android:layout_marginRight="45dp"
-                android:background="@null">
+                android:background="@null"
+                android:elevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:elevation="2dp"
                     android:background="@null"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <SeekBar
                         android:id="@+id/volume_slider_seekbar"
-                        android:layout_gravity="center"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_gravity="center"
                         android:background="@null"
+                        android:elevation="8dp"
                         android:indeterminate="false"
                         android:max="100"
-                        android:elevation="8dp"
-                        android:progress="5"/>
+                        android:progress="5" />
 
                 </LinearLayout>
             </FrameLayout>
@@ -183,19 +183,19 @@
                 android:layout_width="300dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center|right"
-                android:elevation="2dp"
                 android:layout_marginTop="140dp"
                 android:layout_marginRight="45dp"
-                android:background="@null">
+                android:background="@null"
+                android:elevation="2dp">
 
                 <TextView
                     android:id="@+id/video_add_delay_slider_infotext"
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
+                    android:layout_gravity="bottom"
                     android:elevation="8dp"
                     android:gravity="center_horizontal"
                     android:text="Video delay: 0 ms"
-                    android:layout_gravity="bottom"
                     android:textColor="@color/md_green_600"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -204,20 +204,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:elevation="2dp"
                     android:background="@null"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <SeekBar
                         android:id="@+id/video_add_delay_slider_seekbar"
-                        android:layout_gravity="center"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_gravity="center"
                         android:background="@null"
+                        android:elevation="8dp"
                         android:indeterminate="false"
                         android:max="100"
-                        android:elevation="8dp"
-                        android:progress="5"/>
+                        android:progress="5" />
 
                 </LinearLayout>
             </FrameLayout>
@@ -228,30 +228,32 @@
                 android:layout_height="200dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="30dp"
-                android:background="@android:color/black"/>
+                android:background="@android:color/black" />
 
             <FrameLayout
                 android:id="@+id/video_box_self_preview_01"
                 android:layout_width="125dp"
-                android:layout_height="125dp"
+                android:layout_height="166dp"
                 android:layout_gravity="bottom|right"
-                android:layout_marginBottom="5dp"
-                android:layout_marginRight="5dp">
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp">
 
                 <FrameLayout
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_gravity="bottom|right"
+                    android:layout_height="160dp"
+                    android:layout_gravity="center"
                     android:background="@drawable/border_001"
                     android:padding="5dp">
 
                     <com.zoffcc.applications.trifa.CameraSurfacePreview
                         android:id="@+id/camera_surfaceview"
-                        android:layout_width="0dip"
-                        android:layout_height="0dip"
-                        android:layout_gravity="bottom|right"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="0dp"
                         android:elevation="2dp"
-                        android:gravity="center"/>
+                        android:gravity="center"
+                        android:padding="0dp" />
                 </FrameLayout>
             </FrameLayout>
 
@@ -264,16 +266,16 @@
         android:id="@+id/quality_slider_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
         android:layout_marginTop="1dp"
+        android:layout_marginBottom="5dp"
         android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/text_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
             android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
             android:orientation="horizontal">
 
             <TextView
@@ -287,7 +289,7 @@
                 android:text="low"
                 android:textColor="@color/md_green_600"
                 android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/text_vq_med"
@@ -299,7 +301,7 @@
                 android:text="Video Quality"
                 android:textColor="@color/md_green_600"
                 android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/text_vq_high"
@@ -312,7 +314,7 @@
                 android:text="high"
                 android:textColor="@color/md_green_600"
                 android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -330,7 +332,7 @@
             app:horizontalBarThickness="4dp"
             app:position="0"
             app:tickMarkCount="3"
-            app:tickMarkRadius="8dp"/>
+            app:tickMarkRadius="8dp" />
     </LinearLayout>
 
 
@@ -346,8 +348,7 @@
             android:layout_height="70dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/accept_button"
@@ -356,15 +357,14 @@
             android:background="@android:color/transparent"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_green"/>
+            android:src="@drawable/circle_green" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="70dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/camera_toggle_button"
@@ -375,15 +375,14 @@
             android:clickable="true"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_blue"/>
+            android:src="@drawable/circle_blue" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="70dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
 
 
         <ImageButton
@@ -395,7 +394,7 @@
             android:clickable="true"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_yellow"/>
+            android:src="@drawable/circle_yellow" />
 
         <TextView
             android:id="@+id/misc_button_pad"
@@ -403,8 +402,7 @@
             android:layout_height="70dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
 
 
         <ImageButton
@@ -416,15 +414,14 @@
             android:clickable="true"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_orange"/>
+            android:src="@drawable/circle_orange" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="70dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/decline_button"
@@ -433,15 +430,14 @@
             android:background="@android:color/transparent"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_red"/>
+            android:src="@drawable/circle_red" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="70dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
     </LinearLayout>
 
 

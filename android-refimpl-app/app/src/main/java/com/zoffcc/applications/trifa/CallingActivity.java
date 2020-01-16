@@ -63,6 +63,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
@@ -1485,14 +1486,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     private void initViewParams()
     {
+        /*
         ViewGroup.LayoutParams params = cameraSurfacePreview.getLayoutParams();
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int screenWidth = displayMetrics.widthPixels;
         int screenHeight = displayMetrics.heightPixels;
-        params.width = screenWidth;
-        params.height = screenHeight;
+        params.width = MATCH_PARENT; // screenWidth;
+        params.height = MATCH_PARENT; // screenHeight;
         mPreviewRate = (float) screenHeight / (float) screenWidth;
         cameraSurfacePreview.setLayoutParams(params);
+        */
     }
 
     @Override

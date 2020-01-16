@@ -162,9 +162,15 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
         int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
         // setMeasuredDimension(width, height);
-        width = convertDpToPixels(120, getContext());
-        height = convertDpToPixels(120, getContext());
 
+        // HINT: TODO: 120x160 has to match up with camera resolution and
+        //       camera_surfaceview in acticty_calling.xml
+        //       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+        width = convertDpToPixels(120, getContext());
+        height = convertDpToPixels(160, getContext());
+        // HINT: TODO: 120x160 has to match up with camera resolution and
+        //       camera_surfaceview in acticty_calling.xml
+        //       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
         if (mSupportedPreviewSizes != null)
         {
