@@ -173,7 +173,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     public static byte[] global_sps_pps_nal_unit_bytes = null;
     public static int send_sps_pps_every_x_frames_current = 0;
     public static int send_sps_pps_every_x_frames = 20;
-    private static float slider_alpha = 0.4f;
+    private static float slider_alpha = 0.3f;
     static boolean camera_toggle_button_pressed = false;
 
     private static MediaCodec.BufferInfo mBufferInfo_h264_decoder;
@@ -215,7 +215,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         setContentView(R.layout.activity_calling);
 
         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        PREF__video_play_delay_ms = settings_cs1.getInt("video_play_delay_ms", 0);
+        PREF__video_play_delay_ms = settings_cs1.getInt("video_play_delay_ms", 200);
         Log.i(TAG, "pref:get:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
         PREF__audio_play_volume_percent = settings_cs1.getInt("audio_play_volume_percent", 100);
         Log.i(TAG, "pref:get:PREF__audio_play_volume_percent=" + PREF__audio_play_volume_percent);
@@ -316,6 +316,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         box_right_volumeslider_01 = (View) findViewById(R.id.video_box_right_volumeslider_01);
         box_right_volumeslider_01.setVisibility(View.VISIBLE);
         box_right_volumeslider_01.setAlpha(slider_alpha);
+
 
         volume_slider_seekbar_01.setOnTouchListener(new View.OnTouchListener()
         {
