@@ -76,6 +76,7 @@
                 android:layout_height="245dp"
                 android:layout_gravity="top|right"
                 android:layout_marginTop="5dp"
+                android:alpha="0.5"
                 android:background="@null">
 
                 <LinearLayout
@@ -149,7 +150,7 @@
             <FrameLayout
                 android:id="@+id/video_box_right_volumeslider_01"
                 android:layout_width="300dp"
-                android:layout_height="160dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center|right"
                 android:layout_marginTop="0dp"
                 android:layout_marginRight="45dp"
@@ -181,9 +182,9 @@
             <FrameLayout
                 android:id="@+id/video_box_right_video_add_delay_slider_01"
                 android:layout_width="300dp"
-                android:layout_height="100dp"
+                android:layout_height="60dp"
                 android:layout_gravity="center|right"
-                android:layout_marginTop="140dp"
+                android:layout_marginTop="70dp"
                 android:layout_marginRight="45dp"
                 android:background="@null"
                 android:elevation="2dp">
@@ -251,7 +252,7 @@
                         android:layout_height="0dp"
                         android:layout_gravity="center"
                         android:layout_margin="0dp"
-                        android:elevation="2dp"
+                        android:elevation="12dp"
                         android:gravity="center"
                         android:padding="0dp" />
                 </FrameLayout>
