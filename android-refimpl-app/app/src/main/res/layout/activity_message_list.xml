@@ -53,11 +53,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
             android:layout_weight="1000"
             android:padding="10dp"
             android:text="Name"
             android:textColor="@android:color/primary_text_light"
-            android:textSize="20sp"/>
+            android:textSize="15sp"/>
 
         <TextView
             android:layout_width="0dp"
