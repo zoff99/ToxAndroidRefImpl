@@ -48,7 +48,6 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
     public CustomVideoImageView(Context context)
     {
         this(context, null, 0);
-        matrix_was_reset = true;
         if (PREF__X_zoom_incoming_video)
         {
             this.setScaleType(ScaleType.MATRIX);
@@ -58,12 +57,12 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
             this.setScaleType(ScaleType.FIT_CENTER);
         }
         this.setOnTouchListener(this);
+        matrix_was_reset = true;
     }
 
     public CustomVideoImageView(Context context, AttributeSet attrs)
     {
         this(context, attrs, 0);
-        matrix_was_reset = true;
         if (PREF__X_zoom_incoming_video)
         {
             this.setScaleType(ScaleType.MATRIX);
@@ -73,12 +72,12 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
             this.setScaleType(ScaleType.FIT_CENTER);
         }
         this.setOnTouchListener(this);
+        matrix_was_reset = true;
     }
 
     public CustomVideoImageView(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
-        matrix_was_reset = true;
         if (PREF__X_zoom_incoming_video)
         {
             this.setScaleType(ScaleType.MATRIX);
@@ -88,6 +87,7 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
             this.setScaleType(ScaleType.FIT_CENTER);
         }
         this.setOnTouchListener(this);
+        matrix_was_reset = true;
     }
 
     @Override
@@ -105,8 +105,9 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
             sum_scale_factor = 1;
             scaled_mBitmapWidth = 1;
             scaled_mBitmapHeight = 1;
-            matrix_was_reset = true;
         }
+
+        matrix_was_reset = true;
     }
 
     public static void video_output_orentation_update()
@@ -205,24 +206,35 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
 
                             if ((rot_needed == 0) || (rot_needed == 180))
                             {
-
+                                Log.i(TAG, "scale:1=1.0 " + img_w + " " + img_h + " " + mViewHeight + " " + mViewWidth);
+                                this.setScaleX(1.0f);
+                                this.setScaleY(1.0f);
                             }
                             else
                             {
                                 int tmp = img_w;
                                 img_w = img_h;
                                 img_h = tmp;
+
+                                if (img_w < img_h)
+                                {
+                                    // TODO: this is NOT correct yet!!
+                                    scale_up = (float) (mViewHeight / 2) / (float) (mViewWidth / 2);
+                                    Log.i(TAG,
+                                          "scale:2=" + scale_up + " " + img_w + " " + img_h + " " + mViewHeight + " " +
+                                          mViewWidth);
+                                    this.setScaleX(scale_up);
+                                    this.setScaleY(scale_up);
+                                }
+                                else
+                                {
+                                    Log.i(TAG,
+                                          "scale:3=1.0 " + img_w + " " + img_h + " " + mViewHeight + " " + mViewWidth);
+                                    this.setScaleX(1.0f);
+                                    this.setScaleY(1.0f);
+                                }
                             }
 
-                            if (img_w > img_h)
-                            {
-                                // TODO: this is NOT correct yet!!
-                                scale_up = (float) (mViewHeight / 2) / (float) (mViewWidth / 2);
-                                Log.i(TAG, "scale=" + scale_up + " " + img_w + " " + img_h + " " + mViewHeight + " " +
-                                           mViewWidth);
-                                //****// this.setScaleX(scale_up);
-                                //****// this.setScaleY(scale_up);
-                            }
                             this.setRotation(rot_needed);
 
                             matrix_was_reset = false;
