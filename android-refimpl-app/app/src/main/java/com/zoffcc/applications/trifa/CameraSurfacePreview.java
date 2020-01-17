@@ -25,6 +25,7 @@ import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -38,6 +39,7 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     Context mContext;
     static List<Camera.Size> mSupportedPreviewSizes = null;
     static Camera.Size mPreviewSize = null;
+    private float my_alpha = 1.0f;
 
     CameraWrapper mCameraWrapper;
 
@@ -45,6 +47,7 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     public CameraSurfacePreview(Context context, AttributeSet attrs)
     {
         super(context, attrs);
+        this.my_alpha = 1.0f;
         this.mSurfaceHolder = getHolder();
         this.mContext = getContext();
         this.mSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
@@ -142,6 +145,29 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         return optimalSize;
     }
 
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        if ((event.getAction() == MotionEvent.ACTION_DOWN) || (event.getAction() == MotionEvent.ACTION_CANCEL))
+        {
+            if (my_alpha == 1.0f)
+            {
+                my_alpha = 0.0f;
+                this.setAlpha(0.0f);
+            }
+            else
+            {
+                my_alpha = 1.0f;
+                this.setAlpha(1.0f);
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public static int convertDpToPixels(float dp, Context context)
     {
