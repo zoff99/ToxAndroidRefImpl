@@ -53,7 +53,7 @@
 #include <vpx/vpx_image.h>
 #include <sys/mman.h>
 
-// #define AV_MEDIACODEC 1
+#define AV_MEDIACODEC 1
 
 #ifdef AV_MEDIACODEC
 #include <libavcodec/jni.h>
@@ -243,6 +243,7 @@ jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_video_receive_frame_h264_cb_method = NULL;
 jmethodID android_toxav_callback_call_state_cb_method = NULL;
 jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
 jmethodID android_toxav_callback_audio_receive_frame_cb_method = NULL;
@@ -1778,10 +1779,13 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
         filteraudio_incompatible_2 = 1;
     }
 
-    if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
-            && (filteraudio_incompatible_2 == 0))
+    if (sample_count > 0)
     {
-        pass_audio_output(filteraudio, pcm, (unsigned int)sample_count);
+        if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
+                && (filteraudio_incompatible_2 == 0))
+        {
+            pass_audio_output(filteraudio, pcm, (unsigned int)sample_count);
+        }
     }
 
 #endif
@@ -1809,6 +1813,18 @@ void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint1
                                      (jlong)(unsigned long long)ustride, (jlong)(unsigned long long)vstride
                                     );
 }
+
+
+void android_toxav_callback_video_receive_frame_h264_cb(uint32_t friend_number, uint32_t buf_size)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_video_receive_frame_h264_cb_method, (jlong)(unsigned long long)friend_number,
+                                     (jlong)(unsigned long long)buf_size
+                                    );
+}
+
 
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1av_1call_1status(JNIEnv *env, jobject thiz, jint status)
@@ -2033,6 +2049,35 @@ void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t w
     android_toxav_callback_video_receive_frame_cb(friend_number, width, height, ystride, ustride, vstride);
 }
 
+void toxav_video_receive_frame_h264_cb_(ToxAV *av, uint32_t friend_number, const uint8_t *buf,
+                                        const uint32_t buf_size, void *user_data)
+{
+    if(video_buffer_1 != NULL)
+    {
+        if((buf) && (buf_size > 0))
+        {
+            // memset(video_buffer_1, 0, video_buffer_1_size);
+            memcpy(video_buffer_1, buf, (size_t)(buf_size));
+            if (buf_size > 8)
+            {
+                dbg(9, "v_receive_frame_h264_cb:size=%d", buf_size);
+                dbg(9, "v_receive_frame_h264_cb:%d %d %d %d %d %d h %d %d",
+                    video_buffer_1[0],
+                    video_buffer_1[1],
+                    video_buffer_1[2],
+                    video_buffer_1[3],
+                    video_buffer_1[4],
+                    video_buffer_1[5],
+                    video_buffer_1[buf_size-2],
+                    video_buffer_1[buf_size-1]);
+            }
+        }
+    }
+
+    android_toxav_callback_video_receive_frame_h264_cb(friend_number, buf_size);
+}
+
+
 void android_toxav_callback_call_cb(uint32_t friend_number, bool audio_enabled, bool video_enabled)
 {
     JNIEnv *jnienv2;
@@ -2158,7 +2203,7 @@ void *thread_video_av(void *data)
             //usleep((av_iterate_interval / 2) * 1000);
             if(global_av_call_active == 1)
             {
-                usleep(8 * 1000);
+                usleep(5 * 1000);
             }
             else
             {
@@ -2363,6 +2408,16 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_video_receive_frame_cb_method", "(JJJJJJ)V");
     toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
+
+    // --------------------
+    // --------------------
+    android_toxav_callback_video_receive_frame_h264_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_toxav_callback_video_receive_frame_h264_cb_method", "(JJ)V");
+    // toxav_callback_video_receive_frame_h264(tox_av_global, toxav_video_receive_frame_h264_cb_, &mytox_CC);
+    // --------------------
+    // --------------------
+
+
     android_toxav_callback_call_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_call_state_cb_method", "(JI)V");
     toxav_callback_call_state(tox_av_global, toxav_call_state_cb_, &mytox_CC);
@@ -4602,6 +4657,21 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv
 }
 
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(JNIEnv *env, jobject thiz,
+        jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len)
+{
+    TOXAV_ERR_SEND_FRAME error;
+    bool res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                        (uint16_t)frame_height_px,
+                                        (uint8_t *)video_buffer_2,
+                                        (uint32_t)data_len, &error);
+
+    return (jint)error;
+}
+
+
+
 /**
  * Send an audio frame to a friend.
  *
@@ -4666,10 +4736,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
         // TODO: need some locking here!
 
-        if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
-                && (filteraudio_incompatible_2 == 0))
+        if (sample_count > 0)
         {
-            filter_audio(filteraudio, pcm, (unsigned int)sample_count);
+            if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
+                    && (filteraudio_incompatible_2 == 0))
+            {
+                filter_audio(filteraudio, pcm, (unsigned int)sample_count);
+            }
         }
 
 #endif
