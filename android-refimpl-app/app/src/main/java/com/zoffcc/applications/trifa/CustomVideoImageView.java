@@ -180,22 +180,22 @@ public class CustomVideoImageView extends android.support.v7.widget.AppCompatIma
 
                             if (device_orientation == 90)
                             {
-                                System.out.println("rot_dev:270");
+                                Log.i(TAG, "rot_dev:270");
                                 rot_needed = 270;
                             }
                             else if (device_orientation == 270)
                             {
-                                System.out.println("rot_dev:90");
+                                Log.i(TAG, "rot_dev:90");
                                 rot_needed = 90;
                             }
                             else if (device_orientation == 180)
                             {
-                                System.out.println("rot_dev:180");
+                                Log.i(TAG, "rot_dev:180");
                                 rot_needed = 180;
                             }
                             else
                             {
-                                System.out.println("rot_dev:0");
+                                Log.i(TAG, "rot_dev:0");
                                 rot_needed = 0;
                             }
 
