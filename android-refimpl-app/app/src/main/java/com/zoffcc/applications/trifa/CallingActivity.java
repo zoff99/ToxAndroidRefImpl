@@ -43,7 +43,6 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -64,10 +63,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
-import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_start_ts;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.set_audio_delay;
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
@@ -462,6 +461,28 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                 getApplicationContext());
                         settings_cs1.edit().putInt("video_play_delay_ms", PREF__video_play_delay_ms).apply();
                         Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
+
+                        if (PREF__video_play_delay_ms > 200)
+                        {
+                            if (native_aec_lib_ready)
+                            {
+                                set_audio_delay(200);
+                            }
+                        }
+                        else if (PREF__video_play_delay_ms < 0)
+                        {
+                            if (native_aec_lib_ready)
+                            {
+                                set_audio_delay(0);
+                            }
+                        }
+                        else
+                        {
+                            if (native_aec_lib_ready)
+                            {
+                                set_audio_delay(PREF__video_play_delay_ms);
+                            }
+                        }
                     }
                     catch (Exception ee)
                     {

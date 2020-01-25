@@ -43,6 +43,8 @@ public class AudioProcessing
 
     public static native void set_JNI_audio_rec_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num);
 
+    public static native void set_audio_delay(int delay_ms);
+
     public static native void play();
 
     public static native void record();
