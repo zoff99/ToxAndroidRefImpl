@@ -77,6 +77,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encod
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_play_delay_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
+import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
@@ -1277,7 +1278,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         try
         {
             ap = new AudioProcessing();
-            init_buffers(10, 1, 16000, 1, 16000);
+            init_buffers(10, 1, SAMPLE_RATE_FIXED, 1, SAMPLE_RATE_FIXED);
         }
         catch (Exception e)
         {

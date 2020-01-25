@@ -38,7 +38,7 @@ public class NativeAudio
     public static int n_cur_buf = 0;
     public static int n_buf_size_in_bytes = 0;
     public static int[] n_bytes_in_buffer = new int[n_audio_in_buffer_max_count];
-    public static int sampling_rate = 44100;
+    public static int sampling_rate = 48000;
     public static int channel_count = 2;
 
     public static final int n_rec_audio_in_buffer_max_count = 10;
@@ -72,6 +72,30 @@ public class NativeAudio
      * com.zoffcc.applications.trifa D/SensorManager: Proximity, val = 8.0  [far]
      * com.zoffcc.applications.trifa I/trifa.CallingActivity: onSensorChanged:--> speaker
      * com.zoffcc.applications.trifa I/trifa.ToxService: I:setting filteraudio_active=1
+     */
+
+    /*
+     *
+     Low Latency Verification
+     ------------------------
+
+   1. execute "adb shell dumpsys media.audio_flinger". Find a list of the running processes
+    Name Active Client Type      Fmt Chn mask Session fCount S F SRate  L dB  R dB    Server Main buf  Aux Buf Flags UndFrmCnt
+    F  2     no    704    1 00000001 00000003     562  13248 S 1 48000  -inf  -inf  000033C0 0xabab8480 0x0 0x600         0
+    F  5     no    597    1 00000001 00000003     257   6000 A 2 48000    -6    -6  00073B90 0xabab8480 0x0 0x600         0
+    F  1     no    597    1 00000001 00000003       9   6000 S 1 48000  -inf  -inf  00075300 0xabab8480 0x0 0x600         0
+    F  6    yes   9345    3 00000001 00000001     576    128 A 1 48000     0     0  0376AA00 0xabab8480 0x0 0x400       256
+
+   2. execute adb shell ps  | grep echo; find the sample app pid; with the pid, check with result
+    on step 1.: if there is one "F" in the front of your echo pid, player is on fast audio path;
+    otherwise, it is not; for fast audio capture[it is totally different story],
+    if you do NOT see com.example.nativeaudio W/AudioRecord﹕ AUDIO_INPUT_FLAG_FAST denied by client
+    in your logcat output when you create audio recorder, you could "assume" you are on the fast path.
+     If your system image was built muted ALOGW, you will not see the above warning message;
+    in which case you would pray and trust [if you created recorder with optimized frequency!].
+
+    run:  pid=$(adb shell ps | grep -i trifa|awk '{ print $2}');adb shell dumpsys media.audio_flinger|grep "$pid"
+
      */
 
     public static void restartNativeAudioPlayEngine(int sampleRate, int channels)
@@ -144,8 +168,8 @@ public class NativeAudio
                 AudioProcessing.audio_rec_buffer.position(0);
                 NativeAudio.n_rec_audio_buffer[rec_buffer_num].position(0);
                 NativeAudio.n_rec_audio_buffer[rec_buffer_num].rewind();
-                // Log.i(TAG, "audio_rec:buf_len1=" + NativeAudio.n_rec_audio_buffer[rec_buffer_num].remaining());
-                // Log.i(TAG, "audio_rec:buf_len2=" + AudioProcessing.audio_rec_buffer.remaining());
+                Log.i(TAG, "audio_rec:buf_len1=" + NativeAudio.n_rec_audio_buffer[rec_buffer_num].remaining());
+                Log.i(TAG, "audio_rec:buf_len2=" + AudioProcessing.audio_rec_buffer.remaining());
                 AudioProcessing.audio_rec_buffer.put(NativeAudio.n_rec_audio_buffer[rec_buffer_num]);
                 AudioProcessing.record_buffer();
                 AudioProcessing.audio_rec_buffer.position(0);

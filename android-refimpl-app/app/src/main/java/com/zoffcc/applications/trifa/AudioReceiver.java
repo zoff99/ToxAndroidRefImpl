@@ -22,10 +22,8 @@ package com.zoffcc.applications.trifa;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.media.audiofx.AudioEffect;
 import android.media.audiofx.EnvironmentalReverb;
 import android.media.audiofx.LoudnessEnhancer;
-import android.os.Build;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
@@ -33,7 +31,6 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_audio_device_icon;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.isBluetoothScoOn_old;
@@ -221,6 +218,27 @@ public class AudioReceiver extends Thread
 
                 System.out.println("NativeAudio:[2]sampleRate=" + sampleRate + " channels=" + channels);
 
+                if (1 == 1)
+                {
+
+                    int buffer_size22 = AudioTrack.getMinBufferSize(sampleRate, channels, FORMAT);
+                    Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
+                    Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
+
+                    String sampleRateStr = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
+                    {
+                        sampleRateStr = audio_manager_s.getProperty(
+                                AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE); // in decimal Hz
+                        int sampleRate__ = Integer.parseInt(sampleRateStr);
+                        Log.i(TAG, "audio_play:PROPERTY_OUTPUT_SAMPLE_RATE=" + sampleRate__);
+
+                        String framesPerBuffer = audio_manager_s.getProperty(
+                                AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER); // in decimal PCM frames
+                        int framesPerBufferInt = Integer.parseInt(framesPerBuffer);
+                        Log.i(TAG, "audio_play:PROPERTY_OUTPUT_FRAMES_PER_BUFFER=" + framesPerBufferInt);
+                    }
+                }
 
                 NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count);
 

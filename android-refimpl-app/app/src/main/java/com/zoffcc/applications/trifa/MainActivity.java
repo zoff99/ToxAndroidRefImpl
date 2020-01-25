@@ -342,7 +342,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__notification_vibrate = false;
     static boolean PREF__notification = true;
     static final int MIN_AUDIO_SAMPLINGRATE_OUT = 48000;
-    static final int SAMPLE_RATE_FIXED = 16000;
+    static final int SAMPLE_RATE_FIXED = 48000;
     static int PREF__min_audio_samplingrate_out = SAMPLE_RATE_FIXED;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092"; // this is just a dummy, this value is not used!
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
@@ -369,7 +369,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__X_eac_delay_ms = 60;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int FRAME_SIZE_FIXED = 10;
+    static int FRAME_SIZE_FIXED = 40;
     static int PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED; // !! 120 seems to work also !!
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
@@ -378,7 +378,7 @@ public class MainActivity extends AppCompatActivity
     static String PREF__camera_get_preview_format = "YV12"; // "YV12"; // "NV21";
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
-    static int PREF__video_play_delay_ms = 200;
+    static int PREF__video_play_delay_ms = 180;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2998,7 +2998,7 @@ public class MainActivity extends AppCompatActivity
             {
                 destroy_buffers();
                 Log.i(TAG, "audio_play:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
-                init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, 16000);
+                init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
             }
 
         }
@@ -3024,7 +3024,7 @@ public class MainActivity extends AppCompatActivity
                         int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
                         Log.i(TAG,
                               "audio_play:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
-                        init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, 16000);
+                        init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
                     }
 
                 }
@@ -3043,9 +3043,6 @@ public class MainActivity extends AppCompatActivity
                     // Log.i(TAG, "audio_play:buf_len2=" + AudioProcessing.audio_buffer.remaining());
                     AudioProcessing.audio_buffer.put(audio_buffer_2[0]);
                     play_buffer();
-                    AudioProcessing.audio_buffer.position(0);
-                    audio_buffer_2[0].position(0);
-                    audio_buffer_2[0].put(AudioProcessing.audio_buffer);
                     audio_buffer_2[0].position(0);
                 }
                 // -------------- apply AudioProcessing: AEC -----------------------
