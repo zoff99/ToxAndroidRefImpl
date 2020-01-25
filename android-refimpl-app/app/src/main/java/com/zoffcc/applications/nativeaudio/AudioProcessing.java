@@ -33,7 +33,7 @@ public class AudioProcessing
 {
     private static final String TAG = "trifa.AudioProc";
 
-    static Semaphore semaphore_audioprocessing_01 = new Semaphore(1);
+    public static Semaphore semaphore_audioprocessing_01 = new Semaphore(1);
     static boolean native_aec_lib_loaded = false;
     public static boolean native_aec_lib_ready = false;
     public static ByteBuffer audio_buffer;
@@ -72,6 +72,11 @@ public class AudioProcessing
         try
         {
             semaphore_audioprocessing_01.acquire();
+            if (!native_aec_lib_ready)
+            {
+                semaphore_audioprocessing_01.release();
+                return;
+            }
         }
         catch (InterruptedException e)
         {
@@ -87,6 +92,11 @@ public class AudioProcessing
         try
         {
             semaphore_audioprocessing_01.acquire();
+            if (!native_aec_lib_ready)
+            {
+                semaphore_audioprocessing_01.release();
+                return;
+            }
         }
         catch (InterruptedException e)
         {
@@ -97,49 +107,94 @@ public class AudioProcessing
         semaphore_audioprocessing_01.release();
     }
 
-    public static void init_buffers(int channels, int samplingfreq, int channels_rec, int samplingfreq_rec)
+    public static void init_buffers(int frame_size, int channels, int samplingfreq, int channels_rec, int samplingfreq_rec)
     {
+        if (!native_aec_lib_loaded)
+        {
+            return;
+        }
+
         try
         {
-            semaphore_audioprocessing_01.release();
+            semaphore_audioprocessing_01.acquire();
+            if (native_aec_lib_ready)
+            {
+                semaphore_audioprocessing_01.release();
+                return;
+            }
         }
-        catch (Exception e)
+        catch (InterruptedException e)
         {
+            semaphore_audioprocessing_01.release();
+            return;
         }
 
+        if (frame_size != 10)
+        {
+            Log.i(TAG, "init_buffers:frame_size=" + frame_size+" --> ERROR");
+            semaphore_audioprocessing_01.release();
+            return;
+        }
+        else if ((samplingfreq != 8000) && (samplingfreq != 16000) && (samplingfreq != 32000))
+        {
+            Log.i(TAG, "init_buffers:samplingfreq=" + samplingfreq+" --> ERROR");
+            semaphore_audioprocessing_01.release();
+            return;
+        }
+        else
+        {
 
-        // frame size must always be 10ms !!
-        int buffer_size = (samplingfreq / 100) * channels * 2;
+            // frame size must always be 10ms !!
+            int buffer_size = (samplingfreq / 100) * channels * 2;
 
-        audio_buffer = ByteBuffer.allocateDirect(buffer_size * audio_out_buffer_mult);
-        set_JNI_audio_buffer(audio_buffer, buffer_size, 0);
+            Log.i(TAG, "init_buffers:buffer_size=" + buffer_size);
 
-        // frame size must always be 10ms !!
-        int buffer_rec_size = (samplingfreq_rec / 100) * channels_rec * 2;
+            audio_buffer = ByteBuffer.allocateDirect(buffer_size * audio_out_buffer_mult);
+            set_JNI_audio_buffer(audio_buffer, buffer_size, 0);
 
-        audio_rec_buffer = ByteBuffer.allocateDirect(buffer_rec_size * audio_out_buffer_mult);
-        set_JNI_audio_rec_buffer(audio_buffer, buffer_rec_size, 0);
+            // frame size must always be 10ms !!
+            int buffer_rec_size = (samplingfreq_rec / 100) * channels_rec * 2;
 
-        init(channels, samplingfreq, channels_rec, samplingfreq_rec);
+            Log.i(TAG, "init_buffers:buffer_rec_size=" + buffer_rec_size);
 
-        native_aec_lib_ready = true;
+            audio_rec_buffer = ByteBuffer.allocateDirect(buffer_rec_size * audio_out_buffer_mult);
+            set_JNI_audio_rec_buffer(audio_buffer, buffer_rec_size, 0);
+
+            init(channels, samplingfreq, channels_rec, samplingfreq_rec);
+
+            native_aec_lib_ready = true;
+        }
+
+        semaphore_audioprocessing_01.release();
     }
 
     public static void destroy_buffers()
     {
         try
         {
-            semaphore_audioprocessing_01.release();
+            semaphore_audioprocessing_01.acquire();
+            if (!native_aec_lib_ready)
+            {
+                semaphore_audioprocessing_01.release();
+                return;
+            }
         }
-        catch (Exception e)
+        catch (InterruptedException e)
         {
+            semaphore_audioprocessing_01.release();
+            return;
         }
 
-        native_aec_lib_ready = false;
+        if (native_aec_lib_ready)
+        {
+            native_aec_lib_ready = false;
 
-        audio_buffer = null;
-        audio_rec_buffer = null;
+            audio_buffer = null;
+            audio_rec_buffer = null;
 
-        destroy();
+            destroy();
+        }
+
+        semaphore_audioprocessing_01.release();
     }
 }

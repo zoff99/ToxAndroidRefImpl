@@ -45,11 +45,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
-import android.graphics.YuvImage;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.media.AudioTrack;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -73,7 +71,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -141,12 +138,13 @@ import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.play;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
-import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
-import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_decoder;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_decoder;
@@ -2990,8 +2988,19 @@ public class MainActivity extends AppCompatActivity
             audio_buffer_play = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
             // always write to buffer[0] in the pipeline !! -----------
             set_JNI_audio_buffer2(audio_buffer_2[0]);
+
+            int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
+
             // always write to buffer[0] in the pipeline !! -----------
             Log.i(TAG, "audio_play:audio_buffer_play size=" + AudioReceiver.buffer_size);
+
+            if (native_aec_lib_ready)
+            {
+                destroy_buffers();
+                Log.i(TAG, "audio_play:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
+                init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, 16000);
+            }
+
         }
 
         // TODO: dirty hack, "make good"
@@ -3002,11 +3011,21 @@ public class MainActivity extends AppCompatActivity
                 // Log.i(TAG, "audio_play:NativeAudio Play:001");
                 if ((NativeAudio.sampling_rate != (int) sampling_rate_) || (NativeAudio.channel_count != channels_))
                 {
+                    Log.i(TAG, "audio_play:values_changed");
                     NativeAudio.sampling_rate = (int) sampling_rate_;
                     NativeAudio.channel_count = channels_;
                     Log.i(TAG, "audio_play:NativeAudio restart Engine");
                     // TODO: locking? or something like that
                     NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
+
+                    if (native_aec_lib_ready)
+                    {
+                        destroy_buffers();
+                        int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
+                        Log.i(TAG, "audio_play:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
+                        init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, 16000);
+                    }
+
                 }
 
                 audio_buffer_2[0].position(0);
@@ -3022,7 +3041,7 @@ public class MainActivity extends AppCompatActivity
                     // Log.i(TAG, "audio_play:buf_len1=" + audio_buffer_2[0].remaining());
                     // Log.i(TAG, "audio_play:buf_len2=" + AudioProcessing.audio_buffer.remaining());
                     AudioProcessing.audio_buffer.put(audio_buffer_2[0]);
-                    AudioProcessing.play();
+                    play();
                     AudioProcessing.audio_buffer.position(0);
                     audio_buffer_2[0].position(0);
                     audio_buffer_2[0].put(AudioProcessing.audio_buffer);
@@ -8106,8 +8125,16 @@ public class MainActivity extends AppCompatActivity
                                 CallingActivity.ca.right_top_text_1b.setText(
                                         "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
                                         Callstate.video_in_bitrate);
-                                CallingActivity.ca.right_top_text_2.setText(
-                                        "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
+                                if (native_aec_lib_ready)
+                                {
+                                    CallingActivity.ca.right_top_text_2.setText(
+                                            "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay + "e");
+                                }
+                                else
+                                {
+                                    CallingActivity.ca.right_top_text_2.setText(
+                                            "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
+                                }
                             }
                             catch (Exception e)
                             {

@@ -65,6 +65,8 @@ import java.nio.ByteBuffer;
 
 import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_start_ts;
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
@@ -1059,17 +1061,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     synchronized public static void update_top_text_line()
     {
-        Log.i(TAG, "update_top_text_line(1):top_text_line_str3=" + top_text_line_str3);
+        // Log.i(TAG, "update_top_text_line(1):top_text_line_str3=" + top_text_line_str3);
         update_top_text_line(top_text_line_str3, 3);
     }
 
     synchronized public static void update_top_text_line(String text2, int linenum)
     {
-        Log.i(TAG, "update_top_text_line(2):str=" + text2);
-        Log.i(TAG, "update_top_text_line(2):top_text_line_str1=" + top_text_line_str1);
-        Log.i(TAG, "update_top_text_line(2):top_text_line_str2=" + top_text_line_str2);
-        Log.i(TAG, "update_top_text_line(2):top_text_line_str3=" + top_text_line_str3);
-        Log.i(TAG, "update_top_text_line(2):top_text_line_str4=" + top_text_line_str4);
+        // Log.i(TAG, "update_top_text_line(2):str=" + text2);
+        // Log.i(TAG, "update_top_text_line(2):top_text_line_str1=" + top_text_line_str1);
+        // Log.i(TAG, "update_top_text_line(2):top_text_line_str2=" + top_text_line_str2);
+        // Log.i(TAG, "update_top_text_line(2):top_text_line_str3=" + top_text_line_str3);
+        // Log.i(TAG, "update_top_text_line(2):top_text_line_str4=" + top_text_line_str4);
 
         if (linenum == 3)
         {
@@ -1080,7 +1082,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             top_text_line_str4 = text2;
         }
 
-        Log.i(TAG, "update_top_text_line(2b):top_text_line_str3=" + top_text_line_str3);
+        // Log.i(TAG, "update_top_text_line(2b):top_text_line_str3=" + top_text_line_str3);
 
         Runnable myRunnable = new Runnable()
         {
@@ -1089,7 +1091,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
-                    Log.i(TAG, "update_top_text_line(2c):top_text_line_str3=" + top_text_line_str3);
+                    // Log.i(TAG, "update_top_text_line(2c):top_text_line_str3=" + top_text_line_str3);
 
                     if ((top_text_line_str3 != "") || (top_text_line_str4 != ""))
                     {
@@ -1254,7 +1256,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         try
         {
             ap = new AudioProcessing();
-            ap.init_buffers(1, 16000, 1, 16000);
+            init_buffers(10, 1, 16000, 1, 16000);
         }
         catch (Exception e)
         {
@@ -1476,7 +1478,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            ap.destroy_buffers();
+            destroy_buffers();
         }
         catch (Exception e)
         {
