@@ -141,7 +141,7 @@ import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.play;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
@@ -3022,7 +3022,8 @@ public class MainActivity extends AppCompatActivity
                     {
                         destroy_buffers();
                         int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
-                        Log.i(TAG, "audio_play:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
+                        Log.i(TAG,
+                              "audio_play:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
                         init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, 16000);
                     }
 
@@ -3041,7 +3042,7 @@ public class MainActivity extends AppCompatActivity
                     // Log.i(TAG, "audio_play:buf_len1=" + audio_buffer_2[0].remaining());
                     // Log.i(TAG, "audio_play:buf_len2=" + AudioProcessing.audio_buffer.remaining());
                     AudioProcessing.audio_buffer.put(audio_buffer_2[0]);
-                    play();
+                    play_buffer();
                     AudioProcessing.audio_buffer.position(0);
                     audio_buffer_2[0].position(0);
                     audio_buffer_2[0].put(AudioProcessing.audio_buffer);
