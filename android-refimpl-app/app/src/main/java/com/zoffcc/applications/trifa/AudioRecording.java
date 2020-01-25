@@ -149,7 +149,8 @@ public class AudioRecording extends Thread
                         ((sampling_rate * channel_count * 2) / 1000) * PREF__X_audio_recording_frame_size;
 
                 Log.i(TAG, "NativeAudio.n_rec_buf_size_in_bytes=" + NativeAudio.n_rec_buf_size_in_bytes +
-                           " PREF__X_audio_recording_frame_size=" + PREF__X_audio_recording_frame_size);
+                           " PREF__X_audio_recording_frame_size=" + PREF__X_audio_recording_frame_size +
+                           " sampling_rate=" + sampling_rate + " channel_count=" + channel_count);
 
                 for (int i = 0; i < n_rec_audio_in_buffer_max_count; i++)
                 {

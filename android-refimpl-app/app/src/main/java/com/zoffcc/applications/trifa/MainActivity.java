@@ -104,6 +104,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
+import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 import com.zoffcc.applications.trifa.CallingActivity.h264_decoder_output_data;
 import com.zoffcc.applications.trifa.CallingActivity.h264_encoder_output_data;
@@ -342,7 +343,8 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__notification_vibrate = false;
     static boolean PREF__notification = true;
     static final int MIN_AUDIO_SAMPLINGRATE_OUT = 48000;
-    static int PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
+    static final int SAMPLE_RATE_FIXED = 16000;
+    static int PREF__min_audio_samplingrate_out = SAMPLE_RATE_FIXED;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092"; // this is just a dummy, this value is not used!
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
@@ -368,7 +370,8 @@ public class MainActivity extends AppCompatActivity
     static int PREF__X_eac_delay_ms = 60;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int PREF__X_audio_recording_frame_size = 40; // !! 120 seems to work also !!
+    static int  FRAME_SIZE_FIXED = 10;
+    static int PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED; // !! 120 seems to work also !!
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
     static boolean PREF__allow_screen_off_in_audio_call = true;
@@ -831,6 +834,10 @@ public class MainActivity extends AppCompatActivity
             PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
         }
 
+        // ------- FIXED -------
+        PREF__min_audio_samplingrate_out = SAMPLE_RATE_FIXED;
+        // ------- FIXED -------
+
         try
         {
             PREF__allow_screen_off_in_audio_call = settings.getBoolean("allow_screen_off_in_audio_call", true);
@@ -861,6 +868,10 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             PREF__X_audio_recording_frame_size = 40;
         }
+
+        // ------- FIXED -------
+        PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED;
+        // ------- FIXED -------
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 
@@ -1995,6 +2006,11 @@ public class MainActivity extends AppCompatActivity
             PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
         }
 
+        // ------- FIXED -------
+        PREF__min_audio_samplingrate_out = SAMPLE_RATE_FIXED;
+        // ------- FIXED -------
+
+
         Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
         Log.i(TAG, "PREF__min_audio_samplingrate_out:2=" + PREF__min_audio_samplingrate_out);
 
@@ -2028,6 +2044,11 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             PREF__X_audio_recording_frame_size = 40;
         }
+
+        // ------- FIXED -------
+        PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED;
+        // ------- FIXED -------
+
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 

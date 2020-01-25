@@ -419,6 +419,11 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     {
         format_pcm.samplesPerSec = bqPlayerSampleRate;       //sample rate in milli seconds
     }
+
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:start:samplerate=%d", (int)format_pcm.samplesPerSec);
+
     SLDataSource audioSrc = {&loc_bufq, &format_pcm};
 
     // configure audio sink
@@ -572,10 +577,18 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
     {
         rec_samplerate = SL_SAMPLINGRATE_8;
     }
+    else if ((int) sampleRate == 32000)
+    {
+        rec_samplerate = SL_SAMPLINGRATE_32;
+    }
     else if ((int) sampleRate == 16000)
     {
         rec_samplerate = SL_SAMPLINGRATE_16;
     }
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createAudioRecorder:start:samplerate=%d", (int)rec_samplerate);
+
 
     // configure audio sink
     SLDataLocator_AndroidSimpleBufferQueue loc_bq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,

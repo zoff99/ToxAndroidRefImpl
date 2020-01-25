@@ -58,6 +58,7 @@ import android.widget.TextView;
 import com.etiennelawlor.discreteslider.library.ui.DiscreteSlider;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.nativeaudio.AudioProcessing;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -137,6 +138,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private Sensor proximity_sensor = null;
     private Sensor accelerometer_sensor = null;
     static int device_orientation = 0;
+    static AudioProcessing ap = null;
     PowerManager pm = null;
     PowerManager.WakeLock wl1 = null;
     PowerManager.WakeLock wl2 = null;
@@ -1248,6 +1250,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensor_manager.registerListener(this, accelerometer_sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
+
+        try
+        {
+            ap = new AudioProcessing();
+            ap.init_buffers(1, 16000, 1, 16000);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         try
         {
             if (!AudioRecording.stopped)
@@ -1460,6 +1473,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+
+        try
+        {
+            ap.destroy_buffers();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
 
         on_call_ended_actions();
     }
