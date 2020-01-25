@@ -141,6 +141,7 @@ import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
@@ -324,7 +325,7 @@ public class MainActivity extends AppCompatActivity
     static ByteBuffer video_buffer_1 = null;
     static ByteBuffer video_buffer_2 = null;
     final static int audio_in_buffer_max_count = 2; // how many out play buffers? [we are now only using buffer "0" !!]
-    final static int audio_out_buffer_mult = 8;
+    public final static int audio_out_buffer_mult = 1;
     static int audio_in_buffer_element_count = 0;
     static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
     public static long[] audio_buffer_2_ts = new long[n_audio_in_buffer_max_count];
@@ -370,7 +371,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__X_eac_delay_ms = 60;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int  FRAME_SIZE_FIXED = 10;
+    static int FRAME_SIZE_FIXED = 10;
     static int PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED; // !! 120 seems to work also !!
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
@@ -3010,6 +3011,24 @@ public class MainActivity extends AppCompatActivity
 
                 audio_buffer_2[0].position(0);
                 int incoming_bytes = (int) ((sample_count * channels) * 2);
+                // Log.i(TAG, "audio_play:sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" +
+                //           sampling_rate);
+
+                // -------------- apply AudioProcessing: AEC -----------------------
+                if (native_aec_lib_ready)
+                {
+                    AudioProcessing.audio_buffer.position(0);
+                    audio_buffer_2[0].position(0);
+                    // Log.i(TAG, "audio_play:buf_len1=" + audio_buffer_2[0].remaining());
+                    // Log.i(TAG, "audio_play:buf_len2=" + AudioProcessing.audio_buffer.remaining());
+                    AudioProcessing.audio_buffer.put(audio_buffer_2[0]);
+                    AudioProcessing.play();
+                    AudioProcessing.audio_buffer.position(0);
+                    audio_buffer_2[0].position(0);
+                    audio_buffer_2[0].put(AudioProcessing.audio_buffer);
+                    audio_buffer_2[0].position(0);
+                }
+                // -------------- apply AudioProcessing: AEC -----------------------
 
                 if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
                 {

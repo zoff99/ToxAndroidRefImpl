@@ -24,19 +24,28 @@ import android.util.Log;
 import com.zoffcc.applications.trifa.AudioReceiver;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.Semaphore;
+
+import static com.zoffcc.applications.trifa.MainActivity.audio_out_buffer_mult;
 
 @SuppressWarnings("JniMissingFunction")
 public class AudioProcessing
 {
     private static final String TAG = "trifa.AudioProc";
 
+    static Semaphore semaphore_audioprocessing_01 = new Semaphore(1);
     static boolean native_aec_lib_loaded = false;
-    static ByteBuffer audio_buffer;
-    static ByteBuffer audio_rec_buffer;
+    public static boolean native_aec_lib_ready = false;
+    public static ByteBuffer audio_buffer;
+    public static ByteBuffer audio_rec_buffer;
 
     public static native void set_JNI_audio_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num);
 
     public static native void set_JNI_audio_rec_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num);
+
+    public static native void play();
+
+    public static native void record();
 
     public static native void init(int channels, int samplingfreq, int channels_rec, int samplingfreq_rec);
 
@@ -58,25 +67,76 @@ public class AudioProcessing
         }
     }
 
+    static void play_buffer()
+    {
+        try
+        {
+            semaphore_audioprocessing_01.acquire();
+        }
+        catch (InterruptedException e)
+        {
+            semaphore_audioprocessing_01.release();
+            return;
+        }
+        play();
+        semaphore_audioprocessing_01.release();
+    }
+
+    static void record_buffer()
+    {
+        try
+        {
+            semaphore_audioprocessing_01.acquire();
+        }
+        catch (InterruptedException e)
+        {
+            semaphore_audioprocessing_01.release();
+            return;
+        }
+        record();
+        semaphore_audioprocessing_01.release();
+    }
+
     public static void init_buffers(int channels, int samplingfreq, int channels_rec, int samplingfreq_rec)
     {
+        try
+        {
+            semaphore_audioprocessing_01.release();
+        }
+        catch (Exception e)
+        {
+        }
+
+
         // frame size must always be 10ms !!
         int buffer_size = (samplingfreq / 100) * channels * 2;
 
-        audio_buffer = ByteBuffer.allocateDirect(buffer_size);
+        audio_buffer = ByteBuffer.allocateDirect(buffer_size * audio_out_buffer_mult);
         set_JNI_audio_buffer(audio_buffer, buffer_size, 0);
 
         // frame size must always be 10ms !!
         int buffer_rec_size = (samplingfreq_rec / 100) * channels_rec * 2;
 
-        audio_rec_buffer = ByteBuffer.allocateDirect(buffer_rec_size);
+        audio_rec_buffer = ByteBuffer.allocateDirect(buffer_rec_size * audio_out_buffer_mult);
         set_JNI_audio_rec_buffer(audio_buffer, buffer_rec_size, 0);
 
         init(channels, samplingfreq, channels_rec, samplingfreq_rec);
+
+        native_aec_lib_ready = true;
     }
 
     public static void destroy_buffers()
     {
+        try
+        {
+            semaphore_audioprocessing_01.release();
+        }
+        catch (Exception e)
+        {
+        }
+
+        native_aec_lib_ready = false;
+
         audio_buffer = null;
         audio_rec_buffer = null;
 

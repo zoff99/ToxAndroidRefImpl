@@ -25,6 +25,7 @@ import com.zoffcc.applications.trifa.AudioRecording;
 
 import java.nio.ByteBuffer;
 
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_ts;
 
@@ -50,7 +51,7 @@ public class NativeAudio
 
     /**
      * problem switching to audio only
-     *
+     * <p>
      * com.zoffcc.applications.trifa I/trifa.CallingActivity: onSensorChanged:--> EAR
      * com.zoffcc.applications.trifa I/trifa.ToxService: I:setting filteraudio_active=0
      * com.zoffcc.applications.trifa I/trifa.CallingActivity: onSensorChanged:setMode(AudioManager.MODE_IN_COMMUNICATION)
@@ -71,7 +72,6 @@ public class NativeAudio
      * com.zoffcc.applications.trifa D/SensorManager: Proximity, val = 8.0  [far]
      * com.zoffcc.applications.trifa I/trifa.CallingActivity: onSensorChanged:--> speaker
      * com.zoffcc.applications.trifa I/trifa.ToxService: I:setting filteraudio_active=1
-     *
      */
 
     public static void restartNativeAudioPlayEngine(int sampleRate, int channels)
@@ -138,14 +138,27 @@ public class NativeAudio
         if (!microphone_muted)
         {
             // Log.i(TAG, "rec_buffer_ready:002");
+            // -------------- apply AudioProcessing: AEC -----------------------
+            if (native_aec_lib_ready)
+            {
+                AudioProcessing.audio_rec_buffer.position(0);
+                NativeAudio.n_rec_audio_buffer[rec_buffer_num].position(0);
+                NativeAudio.n_rec_audio_buffer[rec_buffer_num].rewind();
+                // Log.i(TAG, "audio_rec:buf_len1=" + NativeAudio.n_rec_audio_buffer[rec_buffer_num].remaining());
+                // Log.i(TAG, "audio_rec:buf_len2=" + AudioProcessing.audio_rec_buffer.remaining());
+                AudioProcessing.audio_rec_buffer.put(NativeAudio.n_rec_audio_buffer[rec_buffer_num]);
+                AudioProcessing.record();
+                AudioProcessing.audio_rec_buffer.position(0);
+                NativeAudio.n_rec_audio_buffer[rec_buffer_num].position(0);
+                NativeAudio.n_rec_audio_buffer[rec_buffer_num].rewind();
+                NativeAudio.n_rec_audio_buffer[rec_buffer_num].put(AudioProcessing.audio_rec_buffer);
+                NativeAudio.n_rec_audio_buffer[rec_buffer_num].position(0);
+                NativeAudio.n_rec_audio_buffer[rec_buffer_num].rewind();
+            }
+            // -------------- apply AudioProcessing: AEC -----------------------
+
             new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num).execute();
         }
-    }
-
-    public static int PlayPCM16_(int buf_num)
-    {
-        Log.i(TAG, "PlayPCM16_:play_delay=" + (System.currentTimeMillis() - audio_buffer_2_ts[buf_num]));
-        return PlayPCM16(buf_num);
     }
 
     /**
