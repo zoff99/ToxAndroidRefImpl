@@ -60,7 +60,7 @@
 #endif
 
 // HINT: it may not be working properly
-#define USE_ECHO_CANCELLATION 1
+// #define USE_ECHO_CANCELLATION 1
 
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
