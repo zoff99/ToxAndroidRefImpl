@@ -2194,21 +2194,14 @@ void *thread_video_av(void *data)
         // pthread_mutex_unlock(&av_thread_lock);
         av_iterate_interval = toxav_iteration_interval(av);
 
-        if((av_iterate_interval / 2) < 1)
+        //usleep((av_iterate_interval / 2) * 1000);
+        if(global_av_call_active == 1)
         {
-            usleep(1 * 1000);
+            usleep(5 * 1000);
         }
         else
         {
-            //usleep((av_iterate_interval / 2) * 1000);
-            if(global_av_call_active == 1)
-            {
-                usleep(5 * 1000);
-            }
-            else
-            {
-                usleep(800 * 1000);
-            }
+            usleep(800 * 1000);
         }
     }
 
@@ -2234,21 +2227,14 @@ void *thread_audio_av(void *data)
         // dbg(9, "AV audio Thread #%d running ...", (int) id);
         av_iterate_interval = toxav_iteration_interval(av);
 
-        if((av_iterate_interval / 2) < 1)
+        //usleep((av_iterate_interval / 2) * 1000);
+        if(global_av_call_active == 1)
         {
-            usleep(1 * 1000);
+            usleep(8 * 1000);
         }
         else
         {
-            //usleep((av_iterate_interval / 2) * 1000);
-            if(global_av_call_active == 1)
-            {
-                usleep(8 * 1000);
-            }
-            else
-            {
-                usleep(800 * 1000);
-            }
+            usleep(800 * 1000);
         }
     }
 
