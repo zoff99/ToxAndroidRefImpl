@@ -139,7 +139,8 @@ public class AudioProcessing
             semaphore_audioprocessing_01.release();
             return;
         }
-        else if ((samplingfreq != 8000) && (samplingfreq != 16000) && (samplingfreq != 32000))
+        // else if ((samplingfreq != 8000) && (samplingfreq != 16000) && (samplingfreq != 32000))
+        else if (samplingfreq != 16000)
         {
             Log.i(TAG, "init_buffers:samplingfreq=" + samplingfreq + " --> ERROR");
             semaphore_audioprocessing_01.release();
