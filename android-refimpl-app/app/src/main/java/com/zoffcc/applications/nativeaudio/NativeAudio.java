@@ -162,24 +162,6 @@ public class NativeAudio
         if (!microphone_muted)
         {
             // Log.i(TAG, "rec_buffer_ready:002");
-            // -------------- apply AudioProcessing: AEC -----------------------
-            if (native_aec_lib_ready)
-            {
-                AudioProcessing.audio_rec_buffer.position(0);
-                NativeAudio.n_rec_audio_buffer[rec_buffer_num].position(0);
-                NativeAudio.n_rec_audio_buffer[rec_buffer_num].rewind();
-                Log.i(TAG, "audio_rec:buf_len1=" + NativeAudio.n_rec_audio_buffer[rec_buffer_num].remaining());
-                Log.i(TAG, "audio_rec:buf_len2=" + AudioProcessing.audio_rec_buffer.remaining());
-                AudioProcessing.audio_rec_buffer.put(NativeAudio.n_rec_audio_buffer[rec_buffer_num]);
-                AudioProcessing.record_buffer();
-                AudioProcessing.audio_rec_buffer.position(0);
-                NativeAudio.n_rec_audio_buffer[rec_buffer_num].position(0);
-                NativeAudio.n_rec_audio_buffer[rec_buffer_num].rewind();
-                NativeAudio.n_rec_audio_buffer[rec_buffer_num].put(AudioProcessing.audio_rec_buffer);
-                NativeAudio.n_rec_audio_buffer[rec_buffer_num].position(0);
-                NativeAudio.n_rec_audio_buffer[rec_buffer_num].rewind();
-            }
-            // -------------- apply AudioProcessing: AEC -----------------------
 
             new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num).execute();
         }

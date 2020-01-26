@@ -22,26 +22,24 @@ package com.zoffcc.applications.trifa;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
 import android.media.audiofx.NoiseSuppressor;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.nio.ByteBuffer;
 
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_rec_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__audiorec_asynctask;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__use_audio_rec_effects;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
@@ -309,6 +307,25 @@ public class AudioRecording extends Thread
             {
                 if (native_audio_engine_down == false)
                 {
+
+                    // -------------- apply AudioProcessing: AEC -----------------------
+                    if (native_aec_lib_ready)
+                    {
+                        AudioProcessing.audio_rec_buffer.position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                        // Log.i(TAG, "audio_rec:buf_len1=" + NativeAudio.n_rec_audio_buffer[bufnum_].remaining());
+                        // Log.i(TAG, "audio_rec:buf_len2=" + AudioProcessing.audio_rec_buffer.remaining());
+                        AudioProcessing.audio_rec_buffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
+                        AudioProcessing.record_buffer();
+                        AudioProcessing.audio_rec_buffer.position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                        NativeAudio.n_rec_audio_buffer[bufnum_].put(AudioProcessing.audio_rec_buffer);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                    }
+                    // -------------- apply AudioProcessing: AEC -----------------------
 
                     _recBuffer.rewind();
                     NativeAudio.n_rec_audio_buffer[bufnum_].rewind();

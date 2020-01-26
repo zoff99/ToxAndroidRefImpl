@@ -53,7 +53,6 @@ public class AudioProcessing
 
     static
     {
-/*
         try
         {
             System.loadLibrary("aec");
@@ -66,8 +65,6 @@ public class AudioProcessing
             Log.i(TAG, "loadLibrary aec failed!");
             e.printStackTrace();
         }
-
- */
     }
 
     public static void play_buffer()
@@ -90,7 +87,7 @@ public class AudioProcessing
         semaphore_audioprocessing_01.release();
     }
 
-    static void record_buffer()
+    public static void record_buffer()
     {
         try
         {
