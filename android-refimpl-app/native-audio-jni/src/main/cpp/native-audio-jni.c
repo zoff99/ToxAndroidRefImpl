@@ -107,7 +107,7 @@ static SLPlayItf bqPlayerPlay;
 static SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
 static SLEffectSendItf bqPlayerEffectSend;
 static SLMuteSoloItf bqPlayerMuteSolo;
-//*//static SLVolumeItf bqPlayerVolume;
+static SLVolumeItf bqPlayerVolume;
 static SLmilliHertz bqPlayerSampleRate = 0;
 static short *resampleBuf = NULL;
 
@@ -436,15 +436,15 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
      *     fast audio does not support when SL_IID_EFFECTSEND is required, skip it
      *     for fast audio case
      */
-#define  num_params  2
+#define  num_params  3
     const SLInterfaceID ids[num_params] = {SL_IID_BUFFERQUEUE,
                                            SL_IID_VOLUME,
-                                           /* SL_IID_ANDROIDCONFIGURATION, */
+                                           SL_IID_ANDROIDCONFIGURATION,
             /*SL_IID_EFFECTSEND,*/
             /*SL_IID_MUTESOLO,*/};
     const SLboolean req[num_params] = {SL_BOOLEAN_TRUE,
                                        SL_BOOLEAN_TRUE,
-                                       /* SL_BOOLEAN_TRUE, */
+                                       SL_BOOLEAN_TRUE,
             /*SL_BOOLEAN_TRUE,*/
             /*SL_BOOLEAN_TRUE,*/};
 
@@ -453,7 +453,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
 
-#if 0
+#if 1
     // ----------------------------------------------------------
     // Code for working with ear speaker by setting stream type to STREAM_VOICE ??
     SLAndroidConfigurationItf playerConfig;
@@ -475,7 +475,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                             (int) result);
 
 
-        SLuint32 presetValue2 = SL_ANDROID_PERFORMANCE_LATENCY;
+        SLuint32 presetValue2 = SL_ANDROID_PERFORMANCE_LATENCY_EFFECTS;
         (*playerConfig)->SetConfiguration(playerConfig,
                                           SL_ANDROID_KEY_PERFORMANCE_MODE,
                                           &presetValue2,
@@ -528,7 +528,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
-#if 0
+#if 1
     // get the volume interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
@@ -1050,7 +1050,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         bqPlayerBufferQueue = NULL;
         bqPlayerEffectSend = NULL;
         bqPlayerMuteSolo = NULL;
-        //*//bqPlayerVolume = NULL;
+        bqPlayerVolume = NULL;
     }
 
     // destroy output mix object, and invalidate all associated interfaces
