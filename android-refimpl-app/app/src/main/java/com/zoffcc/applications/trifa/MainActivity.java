@@ -110,7 +110,9 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
@@ -145,6 +147,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
+import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_decoder;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_decoder;
@@ -3041,8 +3044,47 @@ public class MainActivity extends AppCompatActivity
                     audio_buffer_2[0].position(0);
                     // Log.i(TAG, "audio_play:buf_len1=" + audio_buffer_2[0].remaining());
                     // Log.i(TAG, "audio_play:buf_len2=" + AudioProcessing.audio_buffer.remaining());
+
+
+                    BufferedWriter debug_audio_writer_play_s = null;
+                    try
+                    {
+                        debug_audio_writer_play_s = new BufferedWriter(
+                                new FileWriter("/sdcard/audio_play_s.txt", true));
+                        long ts = (System.currentTimeMillis() - calling_activity_start_ms) * 1000;
+                        int value = 0;
+                        for (int xx = 0; xx < 160; xx++)
+                        {
+                            value = audio_buffer_2[0].getShort(xx * 2);
+                            debug_audio_writer_play_s.write(("" + ts) + "," + value + "\n");
+                            ts = ts + 16;
+                        }
+
+                        if (debug_audio_writer_play_s != null)
+                        {
+                            debug_audio_writer_play_s.close();
+                        }
+
+                        debug_audio_writer_play_s = new BufferedWriter(
+                                new FileWriter("/sdcard/audio_play_s_ts.txt", true));
+                        debug_audio_writer_play_s.write("" + System.currentTimeMillis() + "\n");
+
+                        if (debug_audio_writer_play_s != null)
+                        {
+                            debug_audio_writer_play_s.close();
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                     AudioProcessing.audio_buffer.put(audio_buffer_2[0]);
                     play_buffer();
+
+                    Log.i(TAG, "audio_play:AEC:s:" + Arrays.toString(AudioProcessing.audio_buffer.array()));
+
                     audio_buffer_2[0].position(0);
                 }
                 // -------------- apply AudioProcessing: AEC -----------------------

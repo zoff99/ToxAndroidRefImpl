@@ -37,9 +37,9 @@ public class AudioProcessing
     public static ByteBuffer audio_buffer;
     public static ByteBuffer audio_rec_buffer;
 
-    public static native void set_JNI_audio_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num);
+    public static native void set_JNI_audio_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num, int buffer_offset);
 
-    public static native void set_JNI_audio_rec_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num);
+    public static native void set_JNI_audio_rec_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num, int buffer_offset);
 
     public static native void set_audio_delay(int delay_ms);
 
@@ -150,7 +150,7 @@ public class AudioProcessing
             Log.i(TAG, "init_buffers:buffer_size=" + buffer_size);
 
             audio_buffer = ByteBuffer.allocateDirect(buffer_size * audio_out_buffer_mult);
-            set_JNI_audio_buffer(audio_buffer, buffer_size, 0);
+            set_JNI_audio_buffer(audio_buffer, buffer_size, 0, audio_buffer.arrayOffset());
 
             // frame size must always be 10ms !!
             int buffer_rec_size = (samplingfreq_rec / 100) * channels_rec * 2;
@@ -158,7 +158,7 @@ public class AudioProcessing
             Log.i(TAG, "init_buffers:buffer_rec_size=" + buffer_rec_size);
 
             audio_rec_buffer = ByteBuffer.allocateDirect(buffer_rec_size * audio_out_buffer_mult);
-            set_JNI_audio_rec_buffer(audio_buffer, buffer_rec_size, 0);
+            set_JNI_audio_rec_buffer(audio_buffer, buffer_rec_size, 0, audio_rec_buffer.arrayOffset());
 
             init(channels, samplingfreq, channels_rec, samplingfreq_rec);
 

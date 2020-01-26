@@ -184,6 +184,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static MediaCodec mDecoder_h264;
     private static MediaFormat video_decoder_h264_format = null;
     private DetectHeadset dh = null;
+    public static long calling_activity_start_ms = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -211,6 +212,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
 
         super.onCreate(savedInstanceState);
+
+        calling_activity_start_ms = System.currentTimeMillis();
 
         Log.i(TAG, "onCreate:02");
 
