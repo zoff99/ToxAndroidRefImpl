@@ -466,11 +466,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         settings_cs1.edit().putInt("video_play_delay_ms", PREF__video_play_delay_ms).apply();
                         Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
 
-                        if (PREF__video_play_delay_ms > 200)
+                        if (PREF__video_play_delay_ms > 490)
                         {
                             if (native_aec_lib_ready)
                             {
-                                set_audio_delay(200);
+                                set_audio_delay(490);
                             }
                         }
                         else if (PREF__video_play_delay_ms < 0)
