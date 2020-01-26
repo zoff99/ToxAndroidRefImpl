@@ -603,16 +603,16 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
 
     // create audio recorder
     // (requires the RECORD_AUDIO permission)
-    const SLInterfaceID id[1] = {
-                                    SL_IID_ANDROIDSIMPLEBUFFERQUEUE
-                                    /* SL_IID_ANDROIDCONFIGURATION */
+    const SLInterfaceID id[2] = {
+                                    SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+                                    SL_IID_ANDROIDCONFIGURATION
                                 };
-    const SLboolean req[1] = {
+    const SLboolean req[2] = {
+                                SL_BOOLEAN_TRUE,
                                 SL_BOOLEAN_TRUE
-                                /* SL_BOOLEAN_TRUE */
                              };
     result = (*engineEngine)->CreateAudioRecorder(engineEngine, &recorderObject, &audioSrc,
-                                                  &audioSnk, 1, id, req);
+                                                  &audioSnk, 2, id, req);
 
     if (SL_RESULT_SUCCESS != result)
     {
@@ -620,7 +620,7 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
         return;
     }
 
-#if 0
+#if 1
     // Configure the voice recognition preset which has no
     // signal processing for lower latency.
     SLAndroidConfigurationItf inputConfig;
@@ -630,13 +630,21 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
 
     if (SL_RESULT_SUCCESS == result)
     {
-        SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_UNPROCESSED; // SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:SL_IID_ANDROIDCONFIGURATION...");
+
+        SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION;
+        // SL_ANDROID_RECORDING_PRESET_UNPROCESSED <--- ??
+        // SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION
+        // SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION
         (*inputConfig)->SetConfiguration(inputConfig,
                                          SL_ANDROID_KEY_RECORDING_PRESET,
                                          &presetValue,
                                          sizeof(SLuint32));
 
-        SLuint32 presetValue2 = SL_ANDROID_PERFORMANCE_LATENCY;
+        SLuint32 presetValue2 = SL_ANDROID_PERFORMANCE_LATENCY_EFFECTS;
+        // SL_ANDROID_PERFORMANCE_NONE
+        // SL_ANDROID_PERFORMANCE_LATENCY <--- ??
+        // SL_ANDROID_PERFORMANCE_LATENCY_EFFECTS
         (*inputConfig)->SetConfiguration(inputConfig,
                                          SL_ANDROID_KEY_PERFORMANCE_MODE,
                                          &presetValue2,
@@ -648,6 +656,11 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
         (*inputConfig)->GetConfiguration(inputConfig,
                                          SL_ANDROID_KEY_RECORDING_PRESET,
                                          &presetSize, (void *) &presetRetrieved);
+
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION=3");
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION=4");
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:SL_ANDROID_RECORDING_PRESET_UNPROCESSED=5");
+
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:record_preset=%u",
                             presetRetrieved);
 
@@ -656,6 +669,11 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
         (*inputConfig)->GetConfiguration(inputConfig,
                                          SL_ANDROID_KEY_PERFORMANCE_MODE,
                                          &presetSize, (void *) &presetRetrieved);
+
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:SL_ANDROID_PERFORMANCE_NONE=0");
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:SL_ANDROID_PERFORMANCE_LATENCY=1");
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:SL_ANDROID_PERFORMANCE_LATENCY_EFFECTS=2");
+
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:performance_mode=%u",
                             presetRetrieved);
 
