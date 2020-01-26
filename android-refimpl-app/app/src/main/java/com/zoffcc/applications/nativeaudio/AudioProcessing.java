@@ -31,6 +31,7 @@ public class AudioProcessing
 {
     private static final String TAG = "trifa.AudioProc";
 
+    static final boolean ENABLE_SOFTWARE_AEC3 = false;
     public static Semaphore semaphore_audioprocessing_01 = new Semaphore(1);
     static boolean native_aec_lib_loaded = false;
     public static boolean native_aec_lib_ready = false;
@@ -53,17 +54,20 @@ public class AudioProcessing
 
     static
     {
-        try
+        if (ENABLE_SOFTWARE_AEC3)
         {
-            System.loadLibrary("aec");
-            native_aec_lib_loaded = true;
-            Log.i(TAG, "successfully loaded aec library");
-        }
-        catch (java.lang.UnsatisfiedLinkError e)
-        {
-            native_aec_lib_loaded = false;
-            Log.i(TAG, "loadLibrary aec failed!");
-            e.printStackTrace();
+            try
+            {
+                System.loadLibrary("aec");
+                native_aec_lib_loaded = true;
+                Log.i(TAG, "successfully loaded aec library");
+            }
+            catch (java.lang.UnsatisfiedLinkError e)
+            {
+                native_aec_lib_loaded = false;
+                Log.i(TAG, "loadLibrary aec failed!");
+                e.printStackTrace();
+            }
         }
     }
 

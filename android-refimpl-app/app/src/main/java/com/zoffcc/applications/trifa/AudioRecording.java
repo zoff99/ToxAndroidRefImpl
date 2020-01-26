@@ -41,6 +41,7 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engin
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
+import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
@@ -321,39 +322,44 @@ public class AudioRecording extends Thread
                         //Log.i(TAG, "audio_rec:AEC:s:" +
                         //           Arrays.toString(NativeAudio.n_rec_audio_buffer[bufnum_].array()));
 
-                        BufferedWriter debug_audio_writer_rec_s = null;
-                        try
+                        long save_timestamp = System.currentTimeMillis();
+
+                        if (AEC_DEBUG_DUMP)
                         {
-                            debug_audio_writer_rec_s = new BufferedWriter(
-                                    new FileWriter("/sdcard/audio_rec_s.txt", true));
-                            long ts = (System.currentTimeMillis() - calling_activity_start_ms) * 1000;
-                            int value = 0;
-                            for (int xx = 0; xx < 160; xx++)
+
+                            BufferedWriter debug_audio_writer_rec_s = null;
+                            try
                             {
-                                value = NativeAudio.n_rec_audio_buffer[bufnum_].getShort(xx * 2);
-                                debug_audio_writer_rec_s.write(("" + ts) + "," + value + "\n");
-                                ts = ts + 16;
+                                debug_audio_writer_rec_s = new BufferedWriter(
+                                        new FileWriter("/sdcard/audio_rec_s.txt", true));
+                                long ts = (save_timestamp - calling_activity_start_ms) * 1000;
+                                int value = 0;
+                                for (int xx = 0; xx < 160; xx++)
+                                {
+                                    value = NativeAudio.n_rec_audio_buffer[bufnum_].getShort(xx * 2);
+                                    debug_audio_writer_rec_s.write(("" + ts) + "," + value + "\n");
+                                    ts = ts + 16;
+                                }
+
+                                if (debug_audio_writer_rec_s != null)
+                                {
+                                    debug_audio_writer_rec_s.close();
+                                }
                             }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            debug_audio_writer_rec_s = new BufferedWriter(
+                                    new FileWriter("/sdcard/audio_rec_s_ts.txt", true));
+                            debug_audio_writer_rec_s.write("" + save_timestamp + "\n");
 
                             if (debug_audio_writer_rec_s != null)
                             {
                                 debug_audio_writer_rec_s.close();
                             }
                         }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-
-                        debug_audio_writer_rec_s = new BufferedWriter(
-                                new FileWriter("/sdcard/audio_rec_s_ts.txt", true));
-                        debug_audio_writer_rec_s.write("" + System.currentTimeMillis() + "\n");
-
-                        if (debug_audio_writer_rec_s != null)
-                        {
-                            debug_audio_writer_rec_s.close();
-                        }
-
 
                         // Log.i(TAG, "audio_rec:buf_len1=" + NativeAudio.n_rec_audio_buffer[bufnum_].remaining());
                         // Log.i(TAG, "audio_rec:buf_len2=" + AudioProcessing.audio_rec_buffer.remaining());
@@ -369,30 +375,32 @@ public class AudioRecording extends Thread
                         NativeAudio.n_rec_audio_buffer[bufnum_].position(0);
                         NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
 
-                        BufferedWriter debug_audio_writer_rec_d = null;
-                        try
+                        if (AEC_DEBUG_DUMP)
                         {
-                            debug_audio_writer_rec_d = new BufferedWriter(
-                                    new FileWriter("/sdcard/audio_rec_d.txt", true));
-                            long ts = (System.currentTimeMillis() - calling_activity_start_ms) * 1000;
-                            int value = 0;
-                            for (int xx = 0; xx < 160; xx++)
+                            BufferedWriter debug_audio_writer_rec_d = null;
+                            try
                             {
-                                value = NativeAudio.n_rec_audio_buffer[bufnum_].getShort(xx * 2);
-                                debug_audio_writer_rec_d.write(("" + ts) + "," + value + "\n");
-                                ts = ts + 16;
-                            }
+                                debug_audio_writer_rec_d = new BufferedWriter(
+                                        new FileWriter("/sdcard/audio_rec_d.txt", true));
+                                long ts = (save_timestamp - calling_activity_start_ms) * 1000;
+                                int value = 0;
+                                for (int xx = 0; xx < 160; xx++)
+                                {
+                                    value = NativeAudio.n_rec_audio_buffer[bufnum_].getShort(xx * 2);
+                                    debug_audio_writer_rec_d.write(("" + ts) + "," + value + "\n");
+                                    ts = ts + 16;
+                                }
 
-                            if (debug_audio_writer_rec_d != null)
+                                if (debug_audio_writer_rec_d != null)
+                                {
+                                    debug_audio_writer_rec_d.close();
+                                }
+                            }
+                            catch (Exception e)
                             {
-                                debug_audio_writer_rec_d.close();
+                                e.printStackTrace();
                             }
                         }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-
 
                     }
                     // -------------- apply AudioProcessing: AEC -----------------------
