@@ -57,7 +57,6 @@
 // for native audio
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
-#include <SLES/OpenSLES_AndroidConfiguration.h>
 
 // for native asset manager
 #include <sys/types.h>
