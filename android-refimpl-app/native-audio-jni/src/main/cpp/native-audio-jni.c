@@ -535,6 +535,22 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                         "createBufferQueueAudioPlayer:res_006=%d SL_RESULT_SUCCESS=%d",
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
+
+    SLmillibel curVolume;
+    (*bqPlayerVolume)->GetVolumeLevel(bqPlayerVolume, &curVolume);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:GetVolumeLevel=%d",
+                        (int) curVolume);
+
+    SLmillibel maxVolume;
+    (*bqPlayerVolume)->GetMaxVolumeLevel(bqPlayerVolume, &maxVolume);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createBufferQueueAudioPlayer:GetMaxVolumeLevel=%d",
+                        (int) maxVolume);
+
+    // set max volume
+    (*bqPlayerVolume)->SetVolumeLevel(bqPlayerVolume, maxVolume);
+
 #endif
 
     // set the player's state
