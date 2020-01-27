@@ -63,6 +63,53 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
+
+/*---------------------------------------------------------------------------*/
+/* Android AudioPlayer and AudioRecorder configuration                       */
+/*---------------------------------------------------------------------------*/
+
+/** Audio Performance mode.
+ * Performance mode tells the framework how to configure the audio path
+ * for a player or recorder according to application performance and
+ * functional requirements.
+ * It affects the output or input latency based on acceptable tradeoffs on
+ * battery drain and use of pre or post processing effects.
+ * Performance mode should be set before realizing the object and should be
+ * read after realizing the object to check if the requested mode could be
+ * granted or not.
+ */
+/** Audio Performance mode key */
+#ifdef SL_ANDROID_KEY_PERFORMANCE_MODE
+#undef SL_ANDROID_KEY_PERFORMANCE_MODE
+#endif
+#define SL_ANDROID_KEY_PERFORMANCE_MODE ((const SLchar*) "androidPerformanceMode")
+
+/** Audio performance values */
+/*      No specific performance requirement. Allows HW and SW pre/post processing. */
+#ifdef SL_ANDROID_PERFORMANCE_NONE
+#undef SL_ANDROID_PERFORMANCE_NONE
+#endif
+#define SL_ANDROID_PERFORMANCE_NONE ((SLuint32) 0x00000000)
+/*      Priority given to latency. No HW or software pre/post processing.
+ *      This is the default if no performance mode is specified. */
+#ifdef SL_ANDROID_PERFORMANCE_LATENCY
+#undef SL_ANDROID_PERFORMANCE_LATENCY
+#endif
+#define SL_ANDROID_PERFORMANCE_LATENCY ((SLuint32) 0x00000001)
+/*      Priority given to latency while still allowing HW pre and post processing. */
+#ifdef SL_ANDROID_PERFORMANCE_LATENCY_EFFECTS
+#undef SL_ANDROID_PERFORMANCE_LATENCY_EFFECTS
+#endif
+#define SL_ANDROID_PERFORMANCE_LATENCY_EFFECTS ((SLuint32) 0x00000002)
+/*      Priority given to power saving if latency is not a concern.
+ *      Allows HW and SW pre/post processing. */
+#ifdef SL_ANDROID_PERFORMANCE_POWER_SAVING
+#undef SL_ANDROID_PERFORMANCE_POWER_SAVING
+#endif
+#define SL_ANDROID_PERFORMANCE_POWER_SAVING ((SLuint32) 0x00000003)
+
+
+
 const char *LOGTAG = "trifa.nativeaudio";
 // #define DEBUG_NATIVE_AUDIO_DEEP 1 // define to activate full debug logging
 
