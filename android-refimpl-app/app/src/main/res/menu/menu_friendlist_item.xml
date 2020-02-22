@@ -8,11 +8,24 @@
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
     <item
+        android:id="@+id/item_create_conference"
+        android:icon="@drawable/ic_content_copy_white_24dp"
+        android:title="Create Group"
+        android:visible="true"
+        app:showAsAction="ifRoom|withText"/>
+    <item
         android:id="@+id/item_add_toxproxy"
         android:icon="@drawable/ic_content_copy_white_24dp"
         android:title="add as ToxProxy"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/item_dummy01"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:background="@color/md_red_400"
+        android:title="   ---   "
+        android:visible="true"
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/item_delete"
         android:icon="@drawable/ic_delete_white_24dp"

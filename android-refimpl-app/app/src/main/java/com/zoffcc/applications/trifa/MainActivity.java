@@ -2404,6 +2404,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_conference_get_id(long conference_number, ByteBuffer cookie_buffer);
 
+    public static native int tox_conference_new();
+
+    public static native int tox_conference_invite(long friend_number, long conference_number);
+
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -4420,6 +4424,63 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "conference_connected_cb:cf_num=" + conference_number);
     }
 
+    static void add_conference_wrapper(final long friend_number, long conference_num, String conference_identifier_in, final int a_TOX_CONFERENCE_TYPE, boolean has_conference_identifier)
+    {
+        if (conference_num < 0)
+        {
+            Log.d(TAG, "add_conference_wrapper:ERR:conference number less than zero:" + conference_num);
+            return;
+        }
+
+        String conference_identifier = conference_identifier_in;
+
+        if (!has_conference_identifier)
+        {
+            // we need to get the conference identifier
+            ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
+            cookie_buf3.clear();
+            if (tox_conference_get_id(conference_num, cookie_buf3) == 0)
+            {
+                byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
+                cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
+                conference_identifier = bytes_to_hex(cookie_buffer);
+            }
+            else
+            {
+                Log.d(TAG, "add_conference_wrapper:ERR:error getting conference identifier");
+                return;
+            }
+        }
+
+        if (conference_num >= 0)
+        {
+            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number),
+                                      conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
+        }
+        else
+        {
+            Log.i(TAG, "add_conference_wrapper:error=" + conference_num + " joining conference");
+        }
+
+        try
+        {
+            if (conference_message_list_activity != null)
+            {
+                if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
+                {
+                    conference_message_list_activity.set_conference_connection_status_icon();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        // save tox savedate file
+        MainActivity.update_savedata_file_wrapper();
+    }
+
     static void android_tox_callback_conference_invite_cb_method(final long friend_number, final int a_TOX_CONFERENCE_TYPE, final byte[] cookie_buffer, final long cookie_length)
     {
         Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" +
@@ -4442,43 +4503,7 @@ public class MainActivity extends AppCompatActivity
                 Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
         Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
 
-        if (conference_num >= 0)
-        {
-            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number),
-                                      conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
-        }
-        else
-        {
-            Log.i(TAG, "conference_invite_cb:error=" + conference_num + " joining conference");
-        }
-
-        try
-        {
-            if (conference_message_list_activity != null)
-            {
-                if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
-                {
-                    conference_message_list_activity.set_conference_connection_status_icon();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        MainActivity.update_savedata_file_wrapper(); // join new conference
-        // long num_conferences = tox_conference_get_chatlist_size();
-        // Log.i(TAG, "load conferences at startup[2]: num=" + num_conferences);
-        Log.i(TAG, "conference_invite_cb:res=" + conference_num);
-        //  }
-        // };
-        // t.start();
-        // }
-        //catch (Exception e)
-        //{
-        //   Log.i(TAG, "callback_conference_invite_cb:EET1:" + e.getMessage());
-        //}
+        add_conference_wrapper(friend_number, conference_num, conference_identifier, a_TOX_CONFERENCE_TYPE, true);
     }
 
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)

@@ -44,20 +44,23 @@ import com.mikepenz.iconics.IconicsDrawable;
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.add_conference_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
-import static com.zoffcc.applications.trifa.MainActivity.have_own_relay;
-import static com.zoffcc.applications.trifa.MainActivity.send_relay_pubkey_to_all_friends;
-import static com.zoffcc.applications.trifa.MainActivity.set_friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.get_relay_for_friend;
+import static com.zoffcc.applications.trifa.MainActivity.have_own_relay;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.main_get_friend;
 import static com.zoffcc.applications.trifa.MainActivity.send_all_friend_pubkeys_to_relay;
+import static com.zoffcc.applications.trifa.MainActivity.send_relay_pubkey_to_all_friends;
+import static com.zoffcc.applications.trifa.MainActivity.set_friend_as_own_relay_in_db;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_new;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
@@ -70,6 +73,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ON
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -425,7 +429,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 avatar.setBorderColor(Color.parseColor("#04B431"));
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -761,12 +765,35 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         v.getContext().startActivity(intent);
                         // show friend info page -----------------
                         break;
+
+                    case R.id.item_create_conference:
+                        int res_conf_new = tox_conference_new();
+                        if (res_conf_new > 0)
+                        {
+                            // conference was created, now invite the selected friend
+                            long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                            if (friend_num_temp_safety2 > 0)
+                            {
+                                int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_new);
+                                if (res_conf_invite < 0)
+                                {
+                                    Log.d(TAG, "onMenuItemClick:info:tox_conference_invite:ERR:" + res_conf_invite);
+                                }
+                                else
+                                {
+                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "", TOX_CONFERENCE_TYPE_TEXT.value, true);
+                                }
+                            }
+                        }
+                        break;
                     case R.id.item_add_toxproxy:
                         if (!have_own_relay())
                         {
                             show_confirm_addrelay_dialog(v, f2);
                             // add as ToxProxy relay -----------------
                         }
+                        break;
+                    case R.id.item_dummy01:
                         break;
                     case R.id.item_delete:
                         // delete friend -----------------
