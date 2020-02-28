@@ -60,7 +60,7 @@
 #endif
 
 // HINT: it may not be working properly
-#define USE_ECHO_CANCELLATION 1
+// #define USE_ECHO_CANCELLATION 1
 
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
@@ -2194,21 +2194,14 @@ void *thread_video_av(void *data)
         // pthread_mutex_unlock(&av_thread_lock);
         av_iterate_interval = toxav_iteration_interval(av);
 
-        if((av_iterate_interval / 2) < 1)
+        //usleep((av_iterate_interval / 2) * 1000);
+        if(global_av_call_active == 1)
         {
-            usleep(1 * 1000);
+            usleep(5 * 1000);
         }
         else
         {
-            //usleep((av_iterate_interval / 2) * 1000);
-            if(global_av_call_active == 1)
-            {
-                usleep(5 * 1000);
-            }
-            else
-            {
-                usleep(800 * 1000);
-            }
+            usleep(800 * 1000);
         }
     }
 
@@ -2234,21 +2227,14 @@ void *thread_audio_av(void *data)
         // dbg(9, "AV audio Thread #%d running ...", (int) id);
         av_iterate_interval = toxav_iteration_interval(av);
 
-        if((av_iterate_interval / 2) < 1)
+        //usleep((av_iterate_interval / 2) * 1000);
+        if(global_av_call_active == 1)
         {
-            usleep(1 * 1000);
+            usleep(8 * 1000);
         }
         else
         {
-            //usleep((av_iterate_interval / 2) * 1000);
-            if(global_av_call_active == 1)
-            {
-                usleep(8 * 1000);
-            }
-            else
-            {
-                usleep(800 * 1000);
-            }
+            usleep(800 * 1000);
         }
     }
 
@@ -4523,6 +4509,86 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv 
 }
 
 
+
+/**
+ * Creates a new conference.
+ *
+ * This function creates a new text conference.
+ *
+ * @return conference number on success, or an unspecified value on failure.
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1new(JNIEnv *env, jobject thiz)
+{
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    TOX_ERR_CONFERENCE_NEW error;
+    uint32_t res = tox_conference_new(tox_global, &error);
+
+    if(error != TOX_ERR_CONFERENCE_NEW_OK)
+    {
+        if(error == TOX_ERR_CONFERENCE_NEW_INIT)
+        {
+            dbg(0, "tox_conference_new:TOX_ERR_CONFERENCE_NEW_INIT");
+            return (jint)-1;
+        }
+        else
+        {
+            return (jint)-99;
+        }
+    }
+
+    return (jint)res;
+}
+
+
+/**
+ * Invites a friend to a conference.
+ *
+ * We must be connected to the conference, meaning that the conference has not
+ * been deleted, and either we created the conference with the tox_conference_new function,
+ * or a `conference_connected` event has occurred for the conference.
+ *
+ * @param friend_number The friend number of the friend we want to invite.
+ * @param conference_number The conference number of the conference we want to invite the friend to.
+ *
+ * @return true on success.
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1invite(JNIEnv *env, jobject thiz,
+        jlong friend_number, jlong conference_number)
+{
+    TOX_ERR_CONFERENCE_INVITE error;
+    bool res = tox_conference_invite(tox_global, (uint32_t)friend_number, (uint32_t)conference_number, &error);
+
+    if(error != TOX_ERR_CONFERENCE_INVITE_OK)
+    {
+        if(error == TOX_ERR_CONFERENCE_INVITE_CONFERENCE_NOT_FOUND)
+        {
+            dbg(0, "tox_conference_invite:TOX_ERR_CONFERENCE_INVITE_CONFERENCE_NOT_FOUND");
+            return (jlong)-1;
+        }
+        else if(error == TOX_ERR_CONFERENCE_INVITE_FAIL_SEND)
+        {
+            dbg(0, "tox_conference_invite:TOX_ERR_CONFERENCE_INVITE_FAIL_SEND");
+            return (jlong)-2;
+        }
+        else if(error == TOX_ERR_CONFERENCE_INVITE_NO_CONNECTION)
+        {
+            dbg(0, "tox_conference_invite:TOX_ERR_CONFERENCE_INVITE_NO_CONNECTION");
+            return (jlong)-3;
+        }
+        else
+        {
+            return (jint)-99;
+        }
+    }
+
+    return (jint)res;
+}
 
 // ------------------- Conference -------------------
 // ------------------- Conference -------------------
