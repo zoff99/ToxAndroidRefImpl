@@ -39,6 +39,7 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -554,7 +555,7 @@ public class TrifaToxService extends Service
         Log.i(TAG, "load conferences at startup: num=" + num_conferences);
 
         long[] conference_numbers = tox_conference_get_chatlist();
-        ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
+        ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect(CONFERENCE_ID_LENGTH * 2);
 
         int conf_ = 0;
         for (conf_ = 0; conf_ < num_conferences; conf_++)
@@ -687,10 +688,8 @@ public class TrifaToxService extends Service
                 }
                 else
                 {
-                    tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5,
-                                                                           my_tox_id_local.length()));
-                    global_my_name = ("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5,
-                                                                           my_tox_id_local.length()));
+                    tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5));
+                    global_my_name = ("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5));
                     Log.i(TAG, "AAA:005");
                 }
 
@@ -1497,7 +1496,7 @@ public class TrifaToxService extends Service
 
                                         ByteBuffer msg_text_buffer_resend_v2 = ByteBuffer.allocateDirect(
                                                 raw_data_length);
-                                        msg_text_buffer_resend_v2.put(raw_msg_resend_data, 0, (int) raw_data_length);
+                                        msg_text_buffer_resend_v2.put(raw_msg_resend_data, 0, raw_data_length);
 
                                         int res = tox_util_friend_resend_message_v2(
                                                 tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey),
@@ -1546,53 +1545,43 @@ public class TrifaToxService extends Service
 
 
                 try
-
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
-
                 {
                     e.printStackTrace();
                 }
 
                 try
-
                 {
                     NativeAudio.shutdownEngine();
                 }
                 catch (Exception e)
-
                 {
                     e.printStackTrace();
                 }
 
                 try
-
                 {
                     MainActivity.tox_kill();
                 }
                 catch (Exception e)
-
                 {
                     e.printStackTrace();
                 }
 
                 try
-
                 {
                     Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
                 }
                 catch (Exception e)
-
                 {
                     e.printStackTrace();
                 }
 
             }
-        }
-
-        ;
+        };
 
         ToxServiceThread.start();
     }
@@ -1778,7 +1767,7 @@ public class TrifaToxService extends Service
 
         try
         {
-            out = new String(in, "UTF-8");  // Best way to decode using "UTF-8"
+            out = new String(in, StandardCharsets.UTF_8);  // Best way to decode using "UTF-8"
         }
         catch (Exception e)
         {
