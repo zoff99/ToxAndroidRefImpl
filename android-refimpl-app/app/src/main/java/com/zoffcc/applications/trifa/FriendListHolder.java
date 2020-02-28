@@ -52,8 +52,10 @@ import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_files
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.MainActivity.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.MainActivity.have_own_relay;
+import static com.zoffcc.applications.trifa.MainActivity.invite_to_all_conferences_own_relay;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.main_get_friend;
 import static com.zoffcc.applications.trifa.MainActivity.send_all_friend_pubkeys_to_relay;
@@ -718,6 +720,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                             send_all_friend_pubkeys_to_relay(f2.tox_public_key_string);
                             send_relay_pubkey_to_all_friends(f2.tox_public_key_string);
+                            invite_to_all_conferences_own_relay(f2.tox_public_key_string);
                         }
                         catch (Exception e)
                         {
@@ -781,7 +784,13 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 }
                                 else
                                 {
-                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "", TOX_CONFERENCE_TYPE_TEXT.value, true);
+                                    // invite also my ToxProxy -------------
+                                    if (have_own_relay())
+                                    {
+                                        tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()), res_conf_new);
+                                    }
+                                    // invite also my ToxProxy -------------
+                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "", TOX_CONFERENCE_TYPE_TEXT.value, false);
                                 }
                             }
                         }

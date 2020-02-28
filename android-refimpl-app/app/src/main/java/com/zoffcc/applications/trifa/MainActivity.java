@@ -3342,6 +3342,7 @@ public class MainActivity extends AppCompatActivity
                         {
                             send_friend_pubkey_to_relay(get_own_relay_pubkey(), f.tox_public_key_string);
                             Log.i(TAG, "send friend pubkey to relay");
+                            invite_to_all_conferences_own_relay(f.tox_public_key_string);
                         }
                     }
                 }
@@ -3570,6 +3571,12 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length, byte[] raw_data, long raw_data_length)
     {
+        if (!is_own_relay(tox_friend_get_public_key__wrapper(friend_number)))
+        {
+            // sync message only accepted from my own relay
+            return;
+        }
+
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " full rawmsg    =" + bytes_to_hex(raw_message));
         Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " wrapped rawdata=" + bytes_to_hex(raw_data));
@@ -3623,10 +3630,47 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "friend_sync_message_v2_cb:len=" + text_length + " wrapped msg text str=" +
                        wrapped_msg_text_as_string);
             Log.i(TAG, "friend_sync_message_v2_cb:wrapped msg text hex=" + msg_text_as_hex_string_wrapped);
-            //receive_proxy_friend_message(tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
-            //                             wrapped_msg_text_as_string);
-            receive_incoming_message(2, tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
-                                     wrapped_msg_text_as_string, raw_data, raw_data_length, real_sender_as_hex_string);
+
+            try
+            {
+                if (tox_friend_by_public_key__wrapper(real_sender_as_hex_string) == -1)
+                {
+                    // pubkey does NOT belong to a friend. it is probably a conference id
+                    // check it here
+
+
+                    // Log.i(TAG, "friend_sync_message_v2_cb:LL:" + orma.selectFromConferenceDB().toList());
+
+                    long conference_num = get_conference_num_from_confid(real_sender_as_hex_string);
+                    Log.i(TAG, "friend_sync_message_v2_cb:conference_num=" + conference_num);
+                    if (conference_num > -1)
+                    {
+                        // add text as conference message
+                        long sender_peer_num = get_peernum_from_peer_pubkey(real_sender_as_hex_string,
+                                                                            wrapped_msg_text_as_string.substring(0,
+                                                                                                                 64));
+                        Log.i(TAG, "friend_sync_message_v2_cb:sender_peer_num=" + sender_peer_num);
+
+                        conference_message_add_from_sync(get_conference_num_from_confid(real_sender_as_hex_string),
+                                                         sender_peer_num, TRIFA_MSG_TYPE_TEXT.value,
+                                                         wrapped_msg_text_as_string.substring(64), (text_length - 64));
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    receive_incoming_message(2, tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
+                                             wrapped_msg_text_as_string, raw_data, raw_data_length,
+                                             real_sender_as_hex_string);
+                }
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+            }
         }
         else if (msgv2_type == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
         {
@@ -3682,6 +3726,209 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         }
+    }
+
+    static void conference_message_add_from_sync(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
+    {
+        Log.i(TAG, "conference_message_add_from_sync:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" +
+                   message);
+        int res = tox_conference_peer_number_is_ours(conference_number, peer_number);
+
+        if (res == 1)
+        {
+            // HINT: do not add our own messages, they are already in the DB!
+            Log.i(TAG, "conference_message_add_from_sync:own peer");
+            return;
+        }
+
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        String conf_id = "-1";
+        ConferenceDB conf_temp = null;
+
+        try
+        {
+            // TODO: cache me!!
+            conf_temp = orma.selectFromConferenceDB().
+                    tox_conference_numberEq(conference_number).
+                    and().
+                    conference_activeEq(true).toList().get(0);
+            conf_id = conf_temp.conference_identifier;
+            Log.i(TAG, "conference_message_add_from_sync:conf_id=" + conf_id);
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (conf_temp.notification_silent)
+            {
+                do_notification = false;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (conference_message_list_activity != null)
+        {
+            Log.i(TAG, "conference_message_add_from_sync:noti_and_badge:002conf:" +
+                       conference_message_list_activity.get_current_conf_id() + ":" + conf_id);
+
+            if (conference_message_list_activity.get_current_conf_id().equals(conf_id))
+            {
+                // Log.i(TAG, "noti_and_badge:003:");
+                // no notifcation and no badge update
+                do_notification = false;
+                do_badge_update = false;
+            }
+        }
+
+        ConferenceMessage m = new ConferenceMessage();
+        m.is_new = do_badge_update;
+        // m.tox_friendnum = friend_number;
+        m.tox_peerpubkey = tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
+        m.direction = 0; // msg received
+        m.TOX_MESSAGE_TYPE = 0;
+        m.read = false;
+        m.tox_peername = null;
+        m.conference_identifier = conf_id;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.rcvd_timestamp = System.currentTimeMillis();
+        m.text = message;
+
+        try
+        {
+            m.tox_peername = tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (conference_message_list_activity != null)
+        {
+            if (conference_message_list_activity.get_current_conf_id().equals(conf_id))
+            {
+                insert_into_conference_message_db(m, true);
+            }
+            else
+            {
+                insert_into_conference_message_db(m, false);
+            }
+        }
+        else
+        {
+            long new_msg_id = insert_into_conference_message_db(m, false);
+            Log.i(TAG, "conference_message_add_from_sync:new_msg_id=" + new_msg_id);
+        }
+
+        update_single_conference_in_friendlist_view(conf_temp);
+
+        if (do_notification)
+        {
+            Log.i(TAG, "noti_and_badge:005conf:");
+            // start "new" notification
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // allow notification every n seconds
+                        if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) <
+                            System.currentTimeMillis())
+                        {
+                            if (PREF__notification)
+                            {
+                                Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
+                                Intent notificationIntent = new Intent(context_s, StartMainActivityWrapper.class);
+                                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0,
+                                                                                        notificationIntent, 0);
+                                // -- notification ------------------
+                                // -- notification -----------------
+                                NotificationCompat.Builder b;
+
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                                {
+                                    if ((PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound_and_vibrate);
+                                    }
+                                    else if ((PREF__notification_sound) && (!PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_sound);
+                                    }
+                                    else if ((!PREF__notification_sound) && (PREF__notification_vibrate))
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_vibrate);
+                                    }
+                                    else
+                                    {
+                                        b = new NotificationCompat.Builder(context_s,
+                                                                           MainActivity.channelId_newmessage_silent);
+                                    }
+                                }
+                                else
+                                {
+                                    b = new NotificationCompat.Builder(context_s);
+                                }
+
+                                b.setContentIntent(pendingIntent);
+                                b.setSmallIcon(R.drawable.circle_orange);
+                                b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                                Uri default_notification_sound = RingtoneManager.getDefaultUri(
+                                        RingtoneManager.TYPE_NOTIFICATION);
+
+                                if (PREF__notification_sound)
+                                {
+                                    b.setSound(default_notification_sound);
+                                }
+
+                                if (PREF__notification_vibrate)
+                                {
+                                    long[] vibrate_pattern = {100, 300};
+                                    b.setVibrate(vibrate_pattern);
+                                }
+
+                                b.setContentTitle("TRIfA");
+                                b.setAutoCancel(true);
+                                b.setContentText("new Message");
+                                Notification notification3 = b.build();
+                                nmn3.notify(Notification_new_message_ID, notification3);
+                                // -- notification ------------------
+                                // -- notification ------------------
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            try
+            {
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
     }
 
     // --- incoming message ---
@@ -4421,64 +4668,15 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_connected_cb_method(long conference_number)
     {
+        // invite also my ToxProxy -------------
+        if (have_own_relay())
+        {
+            tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()), conference_number);
+        }
+        // invite also my ToxProxy -------------
+
         Log.i(TAG, "conference_connected_cb:cf_num=" + conference_number);
-    }
-
-    static void add_conference_wrapper(final long friend_number, long conference_num, String conference_identifier_in, final int a_TOX_CONFERENCE_TYPE, boolean has_conference_identifier)
-    {
-        if (conference_num < 0)
-        {
-            Log.d(TAG, "add_conference_wrapper:ERR:conference number less than zero:" + conference_num);
-            return;
-        }
-
-        String conference_identifier = conference_identifier_in;
-
-        if (!has_conference_identifier)
-        {
-            // we need to get the conference identifier
-            ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
-            cookie_buf3.clear();
-            if (tox_conference_get_id(conference_num, cookie_buf3) == 0)
-            {
-                byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
-                cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
-                conference_identifier = bytes_to_hex(cookie_buffer);
-            }
-            else
-            {
-                Log.d(TAG, "add_conference_wrapper:ERR:error getting conference identifier");
-                return;
-            }
-        }
-
-        if (conference_num >= 0)
-        {
-            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number),
-                                      conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
-        }
-        else
-        {
-            Log.i(TAG, "add_conference_wrapper:error=" + conference_num + " joining conference");
-        }
-
-        try
-        {
-            if (conference_message_list_activity != null)
-            {
-                if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
-                {
-                    conference_message_list_activity.set_conference_connection_status_icon();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        // save tox savedate file
-        MainActivity.update_savedata_file_wrapper();
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_conference_invite_cb_method(final long friend_number, final int a_TOX_CONFERENCE_TYPE, final byte[] cookie_buffer, final long cookie_length)
@@ -4502,6 +4700,14 @@ public class MainActivity extends AppCompatActivity
         String conference_identifier = bytes_to_hex(
                 Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
         Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
+
+        // invite also my ToxProxy -------------
+        if (have_own_relay())
+        {
+            tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()), conference_num);
+        }
+        // invite also my ToxProxy -------------
+
 
         add_conference_wrapper(friend_number, conference_num, conference_identifier, a_TOX_CONFERENCE_TYPE, true);
     }
@@ -4932,6 +5138,8 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        update_savedata_file_wrapper();
     }
 
     // ------------------------
@@ -5264,6 +5472,68 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "loadLibrary native-audio-jni failed!");
             e.printStackTrace();
         }
+    }
+
+    static void add_conference_wrapper(final long friend_number, long conference_num, String conference_identifier_in, final int a_TOX_CONFERENCE_TYPE, boolean has_conference_identifier)
+    {
+        if (conference_num < 0)
+        {
+            Log.d(TAG, "add_conference_wrapper:ERR:conference number less than zero:" + conference_num);
+            return;
+        }
+
+        Log.d(TAG, "add_conference_wrapper:confnum=" + conference_num + " conference_identifier_in=" +
+                   conference_identifier_in);
+        String conference_identifier = conference_identifier_in;
+
+        if (has_conference_identifier != true)
+        {
+            Log.d(TAG, "add_conference_wrapper:need to get conference_identifier");
+            // we need to get the conference identifier
+            ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
+            cookie_buf3.clear();
+            if (tox_conference_get_id(conference_num, cookie_buf3) == 0)
+            {
+                byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
+                cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
+                conference_identifier = bytes_to_hex(cookie_buffer);
+            }
+            else
+            {
+                Log.d(TAG, "add_conference_wrapper:ERR:error getting conference identifier");
+                return;
+            }
+        }
+
+        Log.d(TAG, "add_conference_wrapper:conference_identifier=" + conference_identifier);
+
+        if (conference_num >= 0)
+        {
+            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number),
+                                      conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
+        }
+        else
+        {
+            Log.i(TAG, "add_conference_wrapper:error=" + conference_num + " joining conference");
+        }
+
+        try
+        {
+            if (conference_message_list_activity != null)
+            {
+                if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
+                {
+                    conference_message_list_activity.set_conference_connection_status_icon();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        // save tox savedate file
+        update_savedata_file_wrapper();
     }
 
     static FriendList main_get_friend(long friendnum)
@@ -7777,25 +8047,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static String get_peer_name_from_conf_id(String conference_id, String peer_pubkey)
-    {
-        String result = "Unknown Peer";
-        return result;
-    }
-
-    static String get_peer_name_from_num(String conference_id, String peer_pubkey)
-    {
-        String result = "Unknown Peer";
-        return result;
-    }
-
     static long get_conference_num_from_confid(String conference_id)
     {
         try
         {
             return orma.selectFromConferenceDB().
                     conference_activeEq(true).and().
-                    conference_identifierEq(conference_id).get(0).tox_conference_number;
+                    conference_identifierEq(conference_id.toLowerCase()).get(0).tox_conference_number;
         }
         catch (Exception e)
         {
@@ -8789,6 +9047,34 @@ public class MainActivity extends AppCompatActivity
                     tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
                 }
             }
+        }
+    }
+
+    static void invite_to_all_conferences_own_relay(String relay_public_key_string)
+    {
+        try
+        {
+            List<ConferenceDB> c = orma.selectFromConferenceDB().
+                    conference_activeEq(true).and().
+                    tox_conference_numberNotEq(-1).
+                    toList();
+
+            if (c != null)
+            {
+                if (c.size() > 0)
+                {
+                    for (int i = 0; i < c.size(); i++)
+                    {
+                        ConferenceDB conf = c.get(i);
+                        tox_conference_invite(tox_friend_by_public_key__wrapper(relay_public_key_string),
+                                              conf.tox_conference_number);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
