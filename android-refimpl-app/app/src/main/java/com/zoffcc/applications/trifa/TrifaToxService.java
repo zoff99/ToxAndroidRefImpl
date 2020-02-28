@@ -239,6 +239,11 @@ public class TrifaToxService extends Service
         nmn2.notify(ONGOING_NOTIFICATION_ID, notification2);
     }
 
+    /*
+     *
+     * ------ this really stops the whole thing ------
+     *
+     */
     void stop_me(boolean exit_app)
     {
         Log.i(TAG, "stop_me:001");
