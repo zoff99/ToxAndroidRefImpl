@@ -29,8 +29,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import static com.zoffcc.applications.trifa.HelperConference.copy_selected_conference_messages;
-import static com.zoffcc.applications.trifa.HelperMessage.copy_selected_messages;
 import static com.zoffcc.applications.trifa.HelperConference.delete_selected_conference_messages;
+import static com.zoffcc.applications.trifa.HelperMessage.copy_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.delete_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.save_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
@@ -99,7 +99,7 @@ public class ToolbarActionMode implements ActionMode.Callback
                 else
                 {
                     // conference view
-                    delete_selected_conference_messages(context);
+                    delete_selected_conference_messages(context, true, "deleting Messages ...");
                     // TODO: write me
                 }
                 mode.finish(); // Finish action mode

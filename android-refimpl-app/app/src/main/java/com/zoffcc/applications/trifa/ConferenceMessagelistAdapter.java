@@ -267,6 +267,31 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
         return found_item;
     }
 
+    synchronized public void remove_item(final ConferenceMessage del_item)
+    {
+        try
+        {
+            Iterator it = this.messagelistitems.iterator();
+            while (it.hasNext())
+            {
+                ConferenceMessage m2 = (ConferenceMessage) it.next();
+
+                if (m2.id == del_item.id)
+                {
+                    int pos = this.messagelistitems.indexOf(m2);
+                    this.messagelistitems.remove(pos);
+                    this.notifyItemRemoved(pos);
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "update_item:EE:" + e.getMessage());
+        }
+    }
+
     @Override
     public String getSectionText(int position)
     {

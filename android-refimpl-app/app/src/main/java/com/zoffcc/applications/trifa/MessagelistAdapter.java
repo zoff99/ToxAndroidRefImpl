@@ -408,8 +408,6 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     synchronized public void remove_item(final Message del_item)
     {
-        boolean found_item = false;
-
         try
         {
             Iterator it = this.messagelistitems.iterator();
@@ -419,9 +417,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
                 if (m2.id == del_item.id)
                 {
-                    found_item = true;
                     int pos = this.messagelistitems.indexOf(m2);
-                    // Log.i(TAG, "update_item:003:" + pos);
                     this.messagelistitems.remove(pos);
                     this.notifyItemRemoved(pos);
                     break;

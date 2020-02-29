@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.database.Cursor;
@@ -99,54 +100,20 @@ public class HelperConference
         }
     }
 
-    static void delete_selected_conference_messages(Context c)
+    static void delete_selected_conference_messages(Context c, final boolean update_conf_message_list, final String dialog_text)
     {
         // TODO: write me!
+        ProgressDialog progressDialog2 = null;
+
         try
         {
-            if (!MainActivity.selected_conference_messages.isEmpty())
-            {
-                // sort ascending (lowest ID on top)
-                Collections.sort(MainActivity.selected_conference_messages, new Comparator<Long>()
-                {
-                    public int compare(Long o1, Long o2)
-                    {
-                        return o1.compareTo(o2);
-                    }
-                });
-                String copy_text = "";
-                boolean first = true;
-                Iterator i = MainActivity.selected_conference_messages.iterator();
-
-                while (i.hasNext())
-                {
-                    try
-                    {
-                        // TODO: write me
-                        i.next();
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-
-                MainActivity.selected_conference_messages.clear();
-
-                try
-                {
-                    // need to redraw all items again here, to remove the selections
-                    MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
+            new MainActivity.delete_selected_conference_messages_asynchtask(c, progressDialog2, update_conf_message_list,
+                                                                 dialog_text).execute();
         }
-        catch (Exception e2)
+        catch (Exception e)
         {
-            e2.printStackTrace();
+            e.printStackTrace();
+            Log.i(TAG, "delete_selected_conference_messages:EE2:" + e.getMessage());
         }
     }
 
@@ -284,6 +251,27 @@ public class HelperConference
             {
                 return null;
             }
+        }
+    }
+
+    static ConferenceMessage get_last_conference_message_in_this_conference_within_n_seconds(String conference_identifier, int n)
+    {
+        try
+        {
+            ConferenceMessage cm = orma.selectFromConferenceMessage().
+                    conference_identifierEq(conference_identifier.toLowerCase()).
+                    and().
+                    rcvd_timestampGt(System.currentTimeMillis() - (n * 1000)).
+                    orderByRcvd_timestampDesc().
+                    limit(1).
+                    toList().
+                    get(0);
+            return cm;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
         }
     }
 
