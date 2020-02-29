@@ -1,6 +1,6 @@
 /**
  * [TRIfA], JNI part of Tox Reference Implementation for Android
- * Copyright (C) 2017 - 2019 Zoff <zoff@zoff.cc>
+ * Copyright (C) 2017 - 2020 Zoff <zoff@zoff.cc>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -77,8 +77,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 35
-static const char global_version_string[] = "0.99.35";
+#define VERSION_PATCH 36
+static const char global_version_string[] = "0.99.36";
 // ----------- version -----------
 // ----------- version -----------
 
