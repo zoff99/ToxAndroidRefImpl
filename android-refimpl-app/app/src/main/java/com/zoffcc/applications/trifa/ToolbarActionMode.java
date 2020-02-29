@@ -28,11 +28,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import static com.zoffcc.applications.trifa.MainActivity.copy_selected_conference_messages;
-import static com.zoffcc.applications.trifa.MainActivity.copy_selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.delete_selected_conference_messages;
-import static com.zoffcc.applications.trifa.MainActivity.delete_selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.save_selected_messages;
+import static com.zoffcc.applications.trifa.HelperConference.copy_selected_conference_messages;
+import static com.zoffcc.applications.trifa.HelperMessage.copy_selected_messages;
+import static com.zoffcc.applications.trifa.HelperConference.delete_selected_conference_messages;
+import static com.zoffcc.applications.trifa.HelperMessage.delete_selected_messages;
+import static com.zoffcc.applications.trifa.HelperMessage.save_selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;

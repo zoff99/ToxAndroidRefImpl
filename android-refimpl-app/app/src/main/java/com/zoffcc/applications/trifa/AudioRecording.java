@@ -47,7 +47,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplin
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_audio_send_frame;
 
 public class AudioRecording extends Thread

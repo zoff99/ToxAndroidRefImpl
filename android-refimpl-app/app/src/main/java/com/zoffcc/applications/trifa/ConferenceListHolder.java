@@ -34,12 +34,12 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.conference_identifier_short;
-import static com.zoffcc.applications.trifa.MainActivity.delete_conference;
-import static com.zoffcc.applications.trifa.MainActivity.delete_conference_all_messages;
-import static com.zoffcc.applications.trifa.MainActivity.get_conference_title_from_confid;
+import static com.zoffcc.applications.trifa.HelperConference.conference_identifier_short;
+import static com.zoffcc.applications.trifa.HelperConference.delete_conference;
+import static com.zoffcc.applications.trifa.HelperConference.delete_conference_all_messages;
+import static com.zoffcc.applications.trifa.HelperConference.get_conference_title_from_confid;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.set_conference_inactive;
+import static com.zoffcc.applications.trifa.HelperConference.set_conference_inactive;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;

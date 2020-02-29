@@ -45,12 +45,12 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name__wrapper;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;

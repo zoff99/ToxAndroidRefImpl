@@ -35,7 +35,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 

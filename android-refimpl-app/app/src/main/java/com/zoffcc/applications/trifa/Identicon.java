@@ -26,7 +26,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
-import static com.zoffcc.applications.trifa.MainActivity.set_friend_avatar;
+import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;

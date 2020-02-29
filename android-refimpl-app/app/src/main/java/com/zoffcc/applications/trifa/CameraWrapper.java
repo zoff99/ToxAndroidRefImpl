@@ -37,7 +37,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hin
 import static com.zoffcc.applications.trifa.MainActivity.PREF__camera_get_preview_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__fps_half;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__set_fps;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;

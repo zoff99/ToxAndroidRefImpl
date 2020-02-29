@@ -69,11 +69,11 @@ import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
-import static com.zoffcc.applications.trifa.MainActivity.get_friend_name_from_pubkey;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
-import static com.zoffcc.applications.trifa.MainActivity.insert_into_filetransfer_db;
-import static com.zoffcc.applications.trifa.MainActivity.insert_into_message_db;
-import static com.zoffcc.applications.trifa.MainActivity.is_friend_online;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.insert_into_filetransfer_db;
+import static com.zoffcc.applications.trifa.HelperMessage.insert_into_message_db;
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
@@ -82,11 +82,11 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incom
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
-import static com.zoffcc.applications.trifa.MainActivity.update_filetransfer_db_full;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.update_filetransfer_db_full;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FILE_PICK_METHOD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
@@ -356,7 +356,7 @@ public class MessageListActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                final String f_name = MainActivity.get_friend_name_from_num(fn);
+                final String f_name = HelperFriend.get_friend_name_from_num(fn);
 
                 Runnable myRunnable = new Runnable()
                 {

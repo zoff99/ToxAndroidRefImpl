@@ -55,12 +55,12 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
-import static com.zoffcc.applications.trifa.MainActivity.get_conference_num_from_confid;
-import static com.zoffcc.applications.trifa.MainActivity.insert_into_conference_message_db;
-import static com.zoffcc.applications.trifa.MainActivity.is_conference_active;
+import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
+import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
+import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.resolve_name_for_pubkey;
+import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name;
@@ -253,7 +253,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                final String f_name = MainActivity.get_conference_title_from_confid(conf_id);
+                final String f_name = HelperConference.get_conference_title_from_confid(conf_id);
                 final long conference_num = get_conference_num_from_confid(conf_id);
 
                 Runnable myRunnable = new Runnable()

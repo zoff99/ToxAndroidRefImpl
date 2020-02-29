@@ -34,7 +34,7 @@ import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 
-import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 

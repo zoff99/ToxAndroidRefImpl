@@ -39,7 +39,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -128,7 +127,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
@@ -161,9 +159,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -201,8 +197,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_offline_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
@@ -227,7 +221,6 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILETRANSFER_SIZE_MSGV2;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -1090,7 +1083,7 @@ public class MainActivity extends AppCompatActivity
                                          TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
                                                  TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
                                     Log.i(TAG, "set_all_conferences_inactive:001");
-                                    set_all_conferences_inactive();
+                                    HelperConference.set_all_conferences_inactive();
                                     tox_service_fg.tox_thread_start_fg();
                                 }
                             }
@@ -1391,7 +1384,7 @@ public class MainActivity extends AppCompatActivity
         if (!TOX_SERVICE_STARTED)
         {
             Log.i(TAG, "set_all_conferences_inactive:005");
-            set_all_conferences_inactive();
+            HelperConference.set_all_conferences_inactive();
             startService(i);
         }
 
@@ -1773,7 +1766,7 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
-                        set_all_conferences_inactive();
+                        HelperConference.set_all_conferences_inactive();
                         tox_service_fg.tox_thread_start_fg();
                     }
                     catch (Exception e)
@@ -2537,8 +2530,8 @@ public class MainActivity extends AppCompatActivity
                         last_video_frame_received = -1;
                         MainActivity.set_av_call_status(Callstate.state);
                         Intent intent = new Intent(context_s.getApplicationContext(), CallingActivity.class);
-                        Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
-                        Callstate.friend_alias_name = get_friend_name_from_pubkey(Callstate.friend_pubkey);
+                        Callstate.friend_pubkey = HelperFriend.tox_friend_get_public_key__wrapper(fn);
+                        Callstate.friend_alias_name = HelperFriend.get_friend_name_from_pubkey(Callstate.friend_pubkey);
                         Callstate.other_audio_enabled = f_audio_enabled;
                         Callstate.other_video_enabled = f_video_enabled;
                         Callstate.call_init_timestamp = System.currentTimeMillis();
@@ -2566,7 +2559,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
+        if (HelperFriend.tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -2732,7 +2725,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
     {
-        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
+        if (HelperFriend.tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -2793,7 +2786,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_bit_rate_status_cb_method(long friend_number, long audio_bit_rate, long video_bit_rate)
     {
-        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
+        if (HelperFriend.tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -2920,7 +2913,7 @@ public class MainActivity extends AppCompatActivity
         //      " " + channels + " " + sampling_rate);
 
         // long timestamp_audio_frame = System.currentTimeMillis();
-        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
+        if (HelperFriend.tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -3258,40 +3251,40 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_name_cb_method(long friend_number, String friend_name, long length)
     {
         // Log.i(TAG, "friend_alias_name:friend:" + friend_number + " name:" + friend_alias_name);
-        FriendList f = main_get_friend(friend_number);
+        FriendList f = HelperFriend.main_get_friend(friend_number);
 
         // Log.i(TAG, "friend_alias_name:002:" + f);
         if (f != null)
         {
             f.name = friend_name;
-            update_friend_in_db_name(f);
-            update_single_friend_in_friendlist_view(f);
+            HelperFriend.update_friend_in_db_name(f);
+            HelperFriend.update_single_friend_in_friendlist_view(f);
         }
     }
 
     static void android_tox_callback_friend_status_message_cb_method(long friend_number, String status_message, long length)
     {
         // Log.i(TAG, "friend_status_message:friend:" + friend_number + " status message:" + status_message);
-        FriendList f = main_get_friend(friend_number);
+        FriendList f = HelperFriend.main_get_friend(friend_number);
 
         if (f != null)
         {
             f.status_message = status_message;
-            update_friend_in_db_status_message(f);
-            update_single_friend_in_friendlist_view(f);
+            HelperFriend.update_friend_in_db_status_message(f);
+            HelperFriend.update_single_friend_in_friendlist_view(f);
         }
     }
 
     static void android_tox_callback_friend_status_cb_method(long friend_number, int a_TOX_USER_STATUS)
     {
         // Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
-        FriendList f = main_get_friend(friend_number);
+        FriendList f = HelperFriend.main_get_friend(friend_number);
 
         if (f != null)
         {
             f.TOX_USER_STATUS = a_TOX_USER_STATUS;
             Log.i(TAG, "friend_status:2:f.TOX_USER_STATUS=" + f.TOX_USER_STATUS);
-            update_friend_in_db_status(f);
+            HelperFriend.update_friend_in_db_status(f);
 
             try
             {
@@ -3308,14 +3301,14 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "friend_status:EE1:" + e.getMessage());
             }
 
-            update_single_friend_in_friendlist_view(f);
+            HelperFriend.update_single_friend_in_friendlist_view(f);
         }
     }
 
     static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
     {
         Log.i(TAG, "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION);
-        FriendList f = main_get_friend(friend_number);
+        FriendList f = HelperFriend.main_get_friend(friend_number);
 
         if (f != null)
         {
@@ -3323,7 +3316,7 @@ public class MainActivity extends AppCompatActivity
             {
                 f.TOX_CONNECTION_real = a_TOX_CONNECTION;
                 f.TOX_CONNECTION_on_off_real = get_toxconnection_wrapper(f.TOX_CONNECTION);
-                update_friend_in_db_connection_status_real(f);
+                HelperFriend.update_friend_in_db_connection_status_real(f);
             }
 
             if (f.TOX_CONNECTION != a_TOX_CONNECTION)
@@ -3331,28 +3324,28 @@ public class MainActivity extends AppCompatActivity
                 if (f.TOX_CONNECTION == TOX_CONNECTION_NONE.value)
                 {
                     // ******** friend just came online ********
-                    if (have_own_relay())
+                    if (HelperRelay.have_own_relay())
                     {
-                        if (!is_any_relay(f.tox_public_key_string))
+                        if (!HelperRelay.is_any_relay(f.tox_public_key_string))
                         {
-                            send_relay_pubkey_to_friend(get_own_relay_pubkey(), f.tox_public_key_string);
+                            HelperRelay.send_relay_pubkey_to_friend(HelperRelay.get_own_relay_pubkey(), f.tox_public_key_string);
                             Log.i(TAG, "send relay pubkey to friend");
                         }
                         else
                         {
-                            send_friend_pubkey_to_relay(get_own_relay_pubkey(), f.tox_public_key_string);
+                            HelperRelay.send_friend_pubkey_to_relay(HelperRelay.get_own_relay_pubkey(), f.tox_public_key_string);
                             Log.i(TAG, "send friend pubkey to relay");
-                            invite_to_all_conferences_own_relay(f.tox_public_key_string);
+                            HelperRelay.invite_to_all_conferences_own_relay(f.tox_public_key_string);
                         }
                     }
                 }
             }
 
-            if (is_any_relay(f.tox_public_key_string))
+            if (HelperRelay.is_any_relay(f.tox_public_key_string))
             {
-                if (!is_own_relay(f.tox_public_key_string))
+                if (!HelperRelay.is_own_relay(f.tox_public_key_string))
                 {
-                    FriendList f_real = get_friend_for_relay(f.tox_public_key_string);
+                    FriendList f_real = HelperRelay.get_friend_for_relay(f.tox_public_key_string);
 
                     if (f_real != null)
                     {
@@ -3367,7 +3360,7 @@ public class MainActivity extends AppCompatActivity
             {
                 f.TOX_CONNECTION_real = a_TOX_CONNECTION;
                 f.TOX_CONNECTION_on_off_real = get_toxconnection_wrapper(f.TOX_CONNECTION);
-                update_friend_in_db_connection_status_real(f);
+                HelperFriend.update_friend_in_db_connection_status_real(f);
             }
         }
     }
@@ -3428,7 +3421,7 @@ public class MainActivity extends AppCompatActivity
         {
             final Message m = orma.selectFromMessage().
                     msg_id_hashEq(message_id_hash_as_hex_string).
-                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     directionEq(1).
                     readEq(false).
                     toList().get(0);
@@ -3443,18 +3436,18 @@ public class MainActivity extends AppCompatActivity
                     {
                         try
                         {
-                            if (!is_any_relay(tox_friend_get_public_key__wrapper(friend_number)))
+                            if (!HelperRelay.is_any_relay(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
                             {
                                 // only update if the "read receipt" comes from a friend, but not it's relay!
                                 m.raw_msgv2_bytes = "";
                                 m.rcvd_timestamp = System.currentTimeMillis();
                                 m.read = true;
-                                update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
+                                HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
                             }
 
                             m.resend_count = 2;
-                            update_message_in_db_resend_count(m);
-                            update_single_message(m, true);
+                            HelperMessage.update_message_in_db_resend_count(m);
+                            HelperMessage.update_single_message(m, true);
                         }
                         catch (Exception e)
                         {
@@ -3489,7 +3482,7 @@ public class MainActivity extends AppCompatActivity
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
             final Message m = orma.selectFromMessage().
                     message_idEq(message_id).
-                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     directionEq(1).
                     orderByIdDesc().
                     toList().get(0);
@@ -3509,10 +3502,10 @@ public class MainActivity extends AppCompatActivity
                         {
                             m.rcvd_timestamp = System.currentTimeMillis();
                             m.read = true;
-                            update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
+                            HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
                             // TODO this updates all messages. should be done nicer and faster!
                             // update_message_view();
-                            update_single_message(m, true);
+                            HelperMessage.update_single_message(m, true);
                         }
                         catch (Exception e)
                         {
@@ -3540,7 +3533,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "friend_request:friend:" + friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2) +
                    " friend request message:" + friend_request_message);
         String friend_public_key__ = friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2);
-        add_friend_to_system(friend_public_key__, false, null);
+        HelperFriend.add_friend_to_system(friend_public_key__, false, null);
     }
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
@@ -3562,8 +3555,8 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "friend_lossless_packet_cb:recevied CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND");
                     String relay_pubkey = bytes_to_hex(data).substring(2);
                     Log.i(TAG, "friend_lossless_packet_cb:recevied pubkey:" + relay_pubkey);
-                    add_friend_to_system(relay_pubkey.toUpperCase(), true,
-                                         tox_friend_get_public_key__wrapper(friend_number));
+                    HelperFriend.add_friend_to_system(relay_pubkey.toUpperCase(), true,
+                                                      HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
                 }
             }
         }
@@ -3571,7 +3564,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length, byte[] raw_data, long raw_data_length)
     {
-        if (!is_own_relay(tox_friend_get_public_key__wrapper(friend_number)))
+        if (!HelperRelay.is_own_relay(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
         {
             // sync message only accepted from my own relay
             return;
@@ -3633,7 +3626,7 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                if (tox_friend_by_public_key__wrapper(real_sender_as_hex_string) == -1)
+                if (HelperFriend.tox_friend_by_public_key__wrapper(real_sender_as_hex_string) == -1)
                 {
                     // pubkey does NOT belong to a friend. it is probably a conference id
                     // check it here
@@ -3641,19 +3634,20 @@ public class MainActivity extends AppCompatActivity
 
                     // Log.i(TAG, "friend_sync_message_v2_cb:LL:" + orma.selectFromConferenceDB().toList());
 
-                    long conference_num = get_conference_num_from_confid(real_sender_as_hex_string);
+                    long conference_num = HelperConference.get_conference_num_from_confid(real_sender_as_hex_string);
                     Log.i(TAG, "friend_sync_message_v2_cb:conference_num=" + conference_num);
                     if (conference_num > -1)
                     {
                         // add text as conference message
-                        long sender_peer_num = get_peernum_from_peer_pubkey(real_sender_as_hex_string,
-                                                                            wrapped_msg_text_as_string.substring(0,
+                        long sender_peer_num = HelperConference.get_peernum_from_peer_pubkey(real_sender_as_hex_string,
+                                                                                             wrapped_msg_text_as_string.substring(0,
                                                                                                                  64));
                         Log.i(TAG, "friend_sync_message_v2_cb:sender_peer_num=" + sender_peer_num);
 
-                        conference_message_add_from_sync(get_conference_num_from_confid(real_sender_as_hex_string),
-                                                         sender_peer_num, TRIFA_MSG_TYPE_TEXT.value,
-                                                         wrapped_msg_text_as_string.substring(64), (text_length - 64));
+                        conference_message_add_from_sync(
+                                HelperConference.get_conference_num_from_confid(real_sender_as_hex_string),
+                                sender_peer_num, TRIFA_MSG_TYPE_TEXT.value,
+                                wrapped_msg_text_as_string.substring(64), (text_length - 64));
                     }
                     else
                     {
@@ -3662,7 +3656,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    receive_incoming_message(2, tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
+                    receive_incoming_message(2, HelperFriend.tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
                                              wrapped_msg_text_as_string, raw_data, raw_data_length,
                                              real_sender_as_hex_string);
                 }
@@ -3703,10 +3697,10 @@ public class MainActivity extends AppCompatActivity
                                 m.raw_msgv2_bytes = "";
                                 m.rcvd_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
                                 m.read = true;
-                                update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
+                                HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
                                 m.resend_count = 2;
-                                update_message_in_db_resend_count(m);
-                                update_single_message(m, true);
+                                HelperMessage.update_message_in_db_resend_count(m);
+                                HelperMessage.update_single_message(m, true);
                             }
                             catch (Exception e)
                             {
@@ -3791,7 +3785,7 @@ public class MainActivity extends AppCompatActivity
         ConferenceMessage m = new ConferenceMessage();
         m.is_new = do_badge_update;
         // m.tox_friendnum = friend_number;
-        m.tox_peerpubkey = tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
+        m.tox_peerpubkey = HelperConference.tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.read = false;
@@ -3803,7 +3797,7 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            m.tox_peername = tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+            m.tox_peername = HelperConference.tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
         }
         catch (Exception e)
         {
@@ -3814,20 +3808,20 @@ public class MainActivity extends AppCompatActivity
         {
             if (conference_message_list_activity.get_current_conf_id().equals(conf_id))
             {
-                insert_into_conference_message_db(m, true);
+                HelperConference.insert_into_conference_message_db(m, true);
             }
             else
             {
-                insert_into_conference_message_db(m, false);
+                HelperConference.insert_into_conference_message_db(m, false);
             }
         }
         else
         {
-            long new_msg_id = insert_into_conference_message_db(m, false);
+            long new_msg_id = HelperConference.insert_into_conference_message_db(m, false);
             Log.i(TAG, "conference_message_add_from_sync:new_msg_id=" + new_msg_id);
         }
 
-        update_single_conference_in_friendlist_view(conf_temp);
+        HelperConference.update_single_conference_in_friendlist_view(conf_temp);
 
         if (do_notification)
         {
@@ -3951,7 +3945,7 @@ public class MainActivity extends AppCompatActivity
         if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_CANCEL.value)
         {
             Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_CANCEL");
-            cancel_filetransfer(friend_number, file_number);
+            HelperFiletransfer.cancel_filetransfer(friend_number, file_number);
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_RESUME.value)
         {
@@ -3959,7 +3953,7 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+                long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
                 Filetransfer ft_check = orma.selectFromFiletransfer().idEq(ft_id).get(0);
 
                 // -------- DEBUG --------
@@ -3980,20 +3974,20 @@ public class MainActivity extends AppCompatActivity
                 {
                     Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME::+AVATAR+");
                     Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:ft_id=" + ft_id);
-                    set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_RESUME.value);
+                    HelperFiletransfer.set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_RESUME.value);
                     // if outgoing FT set "ft_accepted" to true
-                    set_filetransfer_accepted_from_id(ft_id);
+                    HelperFiletransfer.set_filetransfer_accepted_from_id(ft_id);
                 }
                 else
                 {
                     Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME::*DATA*");
                     Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:ft_id=" + ft_id);
-                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+                    long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
                     Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME:msg_id=" + msg_id);
-                    set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_RESUME.value);
-                    set_message_state_from_id(msg_id, TOX_FILE_CONTROL_RESUME.value);
+                    HelperFiletransfer.set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_RESUME.value);
+                    HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_RESUME.value);
                     // if outgoing FT set "ft_accepted" to true
-                    set_filetransfer_accepted_from_id(ft_id);
+                    HelperFiletransfer.set_filetransfer_accepted_from_id(ft_id);
                     set_message_accepted_from_id(msg_id);
 
                     // update_all_messages_global(true);
@@ -4001,7 +3995,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (ft_id != -1)
                         {
-                            update_single_message_from_messge_id(msg_id, true);
+                            HelperMessage.update_single_message_from_messge_id(msg_id, true);
                         }
                     }
                     catch (Exception e)
@@ -4020,17 +4014,17 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
-                long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
-                set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_PAUSE.value);
-                set_message_state_from_id(msg_id, TOX_FILE_CONTROL_PAUSE.value);
+                long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+                long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
+                HelperFiletransfer.set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_PAUSE.value);
+                HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_PAUSE.value);
 
                 // update_all_messages_global(true);
                 try
                 {
                     if (ft_id != -1)
                     {
-                        update_single_message_from_messge_id(msg_id, true);
+                        HelperMessage.update_single_message_from_messge_id(msg_id, true);
                     }
                 }
                 catch (Exception e)
@@ -4055,7 +4049,7 @@ public class MainActivity extends AppCompatActivity
         {
             Filetransfer ft = orma.selectFromFiletransfer().
                     directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     file_numberEq(file_number).
                     orderByIdDesc().
                     get(0);
@@ -4080,7 +4074,7 @@ public class MainActivity extends AppCompatActivity
                     global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
                     // Log.i(TAG, "file_chunk_request:res(2)=" + res);
                     // remove FT from DB
-                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
+                    HelperFiletransfer.delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                 }
                 else
                 {
@@ -4143,14 +4137,14 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     Log.i(TAG, "file_chunk_request:file_READY:001:f.id=" + ft.id);
-                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft.id, friend_number);
+                    long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft.id, friend_number);
                     Log.i(TAG, "file_chunk_request:file_READY:001a:msg_id=" + msg_id);
-                    update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number,
+                    HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number,
                                                                                  ft.path_name + "/" + ft.file_name);
-                    set_message_state_from_friendnum_and_filenum(friend_number, file_number,
-                                                                 TOX_FILE_CONTROL_CANCEL.value);
-                    set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
-                    set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
+                    HelperMessage.set_message_state_from_friendnum_and_filenum(friend_number, file_number,
+                                                                               TOX_FILE_CONTROL_CANCEL.value);
+                    HelperMessage.set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
+                    HelperFiletransfer.set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
 
                     try
                     {
@@ -4159,7 +4153,7 @@ public class MainActivity extends AppCompatActivity
                         if (ft.id != -1)
                         {
                             Log.i(TAG, "file_chunk_request:file_READY:003:f.id=" + ft.id + " msg_id=" + msg_id);
-                            update_single_message_from_messge_id(msg_id, true);
+                            HelperMessage.update_single_message_from_messge_id(msg_id, true);
                         }
                     }
                     catch (Exception e)
@@ -4173,7 +4167,7 @@ public class MainActivity extends AppCompatActivity
                     global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
                     // Log.i(TAG, "file_chunk_request:res(2)=" + res);
                     // remove FT from DB
-                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
+                    HelperFiletransfer.delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                 }
                 else
                 {
@@ -4195,7 +4189,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES) < position)
                         {
                             ft.current_position = position;
-                            update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -4204,7 +4198,7 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     if (ft.id != -1)
                                     {
-                                        update_single_message_from_ftid(ft.id, false);
+                                        HelperMessage.update_single_message_from_ftid(ft.id, false);
                                     }
                                 }
                                 catch (Exception e)
@@ -4218,7 +4212,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
                         {
                             ft.current_position = position;
-                            update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -4227,7 +4221,7 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     if (ft.id != -1)
                                     {
-                                        update_single_message_from_ftid(ft.id, false);
+                                        HelperMessage.update_single_message_from_ftid(ft.id, false);
                                     }
                                 }
                                 catch (Exception e)
@@ -4258,7 +4252,7 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "file_recv:incoming avatar");
             String file_name_avatar = FRIEND_AVATAR_FILENAME;
             Filetransfer f = new Filetransfer();
-            f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
+            f.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
@@ -4268,7 +4262,7 @@ public class MainActivity extends AppCompatActivity
             f.file_name = file_name_avatar;
             f.filesize = file_size;
             f.current_position = 0;
-            long row_id = insert_into_filetransfer_db(f);
+            long row_id = HelperFiletransfer.insert_into_filetransfer_db(f);
             f.id = row_id;
             // TODO: we just accept incoming avatar, maybe make some checks first?
             tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_RESUME.value);
@@ -4277,7 +4271,7 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "file_recv:incoming regular file");
             Filetransfer f = new Filetransfer();
-            f.tox_public_key_string = tox_friend_get_public_key__wrapper(friend_number);
+            f.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
             f.file_number = file_number;
             f.kind = a_TOX_FILE_KIND;
@@ -4288,11 +4282,11 @@ public class MainActivity extends AppCompatActivity
             f.ft_accepted = false;
             f.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
             f.current_position = 0;
-            long ft_id = insert_into_filetransfer_db(f);
+            long ft_id = HelperFiletransfer.insert_into_filetransfer_db(f);
             f.id = ft_id;
             // add FT message to UI
             Message m = new Message();
-            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
+            m.tox_friendpubkey = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
             m.direction = 0; // msg received
             m.TOX_MESSAGE_TYPE = 0;
             m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
@@ -4310,29 +4304,29 @@ public class MainActivity extends AppCompatActivity
             {
                 if (message_list_activity.get_current_friendnum() == friend_number)
                 {
-                    new_msg_id = insert_into_message_db(m, true);
+                    new_msg_id = HelperMessage.insert_into_message_db(m, true);
                     m.id = new_msg_id;
                 }
                 else
                 {
-                    new_msg_id = insert_into_message_db(m, false);
+                    new_msg_id = HelperMessage.insert_into_message_db(m, false);
                     m.id = new_msg_id;
                 }
             }
             else
             {
-                new_msg_id = insert_into_message_db(m, false);
+                new_msg_id = HelperMessage.insert_into_message_db(m, false);
                 m.id = new_msg_id;
             }
 
             f.message_id = new_msg_id;
-            update_filetransfer_db_full(f);
+            HelperFiletransfer.update_filetransfer_db_full(f);
 
             try
             {
                 // update "new" status on friendlist fragment
                 FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                update_single_friend_in_friendlist_view(f2);
+                HelperFriend.update_single_friend_in_friendlist_view(f2);
             }
             catch (Exception e)
             {
@@ -4356,7 +4350,7 @@ public class MainActivity extends AppCompatActivity
                     directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
                     file_numberEq(file_number).
                     and().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().
                     get(0);
 
@@ -4402,7 +4396,8 @@ public class MainActivity extends AppCompatActivity
                 if (VFS_ENCRYPT)
                 {
                     info.guardianproject.iocipher.FileOutputStream fos = null;
-                    fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                    fos = cache_ft_fos.get(
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                     if (f.fos_open)
                     {
@@ -4422,7 +4417,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     java.io.FileOutputStream fos = null;
                     fos = cache_ft_fos_normal.get(
-                            tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                     if (f.fos_open)
                     {
@@ -4439,7 +4434,7 @@ public class MainActivity extends AppCompatActivity
                     f.fos_open = false;
                 }
 
-                update_filetransfer_db_fos_open(f);
+                HelperFiletransfer.update_filetransfer_db_fos_open(f);
                 move_tmp_file_to_real_file(f.path_name, f.file_name,
                                            VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/",
                                            f.file_name);
@@ -4466,22 +4461,22 @@ public class MainActivity extends AppCompatActivity
 
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
-                    set_friend_avatar(tox_friend_get_public_key__wrapper(friend_number),
+                    HelperFriend.set_friend_avatar(HelperFriend.tox_friend_get_public_key__wrapper(friend_number),
                                       VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
                 }
                 else
                 {
                     Log.i(TAG, "file_recv_chunk:file_READY:001:f.id=" + f.id);
-                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(f.id, friend_number);
+                    long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(f.id, friend_number);
                     Log.i(TAG, "file_recv_chunk:file_READY:001a:msg_id=" + msg_id);
-                    update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number,
+                    HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number,
                                                                                  VFS_PREFIX + VFS_FILE_DIR + "/" +
                                                                                  f.tox_public_key_string + "/" +
                                                                                  f.file_name);
-                    set_message_state_from_friendnum_and_filenum(friend_number, file_number,
-                                                                 TOX_FILE_CONTROL_CANCEL.value);
-                    set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
-                    set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
+                    HelperMessage.set_message_state_from_friendnum_and_filenum(friend_number, file_number,
+                                                                               TOX_FILE_CONTROL_CANCEL.value);
+                    HelperMessage.set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
+                    HelperFiletransfer.set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
 
                     try
                     {
@@ -4490,7 +4485,7 @@ public class MainActivity extends AppCompatActivity
                         if (f.id != -1)
                         {
                             Log.i(TAG, "file_recv_chunk:file_READY:003:f.id=" + f.id + " msg_id=" + msg_id);
-                            update_single_message_from_messge_id(msg_id, true);
+                            HelperMessage.update_single_message_from_messge_id(msg_id, true);
                         }
                     }
                     catch (Exception e)
@@ -4500,7 +4495,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 // remove FT from DB
-                delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
+                HelperFiletransfer.delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
             }
             catch (Exception e2)
             {
@@ -4520,23 +4515,26 @@ public class MainActivity extends AppCompatActivity
                     {
                         fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
                         // Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                        cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
+                        cache_ft_fos.put(
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                         f.fos_open = true;
-                        update_filetransfer_db_fos_open(f);
+                        HelperFiletransfer.update_filetransfer_db_fos_open(f);
                     }
                     else
                     {
-                        fos = cache_ft_fos.get(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                        fos = cache_ft_fos.get(
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                         if (fos == null)
                         {
                             fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
                             // Log.i(TAG,
                             //       "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                            cache_ft_fos.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                             fos);
+                            cache_ft_fos.put(
+                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                    fos);
                             f.fos_open = true;
-                            update_filetransfer_db_fos_open(f);
+                            HelperFiletransfer.update_filetransfer_db_fos_open(f);
                         }
 
                         // Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
@@ -4553,15 +4551,16 @@ public class MainActivity extends AppCompatActivity
                     {
                         fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
                         // Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                        cache_ft_fos_normal.put(tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                                fos);
+                        cache_ft_fos_normal.put(
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                fos);
                         f.fos_open = true;
-                        update_filetransfer_db_fos_open(f);
+                        HelperFiletransfer.update_filetransfer_db_fos_open(f);
                     }
                     else
                     {
                         fos = cache_ft_fos_normal.get(
-                                tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                         if (fos == null)
                         {
@@ -4569,9 +4568,9 @@ public class MainActivity extends AppCompatActivity
                             // Log.i(TAG,
                             //      "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos_normal.put(
-                                    tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
+                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                             f.fos_open = true;
-                            update_filetransfer_db_fos_open(f);
+                            HelperFiletransfer.update_filetransfer_db_fos_open(f);
                         }
 
                         // Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
@@ -4587,7 +4586,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         f.current_position = position;
                         // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
-                        update_filetransfer_db_current_position(f);
+                        HelperFiletransfer.update_filetransfer_db_current_position(f);
 
                         if (f.kind != TOX_FILE_KIND_AVATAR.value)
                         {
@@ -4596,7 +4595,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (f.id != -1)
                                 {
-                                    update_single_message_from_ftid(f.id, false);
+                                    HelperMessage.update_single_message_from_ftid(f.id, false);
                                 }
                             }
                             catch (Exception e)
@@ -4611,7 +4610,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         f.current_position = position;
                         // Log.i(TAG, "file_recv_chunk:filesize==:2:" + f.filesize);
-                        update_filetransfer_db_current_position(f);
+                        HelperFiletransfer.update_filetransfer_db_current_position(f);
 
                         if (f.kind != TOX_FILE_KIND_AVATAR.value)
                         {
@@ -4620,7 +4619,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (f.id != -1)
                                 {
-                                    update_single_message_from_ftid(f.id, false);
+                                    HelperMessage.update_single_message_from_ftid(f.id, false);
                                 }
                             }
                             catch (Exception e)
@@ -4669,9 +4668,9 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_conference_connected_cb_method(long conference_number)
     {
         // invite also my ToxProxy -------------
-        if (have_own_relay())
+        if (HelperRelay.have_own_relay())
         {
-            tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()), conference_number);
+            tox_conference_invite(HelperFriend.tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()), conference_number);
         }
         // invite also my ToxProxy -------------
 
@@ -4702,14 +4701,14 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
 
         // invite also my ToxProxy -------------
-        if (have_own_relay())
+        if (HelperRelay.have_own_relay())
         {
-            tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()), conference_num);
+            tox_conference_invite(HelperFriend.tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()), conference_num);
         }
         // invite also my ToxProxy -------------
 
 
-        add_conference_wrapper(friend_number, conference_num, conference_identifier, a_TOX_CONFERENCE_TYPE, true);
+        HelperConference.add_conference_wrapper(friend_number, conference_num, conference_identifier, a_TOX_CONFERENCE_TYPE, true);
     }
 
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
@@ -4771,7 +4770,7 @@ public class MainActivity extends AppCompatActivity
         ConferenceMessage m = new ConferenceMessage();
         m.is_new = do_badge_update;
         // m.tox_friendnum = friend_number;
-        m.tox_peerpubkey = tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
+        m.tox_peerpubkey = HelperConference.tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.read = false;
@@ -4783,7 +4782,7 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            m.tox_peername = tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+            m.tox_peername = HelperConference.tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
         }
         catch (Exception e)
         {
@@ -4794,20 +4793,20 @@ public class MainActivity extends AppCompatActivity
         {
             if (conference_message_list_activity.get_current_conf_id().equals(conf_id))
             {
-                insert_into_conference_message_db(m, true);
+                HelperConference.insert_into_conference_message_db(m, true);
             }
             else
             {
-                insert_into_conference_message_db(m, false);
+                HelperConference.insert_into_conference_message_db(m, false);
             }
         }
         else
         {
-            long new_msg_id = insert_into_conference_message_db(m, false);
+            long new_msg_id = HelperConference.insert_into_conference_message_db(m, false);
             Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
         }
 
-        update_single_conference_in_friendlist_view(conf_temp);
+        HelperConference.update_single_conference_in_friendlist_view(conf_temp);
 
         if (do_notification)
         {
@@ -4948,7 +4947,7 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "get_conference_title_from_confid:EE:3:" + e2.getMessage());
             }
 
-            update_single_conference_in_friendlist_view(conf_temp2);
+            HelperConference.update_single_conference_in_friendlist_view(conf_temp2);
         }
         catch (Exception e)
         {
@@ -5368,22 +5367,22 @@ public class MainActivity extends AppCompatActivity
                     if (conference_message_list_activity.get_current_conf_id().equals(conf_temp.conference_identifier))
                     {
                         Log.i(TAG, "namelist_change_cb:009");
-                        insert_into_conference_message_db_system_message(m, true);
+                        HelperConference.insert_into_conference_message_db_system_message(m, true);
                     }
                     else
                     {
                         Log.i(TAG, "namelist_change_cb:010");
-                        insert_into_conference_message_db_system_message(m, false);
+                        HelperConference.insert_into_conference_message_db_system_message(m, false);
                     }
                 }
                 else
                 {
-                    long new_msg_id = insert_into_conference_message_db_system_message(m, false);
+                    long new_msg_id = HelperConference.insert_into_conference_message_db_system_message(m, false);
                     Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
                 }
 
                 // update conferenc item -------
-                update_single_conference_in_friendlist_view(conf_temp);
+                HelperConference.update_single_conference_in_friendlist_view(conf_temp);
                 // update conferenc item -------
 
                 if (a_TOX_CONFERENCE_STATE_CHANGE == TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT.value)
@@ -5474,434 +5473,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void add_conference_wrapper(final long friend_number, long conference_num, String conference_identifier_in, final int a_TOX_CONFERENCE_TYPE, boolean has_conference_identifier)
-    {
-        if (conference_num < 0)
-        {
-            Log.d(TAG, "add_conference_wrapper:ERR:conference number less than zero:" + conference_num);
-            return;
-        }
-
-        Log.d(TAG, "add_conference_wrapper:confnum=" + conference_num + " conference_identifier_in=" +
-                   conference_identifier_in);
-        String conference_identifier = conference_identifier_in;
-
-        if (has_conference_identifier != true)
-        {
-            Log.d(TAG, "add_conference_wrapper:need to get conference_identifier");
-            // we need to get the conference identifier
-            ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
-            cookie_buf3.clear();
-            if (tox_conference_get_id(conference_num, cookie_buf3) == 0)
-            {
-                byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
-                cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
-                conference_identifier = bytes_to_hex(cookie_buffer);
-            }
-            else
-            {
-                Log.d(TAG, "add_conference_wrapper:ERR:error getting conference identifier");
-                return;
-            }
-        }
-
-        Log.d(TAG, "add_conference_wrapper:conference_identifier=" + conference_identifier);
-
-        if (conference_num >= 0)
-        {
-            new_or_updated_conference(conference_num, tox_friend_get_public_key__wrapper(friend_number),
-                                      conference_identifier, a_TOX_CONFERENCE_TYPE); // joining new conference
-        }
-        else
-        {
-            Log.i(TAG, "add_conference_wrapper:error=" + conference_num + " joining conference");
-        }
-
-        try
-        {
-            if (conference_message_list_activity != null)
-            {
-                if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
-                {
-                    conference_message_list_activity.set_conference_connection_status_icon();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        // save tox savedate file
-        update_savedata_file_wrapper();
-    }
-
-    static FriendList main_get_friend(long friendnum)
-    {
-        String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
-        // Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
-        FriendList f;
-        List<FriendList> fl = orma.selectFromFriendList().
-                tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                toList();
-
-        // Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
-
-        if (fl.size() > 0)
-        {
-            f = fl.get(0);
-            // Log.i(TAG, "main_get_friend:f=" + f);
-        }
-        else
-        {
-            f = null;
-        }
-
-        return f;
-    }
-
-    static int is_friend_online(long friendnum)
-    {
-        try
-        {
-            return (orma.selectFromFriendList().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                    toList().get(0).TOX_CONNECTION);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    static boolean is_conference_active(String conference_identifier)
-    {
-        try
-        {
-            return (orma.selectFromConferenceDB().
-                    conference_identifierEq(conference_identifier).
-                    toList().get(0).conference_active);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    synchronized static void set_all_friends_offline()
-    {
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    orma.updateFriendList().
-                            TOX_CONNECTION(0).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                }
-
-                try
-                {
-                    orma.updateFriendList().
-                            TOX_CONNECTION_real(0).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                }
-
-                try
-                {
-                    orma.updateFriendList().
-                            TOX_CONNECTION_on_off(0).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                }
-
-                try
-                {
-                    orma.updateFriendList().
-                            TOX_CONNECTION_on_off_real(0).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                }
-
-                try
-                {
-                    orma.updateFriendList().
-                            last_online_timestampEq(LAST_ONLINE_TIMSTAMP_ONLINE_NOW).
-                            last_online_timestamp(System.currentTimeMillis()).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                }
-
-                // ------ DEBUG ------
-                // ------ set all friends to "never" seen online ------
-                // ------ DEBUG ------
-                // try
-                // {
-                //     orma.updateFriendList().
-                //             last_online_timestamp(LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE).
-                //             execute();
-                // }
-                // catch (Exception e)
-                // {
-                // }
-                // ------ DEBUG ------
-                // ------ set all friends to "never" seen online ------
-                // ------ DEBUG ------
-
-                try
-                {
-                    friend_list_fragment.set_all_friends_to_offline();
-                }
-                catch (Exception e)
-                {
-                }
-            }
-        };
-        t.start();
-    }
-
-    synchronized static void update_friend_in_db(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_string(f.tox_public_key_string).
-                name(f.name).
-                status_message(f.status_message).
-                TOX_CONNECTION(f.TOX_CONNECTION).
-                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
-                TOX_USER_STATUS(f.TOX_USER_STATUS).
-                execute();
-    }
-
-    synchronized static void update_friend_in_db_status_message(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                status_message(f.status_message).
-                execute();
-    }
-
-    synchronized static void update_friend_in_db_status(FriendList f)
-    {
-        // Log.i(TAG, "update_friend_in_db_status:f=" + f);
-        int numrows = orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                TOX_USER_STATUS(f.TOX_USER_STATUS).
-                execute();
-        Log.i(TAG, "update_friend_in_db_status:numrows=" + numrows);
-    }
-
-    synchronized static void update_friend_in_db_connection_status(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                TOX_CONNECTION(f.TOX_CONNECTION).
-                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
-                execute();
-    }
-
-    synchronized static void update_friend_in_db_connection_status_real(FriendList f)
-    {
-        try
-        {
-            orma.updateFriendList().
-                    tox_public_key_stringEq(f.tox_public_key_string).
-                    TOX_CONNECTION_real(f.TOX_CONNECTION_real).
-                    TOX_CONNECTION_on_off_real(f.TOX_CONNECTION_on_off_real).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    synchronized static void update_friend_in_db_last_online_timestamp(FriendList f)
-    {
-        // Log.i(TAG, "update_friend_in_db_last_online_timestamp");
-        try
-        {
-            orma.updateFriendList().
-                    tox_public_key_stringEq(f.tox_public_key_string).
-                    last_online_timestamp(f.last_online_timestamp).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    synchronized static void update_friend_in_db_name(FriendList f)
-    {
-        orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                name(f.name).
-                execute();
-    }
-
-    synchronized static void update_message_in_db(final Message m)
-    {
-        final Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    orma.updateMessage().
-                            idEq(m.id).
-                            read(m.read).
-                            text(m.text).
-                            sent_timestamp(m.sent_timestamp).
-                            rcvd_timestamp(m.rcvd_timestamp).
-                            filename_fullpath(m.filename_fullpath).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-        t.start();
-    }
-
-    synchronized static void update_message_in_db_no_read_recvedts(final Message m)
-    {
-        final Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    orma.updateMessage().
-                            idEq(m.id).
-                            text(m.text).
-                            sent_timestamp(m.sent_timestamp).
-                            msg_version(m.msg_version).
-                            filename_fullpath(m.filename_fullpath).
-                            raw_msgv2_bytes(m.raw_msgv2_bytes).
-                            msg_id_hash(m.msg_id_hash).
-                            execute();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        };
-        t.start();
-    }
-
-
-    static void update_message_in_db_filename_fullpath_friendnum_and_filenum(long friend_number, long file_number, String filename_fullpath)
-    {
-        try
-        {
-            long ft_id = orma.selectFromFiletransfer().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    and().file_numberEq(file_number).orderByIdDesc().get(0).id;
-            update_message_in_db_filename_fullpath_from_id(orma.selectFromMessage().
-                    filetransfer_idEq(ft_id).and().
-                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    get(0).id, filename_fullpath);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_message_in_db_filename_fullpath_from_id(long msg_id, String filename_fullpath)
-    {
-        try
-        {
-            orma.updateMessage().idEq(msg_id).filename_fullpath(filename_fullpath).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_message_in_db_filename_fullpath(final Message m)
-    {
-        try
-        {
-            orma.updateMessage().
-                    idEq(m.id).
-                    filename_fullpath(m.filename_fullpath).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_message_in_db_read_rcvd_timestamp_rawmsgbytes(final Message m)
-    {
-        try
-        {
-            orma.updateMessage().
-                    idEq(m.id).
-                    read(m.read).
-                    raw_msgv2_bytes(m.raw_msgv2_bytes).
-                    rcvd_timestamp(m.rcvd_timestamp).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_message_in_db_messageid(final Message m)
-    {
-        try
-        {
-            orma.updateMessage().
-                    idEq(m.id).
-                    message_id(m.message_id).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_message_in_db_resend_count(final Message m)
-    {
-        try
-        {
-            orma.updateMessage().
-                    idEq(m.id).
-                    resend_count(m.resend_count).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
 
     static void change_notification(int a_TOXCONNECTION, final String message)
     {
@@ -5972,12 +5543,12 @@ public class MainActivity extends AppCompatActivity
 
     public static void update_friend_connection_status_helper(int a_TOX_CONNECTION, FriendList f, boolean from_relay)
     {
-        final long friend_number_ = tox_friend_by_public_key__wrapper(f.tox_public_key_string);
+        final long friend_number_ = HelperFriend.tox_friend_by_public_key__wrapper(f.tox_public_key_string);
         boolean went_online = false;
 
         if (f.TOX_CONNECTION != a_TOX_CONNECTION)
         {
-            if ((!from_relay) && (!is_any_relay(f.tox_public_key_string)))
+            if ((!from_relay) && (!HelperRelay.is_any_relay(f.tox_public_key_string)))
             {
                 if (f.TOX_CONNECTION == TOX_CONNECTION_NONE.value)
                 {
@@ -6016,13 +5587,13 @@ public class MainActivity extends AppCompatActivity
                                                       filenum);
                                                 // save FT to db ---------------
                                                 Filetransfer ft_avatar_outgoing = new Filetransfer();
-                                                ft_avatar_outgoing.tox_public_key_string = tox_friend_get_public_key__wrapper(
+                                                ft_avatar_outgoing.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(
                                                         friend_number_);
                                                 ft_avatar_outgoing.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
                                                 ft_avatar_outgoing.file_number = filenum;
                                                 ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
                                                 ft_avatar_outgoing.filesize = avatar_bytes.capacity();
-                                                long rowid = insert_into_filetransfer_db(ft_avatar_outgoing);
+                                                long rowid = HelperFiletransfer.insert_into_filetransfer_db(ft_avatar_outgoing);
                                                 ft_avatar_outgoing.id = rowid;
                                             }
                                             else
@@ -6066,10 +5637,10 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "friend_connection_status:friend status seems: ONLINE");
             f.last_online_timestamp = LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
-            update_friend_in_db_last_online_timestamp(f);
+            HelperFriend.update_friend_in_db_last_online_timestamp(f);
             f.TOX_CONNECTION = a_TOX_CONNECTION;
             f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
-            update_friend_in_db_connection_status(f);
+            HelperFriend.update_friend_in_db_connection_status(f);
 
             try
             {
@@ -6086,7 +5657,7 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            add_all_friends_clear_wrapper(0);
+            HelperFriend.add_all_friends_clear_wrapper(0);
         }
         else // went offline -------------------
         {
@@ -6099,10 +5670,10 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "friend_connection_status:friend status combined: OFFLINE");
                 f.last_online_timestamp = System.currentTimeMillis();
-                update_friend_in_db_last_online_timestamp(f);
+                HelperFriend.update_friend_in_db_last_online_timestamp(f);
                 f.TOX_CONNECTION = combined_connection_status_;
                 f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
-                update_friend_in_db_connection_status(f);
+                HelperFriend.update_friend_in_db_connection_status(f);
 
                 try
                 {
@@ -6119,502 +5690,13 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
 
-                add_all_friends_clear_wrapper(0);
+                HelperFriend.add_all_friends_clear_wrapper(0);
             }
             else
             {
                 Log.i(TAG, "friend or relay offline, combined still ONLINE");
-                update_single_friend_in_friendlist_view(f);
+                HelperFriend.update_single_friend_in_friendlist_view(f);
             }
-        }
-    }
-
-    public static void add_single_conference_message_from_messge_id(final long message_id, final boolean force)
-    {
-        try
-        {
-            if (conference_message_list_fragment != null)
-            {
-                Thread t = new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (message_id != -1)
-                        {
-                            try
-                            {
-                                ConferenceMessage m = orma.selectFromConferenceMessage().idEq(
-                                        message_id).orderByIdDesc().get(0);
-
-                                if (m.id != -1)
-                                {
-                                    if ((force) ||
-                                        (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS <
-                                         System.currentTimeMillis()))
-                                    {
-                                        update_all_messages_global_timestamp = System.currentTimeMillis();
-                                        MainActivity.conference_message_list_fragment.add_message(m);
-                                    }
-                                }
-                            }
-                            catch (Exception e2)
-                            {
-                            }
-                        }
-                    }
-                };
-                t.start();
-            }
-        }
-        catch (Exception e)
-        {
-            // e.printStackTrace();
-        }
-    }
-
-    public static void add_single_message_from_messge_id(final long message_id, final boolean force)
-    {
-        try
-        {
-            Log.i(TAG, "add_single_message_from_messge_id:message_id=" + message_id);
-            Thread t = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    if (message_id != -1)
-                    {
-                        Log.i(TAG, "add_single_message_from_messge_id:message_id=" + message_id);
-
-                        try
-                        {
-                            Message m = orma.selectFromMessage().idEq(message_id).orderByIdDesc().get(0);
-
-                            if (m.id != -1)
-                            {
-                                Log.i(TAG, "add_single_message_from_messge_id:m.id=" + m.id);
-
-                                if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS <
-                                                System.currentTimeMillis()))
-                                {
-                                    Log.i(TAG, "add_single_message_from_messge_id:add_message()");
-
-                                    if (message_list_fragment == null)
-                                    {
-                                        // ok, we need to wait for onResume to finish
-                                        Log.i(TAG,
-                                              "add_single_message_from_messge_id:ok, we need to wait for onResume to finish");
-                                        long loop = 0;
-
-                                        while (loop < 40)  // wait 8 sec., then give up
-                                        {
-                                            loop++;
-
-                                            try
-                                            {
-                                                Thread.sleep(200);
-                                            }
-                                            catch (InterruptedException e)
-                                            {
-                                                e.printStackTrace();
-                                            }
-
-                                            if (message_list_fragment != null)
-                                            {
-                                                // got it
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    if (message_list_fragment != null)
-                                    {
-                                        update_all_messages_global_timestamp = System.currentTimeMillis();
-                                        MainActivity.message_list_fragment.add_message(m);
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e2)
-                        {
-                            Log.i(TAG, "add_single_message_from_messge_id:EE1:" + e2.getMessage());
-                        }
-                    }
-                }
-            };
-            t.start();
-        }
-        catch (Exception e)
-        {
-            // e.printStackTrace();
-            Log.i(TAG, "add_single_message_from_messge_id:EE2:" + e.getMessage());
-        }
-    }
-
-    public static void update_single_message_from_messge_id(final long message_id, final boolean force)
-    {
-        try
-        {
-            if (message_list_fragment != null)
-            {
-                Thread t = new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (message_id != -1)
-                        {
-                            try
-                            {
-                                Message m = orma.selectFromMessage().idEq(message_id).orderByIdDesc().get(0);
-
-                                if (m.id != -1)
-                                {
-                                    if ((force) ||
-                                        (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS <
-                                         System.currentTimeMillis()))
-                                    {
-                                        update_all_messages_global_timestamp = System.currentTimeMillis();
-                                        MainActivity.message_list_fragment.modify_message(m);
-                                    }
-                                }
-                            }
-                            catch (Exception e2)
-                            {
-                            }
-                        }
-                    }
-                };
-                t.start();
-            }
-        }
-        catch (Exception e)
-        {
-            // e.printStackTrace();
-        }
-    }
-
-    public static void update_single_message_from_ftid(final long filetransfer_id, final boolean force)
-    {
-        try
-        {
-            if (message_list_fragment != null)
-            {
-                Thread t = new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            Message m = orma.selectFromMessage().filetransfer_idEq(filetransfer_id).orderByIdDesc().get(
-                                    0);
-
-                            if (m.id != -1)
-                            {
-                                if ((force) || (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS <
-                                                System.currentTimeMillis()))
-                                {
-                                    update_all_messages_global_timestamp = System.currentTimeMillis();
-                                    MainActivity.message_list_fragment.modify_message(m);
-                                }
-                            }
-                        }
-                        catch (Exception e2)
-                        {
-                            e2.printStackTrace();
-                        }
-                    }
-                };
-                t.start();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "update_message_view:EE:" + e.getMessage());
-        }
-    }
-
-    public static void update_single_message(Message m, boolean force)
-    {
-        try
-        {
-            if (message_list_fragment != null)
-            {
-                if ((force) ||
-                    (update_all_messages_global_timestamp + UPDATE_MESSAGES_NORMAL_MILLIS < System.currentTimeMillis()))
-                {
-                    update_all_messages_global_timestamp = System.currentTimeMillis();
-                    message_list_fragment.modify_message(m);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            // e.printStackTrace();
-            Log.i(TAG, "update_message_view:EE:" + e.getMessage());
-        }
-    }
-
-    public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
-    {
-        if (cache_pubkey_fnum.containsKey(friend_public_key_string))
-        {
-            // Log.i(TAG, "cache hit:1");
-            return cache_pubkey_fnum.get(friend_public_key_string);
-        }
-        else
-        {
-            if (cache_pubkey_fnum.size() >= 20)
-            {
-                // TODO: bad!
-                cache_pubkey_fnum.clear();
-            }
-
-            long result = tox_friend_by_public_key(friend_public_key_string);
-            cache_pubkey_fnum.put(friend_public_key_string, result);
-            return result;
-        }
-    }
-
-    public static long get_message_id_from_filetransfer_id_and_friendnum(long filetransfer_id, long friend_number)
-    {
-        try
-        {
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:" + orma.selectFromMessage().toList().size());
-            //
-            //            int i = 0;
-            //            for (i = 0; i < orma.selectFromMessage().toList().size(); i++)
-            //            {
-            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
-            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:#" + i + ":" + orma.selectFromMessage().toList().get(i));
-            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:****");
-            //            }
-            //
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:=====================================");
-            //
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2" + orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size());
-            //
-            //            for (i = 0; i < orma.selectFromMessage().filetransfer_idEq(filetransfer_id).toList().size(); i++)
-            //            {
-            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
-            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2#" + i + ":" + orma.selectFromMessage().toList().get(i));
-            //                Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2****");
-            //            }
-            //
-            //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
-            //
-            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id +
-                       " friend_number=" + friend_number);
-            List<Message> m = orma.selectFromMessage().
-                    filetransfer_idEq(filetransfer_id).and().
-                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    orderByIdDesc().toList();
-
-            if (m.size() == 0)
-            {
-                return -1;
-            }
-
-            return m.get(0).id;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:EE:" + e.getMessage());
-            return -1;
-        }
-    }
-
-    public static long get_filetransfer_id_from_friendnum_and_filenum(long friend_number, long file_number)
-    {
-        try
-        {
-            // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:friend_number=" + friend_number + " file_number=" + file_number);
-            long ft_id = orma.selectFromFiletransfer().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
-                    file_numberEq(file_number).
-                    orderByIdDesc().
-                    toList().
-                    get(0).id;
-            // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:ft_id=" + ft_id);
-            // ----- DEBUG -----
-            //            try
-            //            {
-            //                Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
-            //                //if (ft_tmp.kind != TOX_FILE_KIND_AVATAR.value)
-            //                //{
-            //                Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:ft full=" + ft_tmp);
-            //                //}
-            //            }
-            //            catch (Exception e)
-            //            {
-            //                e.printStackTrace();
-            //                Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:EE2:" + e.getMessage());
-            //            }
-            // ----- DEBUG -----
-            return ft_id;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:EE:" + e.getMessage());
-            return -1;
-        }
-    }
-
-    public static void delete_filetransfer_tmpfile(long friend_number, long file_number)
-    {
-        try
-        {
-            delete_filetransfer_tmpfile(orma.selectFromFiletransfer().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(0).id);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void delete_filetransfer_tmpfile(long filetransfer_id)
-    {
-        try
-        {
-            Filetransfer ft = orma.selectFromFiletransfer().idEq(filetransfer_id).get(0);
-
-            if (VFS_ENCRYPT)
-            {
-                info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
-                        VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
-                f1.delete();
-            }
-            else
-            {
-                java.io.File f1 = new java.io.File(
-                        VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
-                f1.delete();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void set_message_state_from_friendnum_and_filenum(long friend_number, long file_number, int state)
-    {
-        try
-        {
-            long ft_id = orma.selectFromFiletransfer().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    and().file_numberEq(file_number).orderByIdDesc().get(0).id;
-            Log.i(TAG,
-                  "set_message_state_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number +
-                  " file_number=" + file_number);
-            set_message_state_from_id(orma.selectFromMessage().
-                    filetransfer_idEq(ft_id).and().
-                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    get(0).id, state);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "set_message_state_from_friendnum_and_filenum:EE:" + e.getMessage());
-        }
-    }
-
-    public static void set_message_state_from_id(long message_id, int state)
-    {
-        try
-        {
-            orma.updateMessage().idEq(message_id).state(state).execute();
-            Log.i(TAG, "set_message_state_from_id:message_id=" + message_id + " state=" + state);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "set_message_state_from_id:EE:" + e.getMessage());
-        }
-    }
-
-    public static void set_message_start_sending_from_id(long message_id)
-    {
-        try
-        {
-            orma.updateMessage().idEq(message_id).ft_outgoing_started(true).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "set_message_start_sending_from_id:EE:" + e.getMessage());
-        }
-    }
-
-    public static void set_message_filedb_from_friendnum_and_filenum(long friend_number, long file_number, long filedb_id)
-    {
-        try
-        {
-            long ft_id = orma.selectFromFiletransfer().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    and().file_numberEq(file_number).
-                    orderByIdDesc().
-                    get(0).id;
-            Log.i(TAG,
-                  "set_message_filedb_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number +
-                  " file_number=" + file_number);
-            set_message_filedb_from_id(orma.selectFromMessage().
-                    filetransfer_idEq(ft_id).and().
-                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    orderByIdDesc().
-                    get(0).id, filedb_id);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "set_message_filedb_from_friendnum_and_filenum:EE:" + e.getMessage());
-        }
-    }
-
-    public static void set_message_filedb_from_id(long message_id, long filedb_id)
-    {
-        try
-        {
-            orma.updateMessage().idEq(message_id).filedb_id(filedb_id).execute();
-            Log.i(TAG, "set_message_filedb_from_id:message_id=" + message_id + " filedb_id=" + filedb_id);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "set_message_filedb_from_id:EE:" + e.getMessage());
-        }
-    }
-
-    public static void set_filetransfer_state_from_id(long filetransfer_id, int state)
-    {
-        try
-        {
-            orma.updateFiletransfer().idEq(filetransfer_id).state(state).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void set_filetransfer_start_sending_from_id(long filetransfer_id)
-    {
-        try
-        {
-            orma.updateFiletransfer().idEq(filetransfer_id).ft_outgoing_started(true).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
         }
     }
 
@@ -6630,388 +5712,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public static void set_filetransfer_accepted_from_id(long filetransfer_id)
-    {
-        try
-        {
-            orma.updateFiletransfer().idEq(filetransfer_id).ft_accepted(true).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static long get_filetransfer_filenum_from_id(long filetransfer_id)
-    {
-        try
-        {
-            if (orma.selectFromFiletransfer().idEq(filetransfer_id).count() == 1)
-            {
-                return orma.selectFromFiletransfer().idEq(filetransfer_id).get(0).file_number;
-            }
-            else
-            {
-                return -1;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    public static void set_filetransfer_for_message_from_friendnum_and_filenum(long friend_number, long file_number, long ft_id)
-    {
-        try
-        {
-            set_filetransfer_for_message_from_filetransfer_id(orma.selectFromFiletransfer().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
-                    file_numberEq(file_number).
-                    orderByIdDesc().
-                    get(0).id, ft_id);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void set_filetransfer_for_message_from_filetransfer_id(long filetransfer_id, long ft_id)
-    {
-        try
-        {
-            orma.updateMessage().filetransfer_idEq(filetransfer_id).filetransfer_id(ft_id).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void delete_filetransfers_from_friendnum_and_filenum(long friend_number, long file_number)
-    {
-        try
-        {
-            long del_ft_id = orma.selectFromFiletransfer().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
-                    file_numberEq(file_number).
-                    orderByIdDesc().
-                    get(0).id;
-            // Log.i(TAG, "delete_ft:id=" + del_ft_id);
-            delete_filetransfers_from_id(del_ft_id);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void delete_filetransfers_from_id(long filetransfer_id)
-    {
-        try
-        {
-            Log.i(TAG, "delete_ft:id=" + filetransfer_id);
-            orma.deleteFromFiletransfer().idEq(filetransfer_id).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static String tox_friend_get_public_key__wrapper(long friend_number)
-    {
-        if (cache_fnum_pubkey.containsKey(friend_number))
-        {
-            // Log.i(TAG, "cache hit:2");
-            return cache_fnum_pubkey.get(friend_number);
-        }
-        else
-        {
-            if (cache_fnum_pubkey.size() >= 20)
-            {
-                // TODO: bad!
-                cache_fnum_pubkey.clear();
-            }
-
-            String result = tox_friend_get_public_key(friend_number);
-            cache_fnum_pubkey.put(friend_number, result);
-            return result;
-        }
-    }
-
-    public static String tox_conference_peer_get_public_key__wrapper(long conference_number, long peer_number)
-    {
-        if (cache_peernum_pubkey.containsKey("" + conference_number + ":" + peer_number))
-        {
-            // Log.i(TAG, "cache hit:2");
-            return cache_peernum_pubkey.get("" + conference_number + ":" + peer_number);
-        }
-        else
-        {
-            if (cache_peernum_pubkey.size() >= 100)
-            {
-                // TODO: bad!
-                cache_peernum_pubkey.clear();
-            }
-
-            String result = tox_conference_peer_get_public_key(conference_number, peer_number);
-            cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
-            return result;
-        }
-    }
-
-    public static String tox_conference_peer_get_name__wrapper(String conference_identifier, String peer_pubkey)
-    {
-        if (cache_peername_pubkey2.containsKey("" + conference_identifier + ":" + peer_pubkey))
-        {
-            // Log.i(TAG, "cache hit:2b");
-            return cache_peername_pubkey2.get("" + conference_identifier + ":" + peer_pubkey);
-        }
-        else
-        {
-            if (cache_peername_pubkey2.size() >= 100)
-            {
-                // TODO: bad!
-                cache_peername_pubkey2.clear();
-            }
-
-            long conf_num = get_conference_num_from_confid(conference_identifier);
-            long peer_num = get_peernum_from_peer_pubkey(conference_identifier, peer_pubkey);
-
-            if ((conf_num > -1) && (peer_num > -1))
-            {
-                String result = tox_conference_peer_get_name(conf_num, peer_num);
-
-                if (result.equals("-1"))
-                {
-                    return null;
-                }
-                else
-                {
-                    cache_peername_pubkey2.put("" + conference_identifier + ":" + peer_pubkey, result);
-                    return result;
-                }
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
-
     public void show_add_friend(View view)
     {
         Intent intent = new Intent(this, AddFriendActivity.class);
         // intent.putExtra("key", value);
         startActivityForResult(intent, AddFriendActivity_ID);
-    }
-
-    static void cancel_filetransfer(long friend_number, long file_number)
-    {
-        Log.i(TAG, "FTFTFT:cancel_filetransfer");
-        Filetransfer f = null;
-
-        try
-        {
-            f = orma.selectFromFiletransfer().
-                    file_numberEq(file_number).
-                    and().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friend_number)).
-                    orderByIdDesc().
-                    toList().get(0);
-
-            if (f.direction == TRIFA_FT_DIRECTION_INCOMING.value)
-            {
-                if (f.kind == TOX_FILE_KIND_DATA.value)
-                {
-                    long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
-                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
-                    // delete tmp file
-                    delete_filetransfer_tmpfile(friend_number, file_number);
-                    // set state for FT in message
-                    set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
-                    // remove link to any message
-                    set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
-                    // delete FT in DB
-                    Log.i(TAG, "FTFTFT:002");
-                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
-
-                    // update UI
-                    // TODO: updates all messages, this is bad
-                    // update_all_messages_global(false);
-                    try
-                    {
-                        if (f.id != -1)
-                        {
-                            update_single_message_from_messge_id(msg_id, true);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                    }
-                }
-                else // avatar FT
-                {
-                    long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
-                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
-                    set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_CANCEL.value);
-                    set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
-                    // delete tmp file
-                    delete_filetransfer_tmpfile(friend_number, file_number);
-                    // delete FT in DB
-                    Log.i(TAG, "FTFTFT:003");
-                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
-                }
-            }
-            else // outgoing FT
-            {
-                if (f.kind == TOX_FILE_KIND_DATA.value)
-                {
-                    long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
-                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
-                    // set state for FT in message
-                    set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
-                    // remove link to any message
-                    set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
-                    // delete FT in DB
-                    Log.i(TAG, "FTFTFT:OGFT:002");
-                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
-
-                    // update UI
-                    try
-                    {
-                        if (f.id != -1)
-                        {
-                            update_single_message_from_messge_id(msg_id, true);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                    }
-                }
-                else // avatar FT
-                {
-                    long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
-                    long msg_id = get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
-                    set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_CANCEL.value);
-
-                    if (msg_id > -1)
-                    {
-                        set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
-                    }
-
-                    // delete tmp file
-                    delete_filetransfer_tmpfile(friend_number, file_number);
-                    // delete FT in DB
-                    Log.i(TAG, "FTFTFT:OGFT:003");
-                    delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_filetransfer_db_fos_open(final Filetransfer f)
-    {
-        orma.updateFiletransfer().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                and().
-                file_numberEq(f.file_number).
-                fos_open(f.fos_open).
-                execute();
-    }
-
-    static void update_filetransfer_db_current_position(final Filetransfer f)
-    {
-        orma.updateFiletransfer().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                and().
-                file_numberEq(f.file_number).
-                current_position(f.current_position).
-                execute();
-    }
-
-    static void update_filetransfer_db_full(final Filetransfer f)
-    {
-        orma.updateFiletransfer().
-                idEq(f.id).
-                tox_public_key_string(f.tox_public_key_string).
-                direction(f.direction).
-                file_number(f.file_number).
-                kind(f.kind).
-                state(f.state).
-                path_name(f.path_name).
-                message_id(f.message_id).
-                file_name(f.file_name).
-                fos_open(f.fos_open).
-                filesize(f.filesize).
-                current_position(f.current_position).
-                execute();
-    }
-
-    static void update_filetransfer_db_full_from_id(final Filetransfer f, long fid)
-    {
-        orma.updateFiletransfer().
-                idEq(fid).
-                tox_public_key_string(f.tox_public_key_string).
-                direction(f.direction).
-                file_number(f.file_number).
-                kind(f.kind).
-                state(f.state).
-                path_name(f.path_name).
-                message_id(f.message_id).
-                file_name(f.file_name).
-                fos_open(f.fos_open).
-                filesize(f.filesize).
-                current_position(f.current_position).
-                execute();
-    }
-
-    static void update_filetransfer_db_messageid_from_id(final Filetransfer f, long fid)
-    {
-        orma.updateFiletransfer().
-                idEq(fid).
-                message_id(f.message_id).
-                execute();
-    }
-
-    static long insert_into_filetransfer_db(final Filetransfer f)
-    {
-        //Thread t = new Thread()
-        //{
-        //    @Override
-        //    public void run()
-        //    {
-        try
-        {
-            long row_id = orma.insertIntoFiletransfer(f);
-            Log.i(TAG, "insert_into_filetransfer_db:row_id=" + row_id);
-            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Filetransfer where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            Log.i(TAG, "insert_into_filetransfer_db:id res count=" + cursor.getColumnCount());
-            long ft_id = cursor.getLong(0);
-            cursor.close();
-            Log.i(TAG, "insert_into_filetransfer_db:ft_id=" + ft_id);
-            return ft_id;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "insert_into_filetransfer_db:EE:" + e.getMessage());
-            return -1;
-        }
-
-        //    }
-        //};
-        //t.start();
     }
 
     static void delete_vfs_file(String vfs_path_name, String vfs_file_name)
@@ -7031,155 +5736,6 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
-    }
-
-    static void set_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
-    {
-        try
-        {
-            boolean avatar_filesize_non_zero = false;
-            info.guardianproject.iocipher.File f1 = null;
-
-            try
-            {
-                f1 = new info.guardianproject.iocipher.File(avatar_path_name + "/" + avatar_file_name);
-
-                if (f1.length() > 0)
-                {
-                    avatar_filesize_non_zero = true;
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            // Log.i(TAG, "set_friend_avatar:update:pubkey=" + friend_pubkey.substring(0,4) + " path=" + avatar_path_name + " file=" +
-            // avatar_file_name);
-
-            if (avatar_filesize_non_zero)
-            {
-                orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
-                        avatar_pathname(avatar_path_name).
-                        avatar_filename(avatar_file_name).
-                        execute();
-            }
-            else
-            {
-                orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
-                        avatar_pathname(null).
-                        avatar_filename(null).
-                        execute();
-            }
-
-            update_display_friend_avatar(friend_pubkey, avatar_path_name, avatar_file_name);
-        }
-        catch (Exception e)
-        {
-            Log.i(TAG, "set_friend_avatar:EE:" + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    static void add_friend_to_system(final String friend_public_key, final boolean as_friends_relay, final String owner_public_key)
-    {
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    // toxcore needs this!!
-                    Thread.sleep(120);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                // ---- auto add all friends ----
-                // ---- auto add all friends ----
-                // ---- auto add all friends ----
-                long friendnum = tox_friend_add_norequest(friend_public_key); // add friend
-                Log.d(TAG, "add_friend_to_system:fnum add=" + friendnum);
-
-                try
-                {
-                    Thread.sleep(20);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
-                final FriendList f = new FriendList();
-                f.tox_public_key_string = friend_public_key;
-                f.TOX_USER_STATUS = 0;
-                f.TOX_CONNECTION = 0;
-                f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
-                // set name as the last 5 char of the publickey (until we get a proper name)
-                f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
-                f.avatar_pathname = null;
-                f.avatar_filename = null;
-
-                try
-                {
-                    Log.i(TAG, "friend_request:insert:001:f=" + f);
-                    long res = orma.insertIntoFriendList(f);
-                    Log.i(TAG, "friend_request:insert:002:res=" + res);
-                }
-                catch (android.database.sqlite.SQLiteConstraintException e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "friend_request:insert:EE1:" + e.getMessage());
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "friend_request:insert:EE2:" + e.getMessage());
-                }
-
-                if (as_friends_relay)
-                {
-                    // add relay for friend to DB
-                    Log.d(TAG, "add_friend_to_system:add_or_update_friend_relay");
-                    add_or_update_friend_relay(friend_public_key, owner_public_key);
-                    // update friendlist on screen
-                    add_all_friends_clear_wrapper(10);
-                }
-                else
-                {
-                    update_single_friend_in_friendlist_view(f);
-                }
-
-                // ---- auto add all friends ----
-                // ---- auto add all friends ----
-                // ---- auto add all friends ----
-
-                try
-                {
-                    Thread.sleep(100);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                if (PREF__U_keep_nospam == false)
-                {
-                    // ---- set new random nospam value after each added friend ----
-                    // ---- set new random nospam value after each added friend ----
-                    // ---- set new random nospam value after each added friend ----
-                    set_new_random_nospam_value();
-                    // ---- set new random nospam value after each added friend ----
-                    // ---- set new random nospam value after each added friend ----
-                    // ---- set new random nospam value after each added friend ----
-                }
-            }
-        };
-        t.start();
     }
 
     static void update_display_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
@@ -7504,101 +6060,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static long insert_into_message_db(final Message m, final boolean update_message_view_flag)
-    {
-        // Thread t = new Thread()
-        //{
-        //    @Override
-        //    public void run()
-        //    {
-        Log.i(TAG, "insert_into_message_db:m=" + m);
-        long row_id = orma.insertIntoMessage(m);
-
-        try
-        {
-            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Message where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            Log.i(TAG, "insert_into_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_message_view_flag)
-            {
-                Log.i(TAG, "insert_into_message_db:add_single_message_from_messge_id, force=true");
-                add_single_message_from_messge_id(msg_id, true);
-            }
-
-            return msg_id;
-        }
-        catch (Exception e)
-        {
-            Log.i(TAG, "insert_into_message_db:EE:" + e.getMessage());
-            e.printStackTrace();
-            return -1;
-        }
-
-        //    }
-        //};
-        //t.start();
-    }
-
-    static long insert_into_conference_message_db_system_message(final ConferenceMessage m, final boolean update_conference_view_flag)
-    {
-        long row_id = orma.insertIntoConferenceMessage(m);
-
-        try
-        {
-            Cursor cursor = orma.getConnection().rawQuery(
-                    "SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_conference_view_flag)
-            {
-                if (PREF__conference_show_system_messages)
-                {
-                    add_single_conference_message_from_messge_id(msg_id, true);
-                }
-            }
-
-            return msg_id;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
-    static long insert_into_conference_message_db(final ConferenceMessage m, final boolean update_conference_view_flag)
-    {
-        long row_id = orma.insertIntoConferenceMessage(m);
-
-        try
-        {
-            Cursor cursor = orma.getConnection().rawQuery(
-                    "SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_conference_view_flag)
-            {
-                add_single_conference_message_from_messge_id(msg_id, true);
-            }
-
-            return msg_id;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
     static String get_vfs_image_filename_own_avatar()
     {
         return get_g_opts("VFS_OWN_AVATAR_FNAME");
@@ -7622,7 +6083,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
+                    HelperFriend.tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
 
             if (f.avatar_pathname == null)
             {
@@ -7783,161 +6244,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    synchronized static void insert_into_friendlist_db(final FriendList f)
-    {
-        //        Thread t = new Thread()
-        //        {
-        //            @Override
-        //            public void run()
-        //            {
-        try
-        {
-            if (orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).count() == 0)
-            {
-                orma.insertIntoFriendList(f);
-                // Log.i(TAG, "friend added to DB: " + f.tox_public_key_string);
-            }
-            else
-            {
-                // friend already in DB
-                // Log.i(TAG, "friend already in DB: " + f.tox_public_key_string);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "friend added to DB:EE:" + e.getMessage());
-        }
-
-        //            }
-        //        };
-        //        t.start();
-    }
-
-    static void delete_friend_all_files(final long friendnum)
-    {
-        try
-        {
-            Iterator<FileDB> i1 = orma.selectFromFileDB().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(friendnum)).
-                    directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
-                    is_in_VFSEq(true).
-                    toList().iterator();
-            selected_messages.clear();
-            selected_messages_text_only.clear();
-            selected_messages_incoming_file.clear();
-
-            while (i1.hasNext())
-            {
-                try
-                {
-                    long file_id = i1.next().id;
-                    long msg_id = orma.selectFromMessage().filedb_idEq(file_id).directionEq(0).
-                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).get(0).id;
-                    selected_messages.add(msg_id);
-                    selected_messages_incoming_file.add(msg_id);
-                }
-                catch (Exception e2)
-                {
-                    e2.printStackTrace();
-                }
-            }
-
-            delete_selected_messages(main_activity_s, false, false, "deleting Messages ...");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            orma.deleteFromFileDB().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void delete_friend_all_filetransfers(final long friendnum)
-    {
-        try
-        {
-            Log.i(TAG, "delete_ft:ALL for friend=" + friendnum);
-            orma.deleteFromFiletransfer().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(friendnum)).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void delete_friend_all_messages(final long friendnum)
-    {
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                orma.deleteFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
-            }
-        };
-        t.start();
-    }
-
-    static void delete_conference(final String conference_id)
-    {
-        try
-        {
-            Log.i(TAG, "delete_conference:del");
-            orma.deleteFromConferenceDB().conference_identifierEq(conference_id).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "delete_conference:EE:" + e.getMessage());
-        }
-    }
-
-    static void delete_conference_all_messages(final String conference_id)
-    {
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    Log.i(TAG, "delete_conference_all_messages:del");
-                    orma.deleteFromConferenceMessage().conference_identifierEq(conference_id).execute();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "delete_conference_all_messages:EE:" + e.getMessage());
-                }
-            }
-        };
-        t.start();
-    }
-
-    static void delete_friend(final String friend_pubkey)
-    {
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                orma.deleteFromFriendList().
-                        tox_public_key_stringEq(friend_pubkey).
-                        execute();
-            }
-        };
-        t.start();
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -7951,7 +6257,7 @@ public class MainActivity extends AppCompatActivity
                 String friend_tox_id = "";
                 friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst(
                         "TOX:", "").replaceFirst("Tox:", "");
-                add_friend_real(friend_tox_id);
+                HelperFriend.add_friend_real(friend_tox_id);
             }
             else
             {
@@ -7960,255 +6266,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void add_friend_real(String friend_tox_id)
-    {
-        // Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
-        // add friend ---------------
-        long friendnum = tox_friend_add(friend_tox_id, "please add me"); // add friend
-        Log.i(TAG, "add_friend_real:add friend  #:" + friendnum);
-        update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
-
-        if (friendnum > -1)
-        {
-            // nospam=8 chars, checksum=4 chars
-            String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
-            // Log.i(TAG, "add_friend_real:add friend PK:" + friend_public_key);
-            FriendList f = new FriendList();
-            f.tox_public_key_string = friend_public_key;
-
-            try
-            {
-                // set name as the last 5 char of TOXID (until we get a name sent from friend)
-                f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                f.name = "Unknown";
-            }
-
-            f.TOX_USER_STATUS = 0;
-            f.TOX_CONNECTION = 0;
-            f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
-            f.avatar_filename = null;
-            f.avatar_pathname = null;
-
-            try
-            {
-                insert_into_friendlist_db(f);
-            }
-            catch (Exception e)
-            {
-                // e.printStackTrace();
-            }
-
-            update_single_friend_in_friendlist_view(f);
-        }
-
-        if (friendnum == -1)
-        {
-            Log.i(TAG, "add_friend_real:friend already added, or request already sent");
-        }
-
-        // add friend ---------------
-    }
-
-    static long get_peernum_from_peer_pubkey(String conference_id, String peer_pubkey)
-    {
-        try
-        {
-            long conf_num = get_conference_num_from_confid(conference_id);
-            long num_peers = tox_conference_peer_count(conf_num);
-
-            if (num_peers > 0)
-            {
-                int i = 0;
-
-                for (i = 0; i < num_peers; i++)
-                {
-                    String pubkey_try = tox_conference_peer_get_public_key(conf_num, i);
-
-                    if (pubkey_try != null)
-                    {
-                        if (pubkey_try.equals(peer_pubkey))
-                        {
-                            // we found the peer number
-                            return i;
-                        }
-                    }
-                }
-            }
-
-            return -1;
-        }
-        catch (Exception e)
-        {
-            return -1;
-        }
-    }
-
-    static long get_conference_num_from_confid(String conference_id)
-    {
-        try
-        {
-            return orma.selectFromConferenceDB().
-                    conference_activeEq(true).and().
-                    conference_identifierEq(conference_id.toLowerCase()).get(0).tox_conference_number;
-        }
-        catch (Exception e)
-        {
-            return -1;
-        }
-    }
-
-    static String get_conference_title_from_confid(String conference_id)
-    {
-        try
-        {
-            // try in the database
-            String name = orma.selectFromConferenceDB().
-                    conference_identifierEq(conference_id).get(0).name;
-
-            if ((name == null) || (name.equals("-1")))
-            {
-                Log.i(TAG, "get_conference_title_from_confid:EE:1");
-            }
-            else
-            {
-                return name;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "get_conference_title_from_confid:EE:2:" + e.getMessage());
-        }
-
-        try
-        {
-            String name = tox_conference_get_title(orma.selectFromConferenceDB().
-                    conference_activeEq(true).and().
-                    conference_identifierEq(conference_id).get(0).tox_conference_number);
-
-            if ((name == null) || (name.equals("-1")))
-            {
-                Log.i(TAG, "get_conference_title_from_confid:Unknown Conference:1");
-                name = "Unknown Conference";
-            }
-
-            try
-            {
-                // remember it in the Database
-                orma.updateConferenceDB().
-                        conference_identifierEq(conference_id).
-                        name(name).execute();
-            }
-            catch (Exception e2)
-            {
-                e2.printStackTrace();
-                Log.i(TAG, "get_conference_title_from_confid:EE:3:" + e2.getMessage());
-            }
-
-            return name;
-        }
-        catch (Exception e2)
-        {
-            e2.printStackTrace();
-            Log.i(TAG, "get_conference_title_from_confid:EE:4:" + e2.getMessage());
-        }
-
-        Log.i(TAG, "get_conference_title_from_confid:Unknown Conference:2");
-        return "Unknown Conference";
-    }
-
-    static String get_friend_name_from_pubkey(String friend_pubkey)
-    // get_friend_alias_name_wrapper_pubkey(String friend_pubkey)
-    {
-        String ret = "Unknown";
-        String friend_alias_name = "";
-        String friend_name = "";
-
-        try
-        {
-            friend_alias_name = orma.selectFromFriendList().
-                    tox_public_key_stringEq(friend_pubkey).
-                    toList().get(0).alias_name;
-        }
-        catch (Exception e)
-        {
-            friend_alias_name = "";
-            e.printStackTrace();
-        }
-
-        if ((friend_alias_name == null) || (friend_alias_name.equals("")))
-        {
-            try
-            {
-                friend_name = orma.selectFromFriendList().
-                        tox_public_key_stringEq(friend_pubkey).
-                        toList().get(0).name;
-            }
-            catch (Exception e)
-            {
-                friend_name = "";
-                e.printStackTrace();
-            }
-
-            if ((friend_name != null) && (!friend_name.equals("")))
-            {
-                ret = friend_name;
-            }
-        }
-        else
-        {
-            ret = friend_alias_name;
-        }
-
-        return ret;
-    }
-
-
-    static String get_friend_name_from_num(long friendnum)
-    {
-        String result = "Unknown";
-
-        try
-        {
-            if (orma != null)
-            {
-                try
-                {
-                    String result_alias = orma.selectFromFriendList().
-                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                            toList().get(0).alias_name;
-
-                    if (result_alias != null)
-                    {
-                        if (result_alias.length() > 0)
-                        {
-                            result = result_alias;
-                            return result;
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                result = orma.selectFromFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                        toList().get(0).name;
-            }
-        }
-        catch (Exception e)
-        {
-            result = "Unknown";
-            e.printStackTrace();
-        }
-
-        return result;
-    }
 
     static int add_tcp_relay_single_wrapper(String ip, long port, String key_hex)
     {
@@ -8858,565 +6915,6 @@ public class MainActivity extends AppCompatActivity
         //        }
     }
 
-    static String conference_identifier_short(String conference_identifier, boolean uppercase_result)
-    {
-        try
-        {
-            //            return conference_identifier.substring(0, 2) +
-            //                    //
-            //                    ".." +
-            //                    //
-            //                    conference_identifier.substring(conference_identifier.length() - 5, conference_identifier.length());
-            if (uppercase_result)
-            {
-                return (conference_identifier.substring(conference_identifier.length() - 6,
-                                                        conference_identifier.length())).toUpperCase(Locale.ENGLISH);
-            }
-            else
-            {
-                return conference_identifier.substring(conference_identifier.length() - 6,
-                                                       conference_identifier.length());
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return conference_identifier;
-        }
-    }
-
-    static void add_or_update_friend_relay(String relay_public_key_string, String friend_pubkey)
-    {
-        if (relay_public_key_string == null)
-        {
-            Log.d(TAG, "add_or_update_friend_relay:ret01");
-            return;
-        }
-
-        if (friend_pubkey == null)
-        {
-            Log.d(TAG, "add_or_update_friend_relay:ret02");
-            return;
-        }
-
-        try
-        {
-            if (!is_any_relay(friend_pubkey))
-            {
-                String friend_old_relay_pubkey = get_relay_for_friend(friend_pubkey);
-
-                if (friend_old_relay_pubkey != null)
-                {
-                    // delete old relay
-                    delete_friend_current_relay(friend_pubkey);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (!is_any_relay(friend_pubkey))
-            {
-                FriendList fl = main_get_friend(tox_friend_by_public_key__wrapper(friend_pubkey));
-
-                if (fl != null)
-                {
-                    // add relay to DB table
-                    RelayListDB new_relay = new RelayListDB();
-                    new_relay.own_relay = false;
-                    new_relay.TOX_CONNECTION = fl.TOX_CONNECTION;
-                    new_relay.TOX_CONNECTION_on_off = fl.TOX_CONNECTION_on_off;
-                    new_relay.last_online_timestamp = fl.last_online_timestamp;
-                    new_relay.tox_public_key_string = relay_public_key_string.toUpperCase();
-                    new_relay.tox_public_key_string_of_owner = friend_pubkey;
-
-                    //
-                    try
-                    {
-                        orma.insertIntoRelayListDB(new_relay);
-                        Log.i(TAG, "add_or_update_friend_relay:+ADD friend relay+ owner pubkey=" + friend_pubkey);
-                    }
-                    catch (Exception e2)
-                    {
-                        e2.printStackTrace();
-                    }
-
-                    // friend exists -> update
-                    try
-                    {
-                        orma.updateFriendList().
-                                tox_public_key_stringEq(relay_public_key_string).
-                                is_relay(true).
-                                execute();
-                    }
-                    catch (Exception e2)
-                    {
-                        e2.printStackTrace();
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void delete_friend_current_relay(String friend_pubkey)
-    {
-        try
-        {
-            String friend_current_relay_pubkey = get_relay_for_friend(friend_pubkey);
-
-            if (friend_current_relay_pubkey != null)
-            {
-                try
-                {
-                    orma.updateFriendList().
-                            tox_public_key_stringEq(friend_current_relay_pubkey).
-                            is_relay(false).execute();
-                }
-                catch (Exception e1)
-                {
-                    e1.printStackTrace();
-                }
-
-                try
-                {
-                    orma.deleteFromRelayListDB().tox_public_key_string_of_ownerEq(friend_pubkey).execute();
-                }
-                catch (Exception e1)
-                {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void send_relay_pubkey_to_all_friends(String relay_public_key_string)
-    {
-        List<FriendList> fl = orma.selectFromFriendList().
-                is_relayNotEq(true).
-                toList();
-
-        if (fl != null)
-        {
-            if (fl.size() > 0)
-            {
-                long friend_num = -1;
-                int i = 0;
-
-                for (i = 0; i < fl.size(); i++)
-                {
-                    FriendList n = fl.get(i);
-                    friend_num = tox_friend_by_public_key__wrapper(n.tox_public_key_string);
-                    byte[] data = hex_to_bytes("FF" + relay_public_key_string);
-                    data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
-                    tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
-                }
-            }
-        }
-    }
-
-    static void send_all_friend_pubkeys_to_relay(String relay_public_key_string)
-    {
-        List<FriendList> fl = orma.selectFromFriendList().
-                is_relayNotEq(true).
-                toList();
-
-        if (fl != null)
-        {
-            if (fl.size() > 0)
-            {
-                int i = 0;
-                long friend_num = tox_friend_by_public_key__wrapper(relay_public_key_string);
-
-                for (i = 0; i < fl.size(); i++)
-                {
-                    FriendList n = fl.get(i);
-                    byte[] data = hex_to_bytes("FF" + n.tox_public_key_string);
-                    data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
-                    tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
-                }
-            }
-        }
-    }
-
-    static void invite_to_all_conferences_own_relay(String relay_public_key_string)
-    {
-        try
-        {
-            List<ConferenceDB> c = orma.selectFromConferenceDB().
-                    conference_activeEq(true).and().
-                    tox_conference_numberNotEq(-1).
-                    toList();
-
-            if (c != null)
-            {
-                if (c.size() > 0)
-                {
-                    for (int i = 0; i < c.size(); i++)
-                    {
-                        ConferenceDB conf = c.get(i);
-                        tox_conference_invite(tox_friend_by_public_key__wrapper(relay_public_key_string),
-                                              conf.tox_conference_number);
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static boolean is_any_relay(String friend_pubkey)
-    {
-        boolean ret = false;
-        int num = orma.selectFromFriendList().
-                tox_public_key_stringEq(friend_pubkey).
-                is_relayEq(true).
-                count();
-
-        if (num > 0)
-        {
-            ret = true;
-        }
-
-        return ret;
-    }
-
-    static void send_friend_pubkey_to_relay(String relay_public_key_string, String friend_pubkey)
-    {
-        int i = 0;
-        long friend_num = tox_friend_by_public_key__wrapper(relay_public_key_string);
-        byte[] data = hex_to_bytes("FF" + friend_pubkey);
-        data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
-        Log.d(TAG, "send_friend_pubkey_to_relay:data=" + data);
-        int result = tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
-        Log.d(TAG, "send_friend_pubkey_to_relay:res=" + result);
-    }
-
-    static void send_relay_pubkey_to_friend(String relay_public_key_string, String friend_pubkey)
-    {
-        int i = 0;
-        long friend_num = tox_friend_by_public_key__wrapper(friend_pubkey);
-        byte[] data = hex_to_bytes("FF" + relay_public_key_string);
-        data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
-        Log.d(TAG, "send_relay_pubkey_to_friend:data=" + data);
-        int result = tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
-        Log.d(TAG, "send_relay_pubkey_to_friend:res=" + result);
-    }
-
-    static boolean have_own_relay()
-    {
-        boolean ret = false;
-        int num = orma.selectFromRelayListDB().own_relayEq(true).count();
-
-        if (num == 1)
-        {
-            ret = true;
-        }
-
-        return ret;
-    }
-
-    static FriendList get_friend_for_relay(String relay_pubkey)
-    {
-        FriendList ret = null;
-
-        try
-        {
-            String f_pubkey = orma.selectFromRelayListDB().own_relayEq(false).
-                    tox_public_key_stringEq(relay_pubkey).get(0).tox_public_key_string_of_owner;
-            ret = orma.selectFromFriendList().tox_public_key_stringEq(f_pubkey).get(0);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        return ret;
-    }
-
-    static boolean is_own_relay(String friend_pubkey)
-    {
-        boolean ret = false;
-
-        try
-        {
-            String own_relay_pubkey = get_own_relay_pubkey();
-
-            if (own_relay_pubkey != null)
-            {
-                if (friend_pubkey.equals(own_relay_pubkey) == true)
-                {
-                    ret = true;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-        }
-
-        return ret;
-    }
-
-    static String get_own_relay_pubkey()
-    {
-        String ret = null;
-
-        try
-        {
-            ret = orma.selectFromRelayListDB().own_relayEq(true).get(0).tox_public_key_string;
-        }
-        catch (Exception e)
-        {
-        }
-
-        return ret;
-    }
-
-    static String get_relay_for_friend(String friend_pubkey)
-    {
-        String ret = null;
-
-        try
-        {
-            ret = orma.selectFromRelayListDB().own_relayEq(false).
-                    tox_public_key_string_of_ownerEq(friend_pubkey).get(0).tox_public_key_string;
-        }
-        catch (Exception e)
-        {
-        }
-
-        return ret;
-    }
-
-    static void set_all_conferences_inactive()
-    {
-        try
-        {
-            orma.updateConferenceDB().
-                    conference_active(false).
-                    tox_conference_number(-1).
-                    execute();
-            Log.i(TAG, "set_all_conferences_inactive");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "set_all_conferences_inactive:EE:" + e.getMessage());
-        }
-    }
-
-    static void set_conference_inactive(String conference_identifier)
-    {
-        try
-        {
-            orma.updateConferenceDB().
-                    conference_identifierEq(conference_identifier).
-                    conference_active(false).
-                    tox_conference_number(-1).
-                    execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "set_conference_inactive:EE:" + e.getMessage());
-        }
-    }
-
-    static boolean set_friend_as_own_relay_in_db(String friend_public_key)
-    {
-        boolean ret = false;
-
-        try
-        {
-            final List<FriendList> fl = orma.selectFromFriendList().
-                    tox_public_key_stringEq(friend_public_key).toList();
-
-            if (fl.size() == 1)
-            {
-                // add relay to DB table
-                RelayListDB new_relay = new RelayListDB();
-                new_relay.own_relay = true;
-                new_relay.TOX_CONNECTION = fl.get(0).TOX_CONNECTION;
-                new_relay.TOX_CONNECTION_on_off = fl.get(0).TOX_CONNECTION_on_off;
-                new_relay.last_online_timestamp = fl.get(0).last_online_timestamp;
-                new_relay.tox_public_key_string = friend_public_key;
-                new_relay.tox_public_key_string_of_owner = "-- OWN RELAY --";
-                //
-                orma.insertIntoRelayListDB(new_relay);
-                Log.i(TAG, "friend_as_relay_own_in_db:+ADD own relay+");
-                // friend exists -> update
-                orma.updateFriendList().
-                        tox_public_key_stringEq(friend_public_key).
-                        is_relay(true).
-                        execute();
-                Log.i(TAG, "friend_as_relay_own_in_db:+UPDATE friend+");
-                ret = true;
-            }
-        }
-        catch (Exception e1)
-        {
-            Log.i(TAG, "friend_as_relay_own_in_db:EE3:" + e1.getMessage());
-        }
-
-        return ret;
-    }
-
-    static boolean remove_friend_relay_in_db(String friend_pubkey)
-    {
-        boolean ret = false;
-
-        try
-        {
-            String friend_relay_pubkey = get_relay_for_friend(friend_pubkey);
-
-            if (friend_relay_pubkey != null)
-            {
-                try
-                {
-                    orma.updateFriendList().tox_public_key_stringEq(friend_relay_pubkey).
-                            is_relay(false).execute();
-                }
-                catch (Exception e3)
-                {
-                    e3.printStackTrace();
-                }
-
-                try
-                {
-                    orma.deleteFromRelayListDB().tox_public_key_string_of_ownerEq(friend_pubkey).
-                            execute();
-                }
-                catch (Exception e3)
-                {
-                    e3.printStackTrace();
-                }
-            }
-        }
-        catch (Exception e1)
-        {
-            Log.i(TAG, "remove_friend_relay_in_db:EE3:" + e1.getMessage());
-        }
-
-        return ret;
-    }
-
-    static boolean remove_own_relay_in_db()
-    {
-        boolean ret = false;
-
-        try
-        {
-            final List<RelayListDB> rl = orma.selectFromRelayListDB().
-                    own_relayEq(true).toList();
-
-            if (rl.size() == 1)
-            {
-                orma.deleteFromRelayListDB().
-                        tox_public_key_stringEq(rl.get(0).tox_public_key_string).execute();
-                // friend exists -> update
-                orma.updateFriendList().
-                        tox_public_key_stringEq(rl.get(0).tox_public_key_string).
-                        is_relay(false).
-                        execute();
-                Log.i(TAG, "remove_own_relay_in_db:+UPDATE friend+");
-                ret = true;
-            }
-        }
-        catch (Exception e1)
-        {
-            Log.i(TAG, "remove_own_relay_in_db:EE3:" + e1.getMessage());
-        }
-
-        return ret;
-    }
-
-    static void new_or_updated_conference(long conference_number, String who_invited_public_key, String conference_identifier, int conference_type)
-    {
-        try
-        {
-            Log.i(TAG, "new_or_updated_conference:" + "conference_number=" + conference_identifier);
-            final ConferenceDB conf2 = orma.selectFromConferenceDB().
-                    conference_identifierEq(conference_identifier).toList().get(0);
-            // conference already exists -> update and connect
-            orma.updateConferenceDB().
-                    conference_identifierEq(conference_identifier).
-                    conference_active(true).
-                    tox_conference_number(conference_number).execute();
-
-            try
-            {
-                Log.i(TAG, "new_or_updated_conference:*update*");
-                final ConferenceDB conf3 = orma.selectFromConferenceDB().
-                        conference_identifierEq(conference_identifier).toList().get(0);
-                // update or add to "friendlist"
-                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = false;
-                cc.conference_item = ConferenceDB.deep_copy(conf3);
-                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
-            }
-            catch (Exception e3)
-            {
-                Log.i(TAG, "new_or_updated_conference:EE3:" + e3.getMessage());
-            }
-
-            return;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "new_or_updated_conference:EE1:" + e.getMessage());
-
-            // conference is new -> add
-            try
-            {
-                ConferenceDB conf_new = new ConferenceDB();
-                conf_new.conference_identifier = conference_identifier;
-                conf_new.who_invited__tox_public_key_string = who_invited_public_key;
-                conf_new.peer_count = -1;
-                conf_new.own_peer_number = -1;
-                conf_new.kind = conference_type;
-                conf_new.tox_conference_number = conference_number;
-                conf_new.conference_active = true;
-                //
-                orma.insertIntoConferenceDB(conf_new);
-                Log.i(TAG, "new_or_updated_conference:+ADD+");
-
-                try
-                {
-                    // update or add to "friendlist"
-                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = false;
-                    cc.conference_item = ConferenceDB.deep_copy(conf_new);
-                    MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
-                }
-                catch (Exception e4)
-                {
-                    Log.i(TAG, "new_or_updated_conference:EE4:" + e4.getMessage());
-                }
-
-                return;
-            }
-            catch (Exception e1)
-            {
-                e1.printStackTrace();
-                Log.i(TAG, "new_or_updated_conference:EE2:" + e1.getMessage());
-            }
-        }
-    }
-
     static int hash_to_bucket(String hash_value, int number_of_buckets)
     {
         try
@@ -9456,7 +6954,7 @@ public class MainActivity extends AppCompatActivity
                           (int) Math.max(0, Color.blue(inColor) - 255 * inAmount));
     }
 
-    private static class delete_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
+    static class delete_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
     {
         ProgressDialog progressDialog2;
         private WeakReference<Context> weakContext;
@@ -9670,234 +7168,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void delete_selected_messages(final Context c, final boolean update_message_list, final boolean update_friend_list, final String dialog_text)
-    {
-        ProgressDialog progressDialog2 = null;
-
-        try
-        {
-            try
-            {
-                //                main_activity_s.runOnUiThread(new Runnable()
-                //                {
-                //                    @Override
-                //                    public void run()
-                //                    {
-                //                        try
-                //                        {
-                //                            progressDialog2 = ProgressDialog.show(c, "", "deleting Messages ...");
-                //                            progressDialog2.setCanceledOnTouchOutside(false);
-                //                            progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
-                //                            {
-                //                                @Override
-                //                                public void onCancel(DialogInterface dialog)
-                //                                {
-                //                                }
-                //                            });
-                //                        }
-                //                        catch (Exception e)
-                //                        {
-                //                            e.printStackTrace();
-                //                            Log.i(TAG, "CALL:start:EE:" + e.getMessage());
-                //                        }
-                //                    }
-                //                });
-                //                if (main_handler_s != null)
-                //                {
-                //                    main_handler_s.post(myRunnable);
-                //                }
-            }
-            catch (Exception e3)
-            {
-                e3.printStackTrace();
-                Log.i(TAG, "delete_selected_messages:EE1:" + e3.getMessage());
-            }
-
-            new delete_selected_messages_asynchtask(c, progressDialog2, update_message_list, update_friend_list,
-                                                    dialog_text).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "delete_selected_messages:EE2:" + e.getMessage());
-        }
-    }
-
-    static void copy_selected_messages(Context c)
-    {
-        try
-        {
-            if (!selected_messages_text_only.isEmpty())
-            {
-                // sort ascending (lowest ID on top)
-                Collections.sort(selected_messages_text_only, new Comparator<Long>()
-                {
-                    public int compare(Long o1, Long o2)
-                    {
-                        return o1.compareTo(o2);
-                    }
-                });
-                StringBuilder copy_text = new StringBuilder();
-                boolean first = true;
-                Iterator i = selected_messages_text_only.iterator();
-
-                while (i.hasNext())
-                {
-                    try
-                    {
-                        if (first)
-                        {
-                            first = false;
-                            copy_text = new StringBuilder(
-                                    "" + orma.selectFromMessage().idEq((Long) i.next()).get(0).text);
-                        }
-                        else
-                        {
-                            copy_text.append("\n").append(orma.selectFromMessage().idEq((Long) i.next()).get(0).text);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-
-                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text.toString()));
-                Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
-                selected_messages.clear();
-                selected_messages_incoming_file.clear();
-                selected_messages_text_only.clear();
-
-                try
-                {
-                    // need to redraw all items again here, to remove the selections
-                    MainActivity.message_list_fragment.adapter.redraw_all_items();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-        catch (Exception e2)
-        {
-            e2.printStackTrace();
-        }
-    }
-
-    static void copy_selected_conference_messages(Context c)
-    {
-        try
-        {
-            if (!selected_conference_messages.isEmpty())
-            {
-                // sort ascending (lowest ID on top)
-                Collections.sort(selected_conference_messages, new Comparator<Long>()
-                {
-                    public int compare(Long o1, Long o2)
-                    {
-                        return o1.compareTo(o2);
-                    }
-                });
-                StringBuilder copy_text = new StringBuilder();
-                boolean first = true;
-                Iterator i = selected_conference_messages.iterator();
-
-                while (i.hasNext())
-                {
-                    try
-                    {
-                        if (first)
-                        {
-                            first = false;
-                            copy_text = new StringBuilder(
-                                    "" + orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text);
-                        }
-                        else
-                        {
-                            copy_text.append("\n").append(
-                                    orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0).text);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-
-                clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text.toString()));
-                Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
-                selected_conference_messages.clear();
-
-                try
-                {
-                    // need to redraw all items again here, to remove the selections
-                    MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-        catch (Exception e2)
-        {
-            e2.printStackTrace();
-        }
-    }
-
-    static void delete_selected_conference_messages(Context c)
-    {
-        // TODO: write me!
-        try
-        {
-            if (!selected_conference_messages.isEmpty())
-            {
-                // sort ascending (lowest ID on top)
-                Collections.sort(selected_conference_messages, new Comparator<Long>()
-                {
-                    public int compare(Long o1, Long o2)
-                    {
-                        return o1.compareTo(o2);
-                    }
-                });
-                String copy_text = "";
-                boolean first = true;
-                Iterator i = selected_conference_messages.iterator();
-
-                while (i.hasNext())
-                {
-                    try
-                    {
-                        // TODO: write me
-                        i.next();
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-
-                selected_conference_messages.clear();
-
-                try
-                {
-                    // need to redraw all items again here, to remove the selections
-                    MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-        catch (Exception e2)
-        {
-            e2.printStackTrace();
-        }
-    }
-
-    private static class save_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
+    static class save_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
     {
         ProgressDialog progressDialog2;
         private WeakReference<Context> weakContext;
@@ -9987,13 +7258,13 @@ public class MainActivity extends AppCompatActivity
     {
         int ret = TOX_CONNECTION_NONE.value;
 
-        if (is_any_relay(friend_pubkey))
+        if (HelperRelay.is_any_relay(friend_pubkey))
         {
             ret = a_TOX_CONNECTION;
         }
         else
         {
-            String relay_ = get_relay_for_friend(friend_pubkey);
+            String relay_ = HelperRelay.get_relay_for_friend(friend_pubkey);
 
             if (relay_ == null)
             {
@@ -10046,7 +7317,7 @@ public class MainActivity extends AppCompatActivity
     {
         Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
         long friendnum_to_use = friendnum;
-        FriendList f = main_get_friend(friendnum);
+        FriendList f = HelperFriend.main_get_friend(friendnum);
         Log.d(TAG, "tox_friend_send_message_wrapper:f=" + f);
 
         if (f != null)
@@ -10055,12 +7326,12 @@ public class MainActivity extends AppCompatActivity
 
             if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
             {
-                String relay_pubkey = get_relay_for_friend(f.tox_public_key_string);
+                String relay_pubkey = HelperRelay.get_relay_for_friend(f.tox_public_key_string);
 
                 if (relay_pubkey != null)
                 {
                     // friend has a relay
-                    friendnum_to_use = tox_friend_by_public_key__wrapper(relay_pubkey);
+                    friendnum_to_use = HelperFriend.tox_friend_by_public_key__wrapper(relay_pubkey);
                     Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
                 }
             }
@@ -10113,39 +7384,6 @@ public class MainActivity extends AppCompatActivity
             result.msg_hash_hex = "";
             result.raw_message_buf_hex = "";
             return result;
-        }
-    }
-
-    static void save_selected_messages(Context c)
-    {
-        ProgressDialog progressDialog2 = null;
-
-        try
-        {
-            try
-            {
-                progressDialog2 = ProgressDialog.show(c, "", "exporting Messages ...");
-                progressDialog2.setCanceledOnTouchOutside(false);
-                progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
-                {
-                    @Override
-                    public void onCancel(DialogInterface dialog)
-                    {
-                    }
-                });
-            }
-            catch (Exception e3)
-            {
-                e3.printStackTrace();
-                Log.i(TAG, "save_selected_messages:EE1:" + e3.getMessage());
-            }
-
-            new save_selected_messages_asynchtask(c, progressDialog2).execute();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "save_selected_messages:EE2:" + e.getMessage());
         }
     }
 
@@ -10236,55 +7474,6 @@ public class MainActivity extends AppCompatActivity
         img.startAnimation(fadeOut);
     }
 
-    static String resolve_name_for_pubkey(String pub_key, String default_name)
-    {
-        String ret = default_name;
-
-        try
-        {
-            try
-            {
-                if (pub_key.equals(global_my_toxid.substring(0, (TOX_PUBLIC_KEY_SIZE * 2))))
-                {
-                    // its our own key
-                    ret = global_my_name;
-                    return ret;
-                }
-            }
-            catch (Exception e1)
-            {
-                e1.printStackTrace();
-            }
-
-            FriendList fl = orma.selectFromFriendList().
-                    tox_public_key_stringEq(pub_key).
-                    toList().get(0);
-
-            if (fl.name != null)
-            {
-                if (fl.name.length() > 0)
-                {
-                    ret = fl.name;
-                }
-            }
-
-            if (fl.alias_name != null)
-            {
-                if (fl.alias_name.length() > 0)
-                {
-                    ret = fl.alias_name;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            ret = default_name;
-        }
-
-        return ret;
-    }
-
     static void receive_incoming_message(int msg_type, long friend_number, String friend_message_text_utf8, byte[] raw_message, long raw_message_length, String original_sender_pubkey)
     {
         // incoming msg can be:
@@ -10326,7 +7515,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             // m.tox_friendnum = friend_number;
-            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
+            m.tox_friendpubkey = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
             m.direction = 0; // msg received
             m.TOX_MESSAGE_TYPE = 0;
             m.read = false;
@@ -10342,23 +7531,23 @@ public class MainActivity extends AppCompatActivity
             {
                 if (message_list_activity.get_current_friendnum() == friend_number)
                 {
-                    insert_into_message_db(m, true);
+                    HelperMessage.insert_into_message_db(m, true);
                 }
                 else
                 {
-                    insert_into_message_db(m, false);
+                    HelperMessage.insert_into_message_db(m, false);
                 }
             }
             else
             {
-                insert_into_message_db(m, false);
+                HelperMessage.insert_into_message_db(m, false);
             }
 
             try
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                update_single_friend_in_friendlist_view(f);
+                HelperFriend.update_single_friend_in_friendlist_view(f);
 
                 if (f.notification_silent)
                 {
@@ -10504,7 +7693,7 @@ public class MainActivity extends AppCompatActivity
                                                      msg_id_buffer.limit());
             // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                    tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
                     msg_id_as_hex_string).count();
 
             if (already_have_message > 0)
@@ -10512,7 +7701,7 @@ public class MainActivity extends AppCompatActivity
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
                 // TODO: use received timstamp, not "now" here!
-                send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
+                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
                 return;
             }
 
@@ -10530,7 +7719,7 @@ public class MainActivity extends AppCompatActivity
                 m.is_new = true;
             }
 
-            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friend_number);
+            m.tox_friendpubkey = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
             m.direction = 0; // msg received
             m.TOX_MESSAGE_TYPE = 0;
             m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
@@ -10552,25 +7741,25 @@ public class MainActivity extends AppCompatActivity
             {
                 if (message_list_activity.get_current_friendnum() == friend_number)
                 {
-                    insert_into_message_db(m, true);
+                    HelperMessage.insert_into_message_db(m, true);
                 }
                 else
                 {
-                    insert_into_message_db(m, false);
+                    HelperMessage.insert_into_message_db(m, false);
                 }
             }
             else
             {
-                insert_into_message_db(m, false);
+                HelperMessage.insert_into_message_db(m, false);
             }
 
-            send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
+            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
 
             try
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                update_single_friend_in_friendlist_view(f);
+                HelperFriend.update_single_friend_in_friendlist_view(f);
 
                 if (f.notification_silent)
                 {
@@ -10686,7 +7875,7 @@ public class MainActivity extends AppCompatActivity
         else if (msg_type == 2)
         {
             // msgV2 relay message
-            long friend_number_real_sender = tox_friend_by_public_key__wrapper(original_sender_pubkey);
+            long friend_number_real_sender = HelperFriend.tox_friend_by_public_key__wrapper(original_sender_pubkey);
             // Log.i(TAG,
             //      "friend_message_v2:friend:" + friend_number + " ts:" + ts_sec + " systime" + System.currentTimeMillis() +
             //      " message:" + friend_message);
@@ -10718,14 +7907,14 @@ public class MainActivity extends AppCompatActivity
                                                      msg_id_buffer.limit());
             Log.i(TAG, "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                    tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
                     msg_id_as_hex_string).count();
 
             if (already_have_message > 0)
             {
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
-                send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
+                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
                 return;
             }
 
@@ -10766,26 +7955,26 @@ public class MainActivity extends AppCompatActivity
             {
                 if (message_list_activity.get_current_friendnum() == friend_number_real_sender)
                 {
-                    insert_into_message_db(m, true);
+                    HelperMessage.insert_into_message_db(m, true);
                 }
                 else
                 {
-                    insert_into_message_db(m, false);
+                    HelperMessage.insert_into_message_db(m, false);
                 }
             }
             else
             {
-                insert_into_message_db(m, false);
+                HelperMessage.insert_into_message_db(m, false);
             }
 
             // send message receipt v2 to the relay
-            send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
+            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
 
             try
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                update_single_friend_in_friendlist_view(f);
+                HelperFriend.update_single_friend_in_friendlist_view(f);
 
                 if (f.notification_silent)
                 {
@@ -10896,156 +8085,6 @@ public class MainActivity extends AppCompatActivity
                 catch (Exception e)
                 {
                 }
-            }
-        }
-    }
-
-    private static void send_friend_msg_receipt_v2_wrapper(final long friend_number, final int msg_type, final ByteBuffer msg_id_buffer)
-    {
-        // (msg_type == 1) msgV2 direct message
-        // (msg_type == 2) msgV2 relay message
-        if (msg_type == 1)
-        {
-            // send message receipt v2
-            long t_sec_receipt = (System.currentTimeMillis() / 1000);
-            tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
-
-            try
-            {
-                String relay_for_friend = get_relay_for_friend(tox_friend_get_public_key__wrapper(friend_number));
-
-                if (relay_for_friend != null)
-                {
-                    // if friend has a relay, send the "msg receipt" also to the relay. just to be sure.
-                    tox_util_friend_send_msg_receipt_v2(tox_friend_by_public_key__wrapper(relay_for_friend),
-                                                        t_sec_receipt, msg_id_buffer);
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if (msg_type == 2)
-        {
-            // send message receipt v2
-            final long t_sec_receipt = (System.currentTimeMillis() / 1000);
-            final Thread t = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    // delay sending of msg receipt for x milliseconds
-                    try
-                    {
-                        Thread.sleep(DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    // send msg receipt on main thread
-                    final Runnable myRunnable = new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(),
-                                                                         msg_id_buffer.arrayOffset(),
-                                                                         msg_id_buffer.limit());
-                                Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
-                                           msg_id_as_hex_string);
-
-                                try
-                                {
-                                    tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
-
-                                    try
-                                    {
-                                        String relay_for_friend = get_relay_for_friend(
-                                                tox_friend_get_public_key__wrapper(friend_number));
-
-                                        if (relay_for_friend != null)
-                                        {
-                                            // if friend has a relay, send the "msg receipt" also to the relay. just to be sure.
-                                            tox_util_friend_send_msg_receipt_v2(
-                                                    tox_friend_by_public_key__wrapper(relay_for_friend), t_sec_receipt,
-                                                    msg_id_buffer);
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                    };
-
-                    if (main_handler_s != null)
-                    {
-                        main_handler_s.post(myRunnable);
-                    }
-                }
-            };
-            t.start();
-        }
-    }
-
-    static void add_all_friends_clear_wrapper(int delay)
-    {
-        try
-        {
-            if (friend_list_fragment != null)
-            {
-                friend_list_fragment.add_all_friends_clear(delay);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_single_friend_in_friendlist_view(final FriendList f)
-    {
-        try
-        {
-            if (friend_list_fragment != null)
-            {
-                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = true;
-                cc.friend_item = f;
-                friend_list_fragment.modify_friend(cc, cc.is_friend);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static void update_single_conference_in_friendlist_view(final ConferenceDB conf)
-    {
-        if (friend_list_fragment != null)
-        {
-            if (conf != null)
-            {
-                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = false;
-                cc.conference_item = conf;
-                friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
         }
     }

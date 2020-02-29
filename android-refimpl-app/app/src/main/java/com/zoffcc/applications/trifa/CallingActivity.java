@@ -84,7 +84,7 @@ import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
