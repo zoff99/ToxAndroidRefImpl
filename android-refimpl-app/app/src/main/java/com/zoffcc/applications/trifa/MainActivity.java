@@ -1,6 +1,6 @@
 /**
  * [TRIfA], Java part of Tox Reference Implementation for Android
- * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * Copyright (C) 2017 - 2020 Zoff <zoff@zoff.cc>
  * <p>
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -3328,12 +3328,14 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (!HelperRelay.is_any_relay(f.tox_public_key_string))
                         {
-                            HelperRelay.send_relay_pubkey_to_friend(HelperRelay.get_own_relay_pubkey(), f.tox_public_key_string);
+                            HelperRelay.send_relay_pubkey_to_friend(HelperRelay.get_own_relay_pubkey(),
+                                                                    f.tox_public_key_string);
                             Log.i(TAG, "send relay pubkey to friend");
                         }
                         else
                         {
-                            HelperRelay.send_friend_pubkey_to_relay(HelperRelay.get_own_relay_pubkey(), f.tox_public_key_string);
+                            HelperRelay.send_friend_pubkey_to_relay(HelperRelay.get_own_relay_pubkey(),
+                                                                    f.tox_public_key_string);
                             Log.i(TAG, "send friend pubkey to relay");
                             HelperRelay.invite_to_all_conferences_own_relay(f.tox_public_key_string);
                         }
@@ -3436,7 +3438,8 @@ public class MainActivity extends AppCompatActivity
                     {
                         try
                         {
-                            if (!HelperRelay.is_any_relay(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
+                            if (!HelperRelay.is_any_relay(
+                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
                             {
                                 // only update if the "read receipt" comes from a friend, but not it's relay!
                                 m.raw_msgv2_bytes = "";
@@ -3640,14 +3643,14 @@ public class MainActivity extends AppCompatActivity
                     {
                         // add text as conference message
                         long sender_peer_num = HelperConference.get_peernum_from_peer_pubkey(real_sender_as_hex_string,
-                                                                                             wrapped_msg_text_as_string.substring(0,
-                                                                                                                 64));
+                                                                                             wrapped_msg_text_as_string.substring(
+                                                                                                     0, 64));
                         Log.i(TAG, "friend_sync_message_v2_cb:sender_peer_num=" + sender_peer_num);
 
                         conference_message_add_from_sync(
                                 HelperConference.get_conference_num_from_confid(real_sender_as_hex_string),
-                                sender_peer_num, TRIFA_MSG_TYPE_TEXT.value,
-                                wrapped_msg_text_as_string.substring(64), (text_length - 64));
+                                sender_peer_num, TRIFA_MSG_TYPE_TEXT.value, wrapped_msg_text_as_string.substring(64),
+                                (text_length - 64));
                     }
                     else
                     {
@@ -3656,7 +3659,8 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    receive_incoming_message(2, HelperFriend.tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
+                    receive_incoming_message(2,
+                                             HelperFriend.tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
                                              wrapped_msg_text_as_string, raw_data, raw_data_length,
                                              real_sender_as_hex_string);
                 }
@@ -3797,7 +3801,8 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            m.tox_peername = HelperConference.tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+            m.tox_peername = HelperConference.tox_conference_peer_get_name__wrapper(m.conference_identifier,
+                                                                                    m.tox_peerpubkey);
         }
         catch (Exception e)
         {
@@ -3953,7 +3958,8 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+                long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number,
+                                                                                               file_number);
                 Filetransfer ft_check = orma.selectFromFiletransfer().idEq(ft_id).get(0);
 
                 // -------- DEBUG --------
@@ -4014,7 +4020,8 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
+                long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number,
+                                                                                               file_number);
                 long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
                 HelperFiletransfer.set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_PAUSE.value);
                 HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_PAUSE.value);
@@ -4139,12 +4146,15 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "file_chunk_request:file_READY:001:f.id=" + ft.id);
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft.id, friend_number);
                     Log.i(TAG, "file_chunk_request:file_READY:001a:msg_id=" + msg_id);
-                    HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number,
-                                                                                 ft.path_name + "/" + ft.file_name);
+                    HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number,
+                                                                                               file_number,
+                                                                                               ft.path_name + "/" +
+                                                                                               ft.file_name);
                     HelperMessage.set_message_state_from_friendnum_and_filenum(friend_number, file_number,
                                                                                TOX_FILE_CONTROL_CANCEL.value);
                     HelperMessage.set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
-                    HelperFiletransfer.set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
+                    HelperFiletransfer.set_filetransfer_for_message_from_friendnum_and_filenum(friend_number,
+                                                                                               file_number, -1);
 
                     try
                     {
@@ -4462,21 +4472,26 @@ public class MainActivity extends AppCompatActivity
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
                     HelperFriend.set_friend_avatar(HelperFriend.tox_friend_get_public_key__wrapper(friend_number),
-                                      VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/", f.file_name);
+                                                   VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/",
+                                                   f.file_name);
                 }
                 else
                 {
                     Log.i(TAG, "file_recv_chunk:file_READY:001:f.id=" + f.id);
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(f.id, friend_number);
                     Log.i(TAG, "file_recv_chunk:file_READY:001a:msg_id=" + msg_id);
-                    HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number, file_number,
-                                                                                 VFS_PREFIX + VFS_FILE_DIR + "/" +
-                                                                                 f.tox_public_key_string + "/" +
-                                                                                 f.file_name);
+                    HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number,
+                                                                                               file_number, VFS_PREFIX +
+                                                                                                            VFS_FILE_DIR +
+                                                                                                            "/" +
+                                                                                                            f.tox_public_key_string +
+                                                                                                            "/" +
+                                                                                                            f.file_name);
                     HelperMessage.set_message_state_from_friendnum_and_filenum(friend_number, file_number,
                                                                                TOX_FILE_CONTROL_CANCEL.value);
                     HelperMessage.set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
-                    HelperFiletransfer.set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
+                    HelperFiletransfer.set_filetransfer_for_message_from_friendnum_and_filenum(friend_number,
+                                                                                               file_number, -1);
 
                     try
                     {
@@ -4516,7 +4531,8 @@ public class MainActivity extends AppCompatActivity
                         fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
                         // Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos.put(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                fos);
                         f.fos_open = true;
                         HelperFiletransfer.update_filetransfer_db_fos_open(f);
                     }
@@ -4568,7 +4584,8 @@ public class MainActivity extends AppCompatActivity
                             // Log.i(TAG,
                             //      "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos_normal.put(
-                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
+                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                    fos);
                             f.fos_open = true;
                             HelperFiletransfer.update_filetransfer_db_fos_open(f);
                         }
@@ -4670,7 +4687,8 @@ public class MainActivity extends AppCompatActivity
         // invite also my ToxProxy -------------
         if (HelperRelay.have_own_relay())
         {
-            tox_conference_invite(HelperFriend.tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()), conference_number);
+            tox_conference_invite(HelperFriend.tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
+                                  conference_number);
         }
         // invite also my ToxProxy -------------
 
@@ -4703,12 +4721,14 @@ public class MainActivity extends AppCompatActivity
         // invite also my ToxProxy -------------
         if (HelperRelay.have_own_relay())
         {
-            tox_conference_invite(HelperFriend.tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()), conference_num);
+            tox_conference_invite(HelperFriend.tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
+                                  conference_num);
         }
         // invite also my ToxProxy -------------
 
 
-        HelperConference.add_conference_wrapper(friend_number, conference_num, conference_identifier, a_TOX_CONFERENCE_TYPE, true);
+        HelperConference.add_conference_wrapper(friend_number, conference_num, conference_identifier,
+                                                a_TOX_CONFERENCE_TYPE, true);
     }
 
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
@@ -4782,7 +4802,8 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            m.tox_peername = HelperConference.tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+            m.tox_peername = HelperConference.tox_conference_peer_get_name__wrapper(m.conference_identifier,
+                                                                                    m.tox_peerpubkey);
         }
         catch (Exception e)
         {
@@ -5593,7 +5614,8 @@ public class MainActivity extends AppCompatActivity
                                                 ft_avatar_outgoing.file_number = filenum;
                                                 ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
                                                 ft_avatar_outgoing.filesize = avatar_bytes.capacity();
-                                                long rowid = HelperFiletransfer.insert_into_filetransfer_db(ft_avatar_outgoing);
+                                                long rowid = HelperFiletransfer.insert_into_filetransfer_db(
+                                                        ft_avatar_outgoing);
                                                 ft_avatar_outgoing.id = rowid;
                                             }
                                             else
