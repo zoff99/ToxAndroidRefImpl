@@ -526,7 +526,6 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 v.setBackgroundColor(Color.TRANSPARENT);
                 is_selected = false;
                 selected_conference_messages.remove(message_.id);
-                amode_save_menu_item.setVisible(false);
 
                 if (selected_conference_messages.isEmpty())
                 {
@@ -548,7 +547,6 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     v.setBackgroundColor(Color.GRAY);
                     is_selected = true;
                     selected_conference_messages.add(message_.id);
-                    amode_save_menu_item.setVisible(false);
 
                     if (amode != null)
                     {
@@ -587,11 +585,9 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         amode = MainActivity.conference_message_list_activity.startSupportActionMode(
                                 new ToolbarActionMode(context));
-                        amode_save_menu_item = amode.getMenu().findItem(R.id.action_save);
                         v.setBackgroundColor(Color.GRAY);
                         ret.is_selected = true;
                         selected_conference_messages.add(message_.id);
-                        amode_save_menu_item.setVisible(false);
 
                         if (amode != null)
                         {
