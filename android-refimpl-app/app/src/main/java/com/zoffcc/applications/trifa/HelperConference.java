@@ -287,6 +287,27 @@ public class HelperConference
         }
     }
 
+    static ConferenceMessage get_last_conference_message_in_this_conference_within_n_seconds(String conference_identifier, int n)
+    {
+        try
+        {
+            ConferenceMessage cm = orma.selectFromConferenceMessage().
+                    conference_identifierEq(conference_identifier.toLowerCase()).
+                    and().
+                    rcvd_timestampGt(System.currentTimeMillis() - (n * 1000)).
+                    orderByRcvd_timestampDesc().
+                    limit(1).
+                    toList().
+                    get(0);
+            return cm;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     static long insert_into_conference_message_db_system_message(final ConferenceMessage m, final boolean update_conference_view_flag)
     {
         long row_id = orma.insertIntoConferenceMessage(m);

@@ -156,6 +156,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_action
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
+import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
@@ -3634,23 +3635,48 @@ public class MainActivity extends AppCompatActivity
                     // pubkey does NOT belong to a friend. it is probably a conference id
                     // check it here
 
-
                     // Log.i(TAG, "friend_sync_message_v2_cb:LL:" + orma.selectFromConferenceDB().toList());
+                    String real_conference_id = real_sender_as_hex_string;
 
-                    long conference_num = HelperConference.get_conference_num_from_confid(real_sender_as_hex_string);
+                    long conference_num = HelperConference.get_conference_num_from_confid(real_conference_id);
                     Log.i(TAG, "friend_sync_message_v2_cb:conference_num=" + conference_num);
                     if (conference_num > -1)
                     {
+                        String real_sender_peer_pubkey = wrapped_msg_text_as_string.substring(0, 64);
+                        String real_sender_text = wrapped_msg_text_as_string.substring(64);
+                        long real_text_length = (text_length - 64);
+
                         // add text as conference message
-                        long sender_peer_num = HelperConference.get_peernum_from_peer_pubkey(real_sender_as_hex_string,
-                                                                                             wrapped_msg_text_as_string.substring(
-                                                                                                     0, 64));
+                        long sender_peer_num = HelperConference.get_peernum_from_peer_pubkey(real_conference_id,
+                                                                                             real_sender_peer_pubkey);
                         Log.i(TAG, "friend_sync_message_v2_cb:sender_peer_num=" + sender_peer_num);
 
+                        // now check if this is "potentially" a double message, we can not be sure a 100%
+                        // since there is no uniqe key for each message
+                        ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds(
+                                real_conference_id, 20);
+
+                        // Log.i(TAG, "friend_sync_message_v2_cb:last_cm=" + cm);
+                        // Log.i(TAG, "friend_sync_message_v2_cb:real_sender_peer_pubkey=" + real_sender_peer_pubkey);
+                        // Log.i(TAG, "friend_sync_message_v2_cb:cm.tox_peerpubkey=" + cm.tox_peerpubkey);
+                        // Log.i(TAG, "friend_sync_message_v2_cb:real_sender_text=" + real_sender_text);
+                        // Log.i(TAG, "friend_sync_message_v2_cb:cm.text=" + cm.tox_peerpubkey);
+
+                        if (cm != null)
+                        {
+                            if (cm.tox_peerpubkey.equalsIgnoreCase(real_sender_peer_pubkey))
+                            {
+                                if (cm.text.equals(real_sender_text))
+                                {
+                                    // ok it's a "potentially" double message
+                                    return;
+                                }
+                            }
+                        }
+
                         conference_message_add_from_sync(
-                                HelperConference.get_conference_num_from_confid(real_sender_as_hex_string),
-                                sender_peer_num, TRIFA_MSG_TYPE_TEXT.value, wrapped_msg_text_as_string.substring(64),
-                                (text_length - 64));
+                                HelperConference.get_conference_num_from_confid(real_conference_id), sender_peer_num,
+                                TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length);
                     }
                     else
                     {
