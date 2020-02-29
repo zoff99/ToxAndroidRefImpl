@@ -600,43 +600,6 @@ public class HelperMessage
 
         try
         {
-            try
-            {
-                //                main_activity_s.runOnUiThread(new Runnable()
-                //                {
-                //                    @Override
-                //                    public void run()
-                //                    {
-                //                        try
-                //                        {
-                //                            progressDialog2 = ProgressDialog.show(c, "", "deleting Messages ...");
-                //                            progressDialog2.setCanceledOnTouchOutside(false);
-                //                            progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
-                //                            {
-                //                                @Override
-                //                                public void onCancel(DialogInterface dialog)
-                //                                {
-                //                                }
-                //                            });
-                //                        }
-                //                        catch (Exception e)
-                //                        {
-                //                            e.printStackTrace();
-                //                            Log.i(TAG, "CALL:start:EE:" + e.getMessage());
-                //                        }
-                //                    }
-                //                });
-                //                if (main_handler_s != null)
-                //                {
-                //                    main_handler_s.post(myRunnable);
-                //                }
-            }
-            catch (Exception e3)
-            {
-                e3.printStackTrace();
-                Log.i(TAG, "delete_selected_messages:EE1:" + e3.getMessage());
-            }
-
             new MainActivity.delete_selected_messages_asynchtask(c, progressDialog2, update_message_list,
                                                                  update_friend_list, dialog_text).execute();
         }
