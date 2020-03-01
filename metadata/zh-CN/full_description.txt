@@ -1,0 +1,7 @@
+<b>TRIfA 是一个 Tox Android 客户端。</b><br>
+它仍处于开发之中。<br><br>
+
+<b>更多信息：</b><br>
+* <a href="https://tox.zoff.cc">关于 Tox</a><br>
+* <a href="https://matrix.to/#/#trifa:matrix.org">加入 Matrix 上的讨论</a><br>
+* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">加入 Tox IRC 频道</a><br>
