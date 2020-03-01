@@ -58,10 +58,11 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
+import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_public_key;
@@ -264,10 +265,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                         try
                         {
                             long peer_count = tox_conference_peer_count(conference_num);
+                            long frozen_peer_count = tox_conference_offline_peer_count(conference_num);
 
                             if (peer_count > -1)
                             {
-                                ml_maintext.setText(f_name + "\n" + "Users: " + peer_count);
+                                ml_maintext.setText(
+                                        f_name + "\n" + "Active: " + peer_count + " Offline: " + frozen_peer_count);
                             }
                             else
                             {
