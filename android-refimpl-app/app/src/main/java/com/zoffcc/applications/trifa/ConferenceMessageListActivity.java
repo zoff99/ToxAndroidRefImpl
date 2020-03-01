@@ -55,6 +55,8 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
+import java.util.List;
+
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
@@ -827,7 +829,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                         try
                                         {
                                             fl_temp = orma.selectFromFriendList().
-                                                    tox_public_key_stringEq(peer_pubkey).get(0);
+                                                    tox_public_key_stringEq(peer_pubkey).toList().get(0);
 
                                             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
                                             {
