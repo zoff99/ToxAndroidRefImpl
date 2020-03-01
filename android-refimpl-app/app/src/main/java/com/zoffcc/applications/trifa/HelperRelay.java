@@ -214,9 +214,14 @@ public class HelperRelay
                     for (int i = 0; i < c.size(); i++)
                     {
                         ConferenceDB conf = c.get(i);
-                        MainActivity.tox_conference_invite(
+                        int res = MainActivity.tox_conference_invite(
                                 HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string),
                                 conf.tox_conference_number);
+
+                        Log.i(TAG,
+                              "invite_to_all_conferences_own_relay:confnum=" + conf.tox_conference_number + " res=" +
+                              res);
+
                     }
                 }
             }

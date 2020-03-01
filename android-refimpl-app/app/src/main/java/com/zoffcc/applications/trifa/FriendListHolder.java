@@ -791,6 +791,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     }
                                     // invite also my ToxProxy -------------
                                     add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "", TOX_CONFERENCE_TYPE_TEXT.value, false);
+                                    MainActivity.update_savedata_file_wrapper();
                                 }
                             }
                         }

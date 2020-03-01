@@ -4757,6 +4757,7 @@ public class MainActivity extends AppCompatActivity
 
         HelperConference.add_conference_wrapper(friend_number, conference_num, conference_identifier,
                                                 a_TOX_CONFERENCE_TYPE, true);
+        MainActivity.update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
