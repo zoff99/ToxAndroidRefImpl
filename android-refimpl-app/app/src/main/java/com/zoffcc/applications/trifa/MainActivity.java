@@ -254,11 +254,11 @@ public class MainActivity extends AppCompatActivity
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
+    final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
 
-    final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
     static TextView mt = null;
     ImageView top_imageview = null;
     static boolean native_lib_loaded = false;
