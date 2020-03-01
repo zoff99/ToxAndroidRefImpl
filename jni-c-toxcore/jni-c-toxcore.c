@@ -4235,6 +4235,48 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1count(JNI
 }
 
 /**
+ * Return the number of offline peers in the conference. Return value is unspecified on failure.
+ */
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1count(JNIEnv *env, jobject thiz,
+        jlong conference_number)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    TOX_ERR_CONFERENCE_PEER_QUERY error;
+    uint32_t res = tox_conference_offline_peer_count(tox_global, (uint32_t)conference_number, &error);
+
+    if(error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+    {
+        if(error == TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND)
+        {
+            dbg(0, "tox_conference_offline_peer_count:TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND");
+            return (jlong)-1;
+        }
+        else if(error == TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND)
+        {
+            dbg(0, "tox_conference_offline_peer_count:TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND");
+            return (jlong)-2;
+        }
+        else if(error == TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION)
+        {
+            dbg(0, "tox_conference_offline_peer_count:TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION");
+            return (jlong)-3;
+        }
+        else
+        {
+            return (jlong)-99;
+        }
+    }
+
+    return (jlong)res;
+}
+
+
+/**
  * Return the length of the peer's name. Return value is unspecified on failure.
  */
 JNIEXPORT jlong JNICALL

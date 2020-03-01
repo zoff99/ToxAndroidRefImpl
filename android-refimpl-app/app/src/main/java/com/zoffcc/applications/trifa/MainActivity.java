@@ -2376,6 +2376,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_conference_peer_count(long conference_number);
 
+    public static native long tox_conference_offline_peer_count(long conference_number);
+
     public static native long tox_conference_peer_get_name_size(long conference_number, long peer_number);
 
     public static native String tox_conference_peer_get_name(long conference_number, long peer_number);
