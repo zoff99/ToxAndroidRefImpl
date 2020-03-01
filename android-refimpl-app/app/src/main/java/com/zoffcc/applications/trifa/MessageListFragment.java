@@ -34,8 +34,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -75,8 +75,10 @@ public class MessageListFragment extends Fragment
             // reset "new" flags for messages -------
             if (orma != null)
             {
-                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(
-                        false).execute();
+                orma.updateMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        is_new(false).
+                        execute();
             }
             // reset "new" flags for messages -------
         }

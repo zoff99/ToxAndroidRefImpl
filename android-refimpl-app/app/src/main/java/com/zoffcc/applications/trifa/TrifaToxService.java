@@ -48,10 +48,21 @@ import info.guardianproject.iocipher.VirtualFileSystem;
 
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
+import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conference;
+import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
+import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
+import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
+import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
+import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
+import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.bootstrap_single_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
@@ -59,29 +70,22 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.conference_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.get_combined_connection_status;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.get_toxconnection_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.hex_to_bytes;
-import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conference;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
 import static com.zoffcc.applications.trifa.MainActivity.receiver2;
-import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
-import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
-import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
-import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
@@ -92,10 +96,6 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.MainActivity.tox_util_friend_resend_message_v2;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
-import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP2;
@@ -675,6 +675,36 @@ public class TrifaToxService extends Service
 
                 cache_pubkey_fnum.clear();
                 cache_fnum_pubkey.clear();
+
+                // ----- convert old conference messages which did not contain a sent timestamp -----
+                try
+                {
+                    boolean need_migrate_old_conf_msg_date = true;
+
+                    if (get_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done") != null)
+                    {
+                        if (get_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done").equals("true"))
+                        {
+                            need_migrate_old_conf_msg_date = false;
+                        }
+                    }
+
+                    if (need_migrate_old_conf_msg_date == true)
+                    {
+                        orma.getConnection().execSQL(
+                                "update ConferenceMessage set sent_timestamp=rcvd_timestamp" + " where " +
+                                " sent_timestamp='0'");
+                        Log.i(TAG, "onCreate:migrate_old_conf_msg_date");
+                        // now remember that we did that, and don't do it again
+                        set_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done", "true");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "onCreate:migrate_old_conf_msg_date:EE:" + e.getMessage());
+                }
+                // ----- convert old conference messages which did not contain a sent timestamp -----
 
                 // TODO --------
                 String my_tox_id_local = get_my_toxid();

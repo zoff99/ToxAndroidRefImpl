@@ -494,6 +494,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     m.conference_identifier = conf_id;
                     m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
                     m.sent_timestamp = System.currentTimeMillis();
+                    m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
                     m.text = msg;
 
                     if ((msg != null) && (!msg.equalsIgnoreCase("")))

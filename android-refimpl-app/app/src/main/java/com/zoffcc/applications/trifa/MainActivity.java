@@ -3678,7 +3678,8 @@ public class MainActivity extends AppCompatActivity
 
                         conference_message_add_from_sync(
                                 HelperConference.get_conference_num_from_confid(real_conference_id), sender_peer_num,
-                                TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length);
+                                TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
+                                (msg_wrapped_sec * 1000) + msg_wrapped_ms);
                     }
                     else
                     {
@@ -3754,7 +3755,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void conference_message_add_from_sync(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
+    static void conference_message_add_from_sync(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms)
     {
         Log.i(TAG, "conference_message_add_from_sync:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" +
                    message);
@@ -3824,6 +3825,7 @@ public class MainActivity extends AppCompatActivity
         m.tox_peername = null;
         m.conference_identifier = conf_id;
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.sent_timestamp = sent_timestamp_in_ms;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = message;
 
@@ -4827,6 +4829,7 @@ public class MainActivity extends AppCompatActivity
         m.conference_identifier = conf_id;
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
+        m.sent_timestamp = System.currentTimeMillis();
         m.text = message;
 
         try
@@ -5051,6 +5054,7 @@ public class MainActivity extends AppCompatActivity
                 m.conference_identifier = conf_temp.conference_identifier;
                 m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
                 m.rcvd_timestamp = System.currentTimeMillis();
+                m.sent_timestamp = System.currentTimeMillis();
                 String peer_name_temp = "Unknown";
                 String peer_name_temp2 = null;
 
@@ -5246,6 +5250,7 @@ public class MainActivity extends AppCompatActivity
                 m.conference_identifier = conf_temp.conference_identifier;
                 m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
                 m.rcvd_timestamp = System.currentTimeMillis();
+                m.sent_timestamp = System.currentTimeMillis();
                 String peer_name_temp = "Unknown";
                 String peer_name_temp2 = null;
 
@@ -7344,7 +7349,8 @@ public class MainActivity extends AppCompatActivity
                                     {
                                         try
                                         {
-                                            MainActivity.conference_message_list_fragment.adapter.remove_item(m_to_delete);
+                                            MainActivity.conference_message_list_fragment.adapter.remove_item(
+                                                    m_to_delete);
                                         }
                                         catch (Exception e)
                                         {

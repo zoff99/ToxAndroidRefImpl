@@ -186,7 +186,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         textView.setAutoLinkText(m.text);
 
-        date_time.setText(long_date_time_format(m.rcvd_timestamp));
+        date_time.setText(long_date_time_format(m.sent_timestamp));
 
         textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
         {

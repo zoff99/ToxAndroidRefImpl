@@ -65,20 +65,33 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
         switch (viewType)
         {
             case Message_model.TEXT_INCOMING_NOT_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
+                                                                        false);
                 return new ConferenceMessageListHolder_text_incoming_not_read(view, this.context);
             case Message_model.TEXT_INCOMING_HAVE_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
+                // ******** NOT USED ******** //
+                // ******** NOT USED ******** //
+                // ******** NOT USED ******** //
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
+                                                                        false);
+                // ******** NOT USED ******** //
+                // ******** NOT USED ******** //
+                // ******** NOT USED ******** //
                 return new ConferenceMessageListHolder_text_incoming_read(view, this.context);
 
             case Message_model.TEXT_OUTGOING_NOT_READ:
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent,
+                                                                        false);
+                // ******** NOT USED ******** //
+                // ******** NOT USED ******** //
+                // ******** NOT USED ******** //
                 return new ConferenceMessageListHolder_text_outgoing_not_read(view, this.context);
             case Message_model.TEXT_OUTGOING_HAVE_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read, parent,
+                                                                        false);
                 return new ConferenceMessageListHolder_text_outgoing_read(view, this.context);
 
         }
@@ -99,12 +112,14 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 // msg to me
                 if (my_msg.read)
                 {
-                    // has read
+                    // has read ***NOT USED***
+                    Log.i(TAG, "Message_model.TEXT_INCOMING_HAVE_READ");
                     return Message_model.TEXT_INCOMING_HAVE_READ;
                 }
                 else
                 {
                     // not yet read
+                    Log.i(TAG, "Message_model.TEXT_INCOMING_NOT_READ");
                     return Message_model.TEXT_INCOMING_NOT_READ;
                 }
                 // msg to me
@@ -115,11 +130,13 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 if (my_msg.read)
                 {
                     // has read
+                    Log.i(TAG, "Message_model.TEXT_OUTGOING_HAVE_READ");
                     return Message_model.TEXT_OUTGOING_HAVE_READ;
                 }
                 else
                 {
-                    // not yet read
+                    // not yet read ***NOT USED***
+                    Log.i(TAG, "Message_model.TEXT_OUTGOING_NOT_READ");
                     return Message_model.TEXT_OUTGOING_NOT_READ;
                 }
                 // msg from me
@@ -315,7 +332,8 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 else
                 {
                     getSectionText_message_object_ts2 = getSectionText_message_object2.rcvd_timestamp;
-                    getSectionText_message_object_ts_string2 = "" + only_date_time_format(getSectionText_message_object2.rcvd_timestamp);
+                    getSectionText_message_object_ts_string2 =
+                            "" + only_date_time_format(getSectionText_message_object2.rcvd_timestamp);
                     return getSectionText_message_object_ts_string2;
                 }
             }
@@ -329,7 +347,8 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 else
                 {
                     getSectionText_message_object_ts2 = getSectionText_message_object2.sent_timestamp;
-                    getSectionText_message_object_ts_string2 = "" + only_date_time_format(getSectionText_message_object2.sent_timestamp);
+                    getSectionText_message_object_ts_string2 =
+                            "" + only_date_time_format(getSectionText_message_object2.sent_timestamp);
                     return getSectionText_message_object_ts_string2;
                 }
             }

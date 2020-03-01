@@ -90,20 +90,20 @@ public class ConferenceMessageListFragment extends Fragment
             {
                 if (PREF__conference_show_system_messages)
                 {
-                    // TODO: sort by ID ?
+                    // TODO: sort by sent_timestamp ?
                     data_values = orma.selectFromConferenceMessage().
                             conference_identifierEq(current_conf_id).
-                            orderByIdAsc().
+                            orderBySent_timestampAsc().
                             toList();
                 }
                 else
                 {
-                    // TODO: sort by ID ?
+                    // TODO: sort by sent_timestamp ?
                     data_values = orma.selectFromConferenceMessage().
                             conference_identifierEq(current_conf_id).
                             and().
                             tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                            orderByIdAsc().
+                            orderBySent_timestampAsc().
                             toList();
                 }
             }
