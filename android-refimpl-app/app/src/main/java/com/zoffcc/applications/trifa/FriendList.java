@@ -28,8 +28,10 @@ import com.github.gfx.android.orma.annotation.Table;
 @Table
 public class FriendList
 {
+    // pubkey is always saved as UPPER CASE hex string!! -----------------
     @PrimaryKey
     String tox_public_key_string = "";
+    // pubkey is always saved as UPPER CASE hex string!! -----------------
 
     @Column
     @Nullable

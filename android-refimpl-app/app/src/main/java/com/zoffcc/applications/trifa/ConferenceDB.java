@@ -30,8 +30,10 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONF
 @Table
 public class ConferenceDB
 {
+    // conference id is always saved as lower case hex string!! -----------------
     @PrimaryKey
-    String conference_identifier = ""; // for now (bytes->HexString) of the cookie used to join the conference!!
+    String conference_identifier = "";
+    // conference id is always saved as lower case hex string!! -----------------
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String who_invited__tox_public_key_string = "";
