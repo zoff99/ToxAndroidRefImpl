@@ -46,30 +46,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/fi_nick_text_header"
-                    android:layout_width="60dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
+                    android:layout_gravity="start"
                     android:layout_weight="0"
                     android:paddingBottom="15dp"
                     android:paddingLeft="4dp"
                     android:paddingRight="2dp"
+                    android:layout_marginLeft="20dp"
                     android:text="Nick:"
-                    android:textAlignment="textEnd"
+                    android:textAlignment="textStart"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/fi_nick_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="800"
                     android:fontFamily="monospace"
                     android:paddingBottom="15dp"
+                    android:paddingLeft="4dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
                     android:text="my nick er werwer werwer"
                     android:textIsSelectable="true"
                     android:textSize="16sp"
@@ -80,30 +84,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/fi_status_message_text_header"
-                    android:layout_width="60dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
+                    android:layout_gravity="start"
                     android:layout_weight="0"
                     android:paddingBottom="15dp"
                     android:paddingLeft="4dp"
                     android:paddingRight="2dp"
+                    android:layout_marginLeft="20dp"
                     android:text="Status:"
-                    android:textAlignment="textEnd"
+                    android:textAlignment="textStart"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/fi_status_message_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="800"
                     android:fontFamily="monospace"
                     android:paddingBottom="15dp"
+                    android:paddingLeft="4dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
                     android:text="my status er werwer werwer"
                     android:textIsSelectable="true"
                     android:textSize="16sp"
@@ -127,6 +135,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
                         android:hint="Alias"
                         android:imeOptions="actionUnspecified"
                         android:inputType="text"
@@ -138,11 +147,25 @@
 
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="0"
+                android:paddingBottom="15dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:layout_marginLeft="20dp"
+                android:text="Pubkey:"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
                 android:id="@+id/fi_toxprvkey_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="7dp"
-                android:layout_marginRight="7dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:fontFamily="monospace"
                 android:gravity="center_horizontal"
                 android:paddingBottom="15dp"
@@ -165,21 +188,25 @@
 
             <TextView
                 android:id="@+id/fi_relay_text"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:fontFamily="monospace"
+                android:layout_gravity="start"
+                android:layout_weight="0"
+                android:paddingBottom="15dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:layout_marginLeft="20dp"
                 android:text="Friends Relay Pubkey:"
-                android:textIsSelectable="true"
+                android:textAlignment="textStart"
                 android:textSize="16sp"
-                android:typeface="monospace"/>
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/fi_relay_pubkey_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="7dp"
-                android:layout_marginRight="7dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:fontFamily="monospace"
                 android:gravity="center_horizontal"
                 android:paddingBottom="15dp"
@@ -189,6 +216,20 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:typeface="monospace"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:layout_weight="0"
+                android:paddingBottom="15dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:layout_marginLeft="20dp"
+                android:text=""
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
         </LinearLayout>
     </ScrollView>
 
