@@ -33,7 +33,7 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/f_avatar_icon"
-            android:layout_width="35dp"
+            android:layout_width="60dp"
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
