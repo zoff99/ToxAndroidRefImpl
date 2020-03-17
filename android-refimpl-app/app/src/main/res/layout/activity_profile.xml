@@ -42,10 +42,12 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profile_icon"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
                 android:layout_marginTop="0dp"
                 android:paddingBottom="2dp"
                 android:paddingTop="0dp"
@@ -189,8 +191,10 @@
             <ImageView
                 android:id="@+id/mytoxid_imageview"
                 android:layout_width="match_parent"
-                android:layout_height="190dp"
+                android:layout_height="300dp"
                 android:paddingBottom="15dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:paddingTop="15dp"
                 android:src="@mipmap/ic_launcher_round"/>
 
@@ -211,8 +215,8 @@
 
             <ImageView
                 android:id="@+id/my_identicon_imageview"
-                android:layout_width="190dp"
-                android:layout_height="190dp"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
                 android:layout_gravity="center_horizontal"
                 android:paddingBottom="15dp"
                 android:paddingTop="15dp"
