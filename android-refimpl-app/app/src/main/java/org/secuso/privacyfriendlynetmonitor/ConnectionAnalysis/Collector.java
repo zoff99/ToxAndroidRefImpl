@@ -201,6 +201,12 @@ public class Collector
         pull();
         //process reports (passive mode)
         String ret = fillPackageInformation();
+
+        if (ret == null)
+        {
+            ret = "no active Connections found";
+        }
+
         //resolve remote hosts (in cache or permission.INTERNET required)
         // new AsyncDNS().execute("");
         //sorting
@@ -230,8 +236,8 @@ public class Collector
                 //Add to certificate validation, if port 443 (TLS), resolved hostname and not yet
                 //analyzed
                 ip = r.remoteAdd.getHostAddress();
-                if (KnownPorts.isTlsPort(r.remotePort) && hasHostName(ip) && !mCertValMap.containsKey(
-                        getDnsHostName(ip)) && !sCertValList.contains(getDnsHostName(ip)))
+                if (KnownPorts.isTlsPort(r.remotePort) && hasHostName(ip) &&
+                    !mCertValMap.containsKey(getDnsHostName(ip)) && !sCertValList.contains(getDnsHostName(ip)))
                 {
                     sCertValList.add(getDnsHostName(ip));
                 }
@@ -322,7 +328,8 @@ public class Collector
     // fill reports with app data from Package Information Cache
     private static String fillPackageInformation()
     {
-        String ret = "active Network Connections:\n";
+        // String ret = "active Network Connections:\n";
+        String ret = "";
 
         for (int i = 0; i < sReportList.size(); i++)
         {
@@ -341,12 +348,8 @@ public class Collector
                 {
                     if (r.packageName.equals(MY_PACKAGE_NAME))
                     {
-                        ret = ret +
-                              "l -> " + r.localAdd.getHostAddress() + ":" + r.localPort +
-                              "\n" +
-                              "r -> " + r.remoteAdd.getHostAddress() + ":" + r.remotePort +
-                              "/" + r.type +
-                              "\n\n";
+                        ret = ret + "l -> " + r.localAdd.getHostAddress() + ":" + r.localPort + "\n" + "r -> " +
+                              r.remoteAdd.getHostAddress() + ":" + r.remotePort + "/" + r.type + "\n\n";
                     }
                 }
             }
