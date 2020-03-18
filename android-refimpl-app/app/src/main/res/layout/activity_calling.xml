@@ -225,10 +225,14 @@
 
             <ImageView
                 android:id="@+id/caller_avatar_view"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:elevation="20dp"
                 android:background="@android:color/black" />
 
             <FrameLayout
