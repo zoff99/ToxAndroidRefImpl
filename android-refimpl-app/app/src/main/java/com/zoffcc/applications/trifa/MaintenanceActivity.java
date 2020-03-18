@@ -58,6 +58,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.delete_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
+import static com.zoffcc.applications.trifa.MainActivity.import_toxsave_file_unsecure;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -75,6 +76,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_test_notification;
     Button button_test_ringtone;
     Button button_export_savedata;
+    Button button_import_savedata;
 
     Boolean button_test_ringtone_start = true;
     MediaPlayer mMediaPlayer = null;
@@ -110,6 +112,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_test_notification = (Button) findViewById(R.id.button_test_notification);
         button_test_ringtone = (Button) findViewById(R.id.button_test_ringtone);
         button_export_savedata = (Button) findViewById(R.id.button_export_savedata);
+        button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -290,6 +293,22 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 try
                 {
                     export_savedata_unsecure();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        button_import_savedata.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    import_toxsave_file_unsecure();
                 }
                 catch (Exception e)
                 {

@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.Manifest;
+import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -1061,31 +1062,11 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (is_tox_started)
                                 {
-                                    tox_service_fg.stop_tox_fg();
+                                    global_stop_tox();
                                 }
                                 else
                                 {
-                                    int PREF__orbot_enabled_to_int = 0;
-
-                                    if (PREF__orbot_enabled)
-                                    {
-                                        PREF__orbot_enabled_to_int = 1;
-                                    }
-
-                                    int PREF__local_discovery_enabled_to_int = 0;
-
-                                    if (PREF__local_discovery_enabled)
-                                    {
-                                        PREF__local_discovery_enabled_to_int = 1;
-                                    }
-
-                                    init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
-                                         PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
-                                         TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
-                                                 TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
-                                    Log.i(TAG, "set_all_conferences_inactive:001");
-                                    HelperConference.set_all_conferences_inactive();
-                                    tox_service_fg.tox_thread_start_fg();
+                                    global_start_tox();
                                 }
                             }
                             catch (Exception e)
@@ -1832,6 +1813,56 @@ public class MainActivity extends AppCompatActivity
     //            Log.i(TAG, "stop_tox:EE:" + e.getMessage());
     //        }
     //    }
+
+    static void global_stop_tox()
+    {
+        try
+        {
+            if (is_tox_started)
+            {
+                tox_service_fg.stop_tox_fg();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    void global_start_tox()
+    {
+        try
+        {
+            if (!is_tox_started)
+            {
+                int PREF__orbot_enabled_to_int = 0;
+
+                if (PREF__orbot_enabled)
+                {
+                    PREF__orbot_enabled_to_int = 1;
+                }
+
+                int PREF__local_discovery_enabled_to_int = 0;
+
+                if (PREF__local_discovery_enabled)
+                {
+                    PREF__local_discovery_enabled_to_int = 1;
+                }
+
+                init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
+                     PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
+                     TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
+                             TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+                Log.i(TAG, "set_all_conferences_inactive:001");
+                HelperConference.set_all_conferences_inactive();
+                tox_service_fg.tox_thread_start_fg();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void onDestroy()
@@ -8492,6 +8523,42 @@ public class MainActivity extends AppCompatActivity
         else
         {
             return toxav_video_send_frame(friendnum, frame_width_px, frame_height_px);
+        }
+    }
+
+    static void import_toxsave_file_unsecure()
+    {
+        global_stop_tox();
+        java.io.File f_src = new java.io.File(SD_CARD_FILES_EXPORT_DIR + "/" + "I_WANT_TO_IMPORT_savedata.tox");
+        java.io.File f_dst = new java.io.File(app_files_directory + "/" + "savedata.tox");
+        try
+        {
+            io_file_copy(f_src, f_dst);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        // after importing the file. just stop the app hard
+        tox_service_fg.stop_me(true);
+        // --> not static // global_start_tox();
+    }
+
+    static void io_file_copy(File src, File dst) throws java.io.IOException
+    {
+        try (java.io.InputStream in = new java.io.FileInputStream(src))
+        {
+            try (java.io.OutputStream out = new java.io.FileOutputStream(dst))
+            {
+                // Transfer bytes from in to out
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0)
+                {
+                    out.write(buf, 0, len);
+                }
+            }
         }
     }
 
