@@ -55,7 +55,9 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.delete_vfs_file;
+import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -72,6 +74,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_reset_nodelist;
     Button button_test_notification;
     Button button_test_ringtone;
+    Button button_export_savedata;
 
     Boolean button_test_ringtone_start = true;
     MediaPlayer mMediaPlayer = null;
@@ -106,6 +109,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_reset_nodelist = (Button) findViewById(R.id.button_reset_nodelist);
         button_test_notification = (Button) findViewById(R.id.button_test_notification);
         button_test_ringtone = (Button) findViewById(R.id.button_test_ringtone);
+        button_export_savedata = (Button) findViewById(R.id.button_export_savedata);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -278,6 +282,21 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+        button_export_savedata.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    export_savedata_unsecure();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         button_reset_nodelist.setOnClickListener(new View.OnClickListener()
         {
@@ -459,7 +478,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
 
         text_sqlstats.setText(
-                "Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " + num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
+                "Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " +
+                num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
 
         maint_handler_s = maint_handler;
     }
@@ -663,6 +683,12 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
 
         super.onPause();
+    }
+
+    public static void export_savedata_unsecure()
+    {
+        // passphrase is unused for now!
+        export_savedata_file_unsecure("_", SD_CARD_FILES_EXPORT_DIR + "/" + "unsecure_export_savedata.tox");
     }
 
     public static String files_and_sizes_in_dir(File directory)

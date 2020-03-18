@@ -2250,6 +2250,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native void update_savedata_file(String tox_encrypt_passphrase_hash);
 
+    public static native void export_savedata_file_unsecure(String tox_encrypt_passphrase_hash, String export_full_path_of_file);
+
     public static native String get_my_toxid();
 
     // *UNUSED* public static native void bootstrap();

@@ -680,6 +680,25 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 }
 
 
+void export_savedata_file_unsecure(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len, const char* export_full_path_of_file)
+{
+    size_t size = tox_get_savedata_size(tox);
+    dbg(9, "export_savedata_file_unsecure:tox_get_savedata_size=%d", (int)size);
+    char *savedata = malloc(size);
+    dbg(9, "export_savedata_file_unsecure:savedata=%p", savedata);
+    tox_get_savedata(tox, (uint8_t *)savedata);
+
+    FILE *f = fopen(export_full_path_of_file, "wb");
+    fwrite(savedata, size, 1, f);
+    fclose(f);
+
+    if(savedata)
+    {
+        free(savedata);
+    }
+}
+
+
 int bin_id_to_string(const char *bin_id, size_t bin_id_size, char *output, size_t output_size)
 {
     if(bin_id_size != TOX_ADDRESS_SIZE || output_size < (TOX_ADDRESS_SIZE * 2 + 1))
@@ -2460,11 +2479,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     {
         free(passphrase);
     }
-
-    // if (s)
-    //{
-    //  free((void*)s);
-    //}
 }
 
 JNIEXPORT void JNICALL
@@ -2489,7 +2503,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__rea
 
     const char *s = (*env)->GetStringUTFChars(env, passphrase_j, NULL);
     char *passphrase = strdup(s);
-    // WARNING // dbg(9, "passphrase=%s", passphraseXX);
     (*env)->ReleaseStringUTFChars(env, passphrase_j, s);
     size_t passphrase_len = (size_t)strlen(passphrase);
     dbg(9, "update_savedata_file");
@@ -2499,11 +2512,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__rea
     {
         free(passphrase);
     }
-
-    //if (s)
-    //{
-    //  free((void*)s);
-    //}
 }
 
 JNIEXPORT void JNICALL
@@ -2513,6 +2521,34 @@ Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv *e
                    passphrase_j));
 }
 
+void Java_com_zoffcc_applications_trifa_MainActivity_export_1savedata_1file_1unsecure(JNIEnv *env, jobject thiz,
+        jstring passphrase_j, jstring export_full_path_of_file_j)
+{
+    if(tox_global == NULL)
+    {
+        return;
+    }
+
+    const char *export_full_path_of_file = (*env)->GetStringUTFChars(env, export_full_path_of_file_j, NULL);
+    const char *s = (*env)->GetStringUTFChars(env, passphrase_j, NULL);
+    char *passphrase = strdup(s);
+    char *filename_with_path = strdup(export_full_path_of_file);
+    (*env)->ReleaseStringUTFChars(env, passphrase_j, s);
+    (*env)->ReleaseStringUTFChars(env, export_full_path_of_file_j, export_full_path_of_file);
+    size_t passphrase_len = (size_t)strlen(passphrase);
+    dbg(9, "export_savedata_file_unsecure");
+    export_savedata_file_unsecure(tox_global, (const uint8_t *)passphrase, (size_t)passphrase_len, filename_with_path);
+
+    if(passphrase)
+    {
+        free(passphrase);
+    }
+
+    if(filename_with_path)
+    {
+        free(filename_with_path);
+    }
+}
 
 // -----------------
 // -----------------
