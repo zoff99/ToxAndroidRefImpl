@@ -254,6 +254,21 @@
                 android:src="@mipmap/ic_launcher_round"/>
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="0"
+                android:layout_marginTop="40dp"
+                android:paddingBottom="15dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:layout_marginLeft="20dp"
+                android:text="active Network Connections:"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
                 android:id="@+id/mytox_network_connections"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -262,14 +277,27 @@
                 android:fontFamily="monospace"
                 android:gravity="fill_horizontal"
                 android:paddingBottom="15dp"
-                android:paddingTop="12dp"
                 android:text="*error getting active network connections*"
                 android:textAlignment="gravity"
                 android:textIsSelectable="true"
-                android:textSize="16sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:typeface="monospace"/>
 
+            <TextView
+                android:id="@+id/dummy_0004"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:layout_weight="0"
+                android:paddingBottom="15dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:layout_marginLeft="20dp"
+                android:text=""
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
