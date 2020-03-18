@@ -32,11 +32,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="0dp"
                 android:gravity="center_horizontal"
-                android:paddingBottom="0dp"
-                android:paddingTop="5dp"
-                android:text="click on Image to change your Avatar"
+                android:paddingBottom="12dp"
+                android:paddingTop="12dp"
+                android:text="click Image to change your Avatar"
                 android:textColor="@color/md_black_1000"
-                android:textSize="10sp"
+                android:textSize="16sp"
                 android:textStyle="normal"/>
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -59,69 +59,69 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/mynick_textview"
-                    android:layout_width="60dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
+                    android:layout_gravity="start"
                     android:layout_weight="0"
-                    android:paddingBottom="15dp"
+                    android:paddingBottom="1dp"
+                    android:paddingLeft="4dp"
                     android:paddingRight="2dp"
-                    android:paddingTop="12dp"
+                    android:layout_marginLeft="20dp"
                     android:text="Nick:"
-                    android:textAlignment="textEnd"
-                    android:textIsSelectable="true"
+                    android:textAlignment="textStart"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
 
                 <EditText
                     android:id="@+id/mynick_edittext"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="fill_horizontal"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="8"
-                    android:fontFamily="monospace"
-                    android:text="my nick tl ,top,4tokotko4k tpoerkpotl reltrwr ülü"
-                    android:textSize="16sp"
-                    android:typeface="monospace"/>
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:hint="Nick"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/mystatus_message_textview"
-                    android:layout_width="60dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
+                    android:layout_gravity="start"
                     android:layout_weight="0"
-                    android:paddingBottom="15dp"
+                    android:paddingBottom="1dp"
+                    android:paddingLeft="4dp"
                     android:paddingRight="2dp"
-                    android:paddingTop="12dp"
+                    android:layout_marginLeft="20dp"
                     android:text="Status:"
-                    android:textAlignment="textEnd"
-                    android:textIsSelectable="true"
+                    android:textAlignment="textStart"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
 
                 <EditText
                     android:id="@+id/mystatus_message_edittext"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="fill_horizontal"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_weight="8"
-                    android:fontFamily="monospace"
-                    android:text="my status kedmrlsejoriwejk irkwioprjkwepor kpowekrpowek orkweor pkweoprkpoekröosekr öeskr op"
-                    android:textSize="16sp"
-                    android:typeface="monospace"/>
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:hint="Status"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
             </LinearLayout>
 
             <Button
@@ -135,11 +135,25 @@
                 android:text="remove own Relay"/>
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="0"
+                android:paddingBottom="15dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:layout_marginLeft="20dp"
+                android:text="Relay Pubkey:"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
                 android:id="@+id/my_relay_toxid_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="7dp"
-                android:layout_marginRight="7dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:fontFamily="monospace"
                 android:gravity="fill_horizontal"
                 android:paddingBottom="15dp"
@@ -162,11 +176,25 @@
                 android:text="new Random NOSPAM"/>
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_weight="0"
+                android:paddingBottom="15dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:layout_marginLeft="20dp"
+                android:text="Own Pubkey:"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
                 android:id="@+id/mytoxid_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="7dp"
-                android:layout_marginRight="7dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:fontFamily="monospace"
                 android:gravity="fill_horizontal"
                 android:paddingBottom="15dp"
@@ -191,10 +219,12 @@
             <ImageView
                 android:id="@+id/mytoxid_imageview"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="400dp"
                 android:paddingBottom="15dp"
+                android:layout_gravity="center"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
+                android:scaleType="fitCenter"
                 android:paddingTop="15dp"
                 android:src="@mipmap/ic_launcher_round"/>
 
@@ -217,7 +247,8 @@
                 android:id="@+id/my_identicon_imageview"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
                 android:paddingBottom="15dp"
                 android:paddingTop="15dp"
                 android:src="@mipmap/ic_launcher_round"/>
@@ -226,8 +257,8 @@
                 android:id="@+id/mytox_network_connections"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="7dp"
-                android:layout_marginRight="7dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:fontFamily="monospace"
                 android:gravity="fill_horizontal"
                 android:paddingBottom="15dp"
