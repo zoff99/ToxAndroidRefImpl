@@ -20,7 +20,6 @@
 package com.zoffcc.applications.trifa;
 
 import android.Manifest;
-import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -3270,6 +3269,9 @@ public class MainActivity extends AppCompatActivity
             {
                 global_self_last_went_online_timestamp = System.currentTimeMillis();
                 global_self_last_went_offline_timestamp = -1;
+
+                Log.i(TAG, "self_connection_status:went_offline");
+                // TODO: stop any active calls
             }
             else
             {
@@ -3350,6 +3352,22 @@ public class MainActivity extends AppCompatActivity
         {
             if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)
             {
+                if (a_TOX_CONNECTION == 0)
+                {
+                    Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":went offline");
+                    // TODO: stop any active calls to/from this friend
+                    try
+                    {
+                        Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":stop any calls");
+                        toxav_call_control(friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+                        on_call_ended_actions();
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+
                 f.TOX_CONNECTION_real = a_TOX_CONNECTION;
                 f.TOX_CONNECTION_on_off_real = get_toxconnection_wrapper(f.TOX_CONNECTION);
                 HelperFriend.update_friend_in_db_connection_status_real(f);

@@ -4737,8 +4737,10 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv *env, jobject thiz, jlong friend_number,
         jint control)
 {
+    dbg(9, "JNI:toxav_call_control:ENTER");
     TOXAV_ERR_CALL_CONTROL error;
     bool res = toxav_call_control(tox_av_global, (uint32_t)friend_number, (TOXAV_CALL_CONTROL)control, &error);
+    dbg(9, "JNI:toxav_call_control:FINISHED");
     return (jint)res;
 }
 

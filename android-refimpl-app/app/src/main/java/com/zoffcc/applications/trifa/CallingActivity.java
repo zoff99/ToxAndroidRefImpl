@@ -70,6 +70,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.set_audio_dela
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
@@ -84,7 +85,6 @@ import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
-import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -1023,13 +1023,23 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
+                Log.i(TAG, "decline_button_pressed:000");
+
                 try
                 {
                     if (event.getAction() == MotionEvent.ACTION_DOWN)
                     {
-                        Log.i(TAG, "decline button pressed");
-                        toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                           ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+                        Log.i(TAG, "decline_button_pressed:DOWN");
+                        try
+                        {
+                            toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                               ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+                        }
+                        catch (Exception e2)
+                        {
+                            e2.printStackTrace();
+                        }
+                        Log.i(TAG, "decline_button_pressed:on_call_ended_actions");
                         on_call_ended_actions();
                     }
                 }
@@ -1037,6 +1047,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     e.printStackTrace();
                 }
+
                 return true;
             }
         });
