@@ -679,14 +679,14 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 }
 
 
-void export_savedata_file_unsecure(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len, const char* export_full_path_of_file)
+void export_savedata_file_unsecure(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len,
+                                   const char *export_full_path_of_file)
 {
     size_t size = tox_get_savedata_size(tox);
     dbg(9, "export_savedata_file_unsecure:tox_get_savedata_size=%d", (int)size);
     char *savedata = malloc(size);
     dbg(9, "export_savedata_file_unsecure:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
-
     FILE *f = fopen(export_full_path_of_file, "wb");
     fwrite(savedata, size, 1, f);
     fclose(f);
@@ -1768,11 +1768,11 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
         memcpy((void *)audio_buffer_pcm_2, (void *)pcm, (size_t)(sample_count * channels * 2));
 
         // ------------ change PCM volume here ------------
-        if ((sample_count > 0) && (channels > 0))
+        if((sample_count > 0) && (channels > 0))
         {
-            if (audio_play_volume_percent_c < 100)
+            if(audio_play_volume_percent_c < 100)
             {
-                if (audio_play_volume_percent_c == 0)
+                if(audio_play_volume_percent_c == 0)
                 {
                     change_audio_volume_pcm_null((int16_t *)audio_buffer_pcm_2, (size_t)(sample_count * channels * 2));
                 }
@@ -1782,9 +1782,9 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
                 }
             }
         }
+
         // ------------ change PCM volume here ------------
     }
-
 
 #ifdef USE_ECHO_CANCELLATION
 
@@ -1797,7 +1797,7 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
         filteraudio_incompatible_2 = 1;
     }
 
-    if (sample_count > 0)
+    if(sample_count > 0)
     {
         if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
                 && (filteraudio_incompatible_2 == 0))
@@ -1851,9 +1851,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1av_1call_1status(JNIEnv *en
 }
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1play_1volume_1percent(JNIEnv *env, jclass clazz, jint volume_percent)
+Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1play_1volume_1percent(JNIEnv *env, jclass clazz,
+        jint volume_percent)
 {
-    if ((volume_percent >= 0) && (volume_percent <= 100))
+    if((volume_percent >= 0) && (volume_percent <= 100))
     {
         audio_play_volume_percent_c = volume_percent;
     }
@@ -1863,12 +1864,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1play_1volume_1percen
     // ** // float volumeLevelDb = -((float)((100 - volume_percent) / 5)) + 0.0001f;
     // ** // const float VOLUME_REFERENCE = 1.0f;
     // ** // volumeMultiplier = (VOLUME_REFERENCE * pow(10, (volumeLevelDb / 20.f)));
-
     float volumeLevelDb = ((float)volume_percent / 100.0f) - 1.0f;
     volumeMultiplier = powf(20, volumeLevelDb);
-
     // ** // volumeMultiplier = ((float)audio_play_volume_percent_c / 100.0f);
-
     // dbg(9, "set_audio_play_volume_percent:vol=%d mul=%f", volume_percent, volumeMultiplier);
 }
 
@@ -1879,7 +1877,7 @@ void change_audio_volume_pcm_null(int16_t *buf, size_t buf_size_bytes)
 
 void change_audio_volume_pcm(int16_t *buf, size_t num_samples)
 {
-    for (size_t i = 0; i < num_samples; i++)
+    for(size_t i = 0; i < num_samples; i++)
     {
         buf[i] = buf[i] * volumeMultiplier;
     }
@@ -2076,7 +2074,8 @@ void toxav_video_receive_frame_h264_cb_(ToxAV *av, uint32_t friend_number, const
         {
             // memset(video_buffer_1, 0, video_buffer_1_size);
             memcpy(video_buffer_1, buf, (size_t)(buf_size));
-            if (buf_size > 8)
+
+            if(buf_size > 8)
             {
                 dbg(9, "v_receive_frame_h264_cb:size=%d", buf_size);
                 dbg(9, "v_receive_frame_h264_cb:%d %d %d %d %d %d h %d %d",
@@ -2150,7 +2149,6 @@ void *thread_av(void *data)
     dbg(9, "2002");
     pthread_t id = pthread_self();
     dbg(9, "2003");
-
     dbg(2, "AV Thread #%d: starting", (int) id);
 
     while(toxav_iterate_thread_stop != 1)
@@ -2176,7 +2174,6 @@ void *thread_video_av(void *data)
     dbg(9, "2002");
     pthread_t id = pthread_self();
     dbg(9, "2003");
-
     dbg(2, "AV video Thread #%d: starting", (int) id);
     long av_iterate_interval = 1;
 
@@ -2386,7 +2383,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_video_receive_frame_cb_method", "(JJJJJJ)V");
     toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
-
     // --------------------
     // --------------------
     android_toxav_callback_video_receive_frame_h264_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2394,8 +2390,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     // toxav_callback_video_receive_frame_h264(tox_av_global, toxav_video_receive_frame_h264_cb_, &mytox_CC);
     // --------------------
     // --------------------
-
-
     android_toxav_callback_call_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_call_state_cb_method", "(JI)V");
     toxav_callback_call_state(tox_av_global, toxav_call_state_cb_, &mytox_CC);
@@ -4782,10 +4776,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(
 {
     TOXAV_ERR_SEND_FRAME error;
     bool res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
-                                        (uint16_t)frame_height_px,
-                                        (uint8_t *)video_buffer_2,
-                                        (uint32_t)data_len, &error);
-
+                                           (uint16_t)frame_height_px,
+                                           (uint8_t *)video_buffer_2,
+                                           (uint32_t)data_len, &error);
     return (jint)error;
 }
 
@@ -4855,7 +4848,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
         // TODO: need some locking here!
 
-        if (sample_count > 0)
+        if(sample_count > 0)
         {
             if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
                     && (filteraudio_incompatible_2 == 0))
