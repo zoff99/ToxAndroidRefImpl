@@ -145,7 +145,6 @@ typedef struct
     uint32_t state;
     uint32_t audio_bit_rate;
     uint32_t video_bit_rate;
-    // pthread_mutex_t arb_mutex[1];
 } CallControl;
 
 
@@ -2151,17 +2150,6 @@ void *thread_av(void *data)
     dbg(9, "2002");
     pthread_t id = pthread_self();
     dbg(9, "2003");
-    pthread_mutex_t av_thread_lock;
-    dbg(9, "2004");
-
-    if(pthread_mutex_init(&av_thread_lock, NULL) != 0)
-    {
-        dbg(0, "Error creating av_thread_lock");
-    }
-    else
-    {
-        dbg(2, "av_thread_lock created successfully");
-    }
 
     dbg(2, "AV Thread #%d: starting", (int) id);
 
@@ -2188,29 +2176,14 @@ void *thread_video_av(void *data)
     dbg(9, "2002");
     pthread_t id = pthread_self();
     dbg(9, "2003");
-    // pthread_mutex_t av_thread_lock;
-    dbg(9, "2004");
-#if 0
 
-    if(pthread_mutex_init(&av_thread_lock, NULL) != 0)
-    {
-        dbg(0, "Error creating video av_thread_lock");
-    }
-    else
-    {
-        dbg(2, "av_thread_lock video created successfully");
-    }
-
-#endif
     dbg(2, "AV video Thread #%d: starting", (int) id);
     long av_iterate_interval = 1;
 
     while(toxav_video_thread_stop != 1)
     {
-        // pthread_mutex_lock(&av_thread_lock);
         toxav_iterate(av);
         // dbg(9, "AV video Thread #%d running ...", (int) id);
-        // pthread_mutex_unlock(&av_thread_lock);
         av_iterate_interval = toxav_iteration_interval(av);
 
         //usleep((av_iterate_interval / 2) * 1000);
