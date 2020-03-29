@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 import android.database.Cursor;
 import android.util.Log;
 
+import java.net.URLConnection;
 import java.util.Random;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -53,29 +54,33 @@ public class HelperFiletransfer
                 if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
                     3 * 1014 * 1024) // if file size is smaller than 3 MByte accept FT
                 {
-
-                    if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
+                    String mimeType = URLConnection.guessContentTypeFromName(
+                            get_filetransfer_filename_from_id(message.filetransfer_id).toLowerCase());
+                    if (mimeType.startsWith("image"))
                     {
-                        // accept FT
-                        set_filetransfer_accepted_from_id(message.filetransfer_id);
-                        set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
-                        set_message_accepted_from_id(message.id);
-                        set_message_state_from_id(message.id, TOX_FILE_CONTROL_RESUME.value);
-                        tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
-                                         get_filetransfer_filenum_from_id(message.filetransfer_id),
-                                         TOX_FILE_CONTROL_RESUME.value);
+                        if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
+                        {
+                            // accept FT
+                            set_filetransfer_accepted_from_id(message.filetransfer_id);
+                            set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
+                            set_message_accepted_from_id(message.id);
+                            set_message_state_from_id(message.id, TOX_FILE_CONTROL_RESUME.value);
+                            tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
+                                             get_filetransfer_filenum_from_id(message.filetransfer_id),
+                                             TOX_FILE_CONTROL_RESUME.value);
 
-                        // ft_progressbar.setProgress(0);
-                        // ft_progressbar.setMax(100);
-                        // ft_progressbar.setVisibility(View.VISIBLE);
-                        // button_ok.setVisibility(View.GONE);
+                            // ft_progressbar.setProgress(0);
+                            // ft_progressbar.setMax(100);
+                            // ft_progressbar.setVisibility(View.VISIBLE);
+                            // button_ok.setVisibility(View.GONE);
 
-                        // update message view
-                        update_single_message_from_messge_id(message.id, true);
+                            // update message view
+                            update_single_message_from_messge_id(message.id, true);
 
-                        Log.i(TAG, "check_auto_accept_incoming_filetransfer:accepted");
+                            Log.i(TAG, "check_auto_accept_incoming_filetransfer:accepted");
 
-                        return true;
+                            return true;
+                        }
                     }
                 }
             }
@@ -306,6 +311,26 @@ public class HelperFiletransfer
         {
             e.printStackTrace();
             return TOX_FILE_CONTROL_CANCEL.value;
+        }
+    }
+
+    public static String get_filetransfer_filename_from_id(long filetransfer_id)
+    {
+        try
+        {
+            if (orma.selectFromFiletransfer().idEq(filetransfer_id).count() == 1)
+            {
+                return orma.selectFromFiletransfer().idEq(filetransfer_id).get(0).file_name;
+            }
+            else
+            {
+                return "";
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "";
         }
     }
 
