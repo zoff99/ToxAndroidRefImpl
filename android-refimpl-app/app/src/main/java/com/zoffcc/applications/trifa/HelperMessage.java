@@ -100,6 +100,7 @@ public class HelperMessage
             long ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     and().file_numberEq(file_number).orderByIdDesc().get(0).id;
+
             update_message_in_db_filename_fullpath_from_id(orma.selectFromMessage().
                     filetransfer_idEq(ft_id).and().
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).

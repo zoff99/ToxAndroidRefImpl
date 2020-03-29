@@ -22,6 +22,8 @@ package com.zoffcc.applications.trifa;
 import android.database.Cursor;
 import android.util.Log;
 
+import java.util.Random;
+
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
@@ -29,6 +31,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image
 import static com.zoffcc.applications.trifa.MainActivity.set_message_accepted_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
@@ -83,6 +86,54 @@ public class HelperFiletransfer
         }
 
         return false;
+    }
+
+    public static String get_incoming_filetransfer_local_filename(String incoming_filename, String friend_pubkey_str)
+    {
+        String result = TrifaSetPatternActivity.filter_out_specials_from_filepath(incoming_filename);
+        String wanted_full_filename_path = VFS_PREFIX + VFS_FILE_DIR + "/" + friend_pubkey_str;
+
+        // Log.i(TAG, "check_auto_accept_incoming_filetransfer:start=" + incoming_filename + " " + result + " " +
+        //           wanted_full_filename_path);
+
+        info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
+                wanted_full_filename_path + "/" + result);
+
+        if (f1.exists())
+        {
+            Random random = new Random();
+            long new_random_log = (long) random.nextInt() + (1L << 31);
+
+            // Log.i(TAG, "check_auto_accept_incoming_filetransfer:new_random_log=" + new_random_log);
+
+            String random_filename_addon = TrifaSetPatternActivity.filter_out_specials(
+                    TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
+                            TrifaSetPatternActivity.StringToBytes2("" + new_random_log))));
+
+            // Log.i(TAG, "check_auto_accept_incoming_filetransfer:random_filename_addon=" + random_filename_addon);
+
+            String extension = "";
+
+            try
+            {
+                extension = result.substring(result.lastIndexOf("."));
+
+                if (extension.equalsIgnoreCase("."))
+                {
+                    extension = "";
+                }
+            }
+            catch (Exception e)
+            {
+                extension = "";
+            }
+
+            result = result + "_" + random_filename_addon + extension;
+
+            // Log.i(TAG, "check_auto_accept_incoming_filetransfer:result=" + result);
+        }
+
+        return result;
     }
 
     public static long get_filetransfer_id_from_friendnum_and_filenum(long friend_number, long file_number)

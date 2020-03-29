@@ -74,6 +74,33 @@ public class TrifaSetPatternActivity extends SetPatternActivity
         return sha256(patternToBytes(pattern, columnCount));
     }
 
+    public static String filter_out_specials_from_filepath(String path)
+    {
+        try
+        {
+            // TODO: be less strict here, but really actually test it then!
+            return path.replaceAll("[^a-zA-Z0-9_.]", "_");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return path;
+        }
+    }
+
+    public static String filter_out_specials(String in)
+    {
+        try
+        {
+            return in.replaceAll("[^a-zA-Z0-9]", "");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return in;
+        }
+    }
+
     public static String bytesToString(byte[] bytes)
     {
         return Base64.encodeToString(bytes, Base64.NO_WRAP);

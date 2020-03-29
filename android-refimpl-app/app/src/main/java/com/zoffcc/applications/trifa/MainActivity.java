@@ -158,6 +158,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
@@ -4382,6 +4383,10 @@ public class MainActivity extends AppCompatActivity
         }
         else // DATA file ft
         {
+            String filename_corrected = get_incoming_filetransfer_local_filename(filename,
+                                                                                 HelperFriend.tox_friend_get_public_key__wrapper(
+                                                                                         friend_number));
+
             Log.i(TAG, "file_recv:incoming regular file");
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
@@ -4390,7 +4395,7 @@ public class MainActivity extends AppCompatActivity
             f.kind = a_TOX_FILE_KIND;
             f.state = TOX_FILE_CONTROL_PAUSE.value;
             f.path_name = VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + f.tox_public_key_string + "/";
-            f.file_name = filename;
+            f.file_name = filename_corrected;
             f.filesize = file_size;
             f.ft_accepted = false;
             f.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
@@ -4410,7 +4415,7 @@ public class MainActivity extends AppCompatActivity
             m.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
             m.rcvd_timestamp = System.currentTimeMillis();
             m.sent_timestamp = m.rcvd_timestamp;
-            m.text = filename + "\n" + file_size + " bytes";
+            m.text = filename_corrected + "\n" + file_size + " bytes";
             long new_msg_id = -1;
 
             if (message_list_activity != null)
