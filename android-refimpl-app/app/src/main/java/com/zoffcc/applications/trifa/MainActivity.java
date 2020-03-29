@@ -161,6 +161,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
@@ -4363,6 +4364,20 @@ public class MainActivity extends AppCompatActivity
 
         if (a_TOX_FILE_KIND == TOX_FILE_KIND_AVATAR.value)
         {
+            if (file_size > AVATAR_INCOMING_MAX_BYTE_SIZE)
+            {
+                try
+                {
+                    tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                return;
+            }
+
+
             Log.i(TAG, "file_recv:incoming avatar");
             String file_name_avatar = FRIEND_AVATAR_FILENAME;
             Filetransfer f = new Filetransfer();

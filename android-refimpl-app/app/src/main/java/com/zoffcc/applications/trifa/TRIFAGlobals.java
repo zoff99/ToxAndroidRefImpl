@@ -76,6 +76,8 @@ public class TRIFAGlobals
     final static String VFS_OWN_AVATAR_DIR = "/datadir/myavatar/";
     static String VFS_PREFIX = ""; // only set for normal (unencrypted) storage
 
+    final static long AVATAR_INCOMING_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
+
     static boolean orbot_is_really_running = false;
 
     final static int HIGHER_GLOBAL_VIDEO_BITRATE = 3500;
