@@ -2,6 +2,12 @@
 
     <SwitchPreference
         android:defaultValue="true"
+        android:key="auto_accept_image"
+        android:summary="@string/pref_description_auto_accept_image"
+        android:title="@string/pref_title_auto_accept_image"/>
+
+    <SwitchPreference
+        android:defaultValue="true"
         android:key="video_uv_reversed"
         android:summary="@string/pref_description_video_uv_reversed"
         android:title="@string/pref_title_video_uv_reversed"/>

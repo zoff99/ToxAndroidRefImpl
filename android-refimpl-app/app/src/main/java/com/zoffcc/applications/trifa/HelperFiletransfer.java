@@ -22,16 +22,68 @@ package com.zoffcc.applications.trifa;
 import android.database.Cursor;
 import android.util.Log;
 
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
+import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image;
+import static com.zoffcc.applications.trifa.MainActivity.set_message_accepted_from_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperFiletransfer
 {
     private static final String TAG = "trifa.Hlp.Filetransfer";
+
+    public static boolean check_auto_accept_incoming_filetransfer(Message message)
+    {
+        try
+        {
+            if (PREF__auto_accept_image)
+            {
+                if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
+                    3 * 1014 * 1024) // if file size is smaller than 3 MByte accept FT
+                {
+
+                    if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
+                    {
+                        // accept FT
+                        set_filetransfer_accepted_from_id(message.filetransfer_id);
+                        set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
+                        set_message_accepted_from_id(message.id);
+                        set_message_state_from_id(message.id, TOX_FILE_CONTROL_RESUME.value);
+                        tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
+                                         get_filetransfer_filenum_from_id(message.filetransfer_id),
+                                         TOX_FILE_CONTROL_RESUME.value);
+
+                        // ft_progressbar.setProgress(0);
+                        // ft_progressbar.setMax(100);
+                        // ft_progressbar.setVisibility(View.VISIBLE);
+                        // button_ok.setVisibility(View.GONE);
+
+                        // update message view
+                        update_single_message_from_messge_id(message.id, true);
+
+                        Log.i(TAG, "check_auto_accept_incoming_filetransfer:accepted");
+
+                        return true;
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
     public static long get_filetransfer_id_from_friendnum_and_filenum(long friend_number, long file_number)
     {
@@ -163,6 +215,46 @@ public class HelperFiletransfer
         {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    public static long get_filetransfer_filesize_from_id(long filetransfer_id)
+    {
+        try
+        {
+            if (orma.selectFromFiletransfer().idEq(filetransfer_id).count() == 1)
+            {
+                return orma.selectFromFiletransfer().idEq(filetransfer_id).get(0).filesize;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static long get_filetransfer_state_from_id(long filetransfer_id)
+    {
+        try
+        {
+            if (orma.selectFromFiletransfer().idEq(filetransfer_id).count() == 1)
+            {
+                return orma.selectFromFiletransfer().idEq(filetransfer_id).get(0).state;
+            }
+            else
+            {
+                return TOX_FILE_CONTROL_CANCEL.value;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return TOX_FILE_CONTROL_CANCEL.value;
         }
     }
 

@@ -157,6 +157,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_acti
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
@@ -377,6 +378,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
     static int PREF__video_play_delay_ms = 180;
+    static boolean PREF__auto_accept_image = true;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -843,6 +845,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__allow_screen_off_in_audio_call = true;
+        }
+
+        try
+        {
+            PREF__auto_accept_image = settings.getBoolean("auto_accept_image", true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__auto_accept_image = true;
         }
 
         try
@@ -2049,6 +2061,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__allow_screen_off_in_audio_call = true;
+        }
+
+        try
+        {
+            PREF__auto_accept_image = settings.getBoolean("auto_accept_image", true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__auto_accept_image = true;
         }
 
         try
@@ -4423,6 +4445,33 @@ public class MainActivity extends AppCompatActivity
             {
                 e.printStackTrace();
                 Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
+            }
+
+            final Message m2 = m;
+
+            try
+            {
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            sleep(1 * 50);
+                        }
+                        catch (Exception e2)
+                        {
+                            e2.printStackTrace();
+                        }
+                        check_auto_accept_incoming_filetransfer(m2);
+                    }
+                };
+                t.start();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
     }
