@@ -187,6 +187,7 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
                     if (f1.length() > 0)
                     {
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
+                        // GLIDE:own-avatar
                         GlideApp.
                                 with(context).
                                 load(f1).

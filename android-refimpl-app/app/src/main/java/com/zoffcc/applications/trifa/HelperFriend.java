@@ -313,7 +313,8 @@ public class HelperFriend
                 orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                         avatar_pathname(avatar_path_name).
                         avatar_filename(avatar_file_name).
-                        avatar_update(true).
+                        avatar_update(false).
+                        avatar_update_timestamp(System.currentTimeMillis()).
                         execute();
             }
             else
@@ -321,7 +322,8 @@ public class HelperFriend
                 orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                         avatar_pathname(null).
                         avatar_filename(null).
-                        avatar_update(true).
+                        avatar_update(false).
+                        avatar_update_timestamp(System.currentTimeMillis()).
                         execute();
             }
 
@@ -340,6 +342,7 @@ public class HelperFriend
         {
             orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                     avatar_update(avatar_update_value).
+                    avatar_update_timestamp(System.currentTimeMillis()).
                     execute();
         }
         catch (Exception e)

@@ -72,6 +72,9 @@ public class FriendList
     @Nullable
     boolean avatar_update = false; // has avatar changed for this friend?
 
+    @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
+    long avatar_update_timestamp = -1L;
+
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     @Nullable
     boolean notification_silent = false; // show notifications for this friend?
@@ -105,6 +108,7 @@ public class FriendList
         out.last_online_timestamp = in.last_online_timestamp;
         out.alias_name = in.alias_name;
         out.is_relay = in.is_relay;
+        out.avatar_update_timestamp = in.avatar_update_timestamp;
 
         return out;
     }

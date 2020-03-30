@@ -44,13 +44,14 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
@@ -129,7 +130,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         // textView.setText("#" + m.id + ":" + m.text);
         textView.setCustomRegex(TOXURL_PATTERN);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
 
         try
         {
@@ -162,7 +164,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             layout_peer_name_container.setVisibility(View.VISIBLE);
             try
             {
-                peer_name_text.setText(peer_name + " / " + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6), m.tox_peerpubkey.length()));
+                peer_name_text.setText(peer_name + " / " + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
+                                                                                      m.tox_peerpubkey.length()));
             }
             catch (Exception e2)
             {
@@ -203,11 +206,13 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
                 {
@@ -238,7 +243,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 info.guardianproject.iocipher.File f1 = null;
                 try
                 {
-                    f1 = new info.guardianproject.iocipher.File(fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                    f1 = new info.guardianproject.iocipher.File(
+                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                     if (f1.length() > 0)
                     {
                         have_avatar_for_pubkey = true;
@@ -278,7 +284,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         // we need to do the rounded corner background manually here, to change the color ---------------
         GradientDrawable shape = new GradientDrawable();
         shape.setShape(GradientDrawable.RECTANGLE);
-        shape.setCornerRadii(new float[]{CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX});
+        shape.setCornerRadii(
+                new float[]{CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX});
         shape.setColor(peer_color_bg);
         // shape.setStroke(3, borderColor);
         textView_container.setBackground(shape);
@@ -300,7 +307,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                     info.guardianproject.iocipher.File f1 = null;
                     try
                     {
-                        f1 = new info.guardianproject.iocipher.File(fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                        f1 = new info.guardianproject.iocipher.File(
+                                fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                     }
                     catch (Exception e)
                     {
@@ -319,6 +327,9 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                                     load(f1).
                                     diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                     skipMemoryCache(false).
+                                    signature(StringSignature2(
+                                            "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename +
+                                            "_" + fl_temp.avatar_update_timestamp)).
                                     apply(glide_options).
                                     into(img_avatar);
                             // Log.i(TAG, "have_avatar_for_pubkey:002");
@@ -342,9 +353,11 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             img_corner.setVisibility(View.GONE);
             imageView.setVisibility(View.GONE);
             textView_container.setMinimumHeight(4);
-            textView_container.setPadding((int) dp2px(4), textView_container.getPaddingTop(), (int) dp2px(4), textView_container.getPaddingBottom()); // left, top, right, bottom
+            textView_container.setPadding((int) dp2px(4), textView_container.getPaddingTop(), (int) dp2px(4),
+                                          textView_container.getPaddingBottom()); // left, top, right, bottom
             LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
-            parameter.setMargins((int) dp2px(20), parameter.topMargin, parameter.rightMargin, parameter.bottomMargin); // left, top, right, bottom
+            parameter.setMargins((int) dp2px(20), parameter.topMargin, parameter.rightMargin,
+                                 parameter.bottomMargin); // left, top, right, bottom
             textView_container.setLayoutParams(parameter);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
@@ -357,9 +370,11 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             img_corner.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
             textView_container.setMinimumHeight((int) dp2px(50));
-            textView_container.setPadding(0, textView_container.getPaddingTop(), 0, textView_container.getPaddingBottom()); // left, top, right, bottom
+            textView_container.setPadding(0, textView_container.getPaddingTop(), 0,
+                                          textView_container.getPaddingBottom()); // left, top, right, bottom
             LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
-            parameter.setMargins(0, parameter.topMargin, parameter.rightMargin, parameter.bottomMargin); // left, top, right, bottom
+            parameter.setMargins(0, parameter.topMargin, parameter.rightMargin,
+                                 parameter.bottomMargin); // left, top, right, bottom
             textView_container.setLayoutParams(parameter);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
@@ -438,7 +453,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                     {
                         try
                         {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email_addr, null));
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                            Uri.fromParts("mailto", email_addr, null));
                             emailIntent.setType("message/rfc822");
                             // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                             // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
@@ -472,7 +488,9 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                     {
                         try
                         {
-                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
+                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
+                                                                                                     "").replaceFirst(
+                                    "TOX:", "").replaceFirst("Tox:", "");
                             add_friend_real(friend_tox_id);
                         }
                         catch (Exception e)
@@ -506,7 +524,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         @Override
         public boolean onLongClick(final View v)
         {
-            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(context, v, is_selected, message_);
+            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(
+                    context, v, is_selected, message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

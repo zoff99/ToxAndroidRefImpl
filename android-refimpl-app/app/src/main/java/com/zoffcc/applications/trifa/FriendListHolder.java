@@ -47,7 +47,6 @@ import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_files
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
-import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar_update;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
@@ -57,7 +56,6 @@ import static com.zoffcc.applications.trifa.HelperRelay.send_all_friend_pubkeys_
 import static com.zoffcc.applications.trifa.HelperRelay.send_relay_pubkey_to_all_friends;
 import static com.zoffcc.applications.trifa.HelperRelay.set_friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
-import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
@@ -242,15 +240,14 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 with(avatar.getContext()).
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(StringSignature2(
-                                        "_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
+                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                        fl.avatar_update_timestamp)).
                                 placeholder(d_lock).
                                 priority(Priority.HIGH).
-                                skipMemoryCache(fl.avatar_update).
+                                skipMemoryCache(false).
                                 apply(glide_options).
                                 into(avatar);
-
-                        set_friend_avatar_update(fl.tox_public_key_string, false);
 
                         need_create_identicon = false;
                     }
@@ -293,8 +290,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     with(avatar.getContext()).
                                     load(f1).
                                     diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                    signature(StringSignature2(
-                                            "_friendlist_avatar_" + new_avatar_pathname + "/" + new_avatar_filename)).
+                                    signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                            "_avatar_" + new_avatar_pathname + "/" + new_avatar_filename + "_" +
+                                            fl.avatar_update_timestamp)).
                                     placeholder(d_lock).
                                     priority(Priority.HIGH).
                                     skipMemoryCache(false).
@@ -340,8 +338,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             load(byteArray).
                             placeholder(d_lock).
                             diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            signature(StringSignature2(
-                                    "_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
+                            signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                    "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                    fl.avatar_update_timestamp)).
                             skipMemoryCache(false).
                             apply(glide_options).
                             into(avatar);

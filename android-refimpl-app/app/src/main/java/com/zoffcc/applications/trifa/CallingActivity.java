@@ -70,6 +70,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.set_audio_dela
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
+import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
@@ -82,7 +83,7 @@ import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
-import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
+import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
@@ -519,7 +520,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             if (fname != null)
             {
-                put_vfs_image_on_imageview(this, caller_avatar_view, d1, fname);
+                put_vfs_image_on_imageview_real(this, caller_avatar_view, d1, fname, false, true, main_get_friend(
+                        tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)));
             }
         }
         catch (Exception e1)

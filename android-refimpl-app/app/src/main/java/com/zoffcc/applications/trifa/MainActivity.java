@@ -4622,6 +4622,7 @@ public class MainActivity extends AppCompatActivity
 
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
+                    // we have received an avatar image for a friend. and the filetransfer is complete here
                     HelperFriend.set_friend_avatar(HelperFriend.tox_friend_get_public_key__wrapper(friend_number),
                                                    VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/",
                                                    f.file_name);
@@ -6327,12 +6328,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void put_vfs_image_on_imageview(Context c, ImageView v, Drawable placholder, String vfs_image_filename)
-    {
-        put_vfs_image_on_imageview_real(c, v, placholder, vfs_image_filename, false);
-    }
-
-    static void put_vfs_image_on_imageview_real(Context c, ImageView v, Drawable placholder, String vfs_image_filename, boolean force_update)
+    static void put_vfs_image_on_imageview_real(Context c, ImageView v, Drawable placholder, String vfs_image_filename, boolean force_update, boolean is_friend_avatar, FriendList fl)
     {
         try
         {
@@ -6347,23 +6343,55 @@ public class MainActivity extends AppCompatActivity
 
                 if (placholder == null)
                 {
-                    GlideApp.
-                            with(c).
-                            load(f1).
-                            placeholder(R.drawable.round_loading_animation).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            skipMemoryCache(force_update).
-                            into(v);
+                    if (is_friend_avatar)
+                    {
+                        GlideApp.
+                                with(c).
+                                load(f1).
+                                placeholder(R.drawable.round_loading_animation).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                        fl.avatar_update_timestamp)).
+                                skipMemoryCache(false).
+                                into(v);
+                    }
+                    else
+                    {
+                        GlideApp.
+                                with(c).
+                                load(f1).
+                                placeholder(R.drawable.round_loading_animation).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(force_update).
+                                into(v);
+                    }
                 }
                 else
                 {
-                    GlideApp.
-                            with(c).
-                            load(f1).
-                            placeholder(placholder).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            skipMemoryCache(force_update).
-                            into(v);
+                    if (is_friend_avatar)
+                    {
+                        GlideApp.
+                                with(c).
+                                load(f1).
+                                placeholder(placholder).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                        fl.avatar_update_timestamp)).
+                                skipMemoryCache(false).
+                                into(v);
+                    }
+                    else
+                    {
+                        GlideApp.
+                                with(c).
+                                load(f1).
+                                placeholder(placholder).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(force_update).
+                                into(v);
+                    }
                 }
             }
             else

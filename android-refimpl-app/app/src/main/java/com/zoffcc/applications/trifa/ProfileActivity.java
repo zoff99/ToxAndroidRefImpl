@@ -323,7 +323,7 @@ public class ProfileActivity extends AppCompatActivity
 
                                             put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d1,
                                                                             VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
-                                                                            "avatar.png", true);
+                                                                            "avatar.png", true, false, null);
                                             Log.i(TAG, "select_avatar:put_vfs_image_on_imageview");
 
 
@@ -390,7 +390,7 @@ public class ProfileActivity extends AppCompatActivity
             String fname = get_vfs_image_filename_own_avatar();
             if (fname != null)
             {
-                put_vfs_image_on_imageview_real(this, profile_icon, d1, fname, true);
+                put_vfs_image_on_imageview_real(this, profile_icon, d1, fname, true, false, null);
             }
         }
         catch (Exception e)

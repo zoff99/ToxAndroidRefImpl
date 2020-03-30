@@ -80,7 +80,8 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                     info.guardianproject.iocipher.File f1 = null;
                     try
                     {
-                        f1 = new info.guardianproject.iocipher.File(fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                        f1 = new info.guardianproject.iocipher.File(
+                                fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                     }
                     catch (Exception e)
                     {
@@ -93,8 +94,10 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                         {
                             icon.setVisibility(View.VISIBLE);
                             icon.setPadding((int) dp2px(2), (int) dp2px(2), (int) dp2px(2), (int) dp2px(2));
-                            LinearLayout.LayoutParams parameter = new LinearLayout.LayoutParams((int) dp2px(35), (int) dp2px(35));
-                            parameter.setMargins(parameter.leftMargin, (int) dp2px(6), (int) dp2px(10), (int) dp2px(0)); // left, top, right, bottom
+                            LinearLayout.LayoutParams parameter = new LinearLayout.LayoutParams((int) dp2px(35),
+                                                                                                (int) dp2px(35));
+                            parameter.setMargins(parameter.leftMargin, (int) dp2px(6), (int) dp2px(10),
+                                                 (int) dp2px(0)); // left, top, right, bottom
                             icon.setLayoutParams(parameter);
 
                             // --------------------
@@ -109,7 +112,9 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                                     with(c).
                                     load(f1).
                                     diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                    signature(StringSignature2("_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename)).
+                                    signature(StringSignature2(
+                                            "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename +
+                                            "_" + fl_temp.avatar_update_timestamp)).
                                     priority(Priority.HIGH).
                                     placeholder(R.drawable.round_loading_animation).
                                     skipMemoryCache(false).
@@ -146,14 +151,16 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                 icon.setImageDrawable(smiley_face);
 
                 LinearLayout.LayoutParams parameter = new LinearLayout.LayoutParams((int) dp2px(35), (int) dp2px(35));
-                parameter.setMargins(parameter.leftMargin, (int) dp2px(6), (int) dp2px(10), (int) dp2px(0)); // left, top, right, bottom
+                parameter.setMargins(parameter.leftMargin, (int) dp2px(6), (int) dp2px(10),
+                                     (int) dp2px(0)); // left, top, right, bottom
                 icon.setLayoutParams(parameter);
 
                 // we need to do the rounded corner background manually here, to change the color ---------------
                 GradientDrawable shape = new GradientDrawable();
                 shape.setShape(GradientDrawable.RECTANGLE);
                 shape.setSize((int) dp2px(35), (int) dp2px(35));
-                shape.setCornerRadii(new float[]{CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX});
+                shape.setCornerRadii(
+                        new float[]{CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX});
                 shape.setColor(peer_color_bg);
                 icon.setBackground(shape);
                 // we need to do the rounded corner background manually here, to change the color ---------------

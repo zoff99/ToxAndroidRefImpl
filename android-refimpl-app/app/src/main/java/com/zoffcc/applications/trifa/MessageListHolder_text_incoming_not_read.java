@@ -249,6 +249,9 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                                 with(context).
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                        fl.avatar_update_timestamp)).
                                 skipMemoryCache(false).
                                 apply(glide_options).
                                 into(img_avatar);
