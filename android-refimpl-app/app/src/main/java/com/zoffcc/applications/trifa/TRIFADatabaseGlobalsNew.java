@@ -20,12 +20,13 @@
 package com.zoffcc.applications.trifa;
 
 import com.github.gfx.android.orma.annotation.Column;
+import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
 @Table
-public class TRIFADatabaseGlobals
+public class TRIFADatabaseGlobalsNew
 {
-    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @PrimaryKey
     String key;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)

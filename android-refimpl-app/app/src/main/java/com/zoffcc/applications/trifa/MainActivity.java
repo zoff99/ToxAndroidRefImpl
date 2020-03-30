@@ -159,6 +159,8 @@ import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
+import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -2618,7 +2620,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if (HelperFriend.tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -2784,7 +2786,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
     {
-        if (HelperFriend.tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -2845,7 +2847,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_bit_rate_status_cb_method(long friend_number, long audio_bit_rate, long video_bit_rate)
     {
-        if (HelperFriend.tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -2972,7 +2974,7 @@ public class MainActivity extends AppCompatActivity
         //      " " + channels + " " + sampling_rate);
 
         // long timestamp_audio_frame = System.currentTimeMillis();
-        if (HelperFriend.tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
+        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
             return;
@@ -3313,7 +3315,7 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_name_cb_method(long friend_number, String friend_name, long length)
     {
         // Log.i(TAG, "friend_alias_name:friend:" + friend_number + " name:" + friend_alias_name);
-        FriendList f = HelperFriend.main_get_friend(friend_number);
+        FriendList f = main_get_friend(friend_number);
 
         // Log.i(TAG, "friend_alias_name:002:" + f);
         if (f != null)
@@ -3327,7 +3329,7 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_status_message_cb_method(long friend_number, String status_message, long length)
     {
         // Log.i(TAG, "friend_status_message:friend:" + friend_number + " status message:" + status_message);
-        FriendList f = HelperFriend.main_get_friend(friend_number);
+        FriendList f = main_get_friend(friend_number);
 
         if (f != null)
         {
@@ -3340,7 +3342,7 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_status_cb_method(long friend_number, int a_TOX_USER_STATUS)
     {
         // Log.i(TAG, "friend_status:friend:" + friend_number + " status:" + a_TOX_USER_STATUS);
-        FriendList f = HelperFriend.main_get_friend(friend_number);
+        FriendList f = main_get_friend(friend_number);
 
         if (f != null)
         {
@@ -3370,7 +3372,7 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
     {
         Log.i(TAG, "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION);
-        FriendList f = HelperFriend.main_get_friend(friend_number);
+        FriendList f = main_get_friend(friend_number);
 
         if (f != null)
         {
@@ -3707,7 +3709,7 @@ public class MainActivity extends AppCompatActivity
 
             try
             {
-                if (HelperFriend.tox_friend_by_public_key__wrapper(real_sender_as_hex_string) == -1)
+                if (tox_friend_by_public_key__wrapper(real_sender_as_hex_string) == -1)
                 {
                     // pubkey does NOT belong to a friend. it is probably a conference id
                     // check it here
@@ -3763,8 +3765,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    receive_incoming_message(2,
-                                             HelperFriend.tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
+                    receive_incoming_message(2, tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
                                              wrapped_msg_text_as_string, raw_data, raw_data_length,
                                              real_sender_as_hex_string);
                 }
@@ -4837,7 +4838,7 @@ public class MainActivity extends AppCompatActivity
         // invite also my ToxProxy -------------
         if (HelperRelay.have_own_relay())
         {
-            tox_conference_invite(HelperFriend.tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
+            tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
                                   conference_number);
         }
         // invite also my ToxProxy -------------
@@ -4871,7 +4872,7 @@ public class MainActivity extends AppCompatActivity
         // invite also my ToxProxy -------------
         if (HelperRelay.have_own_relay())
         {
-            tox_conference_invite(HelperFriend.tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
+            tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
                                   conference_num);
         }
         // invite also my ToxProxy -------------
@@ -5718,7 +5719,9 @@ public class MainActivity extends AppCompatActivity
 
     public static void update_friend_connection_status_helper(int a_TOX_CONNECTION, FriendList f, boolean from_relay)
     {
-        final long friend_number_ = HelperFriend.tox_friend_by_public_key__wrapper(f.tox_public_key_string);
+        Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:ENTER");
+
+        final long friend_number_ = tox_friend_by_public_key__wrapper(f.tox_public_key_string);
         boolean went_online = false;
 
         if (f.TOX_CONNECTION != a_TOX_CONNECTION)
@@ -5727,72 +5730,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (f.TOX_CONNECTION == TOX_CONNECTION_NONE.value)
                 {
-                    final Runnable myRunnable = new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                if (VFS_ENCRYPT)
-                                {
-                                    String fname = get_vfs_image_filename_own_avatar();
-
-                                    if (fname != null)
-                                    {
-                                        ByteBuffer avatar_bytes = file_to_bytebuffer(fname, true);
-
-                                        if (avatar_bytes != null)
-                                        {
-                                            // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:avatar_bytes=" + bytes_to_hex(avatar_bytes));
-                                            ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
-                                            int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
-
-                                            if (res == 0)
-                                            {
-                                                // Log.i(TAG,
-                                                //       "android_tox_callback_friend_connection_status_cb_method:hash(1)=" +
-                                                //       bytes_to_hex(hash_bytes));
-                                                // send avatar to friend -------
-                                                long filenum = tox_file_send(friend_number_, TOX_FILE_KIND_AVATAR.value,
-                                                                             avatar_bytes.capacity(), hash_bytes,
-                                                                             "avatar.png", "avatar.png".length());
-                                                Log.i(TAG,
-                                                      "android_tox_callback_friend_connection_status_cb_method:filenum=" +
-                                                      filenum);
-                                                // save FT to db ---------------
-                                                Filetransfer ft_avatar_outgoing = new Filetransfer();
-                                                ft_avatar_outgoing.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(
-                                                        friend_number_);
-                                                ft_avatar_outgoing.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
-                                                ft_avatar_outgoing.file_number = filenum;
-                                                ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
-                                                ft_avatar_outgoing.filesize = avatar_bytes.capacity();
-                                                long rowid = HelperFiletransfer.insert_into_filetransfer_db(
-                                                        ft_avatar_outgoing);
-                                                ft_avatar_outgoing.id = rowid;
-                                            }
-                                            else
-                                            {
-                                                Log.i(TAG,
-                                                      "android_tox_callback_friend_connection_status_cb_method:tox_hash res=" +
-                                                      res);
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // TODO: write code
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                    };
-                    main_handler_s.post(myRunnable);
+                    send_avatar_to_friend(tox_friend_by_public_key__wrapper(f.tox_public_key_string));
                 }
             }
 
@@ -5876,6 +5814,86 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static void send_avatar_to_friend(final long friend_number_)
+    {
+        final Thread new_thread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (VFS_ENCRYPT)
+                    {
+                        String fname = get_vfs_image_filename_own_avatar();
+
+                        Log.i(TAG, "send_avatar_to_friend:own_avatar_filename:" + fname);
+
+                        if (fname != null)
+                        {
+                            ByteBuffer avatar_bytes = file_to_bytebuffer(fname, true);
+
+                            Log.i(TAG, "send_avatar_to_friend:avatar_bytes:" + avatar_bytes);
+
+                            if (avatar_bytes != null)
+                            {
+                                // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:avatar_bytes=" + bytes_to_hex(avatar_bytes));
+                                ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+                                int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
+
+                                Log.i(TAG, "send_avatar_to_friend:tox_hash:res=" + res);
+
+
+                                if (res == 0)
+                                {
+                                    // Log.i(TAG,
+                                    //       "android_tox_callback_friend_connection_status_cb_method:hash(1)=" +
+                                    //       bytes_to_hex(hash_bytes));
+                                    // send avatar to friend -------
+
+
+                                    String avatar_filename_for_remote =
+                                            "avatar" + get_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION");
+
+                                    long filenum = tox_file_send(friend_number_, TOX_FILE_KIND_AVATAR.value,
+                                                                 avatar_bytes.capacity(), hash_bytes,
+                                                                 avatar_filename_for_remote,
+                                                                 avatar_filename_for_remote.length());
+                                    Log.i(TAG, "send_avatar_to_friend:filenum=" + filenum + " fname=" +
+                                               avatar_filename_for_remote);
+                                    // save FT to db ---------------
+                                    Filetransfer ft_avatar_outgoing = new Filetransfer();
+                                    ft_avatar_outgoing.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(
+                                            friend_number_);
+                                    ft_avatar_outgoing.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
+                                    ft_avatar_outgoing.file_number = filenum;
+                                    ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
+                                    ft_avatar_outgoing.filesize = avatar_bytes.capacity();
+                                    long rowid = HelperFiletransfer.insert_into_filetransfer_db(ft_avatar_outgoing);
+                                    ft_avatar_outgoing.id = rowid;
+                                }
+                                else
+                                {
+                                    Log.i(TAG, "send_avatar_to_friend:tox_hash res=" + res);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // TODO: write code
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "send_avatar_to_friend:EE01:" + e.getMessage());
+                }
+            }
+        };
+        new_thread.start();
+    }
+
     public static void set_message_accepted_from_id(long message_id)
     {
         try
@@ -5916,8 +5934,10 @@ public class MainActivity extends AppCompatActivity
 
     static void update_display_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
     {
-        // TODO: write me ----
-        // try to load avatar image, and set in friendlist fragment
+        // TODO: update entry in main friendlist (if visible)
+        //       or in chat view (if visible)
+        HelperFriend.update_single_friend_in_friendlist_view(
+                main_get_friend(tox_friend_by_public_key__wrapper(friend_pubkey)));
     }
 
     static void move_tmp_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
@@ -6309,6 +6329,11 @@ public class MainActivity extends AppCompatActivity
 
     static void put_vfs_image_on_imageview(Context c, ImageView v, Drawable placholder, String vfs_image_filename)
     {
+        put_vfs_image_on_imageview_real(c, v, placholder, vfs_image_filename, false);
+    }
+
+    static void put_vfs_image_on_imageview_real(Context c, ImageView v, Drawable placholder, String vfs_image_filename, boolean force_update)
+    {
         try
         {
             // Log.i(TAG, "put_vfs_image_on_imageview:" + vfs_image_filename);
@@ -6327,7 +6352,7 @@ public class MainActivity extends AppCompatActivity
                             load(f1).
                             placeholder(R.drawable.round_loading_animation).
                             diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            skipMemoryCache(false).
+                            skipMemoryCache(force_update).
                             into(v);
                 }
                 else
@@ -6337,7 +6362,7 @@ public class MainActivity extends AppCompatActivity
                             load(f1).
                             placeholder(placholder).
                             diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            skipMemoryCache(false).
+                            skipMemoryCache(force_update).
                             into(v);
                 }
             }
@@ -6352,13 +6377,14 @@ public class MainActivity extends AppCompatActivity
                         load(byteArray).
                         placeholder(placholder).
                         diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                        skipMemoryCache(false).
+                        skipMemoryCache(force_update).
                         into(v);
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "put_vfs_image_on_imageview:EE1:" + e.getMessage());
         }
     }
 
@@ -6366,9 +6392,9 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            if (orma.selectFromTRIFADatabaseGlobals().keyEq(key).count() == 1)
+            if (orma.selectFromTRIFADatabaseGlobalsNew().keyEq(key).count() == 1)
             {
-                TRIFADatabaseGlobals g_opts = orma.selectFromTRIFADatabaseGlobals().keyEq(key).get(0);
+                TRIFADatabaseGlobalsNew g_opts = orma.selectFromTRIFADatabaseGlobalsNew().keyEq(key).get(0);
                 return g_opts.value;
             }
             else
@@ -6388,23 +6414,23 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            TRIFADatabaseGlobals g_opts = new TRIFADatabaseGlobals();
+            TRIFADatabaseGlobalsNew g_opts = new TRIFADatabaseGlobalsNew();
             g_opts.key = key;
             g_opts.value = value;
 
             try
             {
-                orma.insertIntoTRIFADatabaseGlobals(g_opts);
-                Log.i(TAG, "set_g_opts:(INSERT)");
+                orma.insertIntoTRIFADatabaseGlobalsNew(g_opts);
+                Log.i(TAG, "set_g_opts:(INSERT):key=" + key + " value=" + value);
             }
-            catch (android.database.sqlite.SQLiteConstraintException e)
+            catch (android.database.sqlite.SQLiteConstraintException | net.sqlcipher.database.SQLiteConstraintException e)
             {
                 e.printStackTrace();
 
                 try
                 {
-                    orma.updateTRIFADatabaseGlobals().keyEq(key).value(value).execute();
-                    Log.i(TAG, "set_g_opts:(UPDATE)");
+                    orma.updateTRIFADatabaseGlobalsNew().keyEq(key).value(value).execute();
+                    Log.i(TAG, "set_g_opts:(UPDATE):key=" + key + " value=" + value);
                 }
                 catch (Exception e2)
                 {
@@ -6754,8 +6780,11 @@ public class MainActivity extends AppCompatActivity
     {
         if (is_vfs)
         {
+            Log.i(TAG, "file_to_bytebuffer:001");
+
             info.guardianproject.iocipher.File file = new info.guardianproject.iocipher.File(filename_with_fullpath);
             int size = (int) file.length();
+            Log.i(TAG, "file_to_bytebuffer:002:size=" + size);
             ByteBuffer ret = ByteBuffer.allocateDirect(size);
             byte[] bytes = new byte[size];
 
@@ -6771,9 +6800,11 @@ public class MainActivity extends AppCompatActivity
             catch (Exception e)
             {
                 e.printStackTrace();
+                Log.i(TAG, "file_to_bytebuffer:EE01:" + e.getMessage());
             }
         }
 
+        Log.i(TAG, "file_to_bytebuffer:EE99:NULL");
         return null;
     }
 
@@ -7647,7 +7678,7 @@ public class MainActivity extends AppCompatActivity
     {
         Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
         long friendnum_to_use = friendnum;
-        FriendList f = HelperFriend.main_get_friend(friendnum);
+        FriendList f = main_get_friend(friendnum);
         Log.d(TAG, "tox_friend_send_message_wrapper:f=" + f);
 
         if (f != null)
@@ -7661,7 +7692,7 @@ public class MainActivity extends AppCompatActivity
                 if (relay_pubkey != null)
                 {
                     // friend has a relay
-                    friendnum_to_use = HelperFriend.tox_friend_by_public_key__wrapper(relay_pubkey);
+                    friendnum_to_use = tox_friend_by_public_key__wrapper(relay_pubkey);
                     Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
                 }
             }
@@ -8205,7 +8236,7 @@ public class MainActivity extends AppCompatActivity
         else if (msg_type == 2)
         {
             // msgV2 relay message
-            long friend_number_real_sender = HelperFriend.tox_friend_by_public_key__wrapper(original_sender_pubkey);
+            long friend_number_real_sender = tox_friend_by_public_key__wrapper(original_sender_pubkey);
             // Log.i(TAG,
             //      "friend_message_v2:friend:" + friend_number + " ts:" + ts_sec + " systime" + System.currentTimeMillis() +
             //      " message:" + friend_message);

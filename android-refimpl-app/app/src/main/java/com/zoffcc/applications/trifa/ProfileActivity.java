@@ -52,30 +52,36 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.File;
+import java.net.URLConnection;
+import java.util.List;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
+import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.copy_real_file_to_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.get_network_connections;
-import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
-import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
-import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview;
-import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
+import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview_real;
+import static com.zoffcc.applications.trifa.MainActivity.send_avatar_to_friend;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.set_new_random_nospam_value;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_SELF_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NAME_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_STATUS_MESSAGE_LENGTH;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ProfileActivity extends AppCompatActivity
 {
@@ -279,14 +285,88 @@ public class ProfileActivity extends AppCompatActivity
                                 Log.i(TAG, "select_avatar:" + files);
                                 String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
                                 String src_filename = new File(files[0]).getName();
-                                Log.i(TAG, "select_avatar:p=" + src_path + " f=" + src_filename);
-                                copy_real_file_to_vfs_file(src_path, src_filename, VFS_PREFIX + VFS_OWN_AVATAR_DIR,
-                                                           "avatar.png");
-                                set_g_opts("VFS_OWN_AVATAR_FNAME",
-                                           VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
 
-                                put_vfs_image_on_imageview(ProfileActivity.this, profile_icon, d1,
-                                                           VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+                                java.io.File f_real = new java.io.File(src_path + "/" + src_filename);
+                                if (f_real.canRead())
+                                {
+                                    if (f_real.length() <= AVATAR_SELF_MAX_BYTE_SIZE)
+                                    {
+                                        if (f_real.length() > 0)
+                                        {
+
+                                            String avatar_file_name_corrected = TrifaSetPatternActivity.filter_out_specials_from_filepath(
+                                                    src_filename.toLowerCase());
+
+                                            Log.i(TAG,
+                                                  "select_avatar:p=" + src_path + " f=" + avatar_file_name_corrected);
+                                            copy_real_file_to_vfs_file(src_path, src_filename,
+                                                                       VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
+
+                                            String mimeType = URLConnection.guessContentTypeFromName(
+                                                    avatar_file_name_corrected.toLowerCase());
+
+                                            set_g_opts("VFS_OWN_AVATAR_FNAME",
+                                                       VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+
+                                            //if (mimeType.equalsIgnoreCase("image/gif"))
+                                            //{
+                                            //    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".gif");
+                                            //}
+                                            //else if (mimeType.equalsIgnoreCase("image/jpeg"))
+                                            //{
+                                            //    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".jpg");
+                                            //}
+                                            //else
+                                            //{
+                                            set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".png");
+                                            //}
+
+                                            put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d1,
+                                                                            VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
+                                                                            "avatar.png", true);
+                                            Log.i(TAG, "select_avatar:put_vfs_image_on_imageview");
+
+
+                                            List<FriendList> fl = orma.selectFromFriendList().
+                                                    toList();
+
+                                            if (fl != null)
+                                            {
+                                                if (fl.size() > 0)
+                                                {
+                                                    int i = 0;
+                                                    for (i = 0; i < fl.size(); i++)
+                                                    {
+                                                        FriendList n = fl.get(i);
+
+                                                        // Log.i(TAG, "select_avatar:send_avatar_to_friend:i=" + i);
+
+                                                        // iterate over all online friends, and send them our new avatar
+                                                        if (n.TOX_CONNECTION != TOX_CONNECTION_NONE.value)
+                                                        {
+                                                            Log.i(TAG,
+                                                                  "select_avatar:send_avatar_to_friend:online:i=" + i);
+
+                                                            send_avatar_to_friend(
+                                                                    HelperFriend.tox_friend_by_public_key__wrapper(
+                                                                            n.tox_public_key_string));
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Log.i(TAG, "select_avatar:TOO BIG:" + f_real.length());
+                                    }
+                                }
+                                else
+                                {
+                                    Log.i(TAG, "select_avatar:CAN NOT READ:" + src_path + " f=" + src_filename);
+                                }
                             }
                             catch (Exception e)
                             {
@@ -310,7 +390,7 @@ public class ProfileActivity extends AppCompatActivity
             String fname = get_vfs_image_filename_own_avatar();
             if (fname != null)
             {
-                put_vfs_image_on_imageview(this, profile_icon, d1, fname);
+                put_vfs_image_on_imageview_real(this, profile_icon, d1, fname, true);
             }
         }
         catch (Exception e)
@@ -363,7 +443,8 @@ public class ProfileActivity extends AppCompatActivity
             String color_chksum = "<font color=\"#006600\">";
             String ec = "</font>";
             mytoxid_textview.setText(Html.fromHtml(
-                    color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum + my_chksum_temp + ec));
+                    color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum +
+                    my_chksum_temp + ec));
         }
         catch (WriterException e)
         {

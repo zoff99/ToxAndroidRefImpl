@@ -313,6 +313,7 @@ public class HelperFriend
                 orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                         avatar_pathname(avatar_path_name).
                         avatar_filename(avatar_file_name).
+                        avatar_update(true).
                         execute();
             }
             else
@@ -320,6 +321,7 @@ public class HelperFriend
                 orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                         avatar_pathname(null).
                         avatar_filename(null).
+                        avatar_update(true).
                         execute();
             }
 
@@ -331,6 +333,22 @@ public class HelperFriend
             e.printStackTrace();
         }
     }
+
+    static void set_friend_avatar_update(String friend_pubkey, boolean avatar_update_value)
+    {
+        try
+        {
+            orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
+                    avatar_update(avatar_update_value).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "set_friend_avatar_update:EE:" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     static void add_friend_to_system(final String friend_public_key, final boolean as_friends_relay, final String owner_public_key)
     {
@@ -381,7 +399,7 @@ public class HelperFriend
                     long res = orma.insertIntoFriendList(f);
                     Log.i(TAG, "friend_request:insert:002:res=" + res);
                 }
-                catch (android.database.sqlite.SQLiteConstraintException e)
+                catch (android.database.sqlite.SQLiteConstraintException | net.sqlcipher.database.SQLiteConstraintException e)
                 {
                     e.printStackTrace();
                     Log.i(TAG, "friend_request:insert:EE1:" + e.getMessage());

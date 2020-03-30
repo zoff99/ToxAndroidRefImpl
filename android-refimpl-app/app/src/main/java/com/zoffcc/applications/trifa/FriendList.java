@@ -70,6 +70,10 @@ public class FriendList
 
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     @Nullable
+    boolean avatar_update = false; // has avatar changed for this friend?
+
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    @Nullable
     boolean notification_silent = false; // show notifications for this friend?
 
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
@@ -95,11 +99,12 @@ public class FriendList
         out.TOX_USER_STATUS = in.TOX_USER_STATUS;
         out.avatar_filename = in.avatar_filename;
         out.avatar_pathname = in.avatar_pathname;
+        out.avatar_update = in.avatar_update;
         out.notification_silent = in.notification_silent;
         out.sort = in.sort;
         out.last_online_timestamp = in.last_online_timestamp;
         out.alias_name = in.alias_name;
-        out.is_relay=in.is_relay;
+        out.is_relay = in.is_relay;
 
         return out;
     }
@@ -109,16 +114,15 @@ public class FriendList
     {
         try
         {
-        return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) +
-               ", is_relay=" + is_relay +
-               ", name=" + name + ", status_message=" +
-               status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_CONNECTION_on_off=" +
-               TOX_CONNECTION_on_off +", TOX_CONNECTION_real=" +
-               TOX_CONNECTION_real + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
-               ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
-               sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name;
+            return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) + ", is_relay=" + is_relay +
+                   ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION +
+                   ", TOX_CONNECTION_on_off=" + TOX_CONNECTION_on_off + ", TOX_CONNECTION_real=" + TOX_CONNECTION_real +
+                   ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
+                   ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
+                   sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name +
+                   ", avatar_update=" + avatar_update;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return "*Exception*";
         }

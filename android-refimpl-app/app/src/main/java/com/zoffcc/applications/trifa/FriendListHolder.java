@@ -41,29 +41,30 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
-import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.HelperConference.add_conference_wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
-import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_filetransfers;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_messages;
-import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
+import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar_update;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_all_conferences_own_relay;
-import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
-import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.send_all_friend_pubkeys_to_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.send_relay_pubkey_to_all_friends;
 import static com.zoffcc.applications.trifa.HelperRelay.set_friend_as_own_relay_in_db;
+import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
+import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
+import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
+import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_new;
-import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
@@ -245,9 +246,11 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                         "_friendlist_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename)).
                                 placeholder(d_lock).
                                 priority(Priority.HIGH).
-                                skipMemoryCache(false).
+                                skipMemoryCache(fl.avatar_update).
                                 apply(glide_options).
                                 into(avatar);
+
+                        set_friend_avatar_update(fl.tox_public_key_string, false);
 
                         need_create_identicon = false;
                     }
@@ -787,10 +790,12 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     // invite also my ToxProxy -------------
                                     if (have_own_relay())
                                     {
-                                        tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()), res_conf_new);
+                                        tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()),
+                                                              res_conf_new);
                                     }
                                     // invite also my ToxProxy -------------
-                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "", TOX_CONFERENCE_TYPE_TEXT.value, false);
+                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "",
+                                                           TOX_CONFERENCE_TYPE_TEXT.value, false);
                                     MainActivity.update_savedata_file_wrapper();
                                 }
                             }
