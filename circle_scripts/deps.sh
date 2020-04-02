@@ -556,12 +556,12 @@ add_flag -fdiagnostics-color=always
 
 
 
+#    -Wall -Wextra
+#    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
+#    -Wno-pointer-sign -Wno-unused-but-set-variable \
 
 
-
-cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
-    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
-    -Wno-pointer-sign -Wno-unused-but-set-variable \
+cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
