@@ -251,7 +251,7 @@ public class HelperFriend
         }
         else
         {
-            if (MainActivity.cache_pubkey_fnum.size() >= 20)
+            if (MainActivity.cache_pubkey_fnum.size() >= 180)
             {
                 // TODO: bad!
                 MainActivity.cache_pubkey_fnum.clear();
@@ -272,7 +272,7 @@ public class HelperFriend
         }
         else
         {
-            if (MainActivity.cache_fnum_pubkey.size() >= 20)
+            if (MainActivity.cache_fnum_pubkey.size() >= 180)
             {
                 // TODO: bad!
                 MainActivity.cache_fnum_pubkey.clear();
@@ -351,7 +351,6 @@ public class HelperFriend
             e.printStackTrace();
         }
     }
-
 
     static void add_friend_to_system(final String friend_public_key, final boolean as_friends_relay, final String owner_public_key)
     {
