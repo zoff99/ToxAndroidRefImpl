@@ -359,7 +359,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             parameter.setMargins((int) dp2px(20), parameter.topMargin, parameter.rightMargin,
                                  parameter.bottomMargin); // left, top, right, bottom
             textView_container.setLayoutParams(parameter);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
             peer_name_text.setVisibility(View.GONE);
         }
