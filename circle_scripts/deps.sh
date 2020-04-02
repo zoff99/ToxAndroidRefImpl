@@ -570,6 +570,15 @@ echo '#pragma GCC diagnostic pop
 #    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
 #    -Wno-pointer-sign -Wno-unused-but-set-variable \
 
+echo ""
+echo ""
+echo "-------- compiler version --------"
+echo "-------- compiler version --------"
+$GCC --version
+echo "-------- compiler version --------"
+echo "-------- compiler version --------"
+echo ""
+echo ""
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
