@@ -383,7 +383,10 @@ void dbg(int level, const char *fmt, ...)
         // memset(log_line_str, 0, (size_t)MAX_LOG_LINE_LENGTH);
         va_list ap;
         va_start(ap, fmt);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
         vsnprintf(log_line_str, (size_t)MAX_LOG_LINE_LENGTH, level_and_format, ap);
+#pragma GCC diagnostic pop
         // send "log_line_str" to android
         android_logger(level, log_line_str);
         va_end(ap);
