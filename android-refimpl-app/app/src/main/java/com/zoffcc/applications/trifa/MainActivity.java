@@ -3755,7 +3755,7 @@ public class MainActivity extends AppCompatActivity
 
                         conference_message_add_from_sync(
                                 HelperConference.get_conference_num_from_confid(real_conference_id), sender_peer_num,
-                                TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
+                                real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
                                 (msg_wrapped_sec * 1000) + msg_wrapped_ms);
                     }
                     else
@@ -3831,11 +3831,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void conference_message_add_from_sync(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms)
+    static void conference_message_add_from_sync(long conference_number, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms)
     {
-        Log.i(TAG, "conference_message_add_from_sync:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" +
+        Log.i(TAG, "conference_message_add_from_sync:cf_num=" + conference_number + " pnum=" + peer_number2 + " msg=" +
                    message);
-        int res = tox_conference_peer_number_is_ours(conference_number, peer_number);
+
+        int res = -1;
+        if (peer_number2 == -1)
+        {
+            res = -1;
+        }
+        else
+        {
+            res = tox_conference_peer_number_is_ours(conference_number, peer_number2);
+        }
 
         if (res == 1)
         {
@@ -3894,7 +3903,7 @@ public class MainActivity extends AppCompatActivity
         ConferenceMessage m = new ConferenceMessage();
         m.is_new = do_badge_update;
         // m.tox_friendnum = friend_number;
-        m.tox_peerpubkey = HelperConference.tox_conference_peer_get_public_key__wrapper(conference_number, peer_number);
+        m.tox_peerpubkey = peer_pubkey;
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.read = false;
