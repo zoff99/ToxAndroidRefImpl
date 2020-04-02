@@ -542,6 +542,16 @@ add_flag -Wno-pointer-sign
 
 add_flag -Werror
 add_flag -fdiagnostics-color=always
+
+
+echo '#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wlanguage-extension-token"
+#pragma GCC diagnostic ignored "-Wpedantic"
+' > "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+cat "$_NDK_"/sources/android/cpufeatures/cpu-features.c >> "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+echo '#pragma GCC diagnostic pop
+' >> "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+
 ## ---------------- clang flags ----------------
 ## ---------------- clang flags ----------------
 ## ---------------- clang flags ----------------
@@ -577,7 +587,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavutil.a \
     ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
-    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
+    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
 
 res=$?
 

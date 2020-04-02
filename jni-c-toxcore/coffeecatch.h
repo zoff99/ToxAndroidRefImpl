@@ -81,6 +81,8 @@
 #ifndef COFFEECATCH_H
 #define COFFEECATCH_H
 
+#pragma clang system_header
+
 #include <stdint.h>
 #include <sys/types.h>
 

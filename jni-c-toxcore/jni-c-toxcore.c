@@ -1251,8 +1251,6 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uin
 
         if(text_length > 0)
         {
-            JNIEnv *jnienv2;
-            jnienv2 = jni_getenv();
             jstring js1 = c_safe_string_from_java((char *)message_text, text_length);
             // TODO: give back also the raw message bytes!
             (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
@@ -1319,10 +1317,10 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
                    (uint32_t)raw_message_len, message_data, &data_length);
         (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)data_length, (const jbyte *)message_data);
 
+
+
         if(raw_message_len > 0)
         {
-            JNIEnv *jnienv2;
-            jnienv2 = jni_getenv();
             // TODO: give back also the raw message bytes!
             (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                              android_tox_callback_friend_sync_message_v2_cb_method,
@@ -2883,7 +2881,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv *env, jobject t
     COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(env, thiz));
 }
 
-
+void Java_com_zoffcc_applications_trifa_MainActivity_exit__real(JNIEnv *env, jobject thiz) __attribute__((noreturn));
 void Java_com_zoffcc_applications_trifa_MainActivity_exit__real(JNIEnv *env, jobject thiz)
 {
     dbg(9, "Exit Program");
@@ -4808,7 +4806,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv *env, jobject thiz,
         jlong friend_number, jlong sample_count, jint channels, jlong sampling_rate)
 {
-    TOXAV_ERR_SEND_FRAME error;
+    TOXAV_ERR_SEND_FRAME error = 0;
 
     if(global_toxav_valid != true)
     {
@@ -4938,6 +4936,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibAPI(JNIEnv *env, job
 // void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv* env, jobject thiz) __attribute__((optimize("O0")));
 void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv *env, jobject thiz)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+
     // int i = 3;
     // i = (1 / 0);
     char *name = NULL;
@@ -4951,6 +4952,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv *
     int y = *x;
     y = y + 1;
     *(long *)0 = 0xDEADBEEF;
+
+#pragma GCC diagnostic pop
 }
 
 JNIEXPORT void JNICALL
