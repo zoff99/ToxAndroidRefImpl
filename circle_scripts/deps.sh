@@ -486,11 +486,11 @@ add_flag -Wno-vla
 # Disable specific warning flags for C++.
 
 # Comma at end of enum is supported everywhere we run.
-add_cxx_flag -Wno-c++98-compat-pedantic
+#add_cxx_flag -Wno-c++98-compat-pedantic
 # TODO(iphydf): Stop using flexible array members.
-add_cxx_flag -Wno-c99-extensions
+#add_cxx_flag -Wno-c99-extensions
 # We're C-compatible, so use C style casts.
-add_cxx_flag -Wno-old-style-cast
+#add_cxx_flag -Wno-old-style-cast
 
 # Downgrade to warning so we still see it.
 # add_flag -Wno-error=documentation-unknown-command
