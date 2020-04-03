@@ -96,7 +96,7 @@
                 <LinearLayout
                     android:id="@+id/ft_preview_container"
                     android:layout_width="fill_parent"
-                    android:layout_height="150dp"
+                    android:layout_height="250dp"
                     android:layout_marginRight="0dp"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal"
@@ -110,7 +110,7 @@
                     <ImageButton
                         android:id="@+id/ft_preview_image"
                         android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="200dp"
                         android:layout_marginLeft="15dp"
                         android:layout_marginRight="15dp"
                         android:layout_weight="300"
