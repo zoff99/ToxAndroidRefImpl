@@ -72,6 +72,46 @@ mkdir -p $_SRC_
 mkdir -p $_INST_
 
 
+
+
+# --------- check code style -----------
+cd
+mkdir -p ./astyle_compile/
+cd ./astyle_compile/
+wget -O astyle.tgz https://downloads.sourceforge.net/project/astyle/astyle/astyle%203.1/astyle_3.1_linux.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fastyle%2Ffiles%2Fastyle%2Fastyle%25203.1%2Fastyle_3.1_linux.tar.gz%2Fdownload
+tar -xzvf astyle.tgz > /dev/null 2>&1
+mkdir -p build_astyle > /dev/null 2>&1
+cd build_astyle/ > /dev/null 2>&1
+cmake ../astyle/
+make -j$(nproc)
+
+export astyle_bin="$(pwd)/astyle"
+"$astyle_bin" --version || exit 1
+
+cd
+mkdir -p ./astyle_check/
+cd ./astyle_check/
+
+cp -av /root/work/android-refimpl-app ./astyle_check/ || exit 1
+cp -av /root/work/jni-c-toxcore ./astyle_check/ || exit 1
+cp -a /root/work/.git ./astyle_check/ || exit 1
+
+ls -al /root/work/astyle/astylerc  || exit 1
+
+cd ./astyle_check/
+ls -al
+
+SOURCES=`find android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa -name '*.java'|sort`;
+"$astyle_bin" -n --options=/root/work/astyle/astylerc jni-c-toxcore/jni-c-toxcore.c $SOURCES
+git --no-pager diff
+git diff | cat > $CIRCLE_ARTIFACTS/astyle_check.patch 2>&1
+# --------- check code style -----------
+
+
+
+
+
+
 export ORIG_PATH_=$PATH
 
 
@@ -227,6 +267,16 @@ echo "###### ------------------------------"
 
 
 
+# ----- debug signing key -----
+cd ~/
+ls -al ~/.android/debug.keystore
+if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
+    echo "*** generating new signer key ***"
+    echo "*** generating new signer key ***"
+    rm -f ~/.android/debug.keystore
+    keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
+fi
+# ----- debug signing key -----
 
 
 
@@ -324,15 +374,6 @@ if [ "$CIRCLE_BRANCH""x" != "zoff99/maven_artefactx" ]; then
     zip -d $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk META-INF/\*     # remove signature !!
     cp -av $_s_/trifa_src/android-refimpl-app/app/build/outputs/apk/app-release-unsigned.apk ~/app.apk
     cd ~/
-    # remove the "xxxxxx" in fron the of the "rm -f" to create a new debug signing key!! --------------
-    echo xxxxxxrm -f ~/.android/debug.keystore
-    # remove the "xxxxxx" in fron the of the "rm -f" to create a new debug signing key!! --------------
-    ls -al ~/.android/debug.keystore
-    if [ ! -f ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
-        echo "*** generating new signer key ***"
-        echo "*** generating new signer key ***"
-        keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
-    fi
 
     ls -al ~/
     jarsigner -verbose -keystore ~/.android/debug.keystore -storepass android -keypass android -sigalg SHA1withRSA -digestalg SHA1 -sigfile CERT -signedjar app-signed.apk app.apk androiddebugkey

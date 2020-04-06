@@ -15,6 +15,10 @@ build_yasm="1"
 ## ----------------------
 
 
+## set this to make c-toxcore log more verbose -------------
+export DEBUG_TOXCORE_LOGGING=" "
+## set this to make c-toxcore log more verbose -------------
+
 
 #_HOME2_=$(dirname $0)
 #export _HOME2_
@@ -128,7 +132,7 @@ export AND_TOOLCHAIN_ARCH2="arm-linux-androideabi"
 export AND_PATH="$_toolchain_/arm-linux-androideabi/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
-export AND_GCC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-gcc"
+export AND_GCC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
 export AND_CXX="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang++"
 export AND_READELF="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-readelf"
 export AND_ARTEFACT_DIR="arm"
@@ -379,7 +383,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS="-D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
+    CFLAGS=" $DEBUG_TOXCORE_LOGGING -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
     --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
     --disable-soname-versions --host=arm-linux-androideabi \
     --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot \
@@ -421,13 +425,162 @@ echo ""
 echo ""
 echo "compiling jni-c-toxcore ..."
 
+
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+
+
 # make certain warnings into errors!
-WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
+# WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
+
+WARNS=''
+add_flag()     { WARNS="$WARNS $@";               }
+
+# Add all warning flags we can.
+add_flag -Wall
+add_flag -Wextra
+add_flag -Weverything
+
+# Disable specific warning flags for both C and C++.
+
+# TODO(iphydf): Clean these up. Probably all of these are actual bugs.
+add_flag -Wno-cast-align
+# Very verbose, not very useful. This warns about things like int -> uint
+# conversions that change sign without a cast and narrowing conversions.
+add_flag -Wno-conversion
+# TODO(iphydf): Check enum values when received from the user, then assume
+# correctness and remove this suppression.
+add_flag -Wno-covered-switch-default
+# Due to clang's tolower() macro being recursive
+# https://github.com/TokTok/c-toxcore/pull/481
+add_flag -Wno-disabled-macro-expansion
+# We don't put __attribute__ on the public API.
+add_flag -Wno-documentation-deprecated-sync
+# Bootstrap daemon does this.
+add_flag -Wno-format-nonliteral
+# struct Foo foo = {0}; is a common idiom.
+add_flag -Wno-missing-field-initializers
+# Useful sometimes, but we accept padding in structs for clarity.
+# Reordering fields to avoid padding will reduce readability.
+add_flag -Wno-padded
+# This warns on things like _XOPEN_SOURCE, which we currently need (we
+# probably won't need these in the future).
+add_flag -Wno-reserved-id-macro
+# TODO(iphydf): Clean these up. They are likely not bugs, but still
+# potential issues and probably confusing.
+add_flag -Wno-sign-compare
+# Our use of mutexes results in a false positive, see 1bbe446.
+add_flag -Wno-thread-safety-analysis
+# File transfer code has this.
+add_flag -Wno-type-limits
+# Callbacks often don't use all their parameters.
+add_flag -Wno-unused-parameter
+# libvpx uses __attribute__((unused)) for "potentially unused" static
+# functions to avoid unused static function warnings.
+add_flag -Wno-used-but-marked-unused
+# We use variable length arrays a lot.
+add_flag -Wno-vla
+
+# Disable specific warning flags for C++.
+
+# Comma at end of enum is supported everywhere we run.
+#add_cxx_flag -Wno-c++98-compat-pedantic
+# TODO(iphydf): Stop using flexible array members.
+#add_cxx_flag -Wno-c99-extensions
+# We're C-compatible, so use C style casts.
+#add_cxx_flag -Wno-old-style-cast
+
+# Downgrade to warning so we still see it.
+# add_flag -Wno-error=documentation-unknown-command
+add_flag -Wno-documentation-unknown-command
+
+add_flag -Wno-error=unreachable-code
+add_flag -Wno-error=unused-variable
 
 
-cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
-    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
-    -Wno-pointer-sign -Wno-unused-but-set-variable \
+# added by Zoff
+# add_flag -Wno-error=double-promotion
+add_flag -Wno-double-promotion
+
+# add_flag -Wno-error=missing-variable-declarations
+add_flag -Wno-missing-variable-declarations
+
+# add_flag -Wno-error=missing-prototypes
+add_flag -Wno-missing-prototypes
+
+add_flag -Wno-error=incompatible-pointer-types-discards-qualifiers
+add_flag -Wno-error=deprecated-declarations
+
+# add_flag -Wno-error=unused-macros
+add_flag -Wno-unused-macros
+
+#add_flag -Wno-error=bad-function-cast
+add_flag -Wno-bad-function-cast
+
+#add_flag -Wno-error=float-equal
+add_flag -Wno-float-equal
+
+#add_flag -Wno-error=cast-qual
+add_flag -Wno-cast-qual
+
+#add_flag -Wno-error=strict-prototypes
+add_flag -Wno-strict-prototypes
+
+#add_flag -Wno-error=gnu-statement-expression
+add_flag -Wno-gnu-statement-expression
+
+#add_flag -Wno-error=documentation
+add_flag -Wno-documentation
+
+# reactivate this later! ------------
+# add_flag -Wno-error=pointer-sign
+add_flag -Wno-pointer-sign
+# reactivate this later! ------------
+
+
+add_flag -Werror
+add_flag -fdiagnostics-color=always
+
+
+echo '#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wlanguage-extension-token"
+#pragma GCC diagnostic ignored "-Wpedantic"
+' > "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+cat "$_NDK_"/sources/android/cpufeatures/cpu-features.c >> "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+echo '#pragma GCC diagnostic pop
+' >> "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+
+
+
+
+
+
+
+
+
+
+#    -Wall -Wextra
+#    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
+#    -Wno-pointer-sign -Wno-unused-but-set-variable \
+
+echo ""
+echo ""
+echo "-------- compiler version --------"
+echo "-------- compiler version --------"
+$GCC --version
+echo "-------- compiler version --------"
+echo "-------- compiler version --------"
+echo ""
+echo ""
+
+cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
@@ -443,7 +596,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavutil.a \
     ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
-    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
+    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
 
 res=$?
 
@@ -511,7 +664,7 @@ export AND_TOOLCHAIN_ARCH2="x86"
 export AND_PATH="$_toolchain_/x86/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/x86/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/x86/bin/i686-linux-android-clang"
-export AND_GCC="$_toolchain_/x86/bin/i686-linux-android-gcc"
+export AND_GCC="$_toolchain_/x86/bin/i686-linux-android-clang"
 export AND_CXX="$_toolchain_/x86/bin/i686-linux-android-clang++"
 export AND_READELF="$_toolchain_/x86/bin/i686-linux-android-readelf"
 export AND_ARTEFACT_DIR="x86"
@@ -780,7 +933,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS="-D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
+    CFLAGS=" $DEBUG_TOXCORE_LOGGING -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
     --prefix="$_toolchain_"/x86/sysroot/usr \
     --disable-soname-versions --host=x86 \
     --with-sysroot="$_toolchain_"/x86/sysroot \
