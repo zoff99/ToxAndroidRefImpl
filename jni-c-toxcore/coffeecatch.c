@@ -32,6 +32,12 @@
  *
  */
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-noreturn"
+#pragma GCC diagnostic ignored "-Wunreachable-code-break"
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 #ifdef __ANDROID__
 #define USE_UNWIND
 #define USE_CORKSCREW
@@ -1468,3 +1474,5 @@ void coffeecatch_abort(const char* exp, const char* file, int line) {
   }
   abort();
 }
+
+#pragma GCC diagnostic pop
