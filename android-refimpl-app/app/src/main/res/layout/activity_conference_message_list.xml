@@ -187,6 +187,8 @@
 
         </LinearLayout>
 
+        <include layout="@layout/floating_action_button_conference"/>
+
     </FrameLayout>
 
 </LinearLayout>

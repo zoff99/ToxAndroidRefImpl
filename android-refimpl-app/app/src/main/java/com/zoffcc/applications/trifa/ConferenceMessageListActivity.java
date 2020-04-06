@@ -981,4 +981,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         }
     }
 
+    public void show_add_friend_conference(View view)
+    {
+        Log.i(TAG, "show_add_friend_conference");
+        Intent intent = new Intent(this, AddFriendActivity.class);
+        intent.putExtra("conf_id", conf_id);
+        // TODO: create activity
+        // startActivityForResult(intent, AddFriendActivity_ID);
+    }
 }
