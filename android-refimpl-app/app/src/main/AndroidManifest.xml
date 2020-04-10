@@ -137,6 +137,10 @@
             android:launchMode="singleTask">
         </activity>
         <activity
+            android:name=".FriendSelectSingleActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings">
         </activity>

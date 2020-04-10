@@ -317,6 +317,7 @@ public class MainActivity extends AppCompatActivity
     final static int AboutpageActivity_ID = 10005;
     final static int MaintenanceActivity_ID = 10006;
     final static int WhiteListFromDozeActivity_ID = 10008;
+    final static int SelectFriendSingleActivity_ID = 10009;
     final static int Notification_new_message_ID = 10023;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications

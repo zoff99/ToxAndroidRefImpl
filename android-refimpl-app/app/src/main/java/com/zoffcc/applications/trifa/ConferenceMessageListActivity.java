@@ -55,15 +55,16 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
-import java.util.List;
-
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name;
@@ -984,9 +985,47 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     public void show_add_friend_conference(View view)
     {
         Log.i(TAG, "show_add_friend_conference");
-        Intent intent = new Intent(this, AddFriendActivity.class);
+        Intent intent = new Intent(this, FriendSelectSingleActivity.class);
         intent.putExtra("conf_id", conf_id);
-        // TODO: create activity
-        // startActivityForResult(intent, AddFriendActivity_ID);
+        startActivityForResult(intent, SelectFriendSingleActivity_ID);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == SelectFriendSingleActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                try
+                {
+                    String result_friend_pubkey = data.getData().toString();
+                    if (result_friend_pubkey != null)
+                    {
+                        if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)
+                        {
+                            Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey);
+
+                            long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(result_friend_pubkey);
+                            if (friend_num_temp_safety2 > 0)
+                            {
+                                final long conference_num = get_conference_num_from_confid(conf_id);
+                                if (conference_num > -1)
+                                {
+                                    int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, conference_num);
+                                    if (res_conf_invite < 0)
+                                    {
+                                        Log.d(TAG, "onActivityResult:info:tox_conference_invite:ERR:" + res_conf_invite);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
