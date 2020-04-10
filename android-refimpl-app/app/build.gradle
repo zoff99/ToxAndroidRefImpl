@@ -39,8 +39,22 @@ apply plugin: 'com.android.application'
 apply plugin: 'witness'
 apply from: 'witness.gradle'
 
+repositories {
+    maven {
+        url 'https://dl.bintray.com/zoff99/maven'
+        //content {
+        //    includeGroupByRegex "com\\.github\\.maskarade.*"
+        //}
+    }
+    google()
+    jcenter()
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion "28.0.3"
     compileOptions.encoding = 'UTF-8'
     // generatedDensities = []
@@ -64,6 +78,9 @@ android {
         exclude 'META-INF/*version'
         exclude 'META-INF/proguard/okhttp3.pro'
         exclude 'androidsupportmultidexversion.txt'
+//
+        exclude 'META-INF/androidx.*'
+        exclude 'META-INF/proguard/androidx-*'
 //
         exclude 'lib/armeabi/libRSSupport.so'
         exclude 'lib/armeabi/librsjni.so'
@@ -211,11 +228,18 @@ dependencies {
     implementation('com.google.zxing:core:3.3.3') {
         exclude group: 'com.android.support'
     }
-    implementation('com.github.gfx.android.orma:orma:5.0.0-rc4') {
+
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
+    implementation 'androidx.collection:collection:1.1.0'
+    implementation('com.github.maskarade.android.orma:orma:6.0.3') {
+        exclude group: 'io.reactivex'
         exclude group: 'com.android.support'
+        exclude group: 'androidx.core', module: '*'
     }
-    implementation('com.github.gfx.android.orma:orma-encryption:5.0.0-rc4') {
+    implementation('com.github.maskarade.android.orma:orma-encryption:6.0.3') {
+        exclude group: 'io.reactivex'
         exclude group: 'com.android.support'
+        exclude group: 'androidx.core', module: '*'
     }
     //
     implementation('com.github.hotchemi:permissionsdispatcher:3.2.0') {
@@ -255,7 +279,10 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     androidTestImplementation 'com.android.support:multidex:1.0.3'
     androidTestImplementation 'com.android.support:multidex-instrumentation:1.0.3'
-    implementation 'info.guardianproject.iocipher:IOCipher:0.4'
+    implementation ('info.guardianproject.iocipher:IOCipher:0.5'){
+        exclude group: 'com.android.support'
+        exclude group: 'androidx.core', module: '*'
+    }
     implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
     implementation 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
     implementation 'com.google.code.gson:gson:2.8.5'
@@ -267,7 +294,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.daimajia.numberprogressbar:library:1.4@aar'
     implementation 'com.github.lawloretienne:discreteslider:0.0.9'
-    annotationProcessor 'com.github.gfx.android.orma:orma-processor:5.0.0-rc4'
+    annotationProcessor 'com.github.maskarade.android.orma:orma-processor:6.0.3'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
 }
 
