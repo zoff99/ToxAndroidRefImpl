@@ -25,8 +25,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,8 +38,11 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
@@ -170,13 +171,12 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         final String unicode_INCOMING_ENVELOPE = "\uD83D\uDCE8";
         final String unicode_Mobile_Phone_With_Arrow = "\uD83D\uDCF2";
         final String unicode_MEMO = "\uD83D\uDCDD";
-        final String unicode_ARROW_LEFT="←";
+        final String unicode_ARROW_LEFT = "←";
 
         if (m.msg_version == 1)
         {
-            date_time.setText(
-                    unicode_ARROW_LEFT + long_date_time_format(m.sent_timestamp) + "\n" + unicode_Mobile_Phone_With_Arrow +
-                    long_date_time_format(m.rcvd_timestamp));
+            date_time.setText(unicode_ARROW_LEFT + long_date_time_format(m.sent_timestamp) + "\n" +
+                              unicode_Mobile_Phone_With_Arrow + long_date_time_format(m.rcvd_timestamp));
         }
         else
         {

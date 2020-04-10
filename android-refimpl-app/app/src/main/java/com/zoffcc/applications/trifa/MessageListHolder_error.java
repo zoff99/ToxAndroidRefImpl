@@ -20,12 +20,13 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MessageListHolder_error extends RecyclerView.ViewHolder
 {

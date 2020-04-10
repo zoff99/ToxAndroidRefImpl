@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -37,7 +37,7 @@
             android:textColor="@android:color/primary_text_dark"
             android:textSize="18sp"
             android:textStyle="bold"/>
-    </android.support.v7.widget.Toolbar>
+    </androidx.appcompat.widget.Toolbar>
 
     <!-- the layout which will contain (host) the drawerLayout -->
     <FrameLayout

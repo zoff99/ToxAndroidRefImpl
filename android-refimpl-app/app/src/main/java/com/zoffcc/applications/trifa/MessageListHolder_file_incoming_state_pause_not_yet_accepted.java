@@ -22,7 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,6 +34,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_accepted_from_id;

@@ -22,10 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +29,10 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -124,7 +124,7 @@ public class FriendListFragment extends Fragment
         {
             final FriendList f = c.friend_item;
 
-            if (f.is_relay==true)
+            if (f.is_relay == true)
             {
                 // do not update anything if this is a relay
                 return;
@@ -325,7 +325,7 @@ public class FriendListFragment extends Fragment
                 add_all_friends_clear(1);
             }
         }
-        catch(Exception ee)
+        catch (Exception ee)
         {
             ee.printStackTrace();
 

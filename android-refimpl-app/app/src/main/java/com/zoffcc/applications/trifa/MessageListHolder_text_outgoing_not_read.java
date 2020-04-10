@@ -24,8 +24,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,6 +32,9 @@ import android.widget.TextView;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
@@ -110,14 +111,17 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
                 {
                     if (my_position < 1)
                     {
-                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date_string.setText(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                         message_text_date.setVisibility(View.VISIBLE);
                     }
                     else
                     {
-                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
                         {
-                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date_string.setText(
+                                    MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                             message_text_date.setVisibility(View.VISIBLE);
                         }
                     }
@@ -138,7 +142,8 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
         date_time.setText(long_date_time_format(m.sent_timestamp));
 
         textView.setCustomRegex(TOXURL_PATTERN);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
 
         if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
         {
@@ -178,11 +183,13 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
                 {
@@ -257,7 +264,8 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
                     {
                         try
                         {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email_addr, null));
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                            Uri.fromParts("mailto", email_addr, null));
                             emailIntent.setType("message/rfc822");
                             // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                             // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
@@ -291,7 +299,9 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
                     {
                         try
                         {
-                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
+                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
+                                                                                                     "").replaceFirst(
+                                    "TOX:", "").replaceFirst("Tox:", "");
                             add_friend_real(friend_tox_id);
                         }
                         catch (Exception e)
@@ -326,7 +336,8 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
         @Override
         public boolean onLongClick(final View v)
         {
-            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected, message_);
+            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected,
+                                                                                           message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

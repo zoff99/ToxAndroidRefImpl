@@ -20,7 +20,6 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +29,8 @@ import com.l4digital.fastscroll.FastScroller;
 
 import java.util.Iterator;
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class FriendlistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {

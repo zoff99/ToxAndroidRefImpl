@@ -25,8 +25,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -41,8 +39,11 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
@@ -108,7 +109,8 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
         textView.setCustomRegex(TOXURL_PATTERN);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
         textView.setAutoLinkText(m.text);
 
         date_time.setText(long_date_time_format(m.sent_timestamp));
@@ -149,11 +151,13 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
                 {
@@ -163,7 +167,8 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         });
 
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
+                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -269,7 +274,8 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
                     {
                         try
                         {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email_addr, null));
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                            Uri.fromParts("mailto", email_addr, null));
                             emailIntent.setType("message/rfc822");
                             // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                             // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
@@ -303,7 +309,9 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
                     {
                         try
                         {
-                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
+                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
+                                                                                                     "").replaceFirst(
+                                    "TOX:", "").replaceFirst("Tox:", "");
                             add_friend_real(friend_tox_id);
                         }
                         catch (Exception e)
@@ -337,7 +345,8 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         @Override
         public boolean onLongClick(final View v)
         {
-            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(context, v, is_selected, message_);
+            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(
+                    context, v, is_selected, message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

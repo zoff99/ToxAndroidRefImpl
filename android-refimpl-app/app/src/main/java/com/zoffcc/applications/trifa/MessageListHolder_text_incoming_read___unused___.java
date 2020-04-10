@@ -23,8 +23,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,6 +30,9 @@ import android.widget.ImageView;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MessageListHolder_text_incoming_read___unused___ extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -79,7 +80,8 @@ public class MessageListHolder_text_incoming_read___unused___ extends RecyclerVi
         // Log.i(TAG, "bindMessageList");
 
         // textView.setText("#" + m.id + ":" + m.text);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION);
         textView.setAutoLinkText(m.text);
 
         //        if (!m.read)
@@ -108,11 +110,13 @@ public class MessageListHolder_text_incoming_read___unused___ extends RecyclerVi
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
                 }
             }
         });
@@ -207,7 +211,8 @@ public class MessageListHolder_text_incoming_read___unused___ extends RecyclerVi
                     {
                         try
                         {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email_addr, null));
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                            Uri.fromParts("mailto", email_addr, null));
                             emailIntent.setType("message/rfc822");
                             // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                             // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");

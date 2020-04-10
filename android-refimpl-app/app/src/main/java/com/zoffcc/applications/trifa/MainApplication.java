@@ -30,7 +30,7 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.multidex.MultiDex;
+import androidx.multidex.MultiDex;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -56,7 +56,7 @@ public class MainApplication extends Application
     // -----------------------
     // -----------------------
     // -----------------------
-    final static boolean CATCH_EXCEPTIONS = true; // set "true" for release builds!
+    final static boolean CATCH_EXCEPTIONS = false; // set "true" for release builds!
     // -----------------------
     // -----------------------
     // -----------------------

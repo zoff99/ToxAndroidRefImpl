@@ -204,7 +204,7 @@
                 android:src="@drawable/user_pacific"
                 app:civ_border_color="#50000000"
                 app:civ_border_width="2dp"
-                app:civ_fill_color="@color/md_grey_400"/>
+                app:civ_circle_background_color="@color/md_grey_400"/>
 
         </LinearLayout>
 

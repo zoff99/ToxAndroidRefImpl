@@ -21,13 +21,14 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 
@@ -94,7 +95,8 @@ public class ConferenceMessageListHolder_error extends RecyclerView.ViewHolder
         @Override
         public boolean onLongClick(final View v)
         {
-            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(context, v, is_selected, message_);
+            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(
+                    context, v, is_selected, message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

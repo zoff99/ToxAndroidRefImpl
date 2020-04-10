@@ -19,7 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.nio.ByteBuffer;

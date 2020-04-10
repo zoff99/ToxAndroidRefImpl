@@ -24,8 +24,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -33,6 +31,9 @@ import android.widget.ImageView;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
@@ -117,7 +118,8 @@ public class ConferenceMessageListHolder_text_outgoing_not_read extends Recycler
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
         textView.setCustomRegex(TOXURL_PATTERN);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
         textView.setAutoLinkText(m.text);
 
         if (!m.read)
@@ -146,11 +148,13 @@ public class ConferenceMessageListHolder_text_outgoing_not_read extends Recycler
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
                 {
@@ -225,7 +229,8 @@ public class ConferenceMessageListHolder_text_outgoing_not_read extends Recycler
                     {
                         try
                         {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email_addr, null));
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                            Uri.fromParts("mailto", email_addr, null));
                             emailIntent.setType("message/rfc822");
                             // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                             // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
@@ -259,7 +264,9 @@ public class ConferenceMessageListHolder_text_outgoing_not_read extends Recycler
                     {
                         try
                         {
-                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
+                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
+                                                                                                     "").replaceFirst(
+                                    "TOX:", "").replaceFirst("Tox:", "");
                             add_friend_real(friend_tox_id);
                         }
                         catch (Exception e)
@@ -293,7 +300,8 @@ public class ConferenceMessageListHolder_text_outgoing_not_read extends Recycler
         @Override
         public boolean onLongClick(final View v)
         {
-            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(context, v, is_selected, message_);
+            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(
+                    context, v, is_selected, message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

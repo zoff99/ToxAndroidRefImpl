@@ -12,9 +12,8 @@ import android.view.View;
 
 import static com.zoffcc.applications.trifa.CallingActivity.device_orientation;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_zoom_incoming_video;
-import static com.zoffcc.applications.trifa.MainActivity.semaphore_videoout_bitmap;
 
-public class CustomVideoImageView extends android.support.v7.widget.AppCompatImageView implements View.OnTouchListener
+public class CustomVideoImageView extends androidx.appcompat.widget.AppCompatImageView implements View.OnTouchListener
 {
     private static final String TAG = "trifa.CustomVImgVw";
     private static Matrix matrix = new Matrix();

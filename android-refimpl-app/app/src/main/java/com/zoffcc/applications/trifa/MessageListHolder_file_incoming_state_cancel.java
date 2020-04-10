@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -43,6 +42,8 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
@@ -142,14 +143,17 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 {
                     if (my_position < 1)
                     {
-                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date_string.setText(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                         message_text_date.setVisibility(View.VISIBLE);
                     }
                     else
                     {
-                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
                         {
-                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date_string.setText(
+                                    MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                             message_text_date.setVisibility(View.VISIBLE);
                         }
                     }
@@ -171,7 +175,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
         final Message message = m;
 
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION);
 
         button_ok.setVisibility(View.GONE);
         button_cancel.setVisibility(View.GONE);
@@ -249,12 +254,14 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     });
 
 
-                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
+                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
+                            message2.filename_fullpath);
                     try
                     {
                         // Log.i(TAG, "glide:img:001");
 
-                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(
+                                new RoundedCorners((int) dp2px(20)));
                         // apply(glide_options).
 
                         GlideApp.
@@ -288,7 +295,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             ft_preview_image.setVisibility(View.VISIBLE);
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
+                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -361,7 +369,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         @Override
         public boolean onLongClick(final View v)
         {
-            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected, message_);
+            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected,
+                                                                                           message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }
