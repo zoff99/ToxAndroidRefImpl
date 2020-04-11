@@ -28,7 +28,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -38,6 +37,8 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import static com.zoffcc.applications.trifa.MainActivity.getRandomString;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LEN_TRIFA_AUTOGEN_PASSWORD;
@@ -214,24 +215,26 @@ public class SetPasswordActivity extends AppCompatActivity
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter()
-            {
-                @Override
-                public void onAnimationEnd(Animator animation)
-                {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(
+                    new AnimatorListenerAdapter()
+                    {
+                        @Override
+                        public void onAnimationEnd(Animator animation)
+                        {
+                            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                        }
+                    });
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter()
-            {
-                @Override
-                public void onAnimationEnd(Animator animation)
-                {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
+            mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(
+                    new AnimatorListenerAdapter()
+                    {
+                        @Override
+                        public void onAnimationEnd(Animator animation)
+                        {
+                            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                        }
+                    });
         }
         else
         {
@@ -268,7 +271,8 @@ public class SetPasswordActivity extends AppCompatActivity
                 return false;
             }
 
-            String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(mPassword1)));
+            String try_password_hash = TrifaSetPatternActivity.bytesToString(
+                    TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(mPassword1)));
 
             // remember hash ---------------
             PREF__DB_secrect_key__user_hash = try_password_hash;
