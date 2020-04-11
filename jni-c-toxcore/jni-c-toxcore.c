@@ -1540,6 +1540,9 @@ void android_tox_callback_conference_peer_name_cb(uint32_t conference_number, ui
     (*jnienv2)->DeleteLocalRef(jnienv2, js1);
 }
 
+
+/** -----XX-----SPLIT-01-----XX----- */
+
 void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
                              const uint8_t *name, size_t length, void *user_data)
 {
@@ -3044,6 +3047,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1messa
 #endif
 }
 
+
+/** -----XX-----SPLIT-02-----XX----- */
 
 
 JNIEXPORT jlong JNICALL
