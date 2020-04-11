@@ -255,7 +255,7 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     androidTestImplementation 'com.android.support:multidex:1.0.3'
     androidTestImplementation 'com.android.support:multidex-instrumentation:1.0.3'
-    implementation 'info.guardianproject.iocipher:IOCipher:0.4'
+    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
     implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
     implementation 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
     implementation 'com.google.code.gson:gson:2.8.5'
