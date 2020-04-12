@@ -12,7 +12,7 @@ Build Status
 
 Offline Messages \*NEW\* \*NEW\*
 =
-To get offline messages for your TRIfA App, install ToxProxy on your raspberryPi and leave it running at home.
+To get offline messages for your TRIfA App, install ToxProxy on your raspberryPi and leave it running at home.<br>
 See the installation instructions [here](https://github.com/zoff99/ToxBlinkenwall_raspi_lite_image/blob/toxproxy_01/README.md)
 
 Get in touch
