@@ -28,8 +28,8 @@ apply plugin: 'com.jfrog.bintray'
  *
  *
  */
-def maven_artefact_version = '1.0.30'
-project.ext.set("maven_artefact_int_version", 10030)
+def maven_artefact_version = '1.0.31'
+project.ext.set("maven_artefact_int_version", 10031)
 /*
  *
  *
