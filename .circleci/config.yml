@@ -17,8 +17,8 @@ jobs:
 
     steps:
       - run: pwd; ls -al; id -a
-      - run: sudo apt update &&
-          sudo apt install -y zip grep
+      - run: apt update &&
+          apt install -y zip grep sudo
       - run: sudo $(which gem) install github_changelog_generator
 
       - checkout
