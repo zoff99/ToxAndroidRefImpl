@@ -10,6 +10,11 @@ Build Status
 **CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003)
 **Bintray:** [![Download](https://api.bintray.com/packages/zoff99/maven/trifajni/images/download.svg)](https://bintray.com/zoff99/maven/trifajni/_latestVersion)
 
+Offline Messages \*NEW\* \*NEW\*
+=
+To get offline messages for your TRIfA App, install ToxProxy on your raspberryPi and leave it running at home.
+See the installation instructions [here](https://github.com/zoff99/ToxBlinkenwall_raspi_lite_image/blob/toxproxy_01/README.md)
+
 Get in touch
 =
 * <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
