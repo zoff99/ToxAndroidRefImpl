@@ -10,10 +10,10 @@ workflows:
 jobs:
   build:
     #working_directory: ~/work
-    machine:
-      image: circleci/classic:latest
-    #docker:
-    #  - image: ubuntu:bionic
+    #machine:
+    #  image: circleci/classic:latest
+    docker:
+      - image: ubuntu:bionic
 
     steps:
       - run: pwd; ls -al; id -a
