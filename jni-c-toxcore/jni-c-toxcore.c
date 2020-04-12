@@ -849,8 +849,13 @@ void init_tox_callbacks()
     tox_callback_self_connection_status(tox_global, tox_utils_self_connection_status_cb);
     tox_utils_callback_friend_connection_status(tox_global, friend_connection_status_cb);
     tox_callback_friend_connection_status(tox_global, tox_utils_friend_connection_status_cb);
+    // ----------- custom packets -----------
+    // tox_utils_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
+    // tox_callback_friend_lossless_packet(tox_global, tox_utils_friend_lossless_packet_cb);
     tox_utils_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
-    tox_callback_friend_lossless_packet(tox_global, tox_utils_friend_lossless_packet_cb);
+    tox_callback_friend_lossless_packet_per_pktid(tox_global, tox_utils_friend_lossless_packet_cb, 170);
+    tox_callback_friend_lossless_packet_per_pktid(tox_global, friend_lossless_packet_cb, 176);
+    // ----------- custom packets -----------
     tox_utils_callback_file_recv_control(tox_global, file_recv_control_cb);
     tox_callback_file_recv_control(tox_global, tox_utils_file_recv_control_cb);
     tox_utils_callback_file_chunk_request(tox_global, file_chunk_request_cb);
@@ -1534,6 +1539,9 @@ void android_tox_callback_conference_peer_name_cb(uint32_t conference_number, ui
                                      js1, (jlong)(unsigned long long)length);
     (*jnienv2)->DeleteLocalRef(jnienv2, js1);
 }
+
+
+/** -----XX-----SPLIT-01-----XX----- */
 
 void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer_number,
                              const uint8_t *name, size_t length, void *user_data)
@@ -3039,6 +3047,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1messa
 #endif
 }
 
+
+/** -----XX-----SPLIT-02-----XX----- */
 
 
 JNIEXPORT jlong JNICALL
