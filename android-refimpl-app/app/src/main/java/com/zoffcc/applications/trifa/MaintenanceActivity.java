@@ -731,11 +731,11 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         Log.i(TAG, "files_and_sizes_in_dir:file len=" + file.length());
                         if ((file.length() / 1024 / 1024) < 1)
                         {
-                            ret.append("\n").append(file.getName()).append("\t").append(file.length()).append(" Bytes");
+                            ret.append("\n").append(file.getName()).append("  \t").append(file.length()).append(" Bytes");
                         }
                         else
                         {
-                            ret.append("\n").append(file.getName()).append("\t").append(
+                            ret.append("\n").append(file.getName()).append("  \t").append(
                                     file.length() / 1024 / 1024).append(" MBytes");
                         }
                         size_sum = size_sum + file.length();
@@ -759,11 +759,11 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         if ((size_sum / 1024 / 1024) < 1)
         {
-            ret.append("\nSize: ").append(size_sum).append(" Bytes");
+            ret.append("\nSize:  ").append(size_sum).append(" Bytes");
         }
         else
         {
-            ret.append("\nSize: ").append(size_sum / 1024 / 1024).append(" MBytes");
+            ret.append("\nSize:  ").append(size_sum / 1024 / 1024).append(" MBytes");
         }
 
         return ret.toString();
