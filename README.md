@@ -15,6 +15,8 @@ Offline Messages \*NEW\* \*NEW\*
 To get offline messages for your TRIfA App, install ToxProxy on your raspberryPi and leave it running at home.<br>
 See the installation instructions [here](https://github.com/zoff99/ToxBlinkenwall_raspi_lite_image/blob/toxproxy_01/README.md)
 
+<img height="300" src="https://raw.githubusercontent.com/zoff99/ToxProxy/zoff99/tweaks_001/pix/toxproxy_001_medium.jpg"></img><br>
+
 Get in touch
 =
 * <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
