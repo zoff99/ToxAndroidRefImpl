@@ -90,7 +90,7 @@ dependencyVerification {
         'me.zhanghai.android.patternlock:library:2.1.2:library-2.1.2.aar:3b35da8f0ae09ce462d8ba9c896820d3bb0806151552b0af9caf349fb02dcb70',
         'net.sf.jopt-simple:jopt-simple:4.9:jopt-simple-4.9.jar:26c5856e954b5f864db76f13b86919b59c6eecf9fd930b96baa8884626baf2f5',
         'net.sf.kxml:kxml2:2.3.0:kxml2-2.3.0.jar:f264dd9f79a1fde10ce5ecc53221eff24be4c9331c830b7d52f2f08a7b633de2',
-        'net.zetetic:android-database-sqlcipher:3.5.7:android-database-sqlcipher-3.5.7.aar:20e9276aacd18f0fffe62221545046696460775af56736ddd33b8a04a78bc756',
+        'net.zetetic:android-database-sqlcipher:3.5.9:android-database-sqlcipher-3.5.9.aar:eff93b3222f4bdc349ffee2d2e3b2a2507241f17435fb998947bcce486618f1d',
         'org.antlr:antlr4-runtime:4.6:antlr4-runtime-4.6.jar:08b519ce8883f9e0c92d5e16b911dbbb3d29faa434efc4c3c62435341ec4b332',
         'org.apache.commons:commons-compress:1.12:commons-compress-1.12.jar:2c1542faf343185b7cab9c3d55c8ae5471d6d095d3887a4adefdbdf2984dc0b6',
         'org.apache.httpcomponents:httpclient:4.5.2:httpclient-4.5.2.jar:0dffc621400d6c632f55787d996b8aeca36b30746a716e079a985f24d8074057',
