@@ -869,7 +869,19 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                             new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
                                                                                           peer_pubkey).
                                                     withIdentifier(peernum).
-                                                    withName(name3);
+                                                    withName(name3).
+                                                    withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                                                    {
+                                                        @Override
+                                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                        {
+                                                            Intent intent = new Intent(view.getContext(), ConferencePeerInfoActivity.class);
+                                                            intent.putExtra("peer_pubkey", peer_pubkey);
+                                                            intent.putExtra("conf_id", conf_id);
+                                                            view.getContext().startActivity(intent);
+                                                            return true;
+                                                        }
+                                                    });
                                         }
                                         catch (Exception e)
                                         {
@@ -877,7 +889,19 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                             new_item = new ConferenceCustomDrawerPeerItem(false, null).
                                                     withIdentifier(peernum).
                                                     withName(name3).
-                                                    withIcon(GoogleMaterial.Icon.gmd_face);
+                                                    withIcon(GoogleMaterial.Icon.gmd_face).
+                                                    withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                                                    {
+                                                        @Override
+                                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                        {
+                                                            Intent intent = new Intent(view.getContext(), ConferencePeerInfoActivity.class);
+                                                            intent.putExtra("peer_pubkey", peer_pubkey);
+                                                            intent.putExtra("conf_id", conf_id);
+                                                            view.getContext().startActivity(intent);
+                                                            return true;
+                                                        }
+                                                    });
                                         }
 
                                         // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
@@ -1011,10 +1035,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                 final long conference_num = get_conference_num_from_confid(conf_id);
                                 if (conference_num > -1)
                                 {
-                                    int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, conference_num);
+                                    int res_conf_invite = tox_conference_invite(friend_num_temp_safety2,
+                                                                                conference_num);
                                     if (res_conf_invite < 0)
                                     {
-                                        Log.d(TAG, "onActivityResult:info:tox_conference_invite:ERR:" + res_conf_invite);
+                                        Log.d(TAG,
+                                              "onActivityResult:info:tox_conference_invite:ERR:" + res_conf_invite);
                                     }
                                 }
                             }
