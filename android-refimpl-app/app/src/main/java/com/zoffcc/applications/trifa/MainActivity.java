@@ -102,7 +102,6 @@ import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
-import com.zoffcc.applications.trifa.CallingActivity.h264_decoder_output_data;
 import com.zoffcc.applications.trifa.CallingActivity.h264_encoder_output_data;
 
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
@@ -146,9 +145,7 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
-import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_decoder;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
-import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_decoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.global_sps_pps_nal_unit_bytes;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
@@ -2765,24 +2762,6 @@ public class MainActivity extends AppCompatActivity
     static void android_toxav_callback_video_receive_frame_h264_cb_method(long friend_number, long buf_size)
     {
         // HINT: Disabled. this is now handled by c-toxcore. how nice.
-        if (1 == 2)
-        {
-            Log.i(TAG, "callback_video_receive_frame_h264_cb:arrayOffset=" + video_buffer_1.arrayOffset());
-            int off = video_buffer_1.arrayOffset();
-            Log.i(TAG, "callback_video_receive_frame_h264_cb:video_buffer_1:" +
-                       video_buffer_1.array()[off + ((int) buf_size) - 4] + " " +
-                       video_buffer_1.array()[off + ((int) buf_size) - 3] + " " +
-                       video_buffer_1.array()[off + ((int) buf_size) - 2] + " " +
-                       video_buffer_1.array()[off + ((int) buf_size) - 1]);
-            feed_h264_decoder(video_buffer_1.array(), buf_size, off);
-            h264_decoder_output_data buf_decoder_out = fetch_from_h264_decoder();
-
-            if (buf_decoder_out.data != null)
-            {
-                Log.i(TAG, "callback_video_receive_frame_h264_cb:decoded_data:len=" + buf_decoder_out.data.length +
-                           " data=" + buf_decoder_out.data);
-            }
-        }
     }
 
     static void android_toxav_callback_call_state_cb_method(long friend_number, int a_TOXAV_FRIEND_CALL_STATE)
