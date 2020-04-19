@@ -3390,7 +3390,11 @@ public class MainActivity extends AppCompatActivity
                     {
                         Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":stop any calls");
                         toxav_call_control(friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
-                        on_call_ended_actions();
+
+                        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) == friend_number)
+                        {
+                            on_call_ended_actions();
+                        }
                     }
                     catch (Exception e2)
                     {

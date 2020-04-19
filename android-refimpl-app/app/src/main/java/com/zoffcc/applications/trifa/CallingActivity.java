@@ -1526,6 +1526,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
 
 
+        Log.i(TAG, "onPause:on_call_ended_actions");
         on_call_ended_actions();
     }
 
