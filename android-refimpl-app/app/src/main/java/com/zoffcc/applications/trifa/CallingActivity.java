@@ -167,7 +167,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static View video_box_right_top_01 = null;
     final static String MIME_TYPE = "video/avc";   // H.264 Advanced Video Coding
     final static int FRAME_RATE = 15;              // ~15fps
-    final static int IFRAME_INTERVAL = 1;          // 5 seconds between I-frames
+    final static int IFRAME_INTERVAL = 6;          // 6 seconds between I-frames
     private static MediaCodec.BufferInfo mBufferInfo;
     private static MediaCodec mEncoder;
     private static MediaPlayer mMediaPlayer = null;

@@ -4790,6 +4790,26 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(
                                            (uint16_t)frame_height_px,
                                            (uint8_t *)video_buffer_2,
                                            (uint32_t)data_len, &error);
+
+    if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+    {
+        yieldcpu(1); // sleep 1 ms
+        res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                          (uint16_t)frame_height_px,
+                                          (uint8_t *)video_buffer_2,
+                                          (uint32_t)data_len, &error);
+
+        if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+        {
+            yieldcpu(1); // sleep 1 ms
+            res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                              (uint16_t)frame_height_px,
+                                              (uint8_t *)video_buffer_2,
+                                              (uint32_t)data_len, &error);
+        }
+    }
+
+    // dbg(9, "toxav_video_send_frame_h264:res=%d,error=%d", (int)res, (int)error);
     return (jint)error;
 }
 
@@ -4871,6 +4891,25 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 #endif
         bool res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
                                           (uint8_t)channels, (uint32_t)sampling_rate, &error);
+
+
+        if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+        {
+            yieldcpu(1); // sleep 1 ms
+            res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
+                                              (uint8_t)channels, (uint32_t)sampling_rate, &error);
+
+            if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+            {
+                yieldcpu(1); // sleep 1 ms
+                res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
+                                                  (uint8_t)channels, (uint32_t)sampling_rate, &error);
+            }
+        }
+
+
+
+
     }
 
     return (jint)error;
