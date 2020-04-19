@@ -4373,6 +4373,24 @@ public class MainActivity extends AppCompatActivity
                 }
                 return;
             }
+            else if (file_size == 0)
+            {
+                // friend wants to unset avatar
+                HelperFriend.del_friend_avatar(HelperFriend.tox_friend_get_public_key__wrapper(friend_number),
+                                               VFS_PREFIX + VFS_FILE_DIR + "/" +
+                                               HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + "/",
+                                               FRIEND_AVATAR_FILENAME);
+
+                try
+                {
+                    tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                return;
+            }
 
 
             Log.i(TAG, "file_recv:incoming avatar");

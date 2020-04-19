@@ -291,7 +291,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     load(f1).
                                     diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                     signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                            "_avatar_" + new_avatar_pathname + "/" + new_avatar_filename + "_" +
+                                            "_avatar_" + new_avatar_pathname + "/" + FRIEND_AVATAR_FILENAME + "_" +
                                             fl.avatar_update_timestamp)).
                                     placeholder(d_lock).
                                     priority(Priority.HIGH).
