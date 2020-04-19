@@ -77,8 +77,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 38
-static const char global_version_string[] = "0.99.38";
+#define VERSION_PATCH 39
+static const char global_version_string[] = "0.99.39";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -4742,6 +4742,26 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1uv_1r
     bool res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                       (uint16_t)frame_height_px,
                                       (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error);
+
+    if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+    {
+        yieldcpu(1); // sleep 1 ms
+
+        res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                     (uint16_t)frame_height_px,
+                                     (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error);
+
+        if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+        {
+            yieldcpu(1); // sleep 1 ms
+
+            res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                         (uint16_t)frame_height_px,
+                                         (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error);
+
+        }
+    }
+
     return (jint)error;
 }
 // reverse the order of the U and V planes ---------------
@@ -4776,6 +4796,26 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv
     bool res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                       (uint16_t)frame_height_px,
                                       (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error);
+
+    if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+    {
+        yieldcpu(1); // sleep 1 ms
+
+        res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                     (uint16_t)frame_height_px,
+                                     (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error);
+
+        if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+        {
+            yieldcpu(1); // sleep 1 ms
+
+            res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                         (uint16_t)frame_height_px,
+                                         (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error);
+
+        }
+    }
+
     // dbg(9, "toxav_video_send_frame:res=%d,error=%d", (int)res, (int)error);
     return (jint)error;
 }
