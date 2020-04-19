@@ -781,6 +781,8 @@ public class CameraWrapper
                 Log.i(TAG, "onPreviewFrame:EE2:" + e.getMessage());
             }
 
+            // Log.i(TAG, "doInBackground:END:#" + num);
+
             return null;
         }
 

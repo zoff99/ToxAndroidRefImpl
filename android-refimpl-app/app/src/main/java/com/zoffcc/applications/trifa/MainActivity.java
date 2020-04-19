@@ -2910,7 +2910,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_call_comm_cb_method(long friend_number, long a_TOXAV_CALL_COMM_INFO, long comm_number)
     {
-        // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+        Log.i(TAG, "android_toxav_callback_call_comm_cb_method:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
         if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_DECODER_IN_USE_VP8.value)
         {
             // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:3:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
@@ -2934,11 +2934,14 @@ public class MainActivity extends AppCompatActivity
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_DECODER_CURRENT_BITRATE.value)
         {
             Callstate.video_in_bitrate = comm_number;
-            // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:66B:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+            Log.i(TAG,
+                  "android_toxav_callback_call_comm_cb_method:TOXAV_CALL_COMM_DECODER_CURRENT_BITRATE:" + comm_number);
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE.value)
         {
             Callstate.video_bitrate = comm_number;
+            Log.i(TAG,
+                  "android_toxav_callback_call_comm_cb_method:TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE:" + comm_number);
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_PLAY_DELAY.value)
         {
@@ -8562,64 +8565,119 @@ public class MainActivity extends AppCompatActivity
         return output;
     }
 
-    static int toxav_video_send_frame_uv_reversed_wrapper(byte[] buf2, long friendnum, int frame_width_px, int frame_height_px)
+    static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px)
     {
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
-            if (PREF__camera_get_preview_format.equals("YV12"))
-            {
-                byte[] buf = new byte[buf2.length];
-                buf = YV12totoNV12(buf2, buf, frame_width_px, frame_height_px);
-                feed_h264_encoder(buf, frame_width_px, frame_height_px);
-            }
-            else // (PREF__camera_get_preview_format == "NV21")
-            {
-                byte[] buf = new byte[buf2.length];
-                buf = NV21toNV12(buf2, buf, frame_width_px, frame_height_px);
-                feed_h264_encoder(buf, frame_width_px, frame_height_px);
-            }
 
-            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:--------------------------");
-            for (int jj = 0; jj < 2; jj++)
+            final Thread new_thread = new Thread()
             {
-                h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
-
-                if (h264_out_data != null)
+                @Override
+                public void run()
                 {
-                    byte[] buf_out = h264_out_data.data;
-
-                    if (buf_out != null)
+                    try
                     {
-                        if (h264_out_data.sps_pps != null)
+                        if (PREF__camera_get_preview_format.equals("YV12"))
                         {
-                            save_sps_pps_nal(h264_out_data.sps_pps);
+                            byte[] buf = new byte[buf2.length];
+                            buf = YV12totoNV12(buf2, buf, frame_width_px, frame_height_px);
+                            feed_h264_encoder(buf, frame_width_px, frame_height_px);
                         }
-
-                        if (global_sps_pps_nal_unit_bytes != null)
+                        else // (PREF__camera_get_preview_format == "NV21")
                         {
-                            if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
-                            {
-                                // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
-                                MainActivity.video_buffer_2.rewind();
-                                MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
-                                toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
-                                                            global_sps_pps_nal_unit_bytes.length);
-                                send_sps_pps_every_x_frames_current = 0;
-                            }
-
-                            send_sps_pps_every_x_frames_current++;
+                            byte[] buf = new byte[buf2.length];
+                            buf = NV21toNV12(buf2, buf, frame_width_px, frame_height_px);
+                            feed_h264_encoder(buf, frame_width_px, frame_height_px);
                         }
-
-                        MainActivity.video_buffer_2.rewind();
-                        MainActivity.video_buffer_2.put(buf_out);
-                        toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:buf_out==null:#" + jj);
+                        e.printStackTrace();
                     }
                 }
+            };
+            new_thread.start();
+
+
+            final Thread new_thread2 = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        for (int jj = 0; jj < 1; jj++)
+                        {
+                            h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
+
+                            if (h264_out_data != null)
+                            {
+                                byte[] buf_out = h264_out_data.data;
+
+                                if (buf_out != null)
+                                {
+                                    if (h264_out_data.sps_pps != null)
+                                    {
+                                        save_sps_pps_nal(h264_out_data.sps_pps);
+                                    }
+
+                                    MainActivity.video_buffer_2.rewind();
+                                    long data_length = 0;
+
+                                    if (global_sps_pps_nal_unit_bytes != null)
+                                    {
+                                        if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                                        {
+                                            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
+                                            MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
+                                            // toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                            //                            global_sps_pps_nal_unit_bytes.length);
+                                            data_length = data_length + global_sps_pps_nal_unit_bytes.length;
+                                            send_sps_pps_every_x_frames_current = 0;
+                                        }
+
+                                        send_sps_pps_every_x_frames_current++;
+                                    }
+
+                                    MainActivity.video_buffer_2.put(buf_out);
+                                    data_length = data_length + buf_out.length;
+                                    toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                                                data_length);
+                                }
+                                else
+                                {
+                                    // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:buf_out==null:#" + jj);
+                                }
+                            }
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            new_thread2.start();
+
+
+            try
+            {
+                new_thread.join();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                new_thread2.join();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
 
             return 0;
