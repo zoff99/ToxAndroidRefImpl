@@ -723,8 +723,8 @@ public class TrifaToxService extends Service
                 }
                 else
                 {
-                    tox_self_set_name("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5));
-                    global_my_name = ("TRIfA " + my_tox_id_local.substring(my_tox_id_local.length() - 5));
+                    tox_self_set_name("TRIfA " + my_tox_id_local.substring(0, 4));
+                    global_my_name = ("TRIfA " + my_tox_id_local.substring(0, 4));
                     Log.i(TAG, "AAA:005");
                 }
 
