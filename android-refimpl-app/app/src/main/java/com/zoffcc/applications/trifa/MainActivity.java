@@ -2471,6 +2471,14 @@ public class MainActivity extends AppCompatActivity
     // --------------- AV - Conference --------
     public static native long toxav_join_av_groupchat(long friend_number, ByteBuffer cookie_buffer, long cookie_length);
 
+    public static native long toxav_add_av_groupchat();
+
+    public static native long toxav_groupchat_disable_av(long conference_number);
+
+    public static native int toxav_groupchat_av_enabled(long conference_number);
+
+    public static native int toxav_group_send_audio(long groupnumber, long sample_count, int channels, long sampling_rate);
+
     // --------------- AV - Conference --------
     // --------------- AV - Conference --------
     // --------------- AV - Conference --------
@@ -4896,6 +4904,7 @@ public class MainActivity extends AppCompatActivity
         else
         {
             conference_num = toxav_join_av_groupchat(friend_number, cookie_buf2, cookie_length);
+            toxav_groupchat_disable_av(conference_num);
         }
 
         Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);
