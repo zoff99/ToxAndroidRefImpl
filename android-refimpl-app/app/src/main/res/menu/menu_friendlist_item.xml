@@ -10,7 +10,13 @@
     <item
         android:id="@+id/item_create_conference"
         android:icon="@drawable/ic_content_copy_white_24dp"
-        android:title="Create Group"
+        android:title="Create Text Group"
+        android:visible="true"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/item_create_av_conference"
+        android:icon="@drawable/ic_content_copy_white_24dp"
+        android:title="Create Audio Group"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
     <item

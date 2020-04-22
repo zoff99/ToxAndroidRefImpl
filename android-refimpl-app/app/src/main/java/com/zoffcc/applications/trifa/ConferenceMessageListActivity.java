@@ -1037,7 +1037,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                 {
                                     int res_conf_invite = tox_conference_invite(friend_num_temp_safety2,
                                                                                 conference_num);
-                                    if (res_conf_invite < 0)
+                                    if (res_conf_invite < 1)
                                     {
                                         Log.d(TAG,
                                               "onActivityResult:info:tox_conference_invite:ERR:" + res_conf_invite);

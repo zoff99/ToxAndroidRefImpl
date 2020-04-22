@@ -64,6 +64,7 @@ import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_new;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_add_av_groupchat;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
@@ -74,6 +75,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ON
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP;
@@ -773,14 +775,14 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                     case R.id.item_create_conference:
                         int res_conf_new = tox_conference_new();
-                        if (res_conf_new > 0)
+                        if (res_conf_new >= 0)
                         {
                             // conference was created, now invite the selected friend
                             long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
                             if (friend_num_temp_safety2 > 0)
                             {
                                 int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_new);
-                                if (res_conf_invite < 0)
+                                if (res_conf_invite < 1)
                                 {
                                     Log.d(TAG, "onMenuItemClick:info:tox_conference_invite:ERR:" + res_conf_invite);
                                 }
@@ -795,6 +797,28 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     // invite also my ToxProxy -------------
                                     add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "",
                                                            TOX_CONFERENCE_TYPE_TEXT.value, false);
+                                    MainActivity.update_savedata_file_wrapper();
+                                }
+                            }
+                        }
+                        break;
+                    case R.id.item_create_av_conference:
+                        long res_conf_av_new = toxav_add_av_groupchat();
+                        if (res_conf_av_new >= 0)
+                        {
+                            // conference was created, now invite the selected friend
+                            long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                            if (friend_num_temp_safety2 > 0)
+                            {
+                                int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_av_new);
+                                if (res_conf_invite < 1)
+                                {
+                                    Log.d(TAG, "onMenuItemClick:info:AV:tox_conference_invite:ERR:" + res_conf_invite);
+                                }
+                                else
+                                {
+                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_av_new, "",
+                                                           TOX_CONFERENCE_TYPE_AV.value, false);
                                     MainActivity.update_savedata_file_wrapper();
                                 }
                             }
