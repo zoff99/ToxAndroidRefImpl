@@ -4904,7 +4904,8 @@ public class MainActivity extends AppCompatActivity
         else
         {
             conference_num = toxav_join_av_groupchat(friend_number, cookie_buf2, cookie_length);
-            toxav_groupchat_disable_av(conference_num);
+            long result = toxav_groupchat_disable_av(conference_num);
+            Log.i(TAG, "conference_invite_cb:toxav_groupchat_disable_av result=" + result);
         }
 
         Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);

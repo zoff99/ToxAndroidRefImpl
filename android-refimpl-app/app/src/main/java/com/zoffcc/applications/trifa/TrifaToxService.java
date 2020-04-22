@@ -97,6 +97,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.MainActivity.tox_util_friend_resend_message_v2;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP2;
@@ -123,6 +124,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_o
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 
 public class TrifaToxService extends Service
@@ -584,6 +586,13 @@ public class TrifaToxService extends Service
                 new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
                                           conference_identifier, tox_conference_get_type(
                                 conference_numbers[conf_])); // rejoin a saved conference
+
+                if (tox_conference_get_type(conference_numbers[conf_]) == TOX_CONFERENCE_TYPE_AV.value)
+                {
+                    long result = toxav_groupchat_disable_av(conference_numbers[conf_]);
+                    Log.i(TAG, "load conference num=" + conference_numbers[conf_] + " toxav_groupchat_disable_av res=" +
+                               result);
+                }
 
                 try
                 {
