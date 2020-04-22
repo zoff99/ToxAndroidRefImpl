@@ -218,6 +218,8 @@ import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_C
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
@@ -2464,6 +2466,14 @@ public class MainActivity extends AppCompatActivity
     // --------------- Conference -------------
     // --------------- Conference -------------
 
+    // --------------- AV - Conference --------
+    // --------------- AV - Conference --------
+    // --------------- AV - Conference --------
+    public static native long toxav_join_av_groupchat(long friend_number, ByteBuffer cookie_buffer, long cookie_length);
+
+    // --------------- AV - Conference --------
+    // --------------- AV - Conference --------
+    // --------------- AV - Conference --------
 
     // --------------- AV -------------
     // --------------- AV -------------
@@ -4851,13 +4861,14 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_conference_connected_cb_method(long conference_number)
     {
         // invite also my ToxProxy -------------
-        if (HelperRelay.have_own_relay())
+        if (tox_conference_get_type(conference_number) == TOX_CONFERENCE_TYPE_TEXT.value)
         {
-            tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
-                                  conference_number);
+            if (HelperRelay.have_own_relay())
+            {
+                tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
+                                      conference_number);
+            }
         }
-        // invite also my ToxProxy -------------
-
         Log.i(TAG, "conference_connected_cb:cf_num=" + conference_number);
         update_savedata_file_wrapper();
     }
@@ -4876,7 +4887,17 @@ public class MainActivity extends AppCompatActivity
         ByteBuffer cookie_buf2 = ByteBuffer.allocateDirect((int) cookie_length);
         cookie_buf2.put(cookie_buffer);
         Log.i(TAG, "conference_invite_cb:bytebuffer offset=" + cookie_buf2.arrayOffset());
-        long conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
+
+        long conference_num = -1;
+        if (a_TOX_CONFERENCE_TYPE != TOX_CONFERENCE_TYPE_AV.value)
+        {
+            conference_num = tox_conference_join(friend_number, cookie_buf2, cookie_length);
+        }
+        else
+        {
+            conference_num = toxav_join_av_groupchat(friend_number, cookie_buf2, cookie_length);
+        }
+
         Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);
         // strip first 3 bytes of cookie to get the conference_id.
         // this is aweful and hardcoded
@@ -4885,10 +4906,13 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
 
         // invite also my ToxProxy -------------
-        if (HelperRelay.have_own_relay())
+        if (a_TOX_CONFERENCE_TYPE == TOX_CONFERENCE_TYPE_TEXT.value)
         {
-            tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
-                                  conference_num);
+            if (HelperRelay.have_own_relay())
+            {
+                tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
+                                      conference_num);
+            }
         }
         // invite also my ToxProxy -------------
 
@@ -4900,6 +4924,12 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
     {
+        if (tox_conference_get_type(conference_number) == TOX_CONFERENCE_TYPE_AV.value)
+        {
+            // we do not yet process messages from AV groups
+            return;
+        }
+
         // Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message);
         int res = tox_conference_peer_number_is_ours(conference_number, peer_number);
 

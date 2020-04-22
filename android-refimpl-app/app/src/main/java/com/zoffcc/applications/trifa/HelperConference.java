@@ -33,6 +33,8 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperConference
@@ -476,6 +478,33 @@ public class HelperConference
         return "Unknown Conference";
     }
 
+    static int get_conference_kind_from_confid(String conference_id)
+    {
+        try
+        {
+            // try in the database
+            int kind = orma.selectFromConferenceDB().
+                    conference_identifierEq(conference_id).get(0).kind;
+
+            if ((kind < TOX_CONFERENCE_TYPE_TEXT.value) || (kind > TOX_CONFERENCE_TYPE_AV.value))
+            {
+                Log.i(TAG, "get_conference_kind_from_confid:EE:1");
+                return TOX_CONFERENCE_TYPE_TEXT.value;
+            }
+            else
+            {
+                return kind;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "get_conference_kind_from_confid:EE:2:" + e.getMessage());
+        }
+
+        return TOX_CONFERENCE_TYPE_TEXT.value;
+    }
+
     static String conference_identifier_short(String conference_identifier, boolean uppercase_result)
     {
         try
@@ -548,6 +577,7 @@ public class HelperConference
             orma.updateConferenceDB().
                     conference_identifierEq(conference_identifier).
                     conference_active(true).
+                    kind(conference_type).
                     tox_conference_number(conference_number).execute();
 
             try

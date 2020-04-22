@@ -85,6 +85,7 @@ import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_type;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_connection_status;
@@ -581,8 +582,8 @@ public class TrifaToxService extends Service
                       conf2.name);
 
                 new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
-                                          conference_identifier,
-                                          ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT.value); // rejoin a saved conference
+                                          conference_identifier, tox_conference_get_type(
+                                conference_numbers[conf_])); // rejoin a saved conference
 
                 try
                 {

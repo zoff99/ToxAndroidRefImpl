@@ -178,7 +178,7 @@ public class FriendListFragment extends Fragment
                 Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
             }
         }
-        else // is conference
+        else // is conference -----------------------------
         {
             final ConferenceDB cc = c.conference_item;
 

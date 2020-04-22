@@ -28,6 +28,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,8 +39,8 @@ import static com.zoffcc.applications.trifa.HelperConference.conference_identifi
 import static com.zoffcc.applications.trifa.HelperConference.delete_conference;
 import static com.zoffcc.applications.trifa.HelperConference.delete_conference_all_messages;
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_title_from_confid;
-import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.HelperConference.set_conference_inactive;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
@@ -47,6 +48,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_AL
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_SELECTED;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceListHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -63,6 +65,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
     private ImageView imageView;
     private ImageView imageView2;
     private ImageView f_notification;
+    private ViewGroup f_conf_container_parent;
 
     public ConferenceListHolder(View itemView, Context c)
     {
@@ -71,6 +74,8 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         // Log.i(TAG, "FriendListHolder");
 
         this.context = c;
+
+        f_conf_container_parent = (ViewGroup) itemView.findViewById(R.id.f_conf_container_parent);
 
         textView = (TextView) itemView.findViewById(R.id.f_name);
         statusText = (TextView) itemView.findViewById(R.id.f_status_message);
@@ -118,9 +123,20 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             f_notification.setOnClickListener(this);
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_group).
-                color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
-        avatar.setImageDrawable(d_lock);
+        if (fl.kind == TOX_CONFERENCE_TYPE_AV.value)
+        {
+            f_conf_container_parent.setBackgroundResource(R.drawable.friend_list_conf_av_round_bg);
+            final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_music_note).
+                    color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+            avatar.setImageDrawable(d_lock);
+        }
+        else
+        {
+            f_conf_container_parent.setBackgroundResource(R.drawable.friend_list_conf_round_bg);
+            final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_group).
+                    color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+            avatar.setImageDrawable(d_lock);
+        }
 
         try
         {
@@ -134,17 +150,18 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                 }
 
                 statusText.setText(Html.fromHtml("#" + fl.tox_conference_number + " "
-                        //
-                        + conference_identifier_short(fl.conference_identifier, true)
-                        //
-                        + " " + "<b><font color=\"#000000\">Users:" + user_count + "</font></b>"));
+                                                 //
+                                                 + conference_identifier_short(fl.conference_identifier, true)
+                                                 //
+                                                 + " " + "<b><font color=\"#000000\">Users:" + user_count +
+                                                 "</font></b>"));
             }
             else
             {
                 statusText.setText("#" + fl.tox_conference_number + " "
-                                //
-                                + conference_identifier_short(fl.conference_identifier, true)
-                        //
+                                   //
+                                   + conference_identifier_short(fl.conference_identifier, true)
+                                   //
                 );
             }
         }
@@ -218,7 +235,8 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                             icon(GoogleMaterial.Icon.gmd_notifications_off).
                             color(context.getResources().
                                     getColor(R.color.colorPrimaryDark)).
-                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(
+                            FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
                     f_notification.setImageDrawable(d_notification);
                 }
                 else
