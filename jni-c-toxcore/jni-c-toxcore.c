@@ -3986,6 +3986,41 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
 
 
 
+// ------------------- AV - Conference -------------------
+// ------------------- AV - Conference -------------------
+// ------------------- AV - Conference -------------------
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1join_1av_1groupchat(JNIEnv *env, jobject thiz, jlong friend_number,
+        jobject cookie_buffer, jlong cookie_length)
+{
+    uint8_t *cookie_buffer_c = NULL;
+    long capacity = 0;
+
+    if(cookie_buffer == NULL)
+    {
+        return -21;
+    }
+
+    cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
+
+    int32_t res = toxav_join_av_groupchat(tox_global, (uint32_t)friend_number, cookie_buffer_c, (size_t)cookie_length,
+                                        NULL, (void *)NULL);
+
+    return (jlong)res;
+}
+
+
+// ------------------- AV - Conference -------------------
+// ------------------- AV - Conference -------------------
+// ------------------- AV - Conference -------------------
+
+
+
+
+
 
 
 
