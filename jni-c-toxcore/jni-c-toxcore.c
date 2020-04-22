@@ -3995,12 +3995,17 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1join_1av_1groupchat(JNIEnv *env, jobject thiz, jlong friend_number,
         jobject cookie_buffer, jlong cookie_length)
 {
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
     uint8_t *cookie_buffer_c = NULL;
     long capacity = 0;
 
     if(cookie_buffer == NULL)
     {
-        return -21;
+        return (jlong)-21;
     }
 
     cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
@@ -4010,6 +4015,124 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1join_1av_1groupchat(JNIEn
                                         NULL, (void *)NULL);
 
     return (jlong)res;
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1add_1av_1groupchat(JNIEnv *env, jobject thiz)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    int32_t res = toxav_add_av_groupchat(tox_global, NULL, (void *)NULL);
+    return (jlong)res;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1disable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    int32_t res = toxav_groupchat_disable_av(tox_global, (uint32_t)conference_number);
+    return (jlong)res;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1av_1enabled(JNIEnv *env, jobject thiz, jlong conference_number)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    bool res = toxav_groupchat_av_enabled(tox_global, (uint32_t)conference_number);
+
+    if (res == false)
+    {
+        return (jint)-1;
+    }
+    else
+    {
+        return (jint)0;
+    }
+}
+
+
+/* Send audio to the group chat.
+ *
+ * return 0 on success.
+ * return -1 on failure.
+ *
+ * Note that total size of pcm in bytes is equal to `(samples * channels * sizeof(int16_t))`.
+ *
+ * Valid number of samples are `((sample rate) * (audio length) / 1000)` (Valid values for audio length: 2.5, 5, 10, 20, 40 or 60 ms)
+ * Valid number of channels are 1 or 2.
+ * Valid sample rates are 8000, 12000, 16000, 24000, or 48000.
+ *
+ * Recommended values are: samples = 960, channels = 1, sample_rate = 48000
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1group_1send_1audio(JNIEnv *env, jobject thiz,
+        jlong groupnumber, jlong sample_count, jint channels, jlong sampling_rate)
+{
+    if(tox_global == NULL)
+    {
+        return (jint)-2;
+    }
+
+    if(audio_buffer_pcm_1)
+    {
+        int16_t *pcm = (int16_t *)audio_buffer_pcm_1;
+#ifdef USE_ECHO_CANCELLATION
+
+        if(((int)channels == 1) && ((int)sampling_rate == 48000))
+        {
+            filteraudio_incompatible_1 = 0;
+        }
+        else
+        {
+            filteraudio_incompatible_1 = 1;
+        }
+
+        // TODO: need some locking here!
+        if(recording_samling_rate != (uint32_t)sampling_rate)
+        {
+            recording_samling_rate = (uint32_t)sampling_rate;
+            restart_filter_audio((uint32_t)sampling_rate);
+        }
+
+        // TODO: need some locking here!
+
+        if(sample_count > 0)
+        {
+            if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
+                    && (filteraudio_incompatible_2 == 0))
+            {
+                filter_audio(filteraudio, pcm, (unsigned int)sample_count);
+            }
+        }
+
+#endif
+        bool res = toxav_group_send_audio(tox_global, (uint32_t)groupnumber, pcm, (size_t)sample_count,
+                                          (uint8_t)channels, (uint32_t)sampling_rate);
+        if (res == false)
+        {
+            return (jint)-3;
+        }
+        else
+        {
+            return (jint)0;
+        }
+
+    }
+
+    return (jint)-3;
 }
 
 
