@@ -1,0 +1,700 @@
+/**
+ * [TRIfA], Java part of Tox Reference Implementation for Android
+ * Copyright (C) 2017 Zoff <zoff@zoff.cc>
+ * <p>
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ */
+
+package com.zoffcc.applications.trifa;
+
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.StringHolder;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.vanniktech.emoji.EmojiPopup;
+
+import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
+import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
+import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_public_key;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+
+public class ConferenceAudioActivity extends AppCompatActivity
+{
+    private static final String TAG = "trifa.CnfAudioActivity";
+    String conf_id = "-1";
+    String conf_id_prev = "-1";
+
+    // main drawer ----------
+    Drawer conference_message_drawer = null;
+    AccountHeader conference_message_drawer_header = null;
+    ProfileDrawerItem conference_message_profile_item = null;
+    // long peers_in_list_next_num = 0;
+    // main drawer ----------
+
+    ImageView ml_icon = null;
+    ImageView ml_status_icon = null;
+    TextView ml_maintext = null;
+
+    Handler conferences_av_handler = null;
+    static Handler conferences_av_handler_s = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        Log.i(TAG, "onCreate");
+        super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate:002");
+
+        conferences_av_handler = new Handler(getMainLooper());
+        conferences_av_handler_s = conferences_av_handler;
+
+        Intent intent = getIntent();
+        conf_id = intent.getStringExtra("conf_id");
+        Log.i(TAG, "onCreate:003:conf_id=" + conf_id + " conf_id_prev=" + conf_id_prev);
+        conf_id_prev = conf_id;
+
+        setContentView(R.layout.activity_conference_audio);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).
+                color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
+
+        conference_message_profile_item = new ProfileDrawerItem().
+                withName("Userlist").
+                withIcon(drawer_header_icon);
+
+        // Create the AccountHeader
+        conference_message_drawer_header = new AccountHeaderBuilder().
+                withActivity(this).
+                withSelectionListEnabledForSingleProfile(false).
+                withTextColor(getResources().getColor(R.color.md_dark_primary_text)).
+                withHeaderBackground(R.color.colorHeader).
+                withCompactStyle(true).
+                addProfiles(conference_message_profile_item).
+                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
+                {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                    {
+                        return false;
+                    }
+                }).build();
+
+        //        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).
+        //                withIdentifier(1L).
+        //                withName("User1").
+        //                withIcon(GoogleMaterial.Icon.gmd_face);
+
+
+        // peers_in_list_next_num = 1;
+        lookup_peer_listnum_pubkey.clear();
+
+        // create the drawer and remember the `Drawer` result object
+        conference_message_drawer = new DrawerBuilder().
+                withActivity(this).
+                withAccountHeader(conference_message_drawer_header).
+                withInnerShadow(false).
+                withRootView(R.id.drawer_container).
+                withShowDrawerOnFirstLaunch(false).
+                withActionBarDrawerToggleAnimated(true).
+                withActionBarDrawerToggle(true).
+                withToolbar(toolbar).
+                withTranslucentStatusBar(false).
+                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                    {
+                        Log.i(TAG, "drawer:item=" + position);
+                        if (position == 1)
+                        {
+                            // profile
+                            try
+                            {
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        return true;
+                    }
+                }).build();
+
+
+        ml_maintext = (TextView) findViewById(R.id.ml_maintext);
+        ml_icon = (ImageView) findViewById(R.id.ml_icon);
+        ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
+
+        ml_status_icon.setVisibility(View.INVISIBLE);
+
+        ml_icon.setImageResource(R.drawable.circle_red);
+        set_conference_connection_status_icon();
+
+        final Drawable d1 = new IconicsDrawable(getBaseContext()).
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                color(getResources().
+                        getColor(R.color.colorPrimaryDark)).
+                sizeDp(80);
+
+        // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+
+        set_peer_count_header();
+        set_peer_names_and_avatars();
+
+        Log.i(TAG, "onCreate:099");
+    }
+
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        Log.i(TAG, "onResume");
+        super.onResume();
+
+        Log.i(TAG, "onResume:001:conf_id=" + conf_id);
+
+        if (conf_id.equals("-1"))
+        {
+            conf_id = conf_id_prev;
+            Log.i(TAG, "onResume:001:conf_id=" + conf_id);
+        }
+    }
+
+    public void set_conference_connection_status_icon()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (is_conference_active(conf_id))
+                    {
+                        ml_icon.setImageResource(R.drawable.circle_green);
+                    }
+                    else
+                    {
+                        ml_icon.setImageResource(R.drawable.circle_red);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        if (conferences_av_handler_s != null)
+        {
+            conferences_av_handler_s.post(myRunnable);
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (conference_message_drawer.isDrawerOpen())
+        {
+            conference_message_drawer.closeDrawer();
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
+
+    long peer_pubkey_to_long_in_list(String peer_pubkey)
+    {
+        long ret = -1L;
+
+        if (lookup_peer_listnum_pubkey.containsKey(peer_pubkey))
+        {
+            ret = lookup_peer_listnum_pubkey.get(peer_pubkey);
+        }
+
+        return ret;
+    }
+
+    synchronized void set_peer_count_header()
+    {
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                final String f_name = HelperConference.get_conference_title_from_confid(conf_id);
+                final long conference_num = get_conference_num_from_confid(conf_id);
+
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            long peer_count = tox_conference_peer_count(conference_num);
+                            long frozen_peer_count = tox_conference_offline_peer_count(conference_num);
+
+                            if (peer_count > -1)
+                            {
+                                ml_maintext.setText(
+                                        f_name + "\n" + "Active: " + peer_count + " Offline: " + frozen_peer_count);
+                            }
+                            else
+                            {
+                                ml_maintext.setText(f_name);
+                                // ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+        };
+        t.start();
+    }
+
+    synchronized void set_peer_names_and_avatars()
+    {
+        if (is_conference_active(conf_id))
+        {
+            Log.d(TAG, "set_peer_names_and_avatars:001");
+
+            try
+            {
+                remove_group_all_users();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            Log.d(TAG, "set_peer_names_and_avatars:002");
+
+            final long conference_num = get_conference_num_from_confid(conf_id);
+            long num_peers = tox_conference_peer_count(conference_num);
+
+            Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers);
+
+            if (num_peers > 0)
+            {
+                long i = 0;
+                for (i = 0; i < num_peers; i++)
+                {
+                    String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_num, i);
+                    String peer_name_temp = tox_conference_peer_get_name(conference_num, i);
+                    if (peer_name_temp.equals(""))
+                    {
+                        peer_name_temp = null;
+                    }
+                    // Log.d(TAG, "set_peer_names_and_avatars:004:add:" + peer_name_temp);
+                    add_group_user(peer_pubkey_temp, i, peer_name_temp);
+                }
+            }
+        }
+    }
+
+    synchronized void remove_group_all_users()
+    {
+        Log.d(TAG, "remove_group_all_users:001");
+
+        try
+        {
+            Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Runnable myRunnable = new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    lookup_peer_listnum_pubkey.clear();
+                                    conference_message_drawer.removeAllItems();
+                                }
+                                catch (Exception e2)
+                                {
+                                    e2.printStackTrace();
+                                }
+                            }
+                        };
+
+                        if (conferences_av_handler_s != null)
+                        {
+                            conferences_av_handler_s.post(myRunnable);
+                        }
+
+                        // TODO: hack to be synced with additions later
+                        Thread.sleep(120);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    Log.d(TAG, "remove_group_all_users:T:END");
+
+                }
+            };
+            t.start();
+            t.join();
+
+            Log.d(TAG, "remove_group_all_users:T:099");
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "remove_group_user:EE:" + e.getMessage());
+        }
+
+        Log.d(TAG, "remove_group_all_users:002");
+
+    }
+
+    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name)
+    {
+        try
+        {
+            long peer_num_in_list = peer_pubkey_to_long_in_list(peer_pubkey);
+            if (peer_num_in_list == -1)
+            {
+                // -- ADD --
+                String name2 = "";
+                if (name != null)
+                {
+                    name2 = name;
+                }
+                else
+                {
+                    name2 = peer_pubkey.substring(peer_pubkey.length() - 5, peer_pubkey.length());
+                }
+
+                try
+                {
+                    name2 = resolve_name_for_pubkey(peer_pubkey, name2);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                final String name3 = name2;
+
+                lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);
+
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        ConferenceCustomDrawerPeerItem new_item = null;
+                                        FriendList fl_temp = null;
+                                        boolean have_avatar_for_pubkey = false;
+
+                                        try
+                                        {
+                                            fl_temp = orma.selectFromFriendList().
+                                                    tox_public_key_stringEq(peer_pubkey).toList().get(0);
+
+                                            if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
+                                            {
+                                                info.guardianproject.iocipher.File f1 = null;
+                                                try
+                                                {
+                                                    f1 = new info.guardianproject.iocipher.File(
+                                                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                                                    if (f1.length() > 0)
+                                                    {
+                                                        have_avatar_for_pubkey = true;
+                                                    }
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            else
+                                            {
+                                                have_avatar_for_pubkey = false;
+                                                fl_temp = null;
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                            have_avatar_for_pubkey = false;
+                                            // Log.i(TAG, "have_avatar_for_pubkey:00a04:" + have_avatar_for_pubkey);
+                                            fl_temp = null;
+                                        }
+
+                                        try
+                                        {
+                                            new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
+                                                                                          peer_pubkey).
+                                                    withIdentifier(peernum).
+                                                    withName(name3).
+                                                    withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                                                    {
+                                                        @Override
+                                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                        {
+                                                            Intent intent = new Intent(view.getContext(),
+                                                                                       ConferencePeerInfoActivity.class);
+                                                            intent.putExtra("peer_pubkey", peer_pubkey);
+                                                            intent.putExtra("conf_id", conf_id);
+                                                            view.getContext().startActivity(intent);
+                                                            return true;
+                                                        }
+                                                    });
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                            new_item = new ConferenceCustomDrawerPeerItem(false, null).
+                                                    withIdentifier(peernum).
+                                                    withName(name3).
+                                                    withIcon(GoogleMaterial.Icon.gmd_face).
+                                                    withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                                                    {
+                                                        @Override
+                                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                        {
+                                                            Intent intent = new Intent(view.getContext(),
+                                                                                       ConferencePeerInfoActivity.class);
+                                                            intent.putExtra("peer_pubkey", peer_pubkey);
+                                                            intent.putExtra("conf_id", conf_id);
+                                                            view.getContext().startActivity(intent);
+                                                            return true;
+                                                        }
+                                                    });
+                                        }
+
+                                        // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
+                                        conference_message_drawer.addItem(new_item);
+                                    }
+                                    catch (Exception e2)
+                                    {
+                                        e2.printStackTrace();
+                                        Log.i(TAG, "add_group_user:EE2:" + e2.getMessage());
+                                    }
+                                }
+                            };
+
+                            if (conferences_av_handler_s != null)
+                            {
+                                conferences_av_handler_s.post(myRunnable);
+                            }
+
+                        }
+                        catch (Exception e3)
+                        {
+                            e3.printStackTrace();
+                            Log.i(TAG, "add_group_user:EE3:" + e3.getMessage());
+                        }
+                    }
+                };
+                t.start();
+                t.join();
+            }
+            else
+            {
+                // -- UPDATE --
+                String name2 = "";
+                if (name != null)
+                {
+                    name2 = name;
+                }
+                else
+                {
+                    name2 = peer_pubkey.substring(peer_pubkey.length() - 5, peer_pubkey.length());
+                }
+
+                try
+                {
+                    name2 = resolve_name_for_pubkey(peer_pubkey, name2);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                final String name3 = name2;
+
+                lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);
+
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        StringHolder sh = new StringHolder(name3);
+                                        // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
+                                        conference_message_drawer.updateName(peernum, sh);
+                                    }
+                                    catch (Exception e2)
+                                    {
+                                        e2.printStackTrace();
+                                        Log.i(TAG, "add_group_user:EE2:" + e2.getMessage());
+                                    }
+                                }
+                            };
+
+                            if (conferences_av_handler_s != null)
+                            {
+                                conferences_av_handler_s.post(myRunnable);
+                            }
+
+                        }
+                        catch (Exception e3)
+                        {
+                            e3.printStackTrace();
+                            Log.i(TAG, "add_group_user:EE3:" + e3.getMessage());
+                        }
+                    }
+                };
+                t.start();
+                t.join();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "add_group_user:EE:" + e.getMessage());
+        }
+    }
+
+    public void show_add_friend_conference(View view)
+    {
+        Log.i(TAG, "show_add_friend_conference");
+        Intent intent = new Intent(this, FriendSelectSingleActivity.class);
+        intent.putExtra("conf_id", conf_id);
+        startActivityForResult(intent, SelectFriendSingleActivity_ID);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == SelectFriendSingleActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                try
+                {
+                    String result_friend_pubkey = data.getData().toString();
+                    if (result_friend_pubkey != null)
+                    {
+                        if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)
+                        {
+                            Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey);
+
+                            long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(result_friend_pubkey);
+                            if (friend_num_temp_safety2 > 0)
+                            {
+                                final long conference_num = get_conference_num_from_confid(conf_id);
+                                if (conference_num > -1)
+                                {
+                                    int res_conf_invite = tox_conference_invite(friend_num_temp_safety2,
+                                                                                conference_num);
+                                    if (res_conf_invite < 1)
+                                    {
+                                        Log.d(TAG,
+                                              "onActivityResult:info:tox_conference_invite:ERR:" + res_conf_invite);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}

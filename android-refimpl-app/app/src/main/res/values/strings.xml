@@ -2,7 +2,8 @@
     <string name="app_name">TRIfA</string>
     <string name="add_friend_activity_name">Add Friend</string>
     <string name="message_list_activity_name">Chat</string>
-    <string name="conference_message_list_activity_name">Conference</string>
+    <string name="conference_message_list_activity_name">Text Conference</string>
+    <string name="conference_audio_activity_name">Audio Conference</string>
 
     <string name="set_password_message_empty">Password is empty</string>
     <string name="set_password_message_password_invalid">Password too short</string>

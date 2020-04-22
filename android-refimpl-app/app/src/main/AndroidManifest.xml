@@ -83,6 +83,11 @@
             android:label="@string/conference_message_list_activity_name">
         </activity>
         <activity
+            android:name=".ConferenceAudioActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/conference_audio_activity_name">
+        </activity>
+        <activity
             android:name=".CallingActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_calling"

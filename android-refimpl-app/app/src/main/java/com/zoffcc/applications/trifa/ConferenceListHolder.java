@@ -255,9 +255,18 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             }
             else
             {
-                Intent intent = new Intent(v.getContext(), ConferenceMessageListActivity.class);
-                intent.putExtra("conf_id", this.conference.conference_identifier);
-                v.getContext().startActivity(intent);
+                if (this.conference.kind == TOX_CONFERENCE_TYPE_AV.value)
+                {
+                    Intent intent = new Intent(v.getContext(), ConferenceAudioActivity.class);
+                    intent.putExtra("conf_id", this.conference.conference_identifier);
+                    v.getContext().startActivity(intent);
+                }
+                else
+                {
+                    Intent intent = new Intent(v.getContext(), ConferenceMessageListActivity.class);
+                    intent.putExtra("conf_id", this.conference.conference_identifier);
+                    v.getContext().startActivity(intent);
+                }
             }
         }
         catch (Exception e)
