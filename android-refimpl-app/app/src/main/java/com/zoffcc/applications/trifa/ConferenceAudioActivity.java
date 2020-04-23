@@ -24,17 +24,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -45,7 +42,6 @@ import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.vanniktech.emoji.EmojiPopup;
 
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
@@ -78,6 +74,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
     TextView ml_maintext = null;
+    Button AudioGroupPushToTalkButton = null;
 
     Handler conferences_av_handler = null;
     static Handler conferences_av_handler_s = null;
@@ -171,6 +168,44 @@ public class ConferenceAudioActivity extends AppCompatActivity
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
         ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
+
+        AudioGroupPushToTalkButton = (Button) findViewById(R.id.AudioGroupPushToTalkButton);
+        AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
+        AudioGroupPushToTalkButton.setText("Push to Talk");
+
+        AudioGroupPushToTalkButton.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg_pressed);
+                        AudioGroupPushToTalkButton.setText("talking ...");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
+                        AudioGroupPushToTalkButton.setText("Push to Talk");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "setMicrophoneMute:001:EE:" + e.getMessage());
+                    }
+                }
+                return true;
+            }
+        });
 
         ml_status_icon.setVisibility(View.INVISIBLE);
 

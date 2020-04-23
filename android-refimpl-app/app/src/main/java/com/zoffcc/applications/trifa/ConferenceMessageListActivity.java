@@ -44,6 +44,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -646,6 +647,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized void update_group_all_users()
     {
+        Log.d(TAG, "update_group_all_users:001");
+
         try
         {
             set_peer_count_header();
@@ -730,6 +733,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized void remove_group_user(String peer_pubkey)
     {
+        Log.i(TAG, "remove_group_user:peer_pubkey=" + peer_pubkey);
+
         try
         {
             final long peer_num_in_list = peer_pubkey_to_long_in_list(peer_pubkey);
@@ -782,12 +787,15 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized void add_group_user(final String peer_pubkey, final long peernum, String name)
     {
+        Log.i(TAG, "add_group_user:peernum=" + peernum);
+
         try
         {
             long peer_num_in_list = peer_pubkey_to_long_in_list(peer_pubkey);
             if (peer_num_in_list == -1)
             {
                 // -- ADD --
+                Log.i(TAG, "add_group_user:ADD:peernum=" + peernum);
                 String name2 = "";
                 if (name != null)
                 {
@@ -870,12 +878,16 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                                                                           peer_pubkey).
                                                     withIdentifier(peernum).
                                                     withName(name3).
+                                                    withBadge("" + peernum).withBadgeStyle(
+                                                    new BadgeStyle().withTextColor(Color.WHITE).withColorRes(
+                                                            R.color.md_red_700)).
                                                     withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                                                     {
                                                         @Override
                                                         public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
                                                         {
-                                                            Intent intent = new Intent(view.getContext(), ConferencePeerInfoActivity.class);
+                                                            Intent intent = new Intent(view.getContext(),
+                                                                                       ConferencePeerInfoActivity.class);
                                                             intent.putExtra("peer_pubkey", peer_pubkey);
                                                             intent.putExtra("conf_id", conf_id);
                                                             view.getContext().startActivity(intent);
@@ -895,7 +907,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                                         @Override
                                                         public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
                                                         {
-                                                            Intent intent = new Intent(view.getContext(), ConferencePeerInfoActivity.class);
+                                                            Intent intent = new Intent(view.getContext(),
+                                                                                       ConferencePeerInfoActivity.class);
                                                             intent.putExtra("peer_pubkey", peer_pubkey);
                                                             intent.putExtra("conf_id", conf_id);
                                                             view.getContext().startActivity(intent);
@@ -934,6 +947,13 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             else
             {
                 // -- UPDATE --
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                Log.i(TAG, "add_group_user:UPDATE:peernum=" + peernum);
                 String name2 = "";
                 if (name != null)
                 {
@@ -997,6 +1017,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 };
                 t.start();
                 t.join();
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
+                // **** THIS is never used anymore ****
             }
         }
         catch (Exception e)
