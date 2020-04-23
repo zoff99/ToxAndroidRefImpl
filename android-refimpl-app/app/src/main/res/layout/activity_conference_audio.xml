@@ -98,7 +98,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="30dp"
-                        android:background="@color/md_green_700" />
+                        android:background="@color/md_white_1000" />
 
                 </LinearLayout>
 
@@ -156,10 +156,9 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="30dp"
-                        android:background="@color/md_green_700" />
+                        android:background="@color/md_white_1000" />
 
                 </LinearLayout>
-
 
 
             </LinearLayout>
