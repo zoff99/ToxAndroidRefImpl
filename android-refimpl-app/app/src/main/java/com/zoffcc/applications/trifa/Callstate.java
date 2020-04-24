@@ -53,6 +53,7 @@ public class Callstate
     static boolean audio_speaker = true; // true -> loudspeaker, false -> for your ear-speaker
     static int audio_device = 0; // 0 -> phone, 1 -> headset, 2 -> bluetoothdevice
     static long play_delay = 0;
+    static boolean audio_group_active = false;
 
     static void reset_values()
     {
@@ -76,6 +77,7 @@ public class Callstate
         Callstate.audio_speaker = true;
         Callstate.audio_device = 0;
         Callstate.play_delay = 0;
+        Callstate.audio_group_active = false;
         MainActivity.set_av_call_status(Callstate.state);
     }
 

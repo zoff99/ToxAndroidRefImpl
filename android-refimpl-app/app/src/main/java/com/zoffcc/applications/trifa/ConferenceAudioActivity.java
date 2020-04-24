@@ -19,8 +19,12 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -28,10 +32,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.speech.levelmeter.BarLevelDrawable;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -42,11 +48,19 @@ import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.zoffcc.applications.nativeaudio.AudioProcessing;
 
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
+import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
+import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -61,8 +75,12 @@ import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 public class ConferenceAudioActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.CnfAudioActivity";
-    String conf_id = "-1";
-    String conf_id_prev = "-1";
+    static String conf_id = "-1";
+    static String conf_id_prev = "-1";
+    static ConferenceAudioActivity caa = null;
+
+    private DetectHeadset dha = null;
+    static int activity_state = 0;
 
     // main drawer ----------
     Drawer conference_message_drawer = null;
@@ -71,10 +89,13 @@ public class ConferenceAudioActivity extends AppCompatActivity
     // long peers_in_list_next_num = 0;
     // main drawer ----------
 
+    BarLevelDrawable audio_bar_in = null;
+    BarLevelDrawable audio_bar_out = null;
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
     TextView ml_maintext = null;
     Button AudioGroupPushToTalkButton = null;
+    static boolean push_to_talk_active = false;
 
     Handler conferences_av_handler = null;
     static Handler conferences_av_handler_s = null;
@@ -94,7 +115,11 @@ public class ConferenceAudioActivity extends AppCompatActivity
         Log.i(TAG, "onCreate:003:conf_id=" + conf_id + " conf_id_prev=" + conf_id_prev);
         conf_id_prev = conf_id;
 
+        dha = new DetectHeadset(this);
+
         setContentView(R.layout.activity_conference_audio);
+
+        caa = this;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -169,6 +194,9 @@ public class ConferenceAudioActivity extends AppCompatActivity
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
         ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
 
+        audio_bar_in = (BarLevelDrawable) findViewById(R.id.audio_bar_in);
+        audio_bar_out = (BarLevelDrawable) findViewById(R.id.audio_bar_out);
+
         AudioGroupPushToTalkButton = (Button) findViewById(R.id.AudioGroupPushToTalkButton);
         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
         AudioGroupPushToTalkButton.setText("Push to Talk");
@@ -184,6 +212,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     {
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg_pressed);
                         AudioGroupPushToTalkButton.setText("talking ...");
+                        push_to_talk_active = true;
                     }
                     catch (Exception e)
                     {
@@ -196,6 +225,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     {
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
                         AudioGroupPushToTalkButton.setText("Push to Talk");
+                        push_to_talk_active = false;
                     }
                     catch (Exception e)
                     {
@@ -221,6 +251,41 @@ public class ConferenceAudioActivity extends AppCompatActivity
         // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
                 getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+
+
+        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        try
+        {
+            manager.setSpeakerphoneOn(true);
+            Callstate.audio_speaker = true;
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
+
+        try
+        {
+            if (dha._Detect())
+            {
+                // headset plugged in
+                Log.i(TAG, "onReceive:headset:plugged in");
+                manager.setSpeakerphoneOn(false);
+                manager.setWiredHeadsetOn(true);
+                Callstate.audio_device = 1;
+                Callstate.audio_speaker = false;
+                manager.setBluetoothScoOn(false);
+            }
+            else
+            {
+                Log.i(TAG, "onReceive:headset:setImageDrawable:null1");
+            }
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+            Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
+        }
 
         set_peer_count_header();
         set_peer_names_and_avatars();
@@ -248,6 +313,160 @@ public class ConferenceAudioActivity extends AppCompatActivity
             conf_id = conf_id_prev;
             Log.i(TAG, "onResume:001:conf_id=" + conf_id);
         }
+
+        activity_state = 1;
+        push_to_talk_active = false;
+
+        if (Build.VERSION.SDK_INT >= 27)
+        {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+            KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+            if (keyguardManager != null)
+            {
+                keyguardManager.requestDismissKeyguard(this, null);
+            }
+        }
+        else
+        {
+
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        }
+
+
+        try
+        {
+            CallingActivity.ap = new AudioProcessing();
+            init_buffers(10, 1, SAMPLE_RATE_FIXED, 1, SAMPLE_RATE_FIXED);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (!AudioRecording.stopped)
+            {
+                AudioRecording.close();
+                audio_thread.join();
+                audio_thread = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (!AudioReceiver.stopped)
+            {
+                AudioReceiver.close();
+                audio_receiver_thread.join();
+                audio_receiver_thread = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (AudioReceiver.stopped)
+            {
+                audio_receiver_thread = new AudioReceiver();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (AudioRecording.stopped)
+            {
+                audio_thread = new AudioRecording();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        // update every x times per second -----------
+        final int update_per_sec = 8;
+        final Handler ha = new Handler();
+        ha.postDelayed(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                // Log.i(TAG, "update_call_time -> call");
+                update_group_audio_bars();
+                if (activity_state != 0)
+                {
+                    ha.postDelayed(this, 1000 / update_per_sec);
+                }
+            }
+        }, 1000 / update_per_sec);
+        //        // update every x times per second -----------
+
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        conf_id = "-1";
+
+        push_to_talk_active = false;
+        activity_state = 0;
+
+        try
+        {
+            if (!AudioRecording.stopped)
+            {
+                AudioRecording.close();
+                audio_thread.join();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (!AudioReceiver.stopped)
+            {
+                AudioReceiver.close();
+                audio_receiver_thread.join();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            destroy_buffers();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Log.i(TAG, "onPause:on_groupaudio_ended_actions");
+        on_groupaudio_ended_actions();
     }
 
     public void set_conference_connection_status_icon()
@@ -290,7 +509,27 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
         else
         {
-            super.onBackPressed();
+            on_groupaudio_ended_actions();
+        }
+    }
+
+    void update_group_audio_bars()
+    {
+        try
+        {
+            if (push_to_talk_active)
+            {
+                audio_bar_in.setLevel(get_vu_in());
+            }
+            else
+            {
+                audio_bar_in.setLevel(0.0);
+            }
+            audio_bar_out.setLevel(get_vu_out());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -731,5 +970,36 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 }
             }
         }
+    }
+
+
+    // actions to take when group audio starts:
+    static void on_groupaudio_started_actions()
+    {
+    }
+
+    // actions to take when group audio ends by:
+    static void on_groupaudio_ended_actions()
+    {
+        try
+        {
+            close_conference_audio_activity();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void close_conference_audio_activity()
+    {
+        Callstate.reset_values();
+        conf_id = "-1";
+        conf_id_prev = "-1";
+
+        // close conference audio activity --------
+        caa.finish();
+        // close conference audio activity --------
     }
 }

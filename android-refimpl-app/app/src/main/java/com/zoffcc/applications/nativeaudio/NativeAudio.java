@@ -97,7 +97,6 @@ public class NativeAudio
     run:  pid=$(adb shell ps | grep -i trifa|awk '{ print $2}');adb shell dumpsys media.audio_flinger|grep "$pid"
 
      */
-
     public static void restartNativeAudioPlayEngine(int sampleRate, int channels)
     {
         System.out.println("restartNativeAudioPlayEngine:sampleRate=" + sampleRate + " channels=" + channels);
@@ -172,6 +171,11 @@ public class NativeAudio
      */
     public static native void createEngine(int num_bufs);
 
+    // ---------------------
+
+    public static native float get_vu_in();
+
+    public static native float get_vu_out();
     // ---------------------
 
     public static native void createBufferQueueAudioPlayer(int sampleRate, int channels, int num_bufs);

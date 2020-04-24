@@ -41,14 +41,16 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engin
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
+import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
-import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_audio_send_frame;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_group_send_audio;
 
 public class AudioRecording extends Thread
 {
@@ -260,12 +262,21 @@ public class AudioRecording extends Thread
                 {
                     _recBuffer.rewind();
                     _recBuffer.put(_tempBufRec);
-                    audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                            (long) (readBytes_ / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                    if (audio_send_res != 0)
+                    // Log.i(TAG, "toxav_audio_send_frame:001");
+                    if (Callstate.audio_group_active)
                     {
-                        Log.i(TAG, "audio:res=" + audio_send_res + ":" +
-                                   ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+
+                    }
+                    else
+                    {
+                        audio_send_res = toxav_audio_send_frame(
+                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (readBytes_ / 2),
+                                CHANNELS_TOX, SMAPLINGRATE_TOX);
+                        if (audio_send_res != 0)
+                        {
+                            Log.i(TAG, "audio:res=" + audio_send_res + ":" +
+                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                        }
                     }
                 }
             }
@@ -429,10 +440,22 @@ public class AudioRecording extends Thread
                     //      "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX + " SMAPLINGRATE_TOX=" +
                     //      SMAPLINGRATE_TOX);
 
-                    audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                            (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2),
-
-                                                            CHANNELS_TOX, SMAPLINGRATE_TOX);
+                    if (Callstate.audio_group_active)
+                    {
+                        if (ConferenceAudioActivity.push_to_talk_active)
+                        {
+                            toxav_group_send_audio(get_conference_num_from_confid(ConferenceAudioActivity.conf_id),
+                                                   (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX,
+                                                   SMAPLINGRATE_TOX);
+                        }
+                    }
+                    else
+                    {
+                        // Log.i(TAG, "toxav_audio_send_frame:002:native");
+                        audio_send_res = toxav_audio_send_frame(
+                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                    }
 
                     if (DEBUG_MIC_DATA_LOGGING)
                     {
