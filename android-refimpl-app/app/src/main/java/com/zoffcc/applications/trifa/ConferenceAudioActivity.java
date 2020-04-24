@@ -519,7 +519,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         {
             if (push_to_talk_active)
             {
-                audio_bar_in.setLevel(get_vu_in());
+                audio_bar_in.setLevel(get_vu_in() / 90.0f);
             }
             else
             {

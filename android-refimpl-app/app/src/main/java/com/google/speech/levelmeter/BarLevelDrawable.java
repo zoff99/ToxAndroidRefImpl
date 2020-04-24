@@ -71,7 +71,21 @@ public final class BarLevelDrawable extends View
      */
     public void setLevel(double level)
     {
-        mLevel = level;
+        if (level < 0)
+        {
+            mLevel = 0;
+        }
+        else
+        {
+            if (level > 1.0)
+            {
+                mLevel = 1.0;
+            }
+            else
+            {
+                mLevel = level;
+            }
+        }
         invalidate();
     }
 
