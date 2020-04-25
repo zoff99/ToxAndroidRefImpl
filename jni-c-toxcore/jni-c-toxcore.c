@@ -213,6 +213,13 @@ uint8_t global_av_call_active = 0;
 int audio_play_volume_percent_c = 10;
 float volumeMultiplier = -20.0f;
 
+long global_group_audio_acitve_num = -1;
+long global_group_audio_peerbuffers = -1;
+int16_t *global_group_audio_peerbuffers_buffer = NULL;
+uint32_t *global_group_audio_peerbuffers_buffer_start_pos = NULL; // sample position inside the buffer where valid data starts
+uint32_t *global_group_audio_peerbuffers_buffer_end_pos = NULL; // sample position inside the buffer where valid can be added at
+#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES (48000*240/1000) // 240ms PCM16 buffer @48kHz mono int16_t values
+
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_name_cb_method = NULL;
@@ -246,6 +253,7 @@ jmethodID android_toxav_callback_video_receive_frame_h264_cb_method = NULL;
 jmethodID android_toxav_callback_call_state_cb_method = NULL;
 jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
 jmethodID android_toxav_callback_audio_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_group_audio_receive_frame_cb_method = NULL;
 jmethodID android_toxav_callback_call_comm_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 // -------- _callbacks_ --------
@@ -320,6 +328,11 @@ void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_
 
 void android_logger(int level, const char *logtext);
 jstring c_safe_string_from_java(const char *instr, size_t len);
+
+int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, uint32_t *sample_count_new);
+void group_audio_alloc_peer_buffer();
+void group_audio_free_peer_buffer();
+
 // functions -----------
 // functions -----------
 // functions -----------
@@ -1482,6 +1495,27 @@ void android_tox_callback_conference_peer_list_changed_cb(uint32_t conference_nu
 
 void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data)
 {
+    if (!tox_global)
+    {
+        return;
+    }
+
+    if (global_group_audio_acitve_num == conference_number)
+    {
+        TOX_ERR_CONFERENCE_GET_TYPE error;
+        TOX_CONFERENCE_TYPE conf_type = tox_conference_get_type(tox_global, conference_number, &error);
+
+        if ((error == TOX_ERR_CONFERENCE_GET_TYPE_OK) && (conf_type == TOX_CONFERENCE_TYPE_AV))
+        {
+            global_group_audio_acitve_num = -1;
+            global_group_audio_peerbuffers = 0;
+            group_audio_free_peer_buffer();
+            // -------------------
+            global_group_audio_acitve_num = conference_number;
+            group_audio_alloc_peer_buffer();
+        }
+    }
+
     android_tox_callback_conference_peer_list_changed_cb(conference_number);
 }
 
@@ -2407,6 +2441,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     toxav_callback_bit_rate_status(tox_av_global, toxav_bit_rate_status_cb_, &mytox_CC);
     android_toxav_callback_audio_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_audio_receive_frame_cb_method", "(JJIJ)V");
+    android_toxav_callback_group_audio_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_toxav_callback_group_audio_receive_frame_cb_method", "(JJJIJ)V");
     toxav_callback_audio_receive_frame(tox_av_global, toxav_audio_receive_frame_cb_, &mytox_CC);
 #ifdef TOX_HAVE_TOXAV_CALLBACKS_002
     android_toxav_callback_call_comm_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -4030,9 +4066,90 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1add_1av_1groupchat(JNIEnv
     return (jlong)res;
 }
 
+static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t peernumber,
+                                      const int16_t *pcm, unsigned int samples, uint8_t channels, uint32_t
+                                      sample_rate, void *userdata)
+{
+    if (!pcm)
+    {
+        return;
+    }
+
+    uint32_t sample_count_new = 0;
+
+    // allowed input sample rates: 8000, 12000, 16000, 24000, 48000
+    int16_t *new_pcm_buffer = upsample_to_48khz(pcm, (size_t)samples, (uint8_t)channels, (uint32_t)sample_rate, &sample_count_new);
+
+    if (!new_pcm_buffer)
+    {
+        if ((channels == 1) && (sample_rate == 48000))
+        {
+            // we can use the input directly
+            if (audio_buffer_pcm_2 != NULL)
+            {
+                memcpy((void *)audio_buffer_pcm_2, (void *)pcm, (size_t)(samples * channels * 2));
+            }
+
+            JNIEnv *jnienv2;
+            jnienv2 = jni_getenv();
+            (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_group_audio_receive_frame_cb_method,
+                                     (jlong)(unsigned long long)groupnumber,
+                                     (jlong)(unsigned long long)peernumber,
+                                     (jlong)samples, (jint)channels,
+                                     (jlong)sample_rate
+                                    );
+        }
+        else
+        {
+            // some error on upsampling, we skip this audio frame
+            return;
+        }
+    }
+    else
+    {
+        // use new_pcm_buffer with upsampled data
+        if (audio_buffer_pcm_2 != NULL)
+        {
+            memcpy((void *)audio_buffer_pcm_2, (void *)new_pcm_buffer, (size_t)(sample_count_new * 1 * 2));
+        }
+
+        JNIEnv *jnienv2;
+        jnienv2 = jni_getenv();
+        (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                 android_toxav_callback_group_audio_receive_frame_cb_method,
+                                 (jlong)(unsigned long long)groupnumber,
+                                 (jlong)(unsigned long long)peernumber,
+                                 (jlong)sample_count_new, (jint)channels,
+                                 (jlong)sample_rate
+                                );
+
+        free(new_pcm_buffer);
+    }
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1enable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
+{
+    global_group_audio_acitve_num = conference_number;
+    group_audio_alloc_peer_buffer();
+
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    int32_t res = toxav_groupchat_enable_av(tox_global, (uint32_t)conference_number, group_audio_callback_func, (void *)NULL);
+    return (jlong)res;
+}
+
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1disable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
 {
+    global_group_audio_acitve_num = -1;
+    global_group_audio_peerbuffers = 0;
+    group_audio_free_peer_buffer();
+
     if(tox_global == NULL)
     {
         return (jlong)-2;
@@ -5115,6 +5232,131 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 // ------------------- AV -------------------
 // ------------------- AV -------------------
 // ------------------- AV -------------------
+
+
+
+// ------------------- audio util function -------------------
+// ------------------- audio util function -------------------
+// ------------------- audio util function -------------------
+
+void group_audio_alloc_peer_buffer()
+{
+    TOX_ERR_CONFERENCE_PEER_QUERY error;
+    uint32_t num_peers = tox_conference_peer_count(tox_global,
+                                        (uint32_t)global_group_audio_acitve_num,
+                                        &error);
+
+    if (error == TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+    {
+        global_group_audio_peerbuffers = num_peers;
+        global_group_audio_peerbuffers_buffer = (int16_t *)calloc(1, (size_t)global_group_audio_peerbuffers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+        global_group_audio_peerbuffers_buffer_start_pos = (uint32_t *)calloc(1, (size_t)global_group_audio_peerbuffers);
+        global_group_audio_peerbuffers_buffer_end_pos = (uint32_t *)calloc(1, (size_t)global_group_audio_peerbuffers);
+    }
+}
+
+void group_audio_free_peer_buffer()
+{
+    free(global_group_audio_peerbuffers_buffer);
+    free(global_group_audio_peerbuffers_buffer_start_pos);
+    free(global_group_audio_peerbuffers_buffer_end_pos);
+}
+
+
+float interpolate_linear(int16_t start, int16_t end, float interpolation_position)
+{
+    if (interpolation_position <= 0.0)
+    {
+        return (float)start;
+    }
+    else if (interpolation_position >= 1.0)
+    {
+        return (float)end;
+    }
+    else
+    {
+        return (
+                ((1.0f - interpolation_position) * (float)start)
+                +
+                (interpolation_position * (float)end)
+               );
+    }
+}
+
+// allowed input sample rates: 8000, 12000, 16000, 24000, 48000
+//
+// return: allocated new pcm16 buffer, caller needs to free it after use
+//         NULL -> some error
+int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, uint32_t *sample_count_new)
+{
+    if (sample_count < 2)
+    {
+        return NULL;
+    }
+
+    int upsample_factor = 1;
+
+    if (sampling_rate == 8000)
+    {
+        upsample_factor = 6;
+    }
+    else if (sampling_rate == 12000)
+    {
+        upsample_factor = 4;
+    }
+    else if (sampling_rate == 16000)
+    {
+        upsample_factor = 3;
+    }
+    else if (sampling_rate == 24000)
+    {
+        upsample_factor = 2;
+    }
+    else if (sampling_rate == 48000)
+    {
+        return NULL;
+    }
+    else
+    {
+        return NULL;
+    }
+    
+    if (!sample_count_new)
+    {
+        return NULL;
+    }
+    
+    *sample_count_new = sample_count * upsample_factor;
+
+    int32_t new_buffer_byte_size =  48000 * (*sample_count_new) * 2;
+    int16_t *new_pcm_buffer = calloc(1, (size_t)new_buffer_byte_size); // 48kHz , mono, PCM Int16 signed
+    int16_t *new_pcm_buffer_pos = new_pcm_buffer;
+
+    int32_t i;
+    int32_t j;
+    int16_t *pcm_next;
+    for (i = 0; i < (sample_count - 1); i++)
+    {
+        for (j = 0; j < upsample_factor; j++)
+        {
+            pcm_next = pcm + 1;
+            *new_pcm_buffer_pos = (int16_t)interpolate_linear(*pcm, *pcm_next, j/upsample_factor);
+            new_pcm_buffer_pos++;
+            pcm++;
+            if (channels == 2)
+            {
+                pcm++;
+            }
+        }
+    }
+    *new_pcm_buffer_pos = *pcm;
+
+    return new_pcm_buffer;
+}
+
+// ------------------- audio util function -------------------
+// ------------------- audio util function -------------------
+// ------------------- audio util function -------------------
 
 
 
