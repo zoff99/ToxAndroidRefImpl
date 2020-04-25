@@ -806,6 +806,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         long res_conf_av_new = toxav_add_av_groupchat();
                         if (res_conf_av_new >= 0)
                         {
+                            update_savedata_file_wrapper();
                             // conference was created, now invite the selected friend
                             long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
                             if (friend_num_temp_safety2 > 0)
@@ -817,6 +818,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 }
                                 else
                                 {
+                                    update_savedata_file_wrapper();
                                     add_conference_wrapper(friend_num_temp_safety2, res_conf_av_new, "",
                                                            TOX_CONFERENCE_TYPE_AV.value, false);
                                     MainActivity.update_savedata_file_wrapper();
