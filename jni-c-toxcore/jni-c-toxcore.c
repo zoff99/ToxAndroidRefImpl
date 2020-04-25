@@ -422,7 +422,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     CLEAR(options);
     dbg(9, "1006");
     tox_options_default(&options);
-    uint16_t tcp_port = 33776;
+    // uint16_t tcp_port = 33776;
     options.ipv6_enabled = true;
 
     if(orbot_enabled == 1)
@@ -500,7 +500,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
             size_t savedata_len = (size_t)(fsize - TOX_PASS_ENCRYPTION_EXTRA_LENGTH);
             savedata = malloc(savedata_len);
             TOX_ERR_DECRYPTION error2;
-            bool res2 = tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
+            tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
 
             if(savedata_enc)
             {
@@ -1265,7 +1265,7 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uin
         uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
         uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
         uint32_t text_length = 0;
-        bool res = tox_messagev2_get_message_text(raw_message,
+        tox_messagev2_get_message_text(raw_message,
                    (uint32_t)raw_message_len,
                    (bool)false, (uint32_t)0,
                    message_text, &text_length);
@@ -1334,7 +1334,7 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
         uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
         uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
         uint32_t data_length = 0;
-        bool res = tox_messagev2_get_sync_message_data(raw_message,
+        tox_messagev2_get_sync_message_data(raw_message,
                    (uint32_t)raw_message_len, message_data, &data_length);
         (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)data_length, (const jbyte *)message_data);
 
@@ -2188,7 +2188,7 @@ void *thread_av(void *data)
     JNIEnv *env;
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
     dbg(9, "2001");
-    ToxAV *av = (ToxAV *) data;
+    // ToxAV *av = (ToxAV *) data;
     dbg(9, "2002");
     pthread_t id = pthread_self();
     dbg(9, "2003");
@@ -3017,7 +3017,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1msg_1re
     }
 
     uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
-    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    // long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
     bool res = tox_util_friend_send_msg_receipt_v2(tox_global,
                (uint32_t)friend_number, msgid_buffer_c, (uint32_t)ts_sec);
 
@@ -3815,15 +3815,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1wrap(JNIEnv *env
     dbg(0, "tox_messagev2_wrap:001");
     uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
     dbg(0, "tox_messagev2_wrap:002");
-    long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+    // long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
     dbg(0, "tox_messagev2_wrap:00");
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
     dbg(0, "tox_messagev2_wrap:003");
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     dbg(0, "tox_messagev2_wrap:004");
     uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
     dbg(0, "tox_messagev2_wrap:005");
-    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    // long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
     dbg(0, "tox_messagev2_wrap:006");
     dbg(0, "tox_messagev2_wrap:007");
     bool res = tox_messagev2_wrap((uint32_t)text_length, (uint32_t)type,
@@ -3852,7 +3852,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1messa
 
     jstring result = NULL;
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
 
     if(tox_global == NULL)
     {
@@ -3888,7 +3888,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1messa
     }
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
 
     if(tox_global == NULL)
     {
@@ -3922,9 +3922,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1id
     }
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
-    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    // long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
     bool res = tox_messagev2_get_message_id(raw_message_buffer_c, msgid_buffer_c);
 
     if(res == true)
@@ -3948,7 +3948,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1sec(JNI
     }
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     uint32_t res = tox_messagev2_get_ts_sec(raw_message_buffer_c);
     return (jlong)res;
 }
@@ -3964,7 +3964,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1ms(JNIE
     }
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     uint16_t res = tox_messagev2_get_ts_ms(raw_message_buffer_c);
     return (jlong)res;
 }
@@ -3989,9 +3989,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
 
     uint32_t text_length = 0;
     uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
-    long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+    // long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     bool res = tox_messagev2_get_message_text(raw_message_buffer_c, (uint32_t)raw_message_len,
                (bool)is_alter_msg,
                (uint32_t)alter_type, message_text_buffer_c,
