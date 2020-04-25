@@ -2473,6 +2473,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native long toxav_add_av_groupchat();
 
+    public static native long toxav_groupchat_enable_av(long conference_number);
+
     public static native long toxav_groupchat_disable_av(long conference_number);
 
     public static native int toxav_groupchat_av_enabled(long conference_number);
@@ -4904,6 +4906,7 @@ public class MainActivity extends AppCompatActivity
         else
         {
             conference_num = toxav_join_av_groupchat(friend_number, cookie_buf2, cookie_length);
+            update_savedata_file_wrapper();
             long result = toxav_groupchat_disable_av(conference_num);
             Log.i(TAG, "conference_invite_cb:toxav_groupchat_disable_av result=" + result);
         }
