@@ -69,6 +69,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -324,6 +326,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         activity_state = 1;
         push_to_talk_active = false;
 
+        toxav_groupchat_enable_av(get_conference_num_from_confid(conf_id));
+
         if (Build.VERSION.SDK_INT >= 27)
         {
             setShowWhenLocked(true);
@@ -431,6 +435,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
+
+        toxav_groupchat_disable_av(get_conference_num_from_confid(conf_id));
 
         Callstate.audio_group_active = false;
 
