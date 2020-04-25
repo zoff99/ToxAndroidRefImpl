@@ -812,6 +812,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 {
     if (playing_state == _SHUTDOWN)
     {
+        audio_out_vu_value = 0;
         return -1;
     }
 
@@ -825,6 +826,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     {
         if (bqPlayerBufferQueue == NULL)
         {
+            audio_out_vu_value = 0;
             return -2;
         }
 
@@ -837,6 +839,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
                                                  (SLuint32) nextSize);
         if (SL_RESULT_SUCCESS != result)
         {
+            audio_out_vu_value = 0;
             __android_log_print(ANDROID_LOG_INFO, LOGTAG, "PlayPCM16:1:Enqueue:ERR:result=%d",
                                 result);
             return -2;
@@ -1058,6 +1061,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isPlaying(JNIEnv *env,
 jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *env, jclass clazz)
 {
     playing_state = _STOPPED;
+
+    audio_out_vu_value = 0;
 
     // set the player's state
     SLresult result;
