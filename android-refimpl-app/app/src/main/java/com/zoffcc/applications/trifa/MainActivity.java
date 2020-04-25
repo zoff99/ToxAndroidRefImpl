@@ -153,6 +153,8 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_action
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
+import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
+import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
@@ -3258,6 +3260,208 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             Log.i(TAG, "audio_play:EE3:" + e.getMessage());
+        }
+    }
+
+
+    static void android_toxav_callback_group_audio_receive_frame_cb_method(long conference_number, long peer_number, long sample_count, int channels, long sampling_rate)
+    {
+        if (!Callstate.audio_group_active)
+        {
+            return;
+        }
+
+        if (get_conference_num_from_confid(conf_id) != conference_number)
+        {
+            // not the group we are in group audio call with now
+            return;
+        }
+
+        if (Callstate.call_first_audio_frame_received == -1)
+        {
+            Callstate.call_first_audio_frame_received = System.currentTimeMillis();
+            sampling_rate_ = sampling_rate;
+            Log.i(TAG, "group_audio_receive_frame:read:incoming sampling_rate[1]=" + sampling_rate + " Hz");
+            channels_ = channels;
+            Log.i(TAG,
+                  "group_audio_receive_frame:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" +
+                  sampling_rate);
+            temp_string_a =
+                    "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) +
+                    "s";
+            // HINT: PCM_16 needs 2 bytes per sample per channel
+            AudioReceiver.buffer_size =
+                    ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult;  // TODO: this is really bad
+            AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f *
+                                                0.9f); // TODO: this is bad also
+            Log.i(TAG, "group_audio_receive_frame:read:init buffer_size=" + AudioReceiver.buffer_size);
+            Log.i(TAG, "group_audio_receive_frame:read:init sleep_millis=" + AudioReceiver.sleep_millis);
+            // reset audio in buffers
+            int i = 0;
+
+            for (i = 0; i < audio_in_buffer_max_count; i++)
+            {
+                try
+                {
+                    if (audio_buffer_2 != null)
+                    {
+                        if (audio_buffer_2[i] != null)
+                        {
+                            audio_buffer_2[i].clear();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    audio_buffer_2[i] = null;
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                audio_buffer_2[i] = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+                audio_buffer_2_read_length[i] = 0;
+                Log.i(TAG, "group_audio_receive_frame:audio_buffer_2[" + i + "] size=" + AudioReceiver.buffer_size);
+            }
+
+            audio_in_buffer_element_count = 0;
+            audio_buffer_play = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+            // always write to buffer[0] in the pipeline !! -----------
+            set_JNI_audio_buffer2(audio_buffer_2[0]);
+
+            int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
+
+            // always write to buffer[0] in the pipeline !! -----------
+            Log.i(TAG, "group_audio_receive_frame:audio_buffer_play size=" + AudioReceiver.buffer_size);
+
+            if (native_aec_lib_ready)
+            {
+                destroy_buffers();
+                Log.i(TAG, "group_audio_receive_frame:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
+                init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
+            }
+
+        }
+
+        // TODO: dirty hack, "make good"
+        try
+        {
+            if (PREF__use_native_audio_play)
+            {
+                // Log.i(TAG, "audio_play:NativeAudio Play:001");
+                if ((NativeAudio.sampling_rate != (int) sampling_rate_) || (NativeAudio.channel_count != channels_))
+                {
+                    Log.i(TAG, "group_audio_receive_frame:values_changed");
+                    NativeAudio.sampling_rate = (int) sampling_rate_;
+                    NativeAudio.channel_count = channels_;
+                    Log.i(TAG, "group_audio_receive_frame:NativeAudio restart Engine");
+                    // TODO: locking? or something like that
+                    NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
+
+                    if (native_aec_lib_ready)
+                    {
+                        destroy_buffers();
+                        int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
+                        Log.i(TAG,
+                              "group_audio_receive_frame:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
+                        init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
+                    }
+
+                }
+
+                audio_buffer_2[0].position(0);
+                int incoming_bytes = (int) ((sample_count * channels) * 2);
+
+                // -------------- apply AudioProcessing: AEC -----------------------
+                if (native_aec_lib_ready)
+                {
+                    AudioProcessing.audio_buffer.position(0);
+                    audio_buffer_2[0].position(0);
+                    AudioProcessing.audio_buffer.put(audio_buffer_2[0]);
+                    play_buffer();
+                    audio_buffer_2[0].position(0);
+                }
+                // -------------- apply AudioProcessing: AEC -----------------------
+
+                if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
+                {
+                    int remain_bytes = incoming_bytes - (NativeAudio.n_buf_size_in_bytes -
+                                                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    int remain_start_pos = (incoming_bytes - remain_bytes);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(
+                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
+                                                                          audio_buffer_2[0].arrayOffset(),
+                                                                          Math.min(incoming_bytes,
+                                                                                   NativeAudio.n_buf_size_in_bytes -
+                                                                                   NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]));
+
+                    if (remain_bytes > 0)
+                    {
+                        //audio_buffer_2[0].position(remain_start_pos);
+                        audio_buffer_2[0].position(0);
+                        int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+
+                        if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
+                        {
+                            NativeAudio.n_cur_buf = 0;
+                        }
+                        else
+                        {
+                            NativeAudio.n_cur_buf++;
+                        }
+
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(0);
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
+                                                                              remain_start_pos, remain_bytes);
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = remain_bytes;
+                    }
+                    else if (remain_bytes == 0)
+                    {
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+                        int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+
+                        if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
+                        {
+                            NativeAudio.n_cur_buf = 0;
+                        }
+                        else
+                        {
+                            NativeAudio.n_cur_buf++;
+                        }
+                    }
+                    else
+                    {
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] =
+                                NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
+                    }
+                }
+                else
+                {
+                    NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+
+                    if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
+                    {
+                        NativeAudio.n_cur_buf = 0;
+                    }
+                    else
+                    {
+                        NativeAudio.n_cur_buf++;
+                    }
+                }
+            } // PREF__use_native_audio_play -----
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "group_audio_receive_frame:EE3:" + e.getMessage());
         }
     }
 
