@@ -4078,7 +4078,7 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     uint32_t sample_count_new = 0;
 
     // allowed input sample rates: 8000, 12000, 16000, 24000, 48000
-    int16_t *new_pcm_buffer = upsample_to_48khz(pcm, (size_t)samples, (uint8_t)channels, (uint32_t)sample_rate, &sample_count_new);
+    int16_t *new_pcm_buffer = upsample_to_48khz((int16_t *)pcm, (size_t)samples, (uint8_t)channels, (uint32_t)sample_rate, &sample_count_new);
 
     if (!new_pcm_buffer)
     {
