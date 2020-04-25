@@ -81,6 +81,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     private DetectHeadset dha = null;
     static int activity_state = 0;
+    private boolean do_not_close_on_pause = false;
 
     // main drawer ----------
     Drawer conference_message_drawer = null;
@@ -106,6 +107,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
+
+        do_not_close_on_pause = false;
 
         conferences_av_handler = new Handler(getMainLooper());
         conferences_av_handler_s = conferences_av_handler;
@@ -303,16 +306,18 @@ public class ConferenceAudioActivity extends AppCompatActivity
     @Override
     protected void onResume()
     {
-        Log.i(TAG, "onResume");
-        super.onResume();
-
-        Log.i(TAG, "onResume:001:conf_id=" + conf_id);
+        do_not_close_on_pause = false;
 
         if (conf_id.equals("-1"))
         {
             conf_id = conf_id_prev;
             Log.i(TAG, "onResume:001:conf_id=" + conf_id);
         }
+
+        Log.i(TAG, "onResume");
+        super.onResume();
+
+        Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
         activity_state = 1;
         push_to_talk_active = false;
@@ -465,8 +470,14 @@ public class ConferenceAudioActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        boolean need_close_activity = true;
+        if (do_not_close_on_pause)
+        {
+            need_close_activity = false;
+        }
+
         Log.i(TAG, "onPause:on_groupaudio_ended_actions");
-        on_groupaudio_ended_actions();
+        on_groupaudio_ended_actions(need_close_activity);
     }
 
     public void set_conference_connection_status_icon()
@@ -509,7 +520,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
         else
         {
-            on_groupaudio_ended_actions();
+            on_groupaudio_ended_actions(true);
         }
     }
 
@@ -928,6 +939,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         Log.i(TAG, "show_add_friend_conference");
         Intent intent = new Intent(this, FriendSelectSingleActivity.class);
         intent.putExtra("conf_id", conf_id);
+        do_not_close_on_pause = true;
         startActivityForResult(intent, SelectFriendSingleActivity_ID);
     }
 
@@ -949,11 +961,25 @@ public class ConferenceAudioActivity extends AppCompatActivity
                             long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(result_friend_pubkey);
                             if (friend_num_temp_safety2 > 0)
                             {
+                                Log.i(TAG, "onActivityResult:friend_num_temp_safety2:" + friend_num_temp_safety2);
+
+                                if (conf_id.equals("-1"))
+                                {
+                                    conf_id = conf_id_prev;
+                                    Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id);
+                                }
+
                                 final long conference_num = get_conference_num_from_confid(conf_id);
+
+                                Log.i(TAG, "onActivityResult:conference_num:" + conference_num + " conf_id=" + conf_id);
+
                                 if (conference_num > -1)
                                 {
                                     int res_conf_invite = tox_conference_invite(friend_num_temp_safety2,
                                                                                 conference_num);
+
+                                    Log.i(TAG, "onActivityResult:res_conf_invite:" + res_conf_invite);
+
                                     if (res_conf_invite < 1)
                                     {
                                         Log.d(TAG,
@@ -979,15 +1005,18 @@ public class ConferenceAudioActivity extends AppCompatActivity
     }
 
     // actions to take when group audio ends by:
-    static void on_groupaudio_ended_actions()
+    static void on_groupaudio_ended_actions(boolean close)
     {
-        try
+        if (close)
         {
-            close_conference_audio_activity();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            try
+            {
+                close_conference_audio_activity();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 

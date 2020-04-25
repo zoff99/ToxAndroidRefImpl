@@ -1058,6 +1058,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                             long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(result_friend_pubkey);
                             if (friend_num_temp_safety2 > 0)
                             {
+                                if (conf_id.equals("-1"))
+                                {
+                                    conf_id = conf_id_prev;
+                                    Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id);
+                                }
+
                                 final long conference_num = get_conference_num_from_confid(conf_id);
                                 if (conference_num > -1)
                                 {
