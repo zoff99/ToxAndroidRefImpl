@@ -1500,7 +1500,7 @@ void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void 
         return;
     }
 
-    if (global_group_audio_acitve_num == conference_number)
+    if (global_group_audio_acitve_num == (long)conference_number)
     {
         TOX_ERR_CONFERENCE_GET_TYPE error;
         TOX_CONFERENCE_TYPE conf_type = tox_conference_get_type(tox_global, conference_number, &error);
@@ -5335,7 +5335,7 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
     int32_t i;
     int32_t j;
     int16_t *pcm_next;
-    for (i = 0; i < (sample_count - 1); i++)
+    for (i = 0; i < ((int32_t)sample_count - 1); i++)
     {
         for (j = 0; j < upsample_factor; j++)
         {
