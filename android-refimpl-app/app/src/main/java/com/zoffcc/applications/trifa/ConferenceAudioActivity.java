@@ -109,6 +109,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         Log.i(TAG, "onCreate:002");
 
         do_not_close_on_pause = false;
+        Callstate.audio_group_active = true;
 
         conferences_av_handler = new Handler(getMainLooper());
         conferences_av_handler_s = conferences_av_handler;
@@ -307,6 +308,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
     protected void onResume()
     {
         do_not_close_on_pause = false;
+        Callstate.audio_group_active = true;
 
         if (conf_id.equals("-1"))
         {
@@ -429,6 +431,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
+
+        Callstate.audio_group_active = false;
 
         conf_id = "-1";
 

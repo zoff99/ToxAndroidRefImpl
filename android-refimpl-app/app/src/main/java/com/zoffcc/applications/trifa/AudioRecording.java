@@ -444,9 +444,13 @@ public class AudioRecording extends Thread
                     {
                         if (ConferenceAudioActivity.push_to_talk_active)
                         {
-                            toxav_group_send_audio(get_conference_num_from_confid(ConferenceAudioActivity.conf_id),
-                                                   (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX,
-                                                   SMAPLINGRATE_TOX);
+                            int audio_group_send_res = toxav_group_send_audio(
+                                    get_conference_num_from_confid(ConferenceAudioActivity.conf_id),
+                                    (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                            if (audio_group_send_res != 0)
+                            {
+                                Log.i(TAG, "toxav_group_send_audio:res=" + audio_group_send_res);
+                            }
                         }
                     }
                     else
