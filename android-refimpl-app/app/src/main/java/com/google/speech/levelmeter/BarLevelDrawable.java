@@ -104,7 +104,7 @@ public final class BarLevelDrawable extends View
         mDrawable_yellow = new ShapeDrawable(new RectShape());
         mDrawable_yellow.getPaint().setColor(0xffffff00);
         mDrawable_red = new ShapeDrawable(new RectShape());
-        mDrawable_red.getPaint().setColor(0xffffff00);
+        mDrawable_red.getPaint().setColor(0xffff0000);
     }
 
     private void drawBar(Canvas canvas)
