@@ -332,6 +332,8 @@ jstring c_safe_string_from_java(const char *instr, size_t len);
 int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, uint32_t *sample_count_new);
 void group_audio_alloc_peer_buffer();
 void group_audio_free_peer_buffer();
+void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samples);
+int16_t *group_audio_read_buffer(uint32_t peernumber, uint32_t num_samples);
 
 // functions -----------
 // functions -----------
@@ -4069,11 +4071,34 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1add_1av_1groupchat(JNIEnv
 static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t peernumber,
                                       const int16_t *pcm, unsigned int samples, uint8_t channels, uint32_t
                                       sample_rate, void *userdata)
-{
+{    
     if (!pcm)
     {
         return;
     }
+
+/*
+    HINT: this will cause a deadlock
+
+    TOX_ERR_CONFERENCE_PEER_QUERY error;
+    bool is_own_peernumber = tox_conference_peer_number_is_ours(tox, groupnumber, peernumber, &error);
+
+    if(error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+    {
+        // some error, stop here
+        dbg(9, "group_audio_callback_func:RET:002");
+        return;
+    }
+    else
+    {
+        if (is_own_peernumber)
+        {
+            // peernumber is our own peernumber, do not process own audio as incoming audio
+            dbg(9, "group_audio_callback_func:RET:001");
+            return;
+        }
+    }
+*/
 
     uint32_t sample_count_new = 0;
 
@@ -4084,6 +4109,8 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     {
         if ((channels == 1) && (sample_rate == 48000))
         {
+            group_audio_add_buffer(peernumber, (int16_t *)pcm, samples);
+
             // we can use the input directly
             if (audio_buffer_pcm_2 != NULL)
             {
@@ -4109,6 +4136,8 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     else
     {
         // use new_pcm_buffer with upsampled data
+        group_audio_add_buffer(peernumber, new_pcm_buffer, sample_count_new);
+
         if (audio_buffer_pcm_2 != NULL)
         {
             memcpy((void *)audio_buffer_pcm_2, (void *)new_pcm_buffer, (size_t)(sample_count_new * 1 * 2));
@@ -4236,8 +4265,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1group_1send_1audio(JNIEnv
         }
 
 #endif
+
         bool res = toxav_group_send_audio(tox_global, (uint32_t)groupnumber, pcm, (size_t)sample_count,
                                           (uint8_t)channels, (uint32_t)sampling_rate);
+
         if (res == false)
         {
             return (jint)-3;
@@ -5249,7 +5280,8 @@ void group_audio_alloc_peer_buffer()
     if (error == TOX_ERR_CONFERENCE_PEER_QUERY_OK)
     {
         global_group_audio_peerbuffers = num_peers;
-        global_group_audio_peerbuffers_buffer = (int16_t *)calloc(1, (size_t)global_group_audio_peerbuffers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+        global_group_audio_peerbuffers_buffer =
+                    (int16_t *)calloc(1, (size_t)(global_group_audio_peerbuffers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2));
         global_group_audio_peerbuffers_buffer_start_pos = (uint32_t *)calloc(1, (size_t)global_group_audio_peerbuffers);
         global_group_audio_peerbuffers_buffer_end_pos = (uint32_t *)calloc(1, (size_t)global_group_audio_peerbuffers);
     }
@@ -5262,6 +5294,39 @@ void group_audio_free_peer_buffer()
     free(global_group_audio_peerbuffers_buffer_end_pos);
 }
 
+void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samples)
+{
+    uint32_t rollover_at_samples = num_samples;
+    uint32_t new_end_pos = global_group_audio_peerbuffers_buffer_end_pos[peernumber] + num_samples;
+
+    // check if rollover the buffer if we write the samples into it
+    if ((global_group_audio_peerbuffers_buffer_end_pos[peernumber] + num_samples) >= GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES)
+    {
+        // we will rollover
+        new_end_pos = (global_group_audio_peerbuffers_buffer_end_pos[peernumber] + num_samples) - GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES;
+        rollover_at_samples = num_samples - new_end_pos;
+    }
+    
+    memcpy((global_group_audio_peerbuffers_buffer +
+            (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber) +
+            global_group_audio_peerbuffers_buffer_end_pos[peernumber]),
+            (void *)pcm,
+            (size_t)rollover_at_samples);
+
+    if (rollover_at_samples < num_samples)
+    {
+        memcpy(global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES *peernumber),
+               (void *)(pcm + rollover_at_samples),
+               (size_t)(num_samples - rollover_at_samples));
+    }
+    
+    global_group_audio_peerbuffers_buffer_end_pos[peernumber] = new_end_pos;
+}
+
+int16_t *group_audio_read_buffer(uint32_t peernumber, uint32_t num_samples)
+{
+    return (int16_t *)NULL;
+}
 
 float interpolate_linear(int16_t start, int16_t end, float interpolation_position)
 {
@@ -5282,6 +5347,7 @@ float interpolate_linear(int16_t start, int16_t end, float interpolation_positio
                );
     }
 }
+
 
 // allowed input sample rates: 8000, 12000, 16000, 24000, 48000
 //
