@@ -213,6 +213,7 @@ uint8_t global_av_call_active = 0;
 int audio_play_volume_percent_c = 10;
 float volumeMultiplier = -20.0f;
 
+#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 20
 long global_group_audio_acitve_num = -1;
 long global_group_audio_peerbuffers = -1;
 uint64_t global_group_audio_last_process_incoming = 0;
@@ -338,6 +339,7 @@ void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samp
 int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples);
 void group_audio_read_buffer(uint32_t peernumber, uint32_t num_samples, int16_t *ret_buffer);
 uint32_t group_audio_any_have_sample_count_in_buffer_count(uint32_t sample_count);
+void process_incoming_group_audio_on_iterate();
 
 void Pipe_updateIndex(size_t *index, size_t bytes);
 size_t Pipe_getUsed(size_t *_rptr, size_t *_wptr);
@@ -2803,6 +2805,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(JNIEnv *
     // dbg(9, "tox_iterate ... START");
     tox_iterate(tox_global, NULL);
     // dbg(9, "tox_iterate ... READY");
+    process_incoming_group_audio_on_iterate();
 }
 
 JNIEXPORT void JNICALL
@@ -4097,6 +4100,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1add_1av_1groupchat(JNIEnv
     return (jlong)res;
 }
 
+
 static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t peernumber,
                                       const int16_t *pcm, unsigned int samples, uint8_t channels, uint32_t
                                       sample_rate, void *userdata)
@@ -4107,11 +4111,6 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     }
 
     uint32_t sample_count_new = 0;
-    int16_t *pcm_mixed = NULL;
-    int need_process_output = 0;
-
-#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 39
-    const int want_sample_count_40ms = (int)(48000*PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS/1000);
 
     // allowed input sample rates: 8000, 12000, 16000, 24000, 48000
     int16_t *new_pcm_buffer = upsample_to_48khz((int16_t *)pcm, (size_t)samples, (uint8_t)channels, (uint32_t)sample_rate, &sample_count_new);
@@ -4133,9 +4132,23 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
         group_audio_add_buffer(peernumber, new_pcm_buffer, sample_count_new);
         free(new_pcm_buffer);
     }
+}
+
+void process_incoming_group_audio_on_iterate()
+{
+    if (global_group_audio_acitve_num == -1)
+    {
+        return;
+    }
+
+    int16_t *pcm_mixed = NULL;
+    int need_process_output = 0;
+
+    const int want_sample_count_40ms = (int)(48000*PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS/1000);
 
     if ((global_group_audio_last_process_incoming + PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS) <= current_time_monotonic_default())
     {
+        dbg(9, "group_audio_callback_func:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
         global_group_audio_last_process_incoming = current_time_monotonic_default();
         need_process_output = 1;
     }
@@ -4149,11 +4162,6 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
         }
     }
 
-    // ************
-    global_group_audio_last_process_incoming = current_time_monotonic_default();
-    need_process_output = 1;
-    // ************
-
     if (need_process_output == 1)
     {
         if (audio_buffer_pcm_2 == NULL)
@@ -4162,10 +4170,10 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
             jnienv2 = jni_getenv();
             (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_toxav_callback_group_audio_receive_frame_cb_method,
-                                     (jlong)(unsigned long long)groupnumber,
-                                     (jlong)(unsigned long long)peernumber,
-                                     (jlong)want_sample_count_40ms, (jint)channels,
-                                     (jlong)sample_rate
+                                     (jlong)(unsigned long long)global_group_audio_acitve_num,
+                                     (jlong)(unsigned long long)0,
+                                     (jlong)want_sample_count_40ms, (jint)1,
+                                     (jlong)48000
                                     );
 
         }
@@ -4184,10 +4192,10 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
             jnienv2 = jni_getenv();
             (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_toxav_callback_group_audio_receive_frame_cb_method,
-                                     (jlong)(unsigned long long)groupnumber,
-                                     (jlong)(unsigned long long)peernumber,
-                                     (jlong)want_sample_count_40ms, (jint)channels,
-                                     (jlong)sample_rate
+                                     (jlong)(unsigned long long)global_group_audio_acitve_num,
+                                     (jlong)(unsigned long long)0,
+                                     (jlong)want_sample_count_40ms, (jint)1,
+                                     (jlong)48000
                                     );
         }
         else
@@ -4195,6 +4203,7 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
             // audio_buffer_pcm_2 still NULL, there must be some problem
         }
     }
+
 }
 
 JNIEXPORT jlong JNICALL
@@ -5338,22 +5347,9 @@ void group_audio_free_peer_buffer()
 
 uint32_t group_audio_get_samples_in_buffer(uint32_t peernumber)
 {
-    size_t e = global_group_audio_peerbuffers_buffer_end_pos[peernumber];
-    size_t s = global_group_audio_peerbuffers_buffer_start_pos[peernumber];
-
-    if (s == e)
-    {
-        return 0;
-    }
-
-    if (s > e)
-    {
-        return (s - (e + GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES));
-    }
-    else // (s < e)
-    {
-        return (e - s);
-    }
+    return (uint32_t)Pipe_getUsed(
+                &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
+                &global_group_audio_peerbuffers_buffer_end_pos[peernumber]);
 }
 
 // return how many buffers have more or equal to `sample_count` samples available to read
@@ -5419,11 +5415,8 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
             {
                 // dbg(9, "group_audio_get_mixed_output_buffer:j=%d", j);
 
+#if 0
                 int32_t mixed_sample = (int32_t)ret_buf[j] + (int32_t)((float)temp_buf[j] / (float)(num_bufs_ready * 0.8f));
-
-                // ********//
-                mixed_sample = temp_buf[j];
-                // ********//
 
                 // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:before=%d", mixed_sample);
 
@@ -5439,6 +5432,9 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
                 {
                     ret_buf[j] = (int16_t)mixed_sample;
                 }
+#endif
+
+                ret_buf[j] = temp_buf[j];
 
                 // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:after=%d", mixed_sample);
             }
@@ -5454,108 +5450,23 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
 
 void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samples)
 {
-    uint32_t rollover_at_samples = num_samples;
-    uint32_t new_end_pos = global_group_audio_peerbuffers_buffer_end_pos[peernumber] + num_samples;
-
-    // check if rollover the buffer if we write the samples into it
-    if (new_end_pos >= GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES)
-    {
-        // we will rollover
-        new_end_pos =
-            (global_group_audio_peerbuffers_buffer_end_pos[peernumber] + num_samples) % GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES;
-        rollover_at_samples = num_samples - new_end_pos;
-    }
-    
-    memcpy((global_group_audio_peerbuffers_buffer +
-            (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber) +
-            global_group_audio_peerbuffers_buffer_end_pos[peernumber]),
-            (void *)pcm,
-            (size_t)(rollover_at_samples * 2));
-
-    if (rollover_at_samples < num_samples)
-    {
-        memcpy(global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber),
-               (void *)(pcm + rollover_at_samples),
-               (size_t)((num_samples - rollover_at_samples) * 2));
-    }
-
-    // TODO: move start positon, if we write over it
-
-    global_group_audio_peerbuffers_buffer_end_pos[peernumber] =
-        (global_group_audio_peerbuffers_buffer_end_pos[peernumber] + num_samples) % GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES;
+    Pipe_write((const char*)pcm, (size_t)(num_samples * 2),
+            global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber),
+            &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
+            &global_group_audio_peerbuffers_buffer_end_pos[peernumber]);
 }
 
 void group_audio_read_buffer(uint32_t peernumber, uint32_t num_samples, int16_t *ret_buffer)
 {
-    // dbg(9, "group_audio_read_buffer:000:peernumber=%d", peernumber);
-
     if (!ret_buffer)
     {
         return;
     }
-    
-    // dbg(9, "group_audio_read_buffer:001:peernumber=%d", peernumber);
 
-    size_t e = global_group_audio_peerbuffers_buffer_end_pos[peernumber];
-    size_t s = global_group_audio_peerbuffers_buffer_start_pos[peernumber];
-
-    // dbg(9, "group_audio_read_buffer:s=%d e=%d", s, e);
-
-    if ((s < e) && ((e - s) >= num_samples))
-    {
-        // dbg(9, "group_audio_read_buffer:002");
-        memcpy(ret_buffer,
-            (global_group_audio_peerbuffers_buffer +
-                (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber) + s),
-            (num_samples * 2)
-        );
-        // dbg(9, "group_audio_read_buffer:003");
-        global_group_audio_peerbuffers_buffer_start_pos[peernumber] = (s + num_samples) % GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES;
-        // dbg(9, "group_audio_read_buffer:004:s_new=%d", global_group_audio_peerbuffers_buffer_start_pos[peernumber]);
-    }
-    else if (s > e)
-    {
-        // dbg(9, "group_audio_read_buffer:005");
-        if  ((s + num_samples) > GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES)
-        {
-            // we will rollover with our read
-            uint32_t rollover_at_samples = num_samples - ((s + num_samples) % GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES);
-
-            // dbg(9, "group_audio_read_buffer:006");
-
-            memcpy(ret_buffer,
-                (global_group_audio_peerbuffers_buffer +
-                    (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber) + s),
-                (rollover_at_samples * 2)
-            );
-
-            // dbg(9, "group_audio_read_buffer:007:rollover_at_samples=%d num_samples=%d", (int)rollover_at_samples, (int)num_samples);
-
-            memcpy((ret_buffer + rollover_at_samples),
-                (global_group_audio_peerbuffers_buffer +
-                    GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber),
-                (size_t)((num_samples - rollover_at_samples) * 2)
-            );
-
-            // dbg(9, "group_audio_read_buffer:008");
-            global_group_audio_peerbuffers_buffer_start_pos[peernumber] = (s + num_samples) % GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES;
-            // dbg(9, "group_audio_read_buffer:009:s_new=%d", global_group_audio_peerbuffers_buffer_start_pos[peernumber]);
-
-        }
-        else
-        {
-            // normal read
-            // dbg(9, "group_audio_read_buffer:002b");
-            memcpy(ret_buffer,
-                (global_group_audio_peerbuffers_buffer +
-                    (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber) + s),
-                (num_samples * 2)
-            );
-            // dbg(9, "group_audio_read_buffer:003b");
-            global_group_audio_peerbuffers_buffer_start_pos[peernumber] = (s + num_samples) % GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES;
-            // dbg(9, "group_audio_read_buffer:004b:s_new=%d", global_group_audio_peerbuffers_buffer_start_pos[peernumber]);
-        }
-    }
+    Pipe_read((char *)ret_buffer, (size_t)(num_samples * 2),
+            global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber),
+            &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
+            &global_group_audio_peerbuffers_buffer_end_pos[peernumber]);
 }
 
 float interpolate_linear(int16_t start, int16_t end, float interpolation_position)
