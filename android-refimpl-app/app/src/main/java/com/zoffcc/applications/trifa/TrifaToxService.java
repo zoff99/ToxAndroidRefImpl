@@ -1390,9 +1390,9 @@ public class TrifaToxService extends Service
                     //**// long s_time = System.currentTimeMillis();
                     MainActivity.tox_iterate();
 
-                    if (Callstate.state != 0)
+                    if ((Callstate.state != 0) || (Callstate.audio_group_active))
                     {
-                        tox_iteration_interval_ms = 8; // if we are in a video/audio call iterate more often
+                        tox_iteration_interval_ms = 10; // if we are in a video/audio call or in a group audio call iterate more often
                     }
                     else
                     {
