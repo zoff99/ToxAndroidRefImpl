@@ -406,6 +406,9 @@ public class HelperConference
 
     static long get_conference_num_from_confid(String conference_id)
     {
+        // TODO: !!!!cache this!!!!
+        // TODO: !!!!cache this!!!!
+        // TODO: !!!!cache this!!!!
         try
         {
             return orma.selectFromConferenceDB().
