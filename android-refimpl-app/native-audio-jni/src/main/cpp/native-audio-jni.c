@@ -372,6 +372,9 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                                 "player_state:res_011=%d SL_RESULT_SUCCESS=%d PAUSED",
                                 (int) result, (int) SL_RESULT_SUCCESS);
+
+
+            audio_out_vu_value = 0.0f;
             (void) result;
         }
     }
@@ -812,7 +815,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 {
     if (playing_state == _SHUTDOWN)
     {
-        audio_out_vu_value = 0;
+        audio_out_vu_value = 0.0f;
         return -1;
     }
 
@@ -826,11 +829,14 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     {
         if (bqPlayerBufferQueue == NULL)
         {
-            audio_out_vu_value = 0;
+            audio_out_vu_value = 0.0f;
             return -2;
         }
 
-        audio_out_vu_value = audio_vu((int16_t *) nextBuffer, (uint32_t) (nextSize / 2));
+        if (player_state_current == _PLAYING)
+        {
+            audio_out_vu_value = audio_vu((int16_t *) nextBuffer, (uint32_t) (nextSize / 2));
+        }
 
         // enque the buffer
         SLresult result;
@@ -839,7 +845,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
                                                  (SLuint32) nextSize);
         if (SL_RESULT_SUCCESS != result)
         {
-            audio_out_vu_value = 0;
+            audio_out_vu_value = 0.0f;
             __android_log_print(ANDROID_LOG_INFO, LOGTAG, "PlayPCM16:1:Enqueue:ERR:result=%d",
                                 result);
             return -2;
@@ -1062,7 +1068,7 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *
 {
     playing_state = _STOPPED;
 
-    audio_out_vu_value = 0;
+    audio_out_vu_value = 0.0f;
 
     // set the player's state
     SLresult result;
