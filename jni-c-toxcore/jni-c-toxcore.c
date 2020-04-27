@@ -332,7 +332,7 @@ void android_logger(int level, const char *logtext);
 jstring c_safe_string_from_java(const char *instr, size_t len);
 
 int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, uint32_t *sample_count_new);
-void group_audio_alloc_peer_buffer();
+void group_audio_alloc_peer_buffer(uint32_t global_group_audio_acitve_number);
 void group_audio_free_peer_buffer();
 uint32_t group_audio_get_samples_in_buffer(uint32_t peernumber);
 void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samples);
@@ -1543,9 +1543,9 @@ void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void 
             global_group_audio_peerbuffers = 0;
             group_audio_free_peer_buffer();
             // -------------------
-            global_group_audio_acitve_num = conference_number;
             global_group_audio_last_process_incoming = 0;
-            group_audio_alloc_peer_buffer();
+            group_audio_alloc_peer_buffer(conference_number);
+            global_group_audio_acitve_num = conference_number;
         }
     }
 
@@ -4215,9 +4215,9 @@ void process_incoming_group_audio_on_iterate()
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1enable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
 {
-    global_group_audio_acitve_num = conference_number;
     global_group_audio_last_process_incoming = 0;
-    group_audio_alloc_peer_buffer();
+    group_audio_alloc_peer_buffer(conference_number);
+    global_group_audio_acitve_num = conference_number;
 
     if(tox_global == NULL)
     {
@@ -5327,20 +5327,20 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 // ------------------- audio util function -------------------
 // ------------------- audio util function -------------------
 
-void group_audio_alloc_peer_buffer()
+void group_audio_alloc_peer_buffer(uint32_t global_group_audio_acitve_number)
 {
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     uint32_t num_peers = tox_conference_peer_count(tox_global,
-                                        (uint32_t)global_group_audio_acitve_num,
+                                        global_group_audio_acitve_number,
                                         &error);
 
     if (error == TOX_ERR_CONFERENCE_PEER_QUERY_OK)
     {
-        global_group_audio_peerbuffers = num_peers;
         global_group_audio_peerbuffers_buffer =
-                    (int16_t *)calloc(1, (size_t)(global_group_audio_peerbuffers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2));
-        global_group_audio_peerbuffers_buffer_start_pos = (size_t *)calloc(1, (size_t)global_group_audio_peerbuffers);
-        global_group_audio_peerbuffers_buffer_end_pos = (size_t *)calloc(1, (size_t)global_group_audio_peerbuffers);
+                    (int16_t *)calloc(1, (size_t)(num_peers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2));
+        global_group_audio_peerbuffers_buffer_start_pos = (size_t *)calloc(1, (size_t)num_peers);
+        global_group_audio_peerbuffers_buffer_end_pos = (size_t *)calloc(1, (size_t)num_peers);
+        global_group_audio_peerbuffers = num_peers;
     }
 }
 
