@@ -299,7 +299,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
         Log.i(TAG, "onCreate:099");
     }
 
-
     @Override
     protected void onStop()
     {

@@ -88,7 +88,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:gravity="center_horizontal|bottom"
-                        android:text="In"
+                        android:text="Out"
                         android:textColor="@color/md_black_1000"
                         android:textSize="10sp" />
 
@@ -143,7 +143,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:gravity="center_horizontal|bottom"
-                        android:text="Out"
+                        android:text="In"
                         android:textColor="@color/md_black_1000"
                         android:textSize="10sp" />
 
