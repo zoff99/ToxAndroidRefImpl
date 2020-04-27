@@ -207,7 +207,9 @@ public class AudioRecording extends Thread
         if (PREF__use_native_audio_play)
         {
 
+            Log.i(TAG, "audio_rec:StartREC:001");
             NativeAudio.StartREC();
+            Log.i(TAG, "audio_rec:StartREC:002");
 
             while (!stopped)
             {

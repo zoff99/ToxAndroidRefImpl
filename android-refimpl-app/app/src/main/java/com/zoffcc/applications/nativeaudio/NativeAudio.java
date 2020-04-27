@@ -146,7 +146,9 @@ public class NativeAudio
         }
 
         native_audio_engine_down = false;
+        Log.i(TAG, "audio_rec:StartREC:003");
         NativeAudio.StartREC();
+        Log.i(TAG, "audio_rec:StartREC:004");
     }
 
     // ------- DEBUG -------
