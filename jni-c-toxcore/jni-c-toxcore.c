@@ -213,14 +213,14 @@ uint8_t global_av_call_active = 0;
 int audio_play_volume_percent_c = 10;
 float volumeMultiplier = -20.0f;
 
-#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 20
+#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 60
 long global_group_audio_acitve_num = -1;
 long global_group_audio_peerbuffers = -1;
 uint64_t global_group_audio_last_process_incoming = 0;
 int16_t *global_group_audio_peerbuffers_buffer = NULL;
 size_t *global_group_audio_peerbuffers_buffer_start_pos = NULL; // byte position inside the buffer where valid data starts
 size_t *global_group_audio_peerbuffers_buffer_end_pos = NULL; // byte position inside the buffer where valid can be added at
-#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES (48000*240/1000) // 240ms PCM16 buffer @48kHz mono int16_t values
+#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES ((48000*(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 5)/1000) * 2) // XY ms PCM16 buffer @48kHz mono int16_t values
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -4110,6 +4110,12 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
         return;
     }
 
+    if ((channels == 1) && (sample_rate == 48000))
+    {
+        group_audio_add_buffer(peernumber, (int16_t *)pcm, samples);
+        return;
+    }
+
     uint32_t sample_count_new = 0;
 
     // allowed input sample rates: 8000, 12000, 16000, 24000, 48000
@@ -4146,9 +4152,9 @@ void process_incoming_group_audio_on_iterate()
 
     const int want_sample_count_40ms = (int)(48000*PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS/1000);
 
-    if ((global_group_audio_last_process_incoming + PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS) <= current_time_monotonic_default())
+    if ((global_group_audio_last_process_incoming + (PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS - 5)) <= current_time_monotonic_default())
     {
-        dbg(9, "group_audio_callback_func:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
+        // dbg(9, "group_audio_callback_func:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
         global_group_audio_last_process_incoming = current_time_monotonic_default();
         need_process_output = 1;
     }
@@ -5347,9 +5353,9 @@ void group_audio_free_peer_buffer()
 
 uint32_t group_audio_get_samples_in_buffer(uint32_t peernumber)
 {
-    return (uint32_t)Pipe_getUsed(
+    return (uint32_t)(Pipe_getUsed(
                 &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
-                &global_group_audio_peerbuffers_buffer_end_pos[peernumber]);
+                &global_group_audio_peerbuffers_buffer_end_pos[peernumber]) * 2);
 }
 
 // return how many buffers have more or equal to `sample_count` samples available to read
@@ -5378,7 +5384,7 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
     uint32_t num_bufs_ready = group_audio_any_have_sample_count_in_buffer_count(num_samples);
     // dbg(9, "group_audio_get_mixed_output_buffer:num_bufs_ready=%d", num_bufs_ready);
 
-    const size_t buf_size = (size_t)(48000 * num_samples * 2);
+    const size_t buf_size = (size_t)(num_samples * 2);
 
     int16_t *ret_buf = (int16_t *)calloc(1, buf_size);
     if (!ret_buf)
@@ -5535,7 +5541,7 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
     
     *sample_count_new = sample_count * upsample_factor;
 
-    int32_t new_buffer_byte_size =  48000 * (*sample_count_new) * 2;
+    int32_t new_buffer_byte_size =  (*sample_count_new) * 2;
     int16_t *new_pcm_buffer = calloc(1, (size_t)new_buffer_byte_size); // 48kHz , mono, PCM Int16 signed
     int16_t *new_pcm_buffer_pos = new_pcm_buffer;
 
