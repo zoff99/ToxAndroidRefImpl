@@ -17,3 +17,14 @@ Import a Tox Savefile from another Client into TRIfA
   ```
   /sdcard/Android/data/com.zoffcc.applications.trifa/files/vfs_export/I_WANT_TO_IMPORT_savedata.tox
   ```
+
+Import a Tox Savefile from another Client into TRIfA with root on your Android Device
+=
+1) export the tox savefile from your other client (without password!)
+2) kill TRIfA
+3) put the save file directly into the data directory of TRIfA with root access:
+    ```
+    /data/user/0/com.zoffcc.applications.trifa/files/savedata.tox
+    ```
+4) change the uid and gid accordingly and also read/write access
+5) restart TRIfA, now your imported profile should be active
