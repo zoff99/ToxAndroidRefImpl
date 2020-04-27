@@ -213,6 +213,15 @@ uint8_t global_av_call_active = 0;
 int audio_play_volume_percent_c = 10;
 float volumeMultiplier = -20.0f;
 
+#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 60
+long global_group_audio_acitve_num = -1;
+long global_group_audio_peerbuffers = -1;
+uint64_t global_group_audio_last_process_incoming = 0;
+int16_t *global_group_audio_peerbuffers_buffer = NULL;
+size_t *global_group_audio_peerbuffers_buffer_start_pos = NULL; // byte position inside the buffer where valid data starts
+size_t *global_group_audio_peerbuffers_buffer_end_pos = NULL; // byte position inside the buffer where valid can be added at
+#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES ((48000*(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 5)/1000) * 2) // XY ms PCM16 buffer @48kHz mono int16_t values
+
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_friend_name_cb_method = NULL;
@@ -246,6 +255,7 @@ jmethodID android_toxav_callback_video_receive_frame_h264_cb_method = NULL;
 jmethodID android_toxav_callback_call_state_cb_method = NULL;
 jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
 jmethodID android_toxav_callback_audio_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_group_audio_receive_frame_cb_method = NULL;
 jmethodID android_toxav_callback_call_comm_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 // -------- _callbacks_ --------
@@ -320,6 +330,25 @@ void tox_log_cb__custom(Tox *tox, TOX_LOG_LEVEL level, const char *file, uint32_
 
 void android_logger(int level, const char *logtext);
 jstring c_safe_string_from_java(const char *instr, size_t len);
+
+int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, uint32_t *sample_count_new);
+void group_audio_alloc_peer_buffer(uint32_t global_group_audio_acitve_number);
+void group_audio_free_peer_buffer();
+uint32_t group_audio_get_samples_in_buffer(uint32_t peernumber);
+void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samples);
+int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples);
+void group_audio_read_buffer(uint32_t peernumber, uint32_t num_samples, int16_t *ret_buffer);
+uint32_t group_audio_any_have_sample_count_in_buffer_count(uint32_t sample_count);
+void process_incoming_group_audio_on_iterate();
+
+void Pipe_updateIndex(size_t *index, size_t bytes);
+size_t Pipe_getUsed(size_t *_rptr, size_t *_wptr);
+size_t Pipe_write(const char* data, size_t bytes, void *_buf, size_t *_rptr, size_t *_wptr);
+size_t Pipe_read(char* data, size_t bytes, void *_buf, size_t *_rptr, size_t *_wptr);
+size_t Pipe_getFree(size_t *_rptr, size_t *_wptr);
+void Pipe_reset(size_t *_rptr, size_t *_wptr);
+void Pipe_dump(void *_buf);
+
 // functions -----------
 // functions -----------
 // functions -----------
@@ -399,6 +428,22 @@ void dbg(int level, const char *fmt, ...)
     }
 }
 
+// gives the time in SECONDS sind the epoch (1.1.1970)
+time_t get_unix_time(void)
+{
+    return time(NULL);
+}
+
+// gives a counter value that increaes every millisecond
+static uint64_t current_time_monotonic_default()
+{
+    uint64_t time = 0;
+    struct timespec clock_mono;
+    clock_gettime(CLOCK_MONOTONIC, &clock_mono);
+    time = 1000ULL * clock_mono.tv_sec + (clock_mono.tv_nsec / 1000000ULL);
+    return time;
+}
+
 
 Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port,
                 int local_discovery_enabled_, const uint8_t *passphrase, size_t passphrase_len)
@@ -409,7 +454,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     CLEAR(options);
     dbg(9, "1006");
     tox_options_default(&options);
-    uint16_t tcp_port = 33776;
+    // uint16_t tcp_port = 33776;
     options.ipv6_enabled = true;
 
     if(orbot_enabled == 1)
@@ -487,7 +532,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
             size_t savedata_len = (size_t)(fsize - TOX_PASS_ENCRYPTION_EXTRA_LENGTH);
             savedata = malloc(savedata_len);
             TOX_ERR_DECRYPTION error2;
-            bool res2 = tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
+            tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
 
             if(savedata_enc)
             {
@@ -1252,7 +1297,7 @@ void android_tox_callback_friend_message_v2_cb(uint32_t friend_number, const uin
         uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
         uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
         uint32_t text_length = 0;
-        bool res = tox_messagev2_get_message_text(raw_message,
+        tox_messagev2_get_message_text(raw_message,
                    (uint32_t)raw_message_len,
                    (bool)false, (uint32_t)0,
                    message_text, &text_length);
@@ -1321,7 +1366,7 @@ void android_tox_callback_friend_sync_message_v2_cb(uint32_t friend_number, cons
         uint32_t ts_sec = tox_messagev2_get_ts_sec(raw_message);
         uint16_t ts_ms = tox_messagev2_get_ts_ms(raw_message);
         uint32_t data_length = 0;
-        bool res = tox_messagev2_get_sync_message_data(raw_message,
+        tox_messagev2_get_sync_message_data(raw_message,
                    (uint32_t)raw_message_len, message_data, &data_length);
         (*jnienv2)->SetByteArrayRegion(jnienv2, data3, 0, (int)data_length, (const jbyte *)message_data);
 
@@ -1482,6 +1527,28 @@ void android_tox_callback_conference_peer_list_changed_cb(uint32_t conference_nu
 
 void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data)
 {
+    if (!tox_global)
+    {
+        return;
+    }
+
+    if (global_group_audio_acitve_num == (long)conference_number)
+    {
+        TOX_ERR_CONFERENCE_GET_TYPE error;
+        TOX_CONFERENCE_TYPE conf_type = tox_conference_get_type(tox_global, conference_number, &error);
+
+        if ((error == TOX_ERR_CONFERENCE_GET_TYPE_OK) && (conf_type == TOX_CONFERENCE_TYPE_AV))
+        {
+            global_group_audio_acitve_num = -1;
+            global_group_audio_peerbuffers = 0;
+            group_audio_free_peer_buffer();
+            // -------------------
+            global_group_audio_last_process_incoming = 0;
+            group_audio_alloc_peer_buffer(conference_number);
+            global_group_audio_acitve_num = conference_number;
+        }
+    }
+
     android_tox_callback_conference_peer_list_changed_cb(conference_number);
 }
 
@@ -2154,7 +2221,7 @@ void *thread_av(void *data)
     JNIEnv *env;
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
     dbg(9, "2001");
-    ToxAV *av = (ToxAV *) data;
+    // ToxAV *av = (ToxAV *) data;
     dbg(9, "2002");
     pthread_t id = pthread_self();
     dbg(9, "2003");
@@ -2407,6 +2474,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     toxav_callback_bit_rate_status(tox_av_global, toxav_bit_rate_status_cb_, &mytox_CC);
     android_toxav_callback_audio_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_audio_receive_frame_cb_method", "(JJIJ)V");
+    android_toxav_callback_group_audio_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_toxav_callback_group_audio_receive_frame_cb_method", "(JJJIJ)V");
     toxav_callback_audio_receive_frame(tox_av_global, toxav_audio_receive_frame_cb_, &mytox_CC);
 #ifdef TOX_HAVE_TOXAV_CALLBACKS_002
     android_toxav_callback_call_comm_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2736,6 +2805,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(JNIEnv *
     // dbg(9, "tox_iterate ... START");
     tox_iterate(tox_global, NULL);
     // dbg(9, "tox_iterate ... READY");
+    process_incoming_group_audio_on_iterate();
 }
 
 JNIEXPORT void JNICALL
@@ -2981,7 +3051,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1msg_1re
     }
 
     uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
-    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    // long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
     bool res = tox_util_friend_send_msg_receipt_v2(tox_global,
                (uint32_t)friend_number, msgid_buffer_c, (uint32_t)ts_sec);
 
@@ -3779,15 +3849,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1wrap(JNIEnv *env
     dbg(0, "tox_messagev2_wrap:001");
     uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
     dbg(0, "tox_messagev2_wrap:002");
-    long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+    // long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
     dbg(0, "tox_messagev2_wrap:00");
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
     dbg(0, "tox_messagev2_wrap:003");
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     dbg(0, "tox_messagev2_wrap:004");
     uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
     dbg(0, "tox_messagev2_wrap:005");
-    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    // long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
     dbg(0, "tox_messagev2_wrap:006");
     dbg(0, "tox_messagev2_wrap:007");
     bool res = tox_messagev2_wrap((uint32_t)text_length, (uint32_t)type,
@@ -3816,7 +3886,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1messa
 
     jstring result = NULL;
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
 
     if(tox_global == NULL)
     {
@@ -3852,7 +3922,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1messa
     }
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
 
     if(tox_global == NULL)
     {
@@ -3886,9 +3956,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1id
     }
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     uint8_t *msgid_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, msgid_buffer);
-    long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
+    // long msgid_buffer_capacity = (*env)->GetDirectBufferCapacity(env, msgid_buffer);
     bool res = tox_messagev2_get_message_id(raw_message_buffer_c, msgid_buffer_c);
 
     if(res == true)
@@ -3912,7 +3982,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1sec(JNI
     }
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     uint32_t res = tox_messagev2_get_ts_sec(raw_message_buffer_c);
     return (jlong)res;
 }
@@ -3928,7 +3998,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1ms(JNIE
     }
 
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     uint16_t res = tox_messagev2_get_ts_ms(raw_message_buffer_c);
     return (jlong)res;
 }
@@ -3953,9 +4023,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
 
     uint32_t text_length = 0;
     uint8_t *message_text_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, message_text_buffer);
-    long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
+    // long message_text_buffer_capacity = (*env)->GetDirectBufferCapacity(env, message_text_buffer);
     uint8_t *raw_message_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, raw_message_buffer);
-    long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
+    // long raw_message_buffer_capacity = (*env)->GetDirectBufferCapacity(env, raw_message_buffer);
     bool res = tox_messagev2_get_message_text(raw_message_buffer_c, (uint32_t)raw_message_len,
                (bool)is_alter_msg,
                (uint32_t)alter_type, message_text_buffer_c,
@@ -3982,6 +4052,299 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
  * ----------------- MessageV2 --------------------------------
  * ------------------------------------------------------------
  */
+
+
+
+
+// ------------------- AV - Conference -------------------
+// ------------------- AV - Conference -------------------
+// ------------------- AV - Conference -------------------
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1join_1av_1groupchat(JNIEnv *env, jobject thiz, jlong friend_number,
+        jobject cookie_buffer, jlong cookie_length)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    uint8_t *cookie_buffer_c = NULL;
+    long capacity = 0;
+
+    if(cookie_buffer == NULL)
+    {
+        return (jlong)-21;
+    }
+
+    cookie_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, cookie_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
+
+    int32_t res = toxav_join_av_groupchat(tox_global, (uint32_t)friend_number, cookie_buffer_c, (size_t)cookie_length,
+                                        NULL, (void *)NULL);
+
+    return (jlong)res;
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1add_1av_1groupchat(JNIEnv *env, jobject thiz)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    int32_t res = toxav_add_av_groupchat(tox_global, NULL, (void *)NULL);
+    return (jlong)res;
+}
+
+
+static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t peernumber,
+                                      const int16_t *pcm, unsigned int samples, uint8_t channels, uint32_t
+                                      sample_rate, void *userdata)
+{    
+    if (!pcm)
+    {
+        return;
+    }
+
+    if ((channels == 1) && (sample_rate == 48000))
+    {
+        group_audio_add_buffer(peernumber, (int16_t *)pcm, samples);
+        return;
+    }
+
+    uint32_t sample_count_new = 0;
+
+    // allowed input sample rates: 8000, 12000, 16000, 24000, 48000
+    int16_t *new_pcm_buffer = upsample_to_48khz((int16_t *)pcm, (size_t)samples, (uint8_t)channels, (uint32_t)sample_rate, &sample_count_new);
+
+    if (!new_pcm_buffer)
+    {
+        if ((channels == 1) && (sample_rate == 48000))
+        {
+            group_audio_add_buffer(peernumber, (int16_t *)pcm, samples);
+        }
+        else
+        {
+            // some error on upsampling, we skip this audio frame
+        }
+    }
+    else
+    {
+        // use new_pcm_buffer with upsampled data
+        group_audio_add_buffer(peernumber, new_pcm_buffer, sample_count_new);
+        free(new_pcm_buffer);
+    }
+}
+
+void process_incoming_group_audio_on_iterate()
+{
+    if (global_group_audio_acitve_num == -1)
+    {
+        return;
+    }
+
+    int16_t *pcm_mixed = NULL;
+    int need_process_output = 0;
+
+    const int want_sample_count_40ms = (int)(48000*PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS/1000);
+
+    if ((global_group_audio_last_process_incoming + (PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS - 5)) <= current_time_monotonic_default())
+    {
+        // dbg(9, "group_audio_callback_func:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
+        global_group_audio_last_process_incoming = current_time_monotonic_default();
+        need_process_output = 1;
+    }
+    else if (global_group_audio_last_process_incoming == 0)
+    {
+        uint32_t count_ready_buffers = group_audio_any_have_sample_count_in_buffer_count(want_sample_count_40ms);
+        if (count_ready_buffers > 0)
+        {
+            global_group_audio_last_process_incoming = current_time_monotonic_default();
+            need_process_output = 1;
+        }
+    }
+
+    if (need_process_output == 1)
+    {
+        if (audio_buffer_pcm_2 == NULL)
+        {
+            JNIEnv *jnienv2;
+            jnienv2 = jni_getenv();
+            (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_group_audio_receive_frame_cb_method,
+                                     (jlong)(unsigned long long)global_group_audio_acitve_num,
+                                     (jlong)(unsigned long long)0,
+                                     (jlong)want_sample_count_40ms, (jint)1,
+                                     (jlong)48000
+                                    );
+
+        }
+        
+        if (audio_buffer_pcm_2 != NULL)
+        {
+            pcm_mixed = group_audio_get_mixed_output_buffer(want_sample_count_40ms);
+
+            if (pcm_mixed)
+            {
+                memcpy((void *)audio_buffer_pcm_2, (void *)pcm_mixed, (size_t)(want_sample_count_40ms * 1 * 2));
+                free(pcm_mixed);
+            }
+
+            JNIEnv *jnienv2;
+            jnienv2 = jni_getenv();
+            (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_group_audio_receive_frame_cb_method,
+                                     (jlong)(unsigned long long)global_group_audio_acitve_num,
+                                     (jlong)(unsigned long long)0,
+                                     (jlong)want_sample_count_40ms, (jint)1,
+                                     (jlong)48000
+                                    );
+        }
+        else
+        {
+            // audio_buffer_pcm_2 still NULL, there must be some problem
+        }
+    }
+
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1enable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
+{
+    global_group_audio_last_process_incoming = 0;
+    group_audio_alloc_peer_buffer(conference_number);
+    global_group_audio_acitve_num = conference_number;
+
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    int32_t res = toxav_groupchat_enable_av(tox_global, (uint32_t)conference_number, group_audio_callback_func, (void *)NULL);
+    return (jlong)res;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1disable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
+{
+    global_group_audio_acitve_num = -1;
+    global_group_audio_last_process_incoming = 0;
+    global_group_audio_peerbuffers = 0;
+    group_audio_free_peer_buffer();
+
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    int32_t res = toxav_groupchat_disable_av(tox_global, (uint32_t)conference_number);
+    return (jlong)res;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1av_1enabled(JNIEnv *env, jobject thiz, jlong conference_number)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-2;
+    }
+
+    bool res = toxav_groupchat_av_enabled(tox_global, (uint32_t)conference_number);
+
+    if (res == false)
+    {
+        return (jint)-1;
+    }
+    else
+    {
+        return (jint)0;
+    }
+}
+
+
+/* Send audio to the group chat.
+ *
+ * return 0 on success.
+ * return -1 on failure.
+ *
+ * Note that total size of pcm in bytes is equal to `(samples * channels * sizeof(int16_t))`.
+ *
+ * Valid number of samples are `((sample rate) * (audio length) / 1000)` (Valid values for audio length: 2.5, 5, 10, 20, 40 or 60 ms)
+ * Valid number of channels are 1 or 2.
+ * Valid sample rates are 8000, 12000, 16000, 24000, or 48000.
+ *
+ * Recommended values are: samples = 960, channels = 1, sample_rate = 48000
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1group_1send_1audio(JNIEnv *env, jobject thiz,
+        jlong groupnumber, jlong sample_count, jint channels, jlong sampling_rate)
+{
+    if(tox_global == NULL)
+    {
+        return (jint)-2;
+    }
+
+    if(audio_buffer_pcm_1)
+    {
+        int16_t *pcm = (int16_t *)audio_buffer_pcm_1;
+#ifdef USE_ECHO_CANCELLATION
+
+        if(((int)channels == 1) && ((int)sampling_rate == 48000))
+        {
+            filteraudio_incompatible_1 = 0;
+        }
+        else
+        {
+            filteraudio_incompatible_1 = 1;
+        }
+
+        // TODO: need some locking here!
+        if(recording_samling_rate != (uint32_t)sampling_rate)
+        {
+            recording_samling_rate = (uint32_t)sampling_rate;
+            restart_filter_audio((uint32_t)sampling_rate);
+        }
+
+        // TODO: need some locking here!
+
+        if(sample_count > 0)
+        {
+            if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
+                    && (filteraudio_incompatible_2 == 0))
+            {
+                filter_audio(filteraudio, pcm, (unsigned int)sample_count);
+            }
+        }
+
+#endif
+
+        bool res = toxav_group_send_audio(tox_global, (uint32_t)groupnumber, pcm, (size_t)sample_count,
+                                          (uint8_t)channels, (uint32_t)sampling_rate);
+
+        if (res == false)
+        {
+            return (jint)-3;
+        }
+        else
+        {
+            return (jint)0;
+        }
+
+    }
+
+    return (jint)-3;
+}
+
+
+// ------------------- AV - Conference -------------------
+// ------------------- AV - Conference -------------------
+// ------------------- AV - Conference -------------------
+
 
 
 
@@ -4957,6 +5320,325 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 // ------------------- AV -------------------
 // ------------------- AV -------------------
 // ------------------- AV -------------------
+
+
+
+// ------------------- audio util function -------------------
+// ------------------- audio util function -------------------
+// ------------------- audio util function -------------------
+
+void group_audio_alloc_peer_buffer(uint32_t global_group_audio_acitve_number)
+{
+    TOX_ERR_CONFERENCE_PEER_QUERY error;
+    uint32_t num_peers = tox_conference_peer_count(tox_global,
+                                        global_group_audio_acitve_number,
+                                        &error);
+
+    if (error == TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+    {
+        global_group_audio_peerbuffers_buffer =
+                    (int16_t *)calloc(1, (size_t)(num_peers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2));
+        global_group_audio_peerbuffers_buffer_start_pos = (size_t *)calloc(1, (size_t)num_peers);
+        global_group_audio_peerbuffers_buffer_end_pos = (size_t *)calloc(1, (size_t)num_peers);
+        global_group_audio_peerbuffers = num_peers;
+    }
+}
+
+void group_audio_free_peer_buffer()
+{
+    free(global_group_audio_peerbuffers_buffer);
+    free(global_group_audio_peerbuffers_buffer_start_pos);
+    free(global_group_audio_peerbuffers_buffer_end_pos);
+}
+
+uint32_t group_audio_get_samples_in_buffer(uint32_t peernumber)
+{
+    return (uint32_t)(Pipe_getUsed(
+                &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
+                &global_group_audio_peerbuffers_buffer_end_pos[peernumber]) * 2);
+}
+
+// return how many buffers have more or equal to `sample_count` samples available to read
+uint32_t group_audio_any_have_sample_count_in_buffer_count(uint32_t sample_count)
+{
+    uint32_t ret = 0;
+
+    long i;
+    uint32_t has_samples;
+    for(i=0;i<global_group_audio_peerbuffers;i++)
+    {
+        has_samples = group_audio_get_samples_in_buffer(i);
+        if (has_samples >= sample_count)
+        {
+            ret++;
+        }
+    }
+
+    return ret;
+}
+
+// return: allocated new pcm16 buffer, caller needs to free it after use (buffer contains exactly `num_samples` mixed samples)
+//         NULL -> some error
+int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
+{
+    uint32_t num_bufs_ready = group_audio_any_have_sample_count_in_buffer_count(num_samples);
+    // dbg(9, "group_audio_get_mixed_output_buffer:num_bufs_ready=%d", num_bufs_ready);
+
+    const size_t buf_size = (size_t)(num_samples * 2);
+
+    int16_t *ret_buf = (int16_t *)calloc(1, buf_size);
+    if (!ret_buf)
+    {
+        return NULL;
+    }
+
+    int16_t *temp_buf = (int16_t *)calloc(1, buf_size);
+
+    if (!temp_buf)
+    {
+        free(ret_buf);
+        return NULL;
+    }
+
+    long i;
+    uint32_t has_samples;
+    for(i=0;i<global_group_audio_peerbuffers;i++)
+    {
+        // dbg(9, "group_audio_get_mixed_output_buffer:peer=%d", i);
+
+        has_samples = group_audio_get_samples_in_buffer(i);
+        if (has_samples >= num_samples)
+        {
+            // dbg(9, "group_audio_get_mixed_output_buffer:peer has=%d", i);
+
+            // read and mix from this buffer
+            memset(temp_buf, 0, buf_size);
+            group_audio_read_buffer((uint32_t)(i), num_samples, temp_buf);
+            
+            // ------ now mix it ---------------------------------
+            uint32_t j;
+            for(j=0;j<num_samples;j++)
+            {
+                // dbg(9, "group_audio_get_mixed_output_buffer:j=%d", j);
+
+#if 0
+                int32_t mixed_sample = (int32_t)ret_buf[j] + (int32_t)((float)temp_buf[j] / (float)(num_bufs_ready * 0.8f));
+
+                // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:before=%d", mixed_sample);
+
+                if (mixed_sample > INT16_MAX)
+                {
+                    ret_buf[j] = INT16_MAX;
+                }
+                else if (mixed_sample < INT16_MIN)
+                {
+                    ret_buf[j] = INT16_MIN;
+                }
+                else
+                {
+                    ret_buf[j] = (int16_t)mixed_sample;
+                }
+#endif
+
+                ret_buf[j] = temp_buf[j];
+
+                // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:after=%d", mixed_sample);
+            }
+            // ------ now mix it ---------------------------------
+        }
+    }
+
+    free(temp_buf);
+
+    return ret_buf;
+}
+
+
+void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samples)
+{
+    Pipe_write((const char*)pcm, (size_t)(num_samples * 2),
+            global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber),
+            &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
+            &global_group_audio_peerbuffers_buffer_end_pos[peernumber]);
+}
+
+void group_audio_read_buffer(uint32_t peernumber, uint32_t num_samples, int16_t *ret_buffer)
+{
+    if (!ret_buffer)
+    {
+        return;
+    }
+
+    Pipe_read((char *)ret_buffer, (size_t)(num_samples * 2),
+            global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber),
+            &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
+            &global_group_audio_peerbuffers_buffer_end_pos[peernumber]);
+}
+
+float interpolate_linear(int16_t start, int16_t end, float interpolation_position)
+{
+    if (interpolation_position <= 0.0)
+    {
+        return (float)start;
+    }
+    else if (interpolation_position >= 1.0)
+    {
+        return (float)end;
+    }
+    else
+    {
+        return (
+                ((1.0f - interpolation_position) * (float)start)
+                +
+                (interpolation_position * (float)end)
+               );
+    }
+}
+
+
+// allowed input sample rates: 8000, 12000, 16000, 24000, 48000
+//
+// return: allocated new pcm16 buffer, caller needs to free it after use
+//         NULL -> some error
+int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, uint32_t *sample_count_new)
+{
+    if (sample_count < 2)
+    {
+        return NULL;
+    }
+
+    int upsample_factor = 1;
+
+    if (sampling_rate == 8000)
+    {
+        upsample_factor = 6;
+    }
+    else if (sampling_rate == 12000)
+    {
+        upsample_factor = 4;
+    }
+    else if (sampling_rate == 16000)
+    {
+        upsample_factor = 3;
+    }
+    else if (sampling_rate == 24000)
+    {
+        upsample_factor = 2;
+    }
+    else if (sampling_rate == 48000)
+    {
+        return NULL;
+    }
+    else
+    {
+        return NULL;
+    }
+    
+    if (!sample_count_new)
+    {
+        return NULL;
+    }
+    
+    *sample_count_new = sample_count * upsample_factor;
+
+    int32_t new_buffer_byte_size =  (*sample_count_new) * 2;
+    int16_t *new_pcm_buffer = calloc(1, (size_t)new_buffer_byte_size); // 48kHz , mono, PCM Int16 signed
+    int16_t *new_pcm_buffer_pos = new_pcm_buffer;
+
+    int32_t i;
+    int32_t j;
+    int16_t *pcm_next;
+    for (i = 0; i < ((int32_t)sample_count - 1); i++)
+    {
+        for (j = 0; j < upsample_factor; j++)
+        {
+            pcm_next = pcm + 1;
+            *new_pcm_buffer_pos = (int16_t)interpolate_linear(*pcm, *pcm_next, j/upsample_factor);
+            new_pcm_buffer_pos++;
+            pcm++;
+            if (channels == 2)
+            {
+                pcm++;
+            }
+        }
+    }
+    *new_pcm_buffer_pos = *pcm;
+
+    return new_pcm_buffer;
+}
+
+
+void Pipe_reset(size_t *_rptr, size_t *_wptr)
+{
+    *_wptr = 0;
+    *_rptr = 0;
+}
+
+size_t Pipe_read(char* data, size_t bytes, void *_buf, size_t *_rptr, size_t *_wptr)
+{
+    bytes = min(bytes, Pipe_getUsed(_rptr, _wptr));
+    const size_t bytes_read1 = min(bytes, (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2) - *_rptr);
+    memcpy(data, (char *)_buf + *_rptr, bytes_read1);
+    memcpy(data + bytes_read1, _buf, bytes - bytes_read1);
+    Pipe_updateIndex(_rptr, bytes);
+    return bytes;
+}
+
+size_t Pipe_write(const char* data, size_t bytes, void *_buf, size_t *_rptr, size_t *_wptr)
+{
+    bytes = min(bytes, Pipe_getFree(_rptr, _wptr));
+    const size_t bytes_write1 = min(bytes, (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2) - *_wptr); 
+    memcpy((char *)_buf + *_wptr, data, bytes_write1);
+    memcpy(_buf, data + bytes_write1, bytes - bytes_write1);
+    Pipe_updateIndex(_wptr, bytes);
+    return bytes;
+}
+
+void Pipe_dump(void *_buf)
+{
+    printf("buf=");
+    int i;
+    for (i=0;i<(GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);i++)
+    {
+        printf("%d;", ((uint8_t *)_buf)[i]);
+    }
+    printf("\n");
+}
+
+size_t Pipe_getUsed(size_t *_rptr, size_t *_wptr)
+{
+    if (*_wptr >= *_rptr)
+    {
+        return *_wptr - *_rptr;
+    }
+    else
+    {
+        return (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2) - *_rptr + *_wptr;
+    }
+}
+
+void Pipe_updateIndex(size_t *index, size_t bytes)
+{
+    if (bytes >= (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2) - *index)
+    {
+        *index = *index + bytes - (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+    }
+    else
+    {
+        *index = *index + bytes;
+    }
+}
+
+size_t Pipe_getFree(size_t *_rptr, size_t *_wptr)
+{
+    return ((GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2) - 1 - *_wptr + *_rptr) % (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+}
+
+
+
+// ------------------- audio util function -------------------
+// ------------------- audio util function -------------------
+// ------------------- audio util function -------------------
 
 
 
