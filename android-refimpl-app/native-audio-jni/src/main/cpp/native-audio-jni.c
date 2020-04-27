@@ -974,6 +974,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
 
     if (nextSize > 0)
     {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A002x");
+
         if (recorderBufferQueue == NULL)
         {
             __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:01");
@@ -1046,7 +1048,11 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
             __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:03");
             return -2;
         }
+
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:088");
     }
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:099");
 
     return 0;
 }
