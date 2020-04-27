@@ -24,6 +24,7 @@ import android.util.Log;
 import com.zoffcc.applications.trifa.AudioRecording;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.Semaphore;
 
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
@@ -48,6 +49,7 @@ public class NativeAudio
     public static int[] n_rec_bytes_in_buffer = new int[n_rec_audio_in_buffer_max_count];
 
     public static boolean native_audio_engine_down = false;
+    public static Semaphore semaphore_audioprocessing_02 = new Semaphore(1);
 
     /**
      * problem switching to audio only
@@ -99,6 +101,15 @@ public class NativeAudio
      */
     public static void restartNativeAudioPlayEngine(int sampleRate, int channels)
     {
+        try
+        {
+            semaphore_audioprocessing_02.acquire();
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
         System.out.println("restartNativeAudioPlayEngine:sampleRate=" + sampleRate + " channels=" + channels);
 
         native_audio_engine_down = true;
@@ -146,9 +157,13 @@ public class NativeAudio
         }
 
         native_audio_engine_down = false;
-        Log.i(TAG, "audio_rec:StartREC:003");
+
+        Log.i(TAG, "audio_rec:StartREC:003:-restart-");
         NativeAudio.StartREC();
-        Log.i(TAG, "audio_rec:StartREC:004");
+        Log.i(TAG, "audio_rec:StartREC:004:-restart-");
+
+        semaphore_audioprocessing_02.release();
+
     }
 
     // ------- DEBUG -------

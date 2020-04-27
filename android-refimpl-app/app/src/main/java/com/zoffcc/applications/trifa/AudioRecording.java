@@ -38,6 +38,7 @@ import java.nio.ByteBuffer;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_rec_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.semaphore_audioprocessing_02;
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
@@ -113,6 +114,19 @@ public class AudioRecording extends Thread
     @Override
     public void run()
     {
+        if (PREF__use_native_audio_play)
+        {
+
+            try
+            {
+                semaphore_audioprocessing_02.acquire();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
         Log.i(TAG, "Running Audio Thread [OUT]");
         AudioRecord recorder = null;
 
@@ -206,10 +220,12 @@ public class AudioRecording extends Thread
 
         if (PREF__use_native_audio_play)
         {
-
             Log.i(TAG, "audio_rec:StartREC:001");
             NativeAudio.StartREC();
             Log.i(TAG, "audio_rec:StartREC:002");
+
+            semaphore_audioprocessing_02.release();
+
 
             while (!stopped)
             {

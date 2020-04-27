@@ -142,6 +142,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
@@ -3354,6 +3355,12 @@ public class MainActivity extends AppCompatActivity
         {
             if (PREF__use_native_audio_play)
             {
+                if (native_audio_engine_down == false)
+                {
+                    // native audio engine is down. lets wait for it to get up ...
+                    return;
+                }
+
                 // Log.i(TAG, "audio_play:NativeAudio Play:001");
                 if ((NativeAudio.sampling_rate != (int) sampling_rate_) || (NativeAudio.channel_count != channels_))
                 {
