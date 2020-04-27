@@ -325,8 +325,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
         activity_state = 1;
         push_to_talk_active = false;
 
-        toxav_groupchat_enable_av(get_conference_num_from_confid(conf_id));
-
         if (Build.VERSION.SDK_INT >= 27)
         {
             setShowWhenLocked(true);
@@ -428,6 +426,18 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }, 1000 / update_per_sec);
         //        // update every x times per second -----------
 
+
+        try
+        {
+            // let the audio engine start up
+            Thread.sleep(50);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        toxav_groupchat_enable_av(get_conference_num_from_confid(conf_id));
     }
 
     @Override

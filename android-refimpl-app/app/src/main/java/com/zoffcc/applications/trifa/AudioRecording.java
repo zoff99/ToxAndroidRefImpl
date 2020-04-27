@@ -73,6 +73,7 @@ public class AudioRecording extends Thread
     NoiseSuppressor np = null;
     public static boolean microphone_muted = false;
     static final boolean DEBUG_MIC_DATA_LOGGING = false;
+    static boolean audio_engine_starting = false;
 
     // -----------------------
     static ByteBuffer _recBuffer = null;
@@ -126,6 +127,8 @@ public class AudioRecording extends Thread
                 e.printStackTrace();
             }
         }
+
+        audio_engine_starting = true;
 
         Log.i(TAG, "Running Audio Thread [OUT]");
         AudioRecord recorder = null;
@@ -223,6 +226,8 @@ public class AudioRecording extends Thread
             Log.i(TAG, "audio_rec:StartREC:001");
             NativeAudio.StartREC();
             Log.i(TAG, "audio_rec:StartREC:002");
+
+            audio_engine_starting = false;
 
             semaphore_audioprocessing_02.release();
 

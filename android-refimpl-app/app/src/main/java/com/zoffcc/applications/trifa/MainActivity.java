@@ -145,6 +145,7 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_
 import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
+import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
@@ -3355,10 +3356,21 @@ public class MainActivity extends AppCompatActivity
         {
             if (PREF__use_native_audio_play)
             {
-                if (native_audio_engine_down == false)
+                if (audio_engine_starting)
                 {
                     // native audio engine is down. lets wait for it to get up ...
-                    return;
+                    while (audio_engine_starting == true)
+                    {
+                        try
+                        {
+                            Thread.sleep(20);
+                            Log.i(TAG, "group_audio_receive_frame:sleep --------");
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
                 // Log.i(TAG, "audio_play:NativeAudio Play:001");
@@ -7077,11 +7089,11 @@ public class MainActivity extends AppCompatActivity
     {
         if (is_vfs)
         {
-            Log.i(TAG, "file_to_bytebuffer:001");
+            // Log.i(TAG, "file_to_bytebuffer:001");
 
             info.guardianproject.iocipher.File file = new info.guardianproject.iocipher.File(filename_with_fullpath);
             int size = (int) file.length();
-            Log.i(TAG, "file_to_bytebuffer:002:size=" + size);
+            // Log.i(TAG, "file_to_bytebuffer:002:size=" + size);
             ByteBuffer ret = ByteBuffer.allocateDirect(size);
             byte[] bytes = new byte[size];
 
