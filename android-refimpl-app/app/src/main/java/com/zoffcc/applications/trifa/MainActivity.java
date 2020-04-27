@@ -3283,9 +3283,8 @@ public class MainActivity extends AppCompatActivity
             sampling_rate_ = sampling_rate;
             Log.i(TAG, "group_audio_receive_frame:read:incoming sampling_rate[1]=" + sampling_rate + " Hz");
             channels_ = channels;
-            Log.i(TAG,
-                  "group_audio_receive_frame:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" +
-                  sampling_rate);
+            Log.i(TAG, "group_audio_receive_frame:read:init sample_count=" + sample_count + " channels=" + channels +
+                       " sampling_rate=" + sampling_rate);
             temp_string_a =
                     "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) +
                     "s";
@@ -3343,7 +3342,8 @@ public class MainActivity extends AppCompatActivity
             if (native_aec_lib_ready)
             {
                 destroy_buffers();
-                Log.i(TAG, "group_audio_receive_frame:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
+                Log.i(TAG, "group_audio_receive_frame:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" +
+                           sampling_rate_);
                 init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
             }
 
@@ -3369,7 +3369,8 @@ public class MainActivity extends AppCompatActivity
                         destroy_buffers();
                         int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
                         Log.i(TAG,
-                              "group_audio_receive_frame:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
+                              "group_audio_receive_frame:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" +
+                              sampling_rate_);
                         init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
                     }
 
@@ -8995,7 +8996,12 @@ public class MainActivity extends AppCompatActivity
         java.io.File f_dst = new java.io.File(app_files_directory + "/" + "savedata.tox");
         try
         {
+            ls_file(f_src);
+            ls_file(f_dst);
+
             io_file_copy(f_src, f_dst);
+
+            ls_file(f_dst);
         }
         catch (Exception e)
         {
@@ -9003,8 +9009,20 @@ public class MainActivity extends AppCompatActivity
         }
 
         // after importing the file. just stop the app hard
-        tox_service_fg.stop_me(true);
-        // --> not static // global_start_tox();
+        // tox_service_fg.stop_me(true);
+        MainActivity.exit();
+    }
+
+    static void ls_file(File f)
+    {
+        try
+        {
+            Log.i(TAG, "ls_file:" + f.getAbsolutePath() + " size=" + f.length());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     static void io_file_copy(File src, File dst) throws java.io.IOException
