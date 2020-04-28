@@ -131,7 +131,7 @@ uint8_t *audio_rec_buffer[20];
 long audio_rec_buffer_size[20];
 int rec_buf_pointer_start = 0;
 int rec_buf_pointer_next = 0;
-int num_rec_bufs = 3;
+int num_rec_bufs = 3; // BAD: !!! always keep in sync with NavitAudio.java `public static final int n_rec_audio_in_buffer_max_count = 2;` !!!
 #define _RECORDING 3
 int rec_state = _STOPPED;
 #define RECORD_BUFFERS_BETWEEN_REC_AND_PROCESS 2
@@ -158,21 +158,6 @@ static SLEffectSendItf bqPlayerEffectSend;
 static SLMuteSoloItf bqPlayerMuteSolo;
 static SLVolumeItf bqPlayerVolume;
 static SLmilliHertz bqPlayerSampleRate = 0;
-static short *resampleBuf = NULL;
-
-// URI player interfaces
-static SLObjectItf uriPlayerObject = NULL;
-static SLPlayItf uriPlayerPlay;
-static SLSeekItf uriPlayerSeek;
-static SLMuteSoloItf uriPlayerMuteSolo;
-static SLVolumeItf uriPlayerVolume;
-
-// file descriptor player interfaces
-static SLObjectItf fdPlayerObject = NULL;
-static SLPlayItf fdPlayerPlay;
-static SLSeekItf fdPlayerSeek;
-static SLMuteSoloItf fdPlayerMuteSolo;
-static SLVolumeItf fdPlayerVolume;
 
 // recorder interfaces
 static SLObjectItf recorderObject = NULL;
@@ -403,7 +388,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *e
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine:class=%p", NativeAudio_class);
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine:method=%p",
-                        rec_buffer_ready_method);
+                        (void *)rec_buffer_ready_method);
     // find java methods ------------
 
 
@@ -443,7 +428,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                                                                                        jint num_bufs)
 {
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "createBufferQueueAudioPlayer:start:engineEngine=%p", engineEngine);
+                        "createBufferQueueAudioPlayer:start:engineEngine=%p", (const void *)engineEngine);
 
     SLresult result;
     if (sampleRate >= 0)
@@ -862,12 +847,12 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
             if (player_state_current != _PLAYING)
             {
                 // set the player's state
-                SLresult result;
-                result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+                SLresult result2;
+                result2 = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
                 __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                                     "player_state:res_010=%d SL_RESULT_SUCCESS=%d PLAYING",
-                                    (int) result, (int) SL_RESULT_SUCCESS);
-                (void) result;
+                                    (int) result2, (int) SL_RESULT_SUCCESS);
+                (void) result2;
 
                 player_state_current = _PLAYING;
             }
