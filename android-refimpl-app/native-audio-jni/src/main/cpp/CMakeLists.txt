@@ -1,6 +1,38 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall \
+-Wextra \
+-Weverything \
+-Wno-cast-align \
+-Wno-conversion \
+-Wno-covered-switch-default \
+-Wno-disabled-macro-expansion \
+-Wno-documentation-deprecated-sync \
+-Wno-format-nonliteral \
+-Wno-missing-field-initializers \
+-Wno-padded \
+-Wno-reserved-id-macro \
+-Wno-sign-compare \
+-Wno-thread-safety-analysis \
+-Wno-type-limits \
+-Wno-unused-parameter \
+-Wno-used-but-marked-unused \
+-Wno-vla \
+-Wno-documentation-unknown-command \
+\
+-Wno-missing-variable-declarations \
+-Wno-missing-prototypes \
+-Wno-error=deprecated-declarations \
+-Wno-error=unused-macros \
+-Wno-error=float-equal \
+-Wno-error=cast-qual \
+-Wno-error=strict-prototypes \
+-Wno-error=gnu-statement-expression \
+-Wno-documentation \
+-Werror \
+")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -fPIC")
 
 add_library(native-audio-jni SHARED
             native-audio-jni.c)
