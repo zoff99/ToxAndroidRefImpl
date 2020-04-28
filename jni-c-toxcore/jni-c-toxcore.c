@@ -4116,6 +4116,8 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     {
         return;
     }
+    
+    // dbg(9, "group_audio_callback_func:rate=%d samples=%d channels=%d peernumber=%d", (int)sample_rate, (int)samples, (int)channels, (int)peernumber);
 
     if ((channels == 1) && (sample_rate == 48000))
     {
@@ -5540,7 +5542,7 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
     }
     else if (sampling_rate == 48000)
     {
-        return NULL;
+        upsample_factor = 1;
     }
     else
     {
