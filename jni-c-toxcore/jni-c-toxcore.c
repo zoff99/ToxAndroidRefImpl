@@ -2227,10 +2227,12 @@ void *thread_av(void *data)
     dbg(9, "2003");
     dbg(2, "AV Thread #%d: starting", (int) id);
 
+    pthread_setname_np(pthread_self(), "t_av()");
+
     while(toxav_iterate_thread_stop != 1)
     {
         // usleep(toxav_iteration_interval(av) * 1000);
-        yieldcpu(100);
+        yieldcpu(200);
     }
 
     dbg(2, "ToxVideo:Clean thread exit!\n");
@@ -2253,6 +2255,9 @@ void *thread_video_av(void *data)
     dbg(2, "AV video Thread #%d: starting", (int) id);
     long av_iterate_interval = 1;
 
+    pthread_setname_np(pthread_self(), "t_v_iter()");
+
+
     while(toxav_video_thread_stop != 1)
     {
         toxav_iterate(av);
@@ -2266,7 +2271,7 @@ void *thread_video_av(void *data)
         }
         else
         {
-            usleep(800 * 1000);
+            usleep(300 * 1000);
         }
     }
 
@@ -2286,6 +2291,8 @@ void *thread_audio_av(void *data)
     dbg(2, "AV audio Thread #%d: starting", (int) id);
     long av_iterate_interval = 1;
 
+    pthread_setname_np(pthread_self(), "t_a_iter()");
+
     while(toxav_audio_thread_stop != 1)
     {
         toxav_audio_iterate(av);
@@ -2299,7 +2306,7 @@ void *thread_audio_av(void *data)
         }
         else
         {
-            usleep(800 * 1000);
+            usleep(300 * 1000);
         }
     }
 
