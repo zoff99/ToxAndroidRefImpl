@@ -94,16 +94,6 @@ public class AudioRecording extends Thread
         // AutomaticGainControl
         // LoudnessEnhancer
 
-        try
-        {
-            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "Audio Thread [OUT]:EETPr:" + e.getMessage());
-        }
         stopped = false;
         finished = false;
 
@@ -115,6 +105,18 @@ public class AudioRecording extends Thread
     @Override
     public void run()
     {
+        try
+        {
+            // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+            this.setName("AudioRecording");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Audio Thread [OUT]:EETPr:" + e.getMessage());
+        }
+
         if (PREF__use_native_audio_play)
         {
 

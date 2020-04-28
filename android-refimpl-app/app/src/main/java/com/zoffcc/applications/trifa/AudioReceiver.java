@@ -65,15 +65,6 @@ public class AudioReceiver extends Thread
 
     public AudioReceiver()
     {
-        try
-        {
-            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
         stopped = false;
         finished = false;
         start();
@@ -201,6 +192,17 @@ public class AudioReceiver extends Thread
     {
         Log.i(TAG, "Running Audio Thread [IN]");
         track = null;
+
+        try
+        {
+            // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+            this.setName("AudioReceiver");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         try
         {

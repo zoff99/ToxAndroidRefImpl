@@ -648,6 +648,17 @@ public class TrifaToxService extends Service
             public void run()
             {
 
+                try
+                {
+                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+                    this.setName("tox_iterate()");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "Audio Thread [OUT]:EETPr:" + e.getMessage());
+                }
+
                 // ------ correct startup order ------
                 boolean old_is_tox_started = is_tox_started;
                 Log.i(TAG, "is_tox_started:==============================");
@@ -1392,11 +1403,12 @@ public class TrifaToxService extends Service
 
                     if ((Callstate.state != 0) || (Callstate.audio_group_active))
                     {
-                        tox_iteration_interval_ms = 5; // if we are in a video/audio call or in a group audio call iterate more often
+                        tox_iteration_interval_ms = 10; // if we are in a video/audio call or in a group audio call iterate more often
                     }
                     else
                     {
-                        tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
+                        tox_iteration_interval_ms = Math.max(100, MainActivity.tox_iteration_interval());
+                        // Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
                     }
 
                     // --- send pending 1-on-1 text messages here --------------
