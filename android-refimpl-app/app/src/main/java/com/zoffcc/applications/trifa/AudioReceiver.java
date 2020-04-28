@@ -65,15 +65,15 @@ public class AudioReceiver extends Thread
 
     public AudioReceiver()
     {
-        //        try
-        //        {
-        //            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        //            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            e.printStackTrace();
-        //        }
+        try
+        {
+            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         stopped = false;
         finished = false;
         start();
