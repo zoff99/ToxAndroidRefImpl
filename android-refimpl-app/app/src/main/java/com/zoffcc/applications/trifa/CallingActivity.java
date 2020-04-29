@@ -55,6 +55,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.etiennelawlor.discreteslider.library.ui.DiscreteSlider;
+import com.google.speech.levelmeter.BarLevelDrawable;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
@@ -67,6 +68,8 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffer
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.set_audio_delay;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
@@ -156,6 +159,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     View box_right_video_add_delay_slider_01 = null;
     static SeekBar video_add_delay_slider_seekbar_01 = null;
     static TextView video_add_delay_slider_infotext_01 = null;
+    BarLevelDrawable audio_bar_in_v = null;
+    BarLevelDrawable audio_bar_out_v = null;
     static int activity_state = 0;
     com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
     static int quality_slider_position = 0;
@@ -238,6 +243,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
         misc_button = (ImageButton) findViewById(R.id.misc_button);
         misc_button_pad = (TextView) findViewById(R.id.misc_button_pad);
+
+        audio_bar_in_v = (BarLevelDrawable) findViewById(R.id.audio_bar_in_v);
+        audio_bar_out_v = (BarLevelDrawable) findViewById(R.id.audio_bar_out_v);
 
         if (PREF__window_security)
         {
@@ -1060,6 +1068,19 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     }
 
+    void update_call_audio_bars()
+    {
+        try
+        {
+            audio_bar_in_v.setLevel(get_vu_in() / 90.0f);
+            audio_bar_out_v.setLevel(get_vu_out() / 100.0f);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public static void set_av_latency()
     {
         try
@@ -1292,7 +1313,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensor_manager.registerListener(this, accelerometer_sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-
         try
         {
             ap = new AudioProcessing();
@@ -1372,6 +1392,26 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         }, 1000);
         // update call time every second -----------
+
+        // update every x times per second -----------
+        final int update_per_sec = 8;
+        final Handler ha2 = new Handler();
+        ha.postDelayed(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                // Log.i(TAG, "update_call_time -> call");
+                update_call_audio_bars();
+                if (activity_state != 0)
+                {
+                    ha2.postDelayed(this, 1000 / update_per_sec);
+                }
+            }
+        }, 1000 / update_per_sec);
+        // update every x times per second -----------
+
 
         Log.i(TAG, "onResume:99");
     }
@@ -2542,8 +2582,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
 
-//            video_encoder_format.setInteger(MediaFormat.KEY_BITRATE_MODE,
-//                                            MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            //            video_encoder_format.setInteger(MediaFormat.KEY_BITRATE_MODE,
+            //                                            MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
 
             video_encoder_format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
             video_encoder_format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);

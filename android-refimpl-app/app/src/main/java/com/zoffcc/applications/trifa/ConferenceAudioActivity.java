@@ -424,7 +424,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 }
             }
         }, 1000 / update_per_sec);
-        //        // update every x times per second -----------
+        // update every x times per second -----------
 
 
         try

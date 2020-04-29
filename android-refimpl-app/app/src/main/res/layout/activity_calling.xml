@@ -223,6 +223,29 @@
                 </LinearLayout>
             </FrameLayout>
 
+            <LinearLayout
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="0dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center_horizontal|bottom"
+                    android:text="I"
+                    android:textColor="@color/md_white_1000"
+                    android:textSize="5sp" />
+
+                <com.google.speech.levelmeter.BarLevelDrawable
+                    android:id="@+id/audio_bar_in_v"
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="30dp"
+                    android:elevation="10dp" />
+            </LinearLayout>
+
             <ImageView
                 android:id="@+id/caller_avatar_view"
                 android:layout_width="match_parent"
@@ -234,6 +257,31 @@
                 android:layout_marginRight="2dp"
                 android:elevation="20dp"
                 android:background="@android:color/black" />
+
+            <LinearLayout
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_marginRight="0dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center_horizontal|bottom"
+                    android:text="O"
+                    android:textColor="@color/md_white_1000"
+                    android:textSize="5sp" />
+
+                <com.google.speech.levelmeter.BarLevelDrawable
+                    android:id="@+id/audio_bar_out_v"
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="30dp"
+                    android:elevation="10dp" />
+            </LinearLayout>
+
 
             <FrameLayout
                 android:id="@+id/video_box_self_preview_01"
