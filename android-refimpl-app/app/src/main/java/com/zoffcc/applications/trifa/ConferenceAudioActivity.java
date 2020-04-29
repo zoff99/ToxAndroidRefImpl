@@ -556,7 +556,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 audio_bar_in.setLevel(0.0);
             }
 
-            audio_bar_out.setLevel(get_vu_out() / 100.0f);
+            audio_bar_out.setLevel(get_vu_out() / 120.0f);
         }
         catch (Exception e)
         {
