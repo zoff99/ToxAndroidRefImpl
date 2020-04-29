@@ -213,7 +213,7 @@ uint8_t global_av_call_active = 0;
 int audio_play_volume_percent_c = 10;
 float volumeMultiplier = -20.0f;
 
-#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 60
+#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 40
 long global_group_audio_acitve_num = -1;
 long global_group_audio_peerbuffers = -1;
 uint64_t global_group_audio_last_process_incoming = 0;
@@ -2227,10 +2227,12 @@ void *thread_av(void *data)
     dbg(9, "2003");
     dbg(2, "AV Thread #%d: starting", (int) id);
 
+    pthread_setname_np(pthread_self(), "t_av()");
+
     while(toxav_iterate_thread_stop != 1)
     {
         // usleep(toxav_iteration_interval(av) * 1000);
-        yieldcpu(100);
+        yieldcpu(200);
     }
 
     dbg(2, "ToxVideo:Clean thread exit!\n");
@@ -2253,6 +2255,9 @@ void *thread_video_av(void *data)
     dbg(2, "AV video Thread #%d: starting", (int) id);
     long av_iterate_interval = 1;
 
+    pthread_setname_np(pthread_self(), "t_v_iter()");
+
+
     while(toxav_video_thread_stop != 1)
     {
         toxav_iterate(av);
@@ -2266,7 +2271,7 @@ void *thread_video_av(void *data)
         }
         else
         {
-            usleep(800 * 1000);
+            usleep(300 * 1000);
         }
     }
 
@@ -2286,6 +2291,8 @@ void *thread_audio_av(void *data)
     dbg(2, "AV audio Thread #%d: starting", (int) id);
     long av_iterate_interval = 1;
 
+    pthread_setname_np(pthread_self(), "t_a_iter()");
+
     while(toxav_audio_thread_stop != 1)
     {
         toxav_audio_iterate(av);
@@ -2295,11 +2302,11 @@ void *thread_audio_av(void *data)
         //usleep((av_iterate_interval / 2) * 1000);
         if(global_av_call_active == 1)
         {
-            usleep(8 * 1000);
+            usleep(5 * 1000);
         }
         else
         {
-            usleep(800 * 1000);
+            usleep(300 * 1000);
         }
     }
 
@@ -4109,6 +4116,8 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     {
         return;
     }
+    
+    // dbg(9, "group_audio_callback_func:rate=%d samples=%d channels=%d peernumber=%d", (int)sample_rate, (int)samples, (int)channels, (int)peernumber);
 
     if ((channels == 1) && (sample_rate == 48000))
     {
@@ -4154,9 +4163,13 @@ void process_incoming_group_audio_on_iterate()
 
     if ((global_group_audio_last_process_incoming + (PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS - 5)) <= current_time_monotonic_default())
     {
-        // dbg(9, "group_audio_callback_func:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
-        global_group_audio_last_process_incoming = current_time_monotonic_default();
-        need_process_output = 1;
+        uint32_t count_ready_buffers = group_audio_any_have_sample_count_in_buffer_count(want_sample_count_40ms);
+        if (count_ready_buffers > 0)
+        {
+            // dbg(9, "group_audio_callback_func:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
+            global_group_audio_last_process_incoming = current_time_monotonic_default();
+            need_process_output = 1;
+        }
     }
     else if (global_group_audio_last_process_incoming == 0)
     {
@@ -5421,7 +5434,7 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
             {
                 // dbg(9, "group_audio_get_mixed_output_buffer:j=%d", j);
 
-#if 0
+#if 1
                 int32_t mixed_sample = (int32_t)ret_buf[j] + (int32_t)((float)temp_buf[j] / (float)(num_bufs_ready * 0.8f));
 
                 // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:before=%d", mixed_sample);
@@ -5438,9 +5451,11 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
                 {
                     ret_buf[j] = (int16_t)mixed_sample;
                 }
-#endif
 
+#else
                 ret_buf[j] = temp_buf[j];
+
+#endif
 
                 // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:after=%d", mixed_sample);
             }
@@ -5527,7 +5542,7 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
     }
     else if (sampling_rate == 48000)
     {
-        return NULL;
+        upsample_factor = 1;
     }
     else
     {
