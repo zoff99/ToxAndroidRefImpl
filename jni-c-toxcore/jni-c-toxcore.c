@@ -220,7 +220,11 @@ uint64_t global_group_audio_last_process_incoming = 0;
 int16_t *global_group_audio_peerbuffers_buffer = NULL;
 size_t *global_group_audio_peerbuffers_buffer_start_pos = NULL; // byte position inside the buffer where valid data starts
 size_t *global_group_audio_peerbuffers_buffer_end_pos = NULL; // byte position inside the buffer where valid can be added at
-#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES ((48000*(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 3)/1000) * 2) // XY ms PCM16 buffer @48kHz mono int16_t values
+int16_t *group_audio___ret_buf = NULL;
+int16_t *group_audio___temp_buf = NULL;
+int16_t *group_audio___new_pcm_buffer = NULL;
+
+#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES ((48000*(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 5)/1000) * 2) // XY ms PCM16 buffer @48kHz mono int16_t values
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -4151,7 +4155,7 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     {
         // use new_pcm_buffer with upsampled data
         group_audio_add_buffer(peernumber, new_pcm_buffer, sample_count_new);
-        free(new_pcm_buffer);
+        // free(new_pcm_buffer);
     }
 }
 
@@ -4222,7 +4226,7 @@ void process_incoming_group_audio_on_iterate()
                                          (jlong)48000
                                         );
 
-                free(pcm_mixed);
+                // free(pcm_mixed);
             }
         }
         else
@@ -5357,6 +5361,11 @@ void group_audio_alloc_peer_buffer(uint32_t global_group_audio_acitve_number)
 
     if (error == TOX_ERR_CONFERENCE_PEER_QUERY_OK)
     {
+        group_audio___ret_buf = (int16_t *)calloc(1, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+        group_audio___temp_buf = (int16_t *)calloc(1, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+        group_audio___new_pcm_buffer = (int16_t *)calloc(1, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+        
+        
         global_group_audio_peerbuffers_buffer =
                     (int16_t *)calloc(1, (size_t)(num_peers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2));
         global_group_audio_peerbuffers_buffer_start_pos = (size_t *)calloc(1, (size_t)num_peers);
@@ -5370,6 +5379,9 @@ void group_audio_free_peer_buffer()
     free(global_group_audio_peerbuffers_buffer);
     free(global_group_audio_peerbuffers_buffer_start_pos);
     free(global_group_audio_peerbuffers_buffer_end_pos);
+    free(group_audio___ret_buf);
+    free(group_audio___temp_buf);
+    free(group_audio___new_pcm_buffer);
 }
 
 uint32_t group_audio_get_samples_in_buffer(uint32_t peernumber)
@@ -5412,17 +5424,19 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
 
     const size_t buf_size = (size_t)(num_samples * 2);
 
-    int16_t *ret_buf = (int16_t *)calloc(1, buf_size);
+    int16_t *ret_buf = group_audio___ret_buf;
     if (!ret_buf)
     {
         return NULL;
     }
 
-    int16_t *temp_buf = (int16_t *)calloc(1, buf_size);
+    memset(ret_buf, 0, buf_size);
+
+    int16_t *temp_buf = group_audio___temp_buf; // (int16_t *)calloc(1, buf_size);
 
     if (!temp_buf)
     {
-        free(ret_buf);
+        // free(ret_buf);
         return NULL;
     }
 
@@ -5482,7 +5496,7 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
         }
     }
 
-    free(temp_buf);
+    // free(temp_buf);
 
     return ret_buf;
 }
@@ -5586,8 +5600,9 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
     
     *sample_count_new = sample_count * upsample_factor;
 
-    int32_t new_buffer_byte_size =  (*sample_count_new) * 2;
-    int16_t *new_pcm_buffer = calloc(1, (size_t)new_buffer_byte_size); // 48kHz , mono, PCM Int16 signed
+    int32_t new_buffer_byte_size = (*sample_count_new) * 2;
+    int16_t *new_pcm_buffer = group_audio___new_pcm_buffer; // calloc(1, (size_t)new_buffer_byte_size); // 48kHz , mono, PCM Int16 signed
+    memset(new_pcm_buffer, 0, new_buffer_byte_size);
     int16_t *new_pcm_buffer_pos = new_pcm_buffer;
 
     int32_t i;
