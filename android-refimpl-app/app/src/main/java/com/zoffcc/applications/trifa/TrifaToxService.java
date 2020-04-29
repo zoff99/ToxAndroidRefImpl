@@ -1405,7 +1405,7 @@ public class TrifaToxService extends Service
                     {
                         if (Callstate.audio_group_active)
                         {
-                            tox_iteration_interval_ms = 10;
+                            tox_iteration_interval_ms = 4;
                         }
                         else
                         {
