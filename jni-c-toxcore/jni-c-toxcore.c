@@ -220,7 +220,7 @@ uint64_t global_group_audio_last_process_incoming = 0;
 int16_t *global_group_audio_peerbuffers_buffer = NULL;
 size_t *global_group_audio_peerbuffers_buffer_start_pos = NULL; // byte position inside the buffer where valid data starts
 size_t *global_group_audio_peerbuffers_buffer_end_pos = NULL; // byte position inside the buffer where valid can be added at
-#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES ((48000*(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 5)/1000) * 2) // XY ms PCM16 buffer @48kHz mono int16_t values
+#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES ((48000*(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 3)/1000) * 2) // XY ms PCM16 buffer @48kHz mono int16_t values
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -4111,7 +4111,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1add_1av_1groupchat(JNIEnv
 static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t peernumber,
                                       const int16_t *pcm, unsigned int samples, uint8_t channels, uint32_t
                                       sample_rate, void *userdata)
-{    
+{
+
+    if (global_group_audio_acitve_num != (long)groupnumber)
+    {
+        return;
+    }
+
     if (!pcm)
     {
         return;
@@ -4161,7 +4167,7 @@ void process_incoming_group_audio_on_iterate()
 
     const int want_sample_count_40ms = (int)(48000*PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS/1000);
 
-    if ((global_group_audio_last_process_incoming + (PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS - 5)) <= current_time_monotonic_default())
+    if ((global_group_audio_last_process_incoming + (PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS - 4)) <= current_time_monotonic_default())
     {
         uint32_t count_ready_buffers = group_audio_any_have_sample_count_in_buffer_count(want_sample_count_40ms);
         if (count_ready_buffers > 0)
@@ -4203,19 +4209,21 @@ void process_incoming_group_audio_on_iterate()
 
             if (pcm_mixed)
             {
+                // memset((void *)audio_buffer_pcm_2, 0,(size_t)audio_buffer_pcm_2_size);
                 memcpy((void *)audio_buffer_pcm_2, (void *)pcm_mixed, (size_t)(want_sample_count_40ms * 1 * 2));
+
+                JNIEnv *jnienv2;
+                jnienv2 = jni_getenv();
+                (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                         android_toxav_callback_group_audio_receive_frame_cb_method,
+                                         (jlong)(unsigned long long)global_group_audio_acitve_num,
+                                         (jlong)(unsigned long long)0,
+                                         (jlong)want_sample_count_40ms, (jint)1,
+                                         (jlong)48000
+                                        );
+
                 free(pcm_mixed);
             }
-
-            JNIEnv *jnienv2;
-            jnienv2 = jni_getenv();
-            (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-                                     android_toxav_callback_group_audio_receive_frame_cb_method,
-                                     (jlong)(unsigned long long)global_group_audio_acitve_num,
-                                     (jlong)(unsigned long long)0,
-                                     (jlong)want_sample_count_40ms, (jint)1,
-                                     (jlong)48000
-                                    );
         }
         else
         {
@@ -5397,6 +5405,11 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
     uint32_t num_bufs_ready = group_audio_any_have_sample_count_in_buffer_count(num_samples);
     // dbg(9, "group_audio_get_mixed_output_buffer:num_bufs_ready=%d", num_bufs_ready);
 
+    if (num_bufs_ready < 1)
+    {
+        return NULL;
+    }
+
     const size_t buf_size = (size_t)(num_samples * 2);
 
     int16_t *ret_buf = (int16_t *)calloc(1, buf_size);
@@ -5428,6 +5441,12 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
             memset(temp_buf, 0, buf_size);
             group_audio_read_buffer((uint32_t)(i), num_samples, temp_buf);
             
+            uint32_t damping_factor = (int32_t)((float)num_bufs_ready * 0.8f);
+            if (damping_factor < 1)
+            {
+                damping_factor = 1;
+            }
+            
             // ------ now mix it ---------------------------------
             uint32_t j;
             for(j=0;j<num_samples;j++)
@@ -5435,7 +5454,7 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
                 // dbg(9, "group_audio_get_mixed_output_buffer:j=%d", j);
 
 #if 1
-                int32_t mixed_sample = (int32_t)ret_buf[j] + (int32_t)((float)temp_buf[j] / (float)(num_bufs_ready * 0.8f));
+                int32_t mixed_sample = (int32_t)ret_buf[j] + (int32_t)( temp_buf[j] / damping_factor );
 
                 // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:before=%d", mixed_sample);
 
@@ -5471,6 +5490,17 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
 
 void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samples)
 {
+    size_t bytes_free = Pipe_getFree(&global_group_audio_peerbuffers_buffer_start_pos[peernumber],
+                                     &global_group_audio_peerbuffers_buffer_end_pos[peernumber]);
+
+    if ((size_t)(num_samples * 2) > bytes_free)
+    {
+        // not enough space in the ringbuffer
+        dbg(9, "group_audio_add_buffer:not enough space in the ringbuffer");
+        Pipe_reset(&global_group_audio_peerbuffers_buffer_start_pos[peernumber],
+                   &global_group_audio_peerbuffers_buffer_end_pos[peernumber]);
+    }
+
     Pipe_write((const char*)pcm, (size_t)(num_samples * 2),
             global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber),
             &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
@@ -5563,22 +5593,29 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
     int32_t i;
     int32_t j;
     int16_t *pcm_next;
+
     for (i = 0; i < ((int32_t)sample_count - 1); i++)
     {
+        pcm_next = pcm + 1;
+        if (channels == 2)
+        {
+            pcm_next++;
+        }
+
         for (j = 0; j < upsample_factor; j++)
         {
-            pcm_next = pcm + 1;
             *new_pcm_buffer_pos = (int16_t)interpolate_linear(*pcm, *pcm_next, j/upsample_factor);
             new_pcm_buffer_pos++;
+        }
+
+        pcm++;
+        if (channels == 2)
+        {
             pcm++;
-            if (channels == 2)
-            {
-                pcm++;
-            }
         }
     }
-    *new_pcm_buffer_pos = *pcm;
 
+    *new_pcm_buffer_pos = *pcm;
     return new_pcm_buffer;
 }
 
