@@ -1407,7 +1407,8 @@ public class TrifaToxService extends Service
                     }
                     else
                     {
-                        tox_iteration_interval_ms = Math.max(100, MainActivity.tox_iteration_interval());
+                        // tox_iteration_interval_ms = Math.max(100, MainActivity.tox_iteration_interval());
+                        tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
                         // Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
                     }
 
