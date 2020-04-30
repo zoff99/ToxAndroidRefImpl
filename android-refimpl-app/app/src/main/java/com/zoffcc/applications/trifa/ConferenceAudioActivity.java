@@ -116,6 +116,17 @@ public class ConferenceAudioActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         Log.i(TAG, "onCreate");
+
+        if (Build.VERSION.SDK_INT >= 27)
+        {
+            setTurnScreenOn(true);
+        }
+        else
+        {
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        }
+
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
 
