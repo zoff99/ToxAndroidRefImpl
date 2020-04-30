@@ -1405,11 +1405,11 @@ public class TrifaToxService extends Service
                     {
                         if (Callstate.audio_group_active)
                         {
-                            tox_iteration_interval_ms = 4;
+                            tox_iteration_interval_ms = 3; // if we are in a group audio call iterate more often
                         }
                         else
                         {
-                            tox_iteration_interval_ms = 10; // if we are in a video/audio call or in a group audio call iterate more often
+                            tox_iteration_interval_ms = 3; // if we are in a video/audio call iterate more often
                         }
                     }
                     else
