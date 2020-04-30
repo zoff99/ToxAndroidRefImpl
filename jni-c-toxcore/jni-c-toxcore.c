@@ -4127,6 +4127,12 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
                                       const int16_t *pcm, unsigned int samples, uint8_t channels, uint32_t
                                       sample_rate, void *userdata)
 {
+    // check first without locking
+    if (global_group_audio_acitve_num == -1)
+    {
+        return;
+    }
+
     if (!pcm)
     {
         return;
