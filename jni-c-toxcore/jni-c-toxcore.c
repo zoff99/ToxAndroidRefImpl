@@ -5594,7 +5594,7 @@ void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samp
         return;
     }
     
-    if (peernumber >= global_group_audio_peerbuffers)
+    if ((long)peernumber >= global_group_audio_peerbuffers)
     {
         return;
     }
@@ -5622,7 +5622,7 @@ void group_audio_read_buffer(uint32_t peernumber, uint32_t num_samples, int16_t 
 {
     // dbg(9, "group_audio_read_buffer:001");
 
-    if (peernumber >= global_group_audio_peerbuffers)
+    if ((long)peernumber >= global_group_audio_peerbuffers)
     {
         return;
     }
