@@ -1503,6 +1503,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+
         try
         {
             if (wl2 != null)
