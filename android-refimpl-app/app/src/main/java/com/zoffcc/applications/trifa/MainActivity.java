@@ -386,6 +386,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
     static int PREF__video_play_delay_ms = 180;
+    static int PREF__audio_group_play_volume_percent = 100;
     static boolean PREF__auto_accept_image = true;
 
     static String versionName = "";

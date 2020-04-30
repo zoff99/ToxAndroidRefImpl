@@ -22,11 +22,13 @@ package com.zoffcc.applications.trifa;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -35,6 +37,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.speech.levelmeter.BarLevelDrawable;
@@ -60,10 +63,13 @@ import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_volume_percent;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
@@ -99,6 +105,9 @@ public class ConferenceAudioActivity extends AppCompatActivity
     TextView ml_maintext = null;
     Button AudioGroupPushToTalkButton = null;
     static boolean push_to_talk_active = false;
+    static SeekBar group_volume_slider_seekbar_01 = null;
+    View group_box_right_volumeslider_01 = null;
+    private static float group_slider_alpha = 0.3f;
 
     Handler conferences_av_handler = null;
     static Handler conferences_av_handler_s = null;
@@ -124,6 +133,10 @@ public class ConferenceAudioActivity extends AppCompatActivity
         dha = new DetectHeadset(this);
 
         setContentView(R.layout.activity_conference_audio);
+
+        SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        PREF__audio_group_play_volume_percent = settings_cs1.getInt("audio_group_play_volume_percent", 100);
+        Log.i(TAG, "pref:get:PREF__audio_play_volume_percent=" + PREF__audio_group_play_volume_percent);
 
         caa = this;
 
@@ -202,6 +215,94 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         audio_bar_in = (BarLevelDrawable) findViewById(R.id.audio_bar_in);
         audio_bar_out = (BarLevelDrawable) findViewById(R.id.audio_bar_out);
+
+
+        group_box_right_volumeslider_01 = (View) findViewById(R.id.group_video_box_right_volumeslider_01);
+        group_box_right_volumeslider_01.setVisibility(View.VISIBLE);
+        group_box_right_volumeslider_01.setAlpha(group_slider_alpha);
+
+        group_volume_slider_seekbar_01 = (SeekBar) findViewById(R.id.group_volume_slider_seekbar);
+        group_volume_slider_seekbar_01.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                // Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:action:" + event.getAction());
+
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        group_box_right_volumeslider_01.setAlpha(group_slider_alpha);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
+                         (event.getAction() == MotionEvent.ACTION_CANCEL))
+                {
+                    try
+                    {
+                        group_box_right_volumeslider_01.setAlpha(1.0f);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
+                    }
+                }
+                return false;
+            }
+        });
+
+
+        group_volume_slider_seekbar_01.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        {
+            @Override
+            public void onProgressChanged(SeekBar s, int progress_value, boolean from_user)
+            {
+                if ((progress_value >= 0) && (progress_value <= 100))
+                {
+                    PREF__audio_group_play_volume_percent = progress_value;
+                    try
+                    {
+                        set_audio_play_volume_percent(PREF__audio_group_play_volume_percent);
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                    }
+                    try
+                    {
+                        SharedPreferences settings_cs2 = PreferenceManager.getDefaultSharedPreferences(
+                                getApplicationContext());
+                        settings_cs2.edit().putInt("audio_group_play_volume_percent",
+                                                   PREF__audio_group_play_volume_percent).apply();
+                        Log.i(TAG, "pref:set:PREF__audio_group_play_volume_percent=" +
+                                   PREF__audio_group_play_volume_percent);
+                    }
+                    catch (Exception ee)
+                    {
+                        ee.printStackTrace();
+                        Log.i(TAG, "pref:set:PREF__audio_group_play_volume_percent:EE:" + ee.getMessage());
+                    }
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar)
+            {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar)
+            {
+            }
+        });
+
 
         AudioGroupPushToTalkButton = (Button) findViewById(R.id.AudioGroupPushToTalkButton);
         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
@@ -295,6 +396,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         set_peer_count_header();
         set_peer_names_and_avatars();
+        set_audio_play_volume();
 
         Log.i(TAG, "onCreate:099");
     }
@@ -541,6 +643,42 @@ public class ConferenceAudioActivity extends AppCompatActivity
         {
             on_groupaudio_ended_actions(true);
         }
+    }
+
+    static void set_audio_play_volume()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                    {
+                        group_volume_slider_seekbar_01.setProgress(PREF__audio_group_play_volume_percent, true);
+                    }
+                    else
+                    {
+                        group_volume_slider_seekbar_01.setProgress(PREF__audio_group_play_volume_percent);
+                    }
+                }
+                catch (Exception ee)
+                {
+                    ee.printStackTrace();
+                }
+
+                try
+                {
+                    set_audio_play_volume_percent(PREF__audio_group_play_volume_percent);
+                }
+                catch (Exception ee)
+                {
+                    ee.printStackTrace();
+                }
+            }
+        };
+        ConferenceAudioActivity.conferences_av_handler_s.post(myRunnable);
     }
 
     void update_group_audio_bars()
@@ -1022,6 +1160,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
     // actions to take when group audio starts:
     static void on_groupaudio_started_actions()
     {
+        set_audio_play_volume();
     }
 
     // actions to take when group audio ends by:

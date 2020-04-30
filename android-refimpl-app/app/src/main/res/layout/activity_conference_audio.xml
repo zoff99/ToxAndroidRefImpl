@@ -128,7 +128,48 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="10" />
+                        android:layout_weight="2" />
+
+                    <FrameLayout
+                        android:id="@+id/group_video_box_right_volumeslider_01"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="3"
+                        android:layout_gravity="center|bottom"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginBottom="0dp"
+                        android:layout_marginRight="55dp"
+                        android:layout_marginLeft="55dp"
+                        android:background="@null"
+                        android:elevation="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@null"
+                            android:elevation="2dp"
+                            android:orientation="vertical">
+
+                            <SeekBar
+                                android:id="@+id/group_volume_slider_seekbar"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center"
+                                android:background="@null"
+                                android:elevation="8dp"
+                                android:indeterminate="false"
+                                android:max="100"
+                                android:progress="5" />
+
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="4" />
+
 
                 </LinearLayout>
 
