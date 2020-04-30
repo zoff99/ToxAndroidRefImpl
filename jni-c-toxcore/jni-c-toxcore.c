@@ -5500,6 +5500,30 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
 
     const size_t buf_size = (size_t)(num_samples * 2);
 
+    float damping_factor = (float)num_bufs_ready * 0.8f;
+    if (damping_factor < 1)
+    {
+        damping_factor = 1;
+    }
+    // dbg(9, "damping_factor:1=%f", damping_factor);
+
+    // ------------ change PCM volume here ------------
+        if(audio_play_volume_percent_c < 100)
+        {
+            if(audio_play_volume_percent_c == 0)
+            {
+                return NULL;
+            }
+            else
+            {
+                damping_factor = damping_factor / volumeMultiplier;
+                // dbg(9, "damping_factor:2=%f %f", damping_factor, volumeMultiplier);
+            }
+        }
+    // ------------ change PCM volume here ------------
+
+
+
     int16_t *ret_buf = (int16_t *)calloc(1, buf_size * 2);
     if (!ret_buf)
     {
@@ -5518,41 +5542,20 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
 
     long i;
     uint32_t has_samples;
-    // dbg(9, "group_audio_get_mixed_output_buffer:003");
     for(i=0;i<global_group_audio_peerbuffers;i++)
     {
-        // dbg(9, "group_audio_get_mixed_output_buffer:peer=%d", i);
-
-        // dbg(9, "group_audio_get_mixed_output_buffer:004");
         has_samples = group_audio_get_samples_in_buffer(i);
-        // dbg(9, "group_audio_get_mixed_output_buffer:005");
         if (has_samples >= num_samples)
         {
-            // dbg(9, "group_audio_get_mixed_output_buffer:peer has=%d", i);
-
             // read and mix from this buffer
-            // dbg(9, "group_audio_get_mixed_output_buffer:006");
             memset((void *)temp_buf, 0, buf_size);
-            // dbg(9, "group_audio_get_mixed_output_buffer:007");
             group_audio_read_buffer((uint32_t)(i), num_samples, temp_buf);
-            // dbg(9, "group_audio_get_mixed_output_buffer:008");
-            
-            uint32_t damping_factor = (int32_t)((float)num_bufs_ready * 0.8f);
-            if (damping_factor < 1)
-            {
-                damping_factor = 1;
-            }
-            
+
             // ------ now mix it ---------------------------------
             uint32_t j;
             for(j=0;j<num_samples;j++)
             {
-                // dbg(9, "group_audio_get_mixed_output_buffer:j=%d", j);
-
-#if 1
-                int32_t mixed_sample = (int32_t)ret_buf[j] + (int32_t)( temp_buf[j] / damping_factor );
-
-                // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:before=%d", mixed_sample);
+                int32_t mixed_sample = (int32_t)ret_buf[j] + (int32_t)( (float)temp_buf[j] / damping_factor );
 
                 if (mixed_sample > INT16_MAX)
                 {
@@ -5566,13 +5569,6 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
                 {
                     ret_buf[j] = (int16_t)mixed_sample;
                 }
-
-#else
-                ret_buf[j] = temp_buf[j];
-
-#endif
-
-                // dbg(9, "group_audio_get_mixed_output_buffer:mixed_sample:after=%d", mixed_sample);
             }
             // ------ now mix it ---------------------------------
         }
