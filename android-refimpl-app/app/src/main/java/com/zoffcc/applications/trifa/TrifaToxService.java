@@ -30,6 +30,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.Process;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -966,6 +967,8 @@ public class TrifaToxService extends Service
                 long tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
                 Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
 
+                boolean tox_iterate_thread_high_prio = false;
+
                 MainActivity.tox_iterate();
 
                 if (ADD_BOTS_ON_STARTUP)
@@ -1406,6 +1409,23 @@ public class TrifaToxService extends Service
                         if (Callstate.audio_group_active)
                         {
                             tox_iteration_interval_ms = 2; // if we are in a group audio call iterate more often
+
+                            if (!tox_iterate_thread_high_prio)
+                            {
+                                try
+                                {
+                                    tox_iterate_thread_high_prio = true;
+                                    this.setName("tox_iterate()+");
+                                    android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+                                    //android.os.Process.setThreadPriority(
+                                    //        android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                         else
                         {
@@ -1417,6 +1437,21 @@ public class TrifaToxService extends Service
                         // tox_iteration_interval_ms = Math.max(100, MainActivity.tox_iteration_interval());
                         tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
                         // Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
+
+                        if (tox_iterate_thread_high_prio)
+                        {
+                            try
+                            {
+                                tox_iterate_thread_high_prio = false;
+                                this.setName("tox_iterate()");
+                                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
                     }
 
                     // --- send pending 1-on-1 text messages here --------------
