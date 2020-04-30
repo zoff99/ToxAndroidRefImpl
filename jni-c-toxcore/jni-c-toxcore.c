@@ -4167,6 +4167,7 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
         if ((channels == 1) && (sample_rate == 48000))
         {
             group_audio_add_buffer(peernumber, (int16_t *)pcm, samples);
+            // dbg(9, "group_audio_callback_func:ADD:03");
         }
         else
         {
