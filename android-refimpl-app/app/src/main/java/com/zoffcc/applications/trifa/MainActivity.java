@@ -307,6 +307,7 @@ public class MainActivity extends AppCompatActivity
     static MessageListActivity message_list_activity = null;
     static ConferenceMessageListFragment conference_message_list_fragment = null;
     static ConferenceMessageListActivity conference_message_list_activity = null;
+    static ConferenceAudioActivity conference_audio_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
     static String SD_CARD_TMP_DIR = "";
@@ -5589,6 +5590,25 @@ public class MainActivity extends AppCompatActivity
                 {
                     e3.printStackTrace();
                 }
+
+                try
+                {
+                    if (conference_audio_activity != null)
+                    {
+                        Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
+
+                        if (conference_audio_activity.get_current_conf_id().equals(
+                                conf_temp.conference_identifier))
+                        {
+                            Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
+                            conference_audio_activity.update_group_all_users();
+                        }
+                    }
+                }
+                catch (Exception e3)
+                {
+                    e3.printStackTrace();
+                }
             }
         }
         catch (Exception e)
@@ -5596,7 +5616,8 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        update_savedata_file_wrapper();
+        // HINT: this is just too much
+        // update_savedata_file_wrapper();
     }
 
     // ------------------------
