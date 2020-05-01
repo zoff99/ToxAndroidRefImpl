@@ -67,6 +67,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
@@ -144,6 +145,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         dha = new DetectHeadset(this);
 
         setContentView(R.layout.activity_conference_audio);
+
+        conference_audio_activity = this;
 
         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         PREF__audio_group_play_volume_percent = settings_cs1.getInt("audio_group_play_volume_percent", 100);
@@ -433,6 +436,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         Log.i(TAG, "onResume");
         super.onResume();
 
+        conference_audio_activity = this;
+
         Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
         activity_state = 1;
@@ -556,6 +561,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
     @Override
     protected void onPause()
     {
+        conference_audio_activity = null;
+
         super.onPause();
 
         toxav_groupchat_disable_av(get_conference_num_from_confid(conf_id));
@@ -643,6 +650,11 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
     }
 
+    String get_current_conf_id()
+    {
+        return conf_id;
+    }
+
     @Override
     public void onBackPressed()
     {
@@ -723,6 +735,29 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
 
         return ret;
+    }
+
+    synchronized void update_group_all_users()
+    {
+        Log.d(TAG, "update_group_all_users:001");
+
+        try
+        {
+            set_peer_count_header();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            set_peer_names_and_avatars();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     synchronized void set_peer_count_header()
@@ -1105,6 +1140,50 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     public void show_add_friend_conference(View view)
     {
+        toxav_groupchat_disable_av(get_conference_num_from_confid(conf_id));
+
+        Callstate.audio_group_active = false;
+
+        conf_id = "-1";
+
+        push_to_talk_active = false;
+        activity_state = 0;
+
+        try
+        {
+            if (!AudioRecording.stopped)
+            {
+                AudioRecording.close();
+                audio_thread.join();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (!AudioReceiver.stopped)
+            {
+                AudioReceiver.close();
+                audio_receiver_thread.join();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            destroy_buffers();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         Log.i(TAG, "show_add_friend_conference");
         Intent intent = new Intent(this, FriendSelectSingleActivity.class);
         intent.putExtra("conf_id", conf_id);
