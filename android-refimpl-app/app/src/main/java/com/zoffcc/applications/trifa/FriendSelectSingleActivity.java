@@ -44,6 +44,7 @@ public class FriendSelectSingleActivity extends ListActivity
     {
         super.onCreate(savedInstanceState);
 
+        Log.i(TAG, "onCreate:001");
 
         List<FriendList> fl = null;
         try
@@ -70,8 +71,12 @@ public class FriendSelectSingleActivity extends ListActivity
             this.finish();
         }
 
+        Log.i(TAG, "onCreate:002");
+
         try
         {
+            Log.i(TAG, "onCreate:003");
+
             int i = 0;
             int j = 0;
             for (i = 0; i < fl.size(); i++)
@@ -86,12 +91,18 @@ public class FriendSelectSingleActivity extends ListActivity
                 }
             }
 
+            Log.i(TAG, "onCreate:004");
+
             if (j == 0)
             {
                 this.finish();
             }
 
+            Log.i(TAG, "onCreate:005");
+
             String[] friend_pubkey_and_names = new String[j];
+
+            Log.i(TAG, "onCreate:006");
 
             for (i = 0; i < j; i++)
             {
@@ -114,11 +125,26 @@ public class FriendSelectSingleActivity extends ListActivity
                         friend_pubkey_and_names[i] = fl.get(i).tox_public_key_string + ":\n\n" + fl.get(i).alias_name;
                     }
                 }
+
+                // Log.i(TAG, "onCreate:006b:res=" + friend_pubkey_and_names[i]);
+
+                if (friend_pubkey_and_names[i]== null)
+                {
+                    friend_pubkey_and_names[i]="***";
+                }
+                else if(friend_pubkey_and_names[i].length()==0)
+                {
+                    friend_pubkey_and_names[i]="+++";
+                }
             }
+
+            Log.i(TAG, "onCreate:007");
 
             this.setListAdapter(
                     new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, friend_pubkey_and_names));
             ListView lv = getListView();
+
+            Log.i(TAG, "onCreate:008");
 
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
             {
@@ -157,11 +183,16 @@ public class FriendSelectSingleActivity extends ListActivity
                     finish();
                 }
             });
+
+            Log.i(TAG, "onCreate:009");
+
         }
         catch (Exception e)
         {
             e.printStackTrace();
             this.finish();
         }
+
+        Log.i(TAG, "onCreate:010");
     }
 }
