@@ -1198,7 +1198,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // dont let the user use the back button to close the activity
     }
 
-
     //    private final Runnable mHidePart2Runnable = new Runnable()
     //    {
     //        @SuppressLint("InlinedApi")
@@ -1470,7 +1469,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
         }
     }
-
 
     @Override
     protected void onPause()

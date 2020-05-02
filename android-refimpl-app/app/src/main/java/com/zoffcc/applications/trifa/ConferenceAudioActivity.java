@@ -23,6 +23,7 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Build;
@@ -64,7 +65,6 @@ import static com.zoffcc.applications.trifa.HelperConference.is_conference_activ
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_volume_percent;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
@@ -109,6 +109,9 @@ public class ConferenceAudioActivity extends AppCompatActivity
     static SeekBar group_volume_slider_seekbar_01 = null;
     View group_box_right_volumeslider_01 = null;
     private static float group_slider_alpha = 0.3f;
+    static ImageView group_audio_device_icon = null;
+    static ImageView group_audio_send_icon = null;
+
 
     Handler conferences_av_handler = null;
     static Handler conferences_av_handler_s = null;
@@ -230,6 +233,11 @@ public class ConferenceAudioActivity extends AppCompatActivity
         audio_bar_in = (BarLevelDrawable) findViewById(R.id.audio_bar_in);
         audio_bar_out = (BarLevelDrawable) findViewById(R.id.audio_bar_out);
 
+        group_audio_device_icon = (ImageView) findViewById(R.id.group_audio_device_icon);
+        group_audio_send_icon = (ImageView) findViewById(R.id.group_audio_send_icon);
+
+        group_audio_device_icon.setVisibility(View.VISIBLE);
+        group_audio_send_icon.setVisibility(View.VISIBLE);
 
         group_box_right_volumeslider_01 = (View) findViewById(R.id.group_video_box_right_volumeslider_01);
         group_box_right_volumeslider_01.setVisibility(View.VISIBLE);
@@ -347,6 +355,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
                         AudioGroupPushToTalkButton.setText("Push to Talk");
                         push_to_talk_active = false;
+                        update_group_audio_send_icon(0);
+                        AudioRecording.global_audio_group_send_res = -999;
                     }
                     catch (Exception e)
                     {
@@ -395,18 +405,23 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 manager.setWiredHeadsetOn(true);
                 Callstate.audio_device = 1;
                 Callstate.audio_speaker = false;
+                update_group_audio_device_icon();
                 manager.setBluetoothScoOn(false);
             }
             else
             {
+                group_audio_device_icon.setImageDrawable(null);
                 Log.i(TAG, "onReceive:headset:setImageDrawable:null1");
             }
         }
         catch (Exception ee)
         {
             ee.printStackTrace();
+            group_audio_device_icon.setImageDrawable(null);
             Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
         }
+
+        update_group_audio_send_icon(0);
 
         set_peer_count_header();
         set_peer_names_and_avatars();
@@ -562,6 +577,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
     protected void onPause()
     {
         conference_audio_activity = null;
+        AudioRecording.global_audio_group_send_res = -999;
 
         super.onPause();
 
@@ -617,6 +633,73 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         Log.i(TAG, "onPause:on_groupaudio_ended_actions");
         on_groupaudio_ended_actions(need_close_activity);
+    }
+
+    static void update_group_audio_send_icon(int state)
+    {
+        if (state == 0)
+        {
+            group_audio_send_icon.setImageDrawable(null);
+        }
+        else if (state == 1)
+        {
+            Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_play_circle_outline).backgroundColor(
+                    Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+            group_audio_send_icon.setImageDrawable(d4);
+        }
+        else
+        {
+            Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_report).backgroundColor(
+                    Color.TRANSPARENT).color(caa.getResources().getColor(R.color.md_red_800)).sizeDp(80);
+            group_audio_send_icon.setImageDrawable(d4);
+        }
+    }
+
+    static void update_group_audio_device_icon()
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Log.i(TAG, "update_group_audio_device_icon:enter");
+
+                    if (Callstate.audio_device == 0)
+                    {
+                        Log.i(TAG, "update_group_audio_device_icon:clear");
+                        group_audio_device_icon.setImageDrawable(null);
+                    }
+                    else if (Callstate.audio_device == 1)
+                    {
+                        Log.i(TAG, "update_group_audio_device_icon:headset");
+                        Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(
+                                Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(
+                                80);
+                        group_audio_device_icon.setImageDrawable(d4);
+                    }
+                    else if (Callstate.audio_device == 2)
+                    {
+                        Log.i(TAG, "update_group_audio_device_icon:bluetooth");
+                        Drawable d4 = new IconicsDrawable(caa).icon(
+                                GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
+                                caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        group_audio_device_icon.setImageDrawable(d4);
+                    }
+                    else // audio_device == ??
+                    {
+                        Log.i(TAG, "update_group_audio_device_icon:null");
+                        group_audio_device_icon.setImageDrawable(null);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "update_group_audio_device_icon:EE:" + e.getMessage());
+                }
+            }
+        };
+        conferences_av_handler_s.post(myRunnable);
     }
 
     public void set_conference_connection_status_icon()

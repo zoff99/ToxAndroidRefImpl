@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_audio_device_icon;
+import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group_audio_device_icon;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 
 class HeadsetStateReceiver extends BroadcastReceiver
@@ -23,7 +24,7 @@ class HeadsetStateReceiver extends BroadcastReceiver
             }
 
 
-            if (CallingActivity.activity_state == 1)
+            if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1))
             {
                 if (intent.getAction().equals("android.intent.action.HEADSET_PLUG"))
                 {
@@ -36,7 +37,20 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         audio_manager_s.setSpeakerphoneOn(false);
                         audio_manager_s.setWiredHeadsetOn(true);
                         Callstate.audio_device = 1;
-                        update_audio_device_icon();
+                        try
+                        {
+                            update_audio_device_icon();
+                        }
+                        catch(Exception e2)
+                        {
+                        }
+                        try
+                        {
+                            update_group_audio_device_icon();
+                        }
+                        catch(Exception e2)
+                        {
+                        }
                         audio_manager_s.setBluetoothScoOn(false);
                     }
                     else
@@ -45,7 +59,20 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         Log.i(TAG, "onReceive:headset:unplugged");
                         audio_manager_s.setWiredHeadsetOn(false);
                         Callstate.audio_device = 0;
-                        update_audio_device_icon();
+                        try
+                        {
+                            update_audio_device_icon();
+                        }
+                        catch(Exception e2)
+                        {
+                        }
+                        try
+                        {
+                            update_group_audio_device_icon();
+                        }
+                        catch(Exception e2)
+                        {
+                        }
                         if (Callstate.audio_speaker)
                         {
                             audio_manager_s.setSpeakerphoneOn(true);
@@ -65,11 +92,12 @@ class HeadsetStateReceiver extends BroadcastReceiver
 
         try
         {
-            if (CallingActivity.activity_state == 1)
+            if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1))
             {
                 if (intent.getAction().equals("android.media.ACTION_SCO_AUDIO_STATE_UPDATED"))
                 {
-                    Log.i(TAG, "onReceive:" + intent + ":" + intent.getStringExtra("EXTRA_SCO_AUDIO_STATE") + ":" + intent.getStringExtra("EXTRA_SCO_AUDIO_PREVIOUS_STATE"));
+                    Log.i(TAG, "onReceive:" + intent + ":" + intent.getStringExtra("EXTRA_SCO_AUDIO_STATE") + ":" +
+                               intent.getStringExtra("EXTRA_SCO_AUDIO_PREVIOUS_STATE"));
                 }
             }
         }

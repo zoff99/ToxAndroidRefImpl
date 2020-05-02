@@ -42,6 +42,8 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.semaphore_audiopro
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
+import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk_active;
+import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group_audio_send_icon;
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
@@ -74,6 +76,7 @@ public class AudioRecording extends Thread
     public static boolean microphone_muted = false;
     static final boolean DEBUG_MIC_DATA_LOGGING = false;
     static boolean audio_engine_starting = false;
+    static int global_audio_group_send_res = -9999;
 
     // -----------------------
     static ByteBuffer _recBuffer = null;
@@ -467,14 +470,53 @@ public class AudioRecording extends Thread
 
                     if (Callstate.audio_group_active)
                     {
-                        if (ConferenceAudioActivity.push_to_talk_active)
+                        if (push_to_talk_active)
                         {
                             int audio_group_send_res = toxav_group_send_audio(
                                     get_conference_num_from_confid(ConferenceAudioActivity.conf_id),
                                     (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                            if (audio_group_send_res != 0)
+
+                            //Log.i(TAG,
+                            //      "audio_group_send_res__global_audio_group_send_res=" + audio_group_send_res + " " +
+                            //      global_audio_group_send_res);
+
+                            if (audio_group_send_res != global_audio_group_send_res)
                             {
-                                Log.i(TAG, "toxav_group_send_audio:res=" + audio_group_send_res);
+                                if (push_to_talk_active)
+                                {
+                                    if (audio_group_send_res == 0)
+                                    {
+                                        try
+                                        {
+                                            update_group_audio_send_icon(1);
+                                        }
+                                        catch(Exception e2)
+                                        {
+                                        }
+                                        global_audio_group_send_res = audio_group_send_res;
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            update_group_audio_send_icon(2);
+                                        }
+                                        catch(Exception e2)
+                                        {
+                                        }
+                                        global_audio_group_send_res = audio_group_send_res;
+                                    }
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        update_group_audio_send_icon(0);
+                                    }
+                                    catch(Exception e2)
+                                    {
+                                    }
+                                }
                             }
                         }
                     }

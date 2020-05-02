@@ -111,7 +111,54 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="10" />
+                        android:layout_weight="2" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="6"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_weight="2"
+                            android:layout_height="1dp" />
+
+                        <ImageView
+                            android:id="@+id/group_audio_device_icon"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:elevation="10dp"
+                            android:src="@null" />
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_weight="2"
+                            android:layout_height="1dp" />
+
+                        <ImageView
+                            android:id="@+id/group_audio_send_icon"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:elevation="10dp"
+                            android:src="@null" />
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_weight="2"
+                            android:layout_height="1dp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2" />
 
                     <Button
                         android:id="@+id/AudioGroupPushToTalkButton"
