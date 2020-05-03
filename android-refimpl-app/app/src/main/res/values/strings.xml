@@ -242,6 +242,9 @@
     <!-- Strings related to Settings -->
 
 
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
     <string name="Aboutpage_0">TRIfA Crashlog</string>
     <string name="Aboutpage_1" translatable="false">https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/README.md</string>
     <string name="Aboutpage_10" translatable="false">https://github.com/gfx/Android-Orma</string>
@@ -300,25 +303,24 @@
     <string name="ConferenceAudioActivity_19">Push to Talk</string>
     <string name="ConferenceAudioActivity_39">Active: </string>
     <string name="ConferenceAudioActivity_40"> Offline: </string>
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+
 
     <!-- Layout texts -->
     <!-- Layout texts -->
     <!-- Layout texts -->
-
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">scan QR Code</string>
     <string name="layout___enter_password_nthere_is_no_recovery_option">Enter Password\nThere is NO recovery option!</string>
-    <string name="layout___password">Password</string>
     <string name="layout___unlock">Unlock</string>
     <string name="layout___name">Name</string>
     <string name="layout___push_to_talk">Push to talk</string>
-    <string name="layout___name">Name</string>
     <string name="layout___nick">Nick:</string>
     <string name="layout___pubkey">Pubkey:</string>
-    <string name="layout___nick">Nick:</string>
     <string name="layout___status">Status:</string>
     <string name="layout___alias">Alias</string>
-    <string name="layout___pubkey">Pubkey:</string>
     <string name="layout___remove_friends_relay">remove Friends Relay</string>
     <string name="layout___friends_relay_pubkey">Friends Relay Pubkey:</string>
     <string name="layout___waiting_for_orbot">waiting for Orbot ...</string>
@@ -333,10 +335,7 @@
     <string name="layout___test_ringtone_sound">test Ringtone sound</string>
     <string name="layout___export_tox_savedata_unsecure">export tox savedata *unsecure*</string>
     <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA *UNSECURE*</string>
-    <string name="layout___name">Name</string>
     <string name="layout___click_image_to_change_your_avatar">click Image to change your Avatar</string>
-    <string name="layout___nick">Nick:</string>
-    <string name="layout___status">Status:</string>
     <string name="layout___remove_own_relay">remove own Relay</string>
     <string name="layout___relay_pubkey">Relay Pubkey:</string>
     <string name="layout___new_random_nospam">new Random NOSPAM</string>
@@ -356,11 +355,12 @@
     <string name="layout___create_text_group">Create Text Group</string>
     <string name="layout___create_audio_group">Create Audio Group</string>
     <string name="layout___add_as_toxproxy">add as ToxProxy</string>
-    <string name="layout___delete">Delete</string>
     <string name="layout___peer_name">peer name</string>
     <string name="layout___online">Online</string>
     <string name="layout___copy">Copy</string>
     <string name="layout___export">Export</string>
-    <string name="layout___delete">Delete</string>
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+    <!-- Layout texts -->
 
 </resources>
