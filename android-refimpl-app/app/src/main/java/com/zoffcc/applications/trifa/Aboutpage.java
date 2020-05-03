@@ -306,8 +306,8 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         {
         }
 
-        main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc",
-                                                getString(R.string.Aboutpage_0) + android.os.Build.VERSION.SDK + ")",
+        main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc", getString(R.string.Aboutpage_0) + " (a:" +
+                                                                            android.os.Build.VERSION.SDK + ")",
                                                 feedback_text, full_file_name,
                                                 full_file_name_suppl); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
