@@ -48,7 +48,7 @@ import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 
 public class Aboutpage extends AppCompatActivity implements Logging.AsyncResponse
 {
-    private static final String TAG = "trifa.Aboutpage";
+    private static final String TAG = "trifa.Aboutpage"; //$NON-NLS-1$
     ProgressDialog progressDialog2 = null;
 
     @Override
@@ -59,19 +59,20 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         try
         {
             AboutPage aboutPage = new AboutPage(this).
-                    isRTL(false).
-                    setImage(R.drawable.web_hi_res_512).
-                    addWebsite("https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/README.md");
+                isRTL(false).
+                setImage(R.drawable.web_hi_res_512).
+                addWebsite(getString(R.string.Aboutpage_1)); //$NON-NLS-1$
 
             mehdi.sakout.aboutpage.Element e001 = new mehdi.sakout.aboutpage.Element();
-            e001.setTitle("send Crash report via Email");
+            e001.setTitle(getString(R.string.Aboutpage_2)); //$NON-NLS-1$
             e001.setOnClickListener(new View.OnClickListener()
             {
                 public void onClick(View v)
                 {
                     try
                     {
-                        progressDialog2 = ProgressDialog.show(Aboutpage.this, "", "reading crash info ...");
+                        progressDialog2 = ProgressDialog.show(Aboutpage.this, "", getString(
+                            R.string.Aboutpage_4)); //$NON-NLS-1$ //$NON-NLS-2$
 
                         progressDialog2.setCanceledOnTouchOutside(false);
                         progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
@@ -95,11 +96,11 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                 }
             });
             aboutPage.addItem(e001);
-            aboutPage.setDescription("TRIfA a Tox Client for Android\nVersion: " + MainActivity.versionName);
+            aboutPage.setDescription(getString(R.string.Aboutpage_5) + MainActivity.versionName); //$NON-NLS-1$
 
             Element tox_link = new Element();
-            tox_link.setTitle("What is Tox?");
-            Intent tox_faq_page = new Intent(Intent.ACTION_VIEW, Uri.parse("https://tox.zoff.cc"));
+            tox_link.setTitle(getString(R.string.Aboutpage_6)); //$NON-NLS-1$
+            Intent tox_faq_page = new Intent(Intent.ACTION_VIEW, Uri.parse("https://tox.zoff.cc")); //$NON-NLS-1$
             tox_link.setIntent(tox_faq_page);
             aboutPage.addItem(tox_link);
 
@@ -111,130 +112,130 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             //  --------------------------------
             //  --------- used libs ------------
             el2 = new Element();
-            el2.setTitle("used libraries:");
+            el2.setTitle(getString(R.string.Aboutpage_8)); //$NON-NLS-1$
             el2.setIconDrawable(R.drawable.about_icon_github);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.gfx.android.orma");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/gfx/Android-Orma"));
+            el2.setTitle(getString(R.string.Aboutpage_9)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_10))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("info.guardianproject.iocipher:IOCipher");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/guardianproject/IOCipher"));
+            el2.setTitle(getString(R.string.Aboutpage_11)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_12))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.l4digital.fastscroll:fastscroll");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/L4Digital/FastScroll"));
+            el2.setTitle(getString(R.string.Aboutpage_13)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_14))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.bumptech.glide");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bumptech/glide"));
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle("info.guardianproject.netcipher");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/guardianproject/NetCipher"));
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle("com.mikepenz:fontawesome-typeface");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mikepenz/Android-Iconics"));
+            el2.setTitle(getString(R.string.Aboutpage_15)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_16))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.mikepenz:google-material-typeface");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mikepenz/Android-Iconics"));
+            el2.setTitle(getString(R.string.Aboutpage_17)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_18))); //$NON-NLS-1$
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle(getString(R.string.Aboutpage_19)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_20))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.google.zxing:core");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zxing/zxing"));
+            el2.setTitle(getString(R.string.Aboutpage_21)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_22))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.hotchemi:permissionsdispatcher");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/permissions-dispatcher/PermissionsDispatcher"));
+            el2.setTitle(getString(R.string.Aboutpage_23)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_24))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.angads25:filepicker");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Angads25/android-filepicker"));
+            el2.setTitle(getString(R.string.Aboutpage_25)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_26))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.vanniktech:emoji-ios");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/vanniktech/Emoji"));
+            el2.setTitle(getString(R.string.Aboutpage_27)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_28))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.google.code.gson");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/google/gson"));
+            el2.setTitle(getString(R.string.Aboutpage_29)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_30))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.medyo:android-about-page");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/medyo/android-about-page"));
+            el2.setTitle(getString(R.string.Aboutpage_31)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_32))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("de.hdodenhof:circleimageview");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/hdodenhof/CircleImageView"));
+            el2.setTitle(getString(R.string.Aboutpage_33)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_34))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.armcha:AutoLinkTextView");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/armcha/AutoLinkTextView"));
+            el2.setTitle(getString(R.string.Aboutpage_35)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_36))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.chrisbanes:PhotoView");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/chrisbanes/PhotoView"));
+            el2.setTitle(getString(R.string.Aboutpage_37)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_38))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.squareup.okhttp3");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/square/okhttp"));
+            el2.setTitle(getString(R.string.Aboutpage_39)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_40))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.daimajia.numberprogressbar");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/daimajia/NumberProgressBar"));
+            el2.setTitle(getString(R.string.Aboutpage_41)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_42))); //$NON-NLS-1$
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle(getString(R.string.Aboutpage_43)); //$NON-NLS-1$
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_44))); //$NON-NLS-1$
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
@@ -245,26 +246,27 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "onCreate:EE1:" + e.getMessage());
+            Log.i(TAG, "onCreate:EE1:" + e.getMessage()); //$NON-NLS-1$
         }
 
         try
         {
             // find the large top icon in aboutpage layout
             ImageView icon_big = (ImageView) findViewById(R.id.image);
-            Log.i(TAG, "onCreate:icon_big=" + icon_big);
+            Log.i(TAG, "onCreate:icon_big=" + icon_big); //$NON-NLS-1$
 
             final Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.web_hi_res_512);
-            Log.i(TAG, "onCreate:bm1.getWidth()=" + bm1.getWidth() + " bm1.getHeight()=" + bm1.getHeight());
+            Log.i(TAG, "onCreate:bm1.getWidth()=" + bm1.getWidth() + " bm1.getHeight()=" +
+                       bm1.getHeight()); //$NON-NLS-1$ //$NON-NLS-2$
             final Bitmap bm1_scaled = Bitmap.createScaledBitmap(bm1, (int) dp2px(200), (int) dp2px(200), true);
-            Log.i(TAG, "onCreate:dp2px(200)=" + dp2px(200));
+            Log.i(TAG, "onCreate:dp2px(200)=" + dp2px(200)); //$NON-NLS-1$
 
             icon_big.setImageBitmap(bm1_scaled);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "onCreate:EE2:" + e.getMessage());
+            Log.i(TAG, "onCreate:EE2:" + e.getMessage()); //$NON-NLS-1$
         }
     }
 
@@ -272,16 +274,20 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
     @Override
     public void processFinish(String output_part1)
     {
-        String output = output_part1 + System.getProperty("line.separator") + System.getProperty("line.separator") + "LastStackTrace:" + System.getProperty("line.separator") + MainApplication.last_stack_trace_as_string;
-        MainApplication.last_stack_trace_as_string = ""; // reset last stacktrace
+        String output = output_part1 + System.getProperty("line.separator") + System.getProperty("line.separator") +
+                        "LastStackTrace:" + System.getProperty("line.separator") +
+                        MainApplication.last_stack_trace_as_string; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        MainApplication.last_stack_trace_as_string = ""; // reset last stacktrace //$NON-NLS-1$
 
         // String DATA_DEBUG_DIR = new File(getExternalFilesDir(null).getAbsolutePath() + "/crashes").toString();
-        String DATA_DEBUG_DIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes").toString();
+        String DATA_DEBUG_DIR = new File(
+            Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes").toString(); //$NON-NLS-1$
 
-        String date = new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.GERMAN).format(new Date());
-        String full_file_name = DATA_DEBUG_DIR + "/crash_" + date + ".txt";
-        String full_file_name_suppl = DATA_DEBUG_DIR + "/crash_single.txt";
-        String feedback_text = "If there is no file attached, please attach:\n" + full_file_name + "\nto this email.";
+        String date = new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.GERMAN).format(new Date()); //$NON-NLS-1$
+        String full_file_name = DATA_DEBUG_DIR + "/crash_" + date + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$
+        String full_file_name_suppl = DATA_DEBUG_DIR + "/crash_single.txt"; //$NON-NLS-1$
+        String feedback_text = "If there is no file attached, please attach:\n" + full_file_name +
+                               "\nto this email."; //$NON-NLS-1$ //$NON-NLS-2$
 
         Logging.writeToFile(output, Aboutpage.this, full_file_name);
 
@@ -300,6 +306,9 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         {
         }
 
-        main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc", "TRIfA Crashlog (a:" + android.os.Build.VERSION.SDK + ")", feedback_text, full_file_name, full_file_name_suppl);
+        main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc",
+                                                getString(R.string.Aboutpage_0) + android.os.Build.VERSION.SDK + ")",
+                                                feedback_text, full_file_name,
+                                                full_file_name_suppl); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }
