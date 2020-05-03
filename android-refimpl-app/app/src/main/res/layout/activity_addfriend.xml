@@ -42,7 +42,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
-                        android:hint="ToxID"
+                        android:hint="@string/layout___toxid"
                         android:imeOptions="actionUnspecified"
                         android:inputType="text"
                         android:maxLines="1"
@@ -82,7 +82,7 @@
                     android:onClick="read_qr_code"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
-                    android:text="scan QR Code"/>
+                    android:text="@string/layout___scan_qr_code"/>
 
             </LinearLayout>
 

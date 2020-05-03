@@ -8,12 +8,12 @@
     <!--app:showAsAction="ifRoom|withText"/>-->
     <item
         android:id="@+id/item_leave"
-        android:title="Leave"
+        android:title="@string/layout___leave"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/item_delete"
-        android:title="Delete"
+        android:title="@string/layout___delete"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
 </menu>

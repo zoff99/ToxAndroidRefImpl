@@ -53,7 +53,7 @@
                     android:paddingLeft="4dp"
                     android:paddingRight="2dp"
                     android:paddingBottom="15dp"
-                    android:text="Nick:"
+                    android:text="@string/layout___nick"
                     android:textAlignment="textStart"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -85,7 +85,7 @@
                 android:paddingLeft="4dp"
                 android:paddingRight="2dp"
                 android:paddingBottom="15dp"
-                android:text="Pubkey:"
+                android:text="@string/layout___pubkey"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
                 android:textStyle="bold" />

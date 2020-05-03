@@ -4,25 +4,25 @@
     <item
         android:id="@+id/item_info"
         android:icon="@drawable/ic_info_outline_white_24dp"
-        android:title="Info"
+        android:title="@string/layout___info"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/item_create_conference"
         android:icon="@drawable/ic_content_copy_white_24dp"
-        android:title="Create Text Group"
+        android:title="@string/layout___create_text_group"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/item_create_av_conference"
         android:icon="@drawable/ic_content_copy_white_24dp"
-        android:title="Create Audio Group"
+        android:title="@string/layout___create_audio_group"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/item_add_toxproxy"
         android:icon="@drawable/ic_content_copy_white_24dp"
-        android:title="add as ToxProxy"
+        android:title="@string/layout___add_as_toxproxy"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
     <item
@@ -35,7 +35,7 @@
     <item
         android:id="@+id/item_delete"
         android:icon="@drawable/ic_delete_white_24dp"
-        android:title="Delete"
+        android:title="@string/layout___delete"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
 </menu>

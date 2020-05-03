@@ -61,7 +61,7 @@
                 android:layout_marginBottom="40dp"
                 android:background="@color/md_white_1000"
                 android:gravity="center"
-                android:text="waiting for Orbot ..."
+                android:text="@string/layout___waiting_for_orbot"
                 android:textSize="20sp"
                 android:visibility="gone"/>
 

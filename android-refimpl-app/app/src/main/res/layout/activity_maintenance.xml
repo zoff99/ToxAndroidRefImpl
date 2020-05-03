@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
 
@@ -30,7 +31,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="clear Glide Cache"
+                android:text="@string/layout___clear_glide_cache"
                 android:textSize="14sp"/>
 
             <android.support.v7.widget.AppCompatButton
@@ -40,7 +41,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="run VACUUM on Sql Database"
+                android:text="@string/layout___run_vacuum_on_sql_database"
                 android:textSize="14sp"/>
 
             <android.support.v7.widget.AppCompatButton
@@ -50,7 +51,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="run ANALYZE on Sql Database"
+                android:text="@string/layout___run_analyze_on_sql_database"
                 android:textSize="14sp"/>
 
             <android.support.v7.widget.AppCompatButton
@@ -60,7 +61,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="reset favorite Emoji List"
+                android:text="@string/layout___reset_favorite_emoji_list"
                 android:textSize="14sp"/>
 
 
@@ -71,7 +72,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="delete all Avatar Icons"
+                android:text="@string/layout___delete_all_avatar_icons"
                 android:textSize="14sp"/>
 
 
@@ -82,7 +83,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="update Bootstrapnodes from Internet"
+                android:text="@string/layout___update_bootstrapnodes_from_internet"
                 android:textSize="14sp"/>
 
             <android.support.v7.widget.AppCompatButton
@@ -92,7 +93,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="reset Bootstrapnodes to default"
+                android:text="@string/layout___reset_bootstrapnodes_to_default"
                 android:textSize="14sp"/>
 
             <android.support.v7.widget.AppCompatButton
@@ -102,7 +103,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="test Notification sound"
+                android:text="@string/layout___test_notification_sound"
                 android:textSize="14sp"/>
 
             <android.support.v7.widget.AppCompatButton
@@ -112,7 +113,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="test Ringtone sound"
+                android:text="@string/layout___test_ringtone_sound"
                 android:textSize="14sp"/>
 
             <TextView
@@ -151,8 +152,9 @@
                 android:background="@drawable/rounded_orange_dark_bg"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
-                android:text="export tox savedata *unsecure*"
-                android:textSize="14sp"/>
+                android:text="@string/layout___export_tox_savedata_unsecure"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/dummy_0002"
@@ -178,7 +180,7 @@
                 android:layout_marginTop="10dp"
                 android:textColor="@android:color/white"
                 android:textAllCaps="false"
-                android:text="IM-port TOX SAVADATA *UNSECURE*"
+                android:text="@string/layout___im_port_tox_savadata_unsecure"
                 android:textSize="14sp"/>
 
             <TextView

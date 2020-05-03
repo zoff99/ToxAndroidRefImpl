@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">TRIfA</string>
     <string name="add_friend_activity_name">添加好友</string>
     <string name="message_list_activity_name">聊天</string>
     <string name="conference_message_list_activity_name">会议</string>

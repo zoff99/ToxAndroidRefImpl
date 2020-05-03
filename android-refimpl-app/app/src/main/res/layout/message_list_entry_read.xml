@@ -26,7 +26,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="65dp"
                 android:gravity="left"
-                android:text="peer name"
+                android:text="@string/layout___peer_name"
                 android:textColor="#EFEFEF"
                 android:textSize="13sp"/>
 

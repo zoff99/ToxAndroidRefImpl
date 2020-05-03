@@ -53,7 +53,7 @@
                     android:paddingLeft="4dp"
                     android:paddingRight="2dp"
                     android:paddingBottom="15dp"
-                    android:text="Nick:"
+                    android:text="@string/layout___nick"
                     android:textAlignment="textStart"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -91,7 +91,7 @@
                     android:paddingLeft="4dp"
                     android:paddingRight="2dp"
                     android:paddingBottom="15dp"
-                    android:text="Status:"
+                    android:text="@string/layout___status"
                     android:textAlignment="textStart"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -131,7 +131,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
-                        android:hint="Alias"
+                        android:hint="@string/layout___alias"
                         android:imeOptions="actionUnspecified"
                         android:inputType="text"
                         android:maxLines="1"
@@ -150,7 +150,7 @@
                 android:paddingLeft="4dp"
                 android:paddingRight="2dp"
                 android:paddingBottom="15dp"
-                android:text="Pubkey:"
+                android:text="@string/layout___pubkey"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -179,7 +179,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="5dp"
-                android:text="remove Friends Relay" />
+                android:text="@string/layout___remove_friends_relay" />
 
             <TextView
                 android:id="@+id/fi_relay_text"
@@ -191,7 +191,7 @@
                 android:paddingLeft="4dp"
                 android:paddingRight="2dp"
                 android:paddingBottom="15dp"
-                android:text="Friends Relay Pubkey:"
+                android:text="@string/layout___friends_relay_pubkey"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
                 android:textStyle="bold" />

@@ -68,7 +68,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:padding="8dp"
-                    android:text="Name"
+                    android:text="@string/layout___name"
                     android:textColor="@android:color/primary_text_light"
                     android:textSize="15sp"/>
 
