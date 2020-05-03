@@ -478,7 +478,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                          ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
                                          PREF__video_play_delay_ms);
                         video_add_delay_slider_infotext_01.setText(
-                            getString(R.string.CallingActivity_23) + PREF__video_play_delay_ms +
+                            getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " " +
                             getString(R.string.CallingActivity_24)); //$NON-NLS-1$ //$NON-NLS-2$
                         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
                             getApplicationContext());
@@ -2188,8 +2188,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                      ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
                                      PREF__video_play_delay_ms);
                     video_add_delay_slider_infotext_01.setText(context_s.getString(R.string.
-                                                                             CallingActivity_0) +
-                                                               PREF__video_play_delay_ms + context_s.getString(
+                                                                                       CallingActivity_0) + " " +
+                                                               PREF__video_play_delay_ms + " " + context_s.getString(
                         R.string.CallingActivity_123)); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 catch (Exception e)

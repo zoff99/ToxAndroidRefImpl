@@ -96,7 +96,8 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                 }
             });
             aboutPage.addItem(e001);
-            aboutPage.setDescription(getString(R.string.Aboutpage_5) + MainActivity.versionName); //$NON-NLS-1$
+            aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
+                                     MainActivity.versionName); //$NON-NLS-1$
 
             Element tox_link = new Element();
             tox_link.setTitle(getString(R.string.Aboutpage_6)); //$NON-NLS-1$

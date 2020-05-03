@@ -152,7 +152,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         conference_audio_activity = this;
 
         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        PREF__audio_group_play_volume_percent = settings_cs1.getInt("audio_group_play_volume_percent", 100); //$NON-NLS-1$
+        PREF__audio_group_play_volume_percent = settings_cs1.getInt("audio_group_play_volume_percent",
+                                                                    100); //$NON-NLS-1$
         Log.i(TAG, "pref:get:PREF__audio_play_volume_percent=" + PREF__audio_group_play_volume_percent); //$NON-NLS-1$
 
         caa = this;
@@ -165,7 +166,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         conference_message_profile_item = new ProfileDrawerItem().
             withName(getString(R.string.ConferenceAudioActivity_10)). //$NON-NLS-1$
-        withIcon(drawer_header_icon);
+            withIcon(drawer_header_icon);
 
         // Create the AccountHeader
         conference_message_drawer_header = new AccountHeaderBuilder().
@@ -260,7 +261,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage()); //$NON-NLS-1$
+                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" +
+                                   e.getMessage()); //$NON-NLS-1$
                     }
                 }
                 else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
@@ -273,7 +275,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage()); //$NON-NLS-1$
+                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" +
+                                   e.getMessage()); //$NON-NLS-1$
                     }
                 }
                 return false;
@@ -309,7 +312,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     catch (Exception ee)
                     {
                         ee.printStackTrace();
-                        Log.i(TAG, "pref:set:PREF__audio_group_play_volume_percent:EE:" + ee.getMessage()); //$NON-NLS-1$
+                        Log.i(TAG,
+                              "pref:set:PREF__audio_group_play_volume_percent:EE:" + ee.getMessage()); //$NON-NLS-1$
                     }
                 }
             }
@@ -340,7 +344,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     try
                     {
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg_pressed);
-                        AudioGroupPushToTalkButton.setText(getString(R.string.ConferenceAudioActivity_18)); //$NON-NLS-1$
+                        AudioGroupPushToTalkButton.setText(
+                            getString(R.string.ConferenceAudioActivity_18)); //$NON-NLS-1$
                         push_to_talk_active = true;
                     }
                     catch (Exception e)
@@ -353,7 +358,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     try
                     {
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
-                        AudioGroupPushToTalkButton.setText(getString(R.string.ConferenceAudioActivity_19)); //$NON-NLS-1$
+                        AudioGroupPushToTalkButton.setText(
+                            getString(R.string.ConferenceAudioActivity_17)); //$NON-NLS-1$
                         push_to_talk_active = false;
                         update_group_audio_send_icon(0);
                         AudioRecording.global_audio_group_send_res = -999;
@@ -471,8 +477,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         else
         {
 
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+            getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
             getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
@@ -675,8 +681,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     {
                         Log.i(TAG, "update_group_audio_device_icon:headset"); //$NON-NLS-1$
                         Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(
-                            Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(
-                            80);
+                            Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
                         group_audio_device_icon.setImageDrawable(d4);
                     }
                     else if (Callstate.audio_device == 2)
@@ -866,7 +871,9 @@ public class ConferenceAudioActivity extends AppCompatActivity
                             if (peer_count > -1)
                             {
                                 ml_maintext.setText(
-                                    f_name + "\n" + getString(R.string.ConferenceAudioActivity_39) + peer_count + getString(R.string.ConferenceAudioActivity_40) + frozen_peer_count); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                    f_name + "\n" + getString(R.string.ConferenceAudioActivity_39) + " " + peer_count +
+                                    " " + getString(R.string.ConferenceAudioActivity_40) + " " +
+                                    frozen_peer_count); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             }
                             else
                             {
@@ -1052,7 +1059,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                                                 try
                                                 {
                                                     f1 = new info.guardianproject.iocipher.File(
-                                                        fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename); //$NON-NLS-1$
+                                                        fl_temp.avatar_pathname + "/" +
+                                                        fl_temp.avatar_filename); //$NON-NLS-1$
                                                     if (f1.length() > 0)
                                                     {
                                                         have_avatar_for_pubkey = true;
@@ -1292,7 +1300,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                             long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(result_friend_pubkey);
                             if (friend_num_temp_safety2 > 0)
                             {
-                                Log.i(TAG, "onActivityResult:friend_num_temp_safety2:" + friend_num_temp_safety2); //$NON-NLS-1$
+                                Log.i(TAG, "onActivityResult:friend_num_temp_safety2:" +
+                                           friend_num_temp_safety2); //$NON-NLS-1$
 
                                 if (conf_id.equals("-1")) //$NON-NLS-1$
                                 {
@@ -1302,7 +1311,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
                                 final long conference_num = get_conference_num_from_confid(conf_id);
 
-                                Log.i(TAG, "onActivityResult:conference_num:" + conference_num + " conf_id=" + conf_id); //$NON-NLS-1$ //$NON-NLS-2$
+                                Log.i(TAG, "onActivityResult:conference_num:" + conference_num + " conf_id=" +
+                                           conf_id); //$NON-NLS-1$ //$NON-NLS-2$
 
                                 if (conference_num > -1)
                                 {
@@ -1313,8 +1323,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
                                     if (res_conf_invite < 1)
                                     {
-                                        Log.d(TAG,
-                                              "onActivityResult:info:tox_conference_invite:ERR:" + res_conf_invite); //$NON-NLS-1$
+                                        Log.d(TAG, "onActivityResult:info:tox_conference_invite:ERR:" +
+                                                   res_conf_invite); //$NON-NLS-1$
                                     }
                                 }
                             }
