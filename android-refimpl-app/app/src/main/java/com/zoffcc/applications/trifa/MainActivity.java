@@ -101,6 +101,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
+import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 import com.zoffcc.applications.trifa.CallingActivity.h264_encoder_output_data;
@@ -143,7 +144,6 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
-import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
@@ -323,6 +323,7 @@ public class MainActivity extends AppCompatActivity
     final static int MaintenanceActivity_ID = 10006;
     final static int WhiteListFromDozeActivity_ID = 10008;
     final static int SelectFriendSingleActivity_ID = 10009;
+    final static int SelectLanguageActivity_ID = 10010;
     final static int Notification_new_message_ID = 10023;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
@@ -441,6 +442,10 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         Log.i(TAG, "onCreate");
+
+        Log.d(TAG, "Lingver_Language: " + Lingver.getInstance().getLanguage());
+        // Log.d(TAG, "Actual_Language: " + resources.configuration.getLocaleCompat());
+
         EmojiManager.install(new IosEmojiProvider());
         // EmojiManager.install(new EmojiOneProvider());
         resources = this.getResources();
@@ -548,7 +553,7 @@ public class MainActivity extends AppCompatActivity
             channelName = "New Message Sound and Vibrate";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             notification_channel_newmessage_sound_and_vibrate = new NotificationChannel(
-                    channelId_newmessage_sound_and_vibrate, channelName, importance);
+                channelId_newmessage_sound_and_vibrate, channelName, importance);
             notification_channel_newmessage_sound_and_vibrate.setDescription(channelId_newmessage_sound_and_vibrate);
             notification_channel_newmessage_sound_and_vibrate.enableVibration(true);
             nmn3.createNotificationChannel(notification_channel_newmessage_sound_and_vibrate);
@@ -707,42 +712,42 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "waiting_for_orbot_info:F1");
                     waiting_for_orbot_info(false);
                     OrbotHelper.get(this).statusTimeout(120 * 1000).
-                            addStatusCallback(new StatusCallback()
+                        addStatusCallback(new StatusCallback()
+                        {
+                            @Override
+                            public void onEnabled(Intent statusIntent)
                             {
-                                @Override
-                                public void onEnabled(Intent statusIntent)
-                                {
-                                }
+                            }
 
-                                @Override
-                                public void onStarting()
-                                {
-                                }
+                            @Override
+                            public void onStarting()
+                            {
+                            }
 
-                                @Override
-                                public void onStopping()
-                                {
-                                }
+                            @Override
+                            public void onStopping()
+                            {
+                            }
 
-                                @Override
-                                public void onDisabled()
-                                {
-                                    // we got a broadcast with a status of off, so keep waiting
-                                }
+                            @Override
+                            public void onDisabled()
+                            {
+                                // we got a broadcast with a status of off, so keep waiting
+                            }
 
-                                @Override
-                                public void onStatusTimeout()
-                                {
-                                    // throw new RuntimeException("Orbot status request timed out");
-                                    Log.i(TAG, "waiting_for_orbot_info:EEO1:" + "Orbot status request timed out");
-                                }
+                            @Override
+                            public void onStatusTimeout()
+                            {
+                                // throw new RuntimeException("Orbot status request timed out");
+                                Log.i(TAG, "waiting_for_orbot_info:EEO1:" + "Orbot status request timed out");
+                            }
 
-                                @Override
-                                public void onNotYetInstalled()
-                                {
-                                }
-                            }).
-                            init(); // allow 60 seconds to connect to Orbot
+                            @Override
+                            public void onNotYetInstalled()
+                            {
+                            }
+                        }).
+                        init(); // allow 60 seconds to connect to Orbot
                 }
                 else
                 {
@@ -762,42 +767,42 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     OrbotHelper.get(this).statusTimeout(120 * 1000).
-                            addStatusCallback(new StatusCallback()
+                        addStatusCallback(new StatusCallback()
+                        {
+                            @Override
+                            public void onEnabled(Intent statusIntent)
                             {
-                                @Override
-                                public void onEnabled(Intent statusIntent)
-                                {
-                                }
+                            }
 
-                                @Override
-                                public void onStarting()
-                                {
-                                }
+                            @Override
+                            public void onStarting()
+                            {
+                            }
 
-                                @Override
-                                public void onStopping()
-                                {
-                                }
+                            @Override
+                            public void onStopping()
+                            {
+                            }
 
-                                @Override
-                                public void onDisabled()
-                                {
-                                    // we got a broadcast with a status of off, so keep waiting
-                                }
+                            @Override
+                            public void onDisabled()
+                            {
+                                // we got a broadcast with a status of off, so keep waiting
+                            }
 
-                                @Override
-                                public void onStatusTimeout()
-                                {
-                                    // throw new RuntimeException("Orbot status request timed out");
-                                    Log.i(TAG, "waiting_for_orbot_info:EEO2:" + "Orbot status request timed out");
-                                }
+                            @Override
+                            public void onStatusTimeout()
+                            {
+                                // throw new RuntimeException("Orbot status request timed out");
+                                Log.i(TAG, "waiting_for_orbot_info:EEO2:" + "Orbot status request timed out");
+                            }
 
-                                @Override
-                                public void onNotYetInstalled()
-                                {
-                                }
-                            }).
-                            init(); // allow 60 seconds to connect to Orbot
+                            @Override
+                            public void onNotYetInstalled()
+                            {
+                            }
+                        }).
+                        init(); // allow 60 seconds to connect to Orbot
                 }
             }
             else
@@ -835,7 +840,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 PREF__min_audio_samplingrate_out = Integer.parseInt(
-                        settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
+                    settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
             }
         }
         catch (Exception e)
@@ -881,7 +886,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             PREF__X_audio_recording_frame_size = Integer.parseInt(
-                    settings.getString("X_audio_recording_frame_size", "" + 40));
+                settings.getString("X_audio_recording_frame_size", "" + 40));
         }
         catch (Exception e)
         {
@@ -916,10 +921,10 @@ public class MainActivity extends AppCompatActivity
             top_imageview.setBackgroundColor(Color.TRANSPARENT);
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
             final Drawable d1 = new IconicsDrawable(this).
-                    icon(FontAwesome.Icon.faw_exclamation_circle).
-                    paddingDp(20).
-                    color(getResources().getColor(R.color.md_red_600)).
-                    sizeDp(100);
+                icon(FontAwesome.Icon.faw_exclamation_circle).
+                paddingDp(20).
+                color(getResources().getColor(R.color.md_red_600)).
+                sizeDp(100);
             top_imageview.setImageDrawable(d1);
         }
         else
@@ -934,8 +939,8 @@ public class MainActivity extends AppCompatActivity
         // --------- status spinner ---------
         spinner_own_status = (Spinner) findViewById(R.id.spinner_own_status);
         ArrayList<String> own_online_status_string_values = new ArrayList<String>(
-                Arrays.asList(getString(R.string.MainActivity_available), getString(R.string.MainActivity_away), getString(
-                                    R.string.MainActivity_busy)));
+            Arrays.asList(getString(R.string.MainActivity_available), getString(R.string.MainActivity_away),
+                          getString(R.string.MainActivity_busy)));
         ArrayAdapter<String> myAdapter = new OwnStatusSpinnerAdapter(this, R.layout.own_status_spinner_item,
                                                                      own_online_status_string_values);
 
@@ -993,169 +998,168 @@ public class MainActivity extends AppCompatActivity
         // -------- drawer ------------
         // -------- drawer ------------
         // -------- drawer ------------
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.MainActivity_profile).withIcon(
-                GoogleMaterial.Icon.gmd_face);
-        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.MainActivity_settings).withIcon(
-                GoogleMaterial.Icon.gmd_settings);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.MainActivity_logout_login).withIcon(
-                GoogleMaterial.Icon.gmd_refresh);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(R.string.MainActivity_maint).withIcon(
-                GoogleMaterial.Icon.gmd_build);
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(R.string.MainActivity_about).withIcon(
-                GoogleMaterial.Icon.gmd_info);
-        PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName(R.string.MainActivity_exit).withIcon(
-                GoogleMaterial.Icon.gmd_exit_to_app);
+        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(
+            R.string.MainActivity_profile).withIcon(GoogleMaterial.Icon.gmd_face);
+        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(
+            R.string.MainActivity_settings).withIcon(GoogleMaterial.Icon.gmd_settings);
+        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(
+            R.string.MainActivity_logout_login).withIcon(GoogleMaterial.Icon.gmd_refresh);
+        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(
+            R.string.MainActivity_maint).withIcon(GoogleMaterial.Icon.gmd_build);
+        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(
+            R.string.MainActivity_about).withIcon(GoogleMaterial.Icon.gmd_info);
+        PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName(
+            R.string.MainActivity_exit).withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
         final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
-                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
+            color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
         profile_d_item = new ProfileDrawerItem().
-                withName("me").
-                withIcon(d1);
+            withName("me").
+            withIcon(d1);
         // Create the AccountHeader
         main_drawer_header = new AccountHeaderBuilder().
-                withSelectionListEnabledForSingleProfile(false).
-                withActivity(this).
-                withCompactStyle(true).
-                addProfiles(profile_d_item).
-                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
+            withSelectionListEnabledForSingleProfile(false).
+            withActivity(this).
+            withCompactStyle(true).
+            addProfiles(profile_d_item).
+            withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
+            {
+                @Override
+                public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
                 {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
-                    {
-                        return false;
-                    }
-                }).build();
+                    return false;
+                }
+            }).build();
         // create the drawer and remember the `Drawer` result object
         main_drawer = new DrawerBuilder().
-                withActivity(this).
-                withInnerShadow(false).
-                withRootView(R.id.drawer_container).
-                withShowDrawerOnFirstLaunch(false).
-                withActionBarDrawerToggleAnimated(true).
-                withActionBarDrawerToggle(true).
-                withToolbar(toolbar).
-                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(),
-                               item6).
-                withTranslucentStatusBar(false).
-                withAccountHeader(main_drawer_header).
-                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+            withActivity(this).
+            withInnerShadow(false).
+            withRootView(R.id.drawer_container).
+            withShowDrawerOnFirstLaunch(false).
+            withActionBarDrawerToggleAnimated(true).
+            withActionBarDrawerToggle(true).
+            withToolbar(toolbar).
+            addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(), item6).
+            withTranslucentStatusBar(false).
+            withAccountHeader(main_drawer_header).
+            withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+            {
+                @Override
+                public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
                 {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                    Log.i(TAG, "drawer:item=" + position);
+
+                    if (position == 1)
                     {
-                        Log.i(TAG, "drawer:item=" + position);
-
-                        if (position == 1)
+                        // profile
+                        try
                         {
-                            // profile
-                            try
+                            if (Callstate.state == 0)
                             {
-                                if (Callstate.state == 0)
-                                {
-                                    Log.i(TAG, "start profile activity");
-                                    Intent intent = new Intent(context_s, ProfileActivity.class);
-                                    startActivityForResult(intent, ProfileActivity_ID);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
+                                Log.i(TAG, "start profile activity");
+                                Intent intent = new Intent(context_s, ProfileActivity.class);
+                                startActivityForResult(intent, ProfileActivity_ID);
                             }
                         }
-                        else if (position == 3)
+                        catch (Exception e)
                         {
-                            // settings
-                            try
-                            {
-                                if (Callstate.state == 0)
-                                {
-                                    Log.i(TAG, "start settings activity");
-                                    Intent intent = new Intent(context_s, SettingsActivity.class);
-                                    startActivityForResult(intent, SettingsActivity_ID);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
+                            e.printStackTrace();
                         }
-                        else if (position == 4)
-                        {
-                            // logout/login
-                            try
-                            {
-                                if (is_tox_started)
-                                {
-                                    global_stop_tox();
-                                }
-                                else
-                                {
-                                    global_start_tox();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        else if (position == 6)
-                        {
-                            // About
-                            try
-                            {
-                                Log.i(TAG, "start aboutpage activity");
-                                Intent intent = new Intent(context_s, Aboutpage.class);
-                                startActivityForResult(intent, AboutpageActivity_ID);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        else if (position == 5)
-                        {
-                            // Maintenance
-                            try
-                            {
-                                Log.i(TAG, "start Maintenance activity");
-                                Intent intent = new Intent(context_s, MaintenanceActivity.class);
-                                startActivityForResult(intent, MaintenanceActivity_ID);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                            // -- clear Glide cache --
-                            // -- clear Glide cache --
-                            // clearCache();
-                            // -- clear Glide cache --
-                            // -- clear Glide cache --
-                        }
-                        else if (position == 8)
-                        {
-                            // Exit
-                            try
-                            {
-                                if (is_tox_started)
-                                {
-                                    tox_service_fg.stop_tox_fg();
-                                    tox_service_fg.stop_me(true);
-                                }
-                                else
-                                {
-                                    // just exit
-                                    tox_service_fg.stop_me(true);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        return true;
                     }
-                }).build();
+                    else if (position == 3)
+                    {
+                        // settings
+                        try
+                        {
+                            if (Callstate.state == 0)
+                            {
+                                Log.i(TAG, "start settings activity");
+                                Intent intent = new Intent(context_s, SettingsActivity.class);
+                                startActivityForResult(intent, SettingsActivity_ID);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    else if (position == 4)
+                    {
+                        // logout/login
+                        try
+                        {
+                            if (is_tox_started)
+                            {
+                                global_stop_tox();
+                            }
+                            else
+                            {
+                                global_start_tox();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    else if (position == 6)
+                    {
+                        // About
+                        try
+                        {
+                            Log.i(TAG, "start aboutpage activity");
+                            Intent intent = new Intent(context_s, Aboutpage.class);
+                            startActivityForResult(intent, AboutpageActivity_ID);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    else if (position == 5)
+                    {
+                        // Maintenance
+                        try
+                        {
+                            Log.i(TAG, "start Maintenance activity");
+                            Intent intent = new Intent(context_s, MaintenanceActivity.class);
+                            startActivityForResult(intent, MaintenanceActivity_ID);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        // -- clear Glide cache --
+                        // -- clear Glide cache --
+                        // clearCache();
+                        // -- clear Glide cache --
+                        // -- clear Glide cache --
+                    }
+                    else if (position == 8)
+                    {
+                        // Exit
+                        try
+                        {
+                            if (is_tox_started)
+                            {
+                                tox_service_fg.stop_tox_fg();
+                                tox_service_fg.stop_me(true);
+                            }
+                            else
+                            {
+                                // just exit
+                                tox_service_fg.stop_me(true);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return true;
+                }
+            }).build();
         //        DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.material_drawer_layout);
         //        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.faw_envelope_open, R.string.faw_envelope_open);
         //
@@ -1224,10 +1228,10 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 orma = builder.name(dbs_path).
-                        readOnMainThread(AccessThreadConstraint.NONE).
-                        writeOnMainThread(AccessThreadConstraint.NONE).
-                        trace(ORMA_TRACE).
-                        build();
+                    readOnMainThread(AccessThreadConstraint.NONE).
+                    writeOnMainThread(AccessThreadConstraint.NONE).
+                    trace(ORMA_TRACE).
+                    build();
                 Log.i(TAG, "db:open=OK:path=" + dbs_path);
             }
             catch (Exception e)
@@ -1259,10 +1263,10 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 orma = builder.name(dbs_path).
-                        readOnMainThread(AccessThreadConstraint.WARNING).
-                        writeOnMainThread(AccessThreadConstraint.WARNING).
-                        trace(ORMA_TRACE).
-                        build();
+                    readOnMainThread(AccessThreadConstraint.WARNING).
+                    writeOnMainThread(AccessThreadConstraint.WARNING).
+                    trace(ORMA_TRACE).
+                    build();
                 Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
             }
 
@@ -1767,7 +1771,7 @@ public class MainActivity extends AppCompatActivity
                             init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
                                  PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                                  TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
-                                         TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+                                     TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
@@ -1874,8 +1878,8 @@ public class MainActivity extends AppCompatActivity
 
                 init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
                      PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
-                     TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
-                             TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+                     TrifaSetPatternActivity.bytesToString(
+                         TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
                 Log.i(TAG, "set_all_conferences_inactive:001");
                 HelperConference.set_all_conferences_inactive();
                 tox_service_fg.tox_thread_start_fg();
@@ -1967,10 +1971,10 @@ public class MainActivity extends AppCompatActivity
             top_imageview.setBackgroundColor(Color.TRANSPARENT);
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
             final Drawable d1 = new IconicsDrawable(this).
-                    icon(FontAwesome.Icon.faw_exclamation_circle).
-                    paddingDp(20).
-                    color(getResources().getColor(R.color.md_red_600)).
-                    sizeDp(100);
+                icon(FontAwesome.Icon.faw_exclamation_circle).
+                paddingDp(20).
+                color(getResources().getColor(R.color.md_red_600)).
+                sizeDp(100);
             top_imageview.setImageDrawable(d1);
         }
         else
@@ -2048,7 +2052,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 PREF__min_audio_samplingrate_out = Integer.parseInt(
-                        settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
+                    settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
             }
         }
         catch (Exception e)
@@ -2098,7 +2102,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             PREF__X_audio_recording_frame_size = Integer.parseInt(
-                    settings.getString("X_audio_recording_frame_size", "" + 40));
+                settings.getString("X_audio_recording_frame_size", "" + 40));
         }
         catch (Exception e)
         {
@@ -2128,7 +2132,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(
-                        getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                 profile_d_item.withIcon(d1);
                 main_drawer_header.updateProfile(profile_d_item);
             }
@@ -2161,20 +2165,21 @@ public class MainActivity extends AppCompatActivity
                     if (resolve_activity != null)
                     {
                         AlertDialog ad = new AlertDialog.Builder(this).
-                                setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
+                            setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
                                 {
-                                    public void onClick(DialogInterface dialog, int id)
-                                    {
-                                        return;
-                                    }
-                                }).
-                                setPositiveButton(R.string.MainActivity_ok_take_me_there_button, new DialogInterface.OnClickListener()
-                                {
-                                    public void onClick(DialogInterface dialog, int id)
-                                    {
-                                        startActivity(intent);
-                                    }
-                                }).create();
+                                    return;
+                                }
+                            }).
+                            setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
+                                              new DialogInterface.OnClickListener()
+                                              {
+                                                  public void onClick(DialogInterface dialog, int id)
+                                                  {
+                                                      startActivity(intent);
+                                                  }
+                                              }).create();
                         ad.setTitle(getString(R.string.MainActivity_info_dialog_title));
                         ad.setMessage(getString(R.string.MainActivity_add_to_batt_opt));
                         ad.setCancelable(false);
@@ -2671,8 +2676,7 @@ public class MainActivity extends AppCompatActivity
             // allocate new video buffer on 1 frame
             allocate_video_buffer_1((int) frame_width_px, (int) frame_height_px, ystride, ustride, vstride);
             temp_string_a =
-                    "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) +
-                    "s";
+                "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a, 3);
             Callstate.frame_width_px = frame_width_px;
             Callstate.frame_height_px = frame_height_px;
@@ -2685,7 +2689,7 @@ public class MainActivity extends AppCompatActivity
             if ((count_video_frame_received > 20) || ((last_video_frame_sent + 2000) < System.currentTimeMillis()))
             {
                 VIDEO_FRAME_RATE_INCOMING = (int) ((((float) count_video_frame_received / ((float) (
-                        (System.currentTimeMillis() - last_video_frame_received) / 1000.0f))) / 1.0f) + 0.5);
+                    (System.currentTimeMillis() - last_video_frame_received) / 1000.0f))) / 1.0f) + 0.5);
                 // Log.i(TAG, "VIDEO_FRAME_RATE_INCOMING=" + VIDEO_FRAME_RATE_INCOMING + " fps");
                 update_fps();
                 last_video_frame_received = System.currentTimeMillis();
@@ -3013,12 +3017,11 @@ public class MainActivity extends AppCompatActivity
                   "audio_play:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" +
                   sampling_rate);
             temp_string_a =
-                    "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) +
-                    "s";
+                "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             CallingActivity.update_top_text_line(temp_string_a, 4);
             // HINT: PCM_16 needs 2 bytes per sample per channel
             AudioReceiver.buffer_size =
-                    ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult;  // TODO: this is really bad
+                ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult;  // TODO: this is really bad
             AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f *
                                                 0.9f); // TODO: this is bad also
             Log.i(TAG, "audio_play:read:init buffer_size=" + AudioReceiver.buffer_size);
@@ -3122,7 +3125,7 @@ public class MainActivity extends AppCompatActivity
                         try
                         {
                             debug_audio_writer_play_s = new BufferedWriter(
-                                    new FileWriter("/sdcard/audio_play_s.txt", true));
+                                new FileWriter("/sdcard/audio_play_s.txt", true));
                             long ts = (System.currentTimeMillis() - calling_activity_start_ms) * 1000;
                             int value = 0;
                             for (int xx = 0; xx < 160; xx++)
@@ -3138,7 +3141,7 @@ public class MainActivity extends AppCompatActivity
                             }
 
                             debug_audio_writer_play_s = new BufferedWriter(
-                                    new FileWriter("/sdcard/audio_play_s_ts.txt", true));
+                                new FileWriter("/sdcard/audio_play_s_ts.txt", true));
                             debug_audio_writer_play_s.write("" + System.currentTimeMillis() + "\n");
 
                             if (debug_audio_writer_play_s != null)
@@ -3166,7 +3169,7 @@ public class MainActivity extends AppCompatActivity
                                                          NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
                     int remain_start_pos = (incoming_bytes - remain_bytes);
                     NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(
-                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
                     NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
                                                                           audio_buffer_2[0].arrayOffset(),
                                                                           Math.min(incoming_bytes,
@@ -3236,7 +3239,7 @@ public class MainActivity extends AppCompatActivity
                     else
                     {
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] =
-                                NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
+                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
                         //                            for (int j = 0; j < NativeAudio.n_buf_size_in_bytes - 1; j++)
                         //                            {
                         //                                NativeAudio.n_audio_buffer_1.position(j);
@@ -3292,11 +3295,10 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "group_audio_receive_frame:read:init sample_count=" + sample_count + " channels=" + channels +
                        " sampling_rate=" + sampling_rate);
             temp_string_a =
-                    "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) +
-                    "s";
+                "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
             // HINT: PCM_16 needs 2 bytes per sample per channel
             AudioReceiver.buffer_size =
-                    ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult;  // TODO: this is really bad
+                ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult;  // TODO: this is really bad
             AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f *
                                                 0.9f); // TODO: this is bad also
             Log.i(TAG, "group_audio_receive_frame:read:init buffer_size=" + AudioReceiver.buffer_size);
@@ -3419,7 +3421,7 @@ public class MainActivity extends AppCompatActivity
                                                          NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
                     int remain_start_pos = (incoming_bytes - remain_bytes);
                     NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(
-                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
                     NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
                                                                           audio_buffer_2[0].arrayOffset(),
                                                                           Math.min(incoming_bytes,
@@ -3464,7 +3466,7 @@ public class MainActivity extends AppCompatActivity
                     else
                     {
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] =
-                                NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
+                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
                     }
                 }
                 else
@@ -3738,11 +3740,11 @@ public class MainActivity extends AppCompatActivity
         try
         {
             final Message m = orma.selectFromMessage().
-                    msg_id_hashEq(message_id_hash_as_hex_string).
-                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    directionEq(1).
-                    readEq(false).
-                    toList().get(0);
+                msg_id_hashEq(message_id_hash_as_hex_string).
+                tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                directionEq(1).
+                readEq(false).
+                toList().get(0);
 
             if (m != null)
             {
@@ -3755,7 +3757,7 @@ public class MainActivity extends AppCompatActivity
                         try
                         {
                             if (!HelperRelay.is_any_relay(
-                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
                             {
                                 // only update if the "read receipt" comes from a friend, but not it's relay!
                                 m.raw_msgv2_bytes = "";
@@ -3800,11 +3802,11 @@ public class MainActivity extends AppCompatActivity
         {
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
             final Message m = orma.selectFromMessage().
-                    message_idEq(message_id).
-                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    directionEq(1).
-                    orderByIdDesc().
-                    toList().get(0);
+                message_idEq(message_id).
+                tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                directionEq(1).
+                orderByIdDesc().
+                toList().get(0);
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
 
             // Log.i(TAG, "friend_read_receipt:m=" + m);
@@ -3969,7 +3971,7 @@ public class MainActivity extends AppCompatActivity
                         // now check if this is "potentially" a double message, we can not be sure a 100%
                         // since there is no uniqe key for each message
                         ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds(
-                                real_conference_id, 20);
+                            real_conference_id, 20);
 
                         // Log.i(TAG, "friend_sync_message_v2_cb:last_cm=" + cm);
                         // Log.i(TAG, "friend_sync_message_v2_cb:real_sender_peer_pubkey=" + real_sender_peer_pubkey);
@@ -3990,9 +3992,9 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         conference_message_add_from_sync(
-                                HelperConference.get_conference_num_from_confid(real_conference_id), sender_peer_num,
-                                real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
-                                (msg_wrapped_sec * 1000) + msg_wrapped_ms);
+                            HelperConference.get_conference_num_from_confid(real_conference_id), sender_peer_num,
+                            real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
+                            (msg_wrapped_sec * 1000) + msg_wrapped_ms);
                     }
                     else
                     {
@@ -4022,11 +4024,11 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "friend_sync_message_v2_cb:message_id_hash_as_hex_string=" + message_id_hash_as_hex_string +
                            " friendpubkey=" + real_sender_as_hex_string);
                 final Message m = orma.selectFromMessage().
-                        msg_id_hashEq(message_id_hash_as_hex_string).
-                        tox_friendpubkeyEq(real_sender_as_hex_string).
-                        directionEq(1).
-                        readEq(false).
-                        toList().get(0);
+                    msg_id_hashEq(message_id_hash_as_hex_string).
+                    tox_friendpubkeyEq(real_sender_as_hex_string).
+                    directionEq(1).
+                    readEq(false).
+                    toList().get(0);
 
                 if (m != null)
                 {
@@ -4098,9 +4100,9 @@ public class MainActivity extends AppCompatActivity
         {
             // TODO: cache me!!
             conf_temp = orma.selectFromConferenceDB().
-                    tox_conference_numberEq(conference_number).
-                    and().
-                    conference_activeEq(true).toList().get(0);
+                tox_conference_numberEq(conference_number).
+                and().
+                conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
             Log.i(TAG, "conference_message_add_from_sync:conf_id=" + conf_id);
 
@@ -4237,7 +4239,7 @@ public class MainActivity extends AppCompatActivity
                                 b.setSmallIcon(R.drawable.circle_orange);
                                 b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                 Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                        RingtoneManager.TYPE_NOTIFICATION);
+                                    RingtoneManager.TYPE_NOTIFICATION);
 
                                 if (PREF__notification_sound)
                                 {
@@ -4250,7 +4252,8 @@ public class MainActivity extends AppCompatActivity
                                     b.setVibrate(vibrate_pattern);
                                 }
 
-                                b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                b.setContentTitle(
+                                    context_s.getString(R.string.MainActivity_notification_new_message_title));
                                 b.setAutoCancel(true);
                                 b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message));
                                 Notification notification3 = b.build();
@@ -4406,11 +4409,11 @@ public class MainActivity extends AppCompatActivity
         try
         {
             Filetransfer ft = orma.selectFromFiletransfer().
-                    directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
-                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    file_numberEq(file_number).
-                    orderByIdDesc().
-                    get(0);
+                directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
+                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                file_numberEq(file_number).
+                orderByIdDesc().
+                get(0);
 
             if (ft == null)
             {
@@ -4485,12 +4488,12 @@ public class MainActivity extends AppCompatActivity
                         long row_id = orma.insertIntoFileDB(file_);
                         Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
                         filedb_id = orma.selectFromFileDB().
-                                tox_public_key_stringEq(ft.tox_public_key_string).
-                                and().file_nameEq(ft.file_name).
-                                and().path_nameEq(ft.path_name).
-                                and().directionEq(ft.direction).
-                                and().filesizeEq(ft.filesize).
-                                orderByIdDesc().get(0).id;
+                            tox_public_key_stringEq(ft.tox_public_key_string).
+                            and().file_nameEq(ft.file_name).
+                            and().path_nameEq(ft.path_name).
+                            and().directionEq(ft.direction).
+                            and().filesizeEq(ft.filesize).
+                            orderByIdDesc().get(0).id;
                         Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
                     }
 
@@ -4664,7 +4667,7 @@ public class MainActivity extends AppCompatActivity
         {
             String filename_corrected = get_incoming_filetransfer_local_filename(filename,
                                                                                  HelperFriend.tox_friend_get_public_key__wrapper(
-                                                                                         friend_number));
+                                                                                     friend_number));
 
             Log.i(TAG, "file_recv:incoming regular file");
             Filetransfer f = new Filetransfer();
@@ -4771,12 +4774,12 @@ public class MainActivity extends AppCompatActivity
         try
         {
             f = orma.selectFromFiletransfer().
-                    directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
-                    file_numberEq(file_number).
-                    and().
-                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    orderByIdDesc().
-                    get(0);
+                directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
+                file_numberEq(file_number).
+                and().
+                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                orderByIdDesc().
+                get(0);
 
             // Log.i(TAG, "file_recv_chunk:filesize==" + f.filesize);
 
@@ -4788,7 +4791,7 @@ public class MainActivity extends AppCompatActivity
                 if (VFS_ENCRYPT)
                 {
                     info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
-                            f.path_name + "/" + f.file_name);
+                        f.path_name + "/" + f.file_name);
                     info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
                     // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
                     // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
@@ -4821,7 +4824,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     info.guardianproject.iocipher.FileOutputStream fos = null;
                     fos = cache_ft_fos.get(
-                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                        HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                     if (f.fos_open)
                     {
@@ -4841,7 +4844,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     java.io.FileOutputStream fos = null;
                     fos = cache_ft_fos_normal.get(
-                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                        HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                     if (f.fos_open)
                     {
@@ -4877,7 +4880,7 @@ public class MainActivity extends AppCompatActivity
                     long row_id = orma.insertIntoFileDB(file_);
                     Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                            f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
+                        f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
                     Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
                 }
 
@@ -4946,15 +4949,14 @@ public class MainActivity extends AppCompatActivity
                         fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
                         // Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos.put(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                fos);
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                         f.fos_open = true;
                         HelperFiletransfer.update_filetransfer_db_fos_open(f);
                     }
                     else
                     {
                         fos = cache_ft_fos.get(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                         if (fos == null)
                         {
@@ -4962,8 +4964,8 @@ public class MainActivity extends AppCompatActivity
                             // Log.i(TAG,
                             //       "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos.put(
-                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                    fos);
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                fos);
                             f.fos_open = true;
                             HelperFiletransfer.update_filetransfer_db_fos_open(f);
                         }
@@ -4983,15 +4985,14 @@ public class MainActivity extends AppCompatActivity
                         fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
                         // Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos_normal.put(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                fos);
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
                         f.fos_open = true;
                         HelperFiletransfer.update_filetransfer_db_fos_open(f);
                     }
                     else
                     {
                         fos = cache_ft_fos_normal.get(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                         if (fos == null)
                         {
@@ -4999,8 +5000,8 @@ public class MainActivity extends AppCompatActivity
                             // Log.i(TAG,
                             //      "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos_normal.put(
-                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                    fos);
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                fos);
                             f.fos_open = true;
                             HelperFiletransfer.update_filetransfer_db_fos_open(f);
                         }
@@ -5144,7 +5145,7 @@ public class MainActivity extends AppCompatActivity
         // strip first 3 bytes of cookie to get the conference_id.
         // this is aweful and hardcoded
         String conference_identifier = bytes_to_hex(
-                Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
+            Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
         Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
 
         // invite also my ToxProxy -------------
@@ -5190,9 +5191,9 @@ public class MainActivity extends AppCompatActivity
         {
             // TODO: cache me!!
             conf_temp = orma.selectFromConferenceDB().
-                    tox_conference_numberEq(conference_number).
-                    and().
-                    conference_activeEq(true).toList().get(0);
+                tox_conference_numberEq(conference_number).
+                and().
+                conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
         }
         catch (Exception e)
@@ -5327,7 +5328,7 @@ public class MainActivity extends AppCompatActivity
                                 b.setSmallIcon(R.drawable.circle_orange);
                                 b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                 Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                        RingtoneManager.TYPE_NOTIFICATION);
+                                    RingtoneManager.TYPE_NOTIFICATION);
 
                                 if (PREF__notification_sound)
                                 {
@@ -5340,7 +5341,8 @@ public class MainActivity extends AppCompatActivity
                                     b.setVibrate(vibrate_pattern);
                                 }
 
-                                b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                b.setContentTitle(
+                                    context_s.getString(R.string.MainActivity_notification_new_message_title));
                                 b.setAutoCancel(true);
                                 b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
                                 Notification notification3 = b.build();
@@ -5385,16 +5387,16 @@ public class MainActivity extends AppCompatActivity
                 {
                     // TODO: cache me!!
                     conf_temp2 = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                            and().
-                            conference_activeEq(true).
-                            get(0);
+                        and().
+                        conference_activeEq(true).
+                        get(0);
 
                     if (conf_temp2 != null)
                     {
                         // update it in the Database
                         orma.updateConferenceDB().
-                                conference_identifierEq(conf_temp2.conference_identifier).
-                                name(title).execute();
+                            conference_identifierEq(conf_temp2.conference_identifier).
+                            name(title).execute();
                     }
                 }
                 catch (Exception e)
@@ -5429,9 +5431,9 @@ public class MainActivity extends AppCompatActivity
             {
                 // TODO: cache me!!
                 conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                        and().
-                        conference_activeEq(true).
-                        get(0);
+                    and().
+                    conference_activeEq(true).
+                    get(0);
             }
             catch (Exception e)
             {
@@ -5505,7 +5507,7 @@ public class MainActivity extends AppCompatActivity
                         Log.i(TAG, "namelist_change_cb:INFO:" + " 001");
 
                         if (conference_message_list_activity.get_current_conf_id().equals(
-                                conf_temp.conference_identifier))
+                            conf_temp.conference_identifier))
                         {
                             String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
                                                                                           peer_number);
@@ -5564,9 +5566,9 @@ public class MainActivity extends AppCompatActivity
             {
                 // TODO: cache me!!
                 conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                        and().
-                        conference_activeEq(true).
-                        get(0);
+                    and().
+                    conference_activeEq(true).
+                    get(0);
             }
             catch (Exception e)
             {
@@ -5582,7 +5584,7 @@ public class MainActivity extends AppCompatActivity
                         Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
 
                         if (conference_message_list_activity.get_current_conf_id().equals(
-                                conf_temp.conference_identifier))
+                            conf_temp.conference_identifier))
                         {
                             Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
                             conference_message_list_activity.update_group_all_users();
@@ -5600,8 +5602,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
 
-                        if (conference_audio_activity.get_current_conf_id().equals(
-                                conf_temp.conference_identifier))
+                        if (conference_audio_activity.get_current_conf_id().equals(conf_temp.conference_identifier))
                         {
                             Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
                             conference_audio_activity.update_group_all_users();
@@ -5641,9 +5642,9 @@ public class MainActivity extends AppCompatActivity
             {
                 // TODO: cache me!!
                 conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                        and().
-                        conference_activeEq(true).
-                        get(0);
+                    and().
+                    conference_activeEq(true).
+                    get(0);
             }
             catch (Exception e)
             {
@@ -5727,7 +5728,7 @@ public class MainActivity extends AppCompatActivity
                             Log.i(TAG, "namelist_change_cb:INFO:" + " 001.1");
 
                             if (conference_message_list_activity.get_current_conf_id().equals(
-                                    conf_temp.conference_identifier))
+                                conf_temp.conference_identifier))
                             {
                                 String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
                                                                                               peer_number);
@@ -5755,7 +5756,7 @@ public class MainActivity extends AppCompatActivity
                             Log.i(TAG, "namelist_change_cb:INFO:" + " 001");
 
                             if (conference_message_list_activity.get_current_conf_id().equals(
-                                    conf_temp.conference_identifier))
+                                conf_temp.conference_identifier))
                             {
                                 String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
                                                                                               peer_number);
@@ -5801,7 +5802,7 @@ public class MainActivity extends AppCompatActivity
                         if (conference_message_list_activity != null)
                         {
                             if (conference_message_list_activity.get_current_conf_id().equals(
-                                    conf_temp.conference_identifier))
+                                conf_temp.conference_identifier))
                             {
                                 String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
                                                                                               peer_number);
@@ -5817,9 +5818,9 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         String name_from_cacheDB = orma.selectFromConferencePeerCacheDB().
-                                conference_identifierEq(conf_temp.conference_identifier).
-                                peer_pubkeyEq(tox_conference_peer_get_public_key(conference_number, peer_number)).
-                                orderByLast_update_timestampAsc().get(0).peer_name;
+                            conference_identifierEq(conf_temp.conference_identifier).
+                            peer_pubkeyEq(tox_conference_peer_get_public_key(conference_number, peer_number)).
+                            orderByLast_update_timestampAsc().get(0).peer_name;
 
                         if (name_from_cacheDB != null)
                         {
@@ -5873,8 +5874,8 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         orma.deleteFromConferencePeerCacheDB().
-                                conference_identifierEq(conf_temp.conference_identifier).
-                                peer_pubkeyEq(pubkey_save).execute();
+                            conference_identifierEq(conf_temp.conference_identifier).
+                            peer_pubkeyEq(pubkey_save).execute();
                         Log.i(TAG, "namelist_change_cb:deleteFromConferencePeerCacheDB");
                     }
                     catch (Exception e)
@@ -5893,7 +5894,7 @@ public class MainActivity extends AppCompatActivity
                                   "namelist_change_cb:selectFromConferencePeerCacheDB().count=" + count_cache_entries);
 
                             for (ConferencePeerCacheDB entry : orma.selectFromConferencePeerCacheDB().offset(0).limit(
-                                    50))
+                                50))
                             {
                                 Log.i(TAG, "namelist_change_cb:delete peer cache entry ID=" + entry.id);
                                 orma.deleteFromConferencePeerCacheDB().idEq(entry.id).execute();
@@ -6160,7 +6161,7 @@ public class MainActivity extends AppCompatActivity
 
 
                                     String avatar_filename_for_remote =
-                                            "avatar" + get_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION");
+                                        "avatar" + get_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION");
 
                                     long filenum = tox_file_send(friend_number_, TOX_FILE_KIND_AVATAR.value,
                                                                  avatar_bytes.capacity(), hash_bytes,
@@ -6171,7 +6172,7 @@ public class MainActivity extends AppCompatActivity
                                     // save FT to db ---------------
                                     Filetransfer ft_avatar_outgoing = new Filetransfer();
                                     ft_avatar_outgoing.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(
-                                            friend_number_);
+                                        friend_number_);
                                     ft_avatar_outgoing.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
                                     ft_avatar_outgoing.file_number = filenum;
                                     ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
@@ -6244,7 +6245,7 @@ public class MainActivity extends AppCompatActivity
         // TODO: update entry in main friendlist (if visible)
         //       or in chat view (if visible)
         HelperFriend.update_single_friend_in_friendlist_view(
-                main_get_friend(tox_friend_by_public_key__wrapper(friend_pubkey)));
+            main_get_friend(tox_friend_by_public_key__wrapper(friend_pubkey)));
     }
 
     static void move_tmp_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
@@ -6256,11 +6257,11 @@ public class MainActivity extends AppCompatActivity
             if (VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
-                        src_path_name + "/" + src_file_name);
+                    src_path_name + "/" + src_file_name);
                 info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
-                        dst_path_name + "/" + dst_file_name);
+                    dst_path_name + "/" + dst_file_name);
                 info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(
-                        dst_path_name + "/");
+                    dst_path_name + "/");
                 dst_dir.mkdirs();
                 f1.renameTo(f2);
             }
@@ -6325,9 +6326,9 @@ public class MainActivity extends AppCompatActivity
                 String uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length());
                 Log.i(TAG, "copy_real_file_to_vfs_file:uniq_temp_filename=" + uniq_temp_filename);
                 info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
-                        VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
+                    VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
                 info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(
-                        VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
+                    VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
                 dst_dir.mkdirs();
                 java.io.FileInputStream is = null;
                 info.guardianproject.iocipher.FileOutputStream os = null;
@@ -6455,8 +6456,8 @@ public class MainActivity extends AppCompatActivity
             //            os.write(buffer, 0, len);
             //            os.close();
             java.io.InputStream ins = context.getResources().
-                    openRawResource(context.getResources().
-                            getIdentifier("ic_plus_sign", "drawable", context.getPackageName()));
+                openRawResource(context.getResources().
+                    getIdentifier("ic_plus_sign", "drawable", context.getPackageName()));
             byte[] buffer = new byte[1024];
             int length;
 
@@ -6486,7 +6487,7 @@ public class MainActivity extends AppCompatActivity
             if (VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(
-                        src_path_name + "/" + src_file_name);
+                    src_path_name + "/" + src_file_name);
                 uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length()) + appl;
                 // Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
                 java.io.File f2 = new java.io.File(dst_path_name + "/" + uniq_temp_filename);
@@ -6530,7 +6531,7 @@ public class MainActivity extends AppCompatActivity
             if (VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(
-                        src_path_name + "/" + src_file_name);
+                    src_path_name + "/" + src_file_name);
                 java.io.File f2 = new java.io.File(dst_path_name + "/" + dst_file_name);
                 java.io.File dst_dir = new java.io.File(dst_path_name + "/");
                 dst_dir.mkdirs();
@@ -6586,7 +6587,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
+                HelperFriend.tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
 
             if (f.avatar_pathname == null)
             {
@@ -6614,7 +6615,7 @@ public class MainActivity extends AppCompatActivity
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
                 info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(
-                        f1);
+                    f1);
                 byte[] byteArray = new byte[(int) f1.length()];
                 fis.read(byteArray, 0, (int) f1.length());
                 return new BitmapDrawable(BitmapFactory.decodeByteArray(byteArray, 0, (int) f1.length()));
@@ -6652,25 +6653,25 @@ public class MainActivity extends AppCompatActivity
                     if (is_friend_avatar)
                     {
                         GlideApp.
-                                with(c).
-                                load(f1).
-                                placeholder(R.drawable.round_loading_animation).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                        fl.avatar_update_timestamp)).
-                                skipMemoryCache(false).
-                                into(v);
+                            with(c).
+                            load(f1).
+                            placeholder(R.drawable.round_loading_animation).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                fl.avatar_update_timestamp)).
+                            skipMemoryCache(false).
+                            into(v);
                     }
                     else
                     {
                         GlideApp.
-                                with(c).
-                                load(f1).
-                                placeholder(R.drawable.round_loading_animation).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(force_update).
-                                into(v);
+                            with(c).
+                            load(f1).
+                            placeholder(R.drawable.round_loading_animation).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(force_update).
+                            into(v);
                     }
                 }
                 else
@@ -6678,25 +6679,25 @@ public class MainActivity extends AppCompatActivity
                     if (is_friend_avatar)
                     {
                         GlideApp.
-                                with(c).
-                                load(f1).
-                                placeholder(placholder).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                        fl.avatar_update_timestamp)).
-                                skipMemoryCache(false).
-                                into(v);
+                            with(c).
+                            load(f1).
+                            placeholder(placholder).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                fl.avatar_update_timestamp)).
+                            skipMemoryCache(false).
+                            into(v);
                     }
                     else
                     {
                         GlideApp.
-                                with(c).
-                                load(f1).
-                                placeholder(placholder).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(force_update).
-                                into(v);
+                            with(c).
+                            load(f1).
+                            placeholder(placholder).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(force_update).
+                            into(v);
                     }
                 }
             }
@@ -6707,12 +6708,12 @@ public class MainActivity extends AppCompatActivity
                 byte[] byteArray = new byte[(int) f1.length()];
                 fis.read(byteArray, 0, (int) f1.length());
                 GlideApp.
-                        with(c).
-                        load(byteArray).
-                        placeholder(placholder).
-                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                        skipMemoryCache(force_update).
-                        into(v);
+                    with(c).
+                    load(byteArray).
+                    placeholder(placholder).
+                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                    skipMemoryCache(force_update).
+                    into(v);
             }
         }
         catch (Exception e)
@@ -6792,7 +6793,7 @@ public class MainActivity extends AppCompatActivity
                 String friend_tox_id1 = data.getStringExtra("toxid");
                 String friend_tox_id = "";
                 friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst(
-                        "TOX:", "").replaceFirst("Tox:", "");
+                    "TOX:", "").replaceFirst("Tox:", "");
                 HelperFriend.add_friend_real(friend_tox_id);
             }
             else
@@ -6866,8 +6867,9 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-                    intents.add(new LabeledIntent(intent, info.activityInfo.packageName,
-                                                  info.loadLabel(getPackageManager()), info.icon));
+                    intents.add(
+                        new LabeledIntent(intent, info.activityInfo.packageName, info.loadLabel(getPackageManager()),
+                                          info.icon));
                 }
 
                 try
@@ -6882,14 +6884,15 @@ public class MainActivity extends AppCompatActivity
                     email_app.printStackTrace();
                     Log.i(TAG, "email:" + "Error starting Email App");
                     new AlertDialog.Builder(c).setMessage(
-                                            R.string.MainActivity_error_starting_email_app).setPositiveButton(R.string.MainActivity_button_ok,
-                                                                                          null).show();
+                        R.string.MainActivity_error_starting_email_app).setPositiveButton(
+                        R.string.MainActivity_button_ok, null).show();
                 }
             }
             else
             {
                 Log.i(TAG, "email:" + "No Email App found");
-                new AlertDialog.Builder(c).setMessage(R.string.MainActivity_no_email_app_found).setPositiveButton(R.string.MainActivity_button_ok, null).show();
+                new AlertDialog.Builder(c).setMessage(R.string.MainActivity_no_email_app_found).setPositiveButton(
+                    R.string.MainActivity_button_ok, null).show();
             }
         }
         catch (ActivityNotFoundException e)
@@ -6997,9 +7000,9 @@ public class MainActivity extends AppCompatActivity
                                 try
                                 {
                                     CallingActivity.ca.right_top_text_3.setText(
-                                            "IN   " + VIDEO_FRAME_RATE_INCOMING + " fps");
+                                        "IN   " + VIDEO_FRAME_RATE_INCOMING + " fps");
                                     CallingActivity.ca.right_top_text_4.setText(
-                                            "Out " + VIDEO_FRAME_RATE_OUTGOING + " fps");
+                                        "Out " + VIDEO_FRAME_RATE_OUTGOING + " fps");
                                 }
                                 catch (Exception e)
                                 {
@@ -7039,20 +7042,20 @@ public class MainActivity extends AppCompatActivity
                             try
                             {
                                 CallingActivity.ca.right_top_text_1.setText(
-                                        "O:" + Callstate.codec_to_str(Callstate.video_out_codec) + ":" +
-                                        Callstate.video_bitrate);
+                                    "O:" + Callstate.codec_to_str(Callstate.video_out_codec) + ":" +
+                                    Callstate.video_bitrate);
                                 CallingActivity.ca.right_top_text_1b.setText(
-                                        "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
-                                        Callstate.video_in_bitrate);
+                                    "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
+                                    Callstate.video_in_bitrate);
                                 if (native_aec_lib_ready)
                                 {
                                     CallingActivity.ca.right_top_text_2.setText(
-                                            "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay + "e");
+                                        "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay + "e");
                                 }
                                 else
                                 {
                                     CallingActivity.ca.right_top_text_2.setText(
-                                            "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
+                                        "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
                                 }
                             }
                             catch (Exception e)
@@ -7126,7 +7129,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 BufferedInputStream buf = new BufferedInputStream(
-                        new info.guardianproject.iocipher.FileInputStream(file));
+                    new info.guardianproject.iocipher.FileInputStream(file));
                 buf.read(bytes, 0, bytes.length);
                 buf.close();
                 ret = ret.put(bytes);
@@ -7398,7 +7401,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             info.guardianproject.iocipher.RandomAccessFile raf = new info.guardianproject.iocipher.RandomAccessFile(
-                    file_name_with_path, "rw");
+                file_name_with_path, "rw");
             info.guardianproject.iocipher.IOCipherFileChannel inChannel = raf.getChannel();
             // inChannel.lseek(position, OsConstants.SEEK_SET);
             inChannel.write(data, position);
@@ -7565,7 +7568,7 @@ public class MainActivity extends AppCompatActivity
                                 try
                                 {
                                     info.guardianproject.iocipher.File f_vfs = new info.guardianproject.iocipher.File(
-                                            file_.path_name + "/" + file_.file_name);
+                                        file_.path_name + "/" + file_.file_name);
 
                                     if (f_vfs.exists())
                                     {
@@ -7836,7 +7839,7 @@ public class MainActivity extends AppCompatActivity
                                         try
                                         {
                                             MainActivity.conference_message_list_fragment.adapter.remove_item(
-                                                    m_to_delete);
+                                                m_to_delete);
                                         }
                                         catch (Exception e)
                                         {
@@ -7977,11 +7980,11 @@ public class MainActivity extends AppCompatActivity
                 else
                 {
                     int friend_con_status = orma.selectFromFriendList().
-                            tox_public_key_stringEq(friend_pubkey).
-                            get(0).TOX_CONNECTION_real;
+                        tox_public_key_stringEq(friend_pubkey).
+                        get(0).TOX_CONNECTION_real;
                     int relay_con_status = orma.selectFromFriendList().
-                            tox_public_key_stringEq(relay_).
-                            get(0).TOX_CONNECTION_real;
+                        tox_public_key_stringEq(relay_).
+                        get(0).TOX_CONNECTION_real;
 
                     if ((friend_con_status != TOX_CONNECTION_NONE.value) ||
                         (relay_con_status != TOX_CONNECTION_NONE.value))
@@ -8045,8 +8048,8 @@ public class MainActivity extends AppCompatActivity
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
         int raw_message_length_int = raw_message_length_buf.
-                array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
-                array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
+            array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
+            array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
         // Log.i(TAG,
         //      "tox_friend_send_message_wrapper:message=" + message + " res=" + res + " len=" + raw_message_length_int);
         result.error_num = res;
@@ -8112,7 +8115,7 @@ public class MainActivity extends AppCompatActivity
         {
             long start_timestamp = System.currentTimeMillis();
             update_savedata_file(TrifaSetPatternActivity.bytesToString(
-                    TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+                TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
             long end_timestamp = System.currentTimeMillis();
             Log.i(TAG, "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
         }
@@ -8314,7 +8317,7 @@ public class MainActivity extends AppCompatActivity
                                     b.setSmallIcon(R.drawable.circle_orange);
                                     b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                     Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                            RingtoneManager.TYPE_NOTIFICATION);
+                                        RingtoneManager.TYPE_NOTIFICATION);
 
                                     if (PREF__notification_sound)
                                     {
@@ -8327,9 +8330,11 @@ public class MainActivity extends AppCompatActivity
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                    b.setContentTitle(
+                                        context_s.getString(R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message3));
+                                    b.setContentText(
+                                        context_s.getString(R.string.MainActivity_notification_new_message3));
                                     Notification notification3 = b.build();
                                     nmn3.notify(Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -8389,8 +8394,8 @@ public class MainActivity extends AppCompatActivity
                                                      msg_id_buffer.limit());
             // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
-                    msg_id_as_hex_string).count();
+                HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
+                msg_id_as_hex_string).count();
 
             if (already_have_message > 0)
             {
@@ -8526,7 +8531,7 @@ public class MainActivity extends AppCompatActivity
                                     b.setSmallIcon(R.drawable.circle_orange);
                                     b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                     Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                            RingtoneManager.TYPE_NOTIFICATION);
+                                        RingtoneManager.TYPE_NOTIFICATION);
 
                                     if (PREF__notification_sound)
                                     {
@@ -8539,9 +8544,11 @@ public class MainActivity extends AppCompatActivity
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                    b.setContentTitle(
+                                        context_s.getString(R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message4));
+                                    b.setContentText(
+                                        context_s.getString(R.string.MainActivity_notification_new_message4));
                                     Notification notification3 = b.build();
                                     nmn3.notify(Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -8603,8 +8610,8 @@ public class MainActivity extends AppCompatActivity
                                                      msg_id_buffer.limit());
             Log.i(TAG, "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
-                    msg_id_as_hex_string).count();
+                HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
+                msg_id_as_hex_string).count();
 
             if (already_have_message > 0)
             {
@@ -8741,7 +8748,7 @@ public class MainActivity extends AppCompatActivity
                                     b.setSmallIcon(R.drawable.circle_orange);
                                     b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                     Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                            RingtoneManager.TYPE_NOTIFICATION);
+                                        RingtoneManager.TYPE_NOTIFICATION);
 
                                     if (PREF__notification_sound)
                                     {
@@ -8754,9 +8761,11 @@ public class MainActivity extends AppCompatActivity
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                    b.setContentTitle(
+                                        context_s.getString(R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message5));
+                                    b.setContentText(
+                                        context_s.getString(R.string.MainActivity_notification_new_message5));
                                     Notification notification3 = b.build();
                                     nmn3.notify(Notification_new_message_ID, notification3);
                                     // -- notification ------------------

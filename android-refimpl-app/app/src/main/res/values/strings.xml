@@ -352,6 +352,7 @@
     <string name="layout___friends_relay_pubkey">Friends Relay Pubkey:</string>
     <string name="layout___waiting_for_orbot">waiting for Orbot ...</string>
     <string name="layout___clear_glide_cache">clear Glide Cache</string>
+    <string name="layout___set_app_language">set App Language</string>
     <string name="layout___run_vacuum_on_sql_database">run VACUUM on Sql Database</string>
     <string name="layout___run_analyze_on_sql_database">run ANALYZE on Sql Database</string>
     <string name="layout___reset_favorite_emoji_list">reset favorite Emoji List</string>

@@ -33,6 +33,8 @@ import android.preference.PreferenceManager;
 import android.support.multidex.MultiDex;
 import android.util.Log;
 
+import com.yariksoffice.lingver.Lingver;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,6 +47,7 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.TrifaToxService.ONGOING_NOTIFICATION_ID;
@@ -74,6 +77,10 @@ public class MainApplication extends Application
     {
         randnum = (int) (Math.random() * 1000d);
 
+        // Lingver.init(this, Locale.ENGLISH);
+        Lingver.init(this, Locale.getDefault());
+        // Lingver.getInstance().setFollowSystemLocale(this);
+
         Log.i(TAG, "MainApplication:" + randnum + ":" + "onCreate");
         super.onCreate();
 
@@ -96,13 +103,16 @@ public class MainApplication extends Application
         if (crashes > 10000)
         {
             crashes = 0;
-            PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes", crashes).commit();
+            PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes",
+                                                                                                      crashes).commit();
         }
 
         Log.i(TAG, "MainApplication:" + randnum + ":" + "crashes[load]=" + crashes);
-        last_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong("last_crash_time", 0);
+        last_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong(
+            "last_crash_time", 0);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "last_crash_time[load]=" + last_crash_time);
-        prevlast_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong("prevlast_crash_time", 0);
+        prevlast_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong(
+            "prevlast_crash_time", 0);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "prevlast_crash_time[load]=" + prevlast_crash_time);
 
         if (CATCH_EXCEPTIONS)
@@ -129,7 +139,8 @@ public class MainApplication extends Application
     {
         try
         {
-            final Process process = Runtime.getRuntime().exec("ps -w -e -T -o PID,TID,CMDLINE,CMD,PRI,NI,STAT,PCY,CPU"); // |grep -i trifa
+            final Process process = Runtime.getRuntime().exec(
+                "ps -w -e -T -o PID,TID,CMDLINE,CMD,PRI,NI,STAT,PCY,CPU"); // |grep -i trifa
 
             final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             final StringBuilder log = new StringBuilder();
@@ -190,7 +201,8 @@ public class MainApplication extends Application
             {
                 // some problems with the params?
                 final Process process2 = Runtime.getRuntime().exec("logcat -d");
-                final BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
+                final BufferedReader bufferedReader2 = new BufferedReader(
+                    new InputStreamReader(process2.getInputStream()));
                 final StringBuilder log2 = new StringBuilder();
 
                 String line2;
@@ -239,7 +251,9 @@ public class MainApplication extends Application
             myFile.createNewFile();
             FileOutputStream fOut = new FileOutputStream(myFile);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append("Errormesage:\n" + last_stack_trace_as_string + "\n\n===================================\n\n" + log_detailed);
+            myOutWriter.append(
+                "Errormesage:\n" + last_stack_trace_as_string + "\n\n===================================\n\n" +
+                log_detailed);
             myOutWriter.close();
             fOut.close();
             // also save to crash file ----
@@ -290,7 +304,8 @@ public class MainApplication extends Application
         }
 
         crashes++;
-        PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes", crashes).commit();
+        PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes",
+                                                                                                  crashes).commit();
 
         try
         {
@@ -304,8 +319,10 @@ public class MainApplication extends Application
         }
 
         Log.i(TAG, "MainApplication:" + randnum + ":" + "crashes[set]=" + crashes);
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" + (prevlast_crash_time + (60 * 1000)) + " < " + System.currentTimeMillis());
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" + (System.currentTimeMillis() - (prevlast_crash_time + (60 * 1000))));
+        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" + (prevlast_crash_time + (60 * 1000)) + " < " +
+                   System.currentTimeMillis());
+        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" +
+                   (System.currentTimeMillis() - (prevlast_crash_time + (60 * 1000))));
 
 
         try
@@ -326,7 +343,8 @@ public class MainApplication extends Application
         ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
         ComponentName componentInfo = taskInfo.get(0).topActivity;
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "componentInfo=" + componentInfo + " class=" + componentInfo.getClassName());
+        Log.i(TAG, "MainApplication:" + randnum + ":" + "componentInfo=" + componentInfo + " class=" +
+                   componentInfo.getClassName());
 
         try
         {

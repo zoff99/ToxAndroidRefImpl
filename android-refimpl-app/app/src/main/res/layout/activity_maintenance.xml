@@ -25,6 +25,16 @@
             android:orientation="vertical">
 
             <android.support.v7.widget.AppCompatButton
+                android:id="@+id/button_set_app_language"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___set_app_language"
+                android:textSize="14sp"/>
+
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/button_clear_glide_cache"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

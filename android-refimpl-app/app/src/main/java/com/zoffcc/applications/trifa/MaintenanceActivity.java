@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -37,12 +38,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.yariksoffice.lingver.Lingver;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import info.guardianproject.netcipher.client.StrongBuilder;
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder2;
@@ -56,6 +59,7 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.SelectLanguageActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.delete_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
 import static com.zoffcc.applications.trifa.MainActivity.import_toxsave_file_unsecure;
@@ -67,6 +71,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     private static final String TAG = "trifa.MaintActy";
 
     Button button_clear_glide_cache;
+    Button button_set_app_language;
     Button button_sql_vacuum;
     Button button_sql_analyze;
     Button button_fav_emoji_reset;
@@ -103,6 +108,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         setContentView(R.layout.activity_maintenance);
 
         button_clear_glide_cache = (Button) findViewById(R.id.button_clear_glide_cache);
+        button_set_app_language = (Button) findViewById(R.id.button_set_app_language);
         button_sql_vacuum = (Button) findViewById(R.id.button_sql_vacuum);
         button_sql_analyze = (Button) findViewById(R.id.button_sql_analyze);
         button_fav_emoji_reset = (Button) findViewById(R.id.button_fav_emoji_reset);
@@ -117,6 +123,23 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        button_set_app_language.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    Intent intent = new Intent(getBaseContext(), SelectLanguageActivity.class);
+                    startActivityForResult(intent, SelectLanguageActivity_ID);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         button_clear_glide_cache.setOnClickListener(new View.OnClickListener()
         {
@@ -217,7 +240,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 try
                 {
                     getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE).
-                            edit().putString(RECENT_EMOJIS, "").commit();
+                        edit().putString(RECENT_EMOJIS, "").commit();
                 }
                 catch (Exception e)
                 {
@@ -263,8 +286,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     {
                         Log.i(TAG, "StrongOkHttpClientBuilder:002T");
                         StrongOkHttpClientBuilder2 bb = StrongOkHttpClientBuilder2.
-                                forMaxSecurity(MaintenanceActivity.this).
-                                withTorValidation();
+                            forMaxSecurity(MaintenanceActivity.this).
+                            withTorValidation();
                         bb.build(MaintenanceActivity.this);
                         Log.i(TAG, "StrongOkHttpClientBuilder:003T");
                     }
@@ -497,8 +520,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
 
         text_sqlstats.setText(
-                "Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " +
-                num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
+            "Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " +
+            num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
 
         maint_handler_s = maint_handler;
     }
@@ -527,11 +550,11 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 {
                     Log.i(TAG, "onConnected:002");
                     Request request = new Request.Builder().url(TOX_NODELIST_URL).
-                            build();
+                        build();
 
                     Response response = okHttpClient.
-                            newCall(request).
-                            execute();
+                        newCall(request).
+                        execute();
                     Log.i(TAG, "onConnected:003");
 
                     // Type type = new TypeToken<List<NodeListJS>>()
@@ -731,12 +754,13 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         Log.i(TAG, "files_and_sizes_in_dir:file len=" + file.length());
                         if ((file.length() / 1024 / 1024) < 1)
                         {
-                            ret.append("\n").append(file.getName()).append("  \t").append(file.length()).append(" Bytes");
+                            ret.append("\n").append(file.getName()).append("  \t").append(file.length()).append(
+                                " Bytes");
                         }
                         else
                         {
                             ret.append("\n").append(file.getName()).append("  \t").append(
-                                    file.length() / 1024 / 1024).append(" MBytes");
+                                file.length() / 1024 / 1024).append(" MBytes");
                         }
                         size_sum = size_sum + file.length();
                         Log.i(TAG, "files_and_sizes_in_dir:size_sum=" + size_sum);
@@ -767,5 +791,47 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
 
         return ret.toString();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == SelectLanguageActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                try
+                {
+                    String result_lang = data.getData().toString();
+                    if (result_lang != null)
+                    {
+                        if (result_lang.length() > 0)
+                        {
+                            Log.i(TAG, "onActivityResult:result_lang:" + result_lang);
+
+                            if (result_lang.compareTo("_default_") == 0)
+                            {
+                                Lingver.getInstance().setFollowSystemLocale(this);
+                            }
+                            else if (result_lang.compareTo("en") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.ENGLISH);
+                            }
+                            else if (result_lang.compareTo("en") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.US);
+                            }
+                            else if (result_lang.compareTo("zh-rCN") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.SIMPLIFIED_CHINESE);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
