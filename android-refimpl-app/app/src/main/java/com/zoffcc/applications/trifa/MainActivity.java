@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -933,7 +934,8 @@ public class MainActivity extends AppCompatActivity
         // --------- status spinner ---------
         spinner_own_status = (Spinner) findViewById(R.id.spinner_own_status);
         ArrayList<String> own_online_status_string_values = new ArrayList<String>(
-                Arrays.asList("Available", "Away", "Busy"));
+                Arrays.asList(getString(R.string.MainActivity_available), getString(R.string.MainActivity_away), getString(
+                                    R.string.MainActivity_busy)));
         ArrayAdapter<String> myAdapter = new OwnStatusSpinnerAdapter(this, R.layout.own_status_spinner_item,
                                                                      own_online_status_string_values);
 
@@ -991,17 +993,17 @@ public class MainActivity extends AppCompatActivity
         // -------- drawer ------------
         // -------- drawer ------------
         // -------- drawer ------------
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("Profile").withIcon(
+        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.MainActivity_profile).withIcon(
                 GoogleMaterial.Icon.gmd_face);
-        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName("Settings").withIcon(
+        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.MainActivity_settings).withIcon(
                 GoogleMaterial.Icon.gmd_settings);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Logout/Login").withIcon(
+        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.MainActivity_logout_login).withIcon(
                 GoogleMaterial.Icon.gmd_refresh);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("Maintenance").withIcon(
+        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(R.string.MainActivity_maint).withIcon(
                 GoogleMaterial.Icon.gmd_build);
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName("About").withIcon(
+        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(R.string.MainActivity_about).withIcon(
                 GoogleMaterial.Icon.gmd_info);
-        PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName("Exit").withIcon(
+        PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName(R.string.MainActivity_exit).withIcon(
                 GoogleMaterial.Icon.gmd_exit_to_app);
         final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
                 color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
@@ -2159,22 +2161,22 @@ public class MainActivity extends AppCompatActivity
                     if (resolve_activity != null)
                     {
                         AlertDialog ad = new AlertDialog.Builder(this).
-                                setNegativeButton("no", new DialogInterface.OnClickListener()
+                                setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
                                 {
                                     public void onClick(DialogInterface dialog, int id)
                                     {
                                         return;
                                     }
                                 }).
-                                setPositiveButton("OK, take me there", new DialogInterface.OnClickListener()
+                                setPositiveButton(R.string.MainActivity_ok_take_me_there_button, new DialogInterface.OnClickListener()
                                 {
                                     public void onClick(DialogInterface dialog, int id)
                                     {
                                         startActivity(intent);
                                     }
                                 }).create();
-                        ad.setTitle("INFO");
-                        ad.setMessage("Please add TRIfA to the exception list for Batteryoptimization!");
+                        ad.setTitle(getString(R.string.MainActivity_info_dialog_title));
+                        ad.setMessage(getString(R.string.MainActivity_add_to_batt_opt));
                         ad.setCancelable(false);
                         ad.setCanceledOnTouchOutside(false);
                         ad.show();
@@ -3686,6 +3688,7 @@ public class MainActivity extends AppCompatActivity
         final long friend_number_ = friend_number;
         Runnable myRunnable = new Runnable()
         {
+            @SuppressLint("SetTextI18n")
             @Override
             public void run()
             {
@@ -3699,7 +3702,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (typing == 1)
                                 {
-                                    ml_friend_typing.setText("friend is typing ...");
+                                    ml_friend_typing.setText(R.string.MainActivity_friend_is_typing);
                                 }
                                 else
                                 {
@@ -4247,9 +4250,9 @@ public class MainActivity extends AppCompatActivity
                                     b.setVibrate(vibrate_pattern);
                                 }
 
-                                b.setContentTitle("TRIfA");
+                                b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
                                 b.setAutoCancel(true);
-                                b.setContentText("new Message");
+                                b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message));
                                 Notification notification3 = b.build();
                                 nmn3.notify(Notification_new_message_ID, notification3);
                                 // -- notification ------------------
@@ -5337,9 +5340,9 @@ public class MainActivity extends AppCompatActivity
                                     b.setVibrate(vibrate_pattern);
                                 }
 
-                                b.setContentTitle("TRIfA");
+                                b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
                                 b.setAutoCancel(true);
-                                b.setContentText("new Message");
+                                b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
                                 Notification notification3 = b.build();
                                 nmn3.notify(Notification_new_message_ID, notification3);
                                 // -- notification ------------------
@@ -6878,14 +6881,15 @@ public class MainActivity extends AppCompatActivity
                 {
                     email_app.printStackTrace();
                     Log.i(TAG, "email:" + "Error starting Email App");
-                    new AlertDialog.Builder(c).setMessage("Error starting Email App").setPositiveButton("Ok",
-                                                                                                        null).show();
+                    new AlertDialog.Builder(c).setMessage(
+                                            R.string.MainActivity_error_starting_email_app).setPositiveButton(R.string.MainActivity_button_ok,
+                                                                                          null).show();
                 }
             }
             else
             {
                 Log.i(TAG, "email:" + "No Email App found");
-                new AlertDialog.Builder(c).setMessage("No Email App found").setPositiveButton("Ok", null).show();
+                new AlertDialog.Builder(c).setMessage(R.string.MainActivity_no_email_app_found).setPositiveButton(R.string.MainActivity_button_ok, null).show();
             }
         }
         catch (ActivityNotFoundException e)
@@ -7668,7 +7672,7 @@ public class MainActivity extends AppCompatActivity
             {
                 progressDialog2.dismiss();
                 Context c = weakContext.get();
-                Toast.makeText(c, "Messages deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(c, R.string.MainActivity_toast_msg_deleted, Toast.LENGTH_SHORT).show();
             }
             catch (Exception e4)
             {
@@ -7765,7 +7769,7 @@ public class MainActivity extends AppCompatActivity
             {
                 progressDialog2.dismiss();
                 Context c = weakContext.get();
-                Toast.makeText(c, "Messages exported", Toast.LENGTH_SHORT).show();
+                Toast.makeText(c, R.string.MainActivity_toast_msg_exported, Toast.LENGTH_SHORT).show();
             }
             catch (Exception e4)
             {
@@ -7896,7 +7900,7 @@ public class MainActivity extends AppCompatActivity
             {
                 progressDialog2.dismiss();
                 Context c = weakContext.get();
-                Toast.makeText(c, "Messages deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(c, R.string.MainActivity_toast_msgs_deleted, Toast.LENGTH_SHORT).show();
             }
             catch (Exception e4)
             {
@@ -8323,9 +8327,9 @@ public class MainActivity extends AppCompatActivity
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle("TRIfA");
+                                    b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText("new Message");
+                                    b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message3));
                                     Notification notification3 = b.build();
                                     nmn3.notify(Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -8535,9 +8539,9 @@ public class MainActivity extends AppCompatActivity
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle("TRIfA");
+                                    b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText("new Message");
+                                    b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message4));
                                     Notification notification3 = b.build();
                                     nmn3.notify(Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -8750,9 +8754,9 @@ public class MainActivity extends AppCompatActivity
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle("TRIfA");
+                                    b.setContentTitle(context_s.getString(R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText("new Message");
+                                    b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message5));
                                     Notification notification3 = b.build();
                                     nmn3.notify(Notification_new_message_ID, notification3);
                                     // -- notification ------------------

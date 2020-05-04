@@ -245,6 +245,33 @@
     <!-- Java Source texts -->
     <!-- Java Source texts -->
     <!-- Java Source texts -->
+    <string name="MainActivity_profile">Profile</string>
+    <string name="MainActivity_settings">Settings</string>
+    <string name="MainActivity_logout_login">Logout/Login</string>
+    <string name="MainActivity_maint">Maintenance</string>
+    <string name="MainActivity_about">About</string>
+    <string name="MainActivity_exit">Exit</string>
+    <string name="MainActivity_available">Available</string>
+    <string name="MainActivity_away">Away</string>
+    <string name="MainActivity_busy">Busy</string>
+    <string name="MainActivity_no_button">no</string>
+    <string name="MainActivity_ok_take_me_there_button">OK, take me there</string>
+    <string name="MainActivity_info_dialog_title">INFO</string>
+    <string name="MainActivity_add_to_batt_opt">Please add TRIfA to the exception list for Batteryoptimization!</string>
+    <string name="MainActivity_friend_is_typing">friend is typing ...</string>
+    <string name="MainActivity_notification_new_message">new Message</string>
+    <string name="MainActivity_notification_new_message_title" translatable="false">TRIfA</string>
+    <string name="MainActivity_notification_new_message2">new Message</string>
+    <string name="MainActivity_button_ok">Ok</string>
+    <string name="MainActivity_error_starting_email_app">Error starting Email App</string>
+    <string name="MainActivity_no_email_app_found">No Email App found</string>
+    <string name="MainActivity_toast_msg_deleted">Messages deleted</string>
+    <string name="MainActivity_toast_msg_exported">Messages exported</string>
+    <string name="MainActivity_toast_msgs_deleted">Messages deleted</string>
+    <string name="MainActivity_notification_new_message3">new Message</string>
+    <string name="MainActivity_notification_new_message4">new Message</string>
+    <string name="MainActivity_notification_new_message5">new Message</string>
+
     <string name="Aboutpage_0">TRIfA Crashlog</string>
     <string name="Aboutpage_1" translatable="false">https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/README.md</string>
     <string name="Aboutpage_10" translatable="false">https://github.com/gfx/Android-Orma</string>

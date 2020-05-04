@@ -1,0 +1,20 @@
+<resources>
+    <string name="add_friend_activity_name">Freund hinzufügen</string>
+    <string name="set_password_message_empty">kein Passwort</string>
+    <string name="set_password_message_password_invalid">Passwort zu kurz</string>
+    <string name="set_password_message_password_dont_match">Passwort stimmt nicht überein</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="settings_toolbar_title">Einstellungen</string>
+    <string name="title_activity_check_password">Passwort eingeben</string>
+    <string name="title_activity_set_password">Passwort setzen</string>
+    <string name="MainActivity_settings">Einstellungen</string>
+    <string name="MainActivity_profile">Profil</string>
+    <string name="MainActivity_exit">Exit</string>
+    <string name="MainActivity_no_button">Nein</string>
+    <string name="MainActivity_ok_take_me_there_button">Ja, bitte</string>
+    <string name="MainActivity_info_dialog_title">INFO</string>
+    <string name="MainActivity_notification_new_message3">neue Nachricht</string>
+    <string name="MainActivity_notification_new_message4">neue Nachricht</string>
+    <string name="MainActivity_notification_new_message5">neue Nachricht</string>
+    <string name="MainActivity_button_ok">Ok</string>
+</resources>
