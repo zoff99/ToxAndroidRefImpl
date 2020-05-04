@@ -816,14 +816,54 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             {
                                 Lingver.getInstance().setLocale(this, Locale.ENGLISH);
                             }
-                            else if (result_lang.compareTo("en") == 0)
+                            else if (result_lang.compareTo("de") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.US);
+                                Lingver.getInstance().setLocale(this, Locale.GERMAN);
                             }
                             else if (result_lang.compareTo("zh-rCN") == 0)
                             {
                                 Lingver.getInstance().setLocale(this, Locale.SIMPLIFIED_CHINESE);
                             }
+                            // ------------------
+                            // ------------------
+                            // ------------------
+                            //else if (result_lang.compareTo("ar") == 0)
+                            //{
+                            //    // TODO: left to right languages corrupt the layout now
+                            //    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            //}
+                            else if (result_lang.compareTo("es") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            }
+                            //else if (result_lang.compareTo("fa") == 0)
+                            //{
+                            //    // TODO: left to right languages corrupt the layout now
+                            //    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            //}
+                            else if (result_lang.compareTo("fr") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            }
+                            else if (result_lang.compareTo("hi") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            }
+                            else if (result_lang.compareTo("hu") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            }
+                            else if (result_lang.compareTo("it") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            }
+                            else if (result_lang.compareTo("ru") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            }
+                            // ------------------
+                            // ------------------
+                            // ------------------
                         }
                     }
                 }
