@@ -118,7 +118,7 @@
         <item>-1</item>
     </string-array>
 
-    <string name="pref_header_data_sync">数据 &amp; 同步</string>
+    <string name="pref_header_data_sync">数据 &#038; 同步</string>
 
     <string name="pref_title_sync_frequency">同步频率</string>
     <string-array name="pref_sync_frequency_titles">

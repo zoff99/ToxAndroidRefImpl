@@ -1,0 +1,352 @@
+<resources>
+
+    <string name="add_friend_activity_name">दोस्त जोड़ें</string>
+    <string name="message_list_activity_name">चैट</string>
+    <string name="conference_message_list_activity_name">पाठ सम्मेलन</string>
+    <string name="conference_audio_activity_name">ऑडियो कॉन्फ्रेंस</string>
+
+    <string name="set_password_message_empty">पासवर्ड खाली है</string>
+    <string name="set_password_message_password_invalid">पासवर्ड बहुत छोटा है</string>
+    <string name="set_password_message_password_dont_match">पासवर्ड मेल नहीं खाते</string>
+
+    <string name="title_activity_calling">कॉल</string>
+    <string name="title_activity_profile">प्रोफ़ाइल</string>
+    <string name="title_activity_settings">समायोजन</string>
+    <string name="title_activity_crash">दुर्घटना</string>
+    <string name="title_activity_friendinfo">Friendinfo</string>
+    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_aboutpage">के बारे में</string>
+    <string name="title_activity_set_password">पासवर्ड सेट करें</string>
+    <string name="title_activity_check_password">पास वर्ड दर्ज करें</string>
+    <string name="title_activity_share">TRIfA के साथ खुला</string>
+    <string name="title_activity_maintenance">रखरखाव</string>
+
+
+    <string-array name="spinner_own_status_array">
+        <item>ऑनलाइन</item>
+        <item>दूर</item>
+        <item>व्यस्त</item>
+    </string-array>
+
+    <string name="settings_toolbar_title">समायोजन</string>
+
+    
+    
+    
+    <string name="pref_header_general">सामान्य</string>
+
+    <string name="pref_title_auto_accept_image">ऑटो स्वीकार छवि</string>
+    <string name="pref_description_auto_accept_image">ऑटो आकार में 3 एमबीटी तक की छवियां और तस्वीरें स्वीकार करता है</string>
+
+    <string name="pref_title_video_uv_reversed">वीडियो में उल्टा यूवी</string>
+    <string name="pref_description_video_uv_reversed">कैमरा वीडियो में यूवी विमानों के क्रम को उलट दें</string>
+
+    <string name="pref_title_software_echo_cancel">गूंज रद्दीकरण</string>
+    <string name="pref_description_software_echo_cancel">सॉफ्टवेयर इको कैंसिलेशन का उपयोग करें</string>
+
+    <string name="pref_title_higher_video_quality">वीडियो की गुणवत्ता</string>
+    <string name="pref_description_higher_video_quality">बेहतर वीडियो गुणवत्ता का उपयोग करें। \nपरिवर्तन की आवश्यकता है!</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>कम बैंडविड्थ \n(250 kb /s)</item>
+        <item>सामान्य बैंडविड्थ \n(2500 kb /s)</item>
+        <item>उच्च बैंडविड्थ \n(3500 kb /s)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_camera_get_preview_format">कैमरा पूर्वावलोकन प्रारूप</string>
+    <string name="pref_description_camera_get_preview_format">कैमरा प्रीव्यू फॉर्मेट कुछ फोन्स में गलत फॉर्मेट में लगता है</string>
+    <string-array name="pref_camera_get_preview_format_titles">
+        <item>डिफ़ॉल्ट: YV12</item>
+        <item>कुछ फोन: NV21</item>
+    </string-array>
+    <string-array name="pref_camera_get_preview_format_values">
+        <item>YV12</item>
+        <item>NV21</item>
+    </string-array>
+
+    <string name="pref_title_higher_audio_quality">ध्वनि गुणवत्ता</string>
+    <string name="pref_description_higher_audio_quality">बेहतर ऑडियो गुणवत्ता का उपयोग करें। \nपरिवर्तन की आवश्यकता है!</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>कम \n(6 kb /s)</item>
+        <item>सामान्य \n(32 kb /s)</item>
+        <item>उच्च \n(64 kb /s)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_udp_enabled">यूडीपी सक्षम करें</string>
+    <string name="pref_description_udp_enabled">अधिकांश मोबाइल उपकरणों के लिए UDP अधिक इंटरनेट ट्रैफ़िक का कारण बनेगी। \nपरिवर्तन की आवश्यकता RESTART! \nDefault सेटिंग है</string>
+
+    <string name="pref_title_orbot_enabled">टोर प्रॉक्सी को सक्षम करें</string>
+    <string name="pref_description_orbot_enabled">इसका उपयोग करने के लिए आपको Orbot इंस्टॉल करना होगा। \nपरिवर्तन की आवश्यकता है RESTART!</string>
+
+    <string name="pref_title_fps_half">कम एफपीएस</string>
+    <string name="pref_description_fps_half">वीडियो Framerate 1/2: तो 25fps के बजाय 12fps</string>
+
+    <string name="pref_title_set_fps">एफपीएस सेट करें</string>
+    <string name="pref_description_set_fps">15fps वीडियो फ़्रैमरेट सेट करने का प्रयास करें, इससे कुछ फ़ोन क्रैश हो सकते हैं</string>
+
+    <string name="pref_title_display_name">प्रदर्शित होने वाला नाम</string>
+    <string name="pref_default_display_name">जॉन स्मिथ</string>
+
+    <string name="pref_title_conference_show_system_messages">सिस्टम संदेश</string>
+    <string name="pref_description_conference_show_system_messages">सम्मेलनों में सिस्टम संदेश दिखाएं</string>
+
+    <string name="pref_title_local_discovery_enabled">लैन खोज</string>
+    <string name="pref_description_local_discovery_enabled">बूट करने के लिए स्थानीय लैन पर नोड्स का उपयोग करें</string>
+
+    <string name="pref_title_U_keep_nospam">NoSpam रखें</string>
+    <string name="pref_description_U_keep_nospam">NoSpam मान रखें। यह सुरक्षित नहीं है, केवल सक्रिय करें यदि आप जानते हैं कि आप क्या कर रहे हैं!</string>
+
+    <string name="pref_title_allow_screen_off_in_audio_call">स्क्रीन बंद करें</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">यदि आप ऑडीओकल में स्क्रीन को बंद करने में परेशानी का अनुभव करते हैं, तो इसे बंद कर दें</string>
+
+    <string name="pref_title_X_zoom_incoming_video">ज़ूम वीडियोकॉल विंडो</string>
+    <string name="pref_description_X_zoom_incoming_video">विडोकॉल विंडो को पिंच-ज़ूम करने की अनुमति दें। यह पूरी तरह से काम नहीं कर रहा है!</string>
+
+    <string name="pref_title_X_use_native_audio_play">देशी ऑडियो सिस्टम</string>
+    <string name="pref_description_X_use_native_audio_play">!! प्रायोगिक !!! ध्वनि खेलने के लिए मूल ऑडियो का उपयोग करें</string>
+
+    <string name="pref_title_X_battery_saving_mode">बैटरी बचत मोड</string>
+    <string name="pref_description_X_battery_saving_mode">!! प्रायोगिक !! \nthis थोड़ी अधिक बैटरी बचाएगा, लेकिन संदेश भेजने और प्राप्त करने में अधिक समय लगेगा। \nकुछ अन्य बुरे प्रभाव भी!</string>
+
+    <string name="pref_title_X_misc_button_enabled">विविध। बटन</string>
+    <string name="pref_description_X_misc_button_enabled">!! प्रायोगिक !! \nएक निश्चित संदेश भेजने के लिए कॉलिंग स्क्रीन पर एक बटन</string>
+
+    <string name="pref_title_X_eac_delay_ms">एईसी देरी</string>
+    <string name="pref_description_X_eac_delay_ms">!! प्रायोगिक !! \nएमएस में देरी</string>
+
+    <string name="pref_title_add_friends_to_messages">मित्रों को संदेशों में जोड़ें</string>
+    <string-array name="pref_example_list_titles">
+        <item>हमेशा</item>
+        <item>जब संभव</item>
+        <item>कभी नहीँ</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_header_data_sync">डेटा</string>
+
+    <string name="pref_title_sync_frequency">सिंक आवृत्ति</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 मिनट</item>
+        <item>30 मिनिट</item>
+        <item>1 घंटा</item>
+        <item>3 घंटे</item>
+        <item>6 घंटे</item>
+        <item>कभी नहीँ</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+
+    <string name="pref_title_min_audio_samplingrate_out">ऑडियो नमूनाकरण</string>
+    <string name="pref_description_min_audio_samplingrate_out">डिफ़ॉल्ट सेटिंग 48000 हर्ट्ज है</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>ऑटो</item>
+        <item>8000 हर्ट्ज</item>
+        <item>16000 हर्ट्ज</item>
+        <item>48000 हर्ट्ज</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>ऑटो</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+
+
+    <string name="pref_title_X_audio_recording_frame_size">ऑडिओरकोडिंग फ्रेमलाइज</string>
+    <string name="pref_description_X_audio_recording_frame_size">डिफ़ॉल्ट सेटिंग 40 एमएस है</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+
+    <string name="pref_title_X_battery_saving_timeout">ऑफलाइन समय Batterysavings मोड में</string>
+    <string name="pref_description_X_battery_saving_timeout">डिफ़ॉल्ट सेटिंग 15 मिनट की है</string>
+    <string-array name="X_battery_saving_timeout_titles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="X_battery_saving_timeout_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>प्रवेश १</item>
+        <item>प्रवेश २</item>
+        <item>प्रवेश ३</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value"/>
+
+    <string name="pref_title_system_sync_settings">सिस्टम सिंक सेटिंग्स</string>
+
+    <string name="pref_header_notifications">सूचनाएं</string>
+
+    <string name="pref_title_new_message_notifications">नई संदेश सूचनाएं</string>
+
+    <string name="pref_title_ringtone">रिंगटोन</string>
+    <string name="pref_ringtone_silent">मूक</string>
+
+    <string name="pref_title_vibrate">कांपना</string>
+    <string name="pref_title_sound">ध्वनि</string>
+    <string name="add_friend_activity_help">ऊपर दिए गए टेक्स्ट बॉक्स में दोस्त की टोक्स आईडी पेस्ट करें या टैप करें     QR कोड बटन एक कैमरे के साथ दोस्त के कोड को स्कैन करने के लिए।</string>
+    <string name="add_friend_activity_add">दोस्त जोड़ें</string>
+    <string name="cancel">रद्द करना</string>
+    
+    
+    
+
+
+    
+    
+    
+    <string name="MainActivity_profile">प्रोफ़ाइल</string>
+    <string name="MainActivity_settings">समायोजन</string>
+    <string name="MainActivity_logout_login">लॉगआउट /लॉग इन</string>
+    <string name="MainActivity_maint">रखरखाव</string>
+    <string name="MainActivity_about">के बारे में</string>
+    <string name="MainActivity_exit">बाहर जाएं</string>
+    <string name="MainActivity_available">उपलब्ध</string>
+    <string name="MainActivity_away">दूर</string>
+    <string name="MainActivity_busy">व्यस्त</string>
+    <string name="MainActivity_no_button">नहीं</string>
+    <string name="MainActivity_ok_take_me_there_button">ठीक है, मुझे वहाँ ले चलो</string>
+    <string name="MainActivity_info_dialog_title">जानकारी</string>
+    <string name="MainActivity_add_to_batt_opt">कृपया Batteryoptimization की अपवाद सूची में TRIfA जोड़ें!</string>
+    <string name="MainActivity_friend_is_typing">दोस्त टाइप कर रहा है ...</string>
+    <string name="MainActivity_notification_new_message">नया संदेश</string>
+    <string name="MainActivity_notification_new_message2">नया संदेश</string>
+    <string name="MainActivity_button_ok">ठीक है</string>
+    <string name="MainActivity_error_starting_email_app">ईमेल ऐप शुरू करने में त्रुटि</string>
+    <string name="MainActivity_no_email_app_found">कोई ईमेल ऐप नहीं मिला</string>
+    <string name="MainActivity_toast_msg_deleted">संदेश हटाए गए</string>
+    <string name="MainActivity_toast_msg_exported">निर्यात किए गए संदेश</string>
+    <string name="MainActivity_toast_msgs_deleted">संदेश हटाए गए</string>
+    <string name="MainActivity_notification_new_message3">नया संदेश</string>
+    <string name="MainActivity_notification_new_message4">नया संदेश</string>
+    <string name="MainActivity_notification_new_message5">नया संदेश</string>
+
+    <string name="Aboutpage_0">TRIfA क्रैशलॉग</string>
+    <string name="Aboutpage_2">ईमेल के माध्यम से क्रैश रिपोर्ट भेजें</string>
+    <string name="Aboutpage_4">क्रैश की जानकारी पढ़ने ...</string>
+    <string name="Aboutpage_5a">TRIfA Android के लिए एक विषाक्त ग्राहक</string>
+    <string name="Aboutpage_5b">संस्करण:</string>
+    <string name="Aboutpage_6">टॉक्स क्या है?</string>
+    <string name="Aboutpage_8">प्रयुक्त पुस्तकालय:</string>
+
+    <string name="AddFriendActivity.3">गलत ToxID</string>
+    <string name="AddFriendActivity.4">कोई टॉक्सिड नहीं</string>
+
+    <string name="CallingActivity_0">वीडियो विलंब:</string>
+    <string name="CallingActivity_23">वीडियो विलंब:</string>
+
+    <string name="ConferenceAudioActivity_10">उपयोगकर्ता सूची</string>
+    <string name="ConferenceAudioActivity_17">बात करने के लिए धक्का</string>
+    <string name="ConferenceAudioActivity_18">बात कर रहे ...</string>
+    <string name="ConferenceAudioActivity_39">सक्रिय:</string>
+    <string name="ConferenceAudioActivity_40">ऑफ़लाइन:</string>
+    
+    
+    
+
+
+    
+    
+    
+    <string name="layout___toxid">ToxID</string>
+    <string name="layout___scan_qr_code">क्यू आर कोड स्कैन करें</string>
+    <string name="layout___enter_pass_longtext">पासवर्ड दर्ज करें \nकोई पुनर्प्राप्ति विकल्प नहीं है!</string>
+    <string name="layout___unlock">अनलॉक</string>
+    <string name="layout___name">नाम</string>
+    <string name="layout___push_to_talk">बात करने के लिए धक्का</string>
+    <string name="layout___nick">निक:</string>
+    <string name="layout___pubkey">Pubkey:</string>
+    <string name="layout___status">स्थिति:</string>
+    <string name="layout___alias">उपनाम</string>
+    <string name="layout___remove_friends_relay">मित्र रिले निकालें</string>
+    <string name="layout___friends_relay_pubkey">दोस्तों रिले पबकी:</string>
+    <string name="layout___waiting_for_orbot">Orbot की प्रतीक्षा कर रहा है ...</string>
+    <string name="layout___clear_glide_cache">स्पष्ट सरकना</string>
+    <string name="layout___set_app_language">App भाषा सेट करें</string>
+    <string name="layout___run_vacuum_on_sql_database">Sql डेटाबेस पर VACUUM चलाएँ</string>
+    <string name="layout___run_analyze_on_sql_database">Sql Database पर ANALYZE चलाएं</string>
+    <string name="layout___reset_favorite_emoji_list">पसंदीदा इमोजी सूची रीसेट करें</string>
+    <string name="layout___delete_all_avatar_icons">सभी अवतार आइकन हटाएं</string>
+    <string name="layout___update_bootstrapnodes_from_internet">इंटरनेट से बूटस्ट्रैपनॉड्स को अपडेट करें</string>
+    <string name="layout___reset_bootstrapnodes_to_default">डिफ़ॉल्ट पर बूटस्ट्रैपोड्स रीसेट करें</string>
+    <string name="layout___test_notification_sound">परीक्षण अधिसूचना ध्वनि</string>
+    <string name="layout___test_ringtone_sound">रिंगटोन्स ध्वनि का परीक्षण करें</string>
+    <string name="layout___export_tox_savedata_unsecure">एक्सपोर्ट टॉक्सिक सेवेटा * असुरक्षित *</string>
+    <string name="layout___im_port_tox_savadata_unsecure">IM- पोर्ट TOX SAVADATA * UNSECURE *</string>
+    <string name="layout___click_image_to_change_your_avatar">अपने अवतार को बदलने के लिए छवि पर क्लिक करें</string>
+    <string name="layout___remove_own_relay">खुद को हटा दें</string>
+    <string name="layout___relay_pubkey">रिले पबकी:</string>
+    <string name="layout___new_random_nospam">नया रैंडम NOSPAM</string>
+    <string name="layout___own_pubkey">खुद की पब्बी:</string>
+    <string name="layout___copy_toxid">कॉपी ToxID</string>
+    <string name="layout___your_toxidenticon">आपका टोक्सीडेंटिकॉन</string>
+    <string name="layout___active_network_connections">सक्रिय नेटवर्क कनेक्शन:</string>
+    <string name="layout___error_getting_active_network_connections">* सक्रिय नेटवर्क कनेक्शन प्राप्त करने में त्रुटि *</string>
+    <string name="layout___set_password_or_skip">पासवर्ड सेट करें या छोड़ दें। \n\nजब आप एक \nपासवर्ड को छोड़ना चुनते हैं तो स्वतः पूर्ण हो जाएगा \nकोई रिकवरी विकल्प नहीं है!</string>
+    <string name="layout___password">कुंजिका</string>
+    <string name="layout___password_again">कूटशब्द दुबारा भरें</string>
+    <string name="layout___set_password">पासवर्ड सेट करें</string>
+    <string name="layout___skip">छोड़ें</string>
+    <string name="layout___leave">छोड़ना</string>
+    <string name="layout___delete">हटाएं</string>
+    <string name="layout___info">जानकारी</string>
+    <string name="layout___create_text_group">टेक्स्ट ग्रुप बनाएं</string>
+    <string name="layout___create_audio_group">ऑडियो ग्रुप बनाएं</string>
+    <string name="layout___add_as_toxproxy">ToxProxy के रूप में जोड़ें</string>
+    <string name="layout___peer_name">सहकर्मी का नाम</string>
+    <string name="layout___online">ऑनलाइन</string>
+    <string name="layout___copy">प्रतिलिपि</string>
+    <string name="layout___export">निर्यात</string>
+    
+    
+    
+</resources>
