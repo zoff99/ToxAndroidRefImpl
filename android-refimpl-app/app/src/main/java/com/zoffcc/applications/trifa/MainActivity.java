@@ -391,6 +391,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__video_play_delay_ms = 180;
     static int PREF__audio_group_play_volume_percent = 100;
     static boolean PREF__auto_accept_image = true;
+    static boolean PREF__auto_accept_video = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -871,6 +872,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__auto_accept_image = true;
+        }
+
+        try
+        {
+            PREF__auto_accept_video = settings.getBoolean("auto_accept_video", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__auto_accept_video = false;
         }
 
         try
@@ -2087,6 +2098,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__auto_accept_image = true;
+        }
+
+        try
+        {
+            PREF__auto_accept_video = settings.getBoolean("auto_accept_video", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__auto_accept_video = false;
         }
 
         try

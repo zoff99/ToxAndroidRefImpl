@@ -35,8 +35,11 @@
     <!-- Strings related to Settings -->
     <string name="pref_header_general">General</string>
 
-    <string name="pref_title_auto_accept_image">auto accept image</string>
+    <string name="pref_title_auto_accept_image">auto accept images</string>
     <string name="pref_description_auto_accept_image">auto accept Images and Photos up to 3 MByte in size</string>
+
+    <string name="pref_title_auto_accept_video">auto accept videos</string>
+    <string name="pref_description_auto_accept_video">auto accept Videos up to 10 MByte in size</string>
 
     <string name="pref_title_video_uv_reversed">reverse UV in Video</string>
     <string name="pref_description_video_uv_reversed">Reverse the order of UV planes in the camera video</string>
