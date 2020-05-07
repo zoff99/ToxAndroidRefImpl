@@ -10,6 +10,11 @@ Build Status
 **CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003)
 **Bintray:** [![Download](https://api.bintray.com/packages/zoff99/maven/trifajni/images/download.svg)](https://bintray.com/zoff99/maven/trifajni/_latestVersion)
 
+Help Translate the App in your Language
+=
+translate this file and make a PR on github<br>
+https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/android-refimpl-app/app/src/main/res/values/strings.xml
+
 Offline Messages \*NEW\* \*NEW\*
 =
 To get offline messages for your TRIfA App, install ToxProxy on your raspberryPi and leave it running at home.<br>
