@@ -76,7 +76,7 @@ dependencyVerification {
         'com.sun.xml.fastinfoset:FastInfoset:1.2.13:FastInfoset-1.2.13.jar:27a77db909f3c2833c0b1a37c55af1db06045118ad2eed96ce567b6632bce038',
         'com.vanniktech:emoji-ios:0.5.1:emoji-ios-0.5.1.aar:f30f5ad996b81d3a1a5987055d22b2e1bcecc5067c1524addabb271366452e80',
         'com.vanniktech:emoji:0.5.1:emoji-0.5.1.aar:d55f44e04e31895647d62c33c34a8d501995e9e1b5c5f5cee6cbb8630eeb37f7',
-        'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.37:trifa-jni-lib-1.0.37.aar:bc66f4718a2d8f05145c023ea6558af476fecd56da7103255995167ebafafa53',
+        'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.38:trifa-jni-lib-1.0.38.aar:defc386cd14c6767f4b08a80ecbabbf05243ed1ff47d4fb724def6af3ce6c700',
         'commons-codec:commons-codec:1.9:commons-codec-1.9.jar:ad19d2601c3abf0b946b5c3a4113e226a8c1e3305e395b90013b78dd94a723ce',
         'commons-logging:commons-logging:1.2:commons-logging-1.2.jar:daddea1ea0be0f56978ab3006b8ac92834afeefbd9b7e4e6316fca57df0fa636',
         'de.hdodenhof:circleimageview:2.2.0:circleimageview-2.2.0.aar:bc34761dcd5036229ac1ffed6b5b1bef722ad5b097a2c8bba1c5ed2cd4b5c82b',
