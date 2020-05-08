@@ -50,7 +50,7 @@
     <string name="pref_description_software_echo_cancel">Yazılım Yankı İptali Kullan</string>
 
     <string name="pref_title_higher_video_quality">Video kalitesi</string>
-    <string name="pref_description_higher_video_quality">Daha iyi Video kalitesi kullanın. \NDeğişiklik RESTART\'a ihtiyaç duyuyor!</string>
+    <string name="pref_description_higher_video_quality">Daha iyi Video kalitesi kullanın. \nDeğişiklik RESTART\'a ihtiyaç duyuyor!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>düşük bant genişliği \n(250 kb /s)</item>
         <item>normal bant genişliği \n(2500 kb /s)</item>
@@ -74,7 +74,7 @@
     </string-array>
 
     <string name="pref_title_higher_audio_quality">Ses kalitesi</string>
-    <string name="pref_description_higher_audio_quality">Daha iyi Ses kalitesi kullanın. \NDeğişiklik RESTART\'a ihtiyaç duyuyor!</string>
+    <string name="pref_description_higher_audio_quality">Daha iyi Ses kalitesi kullanın. \nDeğişiklik RESTART\'a ihtiyaç duyuyor!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>düşük \n(6 kb /s)</item>
         <item>normal \n(32 kb /s)</item>
@@ -90,7 +90,7 @@
     <string name="pref_description_udp_enabled">çoğu mobil cihaz için UDP çok daha fazla internet trafiğine neden olur. \nDeğişiklik RESTART\'a ihtiyacı var! \nVarsayılan ayar KAPALI</string>
 
     <string name="pref_title_orbot_enabled">Tor Proxy\'yi etkinleştir</string>
-    <string name="pref_description_orbot_enabled">Bunu kullanmak için Orbot\'u yüklemeniz gerekiyor. \NDeğişiklik için RESTART gerekiyor!</string>
+    <string name="pref_description_orbot_enabled">Bunu kullanmak için Orbot\'u yüklemeniz gerekiyor. \nDeğişiklik için RESTART gerekiyor!</string>
 
     <string name="pref_title_fps_half">düşük fps</string>
     <string name="pref_description_fps_half">Video Kare Hızı 1/2: 25 kare /sn yerine 12 kare /sn</string>
@@ -117,7 +117,7 @@
     <string name="pref_description_X_use_native_audio_play">!! Deneysel !! \nSes Çalmak için Yerel Sesi Kullanın</string>
 
     <string name="pref_title_X_battery_saving_mode">Pil Tasarruf Modu</string>
-    <string name="pref_description_X_battery_saving_mode">!! Expermimental !! \nBu daha fazla pil tasarrufu sağlayacaktır, ancak mesajın gönderilmesi ve alınması daha uzun sürecektir. \NBelki de diğer bazı kötü etkiler de!</string>
+    <string name="pref_description_X_battery_saving_mode">!! Expermimental !! \nBu daha fazla pil tasarrufu sağlayacaktır, ancak mesajın gönderilmesi ve alınması daha uzun sürecektir. \nBelki de diğer bazı kötü etkiler de!</string>
 
     <string name="pref_title_X_misc_button_enabled">Çeşitli. Buton</string>
     <string name="pref_description_X_misc_button_enabled">!! Expermimental !! \Sabit bir Mesaj göndermek için Arama Ekranında bir Düğme</string>
@@ -363,7 +363,7 @@
     <string name="layout___your_toxidenticon">ToxIdenticon\'unuz</string>
     <string name="layout___active_network_connections">aktif Ağ Bağlantıları:</string>
     <string name="layout___error_getting_active_network_connections">* etkin ağ bağlantılarını alma hatası *</string>
-    <string name="layout___set_password_or_skip">Parola Ayarla veya atla. \N \nBir atlamayı seçtiğinizde \nparola otomatik olarak oluşturulacaktır \nKurtarma seçeneği YOK!</string>
+    <string name="layout___set_password_or_skip">Parola Ayarla veya atla. \n \nBir atlamayı seçtiğinizde \nparola otomatik olarak oluşturulacaktır \nKurtarma seçeneği YOK!</string>
     <string name="layout___password">Parola</string>
     <string name="layout___password_again">Şifre Tekrar</string>
     <string name="layout___set_password">Şifreyi belirle</string>
