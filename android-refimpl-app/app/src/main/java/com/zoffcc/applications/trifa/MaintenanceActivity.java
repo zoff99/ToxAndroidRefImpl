@@ -861,6 +861,10 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             {
                                 Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
                             }
+                            else if (result_lang.compareTo("sv") == 0)
+                            {
+                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                            }
                             else if (result_lang.compareTo("ru") == 0)
                             {
                                 Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
