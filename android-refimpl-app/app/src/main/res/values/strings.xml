@@ -307,8 +307,8 @@
     <string name="Aboutpage_8">used libraries:</string>
     <string name="Aboutpage_9" translatable="false">com.github.gfx.android.orma</string>
 
-    <string name="AddFriendActivity.3">incorrect ToxID</string>
-    <string name="AddFriendActivity.4">No ToxID</string>
+    <string name="AddFriendActivity_3">incorrect ToxID</string>
+    <string name="AddFriendActivity_4">No ToxID</string>
 
     <string name="CallingActivity_0">Video Delay:</string>
     <string name="CallingActivity_123" translatable="false">ms</string>
