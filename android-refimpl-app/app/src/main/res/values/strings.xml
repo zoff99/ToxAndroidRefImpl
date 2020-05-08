@@ -96,9 +96,6 @@
     <string name="pref_title_set_fps">set fps</string>
     <string name="pref_description_set_fps">try to set 15fps video framerate, this may crash on some phones</string>
 
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
     <string name="pref_title_conference_show_system_messages">System Messages</string>
     <string name="pref_description_conference_show_system_messages">show System Messages in Conferences</string>
 
@@ -127,16 +124,6 @@
     <string name="pref_description_X_eac_delay_ms">!! Expermimental !!\nAEC delay in ms</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
 
     <string name="pref_header_data_sync">Data &#038; sync</string>
 
