@@ -277,8 +277,8 @@
     <string name="Aboutpage_6">Che cos\'è Tox?</string>
     <string name="Aboutpage_8">librerie usate:</string>
 
-    <string name="AddFriendActivity.3">ToxID errato</string>
-    <string name="AddFriendActivity.4">No ToxID</string>
+    <string name="AddFriendActivity_3">ToxID errato</string>
+    <string name="AddFriendActivity_4">No ToxID</string>
 
     <string name="CallingActivity_0">Ritardo video:</string>
     <string name="CallingActivity_23">Ritardo video:</string>

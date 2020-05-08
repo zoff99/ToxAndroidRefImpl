@@ -277,8 +277,8 @@
     <string name="Aboutpage_6">ما هو التوكس؟</string>
     <string name="Aboutpage_8">المكتبات المستعملة:</string>
 
-    <string name="AddFriendActivity.3">ToxID غير صحيح</string>
-    <string name="AddFriendActivity.4">لا يوجد ToxID</string>
+    <string name="AddFriendActivity_3">ToxID غير صحيح</string>
+    <string name="AddFriendActivity_4">لا يوجد ToxID</string>
 
     <string name="CallingActivity_0">تأخير الفيديو:</string>
     <string name="CallingActivity_23">تأخير الفيديو:</string>

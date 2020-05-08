@@ -89,7 +89,7 @@
     <string name="pref_description_udp_enabled">Bei den meisten Mobilgeräten verursacht UDP viel mehr Internetverkehr. \nÄnderung muss neu gestartet werden! \nDie Standardeinstellung ist AUS</string>
 
     <string name="pref_title_orbot_enabled">Aktivieren Sie Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">Sie müssen Orbot installieren, um dies nutzen zu können. \nFnder Neustart muss geändert werden!</string>
+    <string name="pref_description_orbot_enabled">Sie müssen Orbot installieren, um dies nutzen zu können. \nDer Neustart muss geändert werden!</string>
 
     <string name="pref_title_fps_half">niedrigere fps</string>
     <string name="pref_description_fps_half">Video Framerate 1/2: also 12fps statt 25fps</string>
@@ -125,16 +125,6 @@
     <string name="pref_description_X_eac_delay_ms">!! Experimentelle !! \nAEC Verzögerung in ms</string>
 
     <string name="pref_title_add_friends_to_messages">Fügen Sie Nachrichten zu Freunden hinzu</string>
-    <string-array name="pref_example_list_titles">
-        <item>Immer</item>
-        <item>Wenn möglich</item>
-        <item>noch nie</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
 
     <string name="pref_header_data_sync">Data &#038; sync</string>
 
@@ -279,8 +269,8 @@
     <string name="Aboutpage_6">Was ist Tox?</string>
     <string name="Aboutpage_8">gebrauchte Bibliotheken:</string>
 
-    <string name="AddFriendActivity.3">falsche ToxID</string>
-    <string name="AddFriendActivity.4">Keine ToxID</string>
+    <string name="AddFriendActivity_3">falsche ToxID</string>
+    <string name="AddFriendActivity_4">Keine ToxID</string>
 
     <string name="CallingActivity_0">Videoverzögerung:</string>
     <string name="CallingActivity_23">Videoverzögerung:</string>

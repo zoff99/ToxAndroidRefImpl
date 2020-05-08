@@ -277,8 +277,8 @@
     <string name="Aboutpage_6">Tox چیست؟</string>
     <string name="Aboutpage_8">کتابخانه های استفاده شده:</string>
 
-    <string name="AddFriendActivity.3">ToxID نادرست</string>
-    <string name="AddFriendActivity.4">بدون ToxID</string>
+    <string name="AddFriendActivity_3">ToxID نادرست</string>
+    <string name="AddFriendActivity_4">بدون ToxID</string>
 
     <string name="CallingActivity_0">تأخیر ویدیو:</string>
     <string name="CallingActivity_23">تأخیر ویدیو:</string>

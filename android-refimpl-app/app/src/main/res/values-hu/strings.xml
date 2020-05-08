@@ -278,8 +278,8 @@
     <string name="Aboutpage_6">Mi a Tox?</string>
     <string name="Aboutpage_8">használt könyvtárak:</string>
 
-    <string name="AddFriendActivity.3">helytelen ToxID</string>
-    <string name="AddFriendActivity.4">Nincs ToxID</string>
+    <string name="AddFriendActivity_3">helytelen ToxID</string>
+    <string name="AddFriendActivity_4">Nincs ToxID</string>
 
     <string name="CallingActivity_0">Video késleltetés:</string>
     <string name="CallingActivity_23">Video késleltetés:</string>

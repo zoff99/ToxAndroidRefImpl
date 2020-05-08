@@ -278,8 +278,8 @@
     <string name="Aboutpage_6">टॉक्स क्या है?</string>
     <string name="Aboutpage_8">प्रयुक्त पुस्तकालय:</string>
 
-    <string name="AddFriendActivity.3">गलत ToxID</string>
-    <string name="AddFriendActivity.4">कोई टॉक्सिड नहीं</string>
+    <string name="AddFriendActivity_3">गलत ToxID</string>
+    <string name="AddFriendActivity_4">कोई टॉक्सिड नहीं</string>
 
     <string name="CallingActivity_0">वीडियो विलंब:</string>
     <string name="CallingActivity_23">वीडियो विलंब:</string>

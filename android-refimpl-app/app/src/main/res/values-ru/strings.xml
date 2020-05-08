@@ -277,8 +277,8 @@
     <string name="Aboutpage_6">Что такое токсик?</string>
     <string name="Aboutpage_8">используемые библиотеки:</string>
 
-    <string name="AddFriendActivity.3">неверный ToxID</string>
-    <string name="AddFriendActivity.4">Нет ToxID</string>
+    <string name="AddFriendActivity_3">неверный ToxID</string>
+    <string name="AddFriendActivity_4">Нет ToxID</string>
 
     <string name="CallingActivity_0">Задержка видео:</string>
     <string name="CallingActivity_23">Задержка видео:</string>

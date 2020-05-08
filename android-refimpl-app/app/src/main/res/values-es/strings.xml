@@ -278,8 +278,8 @@
     <string name="Aboutpage_6">¿Qué es la toxina?</string>
     <string name="Aboutpage_8">bibliotecas usadas:</string>
 
-    <string name="AddFriendActivity.3">ToxID incorrecto</string>
-    <string name="AddFriendActivity.4">No ToxID</string>
+    <string name="AddFriendActivity_3">ToxID incorrecto</string>
+    <string name="AddFriendActivity_4">No ToxID</string>
 
     <string name="CallingActivity_0">Video Delay:</string>
     <string name="CallingActivity_23">Video Delay:</string>
