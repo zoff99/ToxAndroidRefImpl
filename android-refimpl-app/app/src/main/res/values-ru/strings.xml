@@ -44,7 +44,7 @@
     <string name="pref_description_software_echo_cancel">Использовать программное эхоподавление</string>
 
     <string name="pref_title_higher_video_quality">Качество видео</string>
-    <string name="pref_description_higher_video_quality">Используйте лучшее качество видео. \NИзменение перезапуска!</string>
+    <string name="pref_description_higher_video_quality">Используйте лучшее качество видео. \nИзменение перезапуска!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>низкая пропускная способность \n(250 кбит /с)</item>
         <item>нормальная пропускная способность \n(2500 кбит /с)</item>
@@ -68,7 +68,7 @@
     </string-array>
 
     <string name="pref_title_higher_audio_quality">Качество звука</string>
-    <string name="pref_description_higher_audio_quality">Используйте лучшее качество звука. \NИзменение перезапуска!</string>
+    <string name="pref_description_higher_audio_quality">Используйте лучшее качество звука. \nИзменение перезапуска!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>низкий \n(6 кбит /с)</item>
         <item>нормальный \n(32 кбит /с)</item>
@@ -84,7 +84,7 @@
     <string name="pref_description_udp_enabled">для большинства мобильных устройств UDP вызовет гораздо больший интернет-трафик. \nИзменить нужно RESTART! \nЗначение по умолчанию выключено</string>
 
     <string name="pref_title_orbot_enabled">включить Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">Вам нужно установить Orbot, чтобы использовать это. \NИзменить нужно RESTART!</string>
+    <string name="pref_description_orbot_enabled">Вам нужно установить Orbot, чтобы использовать это. \nИзменить нужно RESTART!</string>
 
     <string name="pref_title_fps_half">ниже fps</string>
     <string name="pref_description_fps_half">Частота кадров видео 1/2: 12 кадров в секунду вместо 25 кадров в секунду</string>
@@ -114,7 +114,7 @@
     <string name="pref_description_X_use_native_audio_play">!! Экспериментальный !! \nИспользуйте собственный звук для воспроизведения звука</string>
 
     <string name="pref_title_X_battery_saving_mode">Режим экономии заряда батареи</string>
-    <string name="pref_description_X_battery_saving_mode">!! Экспериментально !! \nэто сэкономит немного больше батареи, но отправка и получение сообщения займет больше времени. \N Возможно, есть и другие плохие эффекты!</string>
+    <string name="pref_description_X_battery_saving_mode">!! Экспериментально !! \nэто сэкономит немного больше батареи, но отправка и получение сообщения займет больше времени. \n Возможно, есть и другие плохие эффекты!</string>
 
     <string name="pref_title_X_misc_button_enabled">Разный кнопка</string>
     <string name="pref_description_X_misc_button_enabled">!! Экспериментальная !! \nadd кнопка на экране вызова для отправки фиксированного сообщения</string>
@@ -330,7 +330,7 @@
     <string name="layout___your_toxidenticon">Ваш ToxIdenticon</string>
     <string name="layout___active_network_connections">активные сетевые подключения:</string>
     <string name="layout___error_getting_active_network_connections">* ошибка при получении активных сетевых подключений *</string>
-    <string name="layout___set_password_or_skip">Установите пароль или пропустите. \N \nПри выборе пропуска \npassword будет автоматически сгенерирован \nНет опции восстановления!</string>
+    <string name="layout___set_password_or_skip">Установите пароль или пропустите. \n \nПри выборе пропуска \npassword будет автоматически сгенерирован \nНет опции восстановления!</string>
     <string name="layout___password">пароль</string>
     <string name="layout___password_again">Пароль снова</string>
     <string name="layout___set_password">Установка пароля</string>

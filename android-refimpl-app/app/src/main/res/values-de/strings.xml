@@ -49,7 +49,7 @@
     <string name="pref_description_software_echo_cancel">Verwenden Sie die Software Echounterdrückung</string>
 
     <string name="pref_title_higher_video_quality">Videoqualität</string>
-    <string name="pref_description_higher_video_quality">Verwenden Sie eine bessere Videoqualität. \NÄndern muss neu gestartet werden!</string>
+    <string name="pref_description_higher_video_quality">Verwenden Sie eine bessere Videoqualität. \nÄndern muss neu gestartet werden!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>niedrige Bandbreite \n(250 kb /s)</item>
         <item>normale Bandbreite \n(2500 kb /s)</item>
@@ -73,7 +73,7 @@
     </string-array>
 
     <string name="pref_title_higher_audio_quality">Audio Qualität</string>
-    <string name="pref_description_higher_audio_quality">Verwenden Sie eine bessere Audioqualität. \NÄndern muss neu gestartet werden!</string>
+    <string name="pref_description_higher_audio_quality">Verwenden Sie eine bessere Audioqualität. \nÄndern muss neu gestartet werden!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>niedrig \n(6 kb /s)</item>
         <item>normal \n(32 kb /s)</item>
@@ -89,7 +89,7 @@
     <string name="pref_description_udp_enabled">Bei den meisten Mobilgeräten verursacht UDP viel mehr Internetverkehr. \nÄnderung muss neu gestartet werden! \nDie Standardeinstellung ist AUS</string>
 
     <string name="pref_title_orbot_enabled">Aktivieren Sie Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">Sie müssen Orbot installieren, um dies nutzen zu können. \NFnder Neustart muss geändert werden!</string>
+    <string name="pref_description_orbot_enabled">Sie müssen Orbot installieren, um dies nutzen zu können. \nFnder Neustart muss geändert werden!</string>
 
     <string name="pref_title_fps_half">niedrigere fps</string>
     <string name="pref_description_fps_half">Video Framerate 1/2: also 12fps statt 25fps</string>
@@ -116,7 +116,7 @@
     <string name="pref_description_X_use_native_audio_play">!! Experimentell !! \nVerwenden Sie Native Audio, um Sound abzuspielen</string>
 
     <string name="pref_title_X_battery_saving_mode">Batteriesparmodus</string>
-    <string name="pref_description_X_battery_saving_mode">!! Experimentell !! \nDies spart etwas mehr Batterie, aber das Senden und Empfangen von Nachrichten dauert länger. \NWahrscheinlich auch einige andere schlechte Effekte!</string>
+    <string name="pref_description_X_battery_saving_mode">!! Experimentell !! \nDies spart etwas mehr Batterie, aber das Senden und Empfangen von Nachrichten dauert länger. \nWahrscheinlich auch einige andere schlechte Effekte!</string>
 
     <string name="pref_title_X_misc_button_enabled">Sonstiges Taste</string>
     <string name="pref_description_X_misc_button_enabled">!! Experimentell !! \nDie Schaltfläche auf dem Anrufbildschirm hinzufügen, um eine feste Nachricht zu senden</string>
@@ -332,7 +332,7 @@
     <string name="layout___your_toxidenticon">Ihr ToxIdenticon</string>
     <string name="layout___active_network_connections">aktive Netzwerkverbindungen:</string>
     <string name="layout___error_getting_active_network_connections">* Fehler beim Abrufen aktiver Netzwerkverbindungen *</string>
-    <string name="layout___set_password_or_skip">Passwort festlegen oder überspringen. \N \nWenn Sie ein \nKennwort überspringen, wird es automatisch generiert \nEs gibt KEINE Wiederherstellungsoption!</string>
+    <string name="layout___set_password_or_skip">Passwort festlegen oder überspringen. \n \nWenn Sie ein \nKennwort überspringen, wird es automatisch generiert \nEs gibt KEINE Wiederherstellungsoption!</string>
     <string name="layout___password">Passwort</string>
     <string name="layout___password_again">Passwort erneut</string>
     <string name="layout___set_password">Passwort festlegen</string>

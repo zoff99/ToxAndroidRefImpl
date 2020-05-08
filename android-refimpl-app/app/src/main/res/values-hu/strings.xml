@@ -45,7 +45,7 @@
     <string name="pref_description_software_echo_cancel">Használja a szoftver visszhang törlését</string>
 
     <string name="pref_title_higher_video_quality">Videó minőség</string>
-    <string name="pref_description_higher_video_quality">Használjon jobb videominőséget. \NMódosításra van szüksége RESTART!</string>
+    <string name="pref_description_higher_video_quality">Használjon jobb videominőséget. \nMódosításra van szüksége RESTART!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>alacsony sávszélesség \n(250 kb /s)</item>
         <item>normál sávszélesség \n(2500 kb /s)</item>
@@ -69,7 +69,7 @@
     </string-array>
 
     <string name="pref_title_higher_audio_quality">Hangminőség</string>
-    <string name="pref_description_higher_audio_quality">Használjon jobb hangminőséget. \NMódosításhoz RESTART kell!</string>
+    <string name="pref_description_higher_audio_quality">Használjon jobb hangminőséget. \nMódosításhoz RESTART kell!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>alacsony \n(6 kb /s)</item>
         <item>normál \n(32 kb /s)</item>
@@ -85,7 +85,7 @@
     <string name="pref_description_udp_enabled">a legtöbb mobil eszköznél az UDP sokkal több internetes forgalmat fog okozni. \nMódosításhoz RESTART kell! \nA alapértelmezett beállítás KI van kapcsolva</string>
 
     <string name="pref_title_orbot_enabled">engedélyezze a Tor Proxy alkalmazást</string>
-    <string name="pref_description_orbot_enabled">Ennek használatához telepítenie kell az Orbotot. \NA változáshoz RESTART kell!</string>
+    <string name="pref_description_orbot_enabled">Ennek használatához telepítenie kell az Orbotot. \nA változáshoz RESTART kell!</string>
 
     <string name="pref_title_fps_half">alsó fps</string>
     <string name="pref_description_fps_half">Video framerate 1/2: tehát 12 kép /mp, a 25 kép /mp helyett</string>
@@ -115,7 +115,7 @@
     <string name="pref_description_X_use_native_audio_play">!! Kísérleti !! \nHasználja a natív hangot a hang lejátszásához</string>
 
     <string name="pref_title_X_battery_saving_mode">Akkumulátor megtakarítási mód</string>
-    <string name="pref_description_X_battery_saving_mode">!! Kísérleti jellegű! \Na kicsit több energiát takarít meg, de az üzenet továbbküldése és fogadása tovább tart. \NValószínűleg más rossz hatások is!</string>
+    <string name="pref_description_X_battery_saving_mode">!! Kísérleti jellegű! \na kicsit több energiát takarít meg, de az üzenet továbbküldése és fogadása tovább tart. \nValószínűleg más rossz hatások is!</string>
 
     <string name="pref_title_X_misc_button_enabled">Misc. Gomb</string>
     <string name="pref_description_X_misc_button_enabled">!! Kísérleti !! \rögzített üzenet küldéséhez nyomjon meg egy gombot a Hívás képernyőn</string>
@@ -331,7 +331,7 @@
     <string name="layout___your_toxidenticon">A ToxIdenticon</string>
     <string name="layout___active_network_connections">aktív hálózati kapcsolatok:</string>
     <string name="layout___error_getting_active_network_connections">* hiba aktív hálózati kapcsolatok létrehozásakor *</string>
-    <string name="layout___set_password_or_skip">Állítsa be a Jelszó beállítást vagy a kihagyást. \N \nHa úgy dönt, hogy kihagy egy \njelszót, automatikusan generálódik \nNEM NEM helyreállítási lehetőség!</string>
+    <string name="layout___set_password_or_skip">Állítsa be a Jelszó beállítást vagy a kihagyást. \n \nHa úgy dönt, hogy kihagy egy \njelszót, automatikusan generálódik \nNEM NEM helyreállítási lehetőség!</string>
     <string name="layout___password">Jelszó</string>
     <string name="layout___password_again">Jelszó ismét</string>
     <string name="layout___set_password">Állítson be jelszót</string>

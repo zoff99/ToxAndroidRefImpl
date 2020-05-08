@@ -45,7 +45,7 @@
     <string name="pref_description_software_echo_cancel">Usar cancelación de eco de software</string>
 
     <string name="pref_title_higher_video_quality">Calidad de video</string>
-    <string name="pref_description_higher_video_quality">Utilice una mejor calidad de video. \N¡Cambiar necesita reiniciar!</string>
+    <string name="pref_description_higher_video_quality">Utilice una mejor calidad de video. \n¡Cambiar necesita reiniciar!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>bajo ancho de banda \n(250 kb /s)</item>
         <item>ancho de banda normal \n(2500 kb /s)</item>
@@ -69,7 +69,7 @@
     </string-array>
 
     <string name="pref_title_higher_audio_quality">Calidad de audio</string>
-    <string name="pref_description_higher_audio_quality">Utilice una mejor calidad de audio. \N¡El cambio necesita reiniciar!</string>
+    <string name="pref_description_higher_audio_quality">Utilice una mejor calidad de audio. \n¡El cambio necesita reiniciar!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>bajo \n(6 kb /s)</item>
         <item>normal \n(32 kb /s)</item>
@@ -85,7 +85,7 @@
     <string name="pref_description_udp_enabled">para la mayoría de los dispositivos móviles UDP provocará mucho más tráfico de Internet. \n¡El cambio necesita REINICIAR! \nLa configuración predeterminada está DESACTIVADA</string>
 
     <string name="pref_title_orbot_enabled">habilitar Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">Necesitas instalar Orbot para usar esto. \N¡El cambio necesita REINICIAR!</string>
+    <string name="pref_description_orbot_enabled">Necesitas instalar Orbot para usar esto. \n¡El cambio necesita REINICIAR!</string>
 
     <string name="pref_title_fps_half">fps inferiores</string>
     <string name="pref_description_fps_half">Video Framerate 1/2: 12 fps en lugar de 25 fps</string>
@@ -115,7 +115,7 @@
     <string name="pref_description_X_use_native_audio_play">!! Experimental !! \nUtilice audio nativo para reproducir sonido</string>
 
     <string name="pref_title_X_battery_saving_mode">Modo de ahorro de batería</string>
-    <string name="pref_description_X_battery_saving_mode">!! ¡Experimental! \Nesto ahorrará un poco más de batería, pero el mensaje tardará más en enviarse y recibir. \N ¡Probablemente también otros efectos negativos!</string>
+    <string name="pref_description_X_battery_saving_mode">!! ¡Experimental! \nesto ahorrará un poco más de batería, pero el mensaje tardará más en enviarse y recibir. \n ¡Probablemente también otros efectos negativos!</string>
 
     <string name="pref_title_X_misc_button_enabled">Misceláneos Botón</string>
     <string name="pref_description_X_misc_button_enabled">!! Experimental !! \nadd un botón en la pantalla de llamadas para enviar un mensaje fijo</string>
@@ -331,7 +331,7 @@
     <string name="layout___your_toxidenticon">Your ToxIdenticon</string>
     <string name="layout___active_network_connections">Conexiones de red activas:</string>
     <string name="layout___error_getting_active_network_connections">* error al obtener conexiones de red activas *</string>
-    <string name="layout___set_password_or_skip">Establecer contraseña u omitir. \N \nCuando seleccione omitir una \ncontraseña se generará automáticamente \n¡No hay opción de recuperación!</string>
+    <string name="layout___set_password_or_skip">Establecer contraseña u omitir. \n \nCuando seleccione omitir una \ncontraseña se generará automáticamente \n¡No hay opción de recuperación!</string>
     <string name="layout___password">Contraseña</string>
     <string name="layout___password_again">Contraseña de nuevo</string>
     <string name="layout___set_password">Configurar la clave</string>
