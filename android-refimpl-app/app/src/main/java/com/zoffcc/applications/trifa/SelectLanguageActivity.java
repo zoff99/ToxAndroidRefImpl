@@ -55,6 +55,7 @@ public class SelectLanguageActivity extends ListActivity
                         "hu" + ":\n" + "Hungarian",
                         "it" + ":\n" + "Italian",
                         "ru" + ":\n" + "Russian",
+                        "tr" + ":\n" + "Turkish",
                     "zh-rCN" + ":\n" + "Chinese - 中国人",
             };
 
