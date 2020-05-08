@@ -5758,6 +5758,22 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
     int32_t j;
     int16_t *pcm_next;
 
+    if ((sampling_rate == 48000) && (channels == 2))
+    {
+        pcm_next = pcm;
+        for (i = 0; i < (int32_t)sample_count; i++)
+        {
+            // copy each int16 sample from the LEFT channel to the result buffer
+            memcpy(new_pcm_buffer_pos, pcm_next, 2);
+            pcm_next++; // current sample for RIGHT channel
+            pcm_next++; // next sample for LEFT channel
+            new_pcm_buffer_pos++; // advance result buffer
+        }
+
+        return new_pcm_buffer;
+    }
+
+
     for (i = 0; i < ((int32_t)sample_count - 1); i++)
     {
         pcm_next = pcm + 1;
