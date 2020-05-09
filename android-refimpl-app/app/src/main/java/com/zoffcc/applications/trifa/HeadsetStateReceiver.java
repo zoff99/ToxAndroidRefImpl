@@ -41,14 +41,14 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         {
                             update_audio_device_icon();
                         }
-                        catch(Exception e2)
+                        catch (Exception e2)
                         {
                         }
                         try
                         {
                             update_group_audio_device_icon();
                         }
-                        catch(Exception e2)
+                        catch (Exception e2)
                         {
                         }
                         audio_manager_s.setBluetoothScoOn(false);
@@ -63,23 +63,31 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         {
                             update_audio_device_icon();
                         }
-                        catch(Exception e2)
+                        catch (Exception e2)
                         {
                         }
                         try
                         {
                             update_group_audio_device_icon();
                         }
-                        catch(Exception e2)
+                        catch (Exception e2)
                         {
                         }
-                        if (Callstate.audio_speaker)
+
+                        if (ConferenceAudioActivity.activity_state == 1)
                         {
                             audio_manager_s.setSpeakerphoneOn(true);
                         }
                         else
                         {
-                            audio_manager_s.setSpeakerphoneOn(false);
+                            if (Callstate.audio_speaker)
+                            {
+                                audio_manager_s.setSpeakerphoneOn(true);
+                            }
+                            else
+                            {
+                                audio_manager_s.setSpeakerphoneOn(false);
+                            }
                         }
                     }
                 }
