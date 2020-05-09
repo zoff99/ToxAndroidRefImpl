@@ -5555,7 +5555,7 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
 
     const size_t buf_size = (size_t)(num_samples * 2);
 
-    float damping_factor = (float)num_bufs_ready * 0.8f;
+    float damping_factor = (float)num_bufs_ready * 1.5f;
     if (damping_factor < 1)
     {
         damping_factor = 1;
@@ -5572,7 +5572,17 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
         else
         {
             damping_factor = damping_factor / volumeMultiplier;
-            // dbg(9, "damping_factor:2=%f %f", damping_factor, volumeMultiplier);
+            
+            if(audio_play_volume_percent_c < 30)
+            {
+                damping_factor = damping_factor * 4;
+            }
+            else if(audio_play_volume_percent_c < 20)
+            {
+                damping_factor = damping_factor * 7;
+            }
+
+            // dbg(9, "damping_factor:2=%f mult=%f vol=%d", damping_factor, volumeMultiplier, audio_play_volume_percent_c);
         }
     }
     // ------------ change PCM volume here ------------
