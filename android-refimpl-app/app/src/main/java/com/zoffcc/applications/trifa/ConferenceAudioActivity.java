@@ -29,6 +29,7 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -88,6 +89,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
     static String conf_id_prev = "-1"; //$NON-NLS-1$
     static ConferenceAudioActivity caa = null;
 
+    static PowerManager.WakeLock wl_group_audio = null;
     private Thread Group_audio_play_thread = null;
     private boolean Group_audio_play_thread_running = false;
     private DetectHeadset dha = null;
@@ -121,7 +123,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Log.i(TAG, "onCreate"); //$NON-NLS-1$
+        Log.i(TAG, "LC:onCreate");
 
         if (Build.VERSION.SDK_INT >= 27)
         {
@@ -441,12 +443,31 @@ public class ConferenceAudioActivity extends AppCompatActivity
     @Override
     protected void onStop()
     {
+        Log.i(TAG, "LC:onStop");
+
         super.onStop();
     }
 
     @Override
     protected void onResume()
     {
+        Log.i(TAG, "LC:onResume");
+
+        try
+        {
+            Log.i(TAG, "LC:onResume:wakelock:get");
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            wl_group_audio = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "trifa:group_audio_cpu");
+            wl_group_audio.acquire();
+            Log.i(TAG, "LC:onResume:wakelock:get:done");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Log.i(TAG, "LC:onResume:2");
+
         do_not_close_on_pause = false;
         Callstate.audio_group_active = true;
 
@@ -636,6 +657,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
     @Override
     protected void onPause()
     {
+        Log.i(TAG, "LC:onPause");
+
         // singal group audio play thread to stop
         Group_audio_play_thread_running = false;
         try
@@ -820,6 +843,24 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
         else
         {
+            try
+            {
+                if (wl_group_audio != null)
+                {
+                    if (wl_group_audio.isHeld())
+                    {
+                        Log.i(TAG, "LC:onBackPressed:wakelock:release");
+                        wl_group_audio.release();
+                        wl_group_audio = null;
+                        Log.i(TAG, "LC:onBackPressed:wakelock:release:done");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
             on_groupaudio_ended_actions(true);
         }
     }

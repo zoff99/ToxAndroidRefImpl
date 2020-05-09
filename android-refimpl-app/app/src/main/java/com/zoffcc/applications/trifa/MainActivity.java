@@ -5578,9 +5578,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_peer_list_changed_cb_method(long conference_number)
     {
-        // TODO: write me ...
         // update all peers in this conference
-        Log.i(TAG, "conference_peer_list_changed_cb:cf_num=" + conference_number);
+        // Log.i(TAG, "conference_peer_list_changed_cb:cf_num=" + conference_number);
 
         try
         {
@@ -5605,12 +5604,12 @@ public class MainActivity extends AppCompatActivity
                 {
                     if (conference_message_list_activity != null)
                     {
-                        Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
+                        // Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
 
                         if (conference_message_list_activity.get_current_conf_id().equals(
                             conf_temp.conference_identifier))
                         {
-                            Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
+                            // Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
                             conference_message_list_activity.update_group_all_users();
                         }
                     }
@@ -5624,11 +5623,11 @@ public class MainActivity extends AppCompatActivity
                 {
                     if (conference_audio_activity != null)
                     {
-                        Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
+                        // Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
 
                         if (conference_audio_activity.get_current_conf_id().equals(conf_temp.conference_identifier))
                         {
-                            Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
+                            // Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
                             conference_audio_activity.update_group_all_users();
                         }
                     }
