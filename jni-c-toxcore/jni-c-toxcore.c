@@ -343,7 +343,7 @@ void group_audio_add_buffer(uint32_t peernumber, int16_t *pcm, uint32_t num_samp
 int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples);
 void group_audio_read_buffer(uint32_t peernumber, uint32_t num_samples, int16_t *ret_buffer);
 uint32_t group_audio_any_have_sample_count_in_buffer_count(uint32_t sample_count);
-void process_incoming_group_audio_on_iterate();
+int process_incoming_group_audio_on_iterate(int delta_new, int want_ms_output);
 
 void Pipe_updateIndex(size_t *index, size_t bytes);
 size_t Pipe_getUsed(size_t *_rptr, size_t *_wptr);
@@ -2820,14 +2820,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks(JNIEnv *env
 }
 
 
-
 void Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(JNIEnv *env, jobject thiz)
 {
-    process_incoming_group_audio_on_iterate();
-    // dbg(9, "tox_iterate::... START");
     tox_iterate(tox_global, NULL);
-    // dbg(9, "tox_iterate::... READY");
-    process_incoming_group_audio_on_iterate();
+}
+
+jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1group_1audio(JNIEnv *env, jobject thiz, jint delta_new, jint want_ms_output)
+{
+    return (jint)process_incoming_group_audio_on_iterate(delta_new, want_ms_output);
 }
 
 JNIEXPORT void JNICALL
@@ -4189,8 +4189,10 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     pthread_mutex_unlock(&group_audio___mutex);
 }
 
-void process_incoming_group_audio_on_iterate()
+int process_incoming_group_audio_on_iterate(int delta_new, int want_ms_output)
 {
+    int64_t start_time = current_time_monotonic_default();
+
     pthread_mutex_lock(&group_audio___mutex);
     // dbg(9, "process_incoming_group_audio_on_iterate:START");
 
@@ -4198,22 +4200,26 @@ void process_incoming_group_audio_on_iterate()
     {
         pthread_mutex_unlock(&group_audio___mutex);
         // dbg(9, "process_incoming_group_audio_on_iterate:RET:01");
-        return;
+        return (int32_t)(current_time_monotonic_default() - start_time);
     }
 
     int16_t *pcm_mixed = NULL;
     int need_process_output = 0;
 
-    const int tolerance_ms = 4;
-    const int want_sample_count_40ms = (int)(48000*PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS/1000);
-    int64_t global_group_audio_last_process_incoming_last = 0;
+    // const int tolerance_ms = delta_new;
+    const int want_sample_count_40ms = (int)(48000*want_ms_output/1000);
+    // int64_t global_group_audio_last_process_incoming_last = 0;
 
+#if 0
     if ((global_group_audio_last_process_incoming + (PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS - tolerance_ms)) <= current_time_monotonic_default())
     {
         uint32_t count_ready_buffers = group_audio_any_have_sample_count_in_buffer_count(want_sample_count_40ms);
         if (count_ready_buffers > 0)
         {
-            // *** // dbg(9, "process_incoming_group_audio_on_iterate:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
+            // *** //
+            dbg(9, "process_incoming_group_audio_on_iterate:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
+            // delta = (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming) - PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS;
+            // dbg(9, "process_incoming_group_audio_on_iterate:delta2=%d ms", delta);
             global_group_audio_last_process_incoming_last = global_group_audio_last_process_incoming;
             global_group_audio_last_process_incoming = current_time_monotonic_default();
             need_process_output = 2;
@@ -4229,22 +4235,36 @@ void process_incoming_group_audio_on_iterate()
         }
     }
 
+
+#else
+
+    need_process_output = 2;
+
+#endif
+
+
     if (need_process_output > 0)
     {
         int j = 1;
         int loops = 1;
+
+#if 0
         if (need_process_output == 2)
         {
-            // *** // dbg(9, "process_incoming_group_audio_on_iterate:delta=%d", (int)(global_group_audio_last_process_incoming - global_group_audio_last_process_incoming_last));
             loops = ((int)(global_group_audio_last_process_incoming - global_group_audio_last_process_incoming_last))
-                        / (int)(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 1.2f);
-            loops++;
-            if (loops > 4)
+                         / (int)PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS;
+
+            if (loops > 2)
             {
-                loops = 4;
+                loops = 2;
             }
-            // *** // dbg(9, "process_incoming_group_audio_on_iterate:loops=%d", loops);
+            else if (loops == 0)
+            {
+                loops = 1;
+            }
+            // *** // dbg(9, "process_incoming_group_audio_on_iterate:loops=%d delta ms=%d", loops, ((int)(global_group_audio_last_process_incoming - global_group_audio_last_process_incoming_last)));
         }
+#endif
 
         if (audio_buffer_pcm_2 == NULL)
         {
@@ -4304,6 +4324,7 @@ void process_incoming_group_audio_on_iterate()
     // dbg(9, "process_incoming_group_audio_on_iterate:END");
     pthread_mutex_unlock(&group_audio___mutex);
 
+    return (int32_t)(current_time_monotonic_default() - start_time);
 }
 
 JNIEXPORT jlong JNICALL
