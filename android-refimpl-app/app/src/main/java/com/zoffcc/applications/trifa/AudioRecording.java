@@ -26,6 +26,7 @@ import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
 import android.media.audiofx.NoiseSuppressor;
 import android.os.AsyncTask;
+import android.os.Process;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
@@ -80,7 +81,7 @@ public class AudioRecording extends Thread
 
     // -----------------------
     static ByteBuffer _recBuffer = null;
-    private byte[] _tempBufRec = null;
+    private static byte[] _tempBufRec = null;
     // private int _bufferedRecSamples = 0;
     private int buffer_mem_factor = 30;
     private int buf_multiplier = 5;
@@ -167,12 +168,12 @@ public class AudioRecording extends Thread
                 Log.i(TAG, "want_buf_size_in_bytes(1)=" + want_buf_size_in_bytes);
 
                 _recBuffer = ByteBuffer.allocateDirect(
-                        (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2)); // Max 120 ms @ 48 kHz
+                    (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2)); // Max 120 ms @ 48 kHz
                 set_JNI_audio_buffer(_recBuffer);
 
                 // for 60 ms --> 5760 bytes
                 NativeAudio.n_rec_buf_size_in_bytes =
-                        ((sampling_rate * channel_count * 2) / 1000) * PREF__X_audio_recording_frame_size;
+                    ((sampling_rate * channel_count * 2) / 1000) * PREF__X_audio_recording_frame_size;
 
                 Log.i(TAG, "NativeAudio.n_rec_buf_size_in_bytes=" + NativeAudio.n_rec_buf_size_in_bytes +
                            " PREF__X_audio_recording_frame_size=" + PREF__X_audio_recording_frame_size +
@@ -271,7 +272,7 @@ public class AudioRecording extends Thread
         stopped = true;
     }
 
-    public class send_audio_frame_to_toxcore extends AsyncTask<Void, Void, String>
+    public static class send_audio_frame_to_toxcore extends AsyncTask<Void, Void, String>
     {
         int audio_send_res = 0;
         int readBytes_ = 1;
@@ -286,6 +287,14 @@ public class AudioRecording extends Thread
         {
             try
             {
+                Thread.currentThread().setName("t_snd_a_out");
+            }
+            catch (Exception e)
+            {
+            }
+
+            try
+            {
                 if (native_audio_engine_down == false)
                 {
                     _recBuffer.rewind();
@@ -298,8 +307,8 @@ public class AudioRecording extends Thread
                     else
                     {
                         audio_send_res = toxav_audio_send_frame(
-                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (readBytes_ / 2),
-                                CHANNELS_TOX, SMAPLINGRATE_TOX);
+                            tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (readBytes_ / 2),
+                            CHANNELS_TOX, SMAPLINGRATE_TOX);
                         if (audio_send_res != 0)
                         {
                             Log.i(TAG, "audio:res=" + audio_send_res + ":" +
@@ -348,6 +357,14 @@ public class AudioRecording extends Thread
         {
             try
             {
+                Thread.currentThread().setName("t_s_outN:" + bufnum_);
+            }
+            catch (Exception e)
+            {
+            }
+
+            try
+            {
                 if (native_audio_engine_down == false)
                 {
 
@@ -370,7 +387,7 @@ public class AudioRecording extends Thread
                             try
                             {
                                 debug_audio_writer_rec_s = new BufferedWriter(
-                                        new FileWriter("/sdcard/audio_rec_s.txt", true));
+                                    new FileWriter("/sdcard/audio_rec_s.txt", true));
                                 long ts = (save_timestamp - calling_activity_start_ms) * 1000;
                                 int value = 0;
                                 for (int xx = 0; xx < 160; xx++)
@@ -391,7 +408,7 @@ public class AudioRecording extends Thread
                             }
 
                             debug_audio_writer_rec_s = new BufferedWriter(
-                                    new FileWriter("/sdcard/audio_rec_s_ts.txt", true));
+                                new FileWriter("/sdcard/audio_rec_s_ts.txt", true));
                             debug_audio_writer_rec_s.write("" + save_timestamp + "\n");
 
                             if (debug_audio_writer_rec_s != null)
@@ -420,7 +437,7 @@ public class AudioRecording extends Thread
                             try
                             {
                                 debug_audio_writer_rec_d = new BufferedWriter(
-                                        new FileWriter("/sdcard/audio_rec_d.txt", true));
+                                    new FileWriter("/sdcard/audio_rec_d.txt", true));
                                 long ts = (save_timestamp - calling_activity_start_ms) * 1000;
                                 int value = 0;
                                 for (int xx = 0; xx < 160; xx++)
@@ -473,8 +490,8 @@ public class AudioRecording extends Thread
                         if (push_to_talk_active)
                         {
                             int audio_group_send_res = toxav_group_send_audio(
-                                    get_conference_num_from_confid(ConferenceAudioActivity.conf_id),
-                                    (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                                get_conference_num_from_confid(ConferenceAudioActivity.conf_id),
+                                (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
 
                             //Log.i(TAG,
                             //      "audio_group_send_res__global_audio_group_send_res=" + audio_group_send_res + " " +
@@ -490,7 +507,7 @@ public class AudioRecording extends Thread
                                         {
                                             update_group_audio_send_icon(1);
                                         }
-                                        catch(Exception e2)
+                                        catch (Exception e2)
                                         {
                                         }
                                         global_audio_group_send_res = audio_group_send_res;
@@ -501,7 +518,7 @@ public class AudioRecording extends Thread
                                         {
                                             update_group_audio_send_icon(2);
                                         }
-                                        catch(Exception e2)
+                                        catch (Exception e2)
                                         {
                                         }
                                         global_audio_group_send_res = audio_group_send_res;
@@ -513,7 +530,7 @@ public class AudioRecording extends Thread
                                     {
                                         update_group_audio_send_icon(0);
                                     }
-                                    catch(Exception e2)
+                                    catch (Exception e2)
                                     {
                                     }
                                 }
@@ -524,8 +541,8 @@ public class AudioRecording extends Thread
                     {
                         // Log.i(TAG, "toxav_audio_send_frame:002:native");
                         audio_send_res = toxav_audio_send_frame(
-                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                            tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                            (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
                     }
 
                     if (DEBUG_MIC_DATA_LOGGING)
@@ -573,10 +590,10 @@ public class AudioRecording extends Thread
          */
         int validSampleRates[];
         validSampleRates = new int[]{8000, 16000, 22050,
-                //
-                32000, 37800, 44056, 44100, 47250, 48000, 50000, 50400,
-                //
-                88200, 96000, 176400, 192000, 352800, 2822400, 5644800};
+            //
+            32000, 37800, 44056, 44100, 47250, 48000, 50000, 50400,
+            //
+            88200, 96000, 176400, 192000, 352800, 2822400, 5644800};
         /*
          * Selecting default audio input source for recording since
          * AudioFormat.CHANNEL_CONFIGURATION_DEFAULT is deprecated and selecting

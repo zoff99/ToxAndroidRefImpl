@@ -88,6 +88,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
     static String conf_id_prev = "-1"; //$NON-NLS-1$
     static ConferenceAudioActivity caa = null;
 
+    private Thread Group_audio_play_thread = null;
+    private boolean Group_audio_play_thread_running = false;
     private DetectHeadset dha = null;
     static int activity_state = 0;
     private boolean do_not_close_on_pause = false;
@@ -577,11 +579,77 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
 
         toxav_groupchat_enable_av(get_conference_num_from_confid(conf_id));
+
+
+        Group_audio_play_thread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    this.setName("t_ga_play");
+                    android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+                    // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    Log.i(TAG, "Group_audio_play_thread:starting ...");
+                    int delta = 0;
+                    final int sleep_millis = 60; // 60ms is the maximum that JNI can buffer!
+                    int sleep_millis_current = sleep_millis;
+                    Group_audio_play_thread_running = true;
+                    while (Group_audio_play_thread_running)
+                    {
+                        delta = MainActivity.jni_iterate_group_audio(0, sleep_millis);
+                        sleep_millis_current = sleep_millis - delta;
+                        if (sleep_millis_current < 1)
+                        {
+                            sleep_millis_current = 1;
+                        }
+                        else if (sleep_millis_current > sleep_millis)
+                        {
+                            sleep_millis_current = sleep_millis;
+                        }
+                        // Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 100000)); // sleep
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                Log.i(TAG, "Group_audio_play_thread:finished");
+            }
+        };
+
+        Group_audio_play_thread.start();
     }
 
     @Override
     protected void onPause()
     {
+        // singal group audio play thread to stop
+        Group_audio_play_thread_running = false;
+        try
+        {
+            Log.i(TAG, "Group_audio_play_thread:waiting to stop ...");
+            Group_audio_play_thread.join();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Group_audio_play_thread = null;
+        Log.i(TAG, "Group_audio_play_thread:done");
+
         conference_audio_activity = null;
         AudioRecording.global_audio_group_send_res = -999;
 

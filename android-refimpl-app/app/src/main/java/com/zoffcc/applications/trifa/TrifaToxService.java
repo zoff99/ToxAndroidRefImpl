@@ -1408,7 +1408,7 @@ public class TrifaToxService extends Service
                     {
                         if (Callstate.audio_group_active)
                         {
-                            tox_iteration_interval_ms = 10; // if we are in a group audio call iterate more often
+                            tox_iteration_interval_ms = 5; // if we are in a group audio call iterate more often
 
                             if (!tox_iterate_thread_high_prio)
                             {

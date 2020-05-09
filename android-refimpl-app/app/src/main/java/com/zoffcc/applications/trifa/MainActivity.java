@@ -2358,6 +2358,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_iterate();
 
+    // ----------- TRIfA internal -----------
+    public static native int jni_iterate_group_audio(int delta_new, int want_ms_output);
+    // ----------- TRIfA internal -----------
+
     public static native long tox_kill();
 
     public static native void exit();
@@ -3292,7 +3296,6 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "audio_play:EE3:" + e.getMessage());
         }
     }
-
 
     static void android_toxav_callback_group_audio_receive_frame_cb_method(long conference_number, long peer_number, long sample_count, int channels, long sampling_rate)
     {
