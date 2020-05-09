@@ -286,8 +286,8 @@
     <string name="ConferenceAudioActivity_10">Liste d\'utilisateur</string>
     <string name="ConferenceAudioActivity_17">Push to Talk</string>
     <string name="ConferenceAudioActivity_18">parlant ...</string>
-    <string name="ConferenceAudioActivity_39">Actif:</string>
-    <string name="ConferenceAudioActivity_40">Hors ligne:</string>
+    <string name="GroupActivityActive">Actif:</string>
+    <string name="GroupActivityOffline">Hors ligne:</string>
     
     
     

@@ -278,8 +278,8 @@
     <string name="ConferenceAudioActivity_10">Benutzerliste</string>
     <string name="ConferenceAudioActivity_17">Drücken, um zu sprechen</string>
     <string name="ConferenceAudioActivity_18">reden ...</string>
-    <string name="ConferenceAudioActivity_39">Aktiv:</string>
-    <string name="ConferenceAudioActivity_40">Offline:</string>
+    <string name="GroupActivityActive">Aktiv:</string>
+    <string name="GroupActivityOffline">Offline:</string>
     
     
     

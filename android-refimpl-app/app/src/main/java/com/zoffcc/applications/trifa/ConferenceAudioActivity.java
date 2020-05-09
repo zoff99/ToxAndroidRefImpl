@@ -871,8 +871,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                             if (peer_count > -1)
                             {
                                 ml_maintext.setText(
-                                    f_name + "\n" + getString(R.string.ConferenceAudioActivity_39) + " " + peer_count +
-                                    " " + getString(R.string.ConferenceAudioActivity_40) + " " +
+                                    f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count + " " +
+                                    getString(R.string.GroupActivityOffline) + " " +
                                     frozen_peer_count); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             }
                             else

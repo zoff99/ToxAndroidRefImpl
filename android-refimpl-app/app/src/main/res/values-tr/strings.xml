@@ -319,8 +319,8 @@
     <string name="ConferenceAudioActivity_10">Kullanıcı listesi</string>
     <string name="ConferenceAudioActivity_17">Konuşmak için bas</string>
     <string name="ConferenceAudioActivity_18">konuşuyor ...</string>
-    <string name="ConferenceAudioActivity_39">Aktif:</string>
-    <string name="ConferenceAudioActivity_40">Çevrim:</string>
+    <string name="GroupActivityActive">Aktif:</string>
+    <string name="GroupActivityOffline">Çevrim:</string>
     
     
     

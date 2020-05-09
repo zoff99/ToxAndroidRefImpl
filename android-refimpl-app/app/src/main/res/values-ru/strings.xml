@@ -286,8 +286,8 @@
     <string name="ConferenceAudioActivity_10">Список пользователей</string>
     <string name="ConferenceAudioActivity_17">Нажми чтобы говорить</string>
     <string name="ConferenceAudioActivity_18">говорить ...</string>
-    <string name="ConferenceAudioActivity_39">Активный:</string>
-    <string name="ConferenceAudioActivity_40">Не в сети:</string>
+    <string name="GroupActivityActive">Активный:</string>
+    <string name="GroupActivityOffline">Не в сети:</string>
     
     
     

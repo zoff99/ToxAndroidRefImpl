@@ -286,8 +286,8 @@
     <string name="ConferenceAudioActivity_10">قائمة المستخدم</string>
     <string name="ConferenceAudioActivity_17">اضغط للتحدث</string>
     <string name="ConferenceAudioActivity_18">تتحدث ...</string>
-    <string name="ConferenceAudioActivity_39">نشيط:</string>
-    <string name="ConferenceAudioActivity_40">غير متصل على الانترنت:</string>
+    <string name="GroupActivityActive">نشيط:</string>
+    <string name="GroupActivityOffline">غير متصل على الانترنت:</string>
     
     
     

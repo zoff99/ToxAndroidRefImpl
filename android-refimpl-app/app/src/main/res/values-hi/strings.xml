@@ -287,8 +287,8 @@
     <string name="ConferenceAudioActivity_10">उपयोगकर्ता सूची</string>
     <string name="ConferenceAudioActivity_17">बात करने के लिए धक्का</string>
     <string name="ConferenceAudioActivity_18">बात कर रहे ...</string>
-    <string name="ConferenceAudioActivity_39">सक्रिय:</string>
-    <string name="ConferenceAudioActivity_40">ऑफ़लाइन:</string>
+    <string name="GroupActivityActive">सक्रिय:</string>
+    <string name="GroupActivityOffline">ऑफ़लाइन:</string>
     
     
     

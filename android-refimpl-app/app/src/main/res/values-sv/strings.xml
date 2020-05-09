@@ -319,8 +319,8 @@
     <string name="ConferenceAudioActivity_10">Användarlista</string>
     <string name="ConferenceAudioActivity_17">Tryck för att prata</string>
     <string name="ConferenceAudioActivity_18">pratar ...</string>
-    <string name="ConferenceAudioActivity_39">Aktiva:</string>
-    <string name="ConferenceAudioActivity_40">Off-line:</string>
+    <string name="GroupActivityActive">Aktiva:</string>
+    <string name="GroupActivityOffline">Off-line:</string>
     
     
     

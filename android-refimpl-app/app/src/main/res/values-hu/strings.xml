@@ -287,8 +287,8 @@
     <string name="ConferenceAudioActivity_10">Felhasználók névsora</string>
     <string name="ConferenceAudioActivity_17">Push to Talk</string>
     <string name="ConferenceAudioActivity_18">beszél ...</string>
-    <string name="ConferenceAudioActivity_39">Aktív:</string>
-    <string name="ConferenceAudioActivity_40">Offline:</string>
+    <string name="GroupActivityActive">Aktív:</string>
+    <string name="GroupActivityOffline">Offline:</string>
     
     
     

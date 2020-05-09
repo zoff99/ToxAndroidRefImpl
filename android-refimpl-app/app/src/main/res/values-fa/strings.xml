@@ -286,8 +286,8 @@
     <string name="ConferenceAudioActivity_10">لیست کاربران</string>
     <string name="ConferenceAudioActivity_17">فشار به صحبت کردن</string>
     <string name="ConferenceAudioActivity_18">صحبت کردن ...</string>
-    <string name="ConferenceAudioActivity_39">فعال:</string>
-    <string name="ConferenceAudioActivity_40">آفلاین:</string>
+    <string name="GroupActivityActive">فعال:</string>
+    <string name="GroupActivityOffline">آفلاین:</string>
     
     
     
