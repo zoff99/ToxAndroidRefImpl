@@ -457,7 +457,9 @@ public class ConferenceAudioActivity extends AppCompatActivity
         {
             Log.i(TAG, "LC:onResume:wakelock:get");
             PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            wl_group_audio = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "trifa:group_audio_cpu");
+            // wl_group_audio = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "trifa:group_audio_cpu");
+            wl_group_audio = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                                            "trifa:group_audio_cpu");
             wl_group_audio.acquire();
             Log.i(TAG, "LC:onResume:wakelock:get:done");
         }
