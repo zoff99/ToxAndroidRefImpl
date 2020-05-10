@@ -157,8 +157,8 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_acti
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
-import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
@@ -425,6 +425,7 @@ public class MainActivity extends AppCompatActivity
     static Map<String, String> cache_peernum_pubkey = new HashMap<String, String>();
     // static Map<String, String> cache_peername_pubkey = new HashMap<String, String>();
     static Map<String, String> cache_peername_pubkey2 = new HashMap<String, String>();
+    static Map<String, Long> cache_confid_confnum = new HashMap<String, Long>();
     // ---- lookup cache ----
 
     // ---- lookup cache for conference drawer ----
@@ -1151,6 +1152,15 @@ public class MainActivity extends AppCompatActivity
                         // Exit
                         try
                         {
+                            GroupAudioService.stop_me();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        try
+                        {
                             if (is_tox_started)
                             {
                                 tox_service_fg.stop_tox_fg();
@@ -1854,6 +1864,15 @@ public class MainActivity extends AppCompatActivity
 
     static void global_stop_tox()
     {
+        try
+        {
+            GroupAudioService.stop_me();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         try
         {
             if (is_tox_started)
@@ -3304,7 +3323,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        if (get_conference_num_from_confid(conf_id) != conference_number)
+        if (tox_conference_by_confid__wrapper(conf_id) != conference_number)
         {
             // not the group we are in group audio call with now
             return;
@@ -3979,7 +3998,7 @@ public class MainActivity extends AppCompatActivity
                     // Log.i(TAG, "friend_sync_message_v2_cb:LL:" + orma.selectFromConferenceDB().toList());
                     String real_conference_id = real_sender_as_hex_string;
 
-                    long conference_num = HelperConference.get_conference_num_from_confid(real_conference_id);
+                    long conference_num = HelperConference.tox_conference_by_confid__wrapper(real_conference_id);
                     Log.i(TAG, "friend_sync_message_v2_cb:conference_num=" + conference_num);
                     if (conference_num > -1)
                     {
@@ -4016,7 +4035,7 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         conference_message_add_from_sync(
-                            HelperConference.get_conference_num_from_confid(real_conference_id), sender_peer_num,
+                            HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
                             real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
                             (msg_wrapped_sec * 1000) + msg_wrapped_ms);
                     }
@@ -5164,6 +5183,8 @@ public class MainActivity extends AppCompatActivity
             long result = toxav_groupchat_disable_av(conference_num);
             Log.i(TAG, "conference_invite_cb:toxav_groupchat_disable_av result=" + result);
         }
+
+        cache_confid_confnum.clear();
 
         Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);
         // strip first 3 bytes of cookie to get the conference_id.

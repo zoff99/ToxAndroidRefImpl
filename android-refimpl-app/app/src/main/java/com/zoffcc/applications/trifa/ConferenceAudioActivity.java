@@ -19,7 +19,6 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -62,8 +61,8 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
-import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_volume_percent;
@@ -85,9 +84,9 @@ import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceAudioActivity extends AppCompatActivity
 {
-    private static final String TAG = "trifa.CnfAudioActivity"; //$NON-NLS-1$
-    static String conf_id = "-1"; //$NON-NLS-1$
-    static String conf_id_prev = "-1"; //$NON-NLS-1$
+    private static final String TAG = "trifa.CnfAudioActivity";
+    static String conf_id = "-1";
+    static String conf_id_prev = "-1";
     static ConferenceAudioActivity caa = null;
 
     static PowerManager.WakeLock wl_group_audio = null;
@@ -127,6 +126,15 @@ public class ConferenceAudioActivity extends AppCompatActivity
     {
         Log.i(TAG, "LC:onCreate");
 
+        try
+        {
+            GroupAudioService.stop_me();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         if (Build.VERSION.SDK_INT >= 27)
         {
             setTurnScreenOn(true);
@@ -147,7 +155,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         conferences_av_handler_s = conferences_av_handler;
 
         Intent intent = getIntent();
-        conf_id = intent.getStringExtra("conf_id"); //$NON-NLS-1$
+        conf_id = intent.getStringExtra("conf_id");
         Log.i(TAG, "onCreate:003:conf_id=" + conf_id + " conf_id_prev=" + conf_id_prev); //$NON-NLS-1$ //$NON-NLS-2$
         conf_id_prev = conf_id;
 
@@ -535,23 +543,13 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         if (Build.VERSION.SDK_INT >= 27)
         {
-            setShowWhenLocked(true);
             setTurnScreenOn(true);
-            KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-            if (keyguardManager != null)
-            {
-                keyguardManager.requestDismissKeyguard(this, null);
-            }
         }
         else
         {
-
-            getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
             getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
-
 
         try
         {
@@ -645,7 +643,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        toxav_groupchat_enable_av(get_conference_num_from_confid(conf_id));
+        toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
 
 
         Group_audio_play_thread = new Thread()
@@ -724,7 +722,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         super.onPause();
 
-        toxav_groupchat_disable_av(get_conference_num_from_confid(conf_id));
+        toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
 
         Callstate.audio_group_active = false;
 
@@ -1011,7 +1009,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
             public void run()
             {
                 final String f_name = HelperConference.get_conference_title_from_confid(conf_id);
-                final long conference_num = get_conference_num_from_confid(conf_id);
+                final long conference_num = tox_conference_by_confid__wrapper(conf_id);
 
                 Runnable myRunnable = new Runnable()
                 {
@@ -1069,7 +1067,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
             Log.d(TAG, "set_peer_names_and_avatars:002"); //$NON-NLS-1$
 
-            final long conference_num = get_conference_num_from_confid(conf_id);
+            final long conference_num = tox_conference_by_confid__wrapper(conf_id);
             long num_peers = tox_conference_peer_count(conference_num);
 
             Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers); //$NON-NLS-1$
@@ -1386,7 +1384,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     public void show_add_friend_conference(View view)
     {
-        toxav_groupchat_disable_av(get_conference_num_from_confid(conf_id));
+        toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
 
         Callstate.audio_group_active = false;
 
@@ -1464,7 +1462,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                                     Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id); //$NON-NLS-1$
                                 }
 
-                                final long conference_num = get_conference_num_from_confid(conf_id);
+                                final long conference_num = tox_conference_by_confid__wrapper(conf_id);
 
                                 Log.i(TAG, "onActivityResult:conference_num:" + conference_num + " conf_id=" +
                                            conf_id); //$NON-NLS-1$ //$NON-NLS-2$

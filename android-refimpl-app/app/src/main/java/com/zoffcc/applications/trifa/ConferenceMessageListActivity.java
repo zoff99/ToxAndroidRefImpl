@@ -56,9 +56,9 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
-import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
@@ -259,7 +259,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             public void run()
             {
                 final String f_name = HelperConference.get_conference_title_from_confid(conf_id);
-                final long conference_num = get_conference_num_from_confid(conf_id);
+                final long conference_num = tox_conference_by_confid__wrapper(conf_id);
 
                 Runnable myRunnable = new Runnable()
                 {
@@ -316,7 +316,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
             Log.d(TAG, "set_peer_names_and_avatars:002");
 
-            final long conference_num = get_conference_num_from_confid(conf_id);
+            final long conference_num = tox_conference_by_confid__wrapper(conf_id);
             long num_peers = tox_conference_peer_count(conference_num);
 
             Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers);
@@ -502,7 +502,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
                     if ((msg != null) && (!msg.equalsIgnoreCase("")))
                     {
-                        int res = tox_conference_send_message(get_conference_num_from_confid(conf_id), 0, msg);
+                        int res = tox_conference_send_message(tox_conference_by_confid__wrapper(conf_id), 0, msg);
                         Log.i(TAG, "tox_conference_send_message:result=" + res + " m=" + m);
                         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
@@ -1065,7 +1065,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                     Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id);
                                 }
 
-                                final long conference_num = get_conference_num_from_confid(conf_id);
+                                final long conference_num = tox_conference_by_confid__wrapper(conf_id);
                                 if (conference_num > -1)
                                 {
                                     int res_conf_invite = tox_conference_invite(friend_num_temp_safety2,

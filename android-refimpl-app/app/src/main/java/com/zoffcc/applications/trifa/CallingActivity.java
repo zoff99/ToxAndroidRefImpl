@@ -201,6 +201,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // startActivity called from non-Activity context
         Log.i(TAG, "onCreate:01"); //$NON-NLS-1$
 
+        try
+        {
+            GroupAudioService.stop_me();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         if (Build.VERSION.SDK_INT >= 27)
         {
             setShowWhenLocked(true);

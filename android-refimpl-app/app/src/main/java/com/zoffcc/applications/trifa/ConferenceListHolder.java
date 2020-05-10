@@ -40,6 +40,7 @@ import static com.zoffcc.applications.trifa.HelperConference.delete_conference;
 import static com.zoffcc.applications.trifa.HelperConference.delete_conference_all_messages;
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_title_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.set_conference_inactive;
+import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
@@ -308,6 +309,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                         if ((f2.tox_conference_number > -1) && (f2.conference_active))
                         {
                             tox_conference_delete(f2.tox_conference_number);
+                            cache_confid_confnum.clear();
                             update_savedata_file_wrapper(); // after deleteing a conference
                         }
 
@@ -355,6 +357,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                         if ((f2.tox_conference_number > -1) && (f2.conference_active))
                         {
                             tox_conference_delete(f2.tox_conference_number);
+                            cache_confid_confnum.clear();
                             update_savedata_file_wrapper(); // after deleteing a conference
                         }
 

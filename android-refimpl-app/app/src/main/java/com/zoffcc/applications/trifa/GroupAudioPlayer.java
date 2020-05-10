@@ -19,15 +19,17 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 
 public class GroupAudioPlayer extends AppCompatActivity
 {
@@ -44,6 +46,7 @@ public class GroupAudioPlayer extends AppCompatActivity
     static int PlaybackState = GROUP_AUDIO_STATE_PLAYING;
     static boolean mStarted = false;
     static long PlaybackState_Position = 0;
+    static String conf_id = "-1";
 
     public static String channelId = "";
     static NotificationChannel notification_channel_group_audio_play_service = null;
@@ -53,6 +56,11 @@ public class GroupAudioPlayer extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        conf_id = intent.getStringExtra("conf_id");
+
+        Log.i(TAG, "conf_id=" + conf_id);
 
         nmn3 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -72,6 +80,7 @@ public class GroupAudioPlayer extends AppCompatActivity
         try
         {
             Intent i = new Intent(this, GroupAudioService.class);
+            i.putExtra("conf_id", conf_id);
             startService(i);
         }
         catch (Exception e)
@@ -79,6 +88,10 @@ public class GroupAudioPlayer extends AppCompatActivity
             Log.i(TAG, "group_audio_service:EE01:" + e.getMessage());
             e.printStackTrace();
         }
+
+        Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_music_video).backgroundColor(
+            Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        this.getWindow().setBackgroundDrawable(d4);
     }
 
     @Override
@@ -103,63 +116,5 @@ public class GroupAudioPlayer extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
-    }
-
-    private Notification createNotification()
-    {
-        Log.i(TAG, "group_audio_service=" + group_audio_service);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setVisibility(
-            Notification.VISIBILITY_PUBLIC).setOngoing(true).setSmallIcon(R.mipmap.ic_launcher).setContentTitle(
-            "My notification").setContentText("Hello World!");
-
-        int playPauseButtonPosition = 0;
-
-        // addPlayPauseAction(builder);
-
-        return (builder.build());
-    }
-
-    private void addPlayPauseAction(Notification.Builder builder)
-    {
-        String label;
-        int icon;
-        PendingIntent intent = null;
-
-        if (PlaybackState == GROUP_AUDIO_STATE_PLAYING)
-        {
-            label = "pause";
-            icon = R.drawable.circle_orange;
-            // intent = mPauseIntent;
-        }
-        else
-        {
-            label = "play";
-            icon = R.drawable.circle_green;
-            // intent = mPlayIntent;
-        }
-        builder.addAction(new Notification.Action(icon, label, intent));
-    }
-
-    private void setNotificationPlaybackState(Notification.Builder builder)
-    {
-        if (!mStarted)
-        {
-            group_audio_service.stopForeground(true);
-            return;
-        }
-
-        if (PlaybackState == GROUP_AUDIO_STATE_PLAYING && PlaybackState_Position >= 0)
-        {
-            builder.setWhen(System.currentTimeMillis() - PlaybackState_Position).setShowWhen(true).setUsesChronometer(
-                true);
-        }
-        else
-        {
-            builder.setWhen(0).setShowWhen(false).setUsesChronometer(false);
-        }
-
-        // Make sure that the notification can be dismissed by the user when we are not playing:
-        builder.setOngoing(PlaybackState == GROUP_AUDIO_STATE_PLAYING);
     }
 }

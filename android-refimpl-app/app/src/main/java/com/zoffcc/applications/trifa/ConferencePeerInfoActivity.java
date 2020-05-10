@@ -34,7 +34,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
@@ -61,7 +61,7 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
         Intent intent = getIntent();
         peer_pubkey = intent.getStringExtra("peer_pubkey");
         conf_id = intent.getStringExtra("conf_id");
-        final long conference_num = get_conference_num_from_confid(conf_id);
+        final long conference_num = tox_conference_by_confid__wrapper(conf_id);
 
         profile_icon = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.pi_profile_icon);
         peer_toxid = (TextView) findViewById(R.id.pi_toxprvkey_textview);
@@ -71,7 +71,7 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
         profile_icon.setImageDrawable(d1);
 
         String peer_name_txt = tox_conference_peer_get_name__wrapper(conf_id, peer_pubkey);
@@ -93,7 +93,7 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
             try
             {
                 fl_temp = orma.selectFromFriendList().
-                        tox_public_key_stringEq(peer_pubkey).toList().get(0);
+                    tox_public_key_stringEq(peer_pubkey).toList().get(0);
 
                 if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
                 {
@@ -101,7 +101,7 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
                     try
                     {
                         f1 = new info.guardianproject.iocipher.File(
-                                fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                         if (f1.length() > 0)
                         {
                             have_avatar_for_pubkey = true;
@@ -133,7 +133,7 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
                         try
                         {
                             f1 = new info.guardianproject.iocipher.File(
-                                    fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                                fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                         }
                         catch (Exception e)
                         {
@@ -145,21 +145,21 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
                             if (f1.length() > 0)
                             {
                                 final RequestOptions glide_options = new RequestOptions().
-                                        fitCenter().
-                                        circleCrop();
+                                    fitCenter().
+                                    circleCrop();
 
                                 GlideApp.
-                                        with(this).
-                                        load(f1).
-                                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                        signature(StringSignature2("_conf_avatar_" + fl_temp.avatar_pathname + "/" +
-                                                                   fl_temp.avatar_filename + "_" +
-                                                                   fl_temp.avatar_update_timestamp)).
-                                        priority(Priority.HIGH).
-                                        placeholder(R.drawable.round_loading_animation).
-                                        skipMemoryCache(false).
-                                        apply(glide_options).
-                                        into(profile_icon);
+                                    with(this).
+                                    load(f1).
+                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                    signature(StringSignature2(
+                                        "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename +
+                                        "_" + fl_temp.avatar_update_timestamp)).
+                                    priority(Priority.HIGH).
+                                    placeholder(R.drawable.round_loading_animation).
+                                    skipMemoryCache(false).
+                                    apply(glide_options).
+                                    into(profile_icon);
                             }
                         }
                     }
@@ -175,9 +175,9 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
                         peer_color_bg = ChatColors.PeerAvatarColors[hash_to_bucket(peer_pubkey, ChatColors.get_size())];
 
                         final Drawable smiley_face = new IconicsDrawable(context_s).
-                                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                                backgroundColor(Color.TRANSPARENT).
-                                color(peer_color_fg).sizeDp(70);
+                            icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                            backgroundColor(Color.TRANSPARENT).
+                            color(peer_color_fg).sizeDp(70);
 
                         profile_icon.setPadding((int) dp2px(0), (int) dp2px(0), (int) dp2px(0), (int) dp2px(0));
                         profile_icon.setImageDrawable(smiley_face);

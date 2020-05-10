@@ -26,7 +26,6 @@ import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;
 import android.media.audiofx.NoiseSuppressor;
 import android.os.AsyncTask;
-import android.os.Process;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
@@ -45,7 +44,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_sta
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk_active;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group_audio_send_icon;
-import static com.zoffcc.applications.trifa.HelperConference.get_conference_num_from_confid;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
@@ -490,7 +489,7 @@ public class AudioRecording extends Thread
                         if (push_to_talk_active)
                         {
                             int audio_group_send_res = toxav_group_send_audio(
-                                get_conference_num_from_confid(ConferenceAudioActivity.conf_id),
+                                tox_conference_by_confid__wrapper(ConferenceAudioActivity.conf_id),
                                 (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
 
                             //Log.i(TAG,

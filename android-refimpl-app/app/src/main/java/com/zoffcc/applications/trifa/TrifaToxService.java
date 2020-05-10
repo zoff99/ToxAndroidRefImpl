@@ -66,6 +66,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.bootstrap_single_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.bytes_to_hex;
+import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
@@ -586,7 +587,7 @@ public class TrifaToxService extends Service
 
                 new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
                                           conference_identifier, tox_conference_get_type(
-                                conference_numbers[conf_])); // rejoin a saved conference
+                        conference_numbers[conf_])); // rejoin a saved conference
 
                 if (tox_conference_get_type(conference_numbers[conf_]) == TOX_CONFERENCE_TYPE_AV.value)
                 {
@@ -698,6 +699,7 @@ public class TrifaToxService extends Service
 
                 cache_pubkey_fnum.clear();
                 cache_fnum_pubkey.clear();
+                cache_confid_confnum.clear();
 
                 // ----- convert old conference messages which did not contain a sent timestamp -----
                 try
@@ -715,8 +717,8 @@ public class TrifaToxService extends Service
                     if (need_migrate_old_conf_msg_date == true)
                     {
                         orma.getConnection().execSQL(
-                                "update ConferenceMessage set sent_timestamp=rcvd_timestamp" + " where " +
-                                " sent_timestamp='0'");
+                            "update ConferenceMessage set sent_timestamp=rcvd_timestamp" + " where " +
+                            " sent_timestamp='0'");
                         Log.i(TAG, "onCreate:migrate_old_conf_msg_date");
                         // now remember that we did that, and don't do it again
                         set_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done", "true");
@@ -795,7 +797,7 @@ public class TrifaToxService extends Service
 
                     FriendList f;
                     List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
-                            tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+                        tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
 
                     // Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
 
@@ -875,17 +877,15 @@ public class TrifaToxService extends Service
                     {
                         // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
                         orma.updateFriendList().tox_public_key_stringEq(
-                                tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(
-                                f.name).status_message(f.status_message).TOX_CONNECTION(
-                                f.TOX_CONNECTION).TOX_CONNECTION_on_off(
-                                get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(
-                                f.TOX_USER_STATUS).execute();
+                            tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(
+                            f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_CONNECTION_on_off(
+                            get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
                         // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
                     }
 
                     FriendList f_check;
                     List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(
-                            tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+                        tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
                     // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
                     try
                     {
@@ -1044,7 +1044,7 @@ public class TrifaToxService extends Service
                                         {
                                             // set the used value to the new value
                                             BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS =
-                                                    PREF__X_battery_saving_timeout * 1000 * 60;
+                                                PREF__X_battery_saving_timeout * 1000 * 60;
                                             Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
                                                        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
                                                        " PREF__X_battery_saving_timeout:" +
@@ -1064,11 +1064,11 @@ public class TrifaToxService extends Service
                                                                               WakeupAlarmReceiver.class);
                                             // intentWakeFullBroacastReceiver.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
                                             PendingIntent alarmIntent = PendingIntent.getBroadcast(
-                                                    getApplicationContext(), 1001, intent_wakeup,
-                                                    PendingIntent.FLAG_CANCEL_CURRENT);
+                                                getApplicationContext(), 1001, intent_wakeup,
+                                                PendingIntent.FLAG_CANCEL_CURRENT);
                                             getApplicationContext();
                                             AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(
-                                                    ALARM_SERVICE);
+                                                ALARM_SERVICE);
 
 
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -1128,14 +1128,13 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
+                                            change_notification(0, "sleep: " + (int) (
+                                                (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) + "min (" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
                                                                    long_date_time_format_or_empty(
-                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
+                                                                       global_self_last_entered_battery_saving_timestamp)); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1157,14 +1156,13 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
+                                            change_notification(0, "sleep: " + (int) (
+                                                (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) + "min (" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
                                                                    long_date_time_format_or_empty(
-                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
+                                                                       global_self_last_entered_battery_saving_timestamp)); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1189,14 +1187,13 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
+                                            change_notification(0, "sleep: " + (int) (
+                                                (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) + "min (" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
                                                                    long_date_time_format_or_empty(
-                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
+                                                                       global_self_last_entered_battery_saving_timestamp)); // set to offline
                                             set_all_friends_offline();
                                             set_all_conferences_inactive();
                                             // so that the app knows we went offline
@@ -1223,7 +1220,7 @@ public class TrifaToxService extends Service
                                                     // if the user opens the message view -> go online, to be able to send messages
                                                     Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
                                                     TrifaToxService.write_debug_file(
-                                                            "BATTERY_SAVINGS_MODE__finish__msgview");
+                                                        "BATTERY_SAVINGS_MODE__finish__msgview");
                                                     break;
                                                 }
 
@@ -1237,14 +1234,14 @@ public class TrifaToxService extends Service
                                                 catch (Exception es)
                                                 {
                                                     TrifaToxService.write_debug_file(
-                                                            "BATTERY_SAVINGS_MODE__finish__interrupted");
+                                                        "BATTERY_SAVINGS_MODE__finish__interrupted");
                                                     break;
                                                 }
                                             }
 
                                             Log.i(TAG, "finish BATTERY SAVINGS MODE, connecting again");
                                             TrifaToxService.write_debug_file(
-                                                    "BATTERY_SAVINGS_MODE__finish__connecting");
+                                                "BATTERY_SAVINGS_MODE__finish__connecting");
 
                                             // load conferences again
                                             load_and_add_all_conferences();
@@ -1288,7 +1285,7 @@ public class TrifaToxService extends Service
                                                                     ""); // set to real connection status
                                                 bootstrap_me();
                                                 TrifaToxService.write_debug_file(
-                                                        "BATTERY_SAVINGS_MODE__finish__bootstrapping");
+                                                    "BATTERY_SAVINGS_MODE__finish__bootstrapping");
                                             }
                                             else
                                             {
@@ -1298,14 +1295,14 @@ public class TrifaToxService extends Service
                                                 change_notification(TOX_CONNECTION_a,
                                                                     ""); // set to real connection status
                                                 TrifaToxService.write_debug_file(
-                                                        "BATTERY_SAVINGS_MODE__finish__already_online");
+                                                    "BATTERY_SAVINGS_MODE__finish__already_online");
                                             }
 
 
                                             BATTERY_OPTIMIZATION_LAST_SLEEP3 = BATTERY_OPTIMIZATION_LAST_SLEEP2;
                                             BATTERY_OPTIMIZATION_LAST_SLEEP2 = BATTERY_OPTIMIZATION_LAST_SLEEP1;
                                             BATTERY_OPTIMIZATION_LAST_SLEEP1 = (int) (
-                                                    (System.currentTimeMillis() - current_timestamp_) / 1000 / 60);
+                                                (System.currentTimeMillis() - current_timestamp_) / 1000 / 60);
                                             if ((BATTERY_OPTIMIZATION_LAST_SLEEP1 < 0) ||
                                                 (BATTERY_OPTIMIZATION_LAST_SLEEP1 > (3 * 3600 * 1000)))
                                             {
@@ -1315,7 +1312,7 @@ public class TrifaToxService extends Service
 
                                             // set the used value to the new value
                                             BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS =
-                                                    PREF__X_battery_saving_timeout * 1000 * 60;
+                                                PREF__X_battery_saving_timeout * 1000 * 60;
                                             Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
                                                        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
                                                        " PREF__X_battery_saving_timeout:" +
@@ -1361,9 +1358,8 @@ public class TrifaToxService extends Service
                                         Log.i(TAG, "bootrapping:set to true[2]");
                                         try
                                         {
-                                            tox_service_fg.change_notification_fg(0, "sleep: " +
-                                                                                     (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                                             1000) / 60) + "min (" +
+                                            tox_service_fg.change_notification_fg(0, "sleep: " + (int) (
+                                                (BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) + "min (" +
                                                                                      BATTERY_OPTIMIZATION_LAST_SLEEP1 +
                                                                                      "/" +
                                                                                      BATTERY_OPTIMIZATION_LAST_SLEEP2 +
@@ -1371,7 +1367,7 @@ public class TrifaToxService extends Service
                                                                                      BATTERY_OPTIMIZATION_LAST_SLEEP3 +
                                                                                      ") " +
                                                                                      long_date_time_format_or_empty(
-                                                                                             global_self_last_entered_battery_saving_timestamp)); // set notification to "bootstrapping"
+                                                                                         global_self_last_entered_battery_saving_timestamp)); // set notification to "bootstrapping"
                                         }
                                         catch (Exception e)
                                         {
@@ -1472,12 +1468,12 @@ public class TrifaToxService extends Service
                                 int cur_resend_count_per_iteration = 0;
 
                                 List<Message> m_v1 = orma.selectFromMessage().
-                                        directionEq(1).
-                                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
-                                        resend_countEq(0).
-                                        readEq(false).
-                                        orderBySent_timestampAsc().
-                                        toList();
+                                    directionEq(1).
+                                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
+                                    resend_countEq(0).
+                                    readEq(false).
+                                    orderBySent_timestampAsc().
+                                    toList();
 
                                 if (m_v1.size() > 0)
                                 {
@@ -1487,7 +1483,7 @@ public class TrifaToxService extends Service
                                         Message m_resend_v1 = ii.next();
 
                                         if (is_friend_online(
-                                                tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
+                                            tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
                                         {
                                             //Log.i(TAG, "send_pending_1-on-1_messages:v1:fname=" +
                                             //           get_friend_name_from_pubkey(m_resend_v1.tox_friendpubkey) +
@@ -1501,8 +1497,8 @@ public class TrifaToxService extends Service
                                                    m_resend_v1.text);
 
                                         MainActivity.send_message_result result = tox_friend_send_message_wrapper(
-                                                tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey), 0,
-                                                m_resend_v1.text);
+                                            tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey), 0,
+                                            m_resend_v1.text);
                                         long res = result.msg_num;
 
                                         Log.i(TAG,
@@ -1565,13 +1561,13 @@ public class TrifaToxService extends Service
                                 int cur_resend_count_per_iteration = 0;
 
                                 List<Message> m_v1 = orma.selectFromMessage().
-                                        directionEq(1).
-                                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
-                                        resend_countEq(1).
-                                        msg_versionEq(1).
-                                        readEq(false).
-                                        orderBySent_timestampAsc().
-                                        toList();
+                                    directionEq(1).
+                                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
+                                    resend_countEq(1).
+                                    msg_versionEq(1).
+                                    readEq(false).
+                                    orderBySent_timestampAsc().
+                                    toList();
 
                                 if (m_v1.size() > 0)
                                 {
@@ -1581,7 +1577,7 @@ public class TrifaToxService extends Service
                                         Message m_resend_v2 = ii.next();
 
                                         if (is_friend_online(
-                                                tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey)) == 0)
+                                            tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey)) == 0)
                                         {
                                             continue;
                                         }
@@ -1596,12 +1592,12 @@ public class TrifaToxService extends Service
                                         byte[] raw_msg_resend_data = hex_to_bytes(m_resend_v2.raw_msgv2_bytes);
 
                                         ByteBuffer msg_text_buffer_resend_v2 = ByteBuffer.allocateDirect(
-                                                raw_data_length);
+                                            raw_data_length);
                                         msg_text_buffer_resend_v2.put(raw_msg_resend_data, 0, raw_data_length);
 
                                         int res = tox_util_friend_resend_message_v2(
-                                                tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey),
-                                                msg_text_buffer_resend_v2, raw_data_length);
+                                            tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey),
+                                            msg_text_buffer_resend_v2, raw_data_length);
 
                                         Log.i(TAG, "send_pending_1-on-1_messages:v2:res=" + res);
 

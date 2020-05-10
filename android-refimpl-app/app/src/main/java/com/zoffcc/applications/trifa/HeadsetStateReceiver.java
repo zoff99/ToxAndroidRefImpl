@@ -24,7 +24,8 @@ class HeadsetStateReceiver extends BroadcastReceiver
             }
 
 
-            if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1))
+            if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1) ||
+                (GroupAudioService.activity_state == 1))
             {
                 if (intent.getAction().equals("android.intent.action.HEADSET_PLUG"))
                 {
@@ -74,7 +75,7 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         {
                         }
 
-                        if (ConferenceAudioActivity.activity_state == 1)
+                        if ((ConferenceAudioActivity.activity_state == 1) || (GroupAudioService.activity_state == 1))
                         {
                             audio_manager_s.setSpeakerphoneOn(true);
                         }
@@ -100,7 +101,8 @@ class HeadsetStateReceiver extends BroadcastReceiver
 
         try
         {
-            if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1))
+            if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1) ||
+                (GroupAudioService.activity_state == 1))
             {
                 if (intent.getAction().equals("android.media.ACTION_SCO_AUDIO_STATE_UPDATED"))
                 {
