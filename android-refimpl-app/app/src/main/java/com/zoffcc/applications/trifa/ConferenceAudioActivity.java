@@ -1430,9 +1430,9 @@ public class ConferenceAudioActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        Log.i(TAG, "show_add_friend_conference"); //$NON-NLS-1$
+        Log.i(TAG, "show_add_friend_conference");
         Intent intent = new Intent(this, FriendSelectSingleActivity.class);
-        intent.putExtra("conf_id", conf_id); //$NON-NLS-1$
+        intent.putExtra("conf_id", conf_id);
         do_not_close_on_pause = true;
         startActivityForResult(intent, SelectFriendSingleActivity_ID);
     }
