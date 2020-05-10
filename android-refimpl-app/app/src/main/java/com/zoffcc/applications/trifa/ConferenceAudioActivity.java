@@ -38,6 +38,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -115,6 +116,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
     private static float group_slider_alpha = 0.3f;
     static ImageView group_audio_device_icon = null;
     static ImageView group_audio_send_icon = null;
+    ImageButton group_audio_player_icon = null;
 
 
     Handler conferences_av_handler = null;
@@ -432,6 +434,48 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
 
         update_group_audio_send_icon(0);
+
+        group_audio_player_icon = (ImageButton) findViewById(R.id.group_audio_player_icon);
+        group_audio_player_icon.setVisibility(View.VISIBLE);
+        Drawable d677 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_lock).backgroundColor(
+            Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        group_audio_player_icon.setImageDrawable(d677);
+
+        group_audio_player_icon.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+
+                Log.i(TAG, "group_audio_player_icon:onTouch");
+
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        Intent intent = new Intent(group_audio_player_icon.getContext(), GroupAudioPlayer.class);
+                        intent.putExtra("conf_id", conf_id);
+                        startActivity(intent);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
+                         (event.getAction() == MotionEvent.ACTION_CANCEL))
+                {
+                    try
+                    {
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                return false;
+            }
+        });
 
         set_peer_count_header();
         set_peer_names_and_avatars();

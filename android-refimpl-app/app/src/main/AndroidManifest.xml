@@ -91,6 +91,11 @@
             android:label="@string/conference_audio_activity_name">
         </activity>
         <activity
+            android:name=".GroupAudioPlayer"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/conference_audio_activity_player_name">
+        </activity>
+        <activity
             android:name=".CallingActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_calling"
@@ -213,6 +218,12 @@
 
         <service
             android:name=".TrifaToxService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+
+        <service
+            android:name=".GroupAudioService"
             android:enabled="true"
             android:exported="false">
         </service>
