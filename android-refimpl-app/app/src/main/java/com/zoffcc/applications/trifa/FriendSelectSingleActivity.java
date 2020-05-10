@@ -105,9 +105,12 @@ public class FriendSelectSingleActivity extends ListActivity
             Log.i(TAG, "onCreate:006:friend_pubkey_and_names.len=" + friend_pubkey_and_names.length);
 
             i = 0;
+            boolean need_increase = false;
             for (j = 0; j < fl.size(); j++)
             {
-                Log.i(TAG, "onCreate:006a:i=" + i + " n=" + fl.get(j).alias_name);
+                need_increase = false;
+
+                // Log.i(TAG, "onCreate:006a:i=" + i + " n=" + fl.get(j).alias_name);
                 if (is_any_relay(fl.get(j).tox_public_key_string))
                 {
                     // do not show any relays
@@ -118,14 +121,17 @@ public class FriendSelectSingleActivity extends ListActivity
                     if (fl.get(j).alias_name == null)
                     {
                         friend_pubkey_and_names[i] = fl.get(j).tox_public_key_string + ":\n\n" + fl.get(j).name;
+                        need_increase = true;
                     }
                     else if (fl.get(j).alias_name.length() < 1)
                     {
                         friend_pubkey_and_names[i] = fl.get(j).tox_public_key_string + ":\n\n" + fl.get(j).name;
+                        need_increase = true;
                     }
                     else
                     {
                         friend_pubkey_and_names[i] = fl.get(j).tox_public_key_string + ":\n\n" + fl.get(j).alias_name;
+                        need_increase = true;
                     }
 
                     // Log.i(TAG, "onCreate:006c:n=" + friend_pubkey_and_names[i]);
@@ -133,17 +139,25 @@ public class FriendSelectSingleActivity extends ListActivity
 
                 // Log.i(TAG, "onCreate:006b:res=" + friend_pubkey_and_names[i]);
 
-                if (friend_pubkey_and_names[i] == null)
+                try
                 {
-                    friend_pubkey_and_names[i] = "***";
-                    Log.i(TAG, "onCreate:006d");
+                    if (friend_pubkey_and_names[i] == null)
+                    {
+                        friend_pubkey_and_names[i] = "***";
+                        Log.i(TAG, "onCreate:006d");
+                    }
+                    else if (friend_pubkey_and_names[i].length() == 0)
+                    {
+                        friend_pubkey_and_names[i] = "+++";
+                        Log.i(TAG, "onCreate:006e");
+                    }
                 }
-                else if (friend_pubkey_and_names[i].length() == 0)
+                catch (Exception e)
                 {
-                    friend_pubkey_and_names[i] = "+++";
-                    Log.i(TAG, "onCreate:006e");
+                    e.printStackTrace();
                 }
-                else
+
+                if (need_increase)
                 {
                     i++;
                 }
