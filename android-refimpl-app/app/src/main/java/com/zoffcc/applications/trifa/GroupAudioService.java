@@ -26,11 +26,20 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
@@ -46,15 +55,16 @@ public class GroupAudioService extends Service
     static final String TAG = "trifa.GAService";
     static String conf_id = "-1";
     static int ONGOING_GROUP_AUDIO_NOTIFICATION_ID = 886613;
-    public static final String ACTION_PLAY = "com.example.ACTION_PLAY";
-    public static final String ACTION_PAUSE = "com.example.ACTION_PAUSE";
-    public static final String ACTION_STOP = "com.example.ACTION_STOP";
+    public static final String ACTION_PLAY = "com.zoffcc.applications.trifa.ACTION_PLAY";
+    public static final String ACTION_PAUSE = "com.zoffcc.applications.trifa.ACTION_PAUSE";
+    public static final String ACTION_STOP = "com.zoffcc.applications.trifa.ACTION_STOP";
     static boolean running = false;
     static Thread GAThread = null;
     static NotificationManager nm3 = null;
     static GroupAudioService ga_service = null;
     static int activity_state = 0;
     static notification_and_builder noti_and_builder = null;
+    static RemoteViews views = null;
 
     final int GAS_PAUSED = 0;
     final int GAS_PLAYING = 1;
@@ -323,8 +333,34 @@ public class GroupAudioService extends Service
 
     private notification_and_builder buildNotification(int playbackStatus)
     {
-
         notification_and_builder nb = new notification_and_builder();
+
+        RemoteViews views = new RemoteViews(getPackageName(), R.layout.gas_status_bar);
+        RemoteViews bigViews = new RemoteViews(getPackageName(), R.layout.gas_status_bar_expanded);
+
+        views.setChronometer(R.id.status_bar_chrono1, SystemClock.elapsedRealtime(), null, true);
+        bigViews.setChronometer(R.id.status_bar_chrono2, SystemClock.elapsedRealtime(), null, true);
+
+        Drawable d_play = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_play_arrow).backgroundColor(
+            Color.TRANSPARENT).sizeDp(50);
+
+        Drawable d_pause = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_pause).backgroundColor(
+            Color.TRANSPARENT).sizeDp(50);
+
+        Drawable d_stop = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_stop).backgroundColor(
+            Color.TRANSPARENT).sizeDp(50);
+
+        views.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_pause));
+        bigViews.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_pause));
+
+        views.setImageViewBitmap(R.id.status_bar_stop, drawableToBitmap(d_stop));
+        bigViews.setImageViewBitmap(R.id.status_bar_stop, drawableToBitmap(d_stop));
+
+        views.setTextViewText(R.id.status_bar_track_name, "Title"); // bold
+        bigViews.setTextViewText(R.id.status_bar_track_name, "Title"); // bold
+
+        views.setTextViewText(R.id.status_bar_artist_name, "Name");
+        bigViews.setTextViewText(R.id.status_bar_artist_name, "Name");
 
         int notificationAction = android.R.drawable.ic_media_pause;//needs to be initialized
         PendingIntent play_pauseAction = null;
@@ -365,6 +401,8 @@ public class GroupAudioService extends Service
         b.setOngoing(true);
         b.setLocalOnly(true);
         b.setWhen(System.currentTimeMillis());
+        b.setCustomContentView(views);
+        b.setCustomBigContentView(bigViews);
         b.setUsesChronometer(true);
 
         if (playbackStatus == GAS_PLAYING)
@@ -433,5 +471,25 @@ public class GroupAudioService extends Service
 
         ga_service = null;
         removeNotification();
+    }
+
+    public static Bitmap drawableToBitmap(Drawable drawable)
+    {
+        if (drawable instanceof BitmapDrawable)
+        {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+
+        int width = drawable.getIntrinsicWidth();
+        width = width > 0 ? width : 1;
+        int height = drawable.getIntrinsicHeight();
+        height = height > 0 ? height : 1;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }
