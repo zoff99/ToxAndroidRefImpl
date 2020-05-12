@@ -229,6 +229,9 @@
             android:exported="false">
         </service>
 
+        <receiver android:name=".GroupAudioService$ButtonReceiver" android:enabled="true">
+        </receiver>
+
         <receiver android:name=".WakeupAlarmReceiver" android:enabled="true">
 
             <intent-filter>

@@ -23,6 +23,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -56,6 +57,9 @@ public class GroupAudioService extends Service
     public static final String ACTION_PLAY = "com.zoffcc.applications.trifa.ACTION_PLAY";
     public static final String ACTION_PAUSE = "com.zoffcc.applications.trifa.ACTION_PAUSE";
     public static final String ACTION_STOP = "com.zoffcc.applications.trifa.ACTION_STOP";
+    public static final int ACTION_PLAY_ID = 112124;
+    public static final int ACTION_PAUSE_ID = 112125;
+    public static final int ACTION_STOP_ID = 112126;
     static boolean running = false;
     static Thread GAThread = null;
     static NotificationManager nm3 = null;
@@ -63,9 +67,14 @@ public class GroupAudioService extends Service
     static int activity_state = 0;
     static notification_and_builder noti_and_builder = null;
     static RemoteViews views = null;
+    static RemoteViews bigViews = null;
+    static Context context_gas_static = null;
+    static long chronometer_base = 0;
+    static long chronometer_base2 = 0;
 
-    final int GAS_PAUSED = 0;
-    final int GAS_PLAYING = 1;
+    static final int GAS_PAUSED = 0;
+    static final int GAS_PLAYING = 1;
+    static int global_gas_status = 0;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -87,7 +96,8 @@ public class GroupAudioService extends Service
             final long conference_num = tox_conference_by_confid__wrapper(conf_id);
 
             // update the notification text
-            noti_and_builder.b.setContentTitle("#" + conference_num + ": " + f_name);
+            views.setTextViewText(R.id.status_bar_track_name, "#" + conference_num + ": " + f_name); // bold
+            bigViews.setTextViewText(R.id.status_bar_track_name, "#" + conference_num + ": " + f_name); // bold
             noti_and_builder.n = noti_and_builder.b.build();
             nm3.notify(ONGOING_GROUP_AUDIO_NOTIFICATION_ID, noti_and_builder.n);
         }
@@ -108,8 +118,12 @@ public class GroupAudioService extends Service
 
         ga_service = this;
 
+        global_gas_status = GAS_PLAYING;
+
+        context_gas_static = this;
+
         nm3 = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        noti_and_builder = buildNotification(GAS_PLAYING);
+        noti_and_builder = buildNotification(global_gas_status);
         startForeground(ONGOING_GROUP_AUDIO_NOTIFICATION_ID, noti_and_builder.n);
 
         Log.i(TAG, "onCreate:thread:1");
@@ -333,14 +347,14 @@ public class GroupAudioService extends Service
     {
         notification_and_builder nb = new notification_and_builder();
 
-        RemoteViews views = new RemoteViews(getPackageName(), R.layout.gas_status_bar);
-        RemoteViews bigViews = new RemoteViews(getPackageName(), R.layout.gas_status_bar_expanded);
+        views = new RemoteViews(getPackageName(), R.layout.gas_status_bar);
+        bigViews = new RemoteViews(getPackageName(), R.layout.gas_status_bar_expanded);
 
         views.setChronometer(R.id.status_bar_chrono1, SystemClock.elapsedRealtime(), null, true);
         bigViews.setChronometer(R.id.status_bar_chrono2, SystemClock.elapsedRealtime(), null, true);
 
-        Drawable d_play = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_play_arrow).backgroundColor(
-            Color.TRANSPARENT).sizeDp(50);
+        chronometer_base = 0;
+        chronometer_base2 = SystemClock.elapsedRealtime();
 
         Drawable d_pause = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_pause).backgroundColor(
             Color.TRANSPARENT).sizeDp(50);
@@ -368,11 +382,34 @@ public class GroupAudioService extends Service
             e.printStackTrace();
         }
 
-        views.setTextViewText(R.id.status_bar_track_name, "Title"); // bold
-        bigViews.setTextViewText(R.id.status_bar_track_name, "Title"); // bold
 
-        views.setTextViewText(R.id.status_bar_artist_name, "Name");
-        bigViews.setTextViewText(R.id.status_bar_artist_name, "Name");
+        // *************
+        // *************
+        // *************
+        Intent stopIntent = new Intent(this, ButtonReceiver.class);
+        stopIntent.setAction(ACTION_STOP);
+        PendingIntent playPendingIntent = PendingIntent.getBroadcast(this, ACTION_STOP_ID, stopIntent,
+                                                                     PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.status_bar_stop, playPendingIntent);
+        bigViews.setOnClickPendingIntent(R.id.status_bar_stop, playPendingIntent);
+        // *************
+        // *************
+        // *************
+        Intent pauseIntent = new Intent(this, ButtonReceiver.class);
+        pauseIntent.setAction(ACTION_PAUSE);
+        PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, ACTION_PAUSE_ID, pauseIntent,
+                                                                      PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
+        bigViews.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
+        // *************
+        // *************
+        // *************
+
+        views.setTextViewText(R.id.status_bar_track_name, "..."); // bold
+        bigViews.setTextViewText(R.id.status_bar_track_name, "..."); // bold
+
+        views.setTextViewText(R.id.status_bar_artist_name, "Tox:" + "GroupAudio");
+        bigViews.setTextViewText(R.id.status_bar_artist_name, "Tox:" + "GroupAudio");
 
         int notificationAction = android.R.drawable.ic_media_pause;//needs to be initialized
         PendingIntent play_pauseAction = null;
@@ -401,7 +438,7 @@ public class GroupAudioService extends Service
 
         b.setContentTitle("...");
         b.setShowWhen(false);
-        b.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle().setShowActionsInCompactView(0));
+        b.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle());
         b.setColor(getResources().getColor(R.color.colorPrimary));
         b.setSmallIcon(R.mipmap.ic_launcher);
         b.setLargeIcon(null);
@@ -418,15 +455,6 @@ public class GroupAudioService extends Service
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         b.setContentIntent(pendingIntent);
-
-        if (playbackStatus == GAS_PLAYING)
-        {
-            b.addAction(notificationAction, "pause.0", play_pauseAction);
-        }
-        else
-        {
-            b.addAction(notificationAction, "play.1", play_pauseAction);
-        }
 
         Notification n = b.build();
         nb.b = b;
@@ -485,5 +513,131 @@ public class GroupAudioService extends Service
 
         ga_service = null;
         removeNotification();
+    }
+
+    public static class ButtonReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            try
+            {
+                System.out.println("ButtonReceiver:" + intent.getAction());
+
+                if (intent.getAction() == ACTION_STOP)
+                {
+                    global_gas_status = GAS_PAUSED;
+                    stop_me();
+                }
+                else if (intent.getAction() == ACTION_PLAY)
+                {
+                    if (global_gas_status == GAS_PAUSED)
+                    {
+                        do_play();
+                    }
+                }
+                else if (intent.getAction() == ACTION_PAUSE)
+                {
+                    if (global_gas_status == GAS_PLAYING)
+                    {
+                        do_pause();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static void do_pause()
+    {
+        try
+        {
+            // update the notification
+            noti_and_builder.n = noti_and_builder.b.build();
+
+            chronometer_base = chronometer_base + (SystemClock.elapsedRealtime() - chronometer_base2);
+
+            views.setChronometer(R.id.status_bar_chrono1, SystemClock.elapsedRealtime() - chronometer_base, null,
+                                 false);
+            bigViews.setChronometer(R.id.status_bar_chrono2, SystemClock.elapsedRealtime() - chronometer_base, null,
+                                    false);
+
+            Drawable d_play = new IconicsDrawable(context_gas_static).icon(
+                GoogleMaterial.Icon.gmd_play_arrow).backgroundColor(Color.TRANSPARENT).sizeDp(50);
+
+            try
+            {
+                views.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_play));
+                bigViews.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_play));
+
+                Intent playIntent = new Intent(context_gas_static, ButtonReceiver.class);
+                playIntent.setAction(ACTION_PLAY);
+                PendingIntent pausePendingIntent = PendingIntent.getBroadcast(context_gas_static, ACTION_PLAY_ID,
+                                                                              playIntent,
+                                                                              PendingIntent.FLAG_UPDATE_CURRENT);
+                views.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
+                bigViews.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            nm3.notify(ONGOING_GROUP_AUDIO_NOTIFICATION_ID, noti_and_builder.n);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        global_gas_status = GAS_PAUSED;
+    }
+
+
+    static void do_play()
+    {
+        try
+        {
+            // update the notification
+            noti_and_builder.n = noti_and_builder.b.build();
+
+            views.setChronometer(R.id.status_bar_chrono1, SystemClock.elapsedRealtime() - chronometer_base, null, true);
+            bigViews.setChronometer(R.id.status_bar_chrono2, SystemClock.elapsedRealtime() - chronometer_base, null,
+                                    true);
+
+            chronometer_base2 = SystemClock.elapsedRealtime();
+
+            Drawable d_pause = new IconicsDrawable(context_gas_static).icon(
+                GoogleMaterial.Icon.gmd_pause).backgroundColor(Color.TRANSPARENT).sizeDp(50);
+
+            try
+            {
+                views.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_pause));
+                bigViews.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_pause));
+
+                Intent pauseIntent = new Intent(context_gas_static, ButtonReceiver.class);
+                pauseIntent.setAction(ACTION_PAUSE);
+                PendingIntent pausePendingIntent = PendingIntent.getBroadcast(context_gas_static, ACTION_PAUSE_ID,
+                                                                              pauseIntent,
+                                                                              PendingIntent.FLAG_UPDATE_CURRENT);
+                views.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
+                bigViews.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            nm3.notify(ONGOING_GROUP_AUDIO_NOTIFICATION_ID, noti_and_builder.n);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        global_gas_status = GAS_PLAYING;
     }
 }
