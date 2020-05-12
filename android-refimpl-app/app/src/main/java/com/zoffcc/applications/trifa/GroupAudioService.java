@@ -47,6 +47,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.drawableToBitmap;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 
 public class GroupAudioService extends Service
@@ -248,7 +249,7 @@ public class GroupAudioService extends Service
                     Log.i(TAG, "onReceive:headset:setImageDrawable:null2"); //$NON-NLS-1$
                 }
 
-                // HINT: stop audio recoring, we do not need it in this mode -------------
+                // HINT: stop audio recording, we do not need it in this mode -------------
                 try
                 {
                     if (!AudioRecording.stopped)
@@ -265,7 +266,7 @@ public class GroupAudioService extends Service
                     e.printStackTrace();
                     Log.i(TAG, "stop_audio_recording:EE01" + e.getMessage());
                 }
-                // HINT: stop audio recoring, we do not need it in this mode -------------
+                // HINT: stop audio recording, we do not need it in this mode -------------
 
 
                 try
@@ -299,6 +300,8 @@ public class GroupAudioService extends Service
 
                 Log.i(TAG, "GAThread:finished");
                 activity_state = 0;
+
+                toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
             }
         };
 
@@ -568,6 +571,8 @@ public class GroupAudioService extends Service
             Drawable d_play = new IconicsDrawable(context_gas_static).icon(
                 GoogleMaterial.Icon.gmd_play_arrow).backgroundColor(Color.TRANSPARENT).sizeDp(50);
 
+            toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
+
             try
             {
                 views.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_play));
@@ -612,6 +617,8 @@ public class GroupAudioService extends Service
 
             Drawable d_pause = new IconicsDrawable(context_gas_static).icon(
                 GoogleMaterial.Icon.gmd_pause).backgroundColor(Color.TRANSPARENT).sizeDp(50);
+
+            toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
 
             try
             {
