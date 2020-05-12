@@ -26,19 +26,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 
-import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
@@ -51,9 +45,6 @@ public class GroupAudioService extends Service
     static final String TAG = "trifa.GAService";
     static String conf_id = "-1";
     static int ONGOING_GROUP_AUDIO_NOTIFICATION_ID = 886613;
-    static RemoteViews ga_nf_notification_view = null;
-    Notification notification2 = null;
-    NotificationManager nmn2 = null;
     public static final String ACTION_PLAY = "com.example.ACTION_PLAY";
     public static final String ACTION_PAUSE = "com.example.ACTION_PAUSE";
     public static final String ACTION_STOP = "com.example.ACTION_STOP";
@@ -62,6 +53,7 @@ public class GroupAudioService extends Service
     static NotificationManager nm3 = null;
     static GroupAudioService ga_service = null;
     static int activity_state = 0;
+    static notification_and_builder noti_and_builder = null;
 
     final int GAS_PAUSED = 0;
     final int GAS_PLAYING = 1;
@@ -80,6 +72,21 @@ public class GroupAudioService extends Service
         }
         Log.i(TAG, "onStartCommand:conf_id=" + conf_id);
 
+        try
+        {
+            final String f_name = HelperConference.get_conference_title_from_confid(conf_id);
+            final long conference_num = tox_conference_by_confid__wrapper(conf_id);
+
+            // update the notification text
+            noti_and_builder.b.setContentTitle("#" + conference_num + ": " + f_name);
+            noti_and_builder.n = noti_and_builder.b.build();
+            nm3.notify(ONGOING_GROUP_AUDIO_NOTIFICATION_ID, noti_and_builder.n);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         return START_STICKY;
     }
 
@@ -92,43 +99,9 @@ public class GroupAudioService extends Service
 
         ga_service = this;
 
-        if (1 == 2)
-        {
-            nmn2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-            ga_nf_notification_view = new RemoteViews(getPackageName(), R.layout.custom_group_audio_play_notification);
-            // notification_view.setImageViewResource(R.id.ga_nf_image, R.mipmap.ic_launcher);
-            ga_nf_notification_view.setTextViewText(R.id.ga_nf_title, "Tox: " + "GroupAudio");
-            ga_nf_notification_view.setTextViewText(R.id.ga_nf_text, "playing ...");
-
-            NotificationCompat.Builder b;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-            {
-                b = new NotificationCompat.Builder(this, GroupAudioPlayer.channelId);
-            }
-            else
-            {
-                b = new NotificationCompat.Builder(this);
-            }
-            b.setContent(ga_nf_notification_view);
-            b.setOnlyAlertOnce(false);
-            // b.setContentIntent(pendingIntent);
-            b.setVisibility(VISIBILITY_PUBLIC);
-            b.setOngoing(true);
-            b.setSmallIcon(R.mipmap.ic_launcher);
-            b.setPriority(Notification.PRIORITY_MAX);
-
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            {
-                b.setColor(Color.parseColor("#04b431"));
-            }
-
-            notification2 = b.build();
-        }
-
         nm3 = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notification2 = buildNotification(GAS_PLAYING);
-        startForeground(ONGOING_GROUP_AUDIO_NOTIFICATION_ID, notification2);
+        noti_and_builder = buildNotification(GAS_PLAYING);
+        startForeground(ONGOING_GROUP_AUDIO_NOTIFICATION_ID, noti_and_builder.n);
 
         Log.i(TAG, "onCreate:thread:1");
 
@@ -295,6 +268,8 @@ public class GroupAudioService extends Service
     public boolean onUnbind(Intent intent)
     {
         Log.i(TAG, "onUnbind");
+        noti_and_builder.n.flags = Notification.FLAG_ONGOING_EVENT;
+
         return super.onUnbind(intent);
     }
 
@@ -319,9 +294,16 @@ public class GroupAudioService extends Service
         return null;
     }
 
-
-    private Notification buildNotification(int playbackStatus)
+    static class notification_and_builder
     {
+        Notification n;
+        NotificationCompat.Builder b;
+    }
+
+    private notification_and_builder buildNotification(int playbackStatus)
+    {
+
+        notification_and_builder nb = new notification_and_builder();
 
         int notificationAction = android.R.drawable.ic_media_pause;//needs to be initialized
         PendingIntent play_pauseAction = null;
@@ -340,9 +322,6 @@ public class GroupAudioService extends Service
             // play_pauseAction = playbackAction(0);
         }
 
-        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(),
-                                                        R.mipmap.ic_launcher); //replace with your own image
-
         NotificationCompat.Builder b;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
@@ -353,13 +332,19 @@ public class GroupAudioService extends Service
             b = new NotificationCompat.Builder(this);
         }
 
+        b.setContentTitle("...");
         b.setShowWhen(false);
         b.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle().setShowActionsInCompactView(0));
         b.setColor(getResources().getColor(R.color.colorPrimary));
-        b.setSmallIcon(R.mipmap.ic_launcher).setLargeIcon(largeIcon);
-        b.setContentText("Tox:" + "GroupAudio").setContentTitle("playing ...");
+        b.setSmallIcon(R.mipmap.ic_launcher);
+        b.setLargeIcon(null);
+        b.setContentText("Tox:" + "GroupAudio playing ...");
         b.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        b.setAutoCancel(false).setOngoing(true);
+        b.setAutoCancel(false);
+        b.setOngoing(true);
+        b.setLocalOnly(true);
+        b.setWhen(System.currentTimeMillis());
+        b.setUsesChronometer(true);
 
         if (playbackStatus == GAS_PLAYING)
         {
@@ -371,7 +356,9 @@ public class GroupAudioService extends Service
         }
 
         Notification n = b.build();
-        return n;
+        nb.b = b;
+        nb.n = n;
+        return nb;
     }
 
     private static void removeNotification()
