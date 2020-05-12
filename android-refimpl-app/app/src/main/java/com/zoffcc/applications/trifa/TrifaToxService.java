@@ -124,6 +124,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_entered_battery_saving_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_offline_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
@@ -1032,7 +1033,8 @@ public class TrifaToxService extends Service
                             if (PREF__X_battery_saving_mode)
                             {
                                 if ((global_self_connection_status != TOX_CONNECTION_NONE.value) &&
-                                    (!global_showing_messageview) && (Callstate.state == 0))
+                                    (!global_showing_messageview) && (!global_showing_anygroupview) &&
+                                    (Callstate.state == 0) && (!Callstate.audio_group_active))
                                 {
                                     if ((global_self_last_went_online_timestamp +
                                          SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
@@ -1215,9 +1217,9 @@ public class TrifaToxService extends Service
 
                                             for (int ii = 0; ii < sleep_in_sec; ii++)
                                             {
-                                                if (global_showing_messageview)
+                                                if ((global_showing_messageview) || (global_showing_anygroupview))
                                                 {
-                                                    // if the user opens the message view -> go online, to be able to send messages
+                                                    // if the user opens the message view, or any group view -> go online, to be able to send messages
                                                     Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
                                                     TrifaToxService.write_debug_file(
                                                         "BATTERY_SAVINGS_MODE__finish__msgview");

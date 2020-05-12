@@ -36,13 +36,14 @@ public class TRIFAGlobals
     static long global_last_activity_for_battery_savings_ts = -1;
     static long global_self_last_entered_battery_saving_timestamp = -1;
     static boolean global_showing_messageview = false;
+    static boolean global_showing_anygroupview = false;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
     static boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =
-            1000 * 60 * 2; // bootstrap again after 2 minutes offline
+        1000 * 60 * 2; // bootstrap again after 2 minutes offline
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;
     final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 120; // x secs.
     static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
@@ -187,7 +188,7 @@ public class TRIFAGlobals
     public static enum CONTROL_PROXY_MESSAGE_TYPE
     {
         CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY(175), CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND(
-            176), CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT(177), CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH(178);
+        176), CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT(177), CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH(178);
 
         public int value;
 

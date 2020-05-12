@@ -79,6 +79,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -505,6 +506,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
     {
         Log.i(TAG, "LC:onResume");
 
+        global_showing_anygroupview = true;
+
         try
         {
             Log.i(TAG, "LC:onResume:wakelock:get");
@@ -765,6 +768,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        global_showing_anygroupview = false;
 
         boolean need_close_activity = true;
         if (do_not_close_on_pause)

@@ -208,6 +208,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_fo
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_offline_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_tox_self_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
@@ -453,6 +454,7 @@ public class MainActivity extends AppCompatActivity
         resources = this.getResources();
         metrics = resources.getDisplayMetrics();
         global_showing_messageview = false;
+        global_showing_anygroupview = false;
         super.onCreate(savedInstanceState);
         main_handler = new Handler(getMainLooper());
         main_handler_s = main_handler;
