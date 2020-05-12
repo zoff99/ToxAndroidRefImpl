@@ -32,6 +32,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
+import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
@@ -224,6 +225,26 @@ public class GroupAudioService extends Service
                     ee.printStackTrace();
                     Log.i(TAG, "onReceive:headset:setImageDrawable:null2"); //$NON-NLS-1$
                 }
+
+                // HINT: stop audio recoring, we do not need it in this mode -------------
+                try
+                {
+                    if (!AudioRecording.stopped)
+                    {
+                        AudioRecording.close();
+                        audio_thread.join();
+                        audio_thread = null;
+                        NativeAudio.StopREC();
+                        Log.i(TAG, "stop_audio_recording:DONE");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "stop_audio_recording:EE01" + e.getMessage());
+                }
+                // HINT: stop audio recoring, we do not need it in this mode -------------
+
 
                 try
                 {
