@@ -105,7 +105,8 @@
             android:turnScreenOn="true"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"
-            android:theme="@style/FullscreenTheme">
+            android:theme="@style/FullscreenTheme"
+            tools:ignore="LockedOrientationActivity,UnusedAttribute">
         </activity>
         <activity
             android:name=".ProfileActivity"
@@ -228,7 +229,7 @@
             android:exported="false">
         </service>
 
-        <receiver android:name="WakeupAlarmReceiver" android:enabled="true">
+        <receiver android:name=".WakeupAlarmReceiver" android:enabled="true">
 
             <intent-filter>
                 <action android:name="com.zoffcc.applications.trifa.TOXSERVICE_ALARM">
