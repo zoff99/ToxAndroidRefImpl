@@ -26,10 +26,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.IBinder;
@@ -48,6 +45,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_threa
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
+import static com.zoffcc.applications.trifa.MainActivity.drawableToBitmap;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 
 public class GroupAudioService extends Service
@@ -350,11 +348,25 @@ public class GroupAudioService extends Service
         Drawable d_stop = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_stop).backgroundColor(
             Color.TRANSPARENT).sizeDp(50);
 
-        views.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_pause));
-        bigViews.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_pause));
+        try
+        {
+            views.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_pause));
+            bigViews.setImageViewBitmap(R.id.status_bar_play, drawableToBitmap(d_pause));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
-        views.setImageViewBitmap(R.id.status_bar_stop, drawableToBitmap(d_stop));
-        bigViews.setImageViewBitmap(R.id.status_bar_stop, drawableToBitmap(d_stop));
+        try
+        {
+            views.setImageViewBitmap(R.id.status_bar_stop, drawableToBitmap(d_stop));
+            bigViews.setImageViewBitmap(R.id.status_bar_stop, drawableToBitmap(d_stop));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         views.setTextViewText(R.id.status_bar_track_name, "Title"); // bold
         bigViews.setTextViewText(R.id.status_bar_track_name, "Title"); // bold
@@ -364,8 +376,6 @@ public class GroupAudioService extends Service
 
         int notificationAction = android.R.drawable.ic_media_pause;//needs to be initialized
         PendingIntent play_pauseAction = null;
-
-        //PendingIntent contentIntent = PendingIntent.getActivity(this, 0,new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         //Build a new notification according to the current state of the MediaPlayer
         if (playbackStatus == GAS_PLAYING)
@@ -400,10 +410,14 @@ public class GroupAudioService extends Service
         b.setAutoCancel(false);
         b.setOngoing(true);
         b.setLocalOnly(true);
-        b.setWhen(System.currentTimeMillis());
         b.setCustomContentView(views);
         b.setCustomBigContentView(bigViews);
-        b.setUsesChronometer(true);
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        b.setContentIntent(pendingIntent);
 
         if (playbackStatus == GAS_PLAYING)
         {
@@ -471,25 +485,5 @@ public class GroupAudioService extends Service
 
         ga_service = null;
         removeNotification();
-    }
-
-    public static Bitmap drawableToBitmap(Drawable drawable)
-    {
-        if (drawable instanceof BitmapDrawable)
-        {
-            return ((BitmapDrawable) drawable).getBitmap();
-        }
-
-        int width = drawable.getIntrinsicWidth();
-        width = width > 0 ? width : 1;
-        int height = drawable.getIntrinsicHeight();
-        height = height > 0 ? height : 1;
-
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
     }
 }
