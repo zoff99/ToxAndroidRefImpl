@@ -158,6 +158,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_acti
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
+import static com.zoffcc.applications.trifa.GroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
@@ -5464,6 +5465,21 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             Log.i(TAG, "android_tox_callback_conference_title_cb_method:EE1:" + e.getMessage());
+        }
+
+        try
+        {
+            if (GroupAudioService.running)
+            {
+                if (conference_number == tox_conference_by_confid__wrapper(GroupAudioService.conf_id))
+                {
+                    // update group title while in notification only
+                    do_update_group_title();
+                }
+            }
+        }
+        catch (Exception e)
+        {
         }
     }
 

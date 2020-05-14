@@ -39,8 +39,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Track Name"
-            android:textSize="@dimen/text_size_medium"
-            android:textStyle="bold" />
+            android:textSize="@dimen/text_size_small"
+            android:textStyle="normal"/>
 
         <TextView
             android:id="@+id/status_bar_artist_name"

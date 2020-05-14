@@ -647,4 +647,37 @@ public class GroupAudioService extends Service
 
         global_gas_status = GAS_PLAYING;
     }
+
+
+    static void do_update_group_title()
+    {
+        try
+        {
+            // update the notification
+            noti_and_builder.n = noti_and_builder.b.build();
+
+            try
+            {
+                final String f_name = HelperConference.get_conference_title_from_confid(conf_id);
+                final long conference_num = tox_conference_by_confid__wrapper(conf_id);
+
+                // update the notification text
+                views.setTextViewText(R.id.status_bar_track_name, "#" + conference_num + ": " + f_name); // bold
+                bigViews.setTextViewText(R.id.status_bar_track_name, "#" + conference_num + ": " + f_name); // bold
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            nm3.notify(ONGOING_GROUP_AUDIO_NOTIFICATION_ID, noti_and_builder.n);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        global_gas_status = GAS_PLAYING;
+    }
+
 }

@@ -6,11 +6,11 @@
 
     <ImageView
         android:id="@+id/status_bar_album_art"
-        android:layout_width="@dimen/notification_expanded_height"
+        android:layout_width="60dip"
         android:layout_height="@dimen/notification_expanded_height"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:scaleType="centerCrop"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitCenter"
         android:src="@drawable/emoji_ios_1f601" />
 
     <LinearLayout
@@ -121,7 +121,8 @@
             android:focusable="true"
             android:singleLine="true"
             android:text="Track Name"
-            android:textStyle="bold" />
+            android:textSize="@dimen/text_size_small"
+            android:textStyle="normal" />
 
         <TextView
             android:id="@+id/status_bar_artist_name"
