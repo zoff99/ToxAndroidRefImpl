@@ -1095,7 +1095,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         try
         {
             audio_bar_in_v.setLevel(get_vu_in() / 90.0f);
-            audio_bar_out_v.setLevel(get_vu_out() / 100.0f);
+            audio_bar_out_v.setLevel(get_vu_out() / 140.0f);
         }
         catch (Exception e)
         {
