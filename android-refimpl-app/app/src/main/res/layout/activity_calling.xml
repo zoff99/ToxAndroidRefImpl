@@ -233,7 +233,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:gravity="center_horizontal|bottom"
-                    android:text="I"
+                    android:text="O"
                     android:textColor="@color/md_white_1000"
                     android:textSize="5sp" />
 
@@ -269,7 +269,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:gravity="center_horizontal|bottom"
-                    android:text="O"
+                    android:text="I"
                     android:textColor="@color/md_white_1000"
                     android:textSize="5sp" />
 
