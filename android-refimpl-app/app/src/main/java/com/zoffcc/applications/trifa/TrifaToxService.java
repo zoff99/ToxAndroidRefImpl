@@ -590,13 +590,13 @@ public class TrifaToxService extends Service
                                           conference_identifier, tox_conference_get_type(
                         conference_numbers[conf_])); // rejoin a saved conference
 
-                if (tox_conference_get_type(conference_numbers[conf_]) == TOX_CONFERENCE_TYPE_AV.value)
-                {
-                    // TODO: this returns error. check it
-                    long result = toxav_groupchat_disable_av(conference_numbers[conf_]);
-                    Log.i(TAG, "load conference num=" + conference_numbers[conf_] + " toxav_groupchat_disable_av res=" +
-                               result);
-                }
+                //if (tox_conference_get_type(conference_numbers[conf_]) == TOX_CONFERENCE_TYPE_AV.value)
+                //{
+                //    // TODO: this returns error. check it
+                //    long result = toxav_groupchat_disable_av(conference_numbers[conf_]);
+                //    Log.i(TAG, "load conference num=" + conference_numbers[conf_] + " toxav_groupchat_disable_av res=" +
+                //               result);
+                //}
 
                 try
                 {
