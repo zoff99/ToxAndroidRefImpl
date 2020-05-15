@@ -321,6 +321,11 @@ void conference_peer_name_cb(Tox *tox, uint32_t conference_number, uint32_t peer
 void change_audio_volume_pcm_null(int16_t *buf, size_t buf_size_bytes);
 void change_audio_volume_pcm(int16_t *buf, size_t num_samples);
 
+static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t peernumber,
+                                      const int16_t *pcm, unsigned int samples, uint8_t channels, uint32_t
+                                      sample_rate, void *userdata);
+
+
 
 #if TOX_VERSION_IS_API_COMPATIBLE(0, 2, 0)
 void conference_peer_list_changed_cb(Tox *tox, uint32_t conference_number, void *user_data);
@@ -4107,7 +4112,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1join_1av_1groupchat(JNIEn
     capacity = (*env)->GetDirectBufferCapacity(env, cookie_buffer);
 
     int32_t res = toxav_join_av_groupchat(tox_global, (uint32_t)friend_number, cookie_buffer_c, (size_t)cookie_length,
-                                        NULL, (void *)NULL);
+                                        group_audio_callback_func, (void *)NULL);
+
+    if (res != -1)
+    {
+        toxav_groupchat_disable_av(tox_global, (uint32_t)res);
+    }
 
     return (jlong)res;
 }
@@ -4121,7 +4131,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1add_1av_1groupchat(JNIEnv
         return (jlong)-2;
     }
 
-    int32_t res = toxav_add_av_groupchat(tox_global, NULL, (void *)NULL);
+    int32_t res = toxav_add_av_groupchat(tox_global, group_audio_callback_func, (void *)NULL);
+    
+    if (res != -1)
+    {
+        toxav_groupchat_disable_av(tox_global, (uint32_t)res);
+    }
+    
     return (jlong)res;
 }
 
@@ -4357,22 +4373,24 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1disable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
 {
     pthread_mutex_lock(&group_audio___mutex);
-    // dbg(9, "toxav_1groupchat_1disable_1av:START");
+    dbg(9, "toxav_1groupchat_1disable_1av:START");
 
     global_group_audio_acitve_num = -1;
     global_group_audio_last_process_incoming = 0;
     global_group_audio_peerbuffers = 0;
     group_audio_free_peer_buffer();
 
-    // dbg(9, "toxav_1groupchat_1disable_1av:END");
+    dbg(9, "toxav_1groupchat_1disable_1av:END");
     pthread_mutex_unlock(&group_audio___mutex);
 
     if(tox_global == NULL)
     {
+        dbg(9, "toxav_1groupchat_1disable_1av:RET:01");
         return (jlong)-2;
     }
 
     int32_t res = toxav_groupchat_disable_av(tox_global, (uint32_t)conference_number);
+    dbg(9, "toxav_1groupchat_1disable_1av:099:res=%d gnum=%d", res, conference_number);
     return (jlong)res;
 }
 
