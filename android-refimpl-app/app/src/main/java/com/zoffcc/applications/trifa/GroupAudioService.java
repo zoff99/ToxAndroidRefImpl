@@ -267,18 +267,30 @@ public class GroupAudioService extends Service
                     Log.i(TAG, "stop_audio_recording:EE01" + e.getMessage());
                 }
                 // HINT: stop audio recording, we do not need it in this mode -------------
-
-
                 try
                 {
                     Log.i(TAG, "GAThread:starting ...");
+
                     int delta = 0;
+                    int deltax = 0;
                     final int sleep_millis = 60; // 60ms is the maximum that JNI can buffer!
                     int sleep_millis_current = sleep_millis;
                     running = true;
+                    long d1 = 0;
                     while (running)
                     {
-                        delta = MainActivity.jni_iterate_group_audio(0, sleep_millis);
+                        if (d1 == 0)
+                        {
+                            d1 = SystemClock.uptimeMillis();
+                            delta = sleep_millis;
+                        }
+                        else
+                        {
+                            delta = (int) (SystemClock.uptimeMillis() - d1);
+                            d1 = SystemClock.uptimeMillis();
+                        }
+                        deltax = MainActivity.jni_iterate_group_audio(0, sleep_millis);
+                        deltax = (int) (SystemClock.uptimeMillis() - d1);
                         sleep_millis_current = sleep_millis - delta;
                         if (sleep_millis_current < 1)
                         {
@@ -288,9 +300,12 @@ public class GroupAudioService extends Service
                         {
                             sleep_millis_current = sleep_millis;
                         }
-                        //Log.i(TAG, "GAThread:delta=" + delta + " sleep_millis_current=" + sleep_millis_current + " " +
-                        //           ConferenceAudioActivity.conf_id);
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 100000)); // sleep
+
+                        //if (delta > 5)
+                        //{
+                        //    Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
+                        //}
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 2)); // sleep
                     }
                 }
                 catch (Exception e)

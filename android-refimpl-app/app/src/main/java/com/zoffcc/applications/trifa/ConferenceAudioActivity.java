@@ -29,6 +29,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -670,12 +671,25 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 {
                     Log.i(TAG, "Group_audio_play_thread:starting ...");
                     int delta = 0;
+                    int deltax = 0;
                     final int sleep_millis = 60; // 60ms is the maximum that JNI can buffer!
                     int sleep_millis_current = sleep_millis;
                     Group_audio_play_thread_running = true;
+                    long d1 = 0;
                     while (Group_audio_play_thread_running)
                     {
-                        delta = MainActivity.jni_iterate_group_audio(0, sleep_millis);
+                        if (d1 == 0)
+                        {
+                            d1 = SystemClock.uptimeMillis();
+                            delta = sleep_millis;
+                        }
+                        else
+                        {
+                            delta = (int) (SystemClock.uptimeMillis() - d1);
+                            d1 = SystemClock.uptimeMillis();
+                        }
+                        deltax = MainActivity.jni_iterate_group_audio(0, sleep_millis);
+                        deltax = (int) (SystemClock.uptimeMillis() - d1);
                         sleep_millis_current = sleep_millis - delta;
                         if (sleep_millis_current < 1)
                         {
@@ -685,8 +699,12 @@ public class ConferenceAudioActivity extends AppCompatActivity
                         {
                             sleep_millis_current = sleep_millis;
                         }
-                        // Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 100000)); // sleep
+
+                        //if (delta > 5)
+                        //{
+                        //    Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
+                        //}
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 2)); // sleep
                     }
                 }
                 catch (Exception e)
