@@ -123,7 +123,8 @@ int audio_play_buffers_in_queue = 0;
 #define _SHUTDOWN 2
 int playing_state = _STOPPED;
 int player_state_current = _STOPPED;
-#define PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS 2
+#define PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS1 2
+int PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2 = 3;
 pthread_mutex_t play_buffer_queued_count_mutex;
 int play_buffer_queued_count_mutex_valid = 0;
 
@@ -340,12 +341,19 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
     pthread_mutex_unlock(&play_buffer_queued_count_mutex);
 
-    if (audio_play_buffers_in_queue < PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS)
+    if (audio_play_buffers_in_queue < PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS1)
     {
+#ifdef DEBUG_NATIVE_AUDIO_DEEP
+        SLAndroidSimpleBufferQueueState state;
+        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "bqPlayerCallback:real_buffer_count=%d", state.count);
+#endif
 
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "bqPlayerCallback:%d < %d", (int)audio_play_buffers_in_queue, (int)PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS);
+                            "bqPlayerCallback:%d < %d", (int) audio_play_buffers_in_queue,
+                            (int) PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS1);
 #endif
 
         if (player_state_current != _STOPPED)
@@ -388,7 +396,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *e
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine:class=%p", NativeAudio_class);
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine:method=%p",
-                        (void *)rec_buffer_ready_method);
+                        (void *) rec_buffer_ready_method);
     // find java methods ------------
 
 
@@ -428,7 +436,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                                                                                        jint num_bufs)
 {
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "createBufferQueueAudioPlayer:start:engineEngine=%p", (const void *)engineEngine);
+                        "createBufferQueueAudioPlayer:start:engineEngine=%p",
+                        (const void *) engineEngine);
 
     SLresult result;
     if (sampleRate >= 0)
@@ -450,6 +459,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     // configure audio source
     SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
                                                        (SLuint32) num_bufs};
+
+    PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2 = 3; // TODO: do not hardcode this!!
 
     SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, (SLuint32) channels, SL_SAMPLINGRATE_44_1,
                                    SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
@@ -485,13 +496,13 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     const SLInterfaceID ids[num_params] = {SL_IID_BUFFERQUEUE,
                                            SL_IID_VOLUME,
                                            SL_IID_ANDROIDCONFIGURATION,
-            /*SL_IID_EFFECTSEND,*/
-            /*SL_IID_MUTESOLO,*/};
+        /*SL_IID_EFFECTSEND,*/
+        /*SL_IID_MUTESOLO,*/};
     const SLboolean req[num_params] = {SL_BOOLEAN_TRUE,
                                        SL_BOOLEAN_TRUE,
                                        SL_BOOLEAN_TRUE,
-            /*SL_BOOLEAN_TRUE,*/
-            /*SL_BOOLEAN_TRUE,*/};
+        /*SL_BOOLEAN_TRUE,*/
+        /*SL_BOOLEAN_TRUE,*/};
 
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
                                                 num_params, ids, req);
@@ -598,6 +609,32 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
 
 #endif
 
+    // Enqueue a few buffers to get the ball rolling
+    int nextSize = 0;
+    int8_t *nextBuffer = NULL;
+    int feed_buffer_count = PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2;
+    if (feed_buffer_count > num_bufs)
+    {
+        feed_buffer_count = num_bufs;
+    }
+    int jk;
+    for (jk = 0; jk < feed_buffer_count; jk++)
+    {
+        if (bqPlayerBufferQueue != NULL)
+        {
+            nextBuffer = (int8_t *) audio_play_buffer[jk];
+            nextSize = audio_play_buffer_size[jk];
+            if (nextSize > 0)
+            {
+                (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
+                                                (SLuint32) nextSize);
+                pthread_mutex_lock(&play_buffer_queued_count_mutex);
+                audio_play_buffers_in_queue++;
+                pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+            }
+        }
+    }
+
     // set the player's state
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
@@ -665,12 +702,12 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
     // create audio recorder
     // (requires the RECORD_AUDIO permission)
     const SLInterfaceID id[2] = {
-            SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
-            SL_IID_ANDROIDCONFIGURATION
+        SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+        SL_IID_ANDROIDCONFIGURATION
     };
     const SLboolean req[2] = {
-            SL_BOOLEAN_TRUE,
-            SL_BOOLEAN_TRUE
+        SL_BOOLEAN_TRUE,
+        SL_BOOLEAN_TRUE
     };
     result = (*engineEngine)->CreateAudioRecorder(engineEngine, &recorderObject, &audioSrc,
                                                   &audioSnk, 2, id, req);
@@ -842,16 +879,25 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
             pthread_mutex_unlock(&play_buffer_queued_count_mutex);
         }
 
-        if (audio_play_buffers_in_queue > PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS)
+        if (audio_play_buffers_in_queue > PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2)
         {
+#ifdef DEBUG_NATIVE_AUDIO_DEEP
+            SLAndroidSimpleBufferQueueState state;
+            (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                                "bqPlayerCallback:real_buffer_count:2=%d guess=%d", state.count,
+                                audio_play_buffers_in_queue);
+#endif
             if (player_state_current != _PLAYING)
             {
                 // set the player's state
                 SLresult result2;
                 result2 = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
                 __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                    "player_state:res_010=%d SL_RESULT_SUCCESS=%d PLAYING",
-                                    (int) result2, (int) SL_RESULT_SUCCESS);
+                                    "player_state:res_010=%d SL_RESULT_SUCCESS=%d PLAYING inqueue=%d, need=%d",
+                                    (int) result2, (int) SL_RESULT_SUCCESS,
+                                    (int) audio_play_buffers_in_queue,
+                                    (int) PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2);
                 (void) result2;
 
                 player_state_current = _PLAYING;
@@ -992,8 +1038,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
 
         if (num_rec_bufs > 1)
         {
-            int jj = 0;
-            for (jj = 0; jj < (num_rec_bufs - (RECORD_BUFFERS_BETWEEN_REC_AND_PROCESS + 1)); jj++)
+            int jj = 1;
+            for (jj = 1; jj < (num_rec_bufs - 1); jj++)
             {
 
                 nextBuffer = (short *) audio_rec_buffer[rec_buf_pointer_next];
