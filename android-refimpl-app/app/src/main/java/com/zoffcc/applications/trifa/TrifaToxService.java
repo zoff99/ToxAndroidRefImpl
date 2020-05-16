@@ -1414,8 +1414,8 @@ public class TrifaToxService extends Service
                                 {
                                     tox_iterate_thread_high_prio = true;
                                     this.setName("tox_iterate()+");
-                                    android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-                                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+                                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+                                    // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
                                     //android.os.Process.setThreadPriority(
                                     //        android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
                                 }
