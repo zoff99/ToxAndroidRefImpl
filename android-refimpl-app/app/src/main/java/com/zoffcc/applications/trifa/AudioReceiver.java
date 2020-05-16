@@ -242,8 +242,6 @@ public class AudioReceiver extends Thread
                     }
                 }
 
-                NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count);
-
                 NativeAudio.n_buf_size_in_bytes = (sampleRate * channels * 2) / 10; // = 100ms // (48000*1*2) = 96000;
 
                 for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
@@ -258,6 +256,8 @@ public class AudioReceiver extends Thread
                 {
                     NativeAudio.n_bytes_in_buffer[i] = 0;
                 }
+
+                NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count);
 
                 //int res = NativeAudio.PlayPCM16(1);
                 //Log.i(TAG, "audio_play:NativeAudio Play:res=" + res);
