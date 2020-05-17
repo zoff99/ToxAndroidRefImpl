@@ -265,7 +265,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             have_avatar_for_pubkey = false;
             // Log.i(TAG, "have_avatar_for_pubkey:00a04:" + have_avatar_for_pubkey);
             fl_temp = null;

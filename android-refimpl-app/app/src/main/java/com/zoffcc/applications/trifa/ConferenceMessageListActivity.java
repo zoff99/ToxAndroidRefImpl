@@ -303,7 +303,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     {
         if (is_conference_active(conf_id))
         {
-            Log.d(TAG, "set_peer_names_and_avatars:001");
+            // Log.d(TAG, "set_peer_names_and_avatars:001");
 
             try
             {
@@ -314,12 +314,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            Log.d(TAG, "set_peer_names_and_avatars:002");
+            // Log.d(TAG, "set_peer_names_and_avatars:002");
 
             final long conference_num = tox_conference_by_confid__wrapper(conf_id);
             long num_peers = tox_conference_peer_count(conference_num);
 
-            Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers);
+            // Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers);
 
             if (num_peers > 0)
             {
@@ -648,7 +648,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized void update_group_all_users()
     {
-        Log.d(TAG, "update_group_all_users:001");
+        // Log.d(TAG, "update_group_all_users:001");
 
         try
         {
@@ -671,7 +671,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized void remove_group_all_users()
     {
-        Log.d(TAG, "remove_group_all_users:001");
+        // Log.d(TAG, "remove_group_all_users:001");
 
         try
         {
@@ -712,14 +712,14 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
 
-                    Log.d(TAG, "remove_group_all_users:T:END");
+                    // Log.d(TAG, "remove_group_all_users:T:END");
 
                 }
             };
             t.start();
             t.join();
 
-            Log.d(TAG, "remove_group_all_users:T:099");
+            // Log.d(TAG, "remove_group_all_users:T:099");
 
         }
         catch (Exception e)
@@ -728,8 +728,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             Log.i(TAG, "remove_group_user:EE:" + e.getMessage());
         }
 
-        Log.d(TAG, "remove_group_all_users:002");
-
+        // Log.d(TAG, "remove_group_all_users:002");
     }
 
     synchronized void remove_group_user(String peer_pubkey)
@@ -788,7 +787,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     synchronized void add_group_user(final String peer_pubkey, final long peernum, String name)
     {
-        Log.i(TAG, "add_group_user:peernum=" + peernum);
+        // Log.i(TAG, "add_group_user:peernum=" + peernum);
 
         try
         {
@@ -796,7 +795,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             if (peer_num_in_list == -1)
             {
                 // -- ADD --
-                Log.i(TAG, "add_group_user:ADD:peernum=" + peernum);
+                // Log.i(TAG, "add_group_user:ADD:peernum=" + peernum);
                 String name2 = "";
                 if (name != null)
                 {
@@ -867,7 +866,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                         }
                                         catch (Exception e)
                                         {
-                                            e.printStackTrace();
+                                            // e.printStackTrace();
                                             have_avatar_for_pubkey = false;
                                             // Log.i(TAG, "have_avatar_for_pubkey:00a04:" + have_avatar_for_pubkey);
                                             fl_temp = null;
@@ -954,7 +953,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 // **** THIS is never used anymore ****
                 // **** THIS is never used anymore ****
                 // **** THIS is never used anymore ****
-                Log.i(TAG, "add_group_user:UPDATE:peernum=" + peernum);
+                // Log.i(TAG, "add_group_user:UPDATE:peernum=" + peernum);
                 String name2 = "";
                 if (name != null)
                 {

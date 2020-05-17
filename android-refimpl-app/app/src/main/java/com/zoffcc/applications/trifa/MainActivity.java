@@ -8165,7 +8165,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         // Log.i(TAG, "new ToxID=" + MainActivity.get_my_toxid());

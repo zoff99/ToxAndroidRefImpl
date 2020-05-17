@@ -794,7 +794,7 @@ public class HelperFriend
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             ret = default_name;
         }
 

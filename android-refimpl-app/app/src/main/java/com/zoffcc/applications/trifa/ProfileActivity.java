@@ -413,7 +413,7 @@ public class ProfileActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 

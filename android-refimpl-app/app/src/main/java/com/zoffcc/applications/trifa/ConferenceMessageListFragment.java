@@ -62,7 +62,7 @@ public class ConferenceMessageListFragment extends Fragment
         {
             current_conf_id = mla.get_current_conf_id();
         }
-        Log.i(TAG, "current_conf_id=" + current_conf_id);
+        // Log.i(TAG, "current_conf_id=" + current_conf_id);
 
         // default is: at bottom
         is_at_bottom = true;

@@ -49,7 +49,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
 
     public ConferenceMessagelistAdapter(Context context, List<ConferenceMessage> items)
     {
-        Log.i(TAG, "ConferenceMessagelistAdapter");
+        // Log.i(TAG, "ConferenceMessagelistAdapter");
 
         this.messagelistitems = items;
         this.context = context;
@@ -113,13 +113,13 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 if (my_msg.read)
                 {
                     // has read ***NOT USED***
-                    Log.i(TAG, "Message_model.TEXT_INCOMING_HAVE_READ");
+                    // Log.i(TAG, "Message_model.TEXT_INCOMING_HAVE_READ");
                     return Message_model.TEXT_INCOMING_HAVE_READ;
                 }
                 else
                 {
                     // not yet read
-                    Log.i(TAG, "Message_model.TEXT_INCOMING_NOT_READ");
+                    // Log.i(TAG, "Message_model.TEXT_INCOMING_NOT_READ");
                     return Message_model.TEXT_INCOMING_NOT_READ;
                 }
                 // msg to me
@@ -130,13 +130,13 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 if (my_msg.read)
                 {
                     // has read
-                    Log.i(TAG, "Message_model.TEXT_OUTGOING_HAVE_READ");
+                    // Log.i(TAG, "Message_model.TEXT_OUTGOING_HAVE_READ");
                     return Message_model.TEXT_OUTGOING_HAVE_READ;
                 }
                 else
                 {
                     // not yet read ***NOT USED***
-                    Log.i(TAG, "Message_model.TEXT_OUTGOING_NOT_READ");
+                    // Log.i(TAG, "Message_model.TEXT_OUTGOING_NOT_READ");
                     return Message_model.TEXT_OUTGOING_NOT_READ;
                 }
                 // msg from me
@@ -209,15 +209,15 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
 
     public void add_list_clear(List<ConferenceMessage> new_items)
     {
-        Log.i(TAG, "add_list_clear:" + new_items);
+        // Log.i(TAG, "add_list_clear:" + new_items);
 
         try
         {
-            Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
+            // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
             this.notifyDataSetChanged();
-            Log.i(TAG, "add_list_clear:002");
+            // Log.i(TAG, "add_list_clear:002");
         }
         catch (Exception e)
         {

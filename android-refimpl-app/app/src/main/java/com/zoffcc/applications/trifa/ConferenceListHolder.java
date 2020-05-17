@@ -96,7 +96,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             return;
         }
 
-        Log.i(TAG, "bindFriendList:" + fl.tox_conference_number);
+        // Log.i(TAG, "bindFriendList:" + fl.tox_conference_number);
 
         this.conference = fl;
 
