@@ -316,8 +316,8 @@ public class GroupAudioService extends Service
                 Log.i(TAG, "GAThread:finished");
                 activity_state = 0;
 
-                Log.i(TAG, "toxav_groupchat_disable_av:E:gnum=" + tox_conference_by_confid__wrapper(conf_id));
-                Log.i(TAG, "toxav_groupchat_disable_av:E:gid=" + conf_id);
+                // Log.i(TAG, "toxav_groupchat_disable_av:E:gnum=" + tox_conference_by_confid__wrapper(conf_id));
+                // Log.i(TAG, "toxav_groupchat_disable_av:E:gid=" + conf_id);
                 toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
             }
         };
@@ -588,8 +588,8 @@ public class GroupAudioService extends Service
             Drawable d_play = new IconicsDrawable(context_gas_static).icon(
                 GoogleMaterial.Icon.gmd_play_arrow).backgroundColor(Color.TRANSPARENT).sizeDp(50);
 
-            Log.i(TAG, "toxav_groupchat_disable_av:D:gnum=" + tox_conference_by_confid__wrapper(conf_id));
-            Log.i(TAG, "toxav_groupchat_disable_av:D:gid=" + conf_id);
+            // Log.i(TAG, "toxav_groupchat_disable_av:D:gnum=" + tox_conference_by_confid__wrapper(conf_id));
+            // Log.i(TAG, "toxav_groupchat_disable_av:D:gid=" + conf_id);
             toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
 
             try
