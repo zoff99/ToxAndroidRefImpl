@@ -442,7 +442,7 @@ public class HelperFriend
                 }
                 catch (android.database.sqlite.SQLiteConstraintException | net.sqlcipher.database.SQLiteConstraintException e)
                 {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     Log.i(TAG, "friend_request:insert:EE1:" + e.getMessage());
                 }
                 catch (Exception e)

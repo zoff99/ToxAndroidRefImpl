@@ -158,7 +158,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         conf_id = intent.getStringExtra("conf_id");
-        Log.i(TAG, "onCreate:003:conf_id=" + conf_id + " conf_id_prev=" + conf_id_prev); //$NON-NLS-1$ //$NON-NLS-2$
+        // Log.i(TAG, "onCreate:003:conf_id=" + conf_id + " conf_id_prev=" + conf_id_prev); //$NON-NLS-1$ //$NON-NLS-2$
         conf_id_prev = conf_id;
 
         dha = new DetectHeadset(this);
@@ -532,7 +532,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         if (conf_id.equals("-1")) //$NON-NLS-1$
         {
             conf_id = conf_id_prev;
-            Log.i(TAG, "onResume:001:conf_id=" + conf_id); //$NON-NLS-1$
+            // Log.i(TAG, "onResume:001:conf_id=" + conf_id); //$NON-NLS-1$
         }
 
         Log.i(TAG, "onResume"); //$NON-NLS-1$
@@ -540,7 +540,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         conference_audio_activity = this;
 
-        Log.i(TAG, "onResume:001:conf_id=" + conf_id); //$NON-NLS-1$
+        // Log.i(TAG, "onResume:001:conf_id=" + conf_id); //$NON-NLS-1$
 
         activity_state = 1;
         push_to_talk_active = false;
@@ -1005,7 +1005,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     synchronized void update_group_all_users()
     {
-        Log.d(TAG, "update_group_all_users:001"); //$NON-NLS-1$
+        // Log.d(TAG, "update_group_all_users:001"); //$NON-NLS-1$
 
         try
         {
@@ -1079,7 +1079,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
     {
         if (is_conference_active(conf_id))
         {
-            Log.d(TAG, "set_peer_names_and_avatars:001"); //$NON-NLS-1$
+            // Log.d(TAG, "set_peer_names_and_avatars:001"); //$NON-NLS-1$
 
             try
             {
@@ -1090,12 +1090,12 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            Log.d(TAG, "set_peer_names_and_avatars:002"); //$NON-NLS-1$
+            // Log.d(TAG, "set_peer_names_and_avatars:002"); //$NON-NLS-1$
 
             final long conference_num = tox_conference_by_confid__wrapper(conf_id);
             long num_peers = tox_conference_peer_count(conference_num);
 
-            Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers); //$NON-NLS-1$
+            // Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers); //$NON-NLS-1$
 
             if (num_peers > 0)
             {
@@ -1117,7 +1117,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     synchronized void remove_group_all_users()
     {
-        Log.d(TAG, "remove_group_all_users:001"); //$NON-NLS-1$
+        // Log.d(TAG, "remove_group_all_users:001"); //$NON-NLS-1$
 
         try
         {
@@ -1158,14 +1158,14 @@ public class ConferenceAudioActivity extends AppCompatActivity
                         e.printStackTrace();
                     }
 
-                    Log.d(TAG, "remove_group_all_users:T:END"); //$NON-NLS-1$
+                    // Log.d(TAG, "remove_group_all_users:T:END"); //$NON-NLS-1$
 
                 }
             };
             t.start();
             t.join();
 
-            Log.d(TAG, "remove_group_all_users:T:099"); //$NON-NLS-1$
+            // Log.d(TAG, "remove_group_all_users:T:099"); //$NON-NLS-1$
 
         }
         catch (Exception e)
@@ -1174,8 +1174,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
             Log.i(TAG, "remove_group_user:EE:" + e.getMessage()); //$NON-NLS-1$
         }
 
-        Log.d(TAG, "remove_group_all_users:002"); //$NON-NLS-1$
-
+        // Log.d(TAG, "remove_group_all_users:002"); //$NON-NLS-1$
     }
 
     synchronized void add_group_user(final String peer_pubkey, final long peernum, String name)
@@ -1257,7 +1256,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                                         }
                                         catch (Exception e)
                                         {
-                                            e.printStackTrace();
+                                            // e.printStackTrace();
                                             have_avatar_for_pubkey = false;
                                             // Log.i(TAG, "have_avatar_for_pubkey:00a04:" + have_avatar_for_pubkey);
                                             fl_temp = null;
@@ -1475,24 +1474,24 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     {
                         if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)
                         {
-                            Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey); //$NON-NLS-1$
+                            // Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey); //$NON-NLS-1$
 
                             long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(result_friend_pubkey);
                             if (friend_num_temp_safety2 > 0)
                             {
-                                Log.i(TAG, "onActivityResult:friend_num_temp_safety2:" +
-                                           friend_num_temp_safety2); //$NON-NLS-1$
+                                //Log.i(TAG, "onActivityResult:friend_num_temp_safety2:" +
+                                //           friend_num_temp_safety2); //$NON-NLS-1$
 
                                 if (conf_id.equals("-1")) //$NON-NLS-1$
                                 {
                                     conf_id = conf_id_prev;
-                                    Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id); //$NON-NLS-1$
+                                    // Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id); //$NON-NLS-1$
                                 }
 
                                 final long conference_num = tox_conference_by_confid__wrapper(conf_id);
 
-                                Log.i(TAG, "onActivityResult:conference_num:" + conference_num + " conf_id=" +
-                                           conf_id); //$NON-NLS-1$ //$NON-NLS-2$
+                                //Log.i(TAG, "onActivityResult:conference_num:" + conference_num + " conf_id=" +
+                                //           conf_id); //$NON-NLS-1$ //$NON-NLS-2$
 
                                 if (conference_num > -1)
                                 {

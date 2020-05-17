@@ -89,7 +89,7 @@ public class GroupAudioService extends Service
         {
             e.printStackTrace();
         }
-        Log.i(TAG, "onStartCommand:conf_id=" + conf_id);
+        // Log.i(TAG, "onStartCommand:conf_id=" + conf_id);
 
         try
         {

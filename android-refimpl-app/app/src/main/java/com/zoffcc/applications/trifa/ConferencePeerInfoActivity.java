@@ -119,7 +119,7 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
                 have_avatar_for_pubkey = false;
             }
 
