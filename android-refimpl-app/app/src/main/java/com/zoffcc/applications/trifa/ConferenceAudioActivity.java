@@ -671,40 +671,34 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 {
                     Log.i(TAG, "Group_audio_play_thread:starting ...");
                     int delta = 0;
-                    int deltax = 0;
                     final int sleep_millis = 60; // 60ms is the maximum that JNI can buffer!
                     int sleep_millis_current = sleep_millis;
                     Group_audio_play_thread_running = true;
                     long d1 = 0;
+                    long d2 = 0;
                     while (Group_audio_play_thread_running)
                     {
-                        if (d1 == 0)
-                        {
-                            d1 = SystemClock.uptimeMillis();
-                            delta = sleep_millis;
-                        }
-                        else
-                        {
-                            delta = (int) (SystemClock.uptimeMillis() - d1);
-                            d1 = SystemClock.uptimeMillis();
-                        }
-                        deltax = MainActivity.jni_iterate_group_audio(0, sleep_millis);
-                        deltax = (int) (SystemClock.uptimeMillis() - d1);
+                        d1 = SystemClock.uptimeMillis();
+                        // Log.i(TAG, "deltaZZ=" + (SystemClock.uptimeMillis() - d2));
+                        // d2 = SystemClock.uptimeMillis();
+                        MainActivity.jni_iterate_group_audio(0, sleep_millis);
+                        delta = (int) (SystemClock.uptimeMillis() - d1);
+
                         sleep_millis_current = sleep_millis - delta;
                         if (sleep_millis_current < 1)
                         {
                             sleep_millis_current = 1;
                         }
-                        else if (sleep_millis_current > sleep_millis)
+                        else if (sleep_millis_current > sleep_millis + 5)
                         {
-                            sleep_millis_current = sleep_millis;
+                            sleep_millis_current = sleep_millis + 5;
                         }
 
                         //if (delta > 5)
                         //{
                         //    Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
                         //}
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 2)); // sleep
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 300000)); // sleep
                     }
                 }
                 catch (Exception e)
