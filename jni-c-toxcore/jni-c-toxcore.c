@@ -2314,16 +2314,32 @@ void *thread_audio_av(void *data)
 
     pthread_setname_np(pthread_self(), "t_a_iter()");
 
+    int delta = 0;
+    int want_iterate_ms = 5;
+    int will_sleep_ms = want_iterate_ms;
+    int64_t start_time = current_time_monotonic_default();
     while(toxav_audio_thread_stop != 1)
     {
+        start_time = current_time_monotonic_default();
         toxav_audio_iterate(av);
+        delta = (int)(current_time_monotonic_default() - start_time);
         // dbg(9, "AV audio Thread #%d running ...", (int) id);
         av_iterate_interval = toxav_iteration_interval(av);
 
         //usleep((av_iterate_interval / 2) * 1000);
         if(global_av_call_active == 1)
         {
-            usleep(5 * 1000);
+            will_sleep_ms = want_iterate_ms - delta;
+            if (will_sleep_ms < 1)
+            {
+                will_sleep_ms = 1;
+            }
+            else if (will_sleep_ms > (want_iterate_ms + 5))
+            {
+                will_sleep_ms = want_iterate_ms + 5;
+            }
+            // dbg(9, "aiterate_sleep:delta=%d will_sleep_ms=%d", delta, will_sleep_ms);
+            usleep((will_sleep_ms * 1000) - 1);
         }
         else
         {
