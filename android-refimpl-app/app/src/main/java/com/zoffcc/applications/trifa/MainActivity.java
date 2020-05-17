@@ -7214,7 +7214,7 @@ public class MainActivity extends AppCompatActivity
     public static String bytesToHex(byte[] bytes, int start, int len)
     {
         char[] hexChars = new char[(len) * 2];
-        System.out.println("blen=" + (len));
+        // System.out.println("blen=" + (len));
 
         for (int j = start; j < (start + len); j++)
         {
