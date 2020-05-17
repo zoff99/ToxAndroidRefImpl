@@ -360,13 +360,13 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         String relay_ = get_relay_for_friend(fl.tox_public_key_string);
 
-        Log.d(TAG, "001:relay=" + relay_);
+        // Log.d(TAG, "001:relay=" + relay_);
         if (relay_ != null)
         {
             long fnum_ = tox_friend_by_public_key__wrapper(relay_);
 
             FriendList relay_fl = main_get_friend(tox_friend_by_public_key__wrapper(relay_));
-            Log.d(TAG, "002 relay_fl=" + relay_fl + " fnum=" + fnum_);
+            // Log.d(TAG, "002 relay_fl=" + relay_fl + " fnum=" + fnum_);
             if (relay_fl != null)
             {
                 if (fl.TOX_CONNECTION_real == 0)
@@ -377,7 +377,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 {
                     f_status_icon.setImageResource(R.drawable.circle_green);
                 }
-                Log.d(TAG, "003 relay_fl=" + relay_fl);
+                // Log.d(TAG, "003 relay_fl=" + relay_fl);
 
                 if (fl.TOX_CONNECTION == 0)
                 {
@@ -394,7 +394,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
         else // friend has no relay
         {
-            Log.d(TAG, "004");
+            // Log.d(TAG, "004");
 
             if (fl.TOX_CONNECTION == 0)
             {
@@ -628,7 +628,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             // delete friend  messages -------
 
                             // delete friend -------
-                            Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + f2.tox_public_key_string);
+                            // Log.i(TAG, "onMenuItemClick:1.a:pubkey=" + f2.tox_public_key_string);
                             delete_friend(f2.tox_public_key_string);
                             // delete friend -------
 
