@@ -64,7 +64,6 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
-
 /*---------------------------------------------------------------------------*/
 /* Android AudioPlayer and AudioRecorder configuration                       */
 /*---------------------------------------------------------------------------*/
@@ -108,7 +107,6 @@
 #undef SL_ANDROID_PERFORMANCE_POWER_SAVING
 #endif
 #define SL_ANDROID_PERFORMANCE_POWER_SAVING ((SLuint32) 0x00000003)
-
 
 const char *LOGTAG = "trifa.nativeaudio";
 // #define DEBUG_NATIVE_AUDIO_DEEP 1 // define to activate full debug logging
@@ -710,7 +708,7 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
         SL_BOOLEAN_TRUE
     };
     result = (*engineEngine)->CreateAudioRecorder(engineEngine, &recorderObject, &audioSrc,
-                                                  &audioSnk, 2, id, req);
+                                                  &audioSnk, (2), id, req);
 
     if (SL_RESULT_SUCCESS != result)
     {
@@ -799,6 +797,60 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
     result = (*recorderObject)->GetInterface(recorderObject, SL_IID_RECORD, &recorderRecord);
     assert(SL_RESULT_SUCCESS == result);
 
+#if 0
+    /* Enable AEC if requested */
+    if (aec)
+    {
+        SLAndroidAcousticEchoCancellationItf aecItf;
+        result = (*recorderObject)->GetInterface(
+            recorderObject, SL_IID_ANDROIDACOUSTICECHOCANCELLATION, (void *) &aecItf);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:AEC is %savailable",
+                            SL_RESULT_SUCCESS == result ? "" : "not ");
+        if (SL_RESULT_SUCCESS == result)
+        {
+            result = (*aecItf)->SetEnabled(aecItf, true);
+            SLboolean enabled;
+            result = (*aecItf)->IsEnabled(aecItf, &enabled);
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:AEC is %s",
+                                enabled ? "enabled" : "not enabled");
+        }
+    }
+    /* Enable AGC if requested */
+    if (agc)
+    {
+        SLAndroidAutomaticGainControlItf agcItf;
+        result = (*recorderObject)->GetInterface(
+            recorderObject, SL_IID_ANDROIDAUTOMATICGAINCONTROL, (void *) &agcItf);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:AGC is %savailable",
+                            SL_RESULT_SUCCESS == result ? "" : "not ");
+        if (SL_RESULT_SUCCESS == result)
+        {
+            result = (*agcItf)->SetEnabled(agcItf, true);
+            SLboolean enabled;
+            result = (*agcItf)->IsEnabled(agcItf, &enabled);
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:AGC is %s",
+                                enabled ? "enabled" : "not enabled");
+        }
+    }
+    /* Enable NS if requested */
+    if (ns)
+    {
+        SLAndroidNoiseSuppressionItf nsItf;
+        result = (*recorderObject)->GetInterface(
+            recorderObject, SL_IID_ANDROIDNOISESUPPRESSION, (void *) &nsItf);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:NS is %savailable",
+                            SL_RESULT_SUCCESS == result ? "" : "not ");
+        if (SL_RESULT_SUCCESS == result)
+        {
+            result = (*nsItf)->SetEnabled(nsItf, true);
+            SLboolean enabled;
+            result = (*nsItf)->IsEnabled(nsItf, &enabled);
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:NS is %s",
+                                enabled ? "enabled" : "not enabled");
+        }
+    }
+#endif
+
     // get the buffer queue interface
     result = (*recorderObject)->GetInterface(recorderObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
                                              &recorderBufferQueue);
@@ -878,6 +930,14 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
             audio_play_buffers_in_queue++;
             pthread_mutex_unlock(&play_buffer_queued_count_mutex);
         }
+
+#ifdef DEBUG_NATIVE_AUDIO_DEEP
+        SLAndroidSimpleBufferQueueState state;
+        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "bqPlayerCallback:real_buffer_count:2=%d guess=%d", state.count,
+                            audio_play_buffers_in_queue);
+#endif
 
         if (audio_play_buffers_in_queue > PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2)
         {
