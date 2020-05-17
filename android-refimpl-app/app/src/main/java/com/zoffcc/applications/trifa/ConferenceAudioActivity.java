@@ -698,7 +698,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                         //{
                         //    Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
                         //}
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 300000)); // sleep
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 330000)); // sleep
                     }
                 }
                 catch (Exception e)
