@@ -124,7 +124,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         conf_id = intent.getStringExtra("conf_id");
-        Log.i(TAG, "onCreate:003:conf_id=" + conf_id + " conf_id_prev=" + conf_id_prev);
+        // Log.i(TAG, "onCreate:003:conf_id=" + conf_id + " conf_id_prev=" + conf_id_prev);
         conf_id_prev = conf_id;
 
         setContentView(R.layout.activity_conference_message_list);
@@ -347,9 +347,9 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         MainActivity.conference_message_list_fragment = null;
         MainActivity.conference_message_list_activity = null;
-        Log.i(TAG, "onPause:001:conf_id=" + conf_id);
+        // Log.i(TAG, "onPause:001:conf_id=" + conf_id);
         conf_id = "-1";
-        Log.i(TAG, "onPause:002:conf_id=" + conf_id);
+        // Log.i(TAG, "onPause:002:conf_id=" + conf_id);
     }
 
     @Override
@@ -369,12 +369,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onResume");
         super.onResume();
 
-        Log.i(TAG, "onResume:001:conf_id=" + conf_id);
+        // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
         if (conf_id.equals("-1"))
         {
             conf_id = conf_id_prev;
-            Log.i(TAG, "onResume:001:conf_id=" + conf_id);
+            // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
         }
 
         MainActivity.conference_message_list_activity = this;
@@ -1062,7 +1062,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                 if (conf_id.equals("-1"))
                                 {
                                     conf_id = conf_id_prev;
-                                    Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id);
+                                    // Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id);
                                 }
 
                                 final long conference_num = tox_conference_by_confid__wrapper(conf_id);
