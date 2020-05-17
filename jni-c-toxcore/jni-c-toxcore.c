@@ -695,21 +695,21 @@ void restart_filter_audio(uint32_t in_samplerate)
 void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len)
 {
     size_t size = tox_get_savedata_size(tox);
-    dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
+    // dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
     char *savedata = malloc(size);
-    dbg(9, "update_savedata_file:savedata=%p", savedata);
+    // dbg(9, "update_savedata_file:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
     char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
     size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
-    dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
+    // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
     char *savedata_enc = malloc(size_enc);
-    dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
+    // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
     TOX_ERR_ENCRYPTION error;
     tox_pass_encrypt(savedata, size, passphrase, passphrase_len, savedata_enc, &error);
-    dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
+    // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
     bool res = false;
 
     if(size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
@@ -720,7 +720,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
         res = tox_is_data_encrypted(savedata_enc);
     }
 
-    dbg(9, "update_savedata_file:tox_is_data_encrypted=%d", (int)res);
+    // dbg(9, "update_savedata_file:tox_is_data_encrypted=%d", (int)res);
     FILE *f = fopen(full_path_filename_tmp, "wb");
     fwrite(savedata_enc, size_enc, 1, f);
     fclose(f);
@@ -2576,7 +2576,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__rea
     char *passphrase = strdup(s);
     (*env)->ReleaseStringUTFChars(env, passphrase_j, s);
     size_t passphrase_len = (size_t)strlen(passphrase);
-    dbg(9, "update_savedata_file");
+    // dbg(9, "update_savedata_file");
     update_savedata_file(tox_global, (const uint8_t *)passphrase, (size_t)passphrase_len);
 
     if(passphrase)
