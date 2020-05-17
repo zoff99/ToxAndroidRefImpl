@@ -743,8 +743,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         super.onPause();
 
-        Log.i(TAG, "toxav_groupchat_disable_av:A:gnum=" + tox_conference_by_confid__wrapper(conf_id));
-        Log.i(TAG, "toxav_groupchat_disable_av:A:gid=" + conf_id);
+        // Log.i(TAG, "toxav_groupchat_disable_av:A:gnum=" + tox_conference_by_confid__wrapper(conf_id));
+        // Log.i(TAG, "toxav_groupchat_disable_av:A:gid=" + conf_id);
         toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
 
         Callstate.audio_group_active = false;
@@ -1409,8 +1409,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     public void show_add_friend_conference(View view)
     {
-        Log.i(TAG, "toxav_groupchat_disable_av:B:gnum=" + tox_conference_by_confid__wrapper(conf_id));
-        Log.i(TAG, "toxav_groupchat_disable_av:B:gid=" + conf_id);
+        // Log.i(TAG, "toxav_groupchat_disable_av:B:gnum=" + tox_conference_by_confid__wrapper(conf_id));
+        // Log.i(TAG, "toxav_groupchat_disable_av:B:gid=" + conf_id);
         toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
 
         Callstate.audio_group_active = false;
