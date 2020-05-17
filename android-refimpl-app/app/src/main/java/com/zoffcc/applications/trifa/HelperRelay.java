@@ -36,13 +36,13 @@ public class HelperRelay
     {
         if (relay_public_key_string == null)
         {
-            Log.d(TAG, "add_or_update_friend_relay:ret01");
+            // Log.d(TAG, "add_or_update_friend_relay:ret01");
             return;
         }
 
         if (friend_pubkey == null)
         {
-            Log.d(TAG, "add_or_update_friend_relay:ret02");
+            // Log.d(TAG, "add_or_update_friend_relay:ret02");
             return;
         }
 
@@ -86,7 +86,7 @@ public class HelperRelay
                     try
                     {
                         orma.insertIntoRelayListDB(new_relay);
-                        Log.i(TAG, "add_or_update_friend_relay:+ADD friend relay+ owner pubkey=" + friend_pubkey);
+                        // Log.i(TAG, "add_or_update_friend_relay:+ADD friend relay+ owner pubkey=" + friend_pubkey);
                     }
                     catch (Exception e2)
                     {
@@ -218,9 +218,9 @@ public class HelperRelay
                                 HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string),
                                 conf.tox_conference_number);
 
-                        Log.i(TAG,
-                              "invite_to_all_conferences_own_relay:confnum=" + conf.tox_conference_number + " res=" +
-                              res);
+                        // Log.i(TAG,
+                        //       "invite_to_all_conferences_own_relay:confnum=" + conf.tox_conference_number + " res=" +
+                        //       res);
 
                     }
                 }
@@ -254,9 +254,9 @@ public class HelperRelay
         long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string);
         byte[] data = MainActivity.hex_to_bytes("FF" + friend_pubkey);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
-        Log.d(TAG, "send_friend_pubkey_to_relay:data=" + data);
+        // Log.d(TAG, "send_friend_pubkey_to_relay:data=" + data);
         int result = MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
-        Log.d(TAG, "send_friend_pubkey_to_relay:res=" + result);
+        // Log.d(TAG, "send_friend_pubkey_to_relay:res=" + result);
     }
 
     static void send_relay_pubkey_to_friend(String relay_public_key_string, String friend_pubkey)
@@ -265,9 +265,9 @@ public class HelperRelay
         long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(friend_pubkey);
         byte[] data = MainActivity.hex_to_bytes("FF" + relay_public_key_string);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
-        Log.d(TAG, "send_relay_pubkey_to_friend:data=" + data);
+        // Log.d(TAG, "send_relay_pubkey_to_friend:data=" + data);
         int result = MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
-        Log.d(TAG, "send_relay_pubkey_to_friend:res=" + result);
+        // Log.d(TAG, "send_relay_pubkey_to_friend:res=" + result);
     }
 
     static boolean have_own_relay()
@@ -376,13 +376,13 @@ public class HelperRelay
                 new_relay.tox_public_key_string_of_owner = "-- OWN RELAY --";
                 //
                 orma.insertIntoRelayListDB(new_relay);
-                Log.i(TAG, "friend_as_relay_own_in_db:+ADD own relay+");
+                // Log.i(TAG, "friend_as_relay_own_in_db:+ADD own relay+");
                 // friend exists -> update
                 orma.updateFriendList().
                         tox_public_key_stringEq(friend_public_key).
                         is_relay(true).
                         execute();
-                Log.i(TAG, "friend_as_relay_own_in_db:+UPDATE friend+");
+                // Log.i(TAG, "friend_as_relay_own_in_db:+UPDATE friend+");
                 ret = true;
             }
         }
@@ -451,7 +451,7 @@ public class HelperRelay
                         tox_public_key_stringEq(rl.get(0).tox_public_key_string).
                         is_relay(false).
                         execute();
-                Log.i(TAG, "remove_own_relay_in_db:+UPDATE friend+");
+                // Log.i(TAG, "remove_own_relay_in_db:+UPDATE friend+");
                 ret = true;
             }
         }

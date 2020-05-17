@@ -129,13 +129,13 @@ public class HelperConference
             return;
         }
 
-        Log.d(TAG, "add_conference_wrapper:confnum=" + conference_num + " conference_identifier_in=" +
-                   conference_identifier_in);
+        //Log.d(TAG, "add_conference_wrapper:confnum=" + conference_num + " conference_identifier_in=" +
+        //           conference_identifier_in);
         String conference_identifier = conference_identifier_in;
 
         if (has_conference_identifier != true)
         {
-            Log.d(TAG, "add_conference_wrapper:need to get conference_identifier");
+            //Log.d(TAG, "add_conference_wrapper:need to get conference_identifier");
             // we need to get the conference identifier
             ByteBuffer cookie_buf3 = ByteBuffer.allocateDirect((int) CONFERENCE_ID_LENGTH * 2);
             cookie_buf3.clear();
@@ -152,7 +152,7 @@ public class HelperConference
             }
         }
 
-        Log.d(TAG, "add_conference_wrapper:conference_identifier=" + conference_identifier);
+        //Log.d(TAG, "add_conference_wrapper:conference_identifier=" + conference_identifier);
 
         if (conference_num >= 0)
         {
@@ -161,7 +161,7 @@ public class HelperConference
         }
         else
         {
-            Log.i(TAG, "add_conference_wrapper:error=" + conference_num + " joining conference");
+            //Log.i(TAG, "add_conference_wrapper:error=" + conference_num + " joining conference");
         }
 
         try
@@ -288,7 +288,7 @@ public class HelperConference
             Cursor cursor = orma.getConnection().rawQuery(
                 "SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
             cursor.moveToFirst();
-            Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
+            //Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
             long msg_id = cursor.getLong(0);
             cursor.close();
 
@@ -318,7 +318,7 @@ public class HelperConference
             Cursor cursor = orma.getConnection().rawQuery(
                 "SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
             cursor.moveToFirst();
-            Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
+            //Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
             long msg_id = cursor.getLong(0);
             cursor.close();
 
@@ -594,7 +594,7 @@ public class HelperConference
     {
         try
         {
-            Log.i(TAG, "new_or_updated_conference:" + "conference_number=" + conference_identifier);
+            // Log.i(TAG, "new_or_updated_conference:" + "conference_number=" + conference_identifier);
             final ConferenceDB conf2 = orma.selectFromConferenceDB().
                 conference_identifierEq(conference_identifier).toList().get(0);
             // conference already exists -> update and connect

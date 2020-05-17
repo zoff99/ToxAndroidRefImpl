@@ -546,7 +546,7 @@ public class MainActivity extends AppCompatActivity
         SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
         SD_CARD_STATIC_DIR = getExternalFilesDir(null).getAbsolutePath() + "/_staticdir/";
         SD_CARD_FILES_EXPORT_DIR = getExternalFilesDir(null).getAbsolutePath() + "/vfs_export/";
-        Log.i(TAG, "SD_CARD_FILES_EXPORT_DIR:" + SD_CARD_FILES_EXPORT_DIR);
+        // Log.i(TAG, "SD_CARD_FILES_EXPORT_DIR:" + SD_CARD_FILES_EXPORT_DIR);
         SD_CARD_TMP_DUMMYFILE = make_some_static_dummy_file(this.getBaseContext());
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         Log.i(TAG, "java.library.path:" + System.getProperty("java.library.path"));
@@ -1243,7 +1243,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-                Log.i(TAG, "db:path=" + dbs_path);
+                // Log.i(TAG, "db:path=" + dbs_path);
                 File database_dir = new File(new File(dbs_path).getParent());
                 database_dir.mkdirs();
                 OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
@@ -1258,7 +1258,7 @@ public class MainActivity extends AppCompatActivity
                     writeOnMainThread(AccessThreadConstraint.NONE).
                     trace(ORMA_TRACE).
                     build();
-                Log.i(TAG, "db:open=OK:path=" + dbs_path);
+                // Log.i(TAG, "db:open=OK:path=" + dbs_path);
             }
             catch (Exception e)
             {
@@ -1270,7 +1270,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        Log.i(TAG, "db:deleting database:" + dbs_path);
+                        // Log.i(TAG, "db:deleting database:" + dbs_path);
                         new File(dbs_path).delete();
                     }
                     catch (Exception e3)
@@ -1280,7 +1280,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
-                Log.i(TAG, "db:path(2)=" + dbs_path);
+                // Log.i(TAG, "db:path(2)=" + dbs_path);
                 OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
 
                 if (DB_ENCRYPT)
@@ -1293,7 +1293,7 @@ public class MainActivity extends AppCompatActivity
                     writeOnMainThread(AccessThreadConstraint.WARNING).
                     trace(ORMA_TRACE).
                     build();
-                Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
+                // Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
             }
 
             // ----- Clear all messages from DB -----
@@ -1314,7 +1314,7 @@ public class MainActivity extends AppCompatActivity
                     String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
                     File database_dir = new File(new File(dbFile).getParent());
                     database_dir.mkdirs();
-                    Log.i(TAG, "vfs:path=" + dbFile);
+                    // Log.i(TAG, "vfs:path=" + dbFile);
                     vfs = VirtualFileSystem.get();
 
                     try
@@ -1331,7 +1331,7 @@ public class MainActivity extends AppCompatActivity
                         vfs.mount(dbFile, PREF__DB_secrect_key);
                     }
 
-                    Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
+                    // Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
                 }
                 catch (Exception e)
                 {
@@ -1366,11 +1366,11 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
-                        Log.i(TAG, "vfs:path=" + dbFile);
+                        // Log.i(TAG, "vfs:path=" + dbFile);
                         vfs = VirtualFileSystem.get();
                         vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
                         vfs.mount(PREF__DB_secrect_key);
-                        Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
+                        // Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
                     }
                     catch (Exception e2)
                     {
@@ -1379,13 +1379,13 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
-                Log.i(TAG, "vfs:encrypted:(1)prefix=" + VFS_PREFIX);
+                // Log.i(TAG, "vfs:encrypted:(1)prefix=" + VFS_PREFIX);
             }
             else
             {
                 // VFS not encrypted -------------
                 VFS_PREFIX = getExternalFilesDir(null).getAbsolutePath() + "/vfs/";
-                Log.i(TAG, "vfs:not_encrypted:(2)prefix=" + VFS_PREFIX);
+                // Log.i(TAG, "vfs:not_encrypted:(2)prefix=" + VFS_PREFIX);
                 // VFS not encrypted -------------
             }
         }
@@ -4533,7 +4533,7 @@ public class MainActivity extends AppCompatActivity
                         file_.is_in_VFS = false;
                         file_.filesize = ft.filesize;
                         long row_id = orma.insertIntoFileDB(file_);
-                        Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
+                        // Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
                         filedb_id = orma.selectFromFileDB().
                             tox_public_key_stringEq(ft.tox_public_key_string).
                             and().file_nameEq(ft.file_name).
@@ -4541,12 +4541,12 @@ public class MainActivity extends AppCompatActivity
                             and().directionEq(ft.direction).
                             and().filesizeEq(ft.filesize).
                             orderByIdDesc().get(0).id;
-                        Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
+                        // Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
                     }
 
-                    Log.i(TAG, "file_chunk_request:file_READY:001:f.id=" + ft.id);
+                    // Log.i(TAG, "file_chunk_request:file_READY:001:f.id=" + ft.id);
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft.id, friend_number);
-                    Log.i(TAG, "file_chunk_request:file_READY:001a:msg_id=" + msg_id);
+                    // Log.i(TAG, "file_chunk_request:file_READY:001a:msg_id=" + msg_id);
                     HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number,
                                                                                                file_number,
                                                                                                ft.path_name + "/" +
@@ -4559,11 +4559,11 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
-                        Log.i(TAG, "file_chunk_request:file_READY:002");
+                        // Log.i(TAG, "file_chunk_request:file_READY:002");
 
                         if (ft.id != -1)
                         {
-                            Log.i(TAG, "file_chunk_request:file_READY:003:f.id=" + ft.id + " msg_id=" + msg_id);
+                            // Log.i(TAG, "file_chunk_request:file_READY:003:f.id=" + ft.id + " msg_id=" + msg_id);
                             HelperMessage.update_single_message_from_messge_id(msg_id, true);
                         }
                     }
@@ -4654,9 +4654,9 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
     {
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
-        Log.i(TAG,
-              "file_recv:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" +
-              filename + ":" + filename_length);
+        // Log.i(TAG,
+        //       "file_recv:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" +
+        //       filename + ":" + filename_length);
 
         if (a_TOX_FILE_KIND == TOX_FILE_KIND_AVATAR.value)
         {
@@ -4832,7 +4832,7 @@ public class MainActivity extends AppCompatActivity
 
             if (position == 0)
             {
-                Log.i(TAG, "file_recv_chunk:START-O-F:filesize==" + f.filesize);
+                // Log.i(TAG, "file_recv_chunk:START-O-F:filesize==" + f.filesize);
 
                 // file start. just to be sure, make directories
                 if (VFS_ENCRYPT)
@@ -4925,13 +4925,13 @@ public class MainActivity extends AppCompatActivity
                     file_.file_name = f.file_name;
                     file_.filesize = f.filesize;
                     long row_id = orma.insertIntoFileDB(file_);
-                    Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
+                    // Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
                         f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
-                    Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
+                    // Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
                 }
 
-                Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
+                // Log.i(TAG, "file_recv_chunk:kind=" + f.kind);
 
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
@@ -4942,9 +4942,9 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    Log.i(TAG, "file_recv_chunk:file_READY:001:f.id=" + f.id);
+                    // Log.i(TAG, "file_recv_chunk:file_READY:001:f.id=" + f.id);
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(f.id, friend_number);
-                    Log.i(TAG, "file_recv_chunk:file_READY:001a:msg_id=" + msg_id);
+                    // Log.i(TAG, "file_recv_chunk:file_READY:001a:msg_id=" + msg_id);
                     HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number,
                                                                                                file_number, VFS_PREFIX +
                                                                                                             VFS_FILE_DIR +
@@ -4960,11 +4960,11 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
-                        Log.i(TAG, "file_recv_chunk:file_READY:002");
+                        // Log.i(TAG, "file_recv_chunk:file_READY:002");
 
                         if (f.id != -1)
                         {
-                            Log.i(TAG, "file_recv_chunk:file_READY:003:f.id=" + f.id + " msg_id=" + msg_id);
+                            // Log.i(TAG, "file_recv_chunk:file_READY:003:f.id=" + f.id + " msg_id=" + msg_id);
                             HelperMessage.update_single_message_from_messge_id(msg_id, true);
                         }
                     }
@@ -6090,7 +6090,7 @@ public class MainActivity extends AppCompatActivity
 
     public static void update_friend_connection_status_helper(int a_TOX_CONNECTION, FriendList f, boolean from_relay)
     {
-        Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:ENTER");
+        // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:ENTER");
 
         final long friend_number_ = tox_friend_by_public_key__wrapper(f.tox_public_key_string);
         boolean went_online = false;
@@ -6108,19 +6108,19 @@ public class MainActivity extends AppCompatActivity
             if (a_TOX_CONNECTION == TOX_CONNECTION_NONE.value)
             {
                 // ******** friend going offline ********
-                Log.i(TAG, "friend_connection_status:friend going offline:" + System.currentTimeMillis());
+                // Log.i(TAG, "friend_connection_status:friend going offline:" + System.currentTimeMillis());
             }
             else
             {
                 went_online = true;
                 // ******** friend coming online ********
-                Log.i(TAG, "friend_connection_status:friend coming online:" + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
+                // Log.i(TAG, "friend_connection_status:friend coming online:" + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
             }
         }
 
         if (went_online)
         {
-            Log.i(TAG, "friend_connection_status:friend status seems: ONLINE");
+            // Log.i(TAG, "friend_connection_status:friend status seems: ONLINE");
             f.last_online_timestamp = LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
             HelperFriend.update_friend_in_db_last_online_timestamp(f);
             f.TOX_CONNECTION = a_TOX_CONNECTION;
@@ -6149,11 +6149,11 @@ public class MainActivity extends AppCompatActivity
             // check for combined online status of (friend + possible relay)
             int status_new = a_TOX_CONNECTION;
             int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
-            Log.i(TAG, "friend_connection_status:friend status combined con status:" + combined_connection_status_);
+            // Log.i(TAG, "friend_connection_status:friend status combined con status:" + combined_connection_status_);
 
             if (get_toxconnection_wrapper(combined_connection_status_) == TOX_CONNECTION_NONE.value)
             {
-                Log.i(TAG, "friend_connection_status:friend status combined: OFFLINE");
+                // Log.i(TAG, "friend_connection_status:friend status combined: OFFLINE");
                 f.last_online_timestamp = System.currentTimeMillis();
                 HelperFriend.update_friend_in_db_last_online_timestamp(f);
                 f.TOX_CONNECTION = combined_connection_status_;
@@ -6179,7 +6179,7 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                Log.i(TAG, "friend or relay offline, combined still ONLINE");
+                // Log.i(TAG, "friend or relay offline, combined still ONLINE");
                 HelperFriend.update_single_friend_in_friendlist_view(f);
             }
         }

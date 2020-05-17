@@ -52,7 +52,7 @@ public class HelperFiletransfer
         {
             String mimeType = URLConnection.guessContentTypeFromName(
                 get_filetransfer_filename_from_id(message.filetransfer_id).toLowerCase());
-            Log.i(TAG, "check_auto_accept_incoming_filetransfer:mime-type=" + mimeType);
+            // Log.i(TAG, "check_auto_accept_incoming_filetransfer:mime-type=" + mimeType);
 
             if (PREF__auto_accept_image)
             {
@@ -74,7 +74,7 @@ public class HelperFiletransfer
 
                             // update message view
                             update_single_message_from_messge_id(message.id, true);
-                            Log.i(TAG, "check_auto_accept_incoming_filetransfer:image:accepted");
+                            // Log.i(TAG, "check_auto_accept_incoming_filetransfer:image:accepted");
                             return true;
                         }
                     }
@@ -101,7 +101,7 @@ public class HelperFiletransfer
 
                             // update message view
                             update_single_message_from_messge_id(message.id, true);
-                            Log.i(TAG, "check_auto_accept_incoming_filetransfer:video:accepted");
+                            // Log.i(TAG, "check_auto_accept_incoming_filetransfer:video:accepted");
                             return true;
                         }
                     }
@@ -409,7 +409,7 @@ public class HelperFiletransfer
     {
         try
         {
-            Log.i(TAG, "delete_ft:id=" + filetransfer_id);
+            // Log.i(TAG, "delete_ft:id=" + filetransfer_id);
             orma.deleteFromFiletransfer().idEq(filetransfer_id).execute();
         }
         catch (Exception e)
@@ -420,7 +420,7 @@ public class HelperFiletransfer
 
     static void cancel_filetransfer(long friend_number, long file_number)
     {
-        Log.i(TAG, "FTFTFT:cancel_filetransfer");
+        // Log.i(TAG, "FTFTFT:cancel_filetransfer");
         Filetransfer f = null;
 
         try
@@ -445,7 +445,7 @@ public class HelperFiletransfer
                     // remove link to any message
                     set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
                     // delete FT in DB
-                    Log.i(TAG, "FTFTFT:002");
+                    // Log.i(TAG, "FTFTFT:002");
                     delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
 
                     // update UI
@@ -471,7 +471,7 @@ public class HelperFiletransfer
                     // delete tmp file
                     delete_filetransfer_tmpfile(friend_number, file_number);
                     // delete FT in DB
-                    Log.i(TAG, "FTFTFT:003");
+                    // Log.i(TAG, "FTFTFT:003");
                     delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                 }
             }
@@ -486,7 +486,7 @@ public class HelperFiletransfer
                     // remove link to any message
                     set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
                     // delete FT in DB
-                    Log.i(TAG, "FTFTFT:OGFT:002");
+                    // Log.i(TAG, "FTFTFT:OGFT:002");
                     delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
 
                     // update UI
@@ -515,7 +515,7 @@ public class HelperFiletransfer
                     // delete tmp file
                     delete_filetransfer_tmpfile(friend_number, file_number);
                     // delete FT in DB
-                    Log.i(TAG, "FTFTFT:OGFT:003");
+                    // Log.i(TAG, "FTFTFT:OGFT:003");
                     delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
                 }
             }
@@ -600,13 +600,13 @@ public class HelperFiletransfer
         try
         {
             long row_id = orma.insertIntoFiletransfer(f);
-            Log.i(TAG, "insert_into_filetransfer_db:row_id=" + row_id);
+            // Log.i(TAG, "insert_into_filetransfer_db:row_id=" + row_id);
             Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Filetransfer where rowid='" + row_id + "'");
             cursor.moveToFirst();
-            Log.i(TAG, "insert_into_filetransfer_db:id res count=" + cursor.getColumnCount());
+            // Log.i(TAG, "insert_into_filetransfer_db:id res count=" + cursor.getColumnCount());
             long ft_id = cursor.getLong(0);
             cursor.close();
-            Log.i(TAG, "insert_into_filetransfer_db:ft_id=" + ft_id);
+            // Log.i(TAG, "insert_into_filetransfer_db:ft_id=" + ft_id);
             return ft_id;
         }
         catch (Exception e)

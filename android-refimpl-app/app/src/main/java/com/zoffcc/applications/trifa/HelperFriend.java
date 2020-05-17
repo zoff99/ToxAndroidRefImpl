@@ -190,7 +190,7 @@ public class HelperFriend
                 tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
                 execute();
-        Log.i(TAG, "update_friend_in_db_status:numrows=" + numrows);
+        // Log.i(TAG, "update_friend_in_db_status:numrows=" + numrows);
     }
 
     synchronized static void update_friend_in_db_connection_status(FriendList f)
@@ -436,9 +436,9 @@ public class HelperFriend
 
                 try
                 {
-                    Log.i(TAG, "friend_request:insert:001:f=" + f);
+                    // Log.i(TAG, "friend_request:insert:001:f=" + f);
                     long res = orma.insertIntoFriendList(f);
-                    Log.i(TAG, "friend_request:insert:002:res=" + res);
+                    // Log.i(TAG, "friend_request:insert:002:res=" + res);
                 }
                 catch (android.database.sqlite.SQLiteConstraintException | net.sqlcipher.database.SQLiteConstraintException e)
                 {
@@ -454,7 +454,7 @@ public class HelperFriend
                 if (as_friends_relay)
                 {
                     // add relay for friend to DB
-                    Log.d(TAG, "add_friend_to_system:add_or_update_friend_relay");
+                    // Log.d(TAG, "add_friend_to_system:add_or_update_friend_relay");
                     HelperRelay.add_or_update_friend_relay(friend_public_key, owner_public_key);
                     // update friendlist on screen
                     add_all_friends_clear_wrapper(10);
@@ -858,8 +858,8 @@ public class HelperFriend
                                 String msg_id_as_hex_string = MainActivity.bytesToHex(msg_id_buffer.array(),
                                                                                       msg_id_buffer.arrayOffset(),
                                                                                       msg_id_buffer.limit());
-                                Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
-                                           msg_id_as_hex_string);
+                                // Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
+                                //            msg_id_as_hex_string);
 
                                 try
                                 {

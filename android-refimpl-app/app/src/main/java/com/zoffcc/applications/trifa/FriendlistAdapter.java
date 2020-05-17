@@ -40,7 +40,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
 
     public FriendlistAdapter(Context context, List<CombinedFriendsAndConferences> items)
     {
-        Log.i(TAG, "FriendlistAdapter");
+        // Log.i(TAG, "FriendlistAdapter");
 
         this.friendlistitems = items;
         this.context = context;
@@ -99,11 +99,11 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
             switch (type)
             {
                 case CombinedFriendsAndConferences_model.ITEM_IS_FRIEND:
-                    Log.i(TAG, "onBindViewHolder:ITEM_IS_FRIEND");
+                    // Log.i(TAG, "onBindViewHolder:ITEM_IS_FRIEND");
                     ((FriendListHolder) holder).bindFriendList(fl2.friend_item);
                     break;
                 case CombinedFriendsAndConferences_model.ITEM_IS_CONFERENCE:
-                    Log.i(TAG, "onBindViewHolder:ITEM_IS_CONFERENCE");
+                    // Log.i(TAG, "onBindViewHolder:ITEM_IS_CONFERENCE");
                     ((ConferenceListHolder) holder).bindFriendList(fl2.conference_item);
                     break;
             }

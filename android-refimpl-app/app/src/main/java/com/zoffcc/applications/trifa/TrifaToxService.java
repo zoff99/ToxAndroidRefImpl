@@ -578,13 +578,13 @@ public class TrifaToxService extends Service
                 byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
                 cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
                 String conference_identifier = bytes_to_hex(cookie_buffer);
-                Log.i(TAG, "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +
-                           " offset=" + cookie_buf3.arrayOffset());
+                // Log.i(TAG, "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +
+                //           " offset=" + cookie_buf3.arrayOffset());
 
                 final ConferenceDB conf2 = orma.selectFromConferenceDB().toList().get(0);
-                Log.i(TAG,
-                      "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number + " " +
-                      conf2.name);
+                //Log.i(TAG,
+                //      "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number + " " +
+                //      conf2.name);
 
                 new_or_updated_conference(conference_numbers[conf_], tox_friend_get_public_key__wrapper(0),
                                           conference_identifier, tox_conference_get_type(

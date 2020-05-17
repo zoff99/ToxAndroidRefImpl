@@ -234,7 +234,7 @@ public class HelperMessage
     {
         try
         {
-            Log.i(TAG, "add_single_message_from_messge_id:message_id=" + message_id);
+            // Log.i(TAG, "add_single_message_from_messge_id:message_id=" + message_id);
             Thread t = new Thread()
             {
                 @Override
@@ -242,7 +242,7 @@ public class HelperMessage
                 {
                     if (message_id != -1)
                     {
-                        Log.i(TAG, "add_single_message_from_messge_id:message_id=" + message_id);
+                        // Log.i(TAG, "add_single_message_from_messge_id:message_id=" + message_id);
 
                         try
                         {
@@ -250,19 +250,19 @@ public class HelperMessage
 
                             if (m.id != -1)
                             {
-                                Log.i(TAG, "add_single_message_from_messge_id:m.id=" + m.id);
+                                // Log.i(TAG, "add_single_message_from_messge_id:m.id=" + m.id);
 
                                 if ((force) || (MainActivity.update_all_messages_global_timestamp +
                                                 MainActivity.UPDATE_MESSAGES_NORMAL_MILLIS <
                                                 System.currentTimeMillis()))
                                 {
-                                    Log.i(TAG, "add_single_message_from_messge_id:add_message()");
+                                    // Log.i(TAG, "add_single_message_from_messge_id:add_message()");
 
                                     if (MainActivity.message_list_fragment == null)
                                     {
                                         // ok, we need to wait for onResume to finish
-                                        Log.i(TAG,
-                                              "add_single_message_from_messge_id:ok, we need to wait for onResume to finish");
+                                        // Log.i(TAG,
+                                        //       "add_single_message_from_messge_id:ok, we need to wait for onResume to finish");
                                         long loop = 0;
 
                                         while (loop < 40)  // wait 8 sec., then give up
@@ -447,8 +447,10 @@ public class HelperMessage
             //
             //            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:2=====================================");
             //
-            Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id +
-                       " friend_number=" + friend_number);
+
+
+            // Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id +
+            //            " friend_number=" + friend_number);
             List<Message> m = orma.selectFromMessage().
                     filetransfer_idEq(filetransfer_id).and().
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
@@ -476,9 +478,9 @@ public class HelperMessage
             long ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     and().file_numberEq(file_number).orderByIdDesc().get(0).id;
-            Log.i(TAG,
-                  "set_message_state_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number +
-                  " file_number=" + file_number);
+            // Log.i(TAG,
+            //       "set_message_state_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number +
+            //       " file_number=" + file_number);
             set_message_state_from_id(orma.selectFromMessage().
                     filetransfer_idEq(ft_id).and().
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
@@ -496,7 +498,7 @@ public class HelperMessage
         try
         {
             orma.updateMessage().idEq(message_id).state(state).execute();
-            Log.i(TAG, "set_message_state_from_id:message_id=" + message_id + " state=" + state);
+            // Log.i(TAG, "set_message_state_from_id:message_id=" + message_id + " state=" + state);
         }
         catch (Exception e)
         {
@@ -527,9 +529,9 @@ public class HelperMessage
                     and().file_numberEq(file_number).
                     orderByIdDesc().
                     get(0).id;
-            Log.i(TAG,
-                  "set_message_filedb_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number +
-                  " file_number=" + file_number);
+            // Log.i(TAG,
+            //       "set_message_filedb_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number +
+            //       " file_number=" + file_number);
             set_message_filedb_from_id(orma.selectFromMessage().
                     filetransfer_idEq(ft_id).and().
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
@@ -548,7 +550,7 @@ public class HelperMessage
         try
         {
             orma.updateMessage().idEq(message_id).filedb_id(filedb_id).execute();
-            Log.i(TAG, "set_message_filedb_from_id:message_id=" + message_id + " filedb_id=" + filedb_id);
+            // Log.i(TAG, "set_message_filedb_from_id:message_id=" + message_id + " filedb_id=" + filedb_id);
         }
         catch (Exception e)
         {
@@ -564,20 +566,20 @@ public class HelperMessage
         //    @Override
         //    public void run()
         //    {
-        Log.i(TAG, "insert_into_message_db:m=" + m);
+        // Log.i(TAG, "insert_into_message_db:m=" + m);
         long row_id = orma.insertIntoMessage(m);
 
         try
         {
             Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Message where rowid='" + row_id + "'");
             cursor.moveToFirst();
-            Log.i(TAG, "insert_into_message_db:id res count=" + cursor.getColumnCount());
+            // Log.i(TAG, "insert_into_message_db:id res count=" + cursor.getColumnCount());
             long msg_id = cursor.getLong(0);
             cursor.close();
 
             if (update_message_view_flag)
             {
-                Log.i(TAG, "insert_into_message_db:add_single_message_from_messge_id, force=true");
+                // Log.i(TAG, "insert_into_message_db:add_single_message_from_messge_id, force=true");
                 add_single_message_from_messge_id(msg_id, true);
             }
 
