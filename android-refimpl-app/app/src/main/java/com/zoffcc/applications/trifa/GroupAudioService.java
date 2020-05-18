@@ -483,7 +483,7 @@ public class GroupAudioService extends Service
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -512,7 +512,7 @@ public class GroupAudioService extends Service
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         try
@@ -521,7 +521,7 @@ public class GroupAudioService extends Service
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         ga_service = null;
