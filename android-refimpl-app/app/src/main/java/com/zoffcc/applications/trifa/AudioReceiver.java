@@ -30,11 +30,8 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.nio.ByteBuffer;
 
-import static com.zoffcc.applications.trifa.CallingActivity.update_audio_device_icon;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
-import static com.zoffcc.applications.trifa.MainActivity.isBluetoothScoOn_old;
-import static com.zoffcc.applications.trifa.MainActivity.isWiredHeadsetOn_old;
 
 public class AudioReceiver extends Thread
 {
@@ -42,17 +39,10 @@ public class AudioReceiver extends Thread
     static boolean stopped = true;
     static boolean finished = true;
 
-    // the audio recording options
-    // static final int RECORDING_RATE = 48000; // 16000; // 44100;
-    static final int CHANNEL_1 = AudioFormat.CHANNEL_OUT_MONO;
-    static final int CHANNEL_2 = AudioFormat.CHANNEL_OUT_STEREO;
     static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-    static final int AUDIO_GAIN_VALUE = 800;
     static final long SMAPLINGRATE_TOX = 48000; // 16000;
     static long sampling_rate_ = SMAPLINGRATE_TOX;
     static int channels_ = 1;
-    static final boolean ACTVIATE_LEC = false;
-    static final boolean ACTVIATE_ERVB = false;
 
     static boolean native_audio_engine_running = false;
 
@@ -60,131 +50,12 @@ public class AudioReceiver extends Thread
     final static int buffer_multiplier = 4;
     static int buffer_size = 1920 * buffer_multiplier; // TODO: hardcoded is bad!!!!
     AudioTrack track = null;
-    LoudnessEnhancer lec = null;
-    EnvironmentalReverb erv = null;
 
     public AudioReceiver()
     {
         stopped = false;
         finished = false;
         start();
-    }
-
-    public AudioTrack findAudioTrack()
-    {
-        int CHANNEL;
-
-        if (channels_ == 1)
-        {
-            CHANNEL = CHANNEL_1;
-        }
-        else
-        {
-            CHANNEL = CHANNEL_2;
-        }
-
-        int buffer_size22 = AudioTrack.getMinBufferSize((int) sampling_rate_, CHANNEL, FORMAT);
-        Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
-        Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
-
-        String sampleRateStr = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
-        {
-            sampleRateStr = audio_manager_s.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
-            int sampleRate = Integer.parseInt(sampleRateStr);
-            Log.i(TAG, "audio_play:PROPERTY_OUTPUT_SAMPLE_RATE=" + sampleRate);
-
-            String framesPerBuffer = audio_manager_s.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
-            int framesPerBufferInt = Integer.parseInt(framesPerBuffer);
-            Log.i(TAG, "audio_play:PROPERTY_OUTPUT_FRAMES_PER_BUFFER=" + framesPerBufferInt);
-        }
-
-
-        // ---------- 222 ----------
-        int buffer_mem_factor2 = 30;
-        int playBufSize = (int) (2 * (sampling_rate_ / buffer_mem_factor2));
-        Log.i(TAG, "want_buf_size_in_bytes(1)=" + playBufSize);
-        if (playBufSize < buffer_size22)
-        {
-            playBufSize = buffer_size22;
-        }
-
-        if (playBufSize < 6000)
-        {
-            playBufSize = 8192;
-        }
-
-        /*
-         *
-         * HINT: if <playBufSize> is larger then audio delay will get longer!!
-         *
-         *
-         */
-
-        //        if (playBufSize < 16000)
-        //        {
-        //            playBufSize = 16384;
-        //        }
-
-        Log.i(TAG, "want_buf_size_in_bytes(2)=" + playBufSize);
-        // ---------- 222 ----------
-
-        // Log.i(TAG, "t_prio:" + run_adb_command());
-
-        track = new AudioTrack(AudioManager.STREAM_VOICE_CALL, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize,
-                               AudioTrack.MODE_STREAM);
-        // track = new AudioTrack(AudioManager.ROUTE_HEADSET, (int) sampling_rate_, CHANNEL, FORMAT, playBufSize, AudioTrack.MODE_STREAM);
-
-        try
-        {
-            MainActivity.AudioMode_old = audio_manager_s.getMode();
-            MainActivity.RingerMode_old = audio_manager_s.getRingerMode();
-            MainActivity.isSpeakerPhoneOn_old = audio_manager_s.isSpeakerphoneOn();
-            isWiredHeadsetOn_old = audio_manager_s.isWiredHeadsetOn();
-            isBluetoothScoOn_old = audio_manager_s.isBluetoothScoOn();
-
-            if (audio_manager_s.isWiredHeadsetOn())
-            {
-                if (Callstate.audio_speaker)
-                {
-                    audio_manager_s.setSpeakerphoneOn(true);
-                }
-                else
-                {
-                    audio_manager_s.setSpeakerphoneOn(false);
-                }
-            }
-            else
-            {
-                audio_manager_s.setSpeakerphoneOn(false);
-            }
-
-            if (audio_manager_s.isWiredHeadsetOn())
-            {
-                audio_manager_s.setWiredHeadsetOn(true);
-                Callstate.audio_device = 1;
-                update_audio_device_icon();
-                try
-                {
-                    audio_manager_s.setBluetoothScoOn(false);
-                }
-                catch (Exception e2)
-                {
-                    e2.printStackTrace();
-                }
-            }
-            else
-            {
-                Callstate.audio_device = 0;
-                update_audio_device_icon();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        return track;
     }
 
     @Override
@@ -231,12 +102,12 @@ public class AudioReceiver extends Thread
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
                     {
                         sampleRateStr = audio_manager_s.getProperty(
-                                AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE); // in decimal Hz
+                            AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE); // in decimal Hz
                         int sampleRate__ = Integer.parseInt(sampleRateStr);
                         Log.i(TAG, "audio_play:PROPERTY_OUTPUT_SAMPLE_RATE=" + sampleRate__);
 
                         String framesPerBuffer = audio_manager_s.getProperty(
-                                AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER); // in decimal PCM frames
+                            AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER); // in decimal PCM frames
                         int framesPerBufferInt = Integer.parseInt(framesPerBuffer);
                         Log.i(TAG, "audio_play:PROPERTY_OUTPUT_FRAMES_PER_BUFFER=" + framesPerBufferInt);
                     }
@@ -258,9 +129,6 @@ public class AudioReceiver extends Thread
                 }
 
                 NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count);
-
-                //int res = NativeAudio.PlayPCM16(1);
-                //Log.i(TAG, "audio_play:NativeAudio Play:res=" + res);
             }
         }
         catch (Exception e)
