@@ -409,12 +409,22 @@ public class ConferenceAudioActivity extends AppCompatActivity
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         try
         {
+            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             manager.setSpeakerphoneOn(true);
             Callstate.audio_speaker = true;
         }
         catch (Exception ee)
         {
             ee.printStackTrace();
+        }
+
+        try
+        {
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
         }
 
         try

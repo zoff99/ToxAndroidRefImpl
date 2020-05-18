@@ -282,13 +282,22 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         try
         {
             //**//manager.setMode(AudioManager.MODE_NORMAL);
-            // manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             manager.setSpeakerphoneOn(true);
             Callstate.audio_speaker = true;
         }
         catch (Exception ee)
         {
             ee.printStackTrace();
+        }
+
+        try
+        {
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
         }
 
         // Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
@@ -1907,7 +1916,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     try
                     {
                         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                        audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                        //////+++++++/////audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
                         // audioManager.setMode(AudioManager.MODE_IN_CALL);
                         // audioManager.setMode(AudioManager.MODE_NORMAL);
                         // audio_manager_s.setMode(AudioManager.MODE_NORMAL);
@@ -1998,7 +2007,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     try
                     {
-                        audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+                        //////+++++++/////audio_manager_s.setMode(AudioManager.MODE_NORMAL);
                         // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
                         Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_NORMAL)"); //$NON-NLS-1$
                     }
