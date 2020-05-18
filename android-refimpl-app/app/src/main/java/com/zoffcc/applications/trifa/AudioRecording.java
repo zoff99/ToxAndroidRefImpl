@@ -19,12 +19,8 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
-import android.media.audiofx.AcousticEchoCanceler;
-import android.media.audiofx.AutomaticGainControl;
-import android.media.audiofx.NoiseSuppressor;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -65,16 +61,9 @@ public class AudioRecording extends Thread
 
     // the audio recording options
     static int RECORDING_RATE = 48000; // 16000; // 44100;
-    static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-    static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     static final int CHANNELS_TOX = 1;
     public static long SMAPLINGRATE_TOX = 48000; // 16000;
-    static boolean soft_echo_canceller_ready = false;
     final static int milliseconds_audio_samples_max = 120;
-    static int audio_session_id = -1;
-    AutomaticGainControl agc = null;
-    AcousticEchoCanceler aec = null;
-    NoiseSuppressor np = null;
     public static boolean microphone_muted = false;
     static final boolean DEBUG_MIC_DATA_LOGGING = false;
     static boolean audio_engine_starting = false;
@@ -82,11 +71,6 @@ public class AudioRecording extends Thread
 
     // -----------------------
     static ByteBuffer _recBuffer = null;
-    private static byte[] _tempBufRec = null;
-    // private int _bufferedRecSamples = 0;
-    private int buffer_mem_factor = 30;
-    private int buf_multiplier = 5;
-    private boolean android_M_bug = false;
     // -----------------------
 
     /**
@@ -94,16 +78,12 @@ public class AudioRecording extends Thread
      */
     public AudioRecording()
     {
-
-        // AcousticEchoCanceler
-        // AutomaticGainControl
-        // LoudnessEnhancer
-
         stopped = false;
         finished = false;
 
         audio_manager_s.setMicrophoneMute(false);
         audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
+        // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
         start();
     }
 
@@ -274,75 +254,6 @@ public class AudioRecording extends Thread
     {
         stopped = true;
     }
-
-    public static class send_audio_frame_to_toxcore extends AsyncTask<Void, Void, String>
-    {
-        int audio_send_res = 0;
-        int readBytes_ = 1;
-
-        send_audio_frame_to_toxcore(int readBytes)
-        {
-            readBytes_ = readBytes;
-        }
-
-        @Override
-        protected String doInBackground(Void... voids)
-        {
-            try
-            {
-                Thread.currentThread().setName("t_snd_a_out");
-            }
-            catch (Exception e)
-            {
-            }
-
-            try
-            {
-                if (native_audio_engine_down == false)
-                {
-                    _recBuffer.rewind();
-                    _recBuffer.put(_tempBufRec);
-                    // Log.i(TAG, "toxav_audio_send_frame:001");
-                    if (Callstate.audio_group_active)
-                    {
-
-                    }
-                    else
-                    {
-                        audio_send_res = toxav_audio_send_frame(
-                            tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (readBytes_ / 2),
-                            CHANNELS_TOX, SMAPLINGRATE_TOX);
-                        if (audio_send_res != 0)
-                        {
-                            Log.i(TAG, "audio:res=" + audio_send_res + ":" +
-                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "audio:EE6:" + e.getMessage());
-                Log.i(TAG,
-                      "audio:EE7:" + _recBuffer.limit() + ":" + _recBuffer.capacity() + " <-> " + _tempBufRec.length +
-                      " <-> " + readBytes_);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-        }
-    }
-
 
     public static class send_audio_frame_to_toxcore_from_native extends AsyncTask<Void, Void, String>
     {
@@ -576,46 +487,5 @@ public class AudioRecording extends Thread
         protected void onPreExecute()
         {
         }
-    }
-
-
-    /*
-     * thanks to: http://stackoverflow.com/questions/8043387/android-audiorecord-supported-sampling-rates
-     */
-    int getMinSupportedSampleRate(int min_rate)
-    {
-        /*
-         * Valid Audio Sample rates
-         *
-         * @see <a
-         * href="http://en.wikipedia.org/wiki/Sampling_%28signal_processing%29"
-         * >Wikipedia</a>
-         */
-        int validSampleRates[];
-        validSampleRates = new int[]{8000, 16000, 22050,
-            //
-            32000, 37800, 44056, 44100, 47250, 48000, 50000, 50400,
-            //
-            88200, 96000, 176400, 192000, 352800, 2822400, 5644800};
-        /*
-         * Selecting default audio input source for recording since
-         * AudioFormat.CHANNEL_CONFIGURATION_DEFAULT is deprecated and selecting
-         * default encoding format.
-         */
-        for (int i = 0; i < validSampleRates.length; i++)
-        {
-            if (validSampleRates[i] >= min_rate)
-            {
-                int result = AudioRecord.getMinBufferSize(validSampleRates[i], CHANNEL, FORMAT);
-                if (result != AudioRecord.ERROR && result != AudioRecord.ERROR_BAD_VALUE && result > 0)
-                {
-                    // return the mininum supported audio sample rate
-                    return validSampleRates[i];
-                }
-            }
-        }
-        // If none of the sample rates are supported return -1 handle it in
-        // calling method
-        return -1;
     }
 }
