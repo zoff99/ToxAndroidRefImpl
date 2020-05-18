@@ -99,7 +99,6 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.MainActivity.tox_util_friend_resend_message_v2;
-import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP2;
@@ -127,7 +126,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_o
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 
 public class TrifaToxService extends Service
@@ -172,28 +170,63 @@ public class TrifaToxService extends Service
     {
         Log.i(TAG, "change_notification_fg");
 
-        NotificationCompat.Builder b;
+        NotificationCompat.Builder b = null;
+        Notification.Builder b_new = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
-            b = new NotificationCompat.Builder(this, MainActivity.channelId_toxservice);
+            Log.i(TAG, "change_notification_fg:SDK:" + android.os.Build.VERSION.SDK_INT + " -> O:" +
+                       android.os.Build.VERSION_CODES.O);
+            b_new = new Notification.Builder(this, MainActivity.channelId_toxservice);
+            b = null;
         }
         else
         {
+            b_new = null;
             b = new NotificationCompat.Builder(this);
         }
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        b.setOnlyAlertOnce(false);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            b_new.setOnlyAlertOnce(false);
+            try
+            {
+                b_new.setSound(null, null);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            b.setOnlyAlertOnce(false);
+        }
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         if (bootstrapping)
         {
             Log.i(TAG, "change_notification_fg:bootstrapping=true");
             notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
-            b.setSmallIcon(R.drawable.circle_orange_notification);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+            {
+                b_new.setSmallIcon(R.drawable.circle_orange_notification);
+            }
+            else
+            {
+                b.setSmallIcon(R.drawable.circle_orange_notification);
+            }
+
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             {
-                b.setColor(Color.parseColor("#ffce00"));
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                {
+                    b_new.setColor(Color.parseColor("#ffce00"));
+                }
+                else
+                {
+                    b.setColor(Color.parseColor("#ffce00"));
+                }
             }
             notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping" + " " + message);
         }
@@ -204,10 +237,25 @@ public class TrifaToxService extends Service
             if (a_TOXCONNECTION == 0)
             {
                 notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-                b.setSmallIcon(R.drawable.circle_red_notification);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                {
+                    b_new.setSmallIcon(R.drawable.circle_red_notification);
+                }
+                else
+                {
+                    b.setSmallIcon(R.drawable.circle_red_notification);
+                }
+
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 {
-                    b.setColor(Color.parseColor("#ff0000"));
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                    {
+                        b_new.setColor(Color.parseColor("#ff0000"));
+                    }
+                    else
+                    {
+                        b.setColor(Color.parseColor("#ff0000"));
+                    }
                 }
                 notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE" + " " + message);
             }
@@ -216,10 +264,24 @@ public class TrifaToxService extends Service
                 if (a_TOXCONNECTION == 1)
                 {
                     notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    b.setSmallIcon(R.drawable.circle_green_notification);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                    {
+                        b_new.setSmallIcon(R.drawable.circle_green_notification);
+                    }
+                    else
+                    {
+                        b.setSmallIcon(R.drawable.circle_green_notification);
+                    }
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     {
-                        b.setColor(Color.parseColor("#04b431"));
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                        {
+                            b_new.setColor(Color.parseColor("#04b431"));
+                        }
+                        else
+                        {
+                            b.setColor(Color.parseColor("#04b431"));
+                        }
                     }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]" + " " + message);
                     // get_network_connections();
@@ -227,10 +289,24 @@ public class TrifaToxService extends Service
                 else // if (a_TOXCONNECTION__f == 2)
                 {
                     notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    b.setSmallIcon(R.drawable.circle_green_notification);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                    {
+                        b_new.setSmallIcon(R.drawable.circle_green_notification);
+                    }
+                    else
+                    {
+                        b.setSmallIcon(R.drawable.circle_green_notification);
+                    }
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     {
-                        b.setColor(Color.parseColor("#04b431"));
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                        {
+                            b_new.setColor(Color.parseColor("#04b431"));
+                        }
+                        else
+                        {
+                            b.setColor(Color.parseColor("#04b431"));
+                        }
                     }
                     notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]" + " " + message);
                     // get_network_connections();
@@ -239,9 +315,18 @@ public class TrifaToxService extends Service
         }
         notification_view.setTextViewText(R.id.text, "");
 
-        b.setContentIntent(pendingIntent);
-        b.setContent(notification_view);
-        notification2 = b.build();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            b_new.setContentIntent(pendingIntent);
+            b_new.setContent(notification_view);
+            notification2 = b_new.build();
+        }
+        else
+        {
+            b.setContentIntent(pendingIntent);
+            b.setContent(notification_view);
+            notification2 = b.build();
+        }
         nmn2.notify(ONGOING_NOTIFICATION_ID, notification2);
     }
 
@@ -1702,25 +1787,51 @@ public class TrifaToxService extends Service
         notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
         notification_view.setTextViewText(R.id.text, "");
 
-        NotificationCompat.Builder b;
+        NotificationCompat.Builder b = null;
+        Notification.Builder b_new = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
-            b = new NotificationCompat.Builder(this, MainActivity.channelId_toxservice);
+            b_new = new Notification.Builder(this, MainActivity.channelId_toxservice);
+            b = null;
         }
         else
         {
+            b_new = null;
             b = new NotificationCompat.Builder(this);
         }
-        b.setContent(notification_view);
-        b.setOnlyAlertOnce(false);
-        b.setContentIntent(pendingIntent);
-        b.setSmallIcon(R.drawable.circle_red_notification);
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            b.setColor(Color.parseColor("#ff0000"));
-        }
 
-        notification2 = b.build();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            b_new.setContent(notification_view);
+            b_new.setOnlyAlertOnce(false);
+            try
+            {
+                b_new.setSound(null, null);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            b_new.setContentIntent(pendingIntent);
+            b_new.setSmallIcon(R.drawable.circle_red_notification);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            {
+                b_new.setColor(Color.parseColor("#ff0000"));
+            }
+            notification2 = b_new.build();
+        }
+        else
+        {
+            b.setContent(notification_view);
+            b.setOnlyAlertOnce(false);
+            b.setContentIntent(pendingIntent);
+            b.setSmallIcon(R.drawable.circle_red_notification);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            {
+                b.setColor(Color.parseColor("#ff0000"));
+            }
+            notification2 = b.build();
+        }
         // -- notification ------------------
         // -- notification ------------------
 
