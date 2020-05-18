@@ -39,6 +39,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_rec_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.semaphore_audioprocessing_02;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
@@ -47,6 +48,7 @@ import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
+import static com.zoffcc.applications.trifa.MainActivity.PREF_MicGainFactor;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
@@ -229,6 +231,8 @@ public class AudioRecording extends Thread
         if (PREF__use_native_audio_play)
         {
             Log.i(TAG, "audio_rec:StartREC:001");
+            Log.i(TAG, "PREF_MicGainFactor=" + PREF_MicGainFactor);
+            setMicGainFactor(PREF_MicGainFactor);
             NativeAudio.StartREC();
             Log.i(TAG, "audio_rec:StartREC:002");
 

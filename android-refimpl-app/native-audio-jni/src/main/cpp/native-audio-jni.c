@@ -134,6 +134,7 @@ int num_rec_bufs = 3; // BAD: !!! always keep in sync with NavitAudio.java `publ
 #define _RECORDING 3
 int rec_state = _STOPPED;
 #define RECORD_BUFFERS_BETWEEN_REC_AND_PROCESS 2
+float wanted_mic_gain = 1.0f;
 
 jclass NativeAudio_class = NULL;
 jmethodID rec_buffer_ready_method = NULL;
@@ -263,8 +264,6 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:A005:Enqueue -> %d, nextSize=%d", rec_buf_pointer_next, (int)nextSize);
 #endif
 
-        audio_in_vu_value = audio_vu((int16_t *) nextBuffer, (uint32_t) (nextSize / 2));
-
         SLresult result = (*bq)->Enqueue(bq, nextBuffer, (SLuint32) nextSize);
         if (result != SL_RESULT_SUCCESS)
         {
@@ -285,6 +284,36 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         // signal Java code that a new record data is available in buffer #cur_rec_buf
         if ((NativeAudio_class) && (rec_buffer_ready_method))
         {
+            // TODO: make this better? faster?
+            // --------------------------------------------------
+            // increase GAIN manually and rather slow:
+            int16_t *this_buffer_pcm16 = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
+            int this_buffer_size_pcm16 = audio_rec_buffer_size[rec_buf_pointer_start] / 2;
+            int loop = 0;
+            int32_t temp = 0;
+            for (loop = 0; loop < this_buffer_size_pcm16; loop++)
+            {
+                temp = (int16_t) (*this_buffer_pcm16) * wanted_mic_gain;
+                if (temp > INT16_MAX)
+                {
+                    temp = INT16_MAX;
+                }
+                else if (temp < INT16_MIN)
+                {
+                    temp = INT16_MIN;
+                }
+
+                // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "gain:old=%d new=%d",
+                //                     (*this_buffer_pcm16), (int16_t) temp);
+                *this_buffer_pcm16 = (int16_t) temp;
+                this_buffer_pcm16++;
+            }
+            // --------------------------------------------------
+
+            this_buffer_pcm16 = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
+            audio_in_vu_value = audio_vu(this_buffer_pcm16,
+                                         (uint32_t) (this_buffer_size_pcm16 / 2));
+
             // TODO: rewerite this, so that it does not need to call "AttachCurrentThread" and "DetachCurrentThread"
             //       every time!
             JNIEnv *jnienv2;
@@ -987,6 +1016,18 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1rec_1buffe
     audio_rec_buffer_size[num] = (long) capacity;
 }
 
+
+void
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_setMicGainFactor(JNIEnv *env, jclass clazz,
+                                                                      jfloat gain_factor)
+{
+    if (((float) gain_factor >= 1.0f) && ((float) gain_factor <= 15.0f))
+    {
+        wanted_mic_gain = (float) gain_factor;
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "setMicGainFactor:%f",
+                            (double) wanted_mic_gain);
+    }
+}
 
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isRecording(JNIEnv *env, jclass clazz)
 {

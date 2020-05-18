@@ -145,6 +145,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
@@ -381,6 +382,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_audio_rec_effects = false;
     static boolean PREF__window_security = false;
     static int PREF__X_eac_delay_ms = 60;
+    public static float PREF_MicGainFactor = 1.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int FRAME_SIZE_FIXED = 20;
@@ -449,6 +451,7 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "onCreate");
 
+        Log.d(TAG, "Lingver_Locale: " + Lingver.getInstance().getLocale());
         Log.d(TAG, "Lingver_Language: " + Lingver.getInstance().getLanguage());
         // Log.d(TAG, "Actual_Language: " + resources.configuration.getLocaleCompat());
 
@@ -1998,6 +2001,18 @@ public class MainActivity extends AppCompatActivity
             PREF__X_eac_delay_ms = 60;
             e.printStackTrace();
         }
+
+        try
+        {
+            PREF_MicGainFactor = Float.parseFloat(settings.getString("MicGainFactor", "1.0"));
+        }
+        catch (Exception e)
+        {
+            PREF_MicGainFactor = 1.0f;
+            e.printStackTrace();
+        }
+
+        PREF_MicGainFactor = 5.0f;
 
         set_audio_frame_duration_ms(PREF__X_eac_delay_ms);
 
