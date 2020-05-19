@@ -60,6 +60,7 @@ public class WakeupAlarmReceiver extends BroadcastReceiver
 
                     if (trifa_service_thread != null)
                     {
+                        TrifaToxService.need_wakeup_now = true;
                         trifa_service_thread.interrupt();
                         TrifaToxService.write_debug_file("AlarmReceiver_interrupt");
                     }
