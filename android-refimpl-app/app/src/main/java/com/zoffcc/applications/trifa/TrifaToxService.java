@@ -145,6 +145,7 @@ public class TrifaToxService extends Service
     static Thread trifa_service_thread = null;
     static long last_resend_pending_messages_ms = -1;
     static long last_resend_pending_messages2_ms = -1;
+    static boolean need_wakeup_now = false;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -645,6 +646,149 @@ public class TrifaToxService extends Service
         Log.i(TAG, "stop_tox_fg:099");
     }
 
+    void load_and_add_all_friends()
+    {
+        // --- load and update all friends ---
+        MainActivity.friends = MainActivity.tox_self_get_friend_list();
+        Log.i(TAG, "loading_friend:number_of_friends=" + MainActivity.friends.length);
+
+        int fc = 0;
+        boolean exists_in_db = false;
+        //                try
+        //                {
+        //                    MainActivity.friend_list_fragment.clear_friends();
+        //                }
+        //                catch (Exception e)
+        //                {
+        //                }
+
+        for (fc = 0; fc < MainActivity.friends.length; fc++)
+        {
+            // Log.i(TAG, "loading_friend:" + fc + " friendnum=" + MainActivity.friends[fc]);
+            // Log.i(TAG, "loading_friend:" + fc + " pubkey=" + tox_friend_get_public_key__wrapper(MainActivity.friends[fc]));
+
+            FriendList f;
+            List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
+                tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+
+            // Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
+
+            if (fl.size() > 0)
+            {
+                f = fl.get(0);
+                // Log.i(TAG, "loading_friend:" + fc + " db entry=" + f);
+            }
+            else
+            {
+                f = null;
+            }
+
+            if (f == null)
+            {
+                Log.i(TAG, "loading_friend:c is null");
+
+                f = new FriendList();
+                f.tox_public_key_string = "" + (long) ((Math.random() * 10000000d));
+                try
+                {
+                    f.tox_public_key_string = tox_friend_get_public_key__wrapper(MainActivity.friends[fc]);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                f.name = "friend #" + fc;
+                exists_in_db = false;
+                // Log.i(TAG, "loading_friend:c is null fnew=" + f);
+            }
+            else
+            {
+                // Log.i(TAG, "loading_friend:found friend in DB " + f.tox_public_key_string + " f=" + f);
+                exists_in_db = true;
+            }
+
+            try
+            {
+                // get the real "live" connection status of this friend
+                // the value in the database may be old (and wrong)
+                int status_new = tox_friend_get_connection_status(MainActivity.friends[fc]);
+                int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
+                f.TOX_CONNECTION = combined_connection_status_;
+                f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            // ----- would be double in list -----
+            // ----- would be double in list -----
+            // ----- would be double in list -----
+            //                    if (MainActivity.friend_list_fragment != null)
+            //                    {
+            //                        try
+            //                        {
+            //                            MainActivity.friend_list_fragment.add_friends(f);
+            //                        }
+            //                        catch (Exception e)
+            //                        {
+            //                        }
+            //                    }
+            // ----- would be double in list -----
+            // ----- would be double in list -----
+            // ----- would be double in list -----
+
+            if (exists_in_db == false)
+            {
+                // Log.i(TAG, "loading_friend:1:insertIntoFriendList:" + " f=" + f);
+                orma.insertIntoFriendList(f);
+                // Log.i(TAG, "loading_friend:2:insertIntoFriendList:" + " f=" + f);
+            }
+            else
+            {
+                // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
+                orma.updateFriendList().tox_public_key_stringEq(
+                    tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(
+                    f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_CONNECTION_on_off(
+                    get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
+                // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
+            }
+
+            FriendList f_check;
+            List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(
+                tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+            // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
+            try
+            {
+                // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
+
+                try
+                {
+                    if (MainActivity.friend_list_fragment != null)
+                    {
+                        // reload friend in friendlist
+                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                        cc.is_friend = true;
+                        cc.friend_item = fl_check.get(0);
+                        MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "loading_friend:check:EE:" + e.getMessage());
+            }
+        }
+        // --- load and update all friends ---
+    }
+
     void load_and_add_all_conferences()
     {
         long num_conferences = tox_conference_get_chatlist_size();
@@ -700,7 +844,6 @@ public class TrifaToxService extends Service
 
             }
         }
-
     }
 
     static void write_debug_file(String filename)
@@ -861,160 +1004,7 @@ public class TrifaToxService extends Service
 
                 MainActivity.update_savedata_file_wrapper();
 
-                // TODO --------
-
-                MainActivity.friends = MainActivity.tox_self_get_friend_list();
-                Log.i(TAG, "loading_friend:number_of_friends=" + MainActivity.friends.length);
-
-                int fc = 0;
-                boolean exists_in_db = false;
-                //                try
-                //                {
-                //                    MainActivity.friend_list_fragment.clear_friends();
-                //                }
-                //                catch (Exception e)
-                //                {
-                //                }
-
-                for (fc = 0; fc < MainActivity.friends.length; fc++)
-                {
-                    // Log.i(TAG, "loading_friend:" + fc + " friendnum=" + MainActivity.friends[fc]);
-                    // Log.i(TAG, "loading_friend:" + fc + " pubkey=" + tox_friend_get_public_key__wrapper(MainActivity.friends[fc]));
-
-                    FriendList f;
-                    List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
-                        tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
-
-                    // Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
-
-                    if (fl.size() > 0)
-                    {
-                        f = fl.get(0);
-                        // Log.i(TAG, "loading_friend:" + fc + " db entry=" + f);
-                    }
-                    else
-                    {
-                        f = null;
-                    }
-
-                    if (f == null)
-                    {
-                        Log.i(TAG, "loading_friend:c is null");
-
-                        f = new FriendList();
-                        f.tox_public_key_string = "" + (long) ((Math.random() * 10000000d));
-                        try
-                        {
-                            f.tox_public_key_string = tox_friend_get_public_key__wrapper(MainActivity.friends[fc]);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        f.name = "friend #" + fc;
-                        exists_in_db = false;
-                        // Log.i(TAG, "loading_friend:c is null fnew=" + f);
-                    }
-                    else
-                    {
-                        // Log.i(TAG, "loading_friend:found friend in DB " + f.tox_public_key_string + " f=" + f);
-                        exists_in_db = true;
-                    }
-
-                    try
-                    {
-                        // get the real "live" connection status of this friend
-                        // the value in the database may be old (and wrong)
-                        int status_new = tox_friend_get_connection_status(MainActivity.friends[fc]);
-                        int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string,
-                                                                                         status_new);
-                        f.TOX_CONNECTION = combined_connection_status_;
-                        f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    // ----- would be double in list -----
-                    // ----- would be double in list -----
-                    // ----- would be double in list -----
-                    //                    if (MainActivity.friend_list_fragment != null)
-                    //                    {
-                    //                        try
-                    //                        {
-                    //                            MainActivity.friend_list_fragment.add_friends(f);
-                    //                        }
-                    //                        catch (Exception e)
-                    //                        {
-                    //                        }
-                    //                    }
-                    // ----- would be double in list -----
-                    // ----- would be double in list -----
-                    // ----- would be double in list -----
-
-                    if (exists_in_db == false)
-                    {
-                        // Log.i(TAG, "loading_friend:1:insertIntoFriendList:" + " f=" + f);
-                        orma.insertIntoFriendList(f);
-                        // Log.i(TAG, "loading_friend:2:insertIntoFriendList:" + " f=" + f);
-                    }
-                    else
-                    {
-                        // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
-                        orma.updateFriendList().tox_public_key_stringEq(
-                            tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(
-                            f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_CONNECTION_on_off(
-                            get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
-                        // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
-                    }
-
-                    FriendList f_check;
-                    List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(
-                        tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
-                    // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
-                    try
-                    {
-                        // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
-
-                        try
-                        {
-                            if (MainActivity.friend_list_fragment != null)
-                            {
-                                // reload friend in friendlist
-                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                                cc.is_friend = true;
-                                cc.friend_item = fl_check.get(0);
-                                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-
-
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "loading_friend:check:EE:" + e.getMessage());
-                    }
-
-                }
-
-                //                try
-                //                {
-                //                    if (MainActivity.friend_list_fragment != null)
-                //                    {
-                //                        // reload friendlist
-                //                        MainActivity.friend_list_fragment.add_all_friends_clear(50);
-                //                    }
-                //                }
-                //                catch (Exception e)
-                //                {
-                //                    e.printStackTrace();
-                //                }
+                load_and_add_all_friends();
 
                 // --------------- bootstrap ---------------
                 // --------------- bootstrap ---------------
@@ -1117,10 +1107,24 @@ public class TrifaToxService extends Service
                         {
                             if (PREF__X_battery_saving_mode)
                             {
+                                //Log.i(TAG,
+                                //      "BATTERY_OPTIMIZATION:global_showing_messageview=" + global_showing_messageview +
+                                //      " global_showing_anygroupview=" + global_showing_anygroupview +
+                                //      " Callstate.state=" + Callstate.state + " Callstate.audio_group_active=" +
+                                //      Callstate.audio_group_active + " global_self_connection_status=" +
+                                //      global_self_connection_status);
+
                                 if ((global_self_connection_status != TOX_CONNECTION_NONE.value) &&
                                     (!global_showing_messageview) && (!global_showing_anygroupview) &&
                                     (Callstate.state == 0) && (!Callstate.audio_group_active))
                                 {
+                                    //Log.i(TAG, "BATTERY_OPTIMIZATION:global_self_last_went_online_timestamp=" +
+                                    //           global_self_last_went_online_timestamp +
+                                    //           " global_last_activity_for_battery_savings_ts=" +
+                                    //           global_last_activity_for_battery_savings_ts +
+                                    //           " System.currentTimeMillis()=" + System.currentTimeMillis() +
+                                    //           " global_self_connection_status=" + global_self_connection_status);
+
                                     if ((global_self_last_went_online_timestamp +
                                          SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
                                         System.currentTimeMillis())
@@ -1129,6 +1133,8 @@ public class TrifaToxService extends Service
                                              SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
                                             System.currentTimeMillis())
                                         {
+                                            need_wakeup_now = false;
+
                                             // set the used value to the new value
                                             BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS =
                                                 PREF__X_battery_saving_timeout * 1000 * 60;
@@ -1222,8 +1228,15 @@ public class TrifaToxService extends Service
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
                                                                    long_date_time_format_or_empty(
                                                                        global_self_last_entered_battery_saving_timestamp)); // set to offline
-                                            set_all_friends_offline();
-                                            set_all_conferences_inactive();
+
+                                            if (!need_wakeup_now)
+                                            {
+                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                                {
+                                                    set_all_friends_offline();
+                                                    set_all_conferences_inactive();
+                                                }
+                                            }
                                             // so that the app knows we went offline
                                             global_self_last_went_offline_timestamp = System.currentTimeMillis();
                                             global_self_connection_status = TOX_CONNECTION_NONE.value;
@@ -1231,12 +1244,18 @@ public class TrifaToxService extends Service
                                             // --------------- set everything to offline ---------------
                                             // --------------- set everything to offline ---------------
 
-                                            try
+                                            if (!need_wakeup_now)
                                             {
-                                                Thread.sleep(30 * 1000);
-                                            }
-                                            catch (Exception es)
-                                            {
+                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                                {
+                                                    try
+                                                    {
+                                                        Thread.sleep(30 * 1000);
+                                                    }
+                                                    catch (Exception es)
+                                                    {
+                                                    }
+                                                }
                                             }
                                             MainActivity.tox_iterate();
 
@@ -1250,8 +1269,15 @@ public class TrifaToxService extends Service
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
                                                                    long_date_time_format_or_empty(
                                                                        global_self_last_entered_battery_saving_timestamp)); // set to offline
-                                            set_all_friends_offline();
-                                            set_all_conferences_inactive();
+
+                                            if (!need_wakeup_now)
+                                            {
+                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                                {
+                                                    set_all_friends_offline();
+                                                    set_all_conferences_inactive();
+                                                }
+                                            }
                                             // so that the app knows we went offline
                                             global_self_connection_status = TOX_CONNECTION_NONE.value;
                                             // --------------- set everything to offline ---------------
@@ -1260,12 +1286,18 @@ public class TrifaToxService extends Service
 
                                             Log.i(TAG, "entering BATTERY SAVINGS MODE ... 30s");
 
-                                            try
+                                            if (!need_wakeup_now)
                                             {
-                                                Thread.sleep(30 * 1000);
-                                            }
-                                            catch (Exception es)
-                                            {
+                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                                {
+                                                    try
+                                                    {
+                                                        Thread.sleep(30 * 1000);
+                                                    }
+                                                    catch (Exception es)
+                                                    {
+                                                    }
+                                                }
                                             }
                                             MainActivity.tox_iterate();
 
@@ -1281,8 +1313,15 @@ public class TrifaToxService extends Service
                                                                    BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
                                                                    long_date_time_format_or_empty(
                                                                        global_self_last_entered_battery_saving_timestamp)); // set to offline
-                                            set_all_friends_offline();
-                                            set_all_conferences_inactive();
+
+                                            if (!need_wakeup_now)
+                                            {
+                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                                {
+                                                    set_all_friends_offline();
+                                                    set_all_conferences_inactive();
+                                                }
+                                            }
                                             // so that the app knows we went offline
                                             global_self_last_went_offline_timestamp = System.currentTimeMillis();
                                             global_self_connection_status = TOX_CONNECTION_NONE.value;
@@ -1311,6 +1350,11 @@ public class TrifaToxService extends Service
                                                     break;
                                                 }
 
+                                                if (need_wakeup_now)
+                                                {
+                                                    break;
+                                                }
+
                                                 try
                                                 {
                                                     Thread.sleep(10 * 1000); // sleep very long!!
@@ -1330,8 +1374,11 @@ public class TrifaToxService extends Service
                                             TrifaToxService.write_debug_file(
                                                 "BATTERY_SAVINGS_MODE__finish__connecting");
 
+                                            // update all friends again
+                                            load_and_add_all_friends();
                                             // load conferences again
                                             load_and_add_all_conferences();
+                                            Log.i(TAG, "BATTERY SAVINGS MODE, load_and_add_all_conferences");
 
                                             // iterate a few times ---------------------
                                             MainActivity.tox_iterate();
@@ -1360,14 +1407,17 @@ public class TrifaToxService extends Service
                                             }
                                             // iterate a few times ---------------------
 
+                                            need_wakeup_now = false;
                                             trifa_service_thread = null;
 
                                             // bootstrap_single_wrapper("127.3.2.1",9988, "AAA236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9FFF");
+
                                             int TOX_CONNECTION_a = tox_self_get_connection_status();
                                             if (TOX_CONNECTION_a == TOX_CONNECTION_NONE.value)
                                             {
                                                 bootstrapping = true;
                                                 global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                                                Log.i(TAG, "BATTERY SAVINGS MODE, bootstrapping");
                                                 change_notification(TOX_CONNECTION_a,
                                                                     ""); // set to real connection status
                                                 bootstrap_me();
@@ -1381,6 +1431,8 @@ public class TrifaToxService extends Service
                                                 global_self_last_went_offline_timestamp = -1;
                                                 change_notification(TOX_CONNECTION_a,
                                                                     ""); // set to real connection status
+                                                Log.i(TAG, "BATTERY SAVINGS MODE, already_online");
+
                                                 TrifaToxService.write_debug_file(
                                                     "BATTERY_SAVINGS_MODE__finish__already_online");
                                             }
@@ -1404,6 +1456,8 @@ public class TrifaToxService extends Service
                                                        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
                                                        " PREF__X_battery_saving_timeout:" +
                                                        PREF__X_battery_saving_timeout);
+
+                                            // global_self_connection_status = tox_self_get_connection_status();
 
                                         }
                                         else
@@ -1929,6 +1983,26 @@ public class TrifaToxService extends Service
         // ----- TCP mobile ------
         // Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("127.0.0.1", 33447, "252E6D7F8168682363BC473C3951357FB2E28BC9A7B7E1F4CB3B302DC331BDAA".substring(0, (TOX_PUBLIC_KEY_SIZE * 2) - 0)));
         // ----- TCP mobile ------
+    }
+
+    static void wakeup_tox_thread()
+    {
+        // This will wakeup the tox_iterate() thread and go online as quick as possible
+        // only useful if in Batterysavings-Mode
+        try
+        {
+            if (trifa_service_thread != null)
+            {
+                Log.i(TAG, "wakeup_tox_thread");
+                TrifaToxService.need_wakeup_now = true;
+                trifa_service_thread.interrupt();
+                Log.i(TAG, "wakeup_tox_thread:DONE");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
