@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.drawableToBitmap;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
+import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
 public class GroupAudioService extends Service
 {
@@ -210,6 +211,8 @@ public class GroupAudioService extends Service
                 // ------------- START Audio playing -------------
 
                 activity_state = 1;
+
+                wakeup_tox_thread();
 
                 try
                 {

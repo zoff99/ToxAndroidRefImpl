@@ -77,6 +77,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_fo
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
 public class ConferenceMessageListActivity extends AppCompatActivity
 {
@@ -260,6 +261,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             {
                 final String f_name = HelperConference.get_conference_title_from_confid(conf_id);
                 final long conference_num = tox_conference_by_confid__wrapper(conf_id);
+                // Log.i(TAG, "set_peer_count_header:1:conf_id=" + conf_id + " conference_num=" + conference_num);
 
                 Runnable myRunnable = new Runnable()
                 {
@@ -270,6 +272,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                         {
                             long peer_count = tox_conference_peer_count(conference_num);
                             long frozen_peer_count = tox_conference_offline_peer_count(conference_num);
+                            // Log.i(TAG, "set_peer_count_header:2:conf_id=" + conf_id + " conference_num=" + conference_num);
 
                             if (peer_count > -1)
                             {
@@ -378,6 +381,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         }
 
         MainActivity.conference_message_list_activity = this;
+        wakeup_tox_thread();
     }
 
     private void setUpEmojiPopup()

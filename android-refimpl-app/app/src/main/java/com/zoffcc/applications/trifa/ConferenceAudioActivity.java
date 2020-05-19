@@ -83,6 +83,7 @@ import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
 public class ConferenceAudioActivity extends AppCompatActivity
 {
@@ -554,6 +555,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         activity_state = 1;
         push_to_talk_active = false;
+
+        wakeup_tox_thread();
 
         if (Build.VERSION.SDK_INT >= 27)
         {
