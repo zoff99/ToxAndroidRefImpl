@@ -26,6 +26,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothHeadset;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -403,8 +404,12 @@ public class MainActivity extends AppCompatActivity
     static PackageInfo packageInfo_s = null;
     IntentFilter receiverFilter1 = null;
     IntentFilter receiverFilter2 = null;
+    IntentFilter receiverFilter3 = null;
+    IntentFilter receiverFilter4 = null;
     static HeadsetStateReceiver receiver1 = null;
     static HeadsetStateReceiver receiver2 = null;
+    static HeadsetStateReceiver receiver3 = null;
+    static HeadsetStateReceiver receiver4 = null;
     static TextView waiting_view = null;
     static ProgressBar waiting_image = null;
     static ViewGroup normal_container = null;
@@ -1439,6 +1444,15 @@ public class MainActivity extends AppCompatActivity
         receiverFilter2 = new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
         receiver2 = new HeadsetStateReceiver();
         registerReceiver(receiver2, receiverFilter2);
+        // --
+        receiverFilter3 = new IntentFilter(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
+        receiver3 = new HeadsetStateReceiver();
+        registerReceiver(receiver3, receiverFilter3);
+        // --
+        receiverFilter4 = new IntentFilter(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
+        receiver4 = new HeadsetStateReceiver();
+        registerReceiver(receiver4, receiverFilter4);
+        // --
         MainActivity.set_av_call_status(Callstate.state);
     }
 

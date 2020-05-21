@@ -62,6 +62,7 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
+import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
@@ -432,14 +433,22 @@ public class ConferenceAudioActivity extends AppCompatActivity
         {
             if (dha._Detect())
             {
-                // headset plugged in
-                Log.i(TAG, "onReceive:headset:plugged in"); //$NON-NLS-1$
-                manager.setSpeakerphoneOn(false);
-                manager.setWiredHeadsetOn(true);
-                Callstate.audio_device = 1;
-                Callstate.audio_speaker = false;
-                update_group_audio_device_icon();
-                manager.setBluetoothScoOn(false);
+                if (isBluetoothConnected())
+                {
+                    Log.i(TAG, "startBluetoothSco");
+                    manager.startBluetoothSco();
+                }
+                else
+                {
+                    // headset plugged in
+                    Log.i(TAG, "onReceive:headset:plugged in"); //$NON-NLS-1$
+                    manager.setSpeakerphoneOn(false);
+                    manager.setWiredHeadsetOn(true);
+                    Callstate.audio_device = 1;
+                    Callstate.audio_speaker = false;
+                    update_group_audio_device_icon();
+                    manager.setBluetoothScoOn(false);
+                }
             }
             else
             {
