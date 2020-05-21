@@ -660,8 +660,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
-
+        // toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
 
         Group_audio_play_thread = new Thread()
         {
@@ -679,6 +678,17 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 {
                     e.printStackTrace();
                 }
+
+                try
+                {
+                    // wait for conference to be available in DB to lookup current conf num
+                    Thread.sleep(500);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
 
                 try
                 {
@@ -1042,6 +1052,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
             {
                 final String f_name = HelperConference.get_conference_title_from_confid(conf_id);
                 final long conference_num = tox_conference_by_confid__wrapper(conf_id);
+                // Log.i(TAG, "set_peer_count_header:1:conf_id=" + conf_id + " conference_num=" + conference_num);
 
                 Runnable myRunnable = new Runnable()
                 {
@@ -1052,6 +1063,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                         {
                             long peer_count = tox_conference_peer_count(conference_num);
                             long frozen_peer_count = tox_conference_offline_peer_count(conference_num);
+                            // Log.i(TAG, "set_peer_count_header:2:conf_id=" + conf_id + " conference_num=" + conference_num);
 
                             if (peer_count > -1)
                             {
