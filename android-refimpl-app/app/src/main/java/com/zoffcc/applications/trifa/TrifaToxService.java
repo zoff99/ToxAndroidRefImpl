@@ -70,6 +70,7 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.change_notification;
+import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.conference_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.get_combined_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
@@ -834,6 +835,21 @@ public class TrifaToxService extends Service
                         if (conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
                         {
                             conference_message_list_activity.set_conference_connection_status_icon();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    if (conference_audio_activity != null)
+                    {
+                        if (conference_audio_activity.get_current_conf_id().equals(conference_identifier))
+                        {
+                            conference_audio_activity.set_conference_connection_status_icon();
                         }
                     }
                 }
