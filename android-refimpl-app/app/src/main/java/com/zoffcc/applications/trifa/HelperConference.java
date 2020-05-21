@@ -214,7 +214,10 @@ public class HelperConference
             }
 
             String result = MainActivity.tox_conference_peer_get_public_key(conference_number, peer_number);
-            MainActivity.cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
+            if ((conference_number != -1) && (peer_number != -1))
+            {
+                MainActivity.cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
+            }
             return result;
         }
     }
@@ -422,7 +425,10 @@ public class HelperConference
             }
 
             long result = get_conference_num_from_confid(conference_id_string);
-            MainActivity.cache_confid_confnum.put(conference_id_string, result);
+            if (result != -1)
+            {
+                MainActivity.cache_confid_confnum.put(conference_id_string, result);
+            }
             return result;
         }
     }
