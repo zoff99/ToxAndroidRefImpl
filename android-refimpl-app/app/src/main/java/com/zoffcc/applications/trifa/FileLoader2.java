@@ -88,7 +88,7 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
                     // Log.i(TAG, "loadData:Priority.LOW");
                     try
                     {
-                        Thread.sleep(300); // sleep 0.3s
+                        Thread.sleep(20); // sleep 0.02s
                     }
                     catch (Exception e)
                     {
@@ -118,18 +118,29 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
                     {
                         if (priority == Priority.LOW)
                         {
+                            // Log.i(TAG, "loadData:thread_prio=MIN_PRIORITY:LOW");
                             this.setPriority(Thread.MIN_PRIORITY);
                         }
                         else if (priority == Priority.NORMAL)
                         {
+                            // Log.i(TAG, "loadData:thread_prio=NORM_PRIORITY:NORMAL");
                             this.setPriority(Thread.NORM_PRIORITY);
                         }
                         else if (priority == Priority.HIGH)
                         {
-                            this.setPriority(Thread.MAX_PRIORITY);
+                            // Log.i(TAG, "loadData:thread_prio=NORM_PRIORITY:HIGH");
+                            // this.setPriority(Thread.MAX_PRIORITY);
+                            this.setPriority(Thread.NORM_PRIORITY);
                         }
                         rand_num = (long) (Math.random() * 10000d);
-                        temp_file_name = copy_vfs_file_to_real_file(in.getParent(), in.getName(), SD_CARD_TMP_DIR, "_glide" + "_" + rand_num);
+                        try
+                        {
+                            temp_file_name = copy_vfs_file_to_real_file(in.getParent(), in.getName(), SD_CARD_TMP_DIR,
+                                                                        "_glide" + "_" + rand_num);
+                        }
+                        catch (Exception e)
+                        {
+                        }
                     }
                 };
                 // Log.i(TAG, "loadData:" + rand_num_model + ":" + "003");
@@ -139,20 +150,52 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
                 // Log.i(TAG, "loadData:" + rand_num_model + ":" + "005");
 
                 // System.out.println("fileloader2:loadData:000a:temp_file_name=" + temp_file_name);
-                // new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
+                //try
+                //{
+                //    File tt = new java.io.File(SD_CARD_TMP_DIR + "/" + temp_file_name);
+                //    Log.i(TAG, "loadData:infile=" + tt.getAbsolutePath() + " canread=" + tt.canRead());
+                //}
+                //catch (Exception e)
+                //{
+                //    e.printStackTrace();
+                //}
                 out = new java.io.FileInputStream(SD_CARD_TMP_DIR + "/" + temp_file_name);
+
                 // Log.i(TAG, "loadData:" + rand_num_model + ":" + "006");
                 // System.out.println("fileloader2:loadData:000a:data=" + in + " file_new=" + SD_CARD_TMP_DIR + "/" + temp_file_name);
+
+                int bytes_available_to_read = out.available();
+                // Log.i(TAG, "loadData:out=" + out + " out.available()=" + bytes_available_to_read);
+                try
+                {
+                    if (bytes_available_to_read < 1)
+                    {
+                        Log.i(TAG, "loadData:out=" + out + " out.available()=" + bytes_available_to_read);
+                        // Log.i(TAG, "loadData:callback.onDataReady:1a:NULL");
+                        callback.onDataReady(null);
+                        // Log.i(TAG, "loadData:callback.onDataReady:1b:NULL");
+                    }
+                    else
+                    {
+                        // Log.i(TAG, "loadData:callback.onDataReady:2a");
+                        callback.onDataReady(out);
+                        // Log.i(TAG, "loadData:callback.onDataReady:2b");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "callback.onDataReady:EE1:"); // + e.getMessage());
+                }
+
             }
             catch (Exception e)
             {
-                // System.out.println("fileloader2:EE:" + e.getMessage());
-                e.printStackTrace();
+                System.out.println("fileloader2:EE:"); // + e.getMessage());
+                // e.printStackTrace();
             }
             // System.out.println("fileloader2:loadData:004:onDataReady=" + out);
 
             // Log.i(TAG, "loadData:" + rand_num_model + ":" + "007");
-            callback.onDataReady(out);
             // Log.i(TAG, "loadData:" + rand_num_model + ":" + "099");
             // Log.i(TAG, "loadData:end");
         }
@@ -176,8 +219,8 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
             }
             catch (Exception e)
             {
-                e.printStackTrace();
-                Log.i(TAG, "cleanup:EE1:" + e.getMessage());
+                // e.printStackTrace();
+                Log.i(TAG, "cleanup:EE1:"); // + e.getMessage());
             }
 
             try
@@ -190,8 +233,8 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
             }
             catch (Exception e)
             {
-                e.printStackTrace();
-                Log.i(TAG, "cleanup:EE2:" + e.getMessage());
+                // e.printStackTrace();
+                Log.i(TAG, "cleanup:EE2:"); // + e.getMessage());
             }
 
             // Log.i(TAG, "cleanup:" + rand_num_model + ":" + "099");
