@@ -145,7 +145,6 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
-import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
@@ -5465,7 +5464,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
             }
             catch (Exception e2)
@@ -5618,7 +5617,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 catch (Exception e4)
                 {
-                    e4.printStackTrace();
+                    // e4.printStackTrace();
                 }
 
                 m.text = "" + peer_name_temp + " changed name.";
@@ -5650,7 +5649,7 @@ public class MainActivity extends AppCompatActivity
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
 
             if (conf_temp != null)
@@ -6567,12 +6566,21 @@ public class MainActivity extends AppCompatActivity
                 info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(
                     src_path_name + "/" + src_file_name);
                 uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length()) + appl;
-                // Log.i(TAG, "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" + uniq_temp_filename);
+                //Log.i(TAG,
+                //      "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name +
+                //      "/" + uniq_temp_filename);
                 java.io.File f2 = new java.io.File(dst_path_name + "/" + uniq_temp_filename);
                 java.io.File dst_dir = new java.io.File(dst_path_name + "/");
                 dst_dir.mkdirs();
                 info.guardianproject.iocipher.FileInputStream is = null;
                 java.io.FileOutputStream os = null;
+
+                if (!f_real.exists())
+                {
+                    // Log.i(TAG,
+                    //      "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " : does not exist");
+                    return null;
+                }
 
                 try
                 {
@@ -6595,8 +6603,8 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            Log.i(TAG, "copy_vfs_file_to_real_file:EE:" + e.getMessage());
-            e.printStackTrace();
+            Log.i(TAG, "copy_vfs_file_to_real_file:EE:"); // + e.getMessage());
+            // e.printStackTrace();
         }
 
         return uniq_temp_filename;
