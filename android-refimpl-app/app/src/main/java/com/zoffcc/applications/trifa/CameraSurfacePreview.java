@@ -31,6 +31,8 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_views;
+
 public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.Callback
 {
 
@@ -153,13 +155,17 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         {
             if (my_alpha == 1.0f)
             {
+                // make view INVISIBLE (totally transparent)
                 my_alpha = 0.0f;
                 this.setAlpha(0.0f);
+                toggle_osd_views(false);
             }
             else
             {
+                // make view visible
                 my_alpha = 1.0f;
                 this.setAlpha(1.0f);
+                toggle_osd_views(true);
             }
             return true;
         }

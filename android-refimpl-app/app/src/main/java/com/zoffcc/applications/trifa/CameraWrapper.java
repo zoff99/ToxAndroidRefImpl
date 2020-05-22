@@ -32,12 +32,13 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.CallingActivity.device_orientation;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hint;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__camera_get_preview_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__fps_half;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__set_fps;
-import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__video_cam_resolution;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
@@ -52,8 +53,6 @@ public class CameraWrapper
     private static CameraWrapper mCameraWrapper;
     static int camera_video_rotate_angle = 0;
     private boolean mIsPreviewing = false;
-    public static final int IMAGE_WIDTH = 640; // 1280
-    public static final int IMAGE_HEIGHT = 480; // 720
     static byte[] data_new = null;
     static byte[] data_new2 = null;
     private CameraPreviewCallback mCameraPreviewCallback;
@@ -467,6 +466,29 @@ public class CameraWrapper
             mCameraParamters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
             Log.i(TAG, "initCamera:preview size before=" + mCameraParamters.getPreviewSize().width + "," +
                        mCameraParamters.getPreviewSize().height);
+
+            // ---------- configure camera resolution for video calling ------------
+            int IMAGE_WIDTH = 640;
+            int IMAGE_HEIGHT = 480;
+
+            if (PREF__video_cam_resolution == 2)
+            {
+                IMAGE_WIDTH = 1920;
+                IMAGE_HEIGHT = 1080;
+            }
+            else if (PREF__video_cam_resolution == 1)
+            {
+                IMAGE_WIDTH = 1280;
+                IMAGE_HEIGHT = 720;
+            }
+            else
+            {
+                // default setting
+                IMAGE_WIDTH = 640;
+                IMAGE_HEIGHT = 480;
+            }
+            // ---------- configure camera resolution for video calling ------------
+
             mCameraParamters.setPreviewSize(IMAGE_WIDTH, IMAGE_HEIGHT);
             Log.i(TAG, "initCamera:preview size after 1=" + mCameraParamters.getPreviewSize().width + "," +
                        mCameraParamters.getPreviewSize().height);
@@ -493,8 +515,9 @@ public class CameraWrapper
             int bitsperpixel = ImageFormat.getBitsPerPixel(previewFormat);
             float byteperpixel = (float) bitsperpixel / 8.0f;
             Camera.Size camerasize = mCameraParamters2.getPreviewSize();
-            int frame_bytesize = (int) (((float) mCameraParamters.getPreviewSize().width *
-                                         (float) mCameraParamters.getPreviewSize().height) * byteperpixel);
+            int frame_bytesize = (int) (
+                ((float) mCameraParamters.getPreviewSize().width * (float) mCameraParamters.getPreviewSize().height) *
+                byteperpixel);
             Log.i(TAG,
                   "initCamera:bitsperpixel=" + bitsperpixel + " byteperpixel=" + byteperpixel + " frame_bytesize=" +
                   frame_bytesize);
@@ -506,7 +529,7 @@ public class CameraWrapper
             Log.i(TAG, "initCamera:previewFormats:ImageFormat.YUY2=" + ImageFormat.YUY2);
             Camera.Size s = mCameraParamters.getPreviewSize();
             mCamera.setPreviewCallbackWithBuffer(
-                    mCameraPreviewCallback);    // assign the callback called when a frame is shown by the camera preview (for frame processing)
+                mCameraPreviewCallback);    // assign the callback called when a frame is shown by the camera preview (for frame processing)
             // **broken ** // setupCallback((3 * s.width * s.height / 2));
             setupCallback(frame_bytesize);
             // mCamera.addCallbackBuffer(new byte[3 * s.width * s.height / 2]);  // create a reusable buffer for the data passed to onPreviewFrame call (in order to avoid GC)
@@ -608,7 +631,7 @@ public class CameraWrapper
                                 {
                                     video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(data_new,
                                                                                                              tox_friend_by_public_key__wrapper(
-                                                                                                                     Callstate.friend_pubkey),
+                                                                                                                 Callstate.friend_pubkey),
                                                                                                              camera_preview_size2.height,
                                                                                                              camera_preview_size2.width);
 
@@ -622,7 +645,7 @@ public class CameraWrapper
                                 {
                                     MainActivity.toxav_video_send_frame_wrapper(data_new,
                                                                                 tox_friend_by_public_key__wrapper(
-                                                                                        Callstate.friend_pubkey),
+                                                                                    Callstate.friend_pubkey),
                                                                                 camera_preview_size2.height,
                                                                                 camera_preview_size2.width);
                                 }
@@ -651,7 +674,7 @@ public class CameraWrapper
                                 {
                                     video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(data_new,
                                                                                                              tox_friend_by_public_key__wrapper(
-                                                                                                                     Callstate.friend_pubkey),
+                                                                                                                 Callstate.friend_pubkey),
                                                                                                              camera_preview_size2.height,
                                                                                                              camera_preview_size2.width);
 
@@ -665,7 +688,7 @@ public class CameraWrapper
                                 {
                                     MainActivity.toxav_video_send_frame_wrapper(data_new,
                                                                                 tox_friend_by_public_key__wrapper(
-                                                                                        Callstate.friend_pubkey),
+                                                                                    Callstate.friend_pubkey),
                                                                                 camera_preview_size2.height,
                                                                                 camera_preview_size2.width);
                                 }
@@ -697,7 +720,7 @@ public class CameraWrapper
                                 {
                                     video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(data_new2,
                                                                                                              tox_friend_by_public_key__wrapper(
-                                                                                                                     Callstate.friend_pubkey),
+                                                                                                                 Callstate.friend_pubkey),
                                                                                                              camera_preview_size2.width,
                                                                                                              camera_preview_size2.height);
 
@@ -711,7 +734,7 @@ public class CameraWrapper
                                 {
                                     MainActivity.toxav_video_send_frame_wrapper(data_new2,
                                                                                 tox_friend_by_public_key__wrapper(
-                                                                                        Callstate.friend_pubkey),
+                                                                                    Callstate.friend_pubkey),
                                                                                 camera_preview_size2.width,
                                                                                 camera_preview_size2.height);
                                 }
@@ -729,7 +752,7 @@ public class CameraWrapper
                                 {
                                     video_send_res = MainActivity.toxav_video_send_frame_uv_reversed_wrapper(data,
                                                                                                              tox_friend_by_public_key__wrapper(
-                                                                                                                     Callstate.friend_pubkey),
+                                                                                                                 Callstate.friend_pubkey),
                                                                                                              camera_preview_size2.width,
                                                                                                              camera_preview_size2.height);
 
@@ -742,7 +765,7 @@ public class CameraWrapper
                                 else
                                 {
                                     MainActivity.toxav_video_send_frame_wrapper(data, tox_friend_by_public_key__wrapper(
-                                            Callstate.friend_pubkey), camera_preview_size2.width,
+                                        Callstate.friend_pubkey), camera_preview_size2.width,
                                                                                 camera_preview_size2.height);
                                 }
                             }
@@ -758,7 +781,7 @@ public class CameraWrapper
                                     ((last_video_frame_sent + 2000) < System.currentTimeMillis()))
                                 {
                                     VIDEO_FRAME_RATE_OUTGOING = (int) ((((float) count_video_frame_sent / ((float) (
-                                            (System.currentTimeMillis() - last_video_frame_sent) / 1000.0f))) / 1.0f) +
+                                        (System.currentTimeMillis() - last_video_frame_sent) / 1000.0f))) / 1.0f) +
                                                                        0.5);
                                     // Log.i(TAG, "VIDEO_FRAME_RATE_OUTGOING=" + VIDEO_FRAME_RATE_OUTGOING + " fps");
                                     update_fps();
@@ -806,7 +829,7 @@ public class CameraWrapper
                     try
                     {
                         mCamera.addCallbackBuffer(
-                                data); // return the data buffer for then next onPreviewFrame call (no GC)
+                            data); // return the data buffer for then next onPreviewFrame call (no GC)
                     }
                     catch (Exception e)
                     {

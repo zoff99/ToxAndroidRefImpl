@@ -10,16 +10,6 @@
 
     <!--android:background="#0277bd"-->
 
-    <TextView
-        android:id="@+id/top_text_line"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:gravity="center_vertical"
-        android:text="xxxxxxxx"
-        android:textAlignment="center"
-        android:textColor="@color/md_grey_400"
-        android:textSize="22sp" />
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +28,19 @@
                 android:id="@+id/video_view"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="0dp"
                 android:background="@android:color/black" />
+
+            <TextView
+                android:id="@+id/top_text_line"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:elevation="25dp"
+                android:gravity="center_vertical"
+                android:text="xxxxxxxx"
+                android:textAlignment="center"
+                android:textColor="@color/md_grey_400"
+                android:textSize="22sp" />
 
             <FrameLayout
                 android:id="@+id/video_box_left_top_01"
@@ -46,7 +48,7 @@
                 android:layout_height="125dp"
                 android:layout_gravity="top|left"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="30dp"
                 android:background="@null">
 
                 <LinearLayout
@@ -75,7 +77,7 @@
                 android:layout_width="125dp"
                 android:layout_height="245dp"
                 android:layout_gravity="top|right"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="30dp"
                 android:alpha="0.5"
                 android:background="@null">
 
@@ -152,7 +154,7 @@
                 android:layout_width="300dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center|right"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginRight="45dp"
                 android:background="@null"
                 android:elevation="2dp">
@@ -251,12 +253,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp"
                 android:layout_marginLeft="2dp"
+                android:layout_marginTop="2dp"
                 android:layout_marginRight="2dp"
-                android:elevation="20dp"
-                android:background="@android:color/black" />
+                android:layout_marginBottom="2dp"
+                android:background="@android:color/black"
+                android:elevation="20dp" />
 
             <LinearLayout
                 android:layout_width="5dp"
@@ -374,8 +376,9 @@
         <com.etiennelawlor.discreteslider.library.ui.DiscreteSlider
             android:id="@+id/quality_slider"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="20dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="2dp"
             android:background="@color/md_black_1000"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
@@ -393,20 +396,20 @@
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="12dp"
         android:gravity="center_horizontal">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/accept_button"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:background="@android:color/transparent"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
@@ -414,15 +417,15 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/camera_toggle_button"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
@@ -432,7 +435,7 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text=""></TextView>
@@ -440,8 +443,8 @@
 
         <ImageButton
             android:id="@+id/misc_button"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
@@ -452,7 +455,7 @@
         <TextView
             android:id="@+id/misc_button_pad"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text=""></TextView>
@@ -460,8 +463,8 @@
 
         <ImageButton
             android:id="@+id/mute_button"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
@@ -471,15 +474,15 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/decline_button"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:background="@android:color/transparent"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
@@ -487,7 +490,7 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text=""></TextView>

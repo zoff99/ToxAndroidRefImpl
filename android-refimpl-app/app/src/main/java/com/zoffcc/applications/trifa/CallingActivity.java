@@ -112,7 +112,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static final int FRONT_CAMERA_USED = 1;
     private static final int BACK_CAMERA_USED = 2;
     static int active_camera_type = FRONT_CAMERA_USED;
-    // private final Handler mHideHandler = new Handler();
     static CustomVideoImageView mContentView;
     static ViewGroup calling_activity_top_viewgroup_vg;
     static ImageView caller_avatar_view;
@@ -133,7 +132,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static Handler callactivity_handler_s = null;
     static boolean trifa_is_MicrophoneMute = false;
     private static final String TAG = "trifa.CallingActivity"; //$NON-NLS-1$
-    // Camera camera = null;
     static CameraSurfacePreview cameraSurfacePreview = null;
     static float mPreviewRate = -1f;
     // static int front_camera_id = -1;
@@ -155,7 +153,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     TextView right_top_text_3 = null;
     TextView right_top_text_4 = null;
     TextView right_left_text_1 = null;
-    View box_right_volumeslider_01 = null;
+    static View box_right_volumeslider_01 = null;
     static SeekBar volume_slider_seekbar_01 = null;
     View box_right_video_add_delay_slider_01 = null;
     static SeekBar video_add_delay_slider_seekbar_01 = null;
@@ -178,8 +176,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static MediaCodec mEncoder;
     private static MediaPlayer mMediaPlayer = null;
     private static MediaFormat video_encoder_format = null;
-    private static int video_encoder_width = 640;
-    private static int video_encoder_height = 480;
+    private static int video_encoder_width = 640; // start a dummy start value, DO NOT CHANGE
+    private static int video_encoder_height = 480; // start a dummy start value, DO NOT CHANGE
     private static int v_bitrate_bits_per_second = 20 * 1000; // video bitrate <n> bps, in bits per second
     public static byte[] global_sps_pps_nal_unit_bytes = null;
     public static int send_sps_pps_every_x_frames_current = 0;
@@ -1099,6 +1097,41 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus)
+        {
+            hideSystemUI();
+        }
+    }
+
+    private void hideSystemUI()
+    {
+        // Enables regular immersive mode.
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                                        // Set the content to appear under the system bars so that the
+                                        // content doesn't resize when the system bars hide and show.
+                                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                        // Hide the nav bar and status bar
+                                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    // Shows the system bars by removing all the flags
+    // except for the ones that make the content appear under the system bars.
+    private void showSystemUI()
+    {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    }
+
     void update_call_audio_bars()
     {
         try
@@ -1229,38 +1262,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         // dont let the user use the back button to close the activity
     }
-
-    //    private final Runnable mHidePart2Runnable = new Runnable()
-    //    {
-    //        @SuppressLint("InlinedApi")
-    //        @Override
-    //        public void run()
-    //        {
-    //            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-    //        }
-    //    };
-
-    //    private final Runnable mShowPart2Runnable = new Runnable()
-    //    {
-    //        @Override
-    //        public void run()
-    //        {
-    //            ActionBar actionBar = getSupportActionBar();
-    //            if (actionBar != null)
-    //            {
-    //                actionBar.show();
-    //            }
-    //        }
-    //    };
-
-    //    private final Runnable mHideRunnable = new Runnable()
-    //    {
-    //        @Override
-    //        public void run()
-    //        {
-    //            hide();
-    //        }
-    //    };
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
@@ -2126,6 +2127,58 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     }
 
+    static void toggle_osd_views(boolean visible)
+    {
+        if (visible)
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        CallingActivity.video_box_left_top_01.setVisibility(View.VISIBLE);
+                        CallingActivity.video_box_right_top_01.setVisibility(View.VISIBLE);
+                        CallingActivity.box_right_volumeslider_01.setVisibility(View.VISIBLE);
+                        CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.VISIBLE);
+                        CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.VISIBLE);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
+            };
+            CallingActivity.callactivity_handler_s.post(myRunnable);
+        }
+        else
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        CallingActivity.video_box_left_top_01.setVisibility(View.INVISIBLE);
+                        CallingActivity.video_box_right_top_01.setVisibility(View.INVISIBLE);
+                        CallingActivity.box_right_volumeslider_01.setVisibility(View.INVISIBLE);
+                        CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
+                        CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
+            };
+            CallingActivity.callactivity_handler_s.post(myRunnable);
+        }
+    }
+
     void update_call_time()
     {
         if (Callstate.accepted_call == 1)
@@ -2826,7 +2879,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         try
         {
-            mMediaPlayer.stop();
+            if (mMediaPlayer != null)
+            {
+                mMediaPlayer.stop();
+            }
         }
         catch (Exception e)
         {
@@ -2835,7 +2891,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            mMediaPlayer.release();
+            if (mMediaPlayer != null)
+            {
+                mMediaPlayer.release();
+            }
         }
         catch (Exception e)
         {

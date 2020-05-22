@@ -36,6 +36,9 @@
     <dimen name="message_entry_datetime_bottom_padding">10dp</dimen>
 
 
+    <!-- Calling Activity -->
+    <dimen name="calling_activity_bottom_buttons_height">50dp</dimen> <!-- 70dp (factor 1.34) -->
+    <dimen name="calling_activity_bottom_buttons_small_height">37dp</dimen> <!-- 52dp -->
 
     <!-- Text sizes -->
     <dimen name="text_size_extra_micro">10sp</dimen>

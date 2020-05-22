@@ -61,6 +61,19 @@
         <item>2</item>
     </string-array>
 
+    <string name="pref_title_video_cam_resolution">Camera Resolution</string>
+    <string name="pref_description_video_cam_resolution">What Resolution to use for Video Calling</string>
+    <string-array name="pref_video_cam_resolution_titles">
+        <item>640x480</item>
+        <item>1280x720</item>
+        <item>1920x1080</item>
+    </string-array>
+    <string-array name="pref_video_cam_resolution_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <string name="pref_title_camera_get_preview_format">Camera Preview Format</string>
     <string name="pref_description_camera_get_preview_format">Camera Preview Format seems to be in the wrong format on some phones</string>
     <string-array name="pref_camera_get_preview_format_titles">
