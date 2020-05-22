@@ -398,6 +398,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__audio_group_play_volume_percent = 100;
     static boolean PREF__auto_accept_image = true;
     static boolean PREF__auto_accept_video = false;
+    static int PREF__video_cam_resolution = 0;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -921,6 +922,16 @@ public class MainActivity extends AppCompatActivity
         // ------- FIXED -------
         PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED;
         // ------- FIXED -------
+
+        try
+        {
+            PREF__video_cam_resolution = Integer.parseInt(settings.getString("video_cam_resolution", "" + 0));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__video_cam_resolution = 0;
+        }
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 
@@ -1948,6 +1959,8 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         unregisterReceiver(receiver1);
         unregisterReceiver(receiver2);
+        unregisterReceiver(receiver3);
+        unregisterReceiver(receiver4);
     }
 
     @Override
@@ -2187,6 +2200,15 @@ public class MainActivity extends AppCompatActivity
         PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED;
         // ------- FIXED -------
 
+        try
+        {
+            PREF__video_cam_resolution = Integer.parseInt(settings.getString("video_cam_resolution", "" + 0));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__video_cam_resolution = 0;
+        }
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 
