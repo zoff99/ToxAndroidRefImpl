@@ -83,6 +83,8 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
 import static com.zoffcc.applications.trifa.MainActivity.receiver2;
+import static com.zoffcc.applications.trifa.MainActivity.receiver3;
+import static com.zoffcc.applications.trifa.MainActivity.receiver4;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist;
@@ -487,6 +489,24 @@ public class TrifaToxService extends Service
                         try
                         {
                             unregisterReceiver(receiver2);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        try
+                        {
+                            unregisterReceiver(receiver3);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        try
+                        {
+                            unregisterReceiver(receiver4);
                         }
                         catch (Exception e)
                         {
@@ -903,7 +923,7 @@ public class TrifaToxService extends Service
                 catch (Exception e)
                 {
                     e.printStackTrace();
-                    Log.i(TAG, "Audio Thread [OUT]:EETPr:" + e.getMessage());
+                    Log.i(TAG, "thread set name:" + e.getMessage());
                 }
 
                 // ------ correct startup order ------
