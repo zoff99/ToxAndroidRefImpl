@@ -529,20 +529,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         global_showing_anygroupview = true;
 
-        try
-        {
-            Log.i(TAG, "LC:onResume:wakelock:get");
-            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            // wl_group_audio = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "trifa:group_audio_cpu");
-            wl_group_audio = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                                            "trifa:group_audio_cpu");
-            wl_group_audio.acquire();
-            Log.i(TAG, "LC:onResume:wakelock:get:done");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        aquire_all_locks(this);
 
         Log.i(TAG, "LC:onResume:2");
 
@@ -823,8 +810,49 @@ public class ConferenceAudioActivity extends AppCompatActivity
             need_close_activity = false;
         }
 
+        release_all_locks();
+
         Log.i(TAG, "onPause:on_groupaudio_ended_actions"); //$NON-NLS-1$
         on_groupaudio_ended_actions(need_close_activity);
+    }
+
+    static void aquire_all_locks(Context c)
+    {
+        try
+        {
+            Log.i(TAG, "LC:onResume:wakelock:get");
+            PowerManager pm = (PowerManager) c.getSystemService(Context.POWER_SERVICE);
+            // wl_group_audio = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "trifa:group_audio_cpu");
+            wl_group_audio = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                                            "trifa:group_audio_cpu");
+            wl_group_audio.acquire();
+            Log.i(TAG, "LC:onResume:wakelock:get:done");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void release_all_locks()
+    {
+        try
+        {
+            if (wl_group_audio != null)
+            {
+                if (wl_group_audio.isHeld())
+                {
+                    Log.i(TAG, "LC:onBackPressed:wakelock:release");
+                    wl_group_audio.release();
+                    wl_group_audio = null;
+                    Log.i(TAG, "LC:onBackPressed:wakelock:release:done");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     static void update_group_audio_send_icon(int state)
@@ -938,24 +966,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
         else
         {
-            try
-            {
-                if (wl_group_audio != null)
-                {
-                    if (wl_group_audio.isHeld())
-                    {
-                        Log.i(TAG, "LC:onBackPressed:wakelock:release");
-                        wl_group_audio.release();
-                        wl_group_audio = null;
-                        Log.i(TAG, "LC:onBackPressed:wakelock:release:done");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
+            release_all_locks();
             super.onBackPressed();
         }
     }
