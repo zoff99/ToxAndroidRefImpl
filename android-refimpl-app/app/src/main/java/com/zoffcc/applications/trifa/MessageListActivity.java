@@ -1232,7 +1232,7 @@ public class MessageListActivity extends AppCompatActivity
                                     count_video_frame_sent = 0;
                                     if (Callstate.audio_call)
                                     {
-                                        MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                        MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, 0);
                                     }
                                     else
                                     {

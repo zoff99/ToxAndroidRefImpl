@@ -583,6 +583,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             debug001_text.setText("*AUDIO*");
         }
 
+        // ------ only for debugging ------
+        debug001_text.setVisibility(View.INVISIBLE);
+        // ------ only for debugging ------
+
         text_vq_low.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -2981,7 +2985,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         try
@@ -2993,7 +2997,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
