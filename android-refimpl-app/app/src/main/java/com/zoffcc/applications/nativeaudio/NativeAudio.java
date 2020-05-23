@@ -26,10 +26,8 @@ import com.zoffcc.applications.trifa.AudioRecording;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
-import static com.zoffcc.applications.trifa.MainActivity.PREF_MicGainFactor;
-import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_ts;
+import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 
 public class NativeAudio
 {
@@ -160,8 +158,8 @@ public class NativeAudio
         native_audio_engine_down = false;
 
         Log.i(TAG, "audio_rec:StartREC:003:-restart-");
-        Log.i(TAG, "PREF_MicGainFactor=" + PREF_MicGainFactor);
-        setMicGainFactor(PREF_MicGainFactor);
+        Log.i(TAG, "PREF_MicGainFactor=" + PREF_mic_gain_factor);
+        setMicGainFactor(PREF_mic_gain_factor);
         NativeAudio.StartREC();
         Log.i(TAG, "audio_rec:StartREC:004:-restart-");
 

@@ -44,7 +44,7 @@ import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
-import static com.zoffcc.applications.trifa.MainActivity.PREF_MicGainFactor;
+import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
@@ -211,8 +211,8 @@ public class AudioRecording extends Thread
         if (PREF__use_native_audio_play)
         {
             Log.i(TAG, "audio_rec:StartREC:001");
-            Log.i(TAG, "PREF_MicGainFactor=" + PREF_MicGainFactor);
-            setMicGainFactor(PREF_MicGainFactor);
+            Log.i(TAG, "PREF_MicGainFactor=" + PREF_mic_gain_factor);
+            setMicGainFactor(PREF_mic_gain_factor);
             NativeAudio.StartREC();
             Log.i(TAG, "audio_rec:StartREC:002");
 

@@ -85,6 +85,9 @@
         <item>NV21</item>
     </string-array>
 
+    <string name="pref_title_mic_gain_factor">Mic Gain</string>
+    <string name="pref_description_mic_gain_factor">Set a higher Gain if your microphone records with low volume</string>
+
     <string name="pref_title_higher_audio_quality">Audio Quality</string>
     <string name="pref_description_higher_audio_quality">Use better Audio quality.\nChange needs RESTART!</string>
     <string-array name="pref_higher_audio_quality_titles">

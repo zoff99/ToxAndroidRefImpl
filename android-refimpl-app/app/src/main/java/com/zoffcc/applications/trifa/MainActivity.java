@@ -382,7 +382,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_audio_rec_effects = false;
     static boolean PREF__window_security = false;
     static int PREF__X_eac_delay_ms = 60;
-    public static float PREF_MicGainFactor = 1.0f;
+    public static float PREF_mic_gain_factor = 2.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int FRAME_SIZE_FIXED = 20;
@@ -2030,15 +2030,26 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF_MicGainFactor = Float.parseFloat(settings.getString("MicGainFactor", "1.0"));
+            PREF_mic_gain_factor = (float) (settings.getInt("mic_gain_factor", 1));
+            Log.i(TAG, "PREF_mic_gain_factor:1=" + PREF_mic_gain_factor);
+            PREF_mic_gain_factor = PREF_mic_gain_factor + 1.0f;
+
+            if (PREF_mic_gain_factor < 1.0f)
+            {
+                PREF_mic_gain_factor = 1.0f;
+            }
+            else if (PREF_mic_gain_factor > 30.0f)
+            {
+                PREF_mic_gain_factor = 30.0f;
+            }
+            Log.i(TAG, "PREF_mic_gain_factor:2=" + PREF_mic_gain_factor);
         }
         catch (Exception e)
         {
-            PREF_MicGainFactor = 1.0f;
+            PREF_mic_gain_factor = 2.0f;
+            Log.i(TAG, "PREF_mic_gain_factor:E=" + PREF_mic_gain_factor);
             e.printStackTrace();
         }
-
-        PREF_MicGainFactor = 5.0f;
 
         set_audio_frame_duration_ms(PREF__X_eac_delay_ms);
 

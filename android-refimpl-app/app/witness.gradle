@@ -16,6 +16,7 @@ dependencyVerification {
         'com.android.support:design:27.1.1:design-27.1.1.aar:7225973f7ee03765008a9c2f17a40b154c6885169fef022276e811c926a2202c',
         'com.android.support:multidex-instrumentation:1.0.3:multidex-instrumentation-1.0.3.aar:f4586a1b0a8c33ecdbcf4f6a70b07d54086966c23d6f8273aa11109344cd474f',
         'com.android.support:multidex:1.0.3:multidex-1.0.3.aar:ecf6098572e23b5155bab3b9a82b2fd1530eda6c6c157745e0f5287c66eec60c',
+        'com.android.support:preference-v7:27.1.1:preference-v7-27.1.1.aar:a1798a826b4097d00e49280f412b21af08f9bf1179c2e3838dc339d9f843416d',
         'com.android.support:recyclerview-v7:27.1.1:recyclerview-v7-27.1.1.aar:d735e4727878e99ef3980c10d15dc3468462fd509d4fb60cb8bd20b0f735085c',
         'com.android.support:support-annotations:27.1.1:support-annotations-27.1.1.jar:3365960206c3d2b09e845f555e7f88f8effc8d2f00b369e66c4be384029299cf',
         'com.android.support:support-compat:27.1.1:support-compat-27.1.1.aar:880ce01ff5be42b233ff8ec0c61cefb7dc3dc9500fea9e24423214813ac27ea2',
