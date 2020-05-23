@@ -1027,12 +1027,24 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             Callstate.accepted_call = 1;
 
                             Log.i(TAG, "answer button pressed"); //$NON-NLS-1$
-                            toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                         GLOBAL_AUDIO_BITRATE,
-                                         GLOBAL_VIDEO_BITRATE); // these 2 bitrate values are very strange!! sometimes no video incoming!!
-                            // need to set our state manually here, no callback from toxcore :-(
-                            Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
-                            // need to set our state manually here, no callback from toxcore :-(
+
+                            if (Callstate.audio_call)
+                            {
+                                toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                             GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_A.value;
+                            }
+                            else
+                            {
+                                toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                             GLOBAL_AUDIO_BITRATE,
+                                             GLOBAL_VIDEO_BITRATE); // these 2 bitrate values are very strange!! sometimes no video incoming!!
+                                // need to set our state manually here, no callback from toxcore :-(
+                                Callstate.tox_call_state =
+                                    ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_A.value +
+                                    ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
+                                // need to set our state manually here, no callback from toxcore :-(
+                            }
 
                             caller_avatar_view.setVisibility(View.GONE);
                             accept_button.setVisibility(View.GONE);
@@ -1048,6 +1060,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                             Log.i(TAG, "on_call_started_actions:01"); //$NON-NLS-1$
                             on_call_started_actions();
+                            if (Callstate.audio_call)
+                            {
+                                toggle_osd_view_including_cam_preview(!Callstate.audio_call);
+                            }
+
                         }
                     }
                 }
@@ -1445,6 +1462,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }, 1000 / update_per_sec);
         // update every x times per second -----------
 
+        if (Callstate.audio_call)
+        {
+            toggle_osd_view_including_cam_preview(!Callstate.audio_call);
+        }
 
         Log.i(TAG, "onResume:99"); //$NON-NLS-1$
     }
@@ -1708,7 +1729,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
     }
 
-
     public void turnOnScreen()
     {
         if (PREF__allow_screen_off_in_audio_call)
@@ -1767,7 +1787,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Callstate.other_video_enabled = 0;
         Callstate.my_video_enabled = 0;
     }
-
 
     public void turnOnScreen__old()
     {
@@ -1864,7 +1883,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // in case the phone does not really turn the screen off
         mContentView.setVisibility(View.INVISIBLE);
     }
-
 
     private void requestAudioFocus()
     {
@@ -2125,6 +2143,53 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     public void onAccuracyChanged(Sensor sensor, int accuracy)
     {
 
+    }
+
+    static void toggle_osd_view_including_cam_preview(boolean visible)
+    {
+
+        if (visible)
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        cameraSurfacePreview.setVisibility(View.VISIBLE);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
+            };
+            CallingActivity.callactivity_handler_s.post(myRunnable);
+        }
+        else
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        cameraSurfacePreview.setVisibility(View.INVISIBLE);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
+            };
+            CallingActivity.callactivity_handler_s.post(myRunnable);
+        }
+
+        toggle_osd_views(visible);
     }
 
     static void toggle_osd_views(boolean visible)

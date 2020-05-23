@@ -44,6 +44,10 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_ACCEPTING_V;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_ERROR;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_FINISHED;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE;
 
 public class CameraWrapper
 {
@@ -600,8 +604,9 @@ public class CameraWrapper
                 if (Callstate.my_video_enabled == 1)
                 {
                     // only send video frame if call has started
-                    if (!((Callstate.tox_call_state == 0) || (Callstate.tox_call_state == 1) ||
-                          (Callstate.tox_call_state == 2)))
+                    if (!((Callstate.tox_call_state == TOXAV_FRIEND_CALL_STATE_NONE.value) ||
+                          (Callstate.tox_call_state == TOXAV_FRIEND_CALL_STATE_ERROR.value) ||
+                          (Callstate.tox_call_state == TOXAV_FRIEND_CALL_STATE_FINISHED.value)))
                     {
                         if ((PREF__fps_half) && (!use_frame))
                         {
@@ -969,10 +974,18 @@ public class CameraWrapper
 
                 try
                 {
-                    byte[] data_copy_ = new byte[data.length];
-                    System.arraycopy(data, 0, data_copy_, 0, data.length);
-                    myProccesImageOnBackground = (proccesImageOnBackground) new proccesImageOnBackground(data,
-                                                                                                         this).execute();
+                    if (((Callstate.tox_call_state & TOXAV_FRIEND_CALL_STATE_ACCEPTING_V.value) > 0)
+                    && (!Callstate.audio_call))
+                    {
+                        byte[] data_copy_ = new byte[data.length];
+                        System.arraycopy(data, 0, data_copy_, 0, data.length);
+                        myProccesImageOnBackground = (proccesImageOnBackground) new proccesImageOnBackground(data,
+                                                                                                             this).execute();
+                    }
+                    else
+                    {
+                        // Log.i(TAG,"toxav_call_control:not TOXAV_FRIEND_CALL_STATE_ACCEPTING_V");
+                    }
                 }
                 catch (Exception ea)
                 {

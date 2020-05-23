@@ -124,6 +124,7 @@ public class MessageListActivity extends AppCompatActivity
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
     ImageButton ml_phone_icon = null;
+    ImageButton ml_video_icon = null;
     ImageButton ml_button_01 = null;
     static int global_typing = 0;
     Thread typing_flag_thread = null;
@@ -194,6 +195,7 @@ public class MessageListActivity extends AppCompatActivity
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
         ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
         ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
+        ml_video_icon = (ImageButton) findViewById(R.id.ml_video_icon);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
         final ImageButton button01_ = ml_button_01;
         ml_icon.setImageResource(R.drawable.circle_red);
@@ -350,6 +352,10 @@ public class MessageListActivity extends AppCompatActivity
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
             getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
+
+        final Drawable d3 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_video).color(
+            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        ml_video_icon.setImageDrawable(d3);
 
         final long fn = friendnum;
         Thread t = new Thread()
@@ -1098,6 +1104,14 @@ public class MessageListActivity extends AppCompatActivity
         // --- ??? should we do this here?
     }
 
+    public void start_audio_call_to_friend(View view)
+    {
+        Log.i(TAG, "start_call_to_friend_real:audio_only");
+        Callstate.audio_call = true;
+        Log.i(TAG, "toxav_call:Callstate.audio_call = true");
+        start_call_to_friend(view);
+    }
+
     public void start_call_to_friend(View view)
     {
         Log.i(TAG, "start_call_to_friend_real");
@@ -1213,8 +1227,14 @@ public class MessageListActivity extends AppCompatActivity
                                     last_video_frame_received = -1;
                                     count_video_frame_received = 0;
                                     count_video_frame_sent = 0;
-
-                                    MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                    if (Callstate.audio_call)
+                                    {
+                                        MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                    }
+                                    else
+                                    {
+                                        MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                    }
                                     Log.i(TAG, "CALL_OUT:002");
                                 }
                                 catch (Exception e)

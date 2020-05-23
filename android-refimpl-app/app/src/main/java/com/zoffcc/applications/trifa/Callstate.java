@@ -28,6 +28,7 @@ public class Callstate
 {
     static int state = 0; // 0 -> not in a call, 1 -> ringing/calling
     static int tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
+    static boolean audio_call = false;
     static String friend_pubkey = "-1";
     static String friend_alias_name = "";
     static int other_audio_enabled = 1;
@@ -58,6 +59,7 @@ public class Callstate
     static void reset_values()
     {
         Callstate.state = 0;
+        audio_call = false;
         Callstate.call_first_video_frame_received = -1;
         Callstate.call_first_audio_frame_received = -1;
         Callstate.call_start_timestamp = -1;

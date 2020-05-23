@@ -158,6 +158,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_action
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
+import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_view_including_cam_preview;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.GroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
@@ -224,6 +225,12 @@ import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_C
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_H264;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_VP8;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_PLAY_DELAY;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_ACCEPTING_A;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_ACCEPTING_V;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_FINISHED;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_A;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE;
@@ -2714,6 +2721,17 @@ public class MainActivity extends AppCompatActivity
                             set_filteraudio_active(0);
                         }
 
+                        if (f_video_enabled == 0)
+                        {
+                            Callstate.audio_call = true;
+                            Log.i(TAG, "toxav_call:Callstate.audio_call = true");
+                        }
+                        else
+                        {
+                            Callstate.audio_call = false;
+                            Log.i(TAG, "toxav_call:Callstate.audio_call = false");
+                        }
+
                         Callstate.state = 1;
                         Callstate.accepted_call = 0;
                         Callstate.call_first_video_frame_received = -1;
@@ -2757,6 +2775,11 @@ public class MainActivity extends AppCompatActivity
     static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
     {
         if (Callstate.other_video_enabled == 0)
+        {
+            return;
+        }
+
+        if (Callstate.audio_call)
         {
             return;
         }
@@ -2914,15 +2937,18 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        Log.i(TAG, "toxav_call_state:from=" + friend_number + " state=" + a_TOXAV_FRIEND_CALL_STATE);
-        Log.i(TAG, "Callstate.tox_call_state=" + a_TOXAV_FRIEND_CALL_STATE + " old=" + Callstate.tox_call_state);
+        Log.i(TAG, "toxav_call_state:INCOMING_CALL:from=" + friend_number + " state=" + a_TOXAV_FRIEND_CALL_STATE);
+        Log.i(TAG, "Callstate.tox_call_state:INCOMING_CALL=" + a_TOXAV_FRIEND_CALL_STATE + " old=" +
+                   Callstate.tox_call_state);
 
         if (Callstate.state == 1)
         {
             int old_value = Callstate.tox_call_state;
             Callstate.tox_call_state = a_TOXAV_FRIEND_CALL_STATE;
 
-            if ((a_TOXAV_FRIEND_CALL_STATE & (4 + 8 + 16 + 32)) > 0)
+            if ((a_TOXAV_FRIEND_CALL_STATE &
+                 (TOXAV_FRIEND_CALL_STATE_SENDING_A.value + TOXAV_FRIEND_CALL_STATE_SENDING_V.value +
+                  TOXAV_FRIEND_CALL_STATE_ACCEPTING_A.value + TOXAV_FRIEND_CALL_STATE_ACCEPTING_V.value)) > 0)
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call starting");
                 Callstate.call_start_timestamp = System.currentTimeMillis();
@@ -2948,18 +2974,29 @@ public class MainActivity extends AppCompatActivity
                         {
                             e.printStackTrace();
                         }
+
+                        if (Callstate.audio_call)
+                        {
+                            toggle_osd_view_including_cam_preview(!Callstate.audio_call);
+                        }
                     }
                 };
                 CallingActivity.callactivity_handler_s.post(myRunnable);
                 Log.i(TAG, "on_call_started_actions:02");
                 on_call_started_actions();
+
+                if (Callstate.audio_call)
+                {
+                    toggle_osd_view_including_cam_preview(!Callstate.audio_call);
+                }
             }
-            else if ((a_TOXAV_FRIEND_CALL_STATE & (2)) > 0)
+            else if ((a_TOXAV_FRIEND_CALL_STATE & (TOXAV_FRIEND_CALL_STATE_FINISHED.value)) > 0)
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending(1)");
                 on_call_ended_actions();
             }
-            else if ((old_value > 0) && (a_TOXAV_FRIEND_CALL_STATE == 0))
+            else if ((old_value > TOXAV_FRIEND_CALL_STATE_NONE.value) &&
+                     (a_TOXAV_FRIEND_CALL_STATE == TOXAV_FRIEND_CALL_STATE_NONE.value))
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending(2)");
                 on_call_ended_actions();
