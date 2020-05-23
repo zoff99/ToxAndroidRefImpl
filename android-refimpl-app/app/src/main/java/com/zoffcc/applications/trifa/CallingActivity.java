@@ -96,6 +96,7 @@ import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_HIGH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_LOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_MED;
@@ -1037,16 +1038,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             if (Callstate.audio_call)
                             {
                                 toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                             GLOBAL_AUDIO_BITRATE, 0);
-                                Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_A.value;
+                                             GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             }
                             else
                             {
                                 toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                             GLOBAL_AUDIO_BITRATE, 0);
-                                Callstate.tox_call_state =
-                                    ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_A.value +
-                                    ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
+                                             GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
 
                             }
 

@@ -3136,9 +3136,9 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
     {
-        Log.i(TAG,
-              "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
-              " " + channels + " " + sampling_rate);
+        // Log.i(TAG,
+        //      "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
+        //      " " + channels + " " + sampling_rate);
 
         // long timestamp_audio_frame = System.currentTimeMillis();
         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
