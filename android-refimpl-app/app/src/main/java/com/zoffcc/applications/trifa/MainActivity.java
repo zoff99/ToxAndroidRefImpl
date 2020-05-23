@@ -158,6 +158,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_action
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
+import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_view_including_cam_preview;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.GroupAudioService.do_update_group_title;
@@ -2724,11 +2725,15 @@ public class MainActivity extends AppCompatActivity
                         if (f_video_enabled == 0)
                         {
                             Callstate.audio_call = true;
+                            set_debug_text("_AUDIO_");
+
                             Log.i(TAG, "toxav_call:Callstate.audio_call = true");
                         }
                         else
                         {
                             Callstate.audio_call = false;
+                            set_debug_text("VIDEO");
+
                             Log.i(TAG, "toxav_call:Callstate.audio_call = false");
                         }
 
@@ -3131,9 +3136,9 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
     {
-        // Log.i(TAG,
-        //      "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
-        //      " " + channels + " " + sampling_rate);
+        Log.i(TAG,
+              "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
+              " " + channels + " " + sampling_rate);
 
         // long timestamp_audio_frame = System.currentTimeMillis();
         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)

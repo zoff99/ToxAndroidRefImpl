@@ -43,6 +43,27 @@
                 android:textSize="22sp" />
 
             <FrameLayout
+                android:id="@+id/debug001"
+                android:layout_width="125dp"
+                android:layout_height="125dp"
+                android:layout_gravity="top|left"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="30dp"
+                android:background="@null"
+                android:elevation="25dp">
+
+                <TextView
+                    android:id="@+id/debug001_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:gravity="center"
+                    android:text="xxxxxxxx"
+                    android:textColor="@color/md_grey_400"
+                    android:textSize="22sp" />
+            </FrameLayout>
+
+
+            <FrameLayout
                 android:id="@+id/video_box_left_top_01"
                 android:layout_width="125dp"
                 android:layout_height="125dp"

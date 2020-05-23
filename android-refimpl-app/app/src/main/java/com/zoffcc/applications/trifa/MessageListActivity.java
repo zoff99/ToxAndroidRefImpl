@@ -65,6 +65,7 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import java.io.File;
 
+import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.insert_into_filetransfer_db;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.update_filetransfer_db_full;
@@ -1108,6 +1109,8 @@ public class MessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "start_call_to_friend_real:audio_only");
         Callstate.audio_call = true;
+        set_debug_text("_AUDIO_");
+
         Log.i(TAG, "toxav_call:Callstate.audio_call = true");
         start_call_to_friend(view);
     }
@@ -1229,7 +1232,7 @@ public class MessageListActivity extends AppCompatActivity
                                     count_video_frame_sent = 0;
                                     if (Callstate.audio_call)
                                     {
-                                        MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                        MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, 0);
                                     }
                                     else
                                     {

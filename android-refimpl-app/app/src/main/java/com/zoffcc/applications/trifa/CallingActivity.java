@@ -96,7 +96,6 @@ import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.MainActivity.update_bitrates;
 import static com.zoffcc.applications.trifa.MainActivity.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_HIGH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_LOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_MED;
@@ -153,6 +152,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     TextView right_top_text_3 = null;
     TextView right_top_text_4 = null;
     TextView right_left_text_1 = null;
+    static TextView debug001_text = null;
     static View box_right_volumeslider_01 = null;
     static SeekBar volume_slider_seekbar_01 = null;
     View box_right_video_add_delay_slider_01 = null;
@@ -575,6 +575,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         text_vq_med = (TextView) findViewById(R.id.text_vq_med);
         text_vq_high = (TextView) findViewById(R.id.text_vq_high);
 
+        debug001_text = (TextView) findViewById(R.id.debug001_text);
+        debug001_text.setText("VIDEO");
+        if (Callstate.audio_call)
+        {
+            debug001_text.setText("*AUDIO*");
+        }
 
         text_vq_low.setOnTouchListener(new View.OnTouchListener()
         {
@@ -1031,19 +1037,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             if (Callstate.audio_call)
                             {
                                 toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                             GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                             GLOBAL_AUDIO_BITRATE, 0);
                                 Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_A.value;
                             }
                             else
                             {
                                 toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                             GLOBAL_AUDIO_BITRATE,
-                                             GLOBAL_VIDEO_BITRATE); // these 2 bitrate values are very strange!! sometimes no video incoming!!
-                                // need to set our state manually here, no callback from toxcore :-(
+                                             GLOBAL_AUDIO_BITRATE, 0);
                                 Callstate.tox_call_state =
                                     ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_A.value +
                                     ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
-                                // need to set our state manually here, no callback from toxcore :-(
+
                             }
 
                             caller_avatar_view.setVisibility(View.GONE);
@@ -1260,6 +1264,33 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         };
         callactivity_handler_s.post(myRunnable);
+    }
+
+    public static void set_debug_text(final String text)
+    {
+        try
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        debug001_text.setText(text);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.i(TAG, "set_debug_text:EE01:" + e.getMessage());
+                    }
+                }
+            };
+            callactivity_handler_s.post(myRunnable);
+        }
+        catch (Exception e2)
+        {
+            Log.i(TAG, "set_debug_text:EE02:" + e2.getMessage());
+        }
     }
 
     public static void initializeScreenshotSecurity(Activity a)
