@@ -1088,6 +1088,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
 {
     if (rec_state == _SHUTDOWN)
     {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:_SHUTDOWN --> RET");
         return -1;
     }
 
