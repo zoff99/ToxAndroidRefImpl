@@ -4259,7 +4259,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         try
@@ -4271,7 +4271,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         if (conference_message_list_activity != null)
@@ -5350,7 +5350,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         try
@@ -5362,7 +5362,8 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
+            do_notification = false;
         }
 
         if (conference_message_list_activity != null)
