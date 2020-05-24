@@ -5589,7 +5589,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_peer_name_cb_method(long conference_number, long peer_number, String name, long name_length)
     {
-        Log.i(TAG, "conference_peer_name_cb:cf_num=" + conference_number);
+        // Log.i(TAG, "conference_peer_name_cb:cf_num=" + conference_number);
 
         try
         {
