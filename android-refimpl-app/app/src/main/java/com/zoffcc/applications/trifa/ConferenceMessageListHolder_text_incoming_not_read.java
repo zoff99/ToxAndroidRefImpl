@@ -236,7 +236,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             // Log.i(TAG, "have_avatar_for_pubkey:00a01x:" + m.tox_peername + ":" + m.tox_peerpubkey);
 
             fl_temp = orma.selectFromFriendList().
-                    tox_public_key_stringEq(m.tox_peerpubkey).get(0);
+                tox_public_key_stringEq(m.tox_peerpubkey).get(0);
 
             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
             {
@@ -244,7 +244,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 try
                 {
                     f1 = new info.guardianproject.iocipher.File(
-                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                        fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                     if (f1.length() > 0)
                     {
                         have_avatar_for_pubkey = true;
@@ -273,7 +273,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         try
         {
-            peer_color_bg = ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())];
+            peer_color_bg = ChatColors.get_shade(
+                ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())], m.tox_peerpubkey);
             // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
         }
         catch (Exception e)
@@ -285,16 +286,16 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         GradientDrawable shape = new GradientDrawable();
         shape.setShape(GradientDrawable.RECTANGLE);
         shape.setCornerRadii(
-                new float[]{CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX});
+            new float[]{CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX});
         shape.setColor(peer_color_bg);
         // shape.setStroke(3, borderColor);
         textView_container.setBackground(shape);
         // we need to do the rounded corner background manually here, to change the color ---------------
 
         final Drawable smiley_face = new IconicsDrawable(context).
-                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                backgroundColor(peer_color_bg).
-                color(peer_color_fg).sizeDp(70);
+            icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+            backgroundColor(peer_color_bg).
+            color(peer_color_fg).sizeDp(70);
 
         try
         {
@@ -308,7 +309,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                     try
                     {
                         f1 = new info.guardianproject.iocipher.File(
-                                fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                     }
                     catch (Exception e)
                     {
@@ -323,15 +324,15 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                             // Log.i(TAG, "have_avatar_for_pubkey:001");
                             final RequestOptions glide_options = new RequestOptions().fitCenter();
                             GlideApp.
-                                    with(context).
-                                    load(f1).
-                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                    skipMemoryCache(false).
-                                    signature(StringSignature2(
-                                            "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename +
-                                            "_" + fl_temp.avatar_update_timestamp)).
-                                    apply(glide_options).
-                                    into(img_avatar);
+                                with(context).
+                                load(f1).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(false).
+                                signature(StringSignature2(
+                                    "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename + "_" +
+                                    fl_temp.avatar_update_timestamp)).
+                                apply(glide_options).
+                                into(img_avatar);
                             // Log.i(TAG, "have_avatar_for_pubkey:002");
                         }
                     }
@@ -415,23 +416,23 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(url).setTitle(title).
-                setCancelable(false).
-                setPositiveButton("OK", new DialogInterface.OnClickListener()
+            setCancelable(false).
+            setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id)
                 {
-                    public void onClick(DialogInterface dialog, int id)
+                    try
                     {
-                        try
-                        {
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            c.startActivity(intent);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        c.startActivity(intent);
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    dialog.dismiss();
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -446,27 +447,27 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(email_addr).setTitle(title).
-                setCancelable(false).
-                setPositiveButton("OK", new DialogInterface.OnClickListener()
+            setCancelable(false).
+            setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id)
                 {
-                    public void onClick(DialogInterface dialog, int id)
+                    try
                     {
-                        try
-                        {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
-                                                            Uri.fromParts("mailto", email_addr, null));
-                            emailIntent.setType("message/rfc822");
-                            // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-                            // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                            c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                        Uri.fromParts("mailto", email_addr, null));
+                        emailIntent.setType("message/rfc822");
+                        // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                        // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                        c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    dialog.dismiss();
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -481,25 +482,25 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(toxid.toUpperCase()).setTitle(title).
-                setCancelable(false).
-                setPositiveButton("OK", new DialogInterface.OnClickListener()
+            setCancelable(false).
+            setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id)
                 {
-                    public void onClick(DialogInterface dialog, int id)
+                    try
                     {
-                        try
-                        {
-                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
-                                                                                                     "").replaceFirst(
-                                    "TOX:", "").replaceFirst("Tox:", "");
-                            add_friend_real(friend_tox_id);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                        String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
+                                                                                                 "").replaceFirst(
+                            "TOX:", "").replaceFirst("Tox:", "");
+                        add_friend_real(friend_tox_id);
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    dialog.dismiss();
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -525,7 +526,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         public boolean onLongClick(final View v)
         {
             ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(
-                    context, v, is_selected, message_);
+                context, v, is_selected, message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

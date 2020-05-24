@@ -73,7 +73,7 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
             if (have_avatar_for_pubkey)
             {
                 fl_temp = orma.selectFromFriendList().
-                        tox_public_key_stringEq(peer_pubkey).get(0);
+                    tox_public_key_stringEq(peer_pubkey).get(0);
 
                 if (VFS_ENCRYPT)
                 {
@@ -81,7 +81,7 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                     try
                     {
                         f1 = new info.guardianproject.iocipher.File(
-                                fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                     }
                     catch (Exception e)
                     {
@@ -105,21 +105,21 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                             // --------------------
 
                             final RequestOptions glide_options = new RequestOptions().
-                                    fitCenter().
-                                    circleCrop();
+                                fitCenter().
+                                circleCrop();
 
                             GlideApp.
-                                    with(c).
-                                    load(f1).
-                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                    signature(StringSignature2(
-                                            "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename +
-                                            "_" + fl_temp.avatar_update_timestamp)).
-                                    priority(Priority.HIGH).
-                                    placeholder(R.drawable.round_loading_animation).
-                                    skipMemoryCache(false).
-                                    apply(glide_options).
-                                    into(this.icon);
+                                with(c).
+                                load(f1).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(StringSignature2(
+                                    "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename + "_" +
+                                    fl_temp.avatar_update_timestamp)).
+                                priority(Priority.HIGH).
+                                placeholder(R.drawable.round_loading_animation).
+                                skipMemoryCache(false).
+                                apply(glide_options).
+                                into(this.icon);
                         }
                     }
                 }
@@ -139,12 +139,13 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                 int peer_color_bg = c.getResources().getColor(R.color.material_drawer_background);
                 int alpha_value = 160;
 
-                peer_color_bg = ChatColors.PeerAvatarColors[hash_to_bucket(peer_pubkey, ChatColors.get_size())];
+                peer_color_bg = ChatColors.get_shade(
+                    ChatColors.PeerAvatarColors[hash_to_bucket(peer_pubkey, ChatColors.get_size())], peer_pubkey);
 
                 final Drawable smiley_face = new IconicsDrawable(context_s).
-                        icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                        backgroundColor(Color.TRANSPARENT).
-                        color(peer_color_fg).sizeDp(70);
+                    icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                    backgroundColor(Color.TRANSPARENT).
+                    color(peer_color_fg).sizeDp(70);
 
                 icon.setVisibility(View.VISIBLE);
                 icon.setPadding((int) dp2px(0), (int) dp2px(0), (int) dp2px(0), (int) dp2px(0));
@@ -160,7 +161,7 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
                 shape.setShape(GradientDrawable.RECTANGLE);
                 shape.setSize((int) dp2px(35), (int) dp2px(35));
                 shape.setCornerRadii(
-                        new float[]{CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX});
+                    new float[]{CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX});
                 shape.setColor(peer_color_bg);
                 icon.setBackground(shape);
                 // we need to do the rounded corner background manually here, to change the color ---------------

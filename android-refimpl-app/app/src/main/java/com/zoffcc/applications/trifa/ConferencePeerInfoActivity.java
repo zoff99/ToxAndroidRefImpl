@@ -172,7 +172,9 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
                         int peer_color_bg = getResources().getColor(R.color.material_drawer_background);
                         int alpha_value = 160;
 
-                        peer_color_bg = ChatColors.PeerAvatarColors[hash_to_bucket(peer_pubkey, ChatColors.get_size())];
+                        peer_color_bg = ChatColors.get_shade(
+                            ChatColors.PeerAvatarColors[hash_to_bucket(peer_pubkey, ChatColors.get_size())],
+                            peer_pubkey);
 
                         final Drawable smiley_face = new IconicsDrawable(context_s).
                             icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
