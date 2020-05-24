@@ -712,7 +712,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         try
@@ -721,7 +721,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         super.onPause();
