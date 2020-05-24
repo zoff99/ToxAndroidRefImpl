@@ -537,6 +537,7 @@ public class GroupAudioService extends Service
         }
 
         ga_service = null;
+
         removeNotification();
     }
 
@@ -625,7 +626,6 @@ public class GroupAudioService extends Service
         global_gas_status = GAS_PAUSED;
     }
 
-
     static void do_play()
     {
         try
@@ -671,7 +671,6 @@ public class GroupAudioService extends Service
 
         global_gas_status = GAS_PLAYING;
     }
-
 
     static void do_update_group_title()
     {
