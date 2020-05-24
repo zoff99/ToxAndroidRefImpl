@@ -738,20 +738,20 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         StringBuilder ret = new StringBuilder("Files:");
         long size_sum = 0L;
 
-        Log.i(TAG, "files_and_sizes_in_dir:" + directory);
+        // Log.i(TAG, "files_and_sizes_in_dir:" + directory);
 
         try
         {
             for (File file : directory.listFiles())
             {
-                Log.i(TAG, "files_and_sizes_in_dir:file=" + file);
+                // Log.i(TAG, "files_and_sizes_in_dir:file=" + file);
 
                 try
                 {
                     if (file.isFile())
                     {
-                        Log.i(TAG, "files_and_sizes_in_dir:file name=" + file.getName());
-                        Log.i(TAG, "files_and_sizes_in_dir:file len=" + file.length());
+                        // Log.i(TAG, "files_and_sizes_in_dir:file name=" + file.getName());
+                        // Log.i(TAG, "files_and_sizes_in_dir:file len=" + file.length());
                         if ((file.length() / 1024 / 1024) < 1)
                         {
                             ret.append("\n").append(file.getName()).append("  \t").append(file.length()).append(
@@ -763,11 +763,11 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                 file.length() / 1024 / 1024).append(" MBytes");
                         }
                         size_sum = size_sum + file.length();
-                        Log.i(TAG, "files_and_sizes_in_dir:size_sum=" + size_sum);
+                        // Log.i(TAG, "files_and_sizes_in_dir:size_sum=" + size_sum);
                     }
                     else
                     {
-                        Log.i(TAG, "files_and_sizes_in_dir:file? " + file);
+                        // Log.i(TAG, "files_and_sizes_in_dir:file? " + file);
                     }
                 }
                 catch (Exception e)
