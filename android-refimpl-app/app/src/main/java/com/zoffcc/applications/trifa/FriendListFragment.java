@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -124,7 +123,7 @@ public class FriendListFragment extends Fragment
         {
             final FriendList f = c.friend_item;
 
-            if (f.is_relay==true)
+            if (f.is_relay == true)
             {
                 // do not update anything if this is a relay
                 return;
@@ -139,8 +138,8 @@ public class FriendListFragment extends Fragment
                     try
                     {
                         final FriendList f2 = orma.selectFromFriendList().
-                                tox_public_key_stringEq(f.tox_public_key_string).
-                                toList().get(0);
+                            tox_public_key_stringEq(f.tox_public_key_string).
+                            toList().get(0);
 
                         if (f2 != null)
                         {
@@ -193,8 +192,8 @@ public class FriendListFragment extends Fragment
                         // who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
                         // and().
                         final ConferenceDB conf2 = orma.selectFromConferenceDB().
-                                conference_identifierEq(cc.conference_identifier).
-                                toList().get(0);
+                            conference_identifierEq(cc.conference_identifier).
+                            toList().get(0);
 
                         if (conf2 != null)
                         {
@@ -253,6 +252,15 @@ public class FriendListFragment extends Fragment
             e.printStackTrace();
         }
 
+        try
+        {
+            ConferenceListHolder.remove_progress_dialog();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         Log.i(TAG, "onResume");
         super.onResume();
 
@@ -266,11 +274,11 @@ public class FriendListFragment extends Fragment
                     // reload friendlist
                     Log.i(TAG, "onResume:AA");
                     List<FriendList> fl = orma.selectFromFriendList().
-                            is_relayNotEq(true).
-                            orderByTOX_CONNECTION_on_offDesc().
-                            orderByNotification_silentAsc().
-                            orderByLast_online_timestampDesc().
-                            toList();
+                        is_relayNotEq(true).
+                        orderByTOX_CONNECTION_on_offDesc().
+                        orderByNotification_silentAsc().
+                        orderByLast_online_timestampDesc().
+                        toList();
 
                     if (fl != null)
                     {
@@ -292,9 +300,9 @@ public class FriendListFragment extends Fragment
 
                     // reload conferences
                     List<ConferenceDB> confs = orma.selectFromConferenceDB().
-                            orderByConference_activeDesc().
-                            orderByNotification_silentAsc().
-                            toList();
+                        orderByConference_activeDesc().
+                        orderByNotification_silentAsc().
+                        toList();
 
                     if (confs != null)
                     {
@@ -325,7 +333,7 @@ public class FriendListFragment extends Fragment
                 add_all_friends_clear(1);
             }
         }
-        catch(Exception ee)
+        catch (Exception ee)
         {
             ee.printStackTrace();
 
@@ -334,11 +342,11 @@ public class FriendListFragment extends Fragment
                 // reload friendlist
                 Log.i(TAG, "onResume:AA");
                 List<FriendList> fl = orma.selectFromFriendList().
-                        is_relayNotEq(true).
-                        orderByTOX_CONNECTION_on_offDesc().
-                        orderByNotification_silentAsc().
-                        orderByLast_online_timestampDesc().
-                        toList();
+                    is_relayNotEq(true).
+                    orderByTOX_CONNECTION_on_offDesc().
+                    orderByNotification_silentAsc().
+                    orderByLast_online_timestampDesc().
+                    toList();
 
                 if (fl != null)
                 {
@@ -360,9 +368,9 @@ public class FriendListFragment extends Fragment
 
                 // reload conferences
                 List<ConferenceDB> confs = orma.selectFromConferenceDB().
-                        orderByConference_activeDesc().
-                        orderByNotification_silentAsc().
-                        toList();
+                    orderByConference_activeDesc().
+                    orderByNotification_silentAsc().
+                    toList();
 
                 if (confs != null)
                 {
@@ -417,11 +425,11 @@ public class FriendListFragment extends Fragment
                             adapter.clear_items(); // clears friends AND conferences!!
 
                             List<FriendList> fl = orma.selectFromFriendList().
-                                    is_relayNotEq(true).
-                                    orderByTOX_CONNECTION_on_offDesc().
-                                    orderByNotification_silentAsc().
-                                    orderByLast_online_timestampDesc().
-                                    toList();
+                                is_relayNotEq(true).
+                                orderByTOX_CONNECTION_on_offDesc().
+                                orderByNotification_silentAsc().
+                                orderByLast_online_timestampDesc().
+                                toList();
 
                             if (fl != null)
                             {
@@ -442,9 +450,9 @@ public class FriendListFragment extends Fragment
                             }
 
                             List<ConferenceDB> confs = orma.selectFromConferenceDB().
-                                    orderByConference_activeDesc().
-                                    orderByNotification_silentAsc().
-                                    toList();
+                                orderByConference_activeDesc().
+                                orderByNotification_silentAsc().
+                                toList();
 
                             if (confs != null)
                             {
