@@ -164,7 +164,7 @@ public class NativeAudio
         Log.i(TAG, "audio_rec:StartREC:004:-restart-");
 
         semaphore_audioprocessing_02.release();
-
+        Log.i(TAG, "audio_rec:StartREC:004:-restart-:done");
     }
 
     // ------- DEBUG -------
@@ -179,7 +179,6 @@ public class NativeAudio
         if (!microphone_muted)
         {
             // Log.i(TAG, "rec_buffer_ready:002");
-
             new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num).execute();
         }
     }
