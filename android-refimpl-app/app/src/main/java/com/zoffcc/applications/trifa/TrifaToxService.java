@@ -156,7 +156,7 @@ public class TrifaToxService extends Service
         Log.i(TAG, "onStartCommand");
         // this gets called all the time!
         tox_service_fg = this;
-        return START_STICKY;
+        return START_NOT_STICKY; // START_STICKY;
     }
 
     @Override
