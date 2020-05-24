@@ -1043,7 +1043,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             if (Callstate.audio_call)
                             {
                                 toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                             GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                             GLOBAL_AUDIO_BITRATE, 0);
                                 Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             }
                             else
