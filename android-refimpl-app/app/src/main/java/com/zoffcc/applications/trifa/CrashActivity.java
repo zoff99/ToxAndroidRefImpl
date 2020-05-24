@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -43,6 +44,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.zoffcc.applications.trifa.MainActivity.reset_audio_mode;
 
 
 public class CrashActivity extends AppCompatActivity implements Logging.AsyncResponse
@@ -62,6 +65,18 @@ public class CrashActivity extends AppCompatActivity implements Logging.AsyncRes
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crash);
 
+        // --- make sure we reset the audio mode ---
+        reset_audio_mode();
+        try
+        {
+            AudioManager am2 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            am2.setMode(AudioManager.MODE_NORMAL);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        // --- make sure we reset the audio mode ---
 
         CrashView = (View) this.findViewById(R.id.CrashView);
         CrashView.setOnTouchListener(new View.OnTouchListener()
@@ -84,6 +99,8 @@ public class CrashActivity extends AppCompatActivity implements Logging.AsyncRes
                             CrashView.setBackgroundColor(Color.parseColor("#FF9900"));
                             restart_app();
                             finish();
+                            // android.os.Process.killProcess(android.os.Process.myPid());
+                            // System.exit(0);
                             return true;
                         }
                     }
@@ -247,6 +264,8 @@ public class CrashActivity extends AppCompatActivity implements Logging.AsyncRes
                             bug_button.setTop(bug_button.getTop() - 10);
                             restart_app();
                             finish();
+                            // android.os.Process.killProcess(android.os.Process.myPid());
+                            // System.exit(0);
                             return true;
                         }
                     }
@@ -263,7 +282,9 @@ public class CrashActivity extends AppCompatActivity implements Logging.AsyncRes
 
     public void restart_app()
     {
-        PendingIntent intent = PendingIntent.getActivity(getBaseContext(), 0, new Intent(getApplicationContext(), com.zoffcc.applications.trifa.StartMainActivityWrapper.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent intent = PendingIntent.getActivity(getBaseContext(), 0, new Intent(getApplicationContext(),
+                                                                                         com.zoffcc.applications.trifa.StartMainActivityWrapper.class),
+                                                         PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 300, intent); // restart app after n seconds delay
     }
@@ -271,11 +292,14 @@ public class CrashActivity extends AppCompatActivity implements Logging.AsyncRes
     @Override
     public void processFinish(String output_part1)
     {
-        String output = output_part1 + System.getProperty("line.separator") + System.getProperty("line.separator") + "LastStackTrace:" + System.getProperty("line.separator") + MainApplication.last_stack_trace_as_string;
+        String output = output_part1 + System.getProperty("line.separator") + System.getProperty("line.separator") +
+                        "LastStackTrace:" + System.getProperty("line.separator") +
+                        MainApplication.last_stack_trace_as_string;
         MainApplication.last_stack_trace_as_string = ""; // reset last stacktrace
 
         // String DATA_DEBUG_DIR = new File(getExternalFilesDir(null).getAbsolutePath() + "/crashes").toString();
-        String DATA_DEBUG_DIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes").toString();
+        String DATA_DEBUG_DIR = new File(
+            Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes").toString();
 
         Log.i(TAG, "processFinish:DATA_DEBUG_DIR=" + DATA_DEBUG_DIR);
 
@@ -304,7 +328,10 @@ public class CrashActivity extends AppCompatActivity implements Logging.AsyncRes
         try
         {
             Log.i(TAG, "processFinish:MainActivity.main_activity_s=" + MainActivity.main_activity_s);
-            MainActivity.main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc", "TRIfA Crashlog (a:" + android.os.Build.VERSION.SDK + ")", feedback_text, full_file_name, full_file_name_suppl);
+            MainActivity.main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc",
+                                                                 "TRIfA Crashlog (a:" + android.os.Build.VERSION.SDK +
+                                                                 ")", feedback_text, full_file_name,
+                                                                 full_file_name_suppl);
         }
         catch (Exception ee3)
         {

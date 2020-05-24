@@ -348,7 +348,7 @@ public class MainApplication extends Application
 
         try
         {
-            // remove the notofication
+            // remove the notification
             NotificationManager nmn2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             nmn2.cancel(ONGOING_NOTIFICATION_ID);
         }
@@ -356,6 +356,14 @@ public class MainApplication extends Application
         {
             e3.printStackTrace();
         }
+
+        TrifaToxService.is_tox_started = false;
+        TrifaToxService.ToxServiceThread = null;
+        TrifaToxService.orma = null;
+        TrifaToxService.vfs = null;
+        TrifaToxService.trifa_service_thread = null;
+        // TrifaToxService.need_wakeup_now = true;
+        TrifaToxService.TOX_SERVICE_STARTED = false;
 
         Intent intent = new Intent(this, com.zoffcc.applications.trifa.CrashActivity.class);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "xx1 intent(1)=" + intent);
