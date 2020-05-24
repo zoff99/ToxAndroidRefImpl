@@ -615,8 +615,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        reset_audio_mode();
-
         // update every x times per second -----------
         final int update_per_sec = 8;
         final Handler ha = new Handler();
