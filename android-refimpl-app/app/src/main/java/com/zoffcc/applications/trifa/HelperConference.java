@@ -277,7 +277,7 @@ public class HelperConference
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             return null;
         }
     }
