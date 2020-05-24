@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -67,6 +68,25 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
     private ImageView imageView2;
     private ImageView f_notification;
     private ViewGroup f_conf_container_parent;
+    static ProgressDialog progressDialog = null;
+
+    synchronized static void remove_progress_dialog()
+    {
+        try
+        {
+            if (progressDialog != null)
+            {
+                if (ConferenceListHolder.progressDialog.isShowing())
+                {
+                    progressDialog.dismiss();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     public ConferenceListHolder(View itemView, Context c)
     {
@@ -256,6 +276,22 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             }
             else
             {
+                try
+                {
+                    if (progressDialog == null)
+                    {
+                        progressDialog = new ProgressDialog(this.context);
+                        progressDialog.setIndeterminate(true);
+                        progressDialog.setMessage("");
+                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    }
+                    progressDialog.show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 if (this.conference.kind == TOX_CONFERENCE_TYPE_AV.value)
                 {
                     Intent intent = new Intent(v.getContext(), ConferenceAudioActivity.class);
