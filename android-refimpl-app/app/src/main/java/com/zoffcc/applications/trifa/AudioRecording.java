@@ -44,10 +44,10 @@ import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
-import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
+import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_audio_send_frame;
@@ -453,10 +453,33 @@ public class AudioRecording extends Thread
                     }
                     else
                     {
-                        // Log.i(TAG, "toxav_audio_send_frame:002:native");
+                        // Log.i(TAG,
+                        //       "toxav_audio_send_frame:002:native:Callstate.friend_pubkey=" + Callstate.friend_pubkey +
+                        //       " fnum=" + tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
                         audio_send_res = toxav_audio_send_frame(
                             tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                            (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                            ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+
+                        if (audio_send_res == ToxVars.TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_SYNC.value)
+                        {
+                            audio_send_res = toxav_audio_send_frame(
+                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+
+                            if (audio_send_res == ToxVars.TOXAV_ERR_SEND_FRAME.TOXAV_ERR_SEND_FRAME_SYNC.value)
+                            {
+                                audio_send_res = toxav_audio_send_frame(
+                                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                    ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                            }
+                        }
+
+                        // if (audio_send_res != 0)
+                        // {
+                        //   Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" +
+                        //               ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                        // }
+
                     }
 
                     if (DEBUG_MIC_DATA_LOGGING)
