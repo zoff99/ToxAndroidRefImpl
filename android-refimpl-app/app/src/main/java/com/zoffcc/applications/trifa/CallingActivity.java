@@ -88,6 +88,7 @@ import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.format_timeduration_from_seconds;
 import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.put_vfs_image_on_imageview_real;
+import static com.zoffcc.applications.trifa.MainActivity.reset_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
@@ -1653,6 +1654,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e.printStackTrace();
         }
 
+        reset_audio_mode();
 
         Log.i(TAG, "onPause:on_call_ended_actions"); //$NON-NLS-1$
         on_call_ended_actions();

@@ -9316,6 +9316,18 @@ public class MainActivity extends AppCompatActivity
         return bitmap;
     }
 
+    public static void reset_audio_mode()
+    {
+        try
+        {
+            audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     // --------- make app crash ---------
     // --------- make app crash ---------
     // --------- make app crash ---------

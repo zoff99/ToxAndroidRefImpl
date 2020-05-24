@@ -73,6 +73,7 @@ import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActiv
 import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.reset_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
@@ -614,17 +615,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        try
-        {
-            if (AudioRecording.stopped)
-            {
-                audio_thread = new AudioRecording();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        reset_audio_mode();
 
         // update every x times per second -----------
         final int update_per_sec = 8;
@@ -809,6 +800,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         {
             need_close_activity = false;
         }
+
+        reset_audio_mode();
 
         release_all_locks();
 
