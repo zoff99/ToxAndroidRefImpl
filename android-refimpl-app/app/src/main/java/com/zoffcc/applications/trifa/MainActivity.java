@@ -7640,9 +7640,22 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            BigInteger bigInt = new BigInteger(1, hash_value.getBytes());
-            int ret = (int) (bigInt.longValue() % (long) number_of_buckets);
-            // Log.i(TAG, "hash_to_bucket:" + "ret=" + ret + " hash_as_int=" + bigInt + " hash=" + hash_value);
+            int ret = 0;
+            int value = (Integer.parseInt(hash_value.substring(hash_value.length() - 1, hash_value.length() - 0), 16) +
+                         (Integer.parseInt(hash_value.substring(hash_value.length() - 2, hash_value.length() - 1), 16) *
+                          16) +
+                         (Integer.parseInt(hash_value.substring(hash_value.length() - 3, hash_value.length() - 2), 16) *
+                          (16 * 2)) +
+                         (Integer.parseInt(hash_value.substring(hash_value.length() - 4, hash_value.length() - 3), 16) *
+                          (16 * 3)));
+
+            // Log.i(TAG, "hash_to_bucket:value=" + value);
+
+            ret = (value % number_of_buckets);
+
+            // BigInteger bigInt = new BigInteger(1, hash_value.getBytes());
+            // int ret = (int) (bigInt.longValue() % (long) number_of_buckets);
+            // // Log.i(TAG, "hash_to_bucket:" + "ret=" + ret + " hash_as_int=" + bigInt + " hash=" + hash_value);
             return ret;
         }
         catch (Exception e)
