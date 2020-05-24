@@ -122,7 +122,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
     static ImageView group_audio_send_icon = null;
     ImageButton group_audio_player_icon = null;
 
-
     Handler conferences_av_handler = null;
     static Handler conferences_av_handler_s = null;
 
@@ -596,6 +595,18 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 AudioReceiver.close();
                 audio_receiver_thread.join();
                 audio_receiver_thread = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (AudioRecording.stopped)
+            {
+                audio_thread = new AudioRecording();
             }
         }
         catch (Exception e)
@@ -1548,7 +1559,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
     }
 
-
     // actions to take when group audio starts:
     static void on_groupaudio_started_actions()
     {
@@ -1570,7 +1580,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
             }
         }
     }
-
 
     public static void close_conference_audio_activity()
     {
