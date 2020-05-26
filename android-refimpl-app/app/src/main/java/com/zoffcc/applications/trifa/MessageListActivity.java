@@ -1605,7 +1605,7 @@ public class MessageListActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        ret.ret_value = false;
+        ret.ret_value = true;
         return ret;
     }
 }
