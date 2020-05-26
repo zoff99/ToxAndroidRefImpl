@@ -1553,6 +1553,7 @@ public class MessageListActivity extends AppCompatActivity
         {
             if (is_selected)
             {
+                ret.is_selected = true;
             }
             else
             {

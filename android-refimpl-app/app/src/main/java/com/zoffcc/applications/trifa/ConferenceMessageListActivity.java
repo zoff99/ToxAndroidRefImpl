@@ -589,6 +589,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         {
             if (is_selected)
             {
+                ret.is_selected = true;
             }
             else
             {
