@@ -135,6 +135,20 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                layout_message_container.performClick();
+            }
+        });
+        textView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                layout_message_container.performLongClick();
+                return true;
+            }
+        });
+
         date_time.setText(long_date_time_format(m.sent_timestamp));
 
         textView.setCustomRegex(TOXURL_PATTERN);
