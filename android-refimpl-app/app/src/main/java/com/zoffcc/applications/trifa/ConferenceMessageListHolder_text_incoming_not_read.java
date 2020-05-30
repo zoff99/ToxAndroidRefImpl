@@ -46,6 +46,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
@@ -53,6 +54,9 @@ import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -98,6 +102,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     public void bindMessageList(ConferenceMessage m)
     {
         message_ = m;
+
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
 
         // Log.i(TAG, "have_avatar_for_pubkey:0000:==========================");
 
@@ -200,6 +206,16 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         //                m.tox_peerpubkey.length())
         //                //
         //                + ":" + m.text);
+
+        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
+        {
+            // text consits only of emojis -> increase size
+            textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_ONLY_EMOJI_SIZE[PREF__global_font_size]));
+        }
+        else
+        {
+            textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_SIZE[PREF__global_font_size]));
+        }
 
         textView.setAutoLinkText(m.text);
 
@@ -374,7 +390,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             parameter.setMargins((int) dp2px(20), parameter.topMargin, parameter.rightMargin,
                                  parameter.bottomMargin); // left, top, right, bottom
             textView_container.setLayoutParams(parameter);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
             peer_name_text.setVisibility(View.GONE);
         }
@@ -391,7 +406,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             parameter.setMargins(0, parameter.topMargin, parameter.rightMargin,
                                  parameter.bottomMargin); // left, top, right, bottom
             textView_container.setLayoutParams(parameter);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             peer_name_text.setVisibility(View.VISIBLE);
 

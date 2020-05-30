@@ -12,6 +12,16 @@
         android:summary="@string/pref_description_auto_accept_video"
         android:title="@string/pref_title_auto_accept_video" />
 
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/pref_global_font_size_titles"
+        android:entryValues="@array/pref_global_font_size_values"
+        android:key="global_font_size"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="@string/pref_description_global_font_size"
+        android:title="@string/pref_title_global_font_size" />
+
     <SwitchPreference
         android:defaultValue="true"
         android:key="video_uv_reversed"

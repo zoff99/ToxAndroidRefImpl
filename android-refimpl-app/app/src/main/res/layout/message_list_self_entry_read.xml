@@ -38,6 +38,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:paddingLeft="10dp"
+                    android:paddingBottom="3dp"
                     app:emojiSize="@dimen/emoji_size_in_textview"
                     android:text="..."
                     android:textColorLink="@color/textblock_link_color_for_blue"

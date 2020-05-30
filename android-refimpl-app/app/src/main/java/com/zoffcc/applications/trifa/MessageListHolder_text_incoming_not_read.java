@@ -27,6 +27,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,13 +41,17 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -89,6 +94,8 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
         message_ = m;
 
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
+
         is_selected = false;
         if (selected_messages.isEmpty())
         {
@@ -122,16 +129,16 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                     if (my_position < 1)
                     {
                         message_text_date_string.setText(
-                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                         message_text_date.setVisibility(View.VISIBLE);
                     }
                     else
                     {
                         if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
-                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                            MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
                         {
                             message_text_date_string.setText(
-                                    MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                             message_text_date.setVisibility(View.VISIBLE);
                         }
                     }
@@ -148,15 +155,19 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
-        textView.setOnClickListener(new View.OnClickListener() {
+        textView.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 layout_message_container.performClick();
             }
         });
-        textView.setOnLongClickListener(new View.OnLongClickListener() {
+        textView.setOnLongClickListener(new View.OnLongClickListener()
+        {
             @Override
-            public boolean onLongClick(View view) {
+            public boolean onLongClick(View view)
+            {
                 layout_message_container.performLongClick();
                 return true;
             }
@@ -170,11 +181,11 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
         {
             // text consits only of emojis -> increase size
-            textView.setEmojiSize((int) dp2px(36 * 2));
+            textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_ONLY_EMOJI_SIZE[PREF__global_font_size]));
         }
         else
         {
-            textView.setEmojiSize((int) dp2px(36));
+            textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_SIZE[PREF__global_font_size]));
         }
 
         textView.setAutoLinkText(m.text);
@@ -183,13 +194,13 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         final String unicode_INCOMING_ENVELOPE = "\uD83D\uDCE8";
         final String unicode_Mobile_Phone_With_Arrow = "\uD83D\uDCF2";
         final String unicode_MEMO = "\uD83D\uDCDD";
-        final String unicode_ARROW_LEFT="←";
+        final String unicode_ARROW_LEFT = "←";
 
         if (m.msg_version == 1)
         {
             date_time.setText(
-                    unicode_ARROW_LEFT + long_date_time_format(m.sent_timestamp) + "\n" + unicode_Mobile_Phone_With_Arrow +
-                    long_date_time_format(m.rcvd_timestamp));
+                unicode_ARROW_LEFT + long_date_time_format(m.sent_timestamp) + "\n" + unicode_Mobile_Phone_With_Arrow +
+                long_date_time_format(m.rcvd_timestamp));
         }
         else
         {
@@ -228,7 +239,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
 
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
-                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -259,15 +270,15 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
                         GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                        fl.avatar_update_timestamp)).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(img_avatar);
+                            with(context).
+                            load(f1).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                fl.avatar_update_timestamp)).
+                            skipMemoryCache(false).
+                            apply(glide_options).
+                            into(img_avatar);
                     }
                 }
             }
@@ -304,23 +315,23 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(url).setTitle(title).
-                setCancelable(false).
-                setPositiveButton("OK", new DialogInterface.OnClickListener()
+            setCancelable(false).
+            setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id)
                 {
-                    public void onClick(DialogInterface dialog, int id)
+                    try
                     {
-                        try
-                        {
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            c.startActivity(intent);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        c.startActivity(intent);
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    dialog.dismiss();
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -335,27 +346,27 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(email_addr).setTitle(title).
-                setCancelable(false).
-                setPositiveButton("OK", new DialogInterface.OnClickListener()
+            setCancelable(false).
+            setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id)
                 {
-                    public void onClick(DialogInterface dialog, int id)
+                    try
                     {
-                        try
-                        {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
-                                                            Uri.fromParts("mailto", email_addr, null));
-                            emailIntent.setType("message/rfc822");
-                            // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-                            // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                            c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                        Uri.fromParts("mailto", email_addr, null));
+                        emailIntent.setType("message/rfc822");
+                        // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                        // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                        c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    dialog.dismiss();
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -370,25 +381,25 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(toxid.toUpperCase()).setTitle(title).
-                setCancelable(false).
-                setPositiveButton("OK", new DialogInterface.OnClickListener()
+            setCancelable(false).
+            setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id)
                 {
-                    public void onClick(DialogInterface dialog, int id)
+                    try
                     {
-                        try
-                        {
-                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
-                                                                                                     "").replaceFirst(
-                                    "TOX:", "").replaceFirst("Tox:", "");
-                            add_friend_real(friend_tox_id);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
+                        String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
+                                                                                                 "").replaceFirst(
+                            "TOX:", "").replaceFirst("Tox:", "");
+                        add_friend_real(friend_tox_id);
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    dialog.dismiss();
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {

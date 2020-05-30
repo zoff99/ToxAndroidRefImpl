@@ -87,6 +87,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:paddingBottom="3dp"
                     android:text="..."
                     android:textColorLink="@color/textblock_link_color_for_orange"
                     android:textSize="20sp"

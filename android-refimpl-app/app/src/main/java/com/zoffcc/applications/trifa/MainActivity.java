@@ -407,6 +407,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__auto_accept_image = true;
     static boolean PREF__auto_accept_video = false;
     static int PREF__video_cam_resolution = 0;
+    static int PREF__global_font_size = 2;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -939,6 +940,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__video_cam_resolution = 0;
+        }
+
+        try
+        {
+            PREF__global_font_size = Integer.parseInt(settings.getString("global_font_size", "" + 2));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__global_font_size = 2;
         }
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
@@ -2227,6 +2238,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__video_cam_resolution = 0;
+        }
+
+        try
+        {
+            PREF__global_font_size = Integer.parseInt(settings.getString("global_font_size", "" + 2));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__global_font_size = 2;
         }
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");

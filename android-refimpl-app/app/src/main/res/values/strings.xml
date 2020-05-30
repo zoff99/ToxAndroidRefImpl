@@ -74,6 +74,21 @@
         <item>2</item>
     </string-array>
 
+    <string name="pref_title_global_font_size">Font Size</string>
+    <string name="pref_description_global_font_size">Select Font Size</string>
+    <string-array name="pref_global_font_size_titles">
+        <item>very small</item>
+        <item>small</item>
+        <item>default: normal</item>
+        <item>large</item>
+    </string-array>
+    <string-array name="pref_global_font_size_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
     <string name="pref_title_camera_get_preview_format">Camera Preview Format</string>
     <string name="pref_description_camera_get_preview_format">Camera Preview Format seems to be in the wrong format on some phones</string>
     <string-array name="pref_camera_get_preview_format_titles">
