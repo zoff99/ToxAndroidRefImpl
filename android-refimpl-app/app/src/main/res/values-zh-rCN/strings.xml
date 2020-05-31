@@ -1,7 +1,9 @@
 <resources>
     <string name="add_friend_activity_name">添加好友</string>
     <string name="message_list_activity_name">聊天</string>
-    <string name="conference_message_list_activity_name">会议</string>
+    <string name="conference_message_list_activity_name">文字会议</string>
+    <string name="conference_audio_activity_name">音频会议</string>
+    <string name="conference_audio_activity_player_name">音频会议播放器</string>
 
     <string name="set_password_message_empty">密码为空</string>
     <string name="set_password_message_password_invalid">密码太短</string>
@@ -12,6 +14,7 @@
     <string name="title_activity_settings">设置</string>
     <string name="title_activity_crash">崩溃</string>
     <string name="title_activity_friendinfo">好友信息</string>
+    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
     <string name="title_activity_aboutpage">关于</string>
     <string name="title_activity_set_password">设置密码</string>
     <string name="title_activity_check_password">输入密码</string>
@@ -32,6 +35,12 @@
     <!-- Strings related to Settings -->
     <string name="pref_header_general">通用</string>
 
+    <string name="pref_title_auto_accept_image">自动接收图片</string>
+    <string name="pref_description_auto_accept_image">自动接收不超过 3 MByte 的图片和照片</string>
+
+    <string name="pref_title_auto_accept_video">自动接收视频</string>
+    <string name="pref_description_auto_accept_video">自动接收不超过 10 MByte 视频</string>
+
     <string name="pref_title_video_uv_reversed">在视频中反转 UV</string>
     <string name="pref_description_video_uv_reversed">反转摄像机视频中 UV 平面的顺序</string>
 
@@ -51,6 +60,48 @@
         <item>2</item>
     </string-array>
 
+    <string name="pref_title_video_cam_resolution">相机分辨率</string>
+    <string name="pref_description_video_cam_resolution">视频通话使用何种分辨率</string>
+    <string-array name="pref_video_cam_resolution_titles">
+        <item>640x480</item>
+        <item>1280x720</item>
+        <item>1920x1080</item>
+    </string-array>
+    <string-array name="pref_video_cam_resolution_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_global_font_size">字体大小</string>
+    <string name="pref_description_global_font_size">选择字体大小</string>
+    <string-array name="pref_global_font_size_titles">
+        <item>很小</item>
+        <item>小</item>
+        <item>默认：正常</item>
+        <item>大</item>
+    </string-array>
+    <string-array name="pref_global_font_size_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string name="pref_title_camera_get_preview_format">相机预览格式</string>
+    <string name="pref_description_camera_get_preview_format">相机预览格式在某些手机上似乎使用了错误的格式</string>
+    <string-array name="pref_camera_get_preview_format_titles">
+        <item>默认：YV12</item>
+        <item>某些手机：NV21</item>
+    </string-array>
+    <string-array name="pref_camera_get_preview_format_values">
+        <item>YV12</item>
+        <item>NV21</item>
+    </string-array>
+
+    <string name="pref_title_mic_gain_factor">麦克风增益</string>
+    <string name="pref_description_mic_gain_factor">如果你的麦克风录音音量低，设置一个更高的增益</string>
+
     <string name="pref_title_higher_audio_quality">音频质量</string>
     <string name="pref_description_higher_audio_quality">使用更好的音频质量。\n更改需重启！</string>
     <string-array name="pref_higher_audio_quality_titles">
@@ -65,19 +116,16 @@
     </string-array>
 
     <string name="pref_title_udp_enabled">启用 UDP</string>
-    <string name="pref_description_udp_enabled">对于大多数移动设备 UDP 为产生更多网络流量。\n更改需重启！\n默认设置为关闭</string>
+    <string name="pref_description_udp_enabled">对于大多数移动设备 UDP 会产生更多网络流量。\n更改需重启！\n默认设置为关闭</string>
 
     <string name="pref_title_orbot_enabled">启用 Tor 代理</string>
     <string name="pref_description_orbot_enabled">你需要安装 Orbot 以使用。\n更改需重启！</string>
 
     <string name="pref_title_fps_half">更低 fps</string>
-    <string name="pref_description_fps_half">视频帧率 7fps 而非 15fps</string>
+    <string name="pref_description_fps_half">视频帧率 1/2 : 12fps 而非 25fps</string>
 
     <string name="pref_title_set_fps">设置 fps</string>
-    <string name="pref_description_set_fps">尝试设置想要的 [15fps] 视频帧率，可能会在某些设备上崩溃</string>
-
-    <string name="pref_title_display_name">显示姓名</string>
-    <string name="pref_default_display_name">John Smith</string>
+    <string name="pref_description_set_fps">尝试设置 15fps 视频帧率，可能会在某些设备上崩溃</string>
 
     <string name="pref_title_conference_show_system_messages">系统消息</string>
     <string name="pref_description_conference_show_system_messages">会议中显示系统消息</string>
@@ -86,7 +134,7 @@
     <string name="pref_description_local_discovery_enabled">使用本地 LAN 节点引导</string>
 
     <string name="pref_title_U_keep_nospam">保存 NoSpam</string>
-    <string name="pref_description_U_keep_nospam">保存 NoSpam 值。这不安全，只有你知道自己在做什么才会激活！</string>
+    <string name="pref_description_U_keep_nospam">保存 NoSpam 值。这不安全，仅在你知道自己在做什么时启用！</string>
 
     <string name="pref_title_allow_screen_off_in_audio_call">关闭屏幕</string>
     <string name="pref_description_allow_screen_off_in_audio_call">如果你在音频通话中屏幕关闭时遇到问题，请设置为关闭</string>
@@ -107,16 +155,6 @@
     <string name="pref_description_X_eac_delay_ms">!! 实验性 !!\nAEC 延迟（单位 ms）</string>
 
     <string name="pref_title_add_friends_to_messages">向消息添加好友</string>
-    <string-array name="pref_example_list_titles">
-        <item>总是</item>
-        <item>可能时</item>
-        <item>从不</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
 
     <string name="pref_header_data_sync">数据 &#038; 同步</string>
 
@@ -222,4 +260,115 @@
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
+
+
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+    <string name="MainActivity_profile">个人资料</string>
+    <string name="MainActivity_settings">设置</string>
+    <string name="MainActivity_logout_login">登出/登入</string>
+    <string name="MainActivity_maint">管理</string>
+    <string name="MainActivity_about">关于</string>
+    <string name="MainActivity_exit">退出</string>
+    <string name="MainActivity_available">在线</string>
+    <string name="MainActivity_away">离开</string>
+    <string name="MainActivity_busy">忙碌</string>
+    <string name="MainActivity_no_button">不</string>
+    <string name="MainActivity_ok_take_me_there_button">好的，带我过去</string>
+    <string name="MainActivity_info_dialog_title">信息</string>
+    <string name="MainActivity_add_to_batt_opt">请将 TRIfA 电池优化白名单！</string>
+    <string name="MainActivity_friend_is_typing">好友正在输入 ...</string>
+    <string name="MainActivity_notification_new_message">新消息</string>
+    <string name="MainActivity_notification_new_message2">新消息</string>
+    <string name="MainActivity_button_ok">好的</string>
+    <string name="MainActivity_error_starting_email_app">启动电子邮件应用错误</string>
+    <string name="MainActivity_no_email_app_found">未找到电子邮件应用</string>
+    <string name="MainActivity_toast_msg_deleted">消息已删除</string>
+    <string name="MainActivity_toast_msg_exported">消息已导出</string>
+    <string name="MainActivity_toast_msgs_deleted">消息已删除</string>
+    <string name="MainActivity_notification_new_message3">新消息</string>
+    <string name="MainActivity_notification_new_message4">新消息</string>
+    <string name="MainActivity_notification_new_message5">新消息</string>
+
+    <string name="Aboutpage_0">TRIfA 崩溃日志</string>
+    <string name="Aboutpage_2">通过电子邮件发送崩溃报告</string>
+    <string name="Aboutpage_4">阅读崩溃信息 ...</string>
+     <string name="Aboutpage_5a">TRIfA 一个 Tox Android 客户端</string>
+    <string name="Aboutpage_5b">版本：</string>
+    <string name="Aboutpage_6">Tox 是什么？</string>
+    <string name="Aboutpage_8">使用的库：</string>
+
+    <string name="AddFriendActivity_3">错误的 ToxID</string>
+    <string name="AddFriendActivity_4">无 ToxID</string>
+
+    <string name="CallingActivity_0">视频延迟：</string>
+    <string name="CallingActivity_23">视频延迟：</string>
+
+    <string name="ConferenceAudioActivity_10">用户列表</string>
+    <string name="ConferenceAudioActivity_17">推送到聊天</string>
+    <string name="ConferenceAudioActivity_18">正在聊天 ...</string>
+    <string name="GroupActivityActive">在线：</string>
+    <string name="GroupActivityOffline">离线|</string>
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+
+
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+    <string name="layout___toxid">ToxID</string>
+    <string name="layout___scan_qr_code">扫描二维码</string>
+    <string name="layout___enter_pass_longtext">输入密码\n没有恢复选项！</string>
+    <string name="layout___unlock">解锁</string>
+    <string name="layout___name">姓名</string>
+    <string name="layout___push_to_talk">推送到聊天</string>
+    <string name="layout___nick">昵称：</string>
+    <string name="layout___pubkey">公钥：</string>
+    <string name="layout___status">状态：</string>
+    <string name="layout___alias">备注名</string>
+    <string name="layout___remove_friends_relay">移除好友中继</string>
+    <string name="layout___friends_relay_pubkey">好友转发公钥：</string>
+    <string name="layout___waiting_for_orbot">正在等待 Orbot ...</string>
+    <string name="layout___clear_glide_cache">清除 Glide 缓存</string>
+    <string name="layout___set_app_language">设置应用语言</string>
+    <string name="layout___run_vacuum_on_sql_database">在 Sql 数据库上运行 VACUUM</string>
+    <string name="layout___run_analyze_on_sql_database">在 Sql 数据库上运行 ANALYZE</string>
+    <string name="layout___reset_favorite_emoji_list">重置最爱表情列表</string>
+    <string name="layout___delete_all_avatar_icons">删除全部头像图标</string>
+    <string name="layout___update_bootstrapnodes_from_internet">从互联网更新引导节点</string>
+    <string name="layout___reset_bootstrapnodes_to_default">重置引导节点为默认</string>
+    <string name="layout___test_notification_sound">测试通知声音</string>
+    <string name="layout___test_ringtone_sound">测试铃声</string>
+    <string name="layout___export_tox_savedata_unsecure">导出 tox 保存数据 *不安全*</string>
+    <string name="layout___im_port_tox_savadata_unsecure">导入 tox 保存数据 *不安全*</string>
+    <string name="layout___click_image_to_change_your_avatar">点击图像更改你的头像</string>
+    <string name="layout___remove_own_relay">移除自己的中继</string>
+    <string name="layout___relay_pubkey">中继公钥</string>
+    <string name="layout___new_random_nospam">新建随机 NOSPAM</string>
+    <string name="layout___own_pubkey">自己的公钥：</string>
+    <string name="layout___copy_toxid">复制 ToxID</string>
+    <string name="layout___your_toxidenticon">你的 ToxIdenticon</string>
+    <string name="layout___active_network_connections">激活网络连接：</string>
+    <string name="layout___error_getting_active_network_connections">*获取活动网络连接错误*</string>
+    <string name="layout___set_password_or_skip">设置密码或跳过。\n\n当你选择跳过\n会自动生成一个密码\n没有恢复选项！</string>
+    <string name="layout___password">密码</string>
+    <string name="layout___password_again">确认密码</string>
+    <string name="layout___set_password">设置密码</string>
+    <string name="layout___skip">跳过</string>
+    <string name="layout___leave">离开</string>
+    <string name="layout___delete">删除</string>
+    <string name="layout___info">信息</string>
+    <string name="layout___create_text_group">创建文字群组</string>
+    <string name="layout___create_audio_group">创建音频群组</string>
+    <string name="layout___add_as_toxproxy">添加为 ToxProxy</string>
+    <string name="layout___peer_name">对方姓名</string>
+    <string name="layout___online">在线</string>
+    <string name="layout___copy">复制</string>
+    <string name="layout___export">导出</string>
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+
 </resources>
