@@ -22,5 +22,9 @@ jobs:
         name: lint report
         path: /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/native-audio-jni/build/reports/lint-results.html
 
-
+    - name: upload apk
+      uses: actions/upload-artifact@v1
+      with:
+        name: trifa
+        path: /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk
 
