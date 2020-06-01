@@ -8,6 +8,7 @@ This is now also a Tox Client for Android.
 Build Status
 =
 **CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003)
+![Android CI](https://github.com/zoff99/ToxAndroidRefImpl/workflows/Android%20CI/badge.svg)
 **Bintray:** [![Download](https://api.bintray.com/packages/zoff99/maven/trifajni/images/download.svg)](https://bintray.com/zoff99/maven/trifajni/_latestVersion)
 **Weblate:** [![Translations](https://weblate.tox.zoff.cc/widgets/trifa-a-tox-client-for-android/en/android-app/svg-badge.svg)](https://weblate.tox.zoff.cc/engage/trifa-a-tox-client-for-android/en/?utm_source=widget)
 
