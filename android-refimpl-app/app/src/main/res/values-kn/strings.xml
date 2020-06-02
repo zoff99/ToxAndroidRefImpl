@@ -1,0 +1,416 @@
+<resources>
+    <string name="app_name" translatable="false">TRIfA</string>
+    <string name="add_friend_activity_name">ನಿನ್ನ ಗೆಳೆಯನನ್ನು ಸೇರಿಸು</string>
+    <string name="message_list_activity_name">ಮಾತಾಡು</string>
+    <string name="conference_message_list_activity_name">ಪದ ಮಿಲನ</string>
+    <string name="conference_audio_activity_name">ದನಿ ಮಿಲನ</string>
+    <string name="conference_audio_activity_player_name">ದನಿ ಮಿಲನ ಚಲನೆ</string>
+
+    <string name="set_password_message_empty">ಪಾಸ್-ವರ್ಡ್ ಶೂನ್ಯ</string>
+    <string name="set_password_message_password_invalid">ಪಾಸ್-ವರ್ಡ್ ತೀರ ಚಿಕ್ಕದು</string>
+    <string name="set_password_message_password_dont_match">ಪಾಸ್-ವರ್ಡ್  ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತಿಲ್ಲ</string>
+
+    <string name="title_activity_calling">ಕರೆ</string>
+    <string name="title_activity_profile">ಜಾತಕ</string>
+    <string name="title_activity_settings">ಸಂಯೋಜನೆ</string>
+    <string name="title_activity_crash">ಕುಸಿತ</string>
+    <string name="title_activity_friendinfo">ಗೆಳೆಯನ ವಿಚಾರ</string>
+    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_aboutpage">ನಮ್ಮ ಬಗ್ಗೆ</string>
+    <string name="title_activity_set_password">Set ಪಾಸ್-ವರ್ಡ್</string>
+    <string name="title_activity_check_password">Enter ಪಾಸ್-ವರ್ಡ್</string>
+    <string name="title_activity_share">open with TRIfA</string>
+    <string name="title_activity_maintenance">ನಿರ್ವಹಣೆ</string>
+
+
+    <string-array name="spinner_own_status_array">
+        <item>ಆನ್‌ಲೈನ್</item>
+        <item>ದೂರವಿರುವೆ</item>
+        <item>ಕೆಲಸದಲ್ಲಿ ನಿರತನಾಗಿರುವೆ</item>
+    </string-array>
+
+    <string name="settings_toolbar_title">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <string name="pref_header_general">ಸಾಮಾನ್ಯ</string>
+
+    <string name="pref_title_auto_accept_image">ಚಿತ್ರಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸ್ವೀಕರಿಸು</string>
+    <string name="pref_description_auto_accept_image">3 MByte ಗಾತ್ರದ ಚಿತ್ರಗಳು ಮತ್ತು ಫೋಟೋಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸು</string>
+
+    <string name="pref_title_auto_accept_video">ವೀಡಿಯೊಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ </string>
+    <string name="pref_description_auto_accept_video">10 MByte ಗಾತ್ರದ ವೀಡಿಯೊಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ</string>
+
+    <string name="pref_title_video_uv_reversed"> ವೀಡಿಯೊದಲ್ಲಿ ರಿವರ್ಸ್ ಯುವಿ  </string>
+    <string name="pref_description_video_uv_reversed">ಕ್ಯಾಮೆರಾ ವೀಡಿಯೊದಲ್ಲಿ ಯುವಿ  ಕ್ರಮವನ್ನು ಹಿಮ್ಮುಖಗೊಳಿಸಿ</string>
+
+    <string name="pref_title_software_echo_cancel">ಪ್ರತಿಧ್ವನಿ ರದ್ದತಿ</string>
+    <string name="pref_description_software_echo_cancel">ಸಾಫ್ಟ್‌ವೇರ್ ಎಕೋ ರದ್ದತಿ ಬಳಸಿ</string>
+
+    <string name="pref_title_higher_video_quality">ವೀಡಿಯೊ ಗುಣಮಟ್ಟ</string>
+    <string name="pref_description_higher_video_quality">ಉತ್ತಮ ವೀಡಿಯೊ ಗುಣಮಟ್ಟವನ್ನು ಬಳಸಿ. Change n ಬದಲಾವಣೆಗೆ RESTART ಅಗತ್ಯವಿದೆ!</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>ಕಡಿಮೆ bandwidth\n(250 kb/s)</item>
+        <item>ಸಾಮಾನ್ಯ bandwidth\n(2500 kb/s)</item>
+        <item>ಹೆಚ್ಚು bandwidth\n(3500 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_video_cam_resolution">ಕ್ಯಾಮೆರಾ ರೆಸಲ್ಯೂಶನ್</string>
+    <string name="pref_description_video_cam_resolution">ವೀಡಿಯೊ ಕರೆ ಮಾಡಲು ಯಾವ ರೆಸಲ್ಯೂಶನ್ ಬಳಸಬೇಕು</string>
+    <string-array name="pref_video_cam_resolution_titles">
+        <item>640x480</item>
+        <item>1280x720</item>
+        <item>1920x1080</item>
+    </string-array>
+    <string-array name="pref_video_cam_resolution_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_global_font_size">ಅಕ್ಷರ ಗಾತ್ರ</string>
+    <string name="pref_description_global_font_size">Select ಅಕ್ಷರ ಗಾತ್ರ ಆಯ್ಕೆ ಮಾಡಿ</string>
+    <string-array name="pref_global_font_size_titles">
+        <item>ಅತೀ ಸಣ್ಣದು</item>
+        <item>ಸಣ್ಣದು</item>
+        <item>ಸಾಮಾನ್ಯ</item>
+        <item>ದೊಡ್ಡದು</item>
+    </string-array>
+    <string-array name="pref_global_font_size_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string name="pref_title_camera_get_preview_format">ಕ್ಯಾಮೆರಾ ಪೂರ್ವ-ವೀಕ್ಷಣೆ ಸ್ವರೂಪ</string>
+    <string name="pref_description_camera_get_preview_format">ಕ್ಯಾಮೆರಾ ಪೂರ್ವವೀಕ್ಷಣೆ ಸ್ವರೂಪ ಕೆಲವು ಫೋನ್‌ಗಳಲ್ಲಿ ತಪ್ಪಾದ ಸ್ವರೂಪದಲ್ಲಿದೆ ಎಂದು ತೋರುತ್ತದೆ</string>
+    <string-array name="pref_camera_get_preview_format_titles">
+        <item>default: YV12</item>
+        <item>some phones: NV21</item>
+    </string-array>
+    <string-array name="pref_camera_get_preview_format_values">
+        <item>YV12</item>
+        <item>NV21</item>
+    </string-array>
+
+    <string name="pref_title_mic_gain_factor">ಮೈಕ್ ಗೇನ್</string>
+    <string name="pref_description_mic_gain_factor">ನಿಮ್ಮ ಮೈಕ್ರೊಫೋನ್ ಕಡಿಮೆ ಪರಿಮಾಣದೊಂದಿಗೆ ರೆಕಾರ್ಡ್ ಮಾಡಿದರೆ ಹೆಚ್ಚಿನ ಲಾಭವನ್ನು ಹೊಂದಿಸಿ</string>
+
+    <string name="pref_title_higher_audio_quality">Audio Quality</string>
+    <string name="pref_description_higher_audio_quality">Use better Audio quality.\nChange needs RESTART!</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>low\n(6 kb/s)</item>
+        <item>normal\n(32 kb/s)</item>
+        <item>high\n(64 kb/s)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_udp_enabled">enable UDP</string>
+    <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
+
+    <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
+    <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
+
+    <string name="pref_title_fps_half">lower fps</string>
+    <string name="pref_description_fps_half">Video Framerate 1/2 : so 12fps instead of 25fps</string>
+
+    <string name="pref_title_set_fps">set fps</string>
+    <string name="pref_description_set_fps">try to set 15fps video framerate, this may crash on some phones</string>
+
+    <string name="pref_title_conference_show_system_messages">System Messages</string>
+    <string name="pref_description_conference_show_system_messages">show System Messages in Conferences</string>
+
+    <string name="pref_title_local_discovery_enabled">LAN discovery</string>
+    <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
+
+    <string name="pref_title_U_keep_nospam">keep NoSpam</string>
+    <string name="pref_description_U_keep_nospam">keep NoSpam value. This is not safe, only activate if you know what you are doing!</string>
+
+    <string name="pref_title_allow_screen_off_in_audio_call">Turn screen off</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">If you experience troubles with screen turning off in an Audiocall, set this to off</string>
+
+    <string name="pref_title_X_zoom_incoming_video">Zoom Videocall Window</string>
+    <string name="pref_description_X_zoom_incoming_video">allow to pinch-zoom the Videocall Window. This is not working fully!</string>
+
+    <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
+    <string name="pref_description_X_use_native_audio_play">!! Expermimental !!\nUse Native Audio to Play Sound</string>
+
+    <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
+    <string name="pref_description_X_battery_saving_mode">!! Expermimental !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
+
+    <string name="pref_title_X_misc_button_enabled">Misc. Button</string>
+    <string name="pref_description_X_misc_button_enabled">!! Expermimental !!\nadd a Button on Calling Screen to send a fixed Message</string>
+
+    <string name="pref_title_X_eac_delay_ms">AEC delay</string>
+    <string name="pref_description_X_eac_delay_ms">!! Expermimental !!\nAEC delay in ms</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+
+    <string name="pref_header_data_sync">Data &#038; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+
+    <string name="pref_title_min_audio_samplingrate_out">Audio Samplingrate</string>
+    <string name="pref_description_min_audio_samplingrate_out">Default setting is 48000 Hz</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>Auto</item>
+        <item>8000 Hz</item>
+        <item>16000 Hz</item>
+        <item>48000 Hz</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>Auto</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+
+
+    <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
+    <string name="pref_description_X_audio_recording_frame_size">Default setting is 40 ms</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+
+    <string name="pref_title_X_battery_saving_timeout">Offline Time in Batterysavings mode</string>
+    <string name="pref_description_X_battery_saving_timeout">Default setting is 15 minutes</string>
+    <string-array name="X_battery_saving_timeout_titles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="X_battery_saving_timeout_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value"/>
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">ಮೌನ</string>
+
+    <string name="pref_title_vibrate">  ಕಂಪಿಸು</string>
+    <string name="pref_title_sound">ಸದ್ದು</string>
+    <string name="add_friend_activity_help">Paste friend\'s Tox ID in the text box above or tap the
+    QR code button to scan friend\'s code with a camera.</string>
+    <string name="add_friend_activity_add">Add Friend</string>
+    <string name="cancel">Cancel</string>
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+    <!-- Strings related to Settings -->
+
+
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+    <string name="MainActivity_profile">ಜಾತಕ</string>
+    <string name="MainActivity_settings">ಸಂಯೋಜನೆ</string>
+    <string name="MainActivity_logout_login">ಲಾಗ್ ಔಟ್/ಲಾಗಿನ್ ಮಾಡಿ</string>
+    <string name="MainActivity_maint">ನಿರ್ವಹಣೆ</string>
+    <string name="MainActivity_about">ನಮ್ಮ ಬಗ್ಗೆ</string>
+    <string name="MainActivity_exit">ನಿರ್ಗಮನ</string>
+    <string name="MainActivity_available">ಇರುವೆ</string>
+    <string name="MainActivity_away">ದೂರವಿರುವೆ</string>
+    <string name="MainActivity_busy">ನಿರತನಾಗಿರುವೆ</string>
+    <string name="MainActivity_no_button">ಇಲ್ಲ</string>
+    <string name="MainActivity_ok_take_me_there_button">ಓಕೆ ಅಲ್ಲಿಗೆ ಕರೆದುಕೊಂಡು ಹೋಗು</string>
+    <string name="MainActivity_info_dialog_title">ಮಾಹಿತಿ</string>
+    <string name="MainActivity_add_to_batt_opt">Please add TRIfA to the exception list for Batteryoptimization!</string>
+    <string name="MainActivity_friend_is_typing">ಗೆಳೆಯ ಟೈಪಿಸುತ್ತಿದ್ದಾನೆ..</string>
+    <string name="MainActivity_notification_new_message">ಹೊಸ  ಸಂದೇಶ</string>
+    <string name="MainActivity_notification_new_message_title" translatable="false">TRIfA</string>
+    <string name="MainActivity_notification_new_message2">ಹೊಸ ಸಂದೇಶ</string>
+    <string name="MainActivity_button_ok">ಸರಿ</string>
+    <string name="MainActivity_error_starting_email_app">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಶುರುವಾಗುವಾಗ ತಪ್ಪಿದೆ</string>
+    <string name="MainActivity_no_email_app_found">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಸಿಗಲಿಲ್ಲ </string>
+    <string name="MainActivity_toast_msg_deleted">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ</string>
+    <string name="MainActivity_toast_msg_exported">ಸಂದೇಶಗಳನ್ನು ರಫ್ತು ಮಾಡಲಾಗಿದೆ</string>
+    <string name="MainActivity_toast_msgs_deleted">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ</string>
+    <string name="MainActivity_notification_new_message3">ಹೊಸ ಸಂದೇಶ</string>
+    <string name="MainActivity_notification_new_message4">ಹೊಸ ಸಂದೇಶ</string>
+    <string name="MainActivity_notification_new_message5">ಹೊಸ ಸಂದೇಶ</string>
+
+    <string name="Aboutpage_0">TRIfA Crashlog</string>
+    <string name="Aboutpage_1" translatable="false">https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/README.md</string>
+    <string name="Aboutpage_10" translatable="false">https://github.com/gfx/Android-Orma</string>
+    <string name="Aboutpage_11" translatable="false">info.guardianproject.iocipher:IOCipher</string>
+    <string name="Aboutpage_12" translatable="false">https://github.com/guardianproject/IOCipher</string>
+    <string name="Aboutpage_13" translatable="false">com.l4digital.fastscroll:fastscroll</string>
+    <string name="Aboutpage_14" translatable="false">https://github.com/L4Digital/FastScroll</string>
+    <string name="Aboutpage_15" translatable="false">com.github.bumptech.glide</string>
+    <string name="Aboutpage_16" translatable="false">https://github.com/bumptech/glide</string>
+    <string name="Aboutpage_17" translatable="false">info.guardianproject.netcipher</string>
+    <string name="Aboutpage_18" translatable="false">https://github.com/guardianproject/NetCipher</string>
+    <string name="Aboutpage_19" translatable="false">com.mikepenz:fontawesome-typeface</string>
+    <string name="Aboutpage_2">send Crash report via Email</string>
+    <string name="Aboutpage_20" translatable="false">https://github.com/mikepenz/Android-Iconics</string>
+    <string name="Aboutpage_21" translatable="false">com.mikepenz:google-material-typeface</string>
+    <string name="Aboutpage_22" translatable="false">https://github.com/mikepenz/Android-Iconics</string>
+    <string name="Aboutpage_23" translatable="false">com.google.zxing:core</string>
+    <string name="Aboutpage_24" translatable="false">https://github.com/zxing/zxing</string>
+    <string name="Aboutpage_25" translatable="false">com.github.hotchemi:permissionsdispatcher</string>
+    <string name="Aboutpage_26" translatable="false">https://github.com/permissions-dispatcher/PermissionsDispatcher</string>
+    <string name="Aboutpage_27" translatable="false">com.github.angads25:filepicker</string>
+    <string name="Aboutpage_28" translatable="false">https://github.com/Angads25/android-filepicker</string>
+    <string name="Aboutpage_29" translatable="false">com.vanniktech:emoji-ios</string>
+    <string name="Aboutpage_30" translatable="false">https://github.com/vanniktech/Emoji</string>
+    <string name="Aboutpage_31" translatable="false">com.google.code.gson</string>
+    <string name="Aboutpage_32" translatable="false">https://github.com/google/gson</string>
+    <string name="Aboutpage_33" translatable="false">com.github.medyo:android-about-page</string>
+    <string name="Aboutpage_34" translatable="false">https://github.com/medyo/android-about-page</string>
+    <string name="Aboutpage_35" translatable="false">de.hdodenhof:circleimageview</string>
+    <string name="Aboutpage_36" translatable="false">https://github.com/hdodenhof/CircleImageView</string>
+    <string name="Aboutpage_37" translatable="false">com.github.armcha:AutoLinkTextView</string>
+    <string name="Aboutpage_38" translatable="false">https://github.com/armcha/AutoLinkTextView</string>
+    <string name="Aboutpage_39" translatable="false">com.github.chrisbanes:PhotoView</string>
+    <string name="Aboutpage_4">reading crash info ...</string>
+    <string name="Aboutpage_40" translatable="false">https://github.com/chrisbanes/PhotoView</string>
+    <string name="Aboutpage_41" translatable="false">com.squareup.okhttp3</string>
+    <string name="Aboutpage_42" translatable="false">https://github.com/square/okhttp</string>
+    <string name="Aboutpage_43" translatable="false">com.daimajia.numberprogressbar</string>
+    <string name="Aboutpage_44" translatable="false">https://github.com/daimajia/NumberProgressBar</string>
+    <string name="Aboutpage_5a">TRIfA a Tox Client for Android</string>
+    <string name="Aboutpage_5b">Version:</string>
+    <string name="Aboutpage_6">What is Tox?</string>
+    <string name="Aboutpage_8">used libraries:</string>
+    <string name="Aboutpage_9" translatable="false">com.github.gfx.android.orma</string>
+
+    <string name="AddFriendActivity_3">incorrect ToxID</string>
+    <string name="AddFriendActivity_4">No ToxID</string>
+
+    <string name="CallingActivity_0">Video Delay:</string>
+    <string name="CallingActivity_123" translatable="false">ms</string>
+    <string name="CallingActivity_23">Video Delay:</string>
+    <string name="CallingActivity_24" translatable="false">ms</string>
+
+    <string name="ConferenceAudioActivity_10">Userlist</string>
+    <string name="ConferenceAudioActivity_17">Push to Talk</string>
+    <string name="ConferenceAudioActivity_18">talking ...</string>
+    <string name="GroupActivityActive">Active:</string>
+    <string name="GroupActivityOffline">Offline:</string>
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+    <!-- Java Source texts -->
+
+
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+    <string name="layout___toxid">ToxID</string>
+    <string name="layout___scan_qr_code">scan QR Code</string>
+    <string name="layout___enter_pass_longtext">Enter Password\nThere is NO recovery option!</string>
+    <string name="layout___unlock">Unlock</string>
+    <string name="layout___name">Name</string>
+    <string name="layout___push_to_talk">Push to talk</string>
+    <string name="layout___nick">Nick:</string>
+    <string name="layout___pubkey">Pubkey:</string>
+    <string name="layout___status">Status:</string>
+    <string name="layout___alias">Alias</string>
+    <string name="layout___remove_friends_relay">remove Friends Relay</string>
+    <string name="layout___friends_relay_pubkey">Friends Relay Pubkey:</string>
+    <string name="layout___waiting_for_orbot">waiting for Orbot ...</string>
+    <string name="layout___clear_glide_cache">clear Glide Cache</string>
+    <string name="layout___set_app_language">set App Language</string>
+    <string name="layout___run_vacuum_on_sql_database">run VACUUM on Sql Database</string>
+    <string name="layout___run_analyze_on_sql_database">run ANALYZE on Sql Database</string>
+    <string name="layout___reset_favorite_emoji_list">reset favorite Emoji List</string>
+    <string name="layout___delete_all_avatar_icons">delete all Avatar Icons</string>
+    <string name="layout___update_bootstrapnodes_from_internet">update Bootstrapnodes from Internet</string>
+    <string name="layout___reset_bootstrapnodes_to_default">reset Bootstrapnodes to default</string>
+    <string name="layout___test_notification_sound">test Notification sound</string>
+    <string name="layout___test_ringtone_sound">test Ringtone sound</string>
+    <string name="layout___export_tox_savedata_unsecure">export tox savedata *unsecure*</string>
+    <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA *UNSECURE*</string>
+    <string name="layout___click_image_to_change_your_avatar">click Image to change your Avatar</string>
+    <string name="layout___remove_own_relay">remove own Relay</string>
+    <string name="layout___relay_pubkey">Relay Pubkey:</string>
+    <string name="layout___new_random_nospam">new Random NOSPAM</string>
+    <string name="layout___own_pubkey">Own Pubkey:</string>
+    <string name="layout___copy_toxid">copy ToxID</string>
+    <string name="layout___your_toxidenticon">Your ToxIdenticon</string>
+    <string name="layout___active_network_connections">active Network Connections:</string>
+    <string name="layout___error_getting_active_network_connections">*error getting active network connections*</string>
+    <string name="layout___set_password_or_skip">Set Password or skip.\n\nWhen you select to skip a\npassword will be autogenerated\nThere is NO recovery option!</string>
+    <string name="layout___password">Password</string>
+    <string name="layout___password_again">Password again</string>
+    <string name="layout___set_password">Set Password</string>
+    <string name="layout___skip">skip</string>
+    <string name="layout___leave">Leave</string>
+    <string name="layout___delete">Delete</string>
+    <string name="layout___info">Info</string>
+    <string name="layout___create_text_group">Create Text Group</string>
+    <string name="layout___create_audio_group">Create Audio Group</string>
+    <string name="layout___add_as_toxproxy">add as ToxProxy</string>
+    <string name="layout___peer_name">peer name</string>
+    <string name="layout___online">Online</string>
+    <string name="layout___copy">ನಕಲಿ ಮಾಡು</string>
+    <string name="layout___export">ರಫ್ತು</string>
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+    <!-- Layout texts -->
+
+</resources>
