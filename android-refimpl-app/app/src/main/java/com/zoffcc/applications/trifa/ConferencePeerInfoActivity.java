@@ -36,11 +36,11 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
+import static com.zoffcc.applications.trifa.HelperGeneric.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
-import static com.zoffcc.applications.trifa.MainActivity.dp2px;
-import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferencePeerInfoActivity extends AppCompatActivity

@@ -43,7 +43,7 @@ import java.util.Locale;
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
 
-import static com.zoffcc.applications.trifa.MainActivity.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 
 public class Aboutpage extends AppCompatActivity implements Logging.AsyncResponse

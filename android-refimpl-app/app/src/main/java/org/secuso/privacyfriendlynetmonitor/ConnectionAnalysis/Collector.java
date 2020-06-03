@@ -71,7 +71,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.zoffcc.applications.trifa.MainActivity.get_my_pkg_info;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_my_pkg_info;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MY_PACKAGE_NAME;
 
 

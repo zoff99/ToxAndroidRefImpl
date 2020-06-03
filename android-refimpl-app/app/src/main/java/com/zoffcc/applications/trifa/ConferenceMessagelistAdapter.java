@@ -31,7 +31,7 @@ import com.l4digital.fastscroll.FastScroller;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.MainActivity.only_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
 
 public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {

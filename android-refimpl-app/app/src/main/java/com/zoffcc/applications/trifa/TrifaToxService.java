@@ -64,21 +64,21 @@ import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.bootstrap_single_wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.bytes_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
-import static com.zoffcc.applications.trifa.MainActivity.change_notification;
+import static com.zoffcc.applications.trifa.HelperGeneric.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.conference_message_list_activity;
-import static com.zoffcc.applications.trifa.MainActivity.get_combined_connection_status;
-import static com.zoffcc.applications.trifa.MainActivity.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_combined_connection_status;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
-import static com.zoffcc.applications.trifa.MainActivity.get_toxconnection_wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.hex_to_bytes;
-import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
-import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format_or_empty;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_toxconnection_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.hex_to_bytes;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
@@ -86,13 +86,13 @@ import static com.zoffcc.applications.trifa.MainActivity.receiver2;
 import static com.zoffcc.applications.trifa.MainActivity.receiver3;
 import static com.zoffcc.applications.trifa.MainActivity.receiver4;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
-import static com.zoffcc.applications.trifa.MainActivity.set_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_type;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_message_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name_size;
@@ -623,7 +623,7 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "stop_tox_fg:002");
                 stop_me = true;
 
-                MainActivity.update_savedata_file_wrapper(); // save on tox shutdown
+                HelperGeneric.update_savedata_file_wrapper(); // save on tox shutdown
 
                 ToxServiceThread.interrupt();
                 Log.i(TAG, "stop_tox_fg:003");
@@ -958,7 +958,7 @@ public class TrifaToxService extends Service
                     set_all_friends_offline();
                     set_all_conferences_inactive();
                     MainActivity.init_tox_callbacks();
-                    MainActivity.update_savedata_file_wrapper();
+                    HelperGeneric.update_savedata_file_wrapper();
                 }
                 // ------ correct startup order ------
 
@@ -1038,7 +1038,7 @@ public class TrifaToxService extends Service
                 }
                 Log.i(TAG, "AAA:011");
 
-                MainActivity.update_savedata_file_wrapper();
+                HelperGeneric.update_savedata_file_wrapper();
 
                 load_and_add_all_friends();
 
@@ -1996,7 +1996,7 @@ public class TrifaToxService extends Service
             while (i2.hasNext())
             {
                 ee = (BootstrapNodeEntryDB) i2.next();
-                int bootstrap_result = MainActivity.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex);
+                int bootstrap_result = HelperGeneric.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex);
                 Log.i(TAG, "add_tcp_relay_single:res=" + bootstrap_result);
 
                 if (bootstrap_result == 0)

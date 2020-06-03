@@ -143,7 +143,7 @@ public class HelperConference
             {
                 byte[] cookie_buffer = new byte[CONFERENCE_ID_LENGTH];
                 cookie_buf3.get(cookie_buffer, 0, CONFERENCE_ID_LENGTH);
-                conference_identifier = MainActivity.bytes_to_hex(cookie_buffer);
+                conference_identifier = HelperGeneric.bytes_to_hex(cookie_buffer);
             }
             else
             {
@@ -180,7 +180,7 @@ public class HelperConference
         }
 
         // save tox savedate file
-        MainActivity.update_savedata_file_wrapper();
+        HelperGeneric.update_savedata_file_wrapper();
     }
 
     static boolean is_conference_active(String conference_identifier)

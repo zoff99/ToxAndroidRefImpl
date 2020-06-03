@@ -60,9 +60,9 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SelectLanguageActivity_ID;
-import static com.zoffcc.applications.trifa.MainActivity.delete_vfs_file;
+import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
-import static com.zoffcc.applications.trifa.MainActivity.import_toxsave_file_unsecure;
+import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -148,7 +148,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             {
                 try
                 {
-                    MainActivity.clearCache_s();
+                    HelperGeneric.clearCache_s();
                     // Toast.makeText(v.getContext(), "cleared Glide Cache", Toast.LENGTH_SHORT).show();
                 }
                 catch (Exception e)

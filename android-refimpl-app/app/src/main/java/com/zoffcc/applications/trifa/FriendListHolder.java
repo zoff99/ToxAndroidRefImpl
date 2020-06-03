@@ -61,12 +61,12 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
-import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_new;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_add_av_groupchat;
-import static com.zoffcc.applications.trifa.MainActivity.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
@@ -800,7 +800,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     // invite also my ToxProxy -------------
                                     add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "",
                                                            TOX_CONFERENCE_TYPE_TEXT.value, false);
-                                    MainActivity.update_savedata_file_wrapper();
+                                    HelperGeneric.update_savedata_file_wrapper();
                                 }
                             }
                         }
@@ -824,7 +824,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     update_savedata_file_wrapper();
                                     add_conference_wrapper(friend_num_temp_safety2, res_conf_av_new, "",
                                                            TOX_CONFERENCE_TYPE_AV.value, false);
-                                    MainActivity.update_savedata_file_wrapper();
+                                    HelperGeneric.update_savedata_file_wrapper();
                                 }
                             }
                         }

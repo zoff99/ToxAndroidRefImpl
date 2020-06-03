@@ -166,7 +166,7 @@ public class HelperRelay
                 {
                     FriendList n = fl.get(i);
                     friend_num = HelperFriend.tox_friend_by_public_key__wrapper(n.tox_public_key_string);
-                    byte[] data = MainActivity.hex_to_bytes("FF" + relay_public_key_string);
+                    byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
                     data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
                     MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
                 }
@@ -190,7 +190,7 @@ public class HelperRelay
                 for (i = 0; i < fl.size(); i++)
                 {
                     FriendList n = fl.get(i);
-                    byte[] data = MainActivity.hex_to_bytes("FF" + n.tox_public_key_string);
+                    byte[] data = HelperGeneric.hex_to_bytes("FF" + n.tox_public_key_string);
                     data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
                     MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
                 }
@@ -252,7 +252,7 @@ public class HelperRelay
     {
         int i = 0;
         long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string);
-        byte[] data = MainActivity.hex_to_bytes("FF" + friend_pubkey);
+        byte[] data = HelperGeneric.hex_to_bytes("FF" + friend_pubkey);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
         // Log.d(TAG, "send_friend_pubkey_to_relay:data=" + data);
         int result = MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
@@ -263,7 +263,7 @@ public class HelperRelay
     {
         int i = 0;
         long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(friend_pubkey);
-        byte[] data = MainActivity.hex_to_bytes("FF" + relay_public_key_string);
+        byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
         // Log.d(TAG, "send_relay_pubkey_to_friend:data=" + data);
         int result = MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);

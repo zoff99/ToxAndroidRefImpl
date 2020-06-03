@@ -47,7 +47,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
-import static com.zoffcc.applications.trifa.MainActivity.drawableToBitmap;
+import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;

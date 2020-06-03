@@ -36,11 +36,11 @@ import com.mikepenz.materialdrawer.model.AbstractBadgeableDrawerItem;
 
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.MainActivity.StringSignature2;
+import static com.zoffcc.applications.trifa.HelperGeneric.StringSignature2;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
-import static com.zoffcc.applications.trifa.MainActivity.dp2px;
-import static com.zoffcc.applications.trifa.MainActivity.hash_to_bucket;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 

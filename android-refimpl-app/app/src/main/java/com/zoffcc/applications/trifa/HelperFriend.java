@@ -314,7 +314,7 @@ public class HelperFriend
                     avatar_update_timestamp(System.currentTimeMillis()).
                     execute();
 
-            MainActivity.update_display_friend_avatar(friend_pubkey, avatar_path_name, avatar_file_name);
+            HelperGeneric.update_display_friend_avatar(friend_pubkey, avatar_path_name, avatar_file_name);
         }
         catch (Exception e)
         {
@@ -366,7 +366,7 @@ public class HelperFriend
                         execute();
             }
 
-            MainActivity.update_display_friend_avatar(friend_pubkey, avatar_path_name, avatar_file_name);
+            HelperGeneric.update_display_friend_avatar(friend_pubkey, avatar_path_name, avatar_file_name);
         }
         catch (Exception e)
         {
@@ -423,12 +423,12 @@ public class HelperFriend
                     e.printStackTrace();
                 }
 
-                MainActivity.update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
+                HelperGeneric.update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
                 final FriendList f = new FriendList();
                 f.tox_public_key_string = friend_public_key;
                 f.TOX_USER_STATUS = 0;
                 f.TOX_CONNECTION = 0;
-                f.TOX_CONNECTION_on_off = MainActivity.get_toxconnection_wrapper(f.TOX_CONNECTION);
+                f.TOX_CONNECTION_on_off = HelperGeneric.get_toxconnection_wrapper(f.TOX_CONNECTION);
                 // set name as the last 5 char of the publickey (until we get a proper name)
                 f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
                 f.avatar_pathname = null;
@@ -482,7 +482,7 @@ public class HelperFriend
                     // ---- set new random nospam value after each added friend ----
                     // ---- set new random nospam value after each added friend ----
                     // ---- set new random nospam value after each added friend ----
-                    MainActivity.set_new_random_nospam_value();
+                    HelperGeneric.set_new_random_nospam_value();
                     // ---- set new random nospam value after each added friend ----
                     // ---- set new random nospam value after each added friend ----
                     // ---- set new random nospam value after each added friend ----
@@ -617,7 +617,7 @@ public class HelperFriend
         // add friend ---------------
         long friendnum = MainActivity.tox_friend_add(friend_tox_id, "please add me"); // add friend
         Log.i(TAG, "add_friend_real:add friend  #:" + friendnum);
-        MainActivity.update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
+        HelperGeneric.update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
 
         if (friendnum > -1)
         {
@@ -640,7 +640,7 @@ public class HelperFriend
 
             f.TOX_USER_STATUS = 0;
             f.TOX_CONNECTION = 0;
-            f.TOX_CONNECTION_on_off = MainActivity.get_toxconnection_wrapper(f.TOX_CONNECTION);
+            f.TOX_CONNECTION_on_off = HelperGeneric.get_toxconnection_wrapper(f.TOX_CONNECTION);
             f.avatar_filename = null;
             f.avatar_pathname = null;
 
@@ -855,9 +855,9 @@ public class HelperFriend
                         {
                             try
                             {
-                                String msg_id_as_hex_string = MainActivity.bytesToHex(msg_id_buffer.array(),
-                                                                                      msg_id_buffer.arrayOffset(),
-                                                                                      msg_id_buffer.limit());
+                                String msg_id_as_hex_string = HelperGeneric.bytesToHex(msg_id_buffer.array(),
+                                                                                       msg_id_buffer.arrayOffset(),
+                                                                                       msg_id_buffer.limit());
                                 // Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
                                 //            msg_id_as_hex_string);
 
