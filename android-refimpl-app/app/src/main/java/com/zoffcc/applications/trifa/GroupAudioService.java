@@ -32,7 +32,9 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.media.app.NotificationCompat;
+
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -463,7 +465,7 @@ public class GroupAudioService extends Service
 
         b.setContentTitle("...");
         b.setShowWhen(false);
-        b.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle());
+        b.setStyle(new NotificationCompat.MediaStyle());
         b.setColor(getResources().getColor(R.color.colorPrimary));
         b.setSmallIcon(R.mipmap.ic_launcher);
         b.setLargeIcon(null);

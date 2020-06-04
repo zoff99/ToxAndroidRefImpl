@@ -1,9 +1,9 @@
 package com.zoffcc.applications.trifa;
 
 import android.os.Build;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
