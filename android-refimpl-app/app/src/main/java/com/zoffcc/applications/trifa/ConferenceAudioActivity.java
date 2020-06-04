@@ -31,8 +31,6 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -44,8 +42,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.speech.levelmeter.BarLevelDrawable;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -55,6 +55,9 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
@@ -67,13 +70,13 @@ import static com.zoffcc.applications.trifa.HelperConference.is_conference_activ
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
@@ -180,7 +183,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).
-            color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
+            color(IconicsColor.colorInt(getResources().getColor(R.color.md_dark_primary_text))).
+            size(IconicsSize.dp(100));
 
         conference_message_profile_item = new ProfileDrawerItem().
             withName(getString(R.string.ConferenceAudioActivity_10)). //$NON-NLS-1$
@@ -399,13 +403,13 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
             icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-            color(getResources().
-                getColor(R.color.colorPrimaryDark)).
-            sizeDp(80);
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(80));
 
         // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
-        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(80));
 
 
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
@@ -467,8 +471,10 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         group_audio_player_icon = (ImageButton) findViewById(R.id.group_audio_player_icon);
         group_audio_player_icon.setVisibility(View.VISIBLE);
-        Drawable d677 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_lock).backgroundColor(
-            Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        Drawable d677 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_lock).
+            backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+            color(IconicsColor.colorInt(caa.getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(50));
         group_audio_player_icon.setImageDrawable(d677);
 
         group_audio_player_icon.setOnTouchListener(new View.OnTouchListener()
@@ -865,14 +871,18 @@ public class ConferenceAudioActivity extends AppCompatActivity
         }
         else if (state == 1)
         {
-            Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_play_circle_outline).backgroundColor(
-                Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+            Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_play_circle_outline).
+                backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                color(IconicsColor.colorInt(caa.getResources().getColor(R.color.colorPrimaryDark))).
+                size(IconicsSize.dp(80));
             group_audio_send_icon.setImageDrawable(d4);
         }
         else
         {
-            Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_report).backgroundColor(
-                Color.TRANSPARENT).color(caa.getResources().getColor(R.color.md_red_800)).sizeDp(80);
+            Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_report).
+                backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                color(IconicsColor.colorInt(caa.getResources().getColor(R.color.md_red_800))).
+                size(IconicsSize.dp(80));
             group_audio_send_icon.setImageDrawable(d4);
         }
     }
@@ -896,16 +906,19 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     else if (Callstate.audio_device == 1)
                     {
                         Log.i(TAG, "update_group_audio_device_icon:headset"); //$NON-NLS-1$
-                        Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(
-                            Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_headset).
+                            backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                            color(IconicsColor.colorInt(caa.getResources().getColor(R.color.colorPrimaryDark))).
+                            size(IconicsSize.dp(80));
                         group_audio_device_icon.setImageDrawable(d4);
                     }
                     else if (Callstate.audio_device == 2)
                     {
                         Log.i(TAG, "update_group_audio_device_icon:bluetooth"); //$NON-NLS-1$
-                        Drawable d4 = new IconicsDrawable(caa).icon(
-                            GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
-                            caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                        Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_bluetooth_audio).
+                            backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                            color(IconicsColor.colorInt(caa.getResources().getColor(R.color.colorPrimaryDark))).
+                            size(IconicsSize.dp(80));
                         group_audio_device_icon.setImageDrawable(d4);
                     }
                     else // audio_device == ??
@@ -1504,6 +1517,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == SelectFriendSingleActivity_ID)
         {
             if (resultCode == RESULT_OK)

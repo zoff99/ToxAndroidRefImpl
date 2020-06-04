@@ -34,16 +34,19 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
 
 import java.util.List;
+
+import androidx.appcompat.widget.Toolbar;
 
 public class SettingsActivity extends AppCompatPreferenceActivity
 {
@@ -197,7 +200,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                 {
                     final Drawable d1 = new IconicsDrawable(pref.getContext()).
                         icon(FontAwesome.Icon.faw_exclamation_circle).
-                        color(getResources().getColor(R.color.md_red_700)).sizeDp(100);
+                        color(IconicsColor.colorInt(getResources().getColor(R.color.md_red_700))).
+                        size(IconicsSize.dp(100));
                     pref.setIcon(d1);
                 }
                 catch (Exception e)
@@ -229,8 +233,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                         {
                             final Drawable d1 = new IconicsDrawable(preference.getContext()).
                                 icon(FontAwesome.Icon.faw_exclamation_circle).
-                                color(getResources().getColor(R.color.md_red_600)).
-                                sizeDp(100);
+                                color(IconicsColor.colorInt(getResources().getColor(R.color.md_red_600))).
+                                size(IconicsSize.dp(100));
                             preference.setIcon(d1);
                         }
                         catch (Exception e)

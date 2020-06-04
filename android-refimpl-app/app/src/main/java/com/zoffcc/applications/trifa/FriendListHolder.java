@@ -25,9 +25,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,9 +34,15 @@ import android.widget.TextView;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperConference.add_conference_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend;
@@ -48,6 +51,8 @@ import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_filet
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
@@ -61,12 +66,10 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
-import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_new;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_add_av_groupchat;
-import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
@@ -175,9 +178,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         {
             final Drawable d_notification = new IconicsDrawable(context).
                 icon(GoogleMaterial.Icon.gmd_notifications_off).
-                color(context.getResources().
-                    getColor(R.color.colorPrimaryDark)).
-                alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+                color(IconicsColor.colorInt(context.getResources().getColor(R.color.colorPrimaryDark))).
+                alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).
+                size(IconicsSize.dp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED));
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
         }
@@ -185,16 +188,17 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         {
             final Drawable d_notification = new IconicsDrawable(context).
                 icon(GoogleMaterial.Icon.gmd_notifications_active).
-                color(context.getResources().
-                    getColor(R.color.colorPrimaryDark)).
-                alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
+                color(IconicsColor.colorInt(context.getResources().getColor(R.color.colorPrimaryDark))).
+                alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).
+                size(IconicsSize.dp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED));
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
         }
 
         final Drawable d_lock = new IconicsDrawable(context).
-            icon(FontAwesome.Icon.faw_lock).color(context.getResources().
-            getColor(R.color.colorPrimaryDark)).sizeDp(80);
+            icon(FontAwesome.Icon.faw_lock).
+            color(IconicsColor.colorInt(context.getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(80));
 
         textView.setText(fl.name);
         try
@@ -490,10 +494,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                     final Drawable d_notification = new IconicsDrawable(context).
                         icon(GoogleMaterial.Icon.gmd_notifications_off).
-                        color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).
-                        alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(
-                        FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+                        color(IconicsColor.colorInt(context.getResources().getColor(R.color.colorPrimaryDark))).
+                        alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).
+                        size(IconicsSize.dp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED));
                     f_notification.setImageDrawable(d_notification);
 
                     try
@@ -528,9 +531,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                     final Drawable d_notification = new IconicsDrawable(context).
                         icon(GoogleMaterial.Icon.gmd_notifications_active).
-                        color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).
-                        alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
+                        color(IconicsColor.colorInt(context.getResources().getColor(R.color.colorPrimaryDark))).
+                        alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).
+                        size(IconicsSize.dp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED));
                     f_notification.setImageDrawable(d_notification);
 
                     try

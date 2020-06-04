@@ -32,24 +32,25 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.IBinder;
 import android.os.SystemClock;
-import androidx.core.app.NotificationCompat;
-import androidx.media.app.NotificationCompat;
-
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+
+import androidx.core.app.NotificationCompat;
 
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
+import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
@@ -383,11 +384,13 @@ public class GroupAudioService extends Service
         chronometer_base = 0;
         chronometer_base2 = SystemClock.elapsedRealtime();
 
-        Drawable d_pause = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_pause).backgroundColor(
-            Color.TRANSPARENT).sizeDp(50);
+        Drawable d_pause = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_pause).
+            backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+            size(IconicsSize.dp(50));
 
-        Drawable d_stop = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_stop).backgroundColor(
-            Color.TRANSPARENT).sizeDp(50);
+        Drawable d_stop = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_stop).
+            backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+            size(IconicsSize.dp(50));
 
         try
         {
@@ -465,7 +468,7 @@ public class GroupAudioService extends Service
 
         b.setContentTitle("...");
         b.setShowWhen(false);
-        b.setStyle(new NotificationCompat.MediaStyle());
+        b.setStyle(new androidx.media.app.NotificationCompat.MediaStyle());
         b.setColor(getResources().getColor(R.color.colorPrimary));
         b.setSmallIcon(R.mipmap.ic_launcher);
         b.setLargeIcon(null);
@@ -593,8 +596,9 @@ public class GroupAudioService extends Service
             bigViews.setChronometer(R.id.status_bar_chrono2, SystemClock.elapsedRealtime() - chronometer_base, null,
                                     false);
 
-            Drawable d_play = new IconicsDrawable(context_gas_static).icon(
-                GoogleMaterial.Icon.gmd_play_arrow).backgroundColor(Color.TRANSPARENT).sizeDp(50);
+            Drawable d_play = new IconicsDrawable(context_gas_static).icon(GoogleMaterial.Icon.gmd_play_arrow).
+                backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                size(IconicsSize.dp(50));
 
             // Log.i(TAG, "toxav_groupchat_disable_av:D:gnum=" + tox_conference_by_confid__wrapper(conf_id));
             // Log.i(TAG, "toxav_groupchat_disable_av:D:gid=" + conf_id);
@@ -641,8 +645,9 @@ public class GroupAudioService extends Service
 
             chronometer_base2 = SystemClock.elapsedRealtime();
 
-            Drawable d_pause = new IconicsDrawable(context_gas_static).icon(
-                GoogleMaterial.Icon.gmd_pause).backgroundColor(Color.TRANSPARENT).sizeDp(50);
+            Drawable d_pause = new IconicsDrawable(context_gas_static).icon(GoogleMaterial.Icon.gmd_pause).
+                backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                size(IconicsSize.dp(50));
 
             toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
 

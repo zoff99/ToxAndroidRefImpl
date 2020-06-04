@@ -24,23 +24,26 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.StringSignature2;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferencePeerInfoActivity extends AppCompatActivity
@@ -70,8 +73,9 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(200));
         profile_icon.setImageDrawable(d1);
 
         String peer_name_txt = tox_conference_peer_get_name__wrapper(conf_id, peer_pubkey);
@@ -178,8 +182,9 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
 
                         final Drawable smiley_face = new IconicsDrawable(context_s).
                             icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                            backgroundColor(Color.TRANSPARENT).
-                            color(peer_color_fg).sizeDp(70);
+                            backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                            color(IconicsColor.colorInt(peer_color_fg)).
+                            size(IconicsSize.dp(70));
 
                         profile_icon.setPadding((int) dp2px(0), (int) dp2px(0), (int) dp2px(0), (int) dp2px(0));
                         profile_icon.setImageDrawable(smiley_face);

@@ -26,8 +26,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -44,17 +42,22 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
 
 import java.net.URLConnection;
 
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
@@ -149,14 +152,17 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                 {
                     if (my_position < 1)
                     {
-                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date_string.setText(
+                            MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                         message_text_date.setVisibility(View.VISIBLE);
                     }
                     else
                     {
-                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
+                            MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
                         {
-                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date_string.setText(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                             message_text_date.setVisibility(View.VISIBLE);
                         }
                     }
@@ -181,7 +187,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         if (message.filedb_id == -1) // tranfser was canceled somewhere
         {
 
-            textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
+            textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                     AutoLinkMode.MODE_MENTION);
             textView.setAutoLinkText("" + message.text + "\n *canceled*");
 
             ft_preview_image.setImageDrawable(null);
@@ -245,16 +252,17 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                 java.io.File f2 = new java.io.File(message.filename_fullpath);
                 try
                 {
-                    final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+                    final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(
+                        new RoundedCorners((int) dp2px(20)));
 
                     GlideApp.
-                            with(context).
-                            load(f2).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            skipMemoryCache(false).
-                            priority(Priority.LOW).
-                            placeholder(R.drawable.round_loading_animation).
-                            into(ft_preview_image);
+                        with(context).
+                        load(f2).
+                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                        skipMemoryCache(false).
+                        priority(Priority.LOW).
+                        placeholder(R.drawable.round_loading_animation).
+                        into(ft_preview_image);
                 }
                 catch (Exception e)
                 {
@@ -265,9 +273,10 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
             else
             {
                 final Drawable d3 = new IconicsDrawable(this.context).
-                        icon(GoogleMaterial.Icon.gmd_attachment).
-                        backgroundColor(Color.TRANSPARENT).
-                        color(Color.parseColor("#AA000000")).sizeDp(50);
+                    icon(GoogleMaterial.Icon.gmd_attachment).
+                    backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                    color(IconicsColor.colorInt(Color.parseColor("#AA000000"))).
+                    size(IconicsSize.dp(50));
 
                 ft_preview_image.setImageDrawable(d3);
 
@@ -282,12 +291,15 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                             {
                                 MimeTypeMap myMime = MimeTypeMap.getSingleton();
                                 Intent newIntent = new Intent(Intent.ACTION_VIEW);
-                                String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(message.filename_fullpath));
+                                String mimeType = myMime.getMimeTypeFromExtension(
+                                    getFileExtensionFromUrl(message.filename_fullpath));
 
                                 Uri file_uri = null;
                                 if (Build.VERSION.SDK_INT > 23)
                                 {
-                                    file_uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new java.io.File(message.filename_fullpath));
+                                    file_uri = FileProvider.getUriForFile(context,
+                                                                          BuildConfig.APPLICATION_ID + ".provider",
+                                                                          new java.io.File(message.filename_fullpath));
                                     newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 }
                                 else
@@ -323,7 +335,9 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         }
 
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).
+            color(IconicsColor.colorInt(context.getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(50));
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -348,12 +362,12 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                     {
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
                         GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(img_avatar);
+                            with(context).
+                            load(f1).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(false).
+                            apply(glide_options).
+                            into(img_avatar);
                     }
                 }
             }
@@ -379,7 +393,6 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
     }
 
 
-
     private View.OnClickListener onclick_listener = new View.OnClickListener()
     {
         @Override
@@ -394,7 +407,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         @Override
         public boolean onLongClick(final View v)
         {
-            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected, message_);
+            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected,
+                                                                                           message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

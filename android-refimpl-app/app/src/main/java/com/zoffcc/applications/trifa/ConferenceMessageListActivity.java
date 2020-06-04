@@ -25,10 +25,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Px;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,9 +33,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -55,6 +53,11 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
+
+import androidx.annotation.Px;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
@@ -136,7 +139,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).
-            color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
+            color(IconicsColor.colorInt(getResources().getColor(R.color.md_dark_primary_text))).
+            size(IconicsSize.dp(100));
 
         conference_message_profile_item = new ProfileDrawerItem().
             withName("Userlist").
@@ -220,9 +224,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
             icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-            color(getResources().
-                getColor(R.color.colorPrimaryDark)).
-            sizeDp(80);
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(80));
 
         insert_emoji.setImageDrawable(d1);
 
@@ -236,14 +239,16 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         });
 
         // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
-        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(80));
 
         attachemnt_instead_of_send = true;
         ml_button_01.setImageDrawable(send_message_icon);
 
-        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(80));
         ml_phone_icon.setImageDrawable(d2);
 
         set_peer_count_header();
@@ -402,9 +407,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
                     icon(FontAwesome.Icon.faw_keyboard).
-                    color(getResources().
-                        getColor(R.color.colorPrimaryDark)).
-                    sizeDp(80);
+                    color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+                    size(IconicsSize.dp(80));
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.about_icon_email);
@@ -423,9 +427,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
                     icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                    color(getResources().
-                        getColor(R.color.colorPrimaryDark)).
-                    sizeDp(80);
+                    color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+                    size(IconicsSize.dp(80));
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
@@ -1047,6 +1050,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == SelectFriendSingleActivity_ID)
         {
             if (resultCode == RESULT_OK)

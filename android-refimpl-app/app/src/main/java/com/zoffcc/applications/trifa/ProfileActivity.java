@@ -27,8 +27,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -48,31 +46,36 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
 
 import java.io.File;
 import java.net.URLConnection;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
-import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
-import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
-import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
-import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
-import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.HelperGeneric.copy_real_file_to_vfs_file;
-import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_network_connections;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.send_avatar_to_friend;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_new_random_nospam_value;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
+import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
+import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
+import static com.zoffcc.applications.trifa.MainActivity.clipboard;
+import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
-import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_SELF_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
@@ -245,8 +248,9 @@ public class ProfileActivity extends AppCompatActivity
         // don't show keyboard when activity starts
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(200));
         profile_icon.setImageDrawable(d1);
 
         mytoxid_textview.setText("");
@@ -268,7 +272,7 @@ public class ProfileActivity extends AppCompatActivity
                     properties.selection_type = DialogConfigs.FILE_SELECT;
                     properties.root = new java.io.File("/");
                     properties.error_dir = new java.io.File(
-                            Environment.getExternalStorageDirectory().getAbsolutePath());
+                        Environment.getExternalStorageDirectory().getAbsolutePath());
                     properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
                     // TODO: hardcoded is always bad
                     properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF"};
@@ -295,7 +299,7 @@ public class ProfileActivity extends AppCompatActivity
                                         {
 
                                             String avatar_file_name_corrected = TrifaSetPatternActivity.filter_out_specials_from_filepath(
-                                                    src_filename.toLowerCase());
+                                                src_filename.toLowerCase());
 
                                             Log.i(TAG,
                                                   "select_avatar:p=" + src_path + " f=" + avatar_file_name_corrected);
@@ -303,7 +307,7 @@ public class ProfileActivity extends AppCompatActivity
                                                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
 
                                             String mimeType = URLConnection.guessContentTypeFromName(
-                                                    avatar_file_name_corrected.toLowerCase());
+                                                avatar_file_name_corrected.toLowerCase());
 
                                             set_g_opts("VFS_OWN_AVATAR_FNAME",
                                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
@@ -328,7 +332,7 @@ public class ProfileActivity extends AppCompatActivity
 
 
                                             List<FriendList> fl = orma.selectFromFriendList().
-                                                    toList();
+                                                toList();
 
                                             if (fl != null)
                                             {
@@ -348,8 +352,8 @@ public class ProfileActivity extends AppCompatActivity
                                                                   "select_avatar:send_avatar_to_friend:online:i=" + i);
 
                                                             send_avatar_to_friend(
-                                                                    HelperFriend.tox_friend_by_public_key__wrapper(
-                                                                            n.tox_public_key_string));
+                                                                HelperFriend.tox_friend_by_public_key__wrapper(
+                                                                    n.tox_public_key_string));
                                                         }
                                                     }
                                                 }
@@ -443,8 +447,8 @@ public class ProfileActivity extends AppCompatActivity
             String color_chksum = "<font color=\"#006600\">";
             String ec = "</font>";
             mytoxid_textview.setText(Html.fromHtml(
-                    color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum +
-                    my_chksum_temp + ec));
+                color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum + my_chksum_temp +
+                ec));
         }
         catch (WriterException e)
         {
@@ -469,7 +473,7 @@ public class ProfileActivity extends AppCompatActivity
         try
         {
             id_data = Identicon.create_identicon(
-                    MainActivity.get_my_toxid().substring(0, (ToxVars.TOX_PUBLIC_KEY_SIZE * 2))); // Pubkey
+                MainActivity.get_my_toxid().substring(0, (ToxVars.TOX_PUBLIC_KEY_SIZE * 2))); // Pubkey
 
             int w = my_identicon_imageview.getWidth();
             int h = my_identicon_imageview.getHeight();
@@ -550,9 +554,9 @@ public class ProfileActivity extends AppCompatActivity
         try
         {
             global_my_name = mynick_edittext.getText().toString().substring(0, Math.min(
-                    mynick_edittext.getText().toString().length(), TOX_MAX_NAME_LENGTH));
+                mynick_edittext.getText().toString().length(), TOX_MAX_NAME_LENGTH));
             global_my_status_message = mystatus_message_edittext.getText().toString().substring(0, Math.min(
-                    mystatus_message_edittext.getText().toString().length(), TOX_MAX_STATUS_MESSAGE_LENGTH));
+                mystatus_message_edittext.getText().toString().length(), TOX_MAX_STATUS_MESSAGE_LENGTH));
             tox_self_set_name(global_my_name);
             tox_self_set_status_message(global_my_status_message);
             update_savedata_file_wrapper(); // after exiting from Profile Activity

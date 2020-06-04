@@ -30,17 +30,19 @@ import android.widget.LinearLayout;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
 import com.mikepenz.materialdrawer.model.AbstractBadgeableDrawerItem;
 
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.StringSignature2;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -144,8 +146,9 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
 
                 final Drawable smiley_face = new IconicsDrawable(context_s).
                     icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                    backgroundColor(Color.TRANSPARENT).
-                    color(peer_color_fg).sizeDp(70);
+                    backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+                    color(IconicsColor.colorInt(peer_color_fg)).
+                    size(IconicsSize.dp(70));
 
                 icon.setVisibility(View.VISIBLE);
                 icon.setPadding((int) dp2px(0), (int) dp2px(0), (int) dp2px(0), (int) dp2px(0));

@@ -54,17 +54,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
-import androidx.renderscript.Allocation;
-import androidx.renderscript.Element;
-import androidx.renderscript.RenderScript;
-import androidx.renderscript.ScriptIntrinsicYuvToRGB;
-import androidx.renderscript.Type;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -83,9 +72,11 @@ import android.widget.Toast;
 
 import com.github.gfx.android.orma.AccessThreadConstraint;
 import com.github.gfx.android.orma.encryption.EncryptedDatabase;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -118,6 +109,17 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.renderscript.Allocation;
+import androidx.renderscript.Element;
+import androidx.renderscript.RenderScript;
+import androidx.renderscript.ScriptIntrinsicYuvToRGB;
+import androidx.renderscript.Type;
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import info.guardianproject.netcipher.proxy.StatusCallback;
@@ -950,9 +952,9 @@ public class MainActivity extends AppCompatActivity
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
             final Drawable d1 = new IconicsDrawable(this).
                 icon(FontAwesome.Icon.faw_exclamation_circle).
-                paddingDp(20).
-                color(getResources().getColor(R.color.md_red_600)).
-                sizeDp(100);
+                padding(IconicsSize.dp(20)).
+                color(IconicsColor.colorInt(getResources().getColor(R.color.md_red_600))).
+                size(IconicsSize.dp(100));
             top_imageview.setImageDrawable(d1);
         }
         else
@@ -1039,7 +1041,8 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName(
             R.string.MainActivity_exit).withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
         final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
-            color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(100));
         profile_d_item = new ProfileDrawerItem().
             withName("me").
             withIcon(d1);
@@ -1868,9 +1871,9 @@ public class MainActivity extends AppCompatActivity
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
             final Drawable d1 = new IconicsDrawable(this).
                 icon(FontAwesome.Icon.faw_exclamation_circle).
-                paddingDp(20).
-                color(getResources().getColor(R.color.md_red_600)).
-                sizeDp(100);
+                padding(IconicsSize.dp(20)).
+                color(IconicsColor.colorInt(getResources().getColor(R.color.md_red_600))).
+                size(IconicsSize.dp(100));
             top_imageview.setImageDrawable(d1);
         }
         else
@@ -2058,7 +2061,8 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(
-                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                    IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+                    size(IconicsSize.dp(50));
                 profile_d_item.withIcon(d1);
                 main_drawer_header.updateProfile(profile_d_item);
             }

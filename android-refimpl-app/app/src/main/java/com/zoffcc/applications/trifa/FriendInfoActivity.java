@@ -22,8 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -31,19 +29,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar_update;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
+import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.remove_friend_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendInfoActivity extends AppCompatActivity
@@ -89,8 +92,8 @@ public class FriendInfoActivity extends AppCompatActivity
         try
         {
             alias_text.setText(orma.selectFromFriendList().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                    toList().get(0).alias_name);
+                tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                toList().get(0).alias_name);
         }
         catch (Exception e)
         {
@@ -154,8 +157,9 @@ public class FriendInfoActivity extends AppCompatActivity
         }
 
 
-        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+        final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(200));
         profile_icon.setImageDrawable(d1);
 
         try
@@ -169,7 +173,7 @@ public class FriendInfoActivity extends AppCompatActivity
                     try
                     {
                         final FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
-                                tox_friend_get_public_key__wrapper(friendnum_)).toList().get(0);
+                            tox_friend_get_public_key__wrapper(friendnum_)).toList().get(0);
 
                         Runnable myRunnable = new Runnable()
                         {
@@ -222,8 +226,8 @@ public class FriendInfoActivity extends AppCompatActivity
                 Log.i(TAG, "indenticon:001");
 
                 final FriendList f = orma.selectFromFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                        toList().get(0);
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0);
 
                 create_avatar_identicon_for_pubkey(f.tox_public_key_string);
                 set_friend_avatar_update(tox_friend_get_public_key__wrapper(friendnum), true);
@@ -257,21 +261,21 @@ public class FriendInfoActivity extends AppCompatActivity
                 if (alias_name.length() > 0)
                 {
                     orma.updateFriendList().
-                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                            alias_name(alias_name).execute();
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        alias_name(alias_name).execute();
                 }
                 else
                 {
                     orma.updateFriendList().
-                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                            alias_name("").execute();
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        alias_name("").execute();
                 }
             }
             else
             {
                 orma.updateFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                        alias_name("").execute();
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    alias_name("").execute();
             }
         }
         catch (Exception e)
@@ -284,8 +288,8 @@ public class FriendInfoActivity extends AppCompatActivity
             {
                 e1.printStackTrace();
                 orma.updateFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                        alias_name("").execute();
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    alias_name("").execute();
             }
         }
     }

@@ -25,11 +25,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsColor;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.IconicsSize;
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class GroupAudioPlayer extends AppCompatActivity
 {
@@ -89,8 +92,10 @@ public class GroupAudioPlayer extends AppCompatActivity
             e.printStackTrace();
         }
 
-        Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_music_video).backgroundColor(
-            Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+        Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_music_video).
+            backgroundColor(IconicsColor.colorInt(Color.TRANSPARENT)).
+            color(IconicsColor.colorInt(getResources().getColor(R.color.colorPrimaryDark))).
+            size(IconicsSize.dp(80));
         this.getWindow().setBackgroundDrawable(d4);
     }
 
