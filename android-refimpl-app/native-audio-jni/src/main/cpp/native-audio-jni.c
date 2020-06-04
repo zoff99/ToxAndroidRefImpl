@@ -282,7 +282,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         //                    (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
 
         // signal Java code that a new record data is available in buffer #cur_rec_buf
-        if ((NativeAudio_class) && (rec_buffer_ready_method))
+        if ((NativeAudio_class) && (rec_buffer_ready_method) && (rec_state == _RECORDING))
         {
             // TODO: make this better? faster?
             // --------------------------------------------------
@@ -316,21 +316,34 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
             // TODO: rewerite this, so that it does not need to call "AttachCurrentThread" and "DetachCurrentThread"
             //       every time!
-            JNIEnv *jnienv2;
-            jnienv2 = jni_getenv();
-            if (jnienv2 == NULL)
+            if (rec_state == _RECORDING)
             {
-                JavaVMAttachArgs args;
-                args.version = JNI_VERSION_1_6; // choose your JNI version
-                args.name = NULL; // you might want to give the java thread a name
-                args.group = NULL; // you might want to assign the java thread to a ThreadGroup
-                (*cachedJVM)->AttachCurrentThread(cachedJVM, (JNIEnv **) &jnienv2, &args);
+                JNIEnv *jnienv2;
+                jnienv2 = jni_getenv();
+                if (jnienv2 == NULL)
+                {
+                    JavaVMAttachArgs args;
+                    args.version = JNI_VERSION_1_6; // choose your JNI version
+                    args.name = NULL; // you might want to give the java thread a name
+                    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+                    if (cachedJVM)
+                    {
+                        (*cachedJVM)->AttachCurrentThread(cachedJVM, (JNIEnv **) &jnienv2, &args);
+                    }
+                }
+
+                if (jnienv2 != NULL)
+                {
+                    (*jnienv2)->CallStaticVoidMethod(jnienv2, NativeAudio_class,
+                                                     rec_buffer_ready_method,
+                                                     rec_buf_pointer_start);
+                }
+
+                if (cachedJVM)
+                {
+                    (*cachedJVM)->DetachCurrentThread(cachedJVM);
+                }
             }
-
-            (*jnienv2)->CallStaticVoidMethod(jnienv2, NativeAudio_class, rec_buffer_ready_method,
-                                             rec_buf_pointer_start);
-            (*cachedJVM)->DetachCurrentThread(cachedJVM);
-
         }
 
         rec_buf_pointer_start++;
@@ -523,13 +536,13 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     const SLInterfaceID ids[num_params] = {SL_IID_BUFFERQUEUE,
                                            SL_IID_VOLUME,
                                            SL_IID_ANDROIDCONFIGURATION,
-        /*SL_IID_EFFECTSEND,*/
-        /*SL_IID_MUTESOLO,*/};
+            /*SL_IID_EFFECTSEND,*/
+            /*SL_IID_MUTESOLO,*/};
     const SLboolean req[num_params] = {SL_BOOLEAN_TRUE,
                                        SL_BOOLEAN_TRUE,
                                        SL_BOOLEAN_TRUE,
-        /*SL_BOOLEAN_TRUE,*/
-        /*SL_BOOLEAN_TRUE,*/};
+            /*SL_BOOLEAN_TRUE,*/
+            /*SL_BOOLEAN_TRUE,*/};
 
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &audioSrc, &audioSnk,
                                                 num_params, ids, req);
@@ -729,12 +742,12 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
     // create audio recorder
     // (requires the RECORD_AUDIO permission)
     const SLInterfaceID id[2] = {
-        SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
-        SL_IID_ANDROIDCONFIGURATION
+            SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
+            SL_IID_ANDROIDCONFIGURATION
     };
     const SLboolean req[2] = {
-        SL_BOOLEAN_TRUE,
-        SL_BOOLEAN_TRUE
+            SL_BOOLEAN_TRUE,
+            SL_BOOLEAN_TRUE
     };
     result = (*engineEngine)->CreateAudioRecorder(engineEngine, &recorderObject, &audioSrc,
                                                   &audioSnk, (2), id, req);
