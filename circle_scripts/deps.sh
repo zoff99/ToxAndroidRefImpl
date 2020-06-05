@@ -628,6 +628,542 @@ $READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 
 
+
+
+
+
+
+#### ARM64 build ###############################################
+
+
+echo $_HOME_
+
+export _SRC_=$_HOME_/arm64_build/
+export _INST_=$_HOME_/arm64_inst/
+
+echo $_SRC_
+echo $_INST_
+
+rm -Rf $_SRC_
+rm -Rf $_INST_
+
+mkdir -p $_SRC_
+mkdir -p $_INST_
+
+
+
+
+export _SDK_="$_INST_/sdk"
+export _NDK_="$_INST_/ndk/"
+export _BLD_="$_SRC_/build/"
+export _CPUS_=$numcpus_
+
+export _toolchain_="$_INST_/toolchains/"
+export _s_="$_SRC_/"
+export CF2=" -ftree-vectorize "
+export CF3=" -funsafe-math-optimizations -ffast-math "
+# ---- arm -----
+export AND_TOOLCHAIN_ARCH="arm64"
+export AND_TOOLCHAIN_ARCH2="aarch64"
+export AND_TOOLCHAIN_ARCH3="aarch64-linux-android"
+export AND_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin:$ORIG_PATH_"
+export AND_PKG_CONFIG_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/sysroot/usr/lib/pkgconfig"
+export AND_CC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang"
+export AND_GCC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang"
+export AND_CXX="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang++"
+export AND_READELF="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-readelf"
+export AND_ARTEFACT_DIR="arm64"
+
+export PATH="$_SDK_"/tools/bin:$ORIG_PATH_
+
+export ANDROID_NDK_HOME="$_NDK_"
+export ANDROID_HOME="$_SDK_"
+
+
+mkdir -p $_toolchain_
+mkdir -p $AND_PKG_CONFIG_PATH
+mkdir -p $WRKSPACEDIR
+
+
+if [ "$full""x" == "1x" ]; then
+
+    if [ "$download_full""x" == "1x" ]; then
+        cd $WRKSPACEDIR
+        redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
+
+        cd $WRKSPACEDIR
+        redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+    fi
+
+    cd $WRKSPACEDIR
+    # --- verfiy SDK package ---
+    echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
+        > sdk.zip.sha256
+    sha256sum -c sdk.zip.sha256 || exit 1
+    # --- verfiy SDK package ---
+    redirect_cmd unzip sdk.zip
+    mkdir -p "$_SDK_"
+    mv -v tools "$_SDK_"/
+    yes | "$_SDK_"/tools/bin/sdkmanager --licenses > /dev/null 2>&1
+
+    # Install Android Build Tool and Libraries ------------------------------
+    # Install Android Build Tool and Libraries ------------------------------
+    # Install Android Build Tool and Libraries ------------------------------
+    $ANDROID_HOME/tools/bin/sdkmanager --update
+    ANDROID_VERSION=26
+    ANDROID_BUILD_TOOLS_VERSION=26.0.2
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+        "platforms;android-${ANDROID_VERSION}" \
+        "platform-tools"
+    ANDROID_VERSION=25
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
+    ANDROID_BUILD_TOOLS_VERSION=25.0.0
+    redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3"
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
+    # -- why is this not just called "cmake" ? --
+    # cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
+    # -- why is this not just called "cmake" ? --
+    # Install Android Build Tool and Libraries ------------------------------
+    # Install Android Build Tool and Libraries ------------------------------
+    # Install Android Build Tool and Libraries
+
+
+
+    cd $WRKSPACEDIR
+    # --- verfiy NDK package ---
+    echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' \
+        > android-ndk-r13b-linux-x86_64.zip.sha256
+    sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
+    # --- verfiy NDK package ---
+    redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
+    rm -Rf "$_NDK_"
+    mv -v android-ndk-r13b "$_NDK_"
+
+
+
+    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
+    chmod u+x $_HOME_/pp
+    rm -Rf "$_s_"
+    mkdir -p "$_s_"
+
+
+    ## ------- init vars ------- ##
+    ## ------- init vars ------- ##
+    ## ------- init vars ------- ##
+    . $_HOME_/pp
+    ## ------- init vars ------- ##
+    ## ------- init vars ------- ##
+    ## ------- init vars ------- ##
+
+
+    mkdir -p "$PKG_CONFIG_PATH"
+    redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
+        --install-dir "$_toolchain_"/arm64 --api 12 --force   
+
+
+    if [ "$build_yasm""x" == "1x" ]; then
+    # --- YASM ---
+    cd $_s_
+    rm -Rf yasm
+    git clone --depth=1 --branch=v1.3.0 https://github.com/yasm/yasm.git
+    cd $_s_/yasm/;autoreconf -fi
+    rm -Rf "$_BLD_"
+    mkdir -p "$_BLD_"
+    cd "$_BLD_";$_s_/yasm/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
+        --disable-shared --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
+        --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot
+    cd "$_BLD_"
+    make -j $_CPUS_
+    ret_=$?
+    if [ $ret -ne 0 ]; then
+        sleep 10
+        make clean
+        make -j $_CPUS_ || exit 1
+    fi
+    cd "$_BLD_";make install
+    # --- YASM ---
+    fi
+
+
+
+    # --- LIBAV ---
+    cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
+    cd $_s_/libav/; git checkout n4.1.4
+    rm -Rf "$_BLD_"
+    mkdir -p "$_BLD_"
+    cd "$_BLD_";
+
+    ECFLAGS="-Os -fpic"
+    ELDFLAGS=""
+    ARCH_SPECIFIC="--cross-prefix=$AND_TOOLCHAIN_ARCH3- --enable-cross-compile"
+
+    $_s_/libav/configure \
+        --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
+        ${ARCH_SPECIFIC} \
+        --target-os=android \
+        --sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot \
+        --extra-cflags="$ECFLAGS" \
+        --extra-ldflags="$ELDFLAGS" \
+        --disable-shared --enable-static \
+        --enable-pthreads \
+        --disable-symver \
+        --disable-devices --disable-programs \
+        --disable-doc --disable-avdevice \
+        --disable-swscale \
+        --disable-network --disable-everything \
+        --disable-bzlib \
+        --disable-libxcb-shm \
+        --disable-libxcb-xfixes \
+        --enable-ffmpeg --enable-ffprobe \
+        --enable-parser=h264 \
+        --enable-runtime-cpudetect \
+        --enable-jni \
+        --enable-neon \
+        --enable-mediacodec \
+        --enable-decoder=h264_mediacodec \
+        --enable-gpl --enable-decoder=h264 || exit 1
+    cd "$_BLD_";make -j $_CPUS_ || exit 1
+    cd "$_BLD_";make install
+    # --- LIBAV ---
+
+
+
+    # --- X264 ---
+    # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
+    cd $_s_;git clone https://code.videolan.org/videolan/x264.git
+    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    rm -Rf "$_BLD_"
+    mkdir -p "$_BLD_"
+    cd "$_BLD_";
+    $_s_/x264/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
+        --disable-opencl --enable-static \
+        --disable-avs --disable-cli --enable-pic \
+        --host="$AND_TOOLCHAIN_ARCH3" \
+        --sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot
+    cd "$_BLD_";make -j $_CPUS_ || exit 1
+    cd "$_BLD_";make install
+    # --- X264 ---
+
+
+
+    # --- LIBVPX ---
+    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    rm -Rf "$_BLD_"
+    mkdir -p "$_BLD_"
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
+        $_s_/libvpx/configure \
+          --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
+          --sdk-path="$_NDK_" \
+          --disable-examples \
+          --disable-unit-tests \
+          --target=armv7-android-gcc \
+          --size-limit=16384x16384 \
+          --enable-onthefly-bitpacking \
+          --enable-runtime-cpu-detect \
+          --enable-realtime-only \
+          --enable-multi-res-encoding \
+          --enable-temporal-denoising
+
+    cd "$_BLD_";make -j $_CPUS_ || exit 1
+    cd "$_BLD_";make install
+    # --- LIBVPX ---
+
+
+
+
+    # --- OPUS ---
+    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_/opus/;autoreconf -fi
+    rm -Rf "$_BLD_"
+    mkdir -p "$_BLD_"
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
+    $_s_/opus/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
+        --disable-shared --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
+        --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot
+    cd "$_BLD_";make -j $_CPUS_ || exit 1
+    cd "$_BLD_";make install
+    # --- OPUS ---
+       
+
+
+    # --- LIBSODIUM ---
+    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_/libsodium/;autoreconf -fi
+    rm -Rf "$_BLD_"
+    mkdir -p "$_BLD_"
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 "
+    $_s_/libsodium/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
+        --disable-shared --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
+        --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot --disable-pie
+    cd "$_BLD_";make -j $_CPUS_ || exit 1
+    cd "$_BLD_";make install
+    # --- LIBSODIUM ---
+
+
+
+fi
+
+
+cd $_s_;rm -Rf c-toxcore
+
+cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
+cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
+
+
+cd $_s_/c-toxcore/;autoreconf -fi
+rm -Rf "$_BLD_"
+mkdir -p "$_BLD_"
+cd "$_BLD_";$_s_/c-toxcore/configure \
+    CFLAGS=" $DEBUG_TOXCORE_LOGGING -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
+    --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
+    --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
+    --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot \
+    --disable-testing --disable-rt
+
+
+cd "$_BLD_";export V=1 VERBOSE=1;make -j $_CPUS_ || exit 1
+cd "$_BLD_";make install
+
+
+
+# ----- get the source -----
+rm -Rf $_s_/jni-c-toxcore
+rm -Rf $_s_/trifa_src
+mkdir -p $_s_/jni-c-toxcore
+mkdir -p $_s_/trifa_src
+cp -av /root/work/jni-c-toxcore $_s_/
+# ----- get the source -----
+
+
+
+
+
+
+# --- filter_audio ---
+cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
+cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
+# --- filter_audio ---
+
+
+
+
+
+
+
+echo ""
+echo ""
+echo "compiling jni-c-toxcore ..."
+
+
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+
+
+# make certain warnings into errors!
+# WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
+
+WARNS=''
+add_flag()     { WARNS="$WARNS $@";               }
+
+# Add all warning flags we can.
+add_flag -Wall
+add_flag -Wextra
+add_flag -Weverything
+
+# Disable specific warning flags for both C and C++.
+
+# TODO(iphydf): Clean these up. Probably all of these are actual bugs.
+add_flag -Wno-cast-align
+# Very verbose, not very useful. This warns about things like int -> uint
+# conversions that change sign without a cast and narrowing conversions.
+add_flag -Wno-conversion
+# TODO(iphydf): Check enum values when received from the user, then assume
+# correctness and remove this suppression.
+add_flag -Wno-covered-switch-default
+# Due to clang's tolower() macro being recursive
+# https://github.com/TokTok/c-toxcore/pull/481
+add_flag -Wno-disabled-macro-expansion
+# We don't put __attribute__ on the public API.
+add_flag -Wno-documentation-deprecated-sync
+# Bootstrap daemon does this.
+add_flag -Wno-format-nonliteral
+# struct Foo foo = {0}; is a common idiom.
+add_flag -Wno-missing-field-initializers
+# Useful sometimes, but we accept padding in structs for clarity.
+# Reordering fields to avoid padding will reduce readability.
+add_flag -Wno-padded
+# This warns on things like _XOPEN_SOURCE, which we currently need (we
+# probably won't need these in the future).
+add_flag -Wno-reserved-id-macro
+# TODO(iphydf): Clean these up. They are likely not bugs, but still
+# potential issues and probably confusing.
+add_flag -Wno-sign-compare
+# Our use of mutexes results in a false positive, see 1bbe446.
+add_flag -Wno-thread-safety-analysis
+# File transfer code has this.
+add_flag -Wno-type-limits
+# Callbacks often don't use all their parameters.
+add_flag -Wno-unused-parameter
+# libvpx uses __attribute__((unused)) for "potentially unused" static
+# functions to avoid unused static function warnings.
+add_flag -Wno-used-but-marked-unused
+# We use variable length arrays a lot.
+add_flag -Wno-vla
+
+# Disable specific warning flags for C++.
+
+# Comma at end of enum is supported everywhere we run.
+#add_cxx_flag -Wno-c++98-compat-pedantic
+# TODO(iphydf): Stop using flexible array members.
+#add_cxx_flag -Wno-c99-extensions
+# We're C-compatible, so use C style casts.
+#add_cxx_flag -Wno-old-style-cast
+
+# Downgrade to warning so we still see it.
+# add_flag -Wno-error=documentation-unknown-command
+add_flag -Wno-documentation-unknown-command
+
+add_flag -Wno-error=unreachable-code
+add_flag -Wno-error=unused-variable
+
+
+# added by Zoff
+# add_flag -Wno-error=double-promotion
+add_flag -Wno-double-promotion
+
+# add_flag -Wno-error=missing-variable-declarations
+add_flag -Wno-missing-variable-declarations
+
+# add_flag -Wno-error=missing-prototypes
+add_flag -Wno-missing-prototypes
+
+add_flag -Wno-error=incompatible-pointer-types-discards-qualifiers
+add_flag -Wno-error=deprecated-declarations
+
+# add_flag -Wno-error=unused-macros
+add_flag -Wno-unused-macros
+
+#add_flag -Wno-error=bad-function-cast
+add_flag -Wno-bad-function-cast
+
+#add_flag -Wno-error=float-equal
+add_flag -Wno-float-equal
+
+#add_flag -Wno-error=cast-qual
+add_flag -Wno-cast-qual
+
+#add_flag -Wno-error=strict-prototypes
+add_flag -Wno-strict-prototypes
+
+#add_flag -Wno-error=gnu-statement-expression
+add_flag -Wno-gnu-statement-expression
+
+#add_flag -Wno-error=documentation
+add_flag -Wno-documentation
+
+# reactivate this later! ------------
+# add_flag -Wno-error=pointer-sign
+add_flag -Wno-pointer-sign
+# reactivate this later! ------------
+
+
+add_flag -Werror
+add_flag -fdiagnostics-color=always
+
+
+echo '#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wlanguage-extension-token"
+#pragma GCC diagnostic ignored "-Wpedantic"
+' > "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+cat "$_NDK_"/sources/android/cpufeatures/cpu-features.c >> "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+echo '#pragma GCC diagnostic pop
+' >> "$_NDK_"/sources/android/cpufeatures/cpu-features2.c
+
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+## ---------------- clang flags ----------------
+
+
+
+
+
+
+
+
+
+
+#    -Wall -Wextra
+#    -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
+#    -Wno-pointer-sign -Wno-unused-but-set-variable \
+
+echo ""
+echo ""
+echo "-------- compiler version --------"
+echo "-------- compiler version --------"
+$GCC --version
+echo "-------- compiler version --------"
+echo "-------- compiler version --------"
+echo ""
+echo ""
+
+cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
+    $WARNS \
+    -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
+    jni-c-toxcore.c -o libjni-c-toxcore.so \
+    -std=gnu99 -I"$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libtoxcore.a \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libtoxencryptsave.a \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libtoxav.a \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libvpx.a \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libopus.a \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libsodium.a \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libx264.a \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavcodec.a \
+    "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavutil.a \
+    ./filter_audio/libfilteraudio.a \
+    coffeecatch.c coffeejni.c \
+    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
+
+res=$?
+
+echo "... done"
+
+
+if [ $res -ne 0 ]; then
+    echo "ERROR"
+    exit 1
+fi
+
+echo ""
+echo ""
+ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
+
+
+mkdir -p $CIRCLE_ARTIFACTS/android/libs/arm64/
+cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/arm64/
+
+$READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
+$READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
+$READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
+
+# --> /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so
+
+#### ARM64 build ###############################################
+
+
+
+
+
 #### x86 build ###############################################
 
 
