@@ -30,7 +30,7 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.multidex.MultiDex;
+import androidx.multidex.MultiDex;
 import android.util.Log;
 
 import com.yariksoffice.lingver.Lingver;

@@ -32,7 +32,6 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -41,13 +40,15 @@ import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
+import androidx.core.app.NotificationCompat;
+
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
-import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
+import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
@@ -463,7 +464,7 @@ public class GroupAudioService extends Service
 
         b.setContentTitle("...");
         b.setShowWhen(false);
-        b.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle());
+        b.setStyle(new androidx.media.app.NotificationCompat.MediaStyle());
         b.setColor(getResources().getColor(R.color.colorPrimary));
         b.setSmallIcon(R.mipmap.ic_launcher);
         b.setLargeIcon(null);

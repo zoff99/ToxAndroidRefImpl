@@ -19,7 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
