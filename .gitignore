@@ -21,3 +21,6 @@ android-refimpl-app/app/.idea/
 android-refimpl-app/app/local.properties
 android-refimpl-app/gwitness/gwit/reports/
 android-refimpl-app/gwitness/gwit/pluginUnderTestMetadata/
+tools/script
+tools/workspace
+tools/artefacts
