@@ -849,6 +849,8 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
 
 
+    find "$_toolchain_"/"$AND_TOOLCHAIN_ARCH" -name 'arm_neon.h'
+    exit 1
 
     # --- LIBVPX ---
     cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
