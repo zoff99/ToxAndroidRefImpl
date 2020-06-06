@@ -7,6 +7,15 @@
         android:name="android.hardware.location.network"
         android:required="false"/>
     <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false"/>
+    <uses-feature
         android:name="android.hardware.location.gps"
         android:required="false"/>
     <uses-feature
