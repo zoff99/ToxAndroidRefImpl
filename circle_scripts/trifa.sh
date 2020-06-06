@@ -254,10 +254,12 @@ cp -av /root/work/jni-c-toxcore $_s_/trifa_src/
 cp -av /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so $_s_/trifa_src/android-refimpl-app/app/nativelibs/armeabi-v7a/
 cp -av /root/work//artefacts//android/libs/arm64-v8a/libjni-c-toxcore.so $_s_/trifa_src/android-refimpl-app/app/nativelibs/arm64-v8a/
 cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86/
+cp -av /root/work//artefacts//android/libs/x86_64/libjni-c-toxcore.so $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86_64/
 
 ls -hal /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so || exit 1
 ls -hal /root/work//artefacts//android/libs/arm64-v8a/libjni-c-toxcore.so || exit 1
 ls -hal /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so || exit 1
+ls -hal /root/work//artefacts//android/libs/x86_64/libjni-c-toxcore.so || exit 1
 
 echo "###### ---------- ARM --------------------"
 scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/armeabi-v7a//libjni-c-toxcore.so
@@ -265,6 +267,8 @@ echo "###### ---------- ARM64 --------------------"
 scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/arm64-v8a//libjni-c-toxcore.so
 echo "###### ---------- X86 --------------------"
 scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86//libjni-c-toxcore.so
+echo "###### ---------- X86_64 --------------------"
+scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86_64//libjni-c-toxcore.so
 echo "###### ------------------------------"
 
 # ----- get the source -----
@@ -314,6 +318,9 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
 
     cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
     cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
+
+    cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/x86_64/
+    cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/x86_64/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/x86_64/
 
     cd $_s_/trifa_src/android-refimpl-app/ ; ./gradlew :jnilib:dependencies
     cd $_s_/trifa_src/android-refimpl-app/ ; ./gradlew :jnilib:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :jnilib:build --stacktrace --no-daemon # first build may FAIL
