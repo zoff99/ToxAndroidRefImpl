@@ -1,0 +1,108 @@
+--- a/libvpx/build/make/configure.sh	2019-03-13 08:20:13.000000000
++++ b/libvpx/build/build/make/configure.sh	2019-04-15 09:33:34.000000000
+@@ -1013,17 +1013,14 @@
+             win*)
+               asm_conversion_cmd="$asm_conversion_cmd -noelf"
+               AS="$CC -c"
+               EXE_SFX=.exe
+               enable_feature thumb
+               ;;
+-            *)
+-              check_add_asflags --defsym ARCHITECTURE=${arch_int}
+-              ;;
+-          esac
+-
++          esac
++
+           if enabled thumb; then
+             asm_conversion_cmd="$asm_conversion_cmd -thumb"
+             check_add_cflags -mthumb
+             check_add_asflags -mthumb -mimplicit-it=always
+           fi
+           ;;
+@@ -1087,13 +1084,12 @@
+               check_add_cflags --cpu=${tgt_isa##armv}
+               check_add_asflags --cpu=${tgt_isa##armv}
+             fi
+           fi
+           arch_int=${tgt_isa##armv}
+           arch_int=${arch_int%%te}
+-          check_add_asflags --pd "\"ARCHITECTURE SETA ${arch_int}\""
+           enabled debug && add_asflags -g
+           add_cflags --gnu
+           add_cflags --enum_is_int
+           add_cflags --wchar32
+           ;;
+       esac
+@@ -1104,40 +1100,59 @@
+           disable_feature os_support
+           ;;
+ 
+         android*)
+           if [ -n "${sdk_path}" ]; then
+             SDK_PATH=${sdk_path}
+-            COMPILER_LOCATION=`find "${SDK_PATH}" \
+-              -name "arm-linux-androideabi-gcc*" -print -quit`
+-            TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/arm-linux-androideabi-
++            if [ ${tgt_isa} = "arm64" ] || [ ${tgt_isa} = "armv8" ]; then
++              COMPILER_LOCATION=`find "${SDK_PATH}" \
++                -name "aarch64-linux-android-gcc*" -print -quit`
++              TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/aarch64-linux-android-
++            else
++              COMPILER_LOCATION=`find "${SDK_PATH}" \
++                -name "arm-linux-androideabi-gcc*" -print -quit`
++              TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/arm-linux-androideabi-
++            fi
++
+             CC=${TOOLCHAIN_PATH}gcc
+             CXX=${TOOLCHAIN_PATH}g++
+             AR=${TOOLCHAIN_PATH}ar
+             LD=${TOOLCHAIN_PATH}gcc
+             AS=${TOOLCHAIN_PATH}as
+             STRIP=${TOOLCHAIN_PATH}strip
+             NM=${TOOLCHAIN_PATH}nm
+ 
+             if [ -z "${alt_libc}" ]; then
+-              alt_libc=`find "${SDK_PATH}" -name arch-arm -print | \
+-                awk '{n = split($0,a,"/"); \
+-                split(a[n-1],b,"-"); \
+-                print $0 " " b[2]}' | \
+-                sort -g -k 2 | \
+-                awk '{ print $1 }' | tail -1`
++              if [ ${tgt_isa} = "armv7" ]; then
++                alt_libc=`find "${SDK_PATH}" -name arch-arm -print | \
++                  awk '{n = split($0,a,"/"); \
++                  split(a[n-1],b,"-"); \
++                  print $0 " " b[2]}' | \
++                  sort -g -k 2 | \
++                  awk '{ print $1 }' | tail -1`
++			  else
++                alt_libc=`find "${SDK_PATH}" -name arch-${tgt_isa} -print | \
++                  awk '{n = split($0,a,"/"); \
++                  split(a[n-1],b,"-"); \
++                  print $0 " " b[2]}' | \
++                  sort -g -k 2 | \
++                  awk '{ print $1 }' | tail -1`
++			  fi
+             fi
+ 
+             if [ -d "${alt_libc}" ]; then
+               add_cflags "--sysroot=${alt_libc}"
+               add_ldflags "--sysroot=${alt_libc}"
+             fi
+ 
+-            # linker flag that routes around a CPU bug in some
+-            # Cortex-A8 implementations (NDK Dev Guide)
+-            add_ldflags "-Wl,--fix-cortex-a8"
++            if [ ${tgt_isa} = "armv7" ] || [ ${tgt_isa} = "armv7s" ]; then
++              # linker flag that routes around a CPU bug in some
++              # Cortex-A8 implementations (NDK Dev Guide)
++              # only valid for armv7 and clang/clang++ does not recognize this option
++              add_ldflags "-Wl,--fix-cortex-a8"
++            fi
+ 
+             enable_feature pic
+             soft_enable realtime_only
+             if [ ${tgt_isa} = "armv7" ]; then
+               soft_enable runtime_cpu_detect
+             fi
