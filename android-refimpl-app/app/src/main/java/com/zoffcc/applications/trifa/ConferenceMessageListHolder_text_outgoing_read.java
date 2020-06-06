@@ -212,7 +212,7 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
 
                 if ((f1 != null) && (fname != null))
