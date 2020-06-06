@@ -346,6 +346,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     $_s_/opus/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
         --disable-shared --disable-soname-versions --host=arm-linux-androideabi \
+        --enable-float-approx \
         --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
@@ -891,6 +892,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     $_s_/opus/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
         --disable-shared --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
+        --enable-float-approx \
         --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
@@ -1441,6 +1443,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     $_s_/opus/configure --prefix="$_toolchain_"/x86/sysroot/usr \
         --disable-shared --disable-soname-versions --host=x86 \
+        --enable-float-approx \
         --with-sysroot="$_toolchain_"/x86/sysroot
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
@@ -1702,7 +1705,7 @@ if [ "$full""x" == "1x" ]; then
 
     mkdir -p "$PKG_CONFIG_PATH"
     redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
-        --install-dir "$_toolchain_"/x86 --api 21 --force
+        --install-dir "$_toolchain_"/x86_64 --api 21 --force
 
 
     if [ "$build_yasm""x" == "1x" ]; then
@@ -1819,14 +1822,16 @@ if [ "$full""x" == "1x" ]; then
           --disable-examples \
           --disable-unit-tests \
           --target=x86_64-android-gcc \
-          --disable-mmx --disable-sse \
-          --disable-sse2 --disable-sse3 --disable-ssse3 --disable-sse4_1 \
-          --disable-runtime_cpu_detect \
+          --enable-runtime_cpu_detect \
           --size-limit=16384x16384 \
           --disable-onthefly-bitpacking \
           --enable-realtime-only \
           --enable-multi-res-encoding \
           --enable-temporal-denoising || exit 1
+
+#          --disable-mmx --disable-sse \
+#          --disable-sse2 --disable-sse3 --disable-ssse3 --disable-sse4_1 \
+
 
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
@@ -1843,6 +1848,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     $_s_/opus/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
         --disable-shared --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
+        --enable-float-approx \
         --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
