@@ -329,7 +329,7 @@ if [ "$full""x" == "1x" ]; then
           --enable-runtime-cpu-detect \
           --enable-realtime-only \
           --enable-multi-res-encoding \
-          --enable-temporal-denoising
+          --enable-temporal-denoising || exit 1
 
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
@@ -849,16 +849,18 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
 
 
-find "$_toolchain_"/"$AND_TOOLCHAIN_ARCH" -name 'arm_neon.h'
-ls -al /root/work//arm64_inst//toolchains//arm64/lib64/clang/3.8.256229/include/arm_neon.h
-ls -al /root/work//arm64_inst//toolchains//arm64/lib64/clang/3.8/include/arm_neon.h
-ls -al /root/work//arm64_inst//toolchains//arm64/lib/gcc/aarch64-linux-android/4.9.x/include/arm_neon.h
+# find "$_toolchain_"/"$AND_TOOLCHAIN_ARCH" -name 'arm_neon.h'
+# ls -al /root/work//arm64_inst//toolchains//arm64/lib64/clang/3.8.256229/include/arm_neon.h
+# ls -al /root/work//arm64_inst//toolchains//arm64/lib64/clang/3.8/include/arm_neon.h
+# ls -al /root/work//arm64_inst//toolchains//arm64/lib/gcc/aarch64-linux-android/4.9.x/include/arm_neon.h
 
     # --- LIBVPX ---
     cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;wget 'https://raw.githubusercontent.com/cmeng-git/vpx-android/de613e367ea86190955a836c3c0f2bc0f260562f/patches/10.libvpx_configure.sh.patch' -O aa.patch
+    cd $_s_; patch -p1 < aa.patch
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3  -mfloat-abi=softfp -mfpu=neon ";export CFLAGS=" -g -O3 $CF2 $CF3 -mfloat-abi=softfp -mfpu=neon "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3  ";export CFLAGS=" -g -O3 $CF2 $CF3  "
         $_s_/libvpx/configure \
           --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
           --sdk-path="$_NDK_" \
@@ -870,7 +872,7 @@ ls -al /root/work//arm64_inst//toolchains//arm64/lib/gcc/aarch64-linux-android/4
           --enable-runtime-cpu-detect \
           --enable-realtime-only \
           --enable-multi-res-encoding \
-          --enable-temporal-denoising
+          --enable-temporal-denoising || exit 1
 
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
@@ -1422,7 +1424,7 @@ if [ "$full""x" == "1x" ]; then
           --disable-onthefly-bitpacking \
           --enable-realtime-only \
           --enable-multi-res-encoding \
-          --enable-temporal-denoising
+          --enable-temporal-denoising || exit 1
 
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
