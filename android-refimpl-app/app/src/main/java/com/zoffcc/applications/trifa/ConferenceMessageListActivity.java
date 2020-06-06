@@ -507,7 +507,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     if ((msg != null) && (!msg.equalsIgnoreCase("")))
                     {
                         int res = tox_conference_send_message(tox_conference_by_confid__wrapper(conf_id), 0, msg);
-                        Log.i(TAG, "tox_conference_send_message:result=" + res + " m=" + m);
+                        // Log.i(TAG, "tox_conference_send_message:result=" + res + " m=" + m);
                         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
                         if (res > -1)
