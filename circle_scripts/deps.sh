@@ -1156,7 +1156,7 @@ echo ""
 ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 
-mkdir -p $CIRCLE_ARTIFACTS/android/libs/arm64/
+mkdir -p $CIRCLE_ARTIFACTS/android/libs/arm64-v8a/
 cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/arm64-v8a/
 
 $READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
