@@ -121,15 +121,15 @@ android {
         // exclude 'lib/x86/librsjni_androidx.so'
         // exclude 'lib/x86'
         //
-        exclude 'lib/x86_64/libRSSupport.so'
-        exclude 'lib/x86_64/librsjni.so'
-        exclude 'lib/x86_64/libsqlcipher.so'
-        exclude 'lib/x86_64/libiocipher.so'
-        exclude 'lib/x86_64/libspeex.so'
-        exclude 'lib/x86_64/libblasV8.so'
-        exclude 'lib/x86_64/librsjni_androidx.so'
-        exclude 'lib/x86_64/libnative-audio-jni.so'
-        exclude 'lib/x86_64'
+        // exclude 'lib/x86_64/libRSSupport.so'
+        // exclude 'lib/x86_64/librsjni.so'
+        // exclude 'lib/x86_64/libsqlcipher.so'
+        // exclude 'lib/x86_64/libiocipher.so'
+        // exclude 'lib/x86_64/libspeex.so'
+        // exclude 'lib/x86_64/libblasV8.so'
+        // exclude 'lib/x86_64/librsjni_androidx.so'
+        // exclude 'lib/x86_64/libnative-audio-jni.so'
+        // exclude 'lib/x86_64'
         //
     }
 
