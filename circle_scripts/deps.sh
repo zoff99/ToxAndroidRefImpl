@@ -849,14 +849,16 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
 
 
-    find "$_toolchain_"/"$AND_TOOLCHAIN_ARCH" -name 'arm_neon.h'
-    exit 1
+find "$_toolchain_"/"$AND_TOOLCHAIN_ARCH" -name 'arm_neon.h'
+ls -al /root/work//arm64_inst//toolchains//arm64/lib64/clang/3.8.256229/include/arm_neon.h
+ls -al /root/work//arm64_inst//toolchains//arm64/lib64/clang/3.8/include/arm_neon.h
+ls -al /root/work//arm64_inst//toolchains//arm64/lib/gcc/aarch64-linux-android/4.9.x/include/arm_neon.h
 
     # --- LIBVPX ---
     cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I$_toolchain_/$AND_TOOLCHAIN_ARCH/clang/3.8/include ";export CFLAGS=" -g -O3 $CF2 $CF3 -I$_toolchain_/$AND_TOOLCHAIN_ARCH/clang/3.8/include "
         $_s_/libvpx/configure \
           --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
           --sdk-path="$_NDK_" \
@@ -872,6 +874,8 @@ if [ "$full""x" == "1x" ]; then
 
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
+    unset CFLAGS
+    unset CXXFLAGS
     # --- LIBVPX ---
 
 
