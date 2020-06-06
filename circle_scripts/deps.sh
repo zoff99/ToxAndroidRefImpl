@@ -860,7 +860,7 @@ if [ "$full""x" == "1x" ]; then
           --sdk-path="$_NDK_" \
           --disable-examples \
           --disable-unit-tests \
-          --target=armv7-android-gcc \
+          --target=arm64-android-gcc \
           --size-limit=16384x16384 \
           --enable-onthefly-bitpacking \
           --enable-runtime-cpu-detect \
