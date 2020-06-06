@@ -93,6 +93,7 @@ done
 
 
 
+export ORIG_PATH_=$PATH
 
 
 
@@ -112,9 +113,6 @@ rm -Rf $_INST_
 
 mkdir -p $_SRC_
 mkdir -p $_INST_
-
-
-export ORIG_PATH_=$PATH
 
 
 export _SDK_="$_INST_/sdk"
@@ -633,6 +631,7 @@ $READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 
 
+
 #### ARM64 build ###############################################
 
 
@@ -763,7 +762,7 @@ if [ "$full""x" == "1x" ]; then
 
     mkdir -p "$PKG_CONFIG_PATH"
     redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
-        --install-dir "$_toolchain_"/arm64 --api 12 --force   
+        --install-dir "$_toolchain_"/arm64 --api 21 --force
 
 
     if [ "$build_yasm""x" == "1x" ]; then
@@ -776,7 +775,7 @@ if [ "$full""x" == "1x" ]; then
     mkdir -p "$_BLD_"
     cd "$_BLD_";$_s_/yasm/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
         --disable-shared --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
-        --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot
+        --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot || exit 1
     cd "$_BLD_"
     make -j $_CPUS_
     ret_=$?
@@ -800,7 +799,7 @@ if [ "$full""x" == "1x" ]; then
 
     ECFLAGS="-Os -fpic"
     ELDFLAGS=""
-    ARCH_SPECIFIC="--cross-prefix=$AND_TOOLCHAIN_ARCH3- --enable-cross-compile"
+    ARCH_SPECIFIC="--arch=arm64 --cross-prefix=$AND_TOOLCHAIN_ARCH3- --enable-cross-compile"
 
     $_s_/libav/configure \
         --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
@@ -919,7 +918,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" $DEBUG_TOXCORE_LOGGING -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
+    CFLAGS=" $DEBUG_TOXCORE_LOGGING -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function" \
     --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
     --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
     --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot \
@@ -1118,7 +1117,7 @@ echo ""
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
-    -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
+    -funwind-tables -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libtoxcore.a \
@@ -1150,7 +1149,7 @@ ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 
 mkdir -p $CIRCLE_ARTIFACTS/android/libs/arm64/
-cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/arm64/
+cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/arm64-v8a/
 
 $READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
 $READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
