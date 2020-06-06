@@ -65,6 +65,12 @@ android {
         exclude 'META-INF/proguard/okhttp3.pro'
         exclude 'androidsupportmultidexversion.txt'
 //
+        exclude 'kotlin/**'
+        exclude 'kotlin/*'
+        exclude 'kotlin'
+        exclude 'META-INF/kotlin*'
+        exclude 'META-INF/com.yariksoffice*'
+//
         exclude 'lib/armeabi/libRSSupport.so'
         exclude 'lib/armeabi/librsjni.so'
         exclude 'lib/armeabi/libsqlcipher.so'
