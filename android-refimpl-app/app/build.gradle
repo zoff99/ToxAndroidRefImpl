@@ -41,7 +41,7 @@ apply from: 'witness.gradle'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    buildToolsVersion "29.0.2"
     compileOptions.encoding = 'UTF-8'
     // generatedDensities = []
 
