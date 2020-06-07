@@ -125,7 +125,8 @@ typedef struct ucontext {
 
 #elif defined(__aarch64__)
 
-#elif defined(__i386__)
+#elif defined(__i386__) || defined(__x86_64__)
+
 
 /* Taken from Google Breakpad. */
 
@@ -238,7 +239,7 @@ typedef struct {
 // TODO: android studio ----------
 // TODO: android studio ----------
 #if 0
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
 #include <setjmp.h>
 void siglongjmp(jmp_buf env, int val);
 int sigsetjmp(jmp_buf env, int savemask);

@@ -11,7 +11,9 @@
 /android-refimpl-app.externalNativeBuild
 android-refimpl-app/app/nativelibs/armeabi/libjni-c-toxcore.so
 android-refimpl-app/app/nativelibs/armeabi-v7a/libjni-c-toxcore.so
+android-refimpl-app/app/nativelibs/arm64-v8a/libjni-c-toxcore.so
 android-refimpl-app/app/nativelibs/x86/libjni-c-toxcore.so
+android-refimpl-app/app/nativelibs/x86_64/libjni-c-toxcore.so
 android-refimpl-app/app/lint-report.html
 android-refimpl-app/app/lint-report.txt
 android-refimpl-app/app/lint-report.xml
@@ -21,3 +23,6 @@ android-refimpl-app/app/.idea/
 android-refimpl-app/app/local.properties
 android-refimpl-app/gwitness/gwit/reports/
 android-refimpl-app/gwitness/gwit/pluginUnderTestMetadata/
+tools/script
+tools/workspace
+tools/artefacts
