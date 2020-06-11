@@ -2798,7 +2798,7 @@ public class HelperGeneric
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                     }
                 }
             };
@@ -2812,7 +2812,7 @@ public class HelperGeneric
                 {
                     try
                     {
-                        for (int jj = 0; jj < 1; jj++)
+                        for (int jj = 0; jj < 3; jj++)
                         {
                             CallingActivity.h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
 
@@ -2860,12 +2860,11 @@ public class HelperGeneric
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                     }
                 }
             };
             new_thread2.start();
-
 
             try
             {
