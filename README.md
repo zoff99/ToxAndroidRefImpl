@@ -4,6 +4,8 @@
 This is now also a Tox Client for Android.
 
 <a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://gitlab.com/fdroid/artwork/raw/master/badge/get-it-on.png" width="200"></a>
+<a href="https://play.google.com/store/apps/details?id=com.zoffcc.applications.trifa"><img src="https://gitlab.com/fdroid/artwork/raw/master/badge/get-it-on.png" width="200"></a>
+
 
 Build Status
 =
