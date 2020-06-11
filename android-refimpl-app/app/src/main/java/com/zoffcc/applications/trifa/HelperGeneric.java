@@ -2830,15 +2830,6 @@ public class HelperGeneric
             };
             new_thread.start();
 
-            try
-            {
-                new_thread.join();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
             final Thread new_thread2 = new Thread()
             {
                 @Override
@@ -2930,11 +2921,23 @@ public class HelperGeneric
 
             try
             {
-                new_thread2.join();
+                new_thread.join();
             }
             catch (Exception e)
             {
                 e.printStackTrace();
+            }
+
+            if (1 == 1)
+            {
+                try
+                {
+                    new_thread2.join();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
 
             return 0;

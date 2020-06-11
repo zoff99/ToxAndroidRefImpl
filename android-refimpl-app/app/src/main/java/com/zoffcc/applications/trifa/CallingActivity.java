@@ -42,7 +42,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -63,6 +62,8 @@ import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
@@ -75,27 +76,29 @@ import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.format_timeduration_from_seconds;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
+import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
+import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_bitrates;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encoding;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__video_call_quality;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__video_cam_resolution;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_play_delay_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
-import static com.zoffcc.applications.trifa.HelperGeneric.format_timeduration_from_seconds;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
-import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
-import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
-import static com.zoffcc.applications.trifa.HelperGeneric.update_bitrates;
-import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_HIGH;
@@ -164,7 +167,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     BarLevelDrawable audio_bar_out_v = null;
     static int activity_state = 0;
     com.etiennelawlor.discreteslider.library.ui.DiscreteSlider quality_slider = null;
-    static int quality_slider_position = 0;
     TextView text_vq_low = null;
     TextView text_vq_med = null;
     TextView text_vq_high = null;
@@ -597,17 +599,32 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
+                        int max_video_bitrate_ = VIDEO_ENCODER_MAX_BITRATE_LOW;
+
+                        if (PREF__video_cam_resolution == 2)
+                        {
+                            max_video_bitrate_ = VIDEO_ENCODER_MAX_BITRATE_LOW * 2;
+                        }
+                        else if (PREF__video_cam_resolution == 1)
+                        {
+                            max_video_bitrate_ = (int) (VIDEO_ENCODER_MAX_BITRATE_LOW * 1.5);
+                        }
+
                         int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
-                                                    VIDEO_ENCODER_MAX_BITRATE_LOW);
+                                                    max_video_bitrate_);
 
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_LOW);
                         if (res != 0)
                         {
-                            quality_slider_position = 0;
-                            quality_slider.setPosition(quality_slider_position);
+                            PREF__video_call_quality = 0;
+                            quality_slider.setPosition(PREF__video_call_quality);
+
+                            SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
+                                getApplicationContext());
+                            settings_cs1.edit().putString("video_call_quality", "" + PREF__video_call_quality).apply();
                         }
                     }
                     catch (Exception e)
@@ -630,17 +647,32 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
+                        int max_video_bitrate_ = VIDEO_ENCODER_MAX_BITRATE_MED;
+
+                        if (PREF__video_cam_resolution == 2)
+                        {
+                            max_video_bitrate_ = VIDEO_ENCODER_MAX_BITRATE_MED * 2;
+                        }
+                        else if (PREF__video_cam_resolution == 1)
+                        {
+                            max_video_bitrate_ = (int) (VIDEO_ENCODER_MAX_BITRATE_MED * 1.5);
+                        }
+
                         int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
-                                                    VIDEO_ENCODER_MAX_BITRATE_MED);
+                                                    max_video_bitrate_);
 
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_MED);
                         if (res != 0)
                         {
-                            quality_slider_position = 1;
-                            quality_slider.setPosition(quality_slider_position);
+                            PREF__video_call_quality = 1;
+                            quality_slider.setPosition(PREF__video_call_quality);
+
+                            SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
+                                getApplicationContext());
+                            settings_cs1.edit().putString("video_call_quality", "" + PREF__video_call_quality).apply();
                         }
                     }
                     catch (Exception e)
@@ -662,17 +694,32 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
+                        int max_video_bitrate_ = VIDEO_ENCODER_MAX_BITRATE_HIGH;
+
+                        if (PREF__video_cam_resolution == 2)
+                        {
+                            max_video_bitrate_ = VIDEO_ENCODER_MAX_BITRATE_HIGH * 2;
+                        }
+                        else if (PREF__video_cam_resolution == 1)
+                        {
+                            max_video_bitrate_ = (int) (VIDEO_ENCODER_MAX_BITRATE_HIGH * 1.5);
+                        }
+
                         int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
-                                                    VIDEO_ENCODER_MAX_BITRATE_HIGH);
+                                                    max_video_bitrate_);
 
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_HIGH);
                         if (res != 0)
                         {
-                            quality_slider_position = 2;
-                            quality_slider.setPosition(quality_slider_position);
+                            PREF__video_call_quality = 2;
+                            quality_slider.setPosition(PREF__video_call_quality);
+
+                            SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
+                                getApplicationContext());
+                            settings_cs1.edit().putString("video_call_quality", "" + PREF__video_call_quality).apply();
                         }
                     }
                     catch (Exception e)
@@ -685,14 +732,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-
         update_bitrates();
         update_fps();
         update_call_time();
         set_video_delay_ms();
         set_audio_play_volume();
 
-        quality_slider.setPosition(quality_slider_position);
+        quality_slider.setPosition(PREF__video_call_quality);
 
         // Detect when slider position changes
         quality_slider.setOnDiscreteSliderChangeListener(new DiscreteSlider.OnDiscreteSliderChangeListener()
@@ -701,7 +747,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             public void onPositionChanged(int position)
             {
                 Log.i(TAG, "setOnDiscreteSliderChangeListener:pos=" + position); //$NON-NLS-1$
-                final int prev_position = quality_slider_position;
+                final int prev_position = PREF__video_call_quality;
 
                 if (prev_position != position)
                 {
@@ -717,6 +763,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         value = VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
                         value1 = VIDEO_ENCODER_MAX_BITRATE_HIGH;
                     }
+
+                    if (PREF__video_cam_resolution == 2)
+                    {
+                        value1 = value1 * 2;
+                    }
+                    else if (PREF__video_cam_resolution == 1)
+                    {
+                        value1 = (int) (value1 * 1.5);
+                    }
+
                     int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                 ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
                                                 value1);
@@ -728,9 +784,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     if (res != 0)
                     {
-                        quality_slider_position = position;
-                        Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_NEW:" +
-                                   quality_slider.getPosition()); //$NON-NLS-1$
+                        PREF__video_call_quality = position;
+                        Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_NEW:" + quality_slider.getPosition());
+
+                        SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
+                            getApplicationContext());
+                        settings_cs1.edit().putString("video_call_quality", "" + PREF__video_call_quality).apply();
                     }
                     else
                     {
@@ -1189,10 +1248,28 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         try
         {
+            int value1 = VIDEO_ENCODER_MAX_BITRATE_LOW;
+            if (PREF__video_call_quality == 1)
+            {
+                value1 = VIDEO_ENCODER_MAX_BITRATE_MED;
+            }
+            else if (PREF__video_call_quality == 2)
+            {
+                value1 = VIDEO_ENCODER_MAX_BITRATE_HIGH;
+            }
+
+            if (PREF__video_cam_resolution == 2)
+            {
+                value1 = value1 * 2;
+            }
+            else if (PREF__video_cam_resolution == 1)
+            {
+                value1 = (int) (value1 * 1.5);
+            }
+
             int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
-                                       VIDEO_ENCODER_MAX_BITRATE_LOW);
-            Log.i(TAG, "max_v_birate_set:res=" + res); //$NON-NLS-1$
+                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value, value1);
+            Log.i(TAG, "max_v_birate_set:res=" + res);
         }
         catch (Exception e)
         {

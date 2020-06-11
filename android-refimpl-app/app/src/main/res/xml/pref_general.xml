@@ -49,15 +49,6 @@
         android:key="orbot_enabled"
         android:summary="@string/pref_description_orbot_enabled"
         android:title="@string/pref_title_orbot_enabled" />
-    <ListPreference
-        android:defaultValue="1"
-        android:entries="@array/pref_higher_video_quality_titles"
-        android:entryValues="@array/pref_higher_video_quality_values"
-        android:key="higher_video_quality"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:summary="@string/pref_description_higher_video_quality"
-        android:title="@string/pref_title_higher_video_quality" />
 
     <ListPreference
         android:defaultValue="0"

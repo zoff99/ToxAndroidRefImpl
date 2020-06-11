@@ -54,17 +54,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
-import androidx.renderscript.Allocation;
-import androidx.renderscript.Element;
-import androidx.renderscript.RenderScript;
-import androidx.renderscript.ScriptIntrinsicYuvToRGB;
-import androidx.renderscript.Type;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -118,6 +107,17 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.renderscript.Allocation;
+import androidx.renderscript.Element;
+import androidx.renderscript.RenderScript;
+import androidx.renderscript.ScriptIntrinsicYuvToRGB;
+import androidx.renderscript.Type;
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import info.guardianproject.netcipher.proxy.StatusCallback;
@@ -157,11 +157,9 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_AUDIO_BITRAT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BITRATE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
@@ -344,8 +342,9 @@ public class MainActivity extends AppCompatActivity
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092"; // this is just a dummy, this value is not used!
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
-    static int PREF__higher_video_quality = 1;
+    static int PREF__higher_video_quality = 0;
     static int PREF__higher_audio_quality = 1;
+    static int PREF__video_call_quality = 0;
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
@@ -640,31 +639,19 @@ public class MainActivity extends AppCompatActivity
             PREF__udp_enabled = 0;
         }
 
+        PREF__higher_video_quality = 0;
+        GLOBAL_VIDEO_BITRATE = LOWER_GLOBAL_VIDEO_BITRATE;
+
         try
         {
-            PREF__higher_video_quality = Integer.parseInt(settings.getString("higher_video_quality", "1"));
+            PREF__video_call_quality = Integer.parseInt(settings.getString("video_call_quality", "0"));
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__higher_video_quality = 1;
-            // -------- convert old boolean value to String, otherwise -> crash --------
-            settings.edit().putString("higher_video_quality", "" + PREF__higher_video_quality).commit();
-            // -------- convert old boolean value to String, otherwise -> crash --------
+            PREF__video_call_quality = 0;
         }
 
-        if (PREF__higher_video_quality == 2)
-        {
-            GLOBAL_VIDEO_BITRATE = HIGHER_GLOBAL_VIDEO_BITRATE;
-        }
-        else if (PREF__higher_video_quality == 1)
-        {
-            GLOBAL_VIDEO_BITRATE = NORMAL_GLOBAL_VIDEO_BITRATE;
-        }
-        else
-        {
-            GLOBAL_VIDEO_BITRATE = LOWER_GLOBAL_VIDEO_BITRATE;
-        }
 
         try
         {
@@ -1890,30 +1877,17 @@ public class MainActivity extends AppCompatActivity
             PREF__udp_enabled = 0;
         }
 
+        PREF__higher_video_quality = 0;
+        GLOBAL_VIDEO_BITRATE = LOWER_GLOBAL_VIDEO_BITRATE;
+
         try
         {
-            PREF__higher_video_quality = Integer.parseInt(settings.getString("higher_video_quality", "1"));
+            PREF__video_call_quality = Integer.parseInt(settings.getString("video_call_quality", "0"));
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__higher_video_quality = 1;
-            // -------- convert old boolean value to String, otherwise -> crash --------
-            settings.edit().putString("higher_video_quality", "" + PREF__higher_video_quality).commit();
-            // -------- convert old boolean value to String, otherwise -> crash --------
-        }
-
-        if (PREF__higher_video_quality == 2)
-        {
-            GLOBAL_VIDEO_BITRATE = HIGHER_GLOBAL_VIDEO_BITRATE;
-        }
-        else if (PREF__higher_video_quality == 1)
-        {
-            GLOBAL_VIDEO_BITRATE = NORMAL_GLOBAL_VIDEO_BITRATE;
-        }
-        else
-        {
-            GLOBAL_VIDEO_BITRATE = LOWER_GLOBAL_VIDEO_BITRATE;
+            PREF__video_call_quality = 0;
         }
 
         try
