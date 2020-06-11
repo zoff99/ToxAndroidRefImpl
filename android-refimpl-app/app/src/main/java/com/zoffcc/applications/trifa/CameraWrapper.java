@@ -33,13 +33,13 @@ import java.util.List;
 
 import static com.zoffcc.applications.trifa.CallingActivity.device_orientation;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__cam_recording_hint;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__camera_get_preview_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__fps_half;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__set_fps;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_cam_resolution;
-import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
@@ -577,6 +577,7 @@ public class CameraWrapper
         public int[] procImage;
         private int num = -1;
         CameraPreviewCallback cb;
+        long capture_ts;
 
         proccesImageOnBackground(byte[] _data, CameraPreviewCallback _cb)
         {
@@ -595,6 +596,8 @@ public class CameraWrapper
             catch (Exception e)
             {
             }
+
+            capture_ts = System.currentTimeMillis();
 
             // Log.i(TAG, "doInBackground:start:#" + num);
             try
@@ -635,9 +638,10 @@ public class CameraWrapper
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new,
                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                 Callstate.friend_pubkey),
+                                                                                                                  Callstate.friend_pubkey),
                                                                                                               camera_preview_size2.height,
-                                                                                                              camera_preview_size2.width);
+                                                                                                              camera_preview_size2.width,
+                                                                                                              capture_ts);
 
                                     if (video_send_res != 0)
                                     {
@@ -649,9 +653,10 @@ public class CameraWrapper
                                 {
                                     HelperGeneric.toxav_video_send_frame_wrapper(data_new,
                                                                                  tox_friend_by_public_key__wrapper(
-                                                                                    Callstate.friend_pubkey),
+                                                                                     Callstate.friend_pubkey),
                                                                                  camera_preview_size2.height,
-                                                                                 camera_preview_size2.width);
+                                                                                 camera_preview_size2.width,
+                                                                                 capture_ts);
                                 }
 
                             }
@@ -678,9 +683,10 @@ public class CameraWrapper
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new,
                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                 Callstate.friend_pubkey),
+                                                                                                                  Callstate.friend_pubkey),
                                                                                                               camera_preview_size2.height,
-                                                                                                              camera_preview_size2.width);
+                                                                                                              camera_preview_size2.width,
+                                                                                                              capture_ts);
 
                                     if (video_send_res != 0)
                                     {
@@ -692,9 +698,10 @@ public class CameraWrapper
                                 {
                                     HelperGeneric.toxav_video_send_frame_wrapper(data_new,
                                                                                  tox_friend_by_public_key__wrapper(
-                                                                                    Callstate.friend_pubkey),
+                                                                                     Callstate.friend_pubkey),
                                                                                  camera_preview_size2.height,
-                                                                                 camera_preview_size2.width);
+                                                                                 camera_preview_size2.width,
+                                                                                 capture_ts);
                                 }
                             }
                             else if (CameraWrapper.camera_video_rotate_angle == 180)
@@ -724,9 +731,10 @@ public class CameraWrapper
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new2,
                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                 Callstate.friend_pubkey),
+                                                                                                                  Callstate.friend_pubkey),
                                                                                                               camera_preview_size2.width,
-                                                                                                              camera_preview_size2.height);
+                                                                                                              camera_preview_size2.height,
+                                                                                                              capture_ts);
 
                                     if (video_send_res != 0)
                                     {
@@ -738,9 +746,10 @@ public class CameraWrapper
                                 {
                                     HelperGeneric.toxav_video_send_frame_wrapper(data_new2,
                                                                                  tox_friend_by_public_key__wrapper(
-                                                                                    Callstate.friend_pubkey),
+                                                                                     Callstate.friend_pubkey),
                                                                                  camera_preview_size2.width,
-                                                                                 camera_preview_size2.height);
+                                                                                 camera_preview_size2.height,
+                                                                                 capture_ts);
                                 }
                             }
                             else
@@ -756,9 +765,10 @@ public class CameraWrapper
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data,
                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                 Callstate.friend_pubkey),
+                                                                                                                  Callstate.friend_pubkey),
                                                                                                               camera_preview_size2.width,
-                                                                                                              camera_preview_size2.height);
+                                                                                                              camera_preview_size2.height,
+                                                                                                              capture_ts);
 
                                     if (video_send_res != 0)
                                     {
@@ -768,9 +778,12 @@ public class CameraWrapper
                                 }
                                 else
                                 {
-                                    HelperGeneric.toxav_video_send_frame_wrapper(data, tox_friend_by_public_key__wrapper(
-                                        Callstate.friend_pubkey), camera_preview_size2.width,
-                                                                                 camera_preview_size2.height);
+                                    HelperGeneric.toxav_video_send_frame_wrapper(data,
+                                                                                 tox_friend_by_public_key__wrapper(
+                                                                                     Callstate.friend_pubkey),
+                                                                                 camera_preview_size2.width,
+                                                                                 camera_preview_size2.height,
+                                                                                 capture_ts);
                                 }
                             }
 

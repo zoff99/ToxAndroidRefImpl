@@ -35,8 +35,6 @@ import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -58,6 +56,9 @@ import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.Random;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
@@ -67,6 +68,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
@@ -77,6 +79,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H264;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
@@ -93,6 +96,11 @@ public class HelperGeneric
      */
 
     private static final String TAG = "trifa.Hlp.Generic";
+
+    static long video_frame_age_mean = 0;
+    static int video_frame_age_values_cur_index = 0;
+    final static int video_frame_age_values_cur_index_count = 10;
+    static long[] video_frame_age_values = new long[video_frame_age_values_cur_index_count];
 
     public static void clearCache_s()
     {
@@ -401,13 +409,14 @@ public class HelperGeneric
                     try
                     {
                         // allow notification every n seconds
-                        if ((MainActivity.Notification_new_message_last_shown_timestamp + MainActivity.Notification_new_message_every_millis) <
-                            System.currentTimeMillis())
+                        if ((MainActivity.Notification_new_message_last_shown_timestamp +
+                             MainActivity.Notification_new_message_every_millis) < System.currentTimeMillis())
                         {
                             if (MainActivity.PREF__notification)
                             {
                                 MainActivity.Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                Intent notificationIntent = new Intent(MainActivity.context_s, StartMainActivityWrapper.class);
+                                Intent notificationIntent = new Intent(MainActivity.context_s,
+                                                                       StartMainActivityWrapper.class);
                                 notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.context_s, 0,
                                                                                         notificationIntent, 0);
@@ -417,17 +426,20 @@ public class HelperGeneric
 
                                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
                                 {
-                                    if ((MainActivity.PREF__notification_sound) && (MainActivity.PREF__notification_vibrate))
+                                    if ((MainActivity.PREF__notification_sound) &&
+                                        (MainActivity.PREF__notification_vibrate))
                                     {
                                         b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                            MainActivity.channelId_newmessage_sound_and_vibrate);
                                     }
-                                    else if ((MainActivity.PREF__notification_sound) && (!MainActivity.PREF__notification_vibrate))
+                                    else if ((MainActivity.PREF__notification_sound) &&
+                                             (!MainActivity.PREF__notification_vibrate))
                                     {
                                         b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                            MainActivity.channelId_newmessage_sound);
                                     }
-                                    else if ((!MainActivity.PREF__notification_sound) && (MainActivity.PREF__notification_vibrate))
+                                    else if ((!MainActivity.PREF__notification_sound) &&
+                                             (MainActivity.PREF__notification_vibrate))
                                     {
                                         b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                            MainActivity.channelId_newmessage_vibrate);
@@ -460,10 +472,11 @@ public class HelperGeneric
                                     b.setVibrate(vibrate_pattern);
                                 }
 
-                                b.setContentTitle(
-                                    MainActivity.context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                b.setContentTitle(MainActivity.context_s.getString(
+                                    R.string.MainActivity_notification_new_message_title));
                                 b.setAutoCancel(true);
-                                b.setContentText(MainActivity.context_s.getString(R.string.MainActivity_notification_new_message));
+                                b.setContentText(
+                                    MainActivity.context_s.getString(R.string.MainActivity_notification_new_message));
                                 Notification notification3 = b.build();
                                 MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
                                 // -- notification ------------------
@@ -630,7 +643,8 @@ public class HelperGeneric
                                     String avatar_filename_for_remote =
                                         "avatar" + get_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION");
 
-                                    long filenum = MainActivity.tox_file_send(friend_number_, TOX_FILE_KIND_AVATAR.value,
+                                    long filenum = MainActivity.tox_file_send(friend_number_,
+                                                                              TOX_FILE_KIND_AVATAR.value,
                                                                               avatar_bytes.capacity(), hash_bytes,
                                                                               avatar_filename_for_remote,
                                                                               avatar_filename_for_remote.length());
@@ -776,7 +790,7 @@ public class HelperGeneric
     static void copy_real_file_to_vfs_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
     {
         Log.i(TAG, "copy_real_file_to_vfs_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name + "/" +
-                                dst_file_name);
+                   dst_file_name);
 
         try
         {
@@ -1981,8 +1995,8 @@ public class HelperGeneric
         // use msg V2 API Call
         long t_sec = (System.currentTimeMillis() / 1000);
         long res = MainActivity.tox_util_friend_send_message_v2(friendnum_to_use, a_TOX_MESSAGE_TYPE, t_sec, message,
-                                                                message.length(), raw_message_buf, raw_message_length_buf,
-                                                                msg_id_buffer);
+                                                                message.length(), raw_message_buf,
+                                                                raw_message_length_buf, msg_id_buffer);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
         int raw_message_length_int = raw_message_length_buf.
@@ -2001,7 +2015,7 @@ public class HelperGeneric
             result.raw_message_buf_hex = bytesToHex(raw_message_buf.array(), raw_message_buf.arrayOffset(),
                                                     raw_message_length_int);
             Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
-                                    result.raw_message_buf_hex);
+                       result.raw_message_buf_hex);
             return result;
         }
         else if (res == -9991)
@@ -2055,9 +2069,8 @@ public class HelperGeneric
             {
                 MainActivity.semaphore_tox_savedata.acquire();
                 long start_timestamp = System.currentTimeMillis();
-                MainActivity.update_savedata_file(TrifaSetPatternActivity.bytesToString(
-                    TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(
-                        MainActivity.PREF__DB_secrect_key))));
+                MainActivity.update_savedata_file(TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
+                    TrifaSetPatternActivity.StringToBytes2(MainActivity.PREF__DB_secrect_key))));
                 long end_timestamp = System.currentTimeMillis();
                 MainActivity.semaphore_tox_savedata.release();
                 Log.i(TAG,
@@ -2179,7 +2192,8 @@ public class HelperGeneric
                                 if (MainActivity.PREF__notification)
                                 {
                                     MainActivity.Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                    Intent notificationIntent = new Intent(MainActivity.context_s, StartMainActivityWrapper.class);
+                                    Intent notificationIntent = new Intent(MainActivity.context_s,
+                                                                           StartMainActivityWrapper.class);
                                     notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.context_s, 0,
                                                                                             notificationIntent, 0);
@@ -2189,17 +2203,20 @@ public class HelperGeneric
 
                                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
                                     {
-                                        if ((MainActivity.PREF__notification_sound) && (MainActivity.PREF__notification_vibrate))
+                                        if ((MainActivity.PREF__notification_sound) &&
+                                            (MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_sound_and_vibrate);
                                         }
-                                        else if ((MainActivity.PREF__notification_sound) && (!MainActivity.PREF__notification_vibrate))
+                                        else if ((MainActivity.PREF__notification_sound) &&
+                                                 (!MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_sound);
                                         }
-                                        else if ((!MainActivity.PREF__notification_sound) && (MainActivity.PREF__notification_vibrate))
+                                        else if ((!MainActivity.PREF__notification_sound) &&
+                                                 (MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_vibrate);
@@ -2232,11 +2249,11 @@ public class HelperGeneric
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle(
-                                        MainActivity.context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                    b.setContentTitle(MainActivity.context_s.getString(
+                                        R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText(
-                                        MainActivity.context_s.getString(R.string.MainActivity_notification_new_message3));
+                                    b.setContentText(MainActivity.context_s.getString(
+                                        R.string.MainActivity_notification_new_message3));
                                     Notification notification3 = b.build();
                                     MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -2393,7 +2410,8 @@ public class HelperGeneric
                                 if (MainActivity.PREF__notification)
                                 {
                                     MainActivity.Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                    Intent notificationIntent = new Intent(MainActivity.context_s, StartMainActivityWrapper.class);
+                                    Intent notificationIntent = new Intent(MainActivity.context_s,
+                                                                           StartMainActivityWrapper.class);
                                     notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.context_s, 0,
                                                                                             notificationIntent, 0);
@@ -2403,17 +2421,20 @@ public class HelperGeneric
 
                                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
                                     {
-                                        if ((MainActivity.PREF__notification_sound) && (MainActivity.PREF__notification_vibrate))
+                                        if ((MainActivity.PREF__notification_sound) &&
+                                            (MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_sound_and_vibrate);
                                         }
-                                        else if ((MainActivity.PREF__notification_sound) && (!MainActivity.PREF__notification_vibrate))
+                                        else if ((MainActivity.PREF__notification_sound) &&
+                                                 (!MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_sound);
                                         }
-                                        else if ((!MainActivity.PREF__notification_sound) && (MainActivity.PREF__notification_vibrate))
+                                        else if ((!MainActivity.PREF__notification_sound) &&
+                                                 (MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_vibrate);
@@ -2446,11 +2467,11 @@ public class HelperGeneric
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle(
-                                        MainActivity.context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                    b.setContentTitle(MainActivity.context_s.getString(
+                                        R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText(
-                                        MainActivity.context_s.getString(R.string.MainActivity_notification_new_message4));
+                                    b.setContentText(MainActivity.context_s.getString(
+                                        R.string.MainActivity_notification_new_message4));
                                     Notification notification3 = b.build();
                                     MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -2610,7 +2631,8 @@ public class HelperGeneric
                                 if (MainActivity.PREF__notification)
                                 {
                                     MainActivity.Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                    Intent notificationIntent = new Intent(MainActivity.context_s, StartMainActivityWrapper.class);
+                                    Intent notificationIntent = new Intent(MainActivity.context_s,
+                                                                           StartMainActivityWrapper.class);
                                     notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.context_s, 0,
                                                                                             notificationIntent, 0);
@@ -2620,17 +2642,20 @@ public class HelperGeneric
 
                                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
                                     {
-                                        if ((MainActivity.PREF__notification_sound) && (MainActivity.PREF__notification_vibrate))
+                                        if ((MainActivity.PREF__notification_sound) &&
+                                            (MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_sound_and_vibrate);
                                         }
-                                        else if ((MainActivity.PREF__notification_sound) && (!MainActivity.PREF__notification_vibrate))
+                                        else if ((MainActivity.PREF__notification_sound) &&
+                                                 (!MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_sound);
                                         }
-                                        else if ((!MainActivity.PREF__notification_sound) && (MainActivity.PREF__notification_vibrate))
+                                        else if ((!MainActivity.PREF__notification_sound) &&
+                                                 (MainActivity.PREF__notification_vibrate))
                                         {
                                             b = new NotificationCompat.Builder(MainActivity.context_s,
                                                                                MainActivity.channelId_newmessage_vibrate);
@@ -2663,11 +2688,11 @@ public class HelperGeneric
                                         b.setVibrate(vibrate_pattern);
                                     }
 
-                                    b.setContentTitle(
-                                        MainActivity.context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                    b.setContentTitle(MainActivity.context_s.getString(
+                                        R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
-                                    b.setContentText(
-                                        MainActivity.context_s.getString(R.string.MainActivity_notification_new_message5));
+                                    b.setContentText(MainActivity.context_s.getString(
+                                        R.string.MainActivity_notification_new_message5));
                                     Notification notification3 = b.build();
                                     MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -2770,11 +2795,12 @@ public class HelperGeneric
         return output;
     }
 
-    static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px)
+    static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
     {
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
+            final long video_frame_age = capture_ts;
 
             final Thread new_thread = new Thread()
             {
@@ -2804,6 +2830,14 @@ public class HelperGeneric
             };
             new_thread.start();
 
+            try
+            {
+                new_thread.join();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
 
             final Thread new_thread2 = new Thread()
             {
@@ -2840,6 +2874,28 @@ public class HelperGeneric
                                             //                            global_sps_pps_nal_unit_bytes.length);
                                             data_length = data_length + global_sps_pps_nal_unit_bytes.length;
                                             send_sps_pps_every_x_frames_current = 0;
+
+                                            video_frame_age_values[video_frame_age_values_cur_index] = (int) (
+                                                System.currentTimeMillis() - video_frame_age);
+                                            video_frame_age_values_cur_index++;
+                                            if (video_frame_age_values_cur_index >=
+                                                video_frame_age_values_cur_index_count)
+                                            {
+                                                video_frame_age_values_cur_index = 0;
+                                            }
+
+                                            video_frame_age_mean = 0;
+                                            for (int kk = 0; kk < video_frame_age_values_cur_index_count; kk++)
+                                            {
+                                                video_frame_age_mean =
+                                                    video_frame_age_mean + video_frame_age_values[kk];
+                                            }
+
+                                            video_frame_age_mean = video_frame_age_mean / 10;
+
+                                            toxav_option_set(friendnum, TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS.value,
+                                                             video_frame_age_mean);
+
                                         }
 
                                         send_sps_pps_every_x_frames_current++;
@@ -2847,8 +2903,14 @@ public class HelperGeneric
 
                                     MainActivity.video_buffer_2.put(buf_out);
                                     data_length = data_length + buf_out.length;
-                                    MainActivity.toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
-                                                                             data_length);
+
+                                    // Log.i(TAG,
+                                    //      "H264:video_frame_age=" + (System.currentTimeMillis() - video_frame_age));
+
+                                    MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
+                                                                                 frame_height_px, data_length,
+                                                                                 (int) (System.currentTimeMillis() -
+                                                                                        video_frame_age));
                                 }
                                 else
                                 {
@@ -2868,15 +2930,6 @@ public class HelperGeneric
 
             try
             {
-                new_thread.join();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            try
-            {
                 new_thread2.join();
             }
             catch (Exception e)
@@ -2892,7 +2945,7 @@ public class HelperGeneric
         }
     }
 
-    static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px)
+    static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px, long capture_ts)
     {
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
@@ -2928,7 +2981,8 @@ public class HelperGeneric
 
                     MainActivity.video_buffer_2.rewind();
                     MainActivity.video_buffer_2.put(buf_out);
-                    MainActivity.toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px, buf_out.length);
+                    MainActivity.toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                                             buf_out.length);
                 }
                 else
                 {
