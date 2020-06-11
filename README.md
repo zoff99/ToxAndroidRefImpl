@@ -3,9 +3,8 @@
 ~~This is not a Reference Client, it's c-toxcore for Android.~~<br>
 This is now also a Tox Client for Android.
 
-<a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://gitlab.com/fdroid/artwork/raw/master/badge/get-it-on.png" width="200"></a>
-<a href="https://play.google.com/store/apps/details?id=com.zoffcc.applications.trifa"><img src="https://gitlab.com/fdroid/artwork/raw/master/badge/get-it-on.png" width="200"></a>
-
+<a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/f-droid.png" width="200"></a>
+<a href="https://play.google.com/store/apps/details?id=com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/playstore.png" width="200"></a>
 
 Build Status
 =
