@@ -77,8 +77,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 42
-static const char global_version_string[] = "0.99.42";
+#define VERSION_PATCH 43
+static const char global_version_string[] = "0.99.43";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -5350,11 +5350,44 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv
     return (jint)error;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264_1age(JNIEnv *env, jobject thiz,
+        jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len, jint age_ms)
+{
+    TOXAV_ERR_SEND_FRAME error;
+    bool res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                           (uint16_t)frame_height_px,
+                                           (uint8_t *)video_buffer_2,
+                                           (uint32_t)data_len, &error, (uint32_t)age_ms);
+
+    if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+    {
+        yieldcpu(1); // sleep 1 ms
+        res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                          (uint16_t)frame_height_px,
+                                          (uint8_t *)video_buffer_2,
+                                          (uint32_t)data_len, &error, (uint32_t)(age_ms + 1));
+
+        if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+        {
+            yieldcpu(1); // sleep 1 ms
+            res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                              (uint16_t)frame_height_px,
+                                              (uint8_t *)video_buffer_2,
+                                              (uint32_t)data_len, &error, (uint32_t)(age_ms + 2));
+        }
+    }
+
+    // dbg(9, "toxav_video_send_frame_h264:res=%d,error=%d", (int)res, (int)error);
+    return (jint)error;
+}
+
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len)
 {
+
     TOXAV_ERR_SEND_FRAME error;
     bool res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                            (uint16_t)frame_height_px,
