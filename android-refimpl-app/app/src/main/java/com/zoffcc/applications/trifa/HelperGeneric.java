@@ -1455,8 +1455,20 @@ public class HelperGeneric
                             }
                             catch (Exception e)
                             {
-                                e.printStackTrace();
+                                // e.printStackTrace();
                             }
+
+                            try
+                            {
+                                CallingActivity.top_text_line.setText(
+                                    Callstate.friend_alias_name + " " + Callstate.round_trip_time + "/" +
+                                    Callstate.play_delay);
+                            }
+                            catch (Exception e)
+                            {
+                                // e.printStackTrace();
+                            }
+
                         }
                     };
 
@@ -3079,6 +3091,18 @@ public class HelperGeneric
         try
         {
             MainActivity.audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void set_calling_audio_mode()
+    {
+        try
+        {
+            MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
         }
         catch (Exception e)
         {
