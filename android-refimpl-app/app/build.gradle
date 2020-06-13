@@ -64,13 +64,13 @@ android {
         exclude 'META-INF/*version'
         exclude 'META-INF/proguard/okhttp3.pro'
         exclude 'androidsupportmultidexversion.txt'
-//
+        //
         exclude 'kotlin/**'
         exclude 'kotlin/*'
         exclude 'kotlin'
         exclude 'META-INF/kotlin*'
         exclude 'META-INF/com.yariksoffice*'
-//
+        //
         exclude 'lib/armeabi/libRSSupport.so'
         exclude 'lib/armeabi/librsjni.so'
         exclude 'lib/armeabi/libsqlcipher.so'
@@ -89,6 +89,7 @@ android {
         // exclude 'lib/arm64-v8a/libblasV8.so'
         // exclude 'lib/arm64-v8a/librsjni_androidx.so'
         // exclude 'lib/arm64-v8a/libnative-audio-jni.so'
+        // exclude 'lib/arm64-v8a/libjni-c-toxcore.so'
         // exclude 'lib/arm64-v8a'
         //
         exclude 'lib/mips64/libRSSupport.so'
