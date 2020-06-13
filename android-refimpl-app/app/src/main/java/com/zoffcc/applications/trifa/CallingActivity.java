@@ -80,6 +80,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.format_timeduration_fr
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_bitrates;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
@@ -292,6 +293,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             ee.printStackTrace();
         }
+
+        reset_audio_mode();
 
         try
         {
@@ -974,6 +977,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             mute_button.setVisibility(View.VISIBLE);
 
             stop_ringtone();
+            set_calling_audio_mode();
         }
         else
         {
@@ -2513,6 +2517,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         set_video_delay_ms();
         set_audio_play_volume();
         stop_ringtone();
+        set_calling_audio_mode();
 
         Runnable myRunnable = new Runnable()
         {
