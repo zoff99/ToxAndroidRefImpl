@@ -40,7 +40,7 @@
                 android:text="xxxxxxxx"
                 android:textAlignment="center"
                 android:textColor="@color/md_grey_400"
-                android:textSize="22sp" />
+                android:textSize="18sp" />
 
             <FrameLayout
                 android:id="@+id/debug001"
