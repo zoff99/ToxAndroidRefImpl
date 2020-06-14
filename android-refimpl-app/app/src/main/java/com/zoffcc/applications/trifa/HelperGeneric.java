@@ -66,6 +66,9 @@ import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_enco
 import static com.zoffcc.applications.trifa.CallingActivity.global_sps_pps_nal_unit_bytes;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x_frames_current;
+import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames;
+import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames_current;
+import static com.zoffcc.applications.trifa.Callstate.java_video_encoder_first_frame_in;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -317,9 +320,9 @@ public class HelperGeneric
         {
             // TODO: cache me!!
             conf_temp = orma.selectFromConferenceDB().
-                tox_conference_numberEq(conference_number).
-                and().
-                conference_activeEq(true).toList().get(0);
+                    tox_conference_numberEq(conference_number).
+                    and().
+                    conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
             // Log.i(TAG, "conference_message_add_from_sync:conf_id=" + conf_id);
         }
@@ -459,7 +462,7 @@ public class HelperGeneric
                                 b.setSmallIcon(R.drawable.circle_orange);
                                 b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                 Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                    RingtoneManager.TYPE_NOTIFICATION);
+                                        RingtoneManager.TYPE_NOTIFICATION);
 
                                 if (MainActivity.PREF__notification_sound)
                                 {
@@ -473,10 +476,10 @@ public class HelperGeneric
                                 }
 
                                 b.setContentTitle(MainActivity.context_s.getString(
-                                    R.string.MainActivity_notification_new_message_title));
+                                        R.string.MainActivity_notification_new_message_title));
                                 b.setAutoCancel(true);
-                                b.setContentText(
-                                    MainActivity.context_s.getString(R.string.MainActivity_notification_new_message));
+                                b.setContentText(MainActivity.context_s.getString(
+                                        R.string.MainActivity_notification_new_message));
                                 Notification notification3 = b.build();
                                 MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
                                 // -- notification ------------------
@@ -641,7 +644,7 @@ public class HelperGeneric
 
 
                                     String avatar_filename_for_remote =
-                                        "avatar" + get_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION");
+                                            "avatar" + get_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION");
 
                                     long filenum = MainActivity.tox_file_send(friend_number_,
                                                                               TOX_FILE_KIND_AVATAR.value,
@@ -653,7 +656,7 @@ public class HelperGeneric
                                     // save FT to db ---------------
                                     Filetransfer ft_avatar_outgoing = new Filetransfer();
                                     ft_avatar_outgoing.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(
-                                        friend_number_);
+                                            friend_number_);
                                     ft_avatar_outgoing.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
                                     ft_avatar_outgoing.file_number = filenum;
                                     ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
@@ -719,7 +722,7 @@ public class HelperGeneric
         // TODO: update entry in main friendlist (if visible)
         //       or in chat view (if visible)
         HelperFriend.update_single_friend_in_friendlist_view(
-            main_get_friend(tox_friend_by_public_key__wrapper(friend_pubkey)));
+                main_get_friend(tox_friend_by_public_key__wrapper(friend_pubkey)));
     }
 
     static void move_tmp_file_to_real_file(String src_path_name, String src_file_name, String dst_path_name, String dst_file_name)
@@ -731,11 +734,11 @@ public class HelperGeneric
             if (MainActivity.VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
-                    src_path_name + "/" + src_file_name);
+                        src_path_name + "/" + src_file_name);
                 info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
-                    dst_path_name + "/" + dst_file_name);
+                        dst_path_name + "/" + dst_file_name);
                 info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(
-                    dst_path_name + "/");
+                        dst_path_name + "/");
                 dst_dir.mkdirs();
                 f1.renameTo(f2);
             }
@@ -800,9 +803,9 @@ public class HelperGeneric
                 String uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length());
                 Log.i(TAG, "copy_real_file_to_vfs_file:uniq_temp_filename=" + uniq_temp_filename);
                 info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
-                    VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
+                        VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + uniq_temp_filename);
                 info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(
-                    VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
+                        VFS_PREFIX + VFS_TMP_FILE_DIR + "/");
                 dst_dir.mkdirs();
                 java.io.FileInputStream is = null;
                 info.guardianproject.iocipher.FileOutputStream os = null;
@@ -997,8 +1000,8 @@ public class HelperGeneric
             //            os.write(buffer, 0, len);
             //            os.close();
             java.io.InputStream ins = context.getResources().
-                openRawResource(context.getResources().
-                    getIdentifier("ic_plus_sign", "drawable", context.getPackageName()));
+                    openRawResource(context.getResources().
+                            getIdentifier("ic_plus_sign", "drawable", context.getPackageName()));
             byte[] buffer = new byte[1024];
             int length;
 
@@ -1028,7 +1031,7 @@ public class HelperGeneric
             if (MainActivity.VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(
-                    src_path_name + "/" + src_file_name);
+                        src_path_name + "/" + src_file_name);
                 uniq_temp_filename = get_uniq_tmp_filename(f_real.getAbsolutePath(), f_real.length()) + appl;
                 //Log.i(TAG,
                 //      "copy_vfs_file_to_real_file:" + src_path_name + "/" + src_file_name + " -> " + dst_path_name +
@@ -1081,7 +1084,7 @@ public class HelperGeneric
             if (MainActivity.VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f_real = new info.guardianproject.iocipher.File(
-                    src_path_name + "/" + src_file_name);
+                        src_path_name + "/" + src_file_name);
                 File f2 = new File(dst_path_name + "/" + dst_file_name);
                 File dst_dir = new File(dst_path_name + "/");
                 dst_dir.mkdirs();
@@ -1137,7 +1140,7 @@ public class HelperGeneric
         try
         {
             FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
-                HelperFriend.tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
+                    HelperFriend.tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
 
             if (f.avatar_pathname == null)
             {
@@ -1165,7 +1168,7 @@ public class HelperGeneric
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
                 info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(
-                    f1);
+                        f1);
                 byte[] byteArray = new byte[(int) f1.length()];
                 fis.read(byteArray, 0, (int) f1.length());
                 return new BitmapDrawable(BitmapFactory.decodeByteArray(byteArray, 0, (int) f1.length()));
@@ -1203,25 +1206,25 @@ public class HelperGeneric
                     if (is_friend_avatar)
                     {
                         GlideApp.
-                            with(c).
-                            load(f1).
-                            placeholder(R.drawable.round_loading_animation).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                fl.avatar_update_timestamp)).
-                            skipMemoryCache(false).
-                            into(v);
+                                with(c).
+                                load(f1).
+                                placeholder(R.drawable.round_loading_animation).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                        fl.avatar_update_timestamp)).
+                                skipMemoryCache(false).
+                                into(v);
                     }
                     else
                     {
                         GlideApp.
-                            with(c).
-                            load(f1).
-                            placeholder(R.drawable.round_loading_animation).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            skipMemoryCache(force_update).
-                            into(v);
+                                with(c).
+                                load(f1).
+                                placeholder(R.drawable.round_loading_animation).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(force_update).
+                                into(v);
                     }
                 }
                 else
@@ -1229,25 +1232,25 @@ public class HelperGeneric
                     if (is_friend_avatar)
                     {
                         GlideApp.
-                            with(c).
-                            load(f1).
-                            placeholder(placholder).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                fl.avatar_update_timestamp)).
-                            skipMemoryCache(false).
-                            into(v);
+                                with(c).
+                                load(f1).
+                                placeholder(placholder).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                        fl.avatar_update_timestamp)).
+                                skipMemoryCache(false).
+                                into(v);
                     }
                     else
                     {
                         GlideApp.
-                            with(c).
-                            load(f1).
-                            placeholder(placholder).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            skipMemoryCache(force_update).
-                            into(v);
+                                with(c).
+                                load(f1).
+                                placeholder(placholder).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(force_update).
+                                into(v);
                     }
                 }
             }
@@ -1258,12 +1261,12 @@ public class HelperGeneric
                 byte[] byteArray = new byte[(int) f1.length()];
                 fis.read(byteArray, 0, (int) f1.length());
                 GlideApp.
-                    with(c).
-                    load(byteArray).
-                    placeholder(placholder).
-                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                    skipMemoryCache(force_update).
-                    into(v);
+                        with(c).
+                        load(byteArray).
+                        placeholder(placholder).
+                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                        skipMemoryCache(force_update).
+                        into(v);
             }
         }
         catch (Exception e)
@@ -1395,9 +1398,9 @@ public class HelperGeneric
                                 try
                                 {
                                     CallingActivity.ca.right_top_text_3.setText(
-                                        "IN   " + VIDEO_FRAME_RATE_INCOMING + " fps");
+                                            "IN   " + VIDEO_FRAME_RATE_INCOMING + " fps");
                                     CallingActivity.ca.right_top_text_4.setText(
-                                        "Out " + VIDEO_FRAME_RATE_OUTGOING + " fps");
+                                            "Out " + VIDEO_FRAME_RATE_OUTGOING + " fps");
                                 }
                                 catch (Exception e)
                                 {
@@ -1437,20 +1440,20 @@ public class HelperGeneric
                             try
                             {
                                 CallingActivity.ca.right_top_text_1.setText(
-                                    "O:" + Callstate.codec_to_str(Callstate.video_out_codec) + ":" +
-                                    Callstate.video_bitrate);
+                                        "O:" + Callstate.codec_to_str(Callstate.video_out_codec) + ":" +
+                                        Callstate.video_bitrate);
                                 CallingActivity.ca.right_top_text_1b.setText(
-                                    "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
-                                    Callstate.video_in_bitrate);
+                                        "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
+                                        Callstate.video_in_bitrate);
                                 if (native_aec_lib_ready)
                                 {
                                     CallingActivity.ca.right_top_text_2.setText(
-                                        "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay + "e");
+                                            "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay + "e");
                                 }
                                 else
                                 {
                                     CallingActivity.ca.right_top_text_2.setText(
-                                        "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
+                                            "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
                                 }
                             }
                             catch (Exception e)
@@ -1461,8 +1464,8 @@ public class HelperGeneric
                             try
                             {
                                 CallingActivity.top_text_line.setText(
-                                    Callstate.friend_alias_name + " " + Callstate.round_trip_time + "/" +
-                                    Callstate.play_delay);
+                                        Callstate.friend_alias_name + " " + Callstate.round_trip_time + "/" +
+                                        Callstate.play_delay + "/" + Callstate.java_video_play_delay);
                             }
                             catch (Exception e)
                             {
@@ -1536,7 +1539,7 @@ public class HelperGeneric
             try
             {
                 BufferedInputStream buf = new BufferedInputStream(
-                    new info.guardianproject.iocipher.FileInputStream(file));
+                        new info.guardianproject.iocipher.FileInputStream(file));
                 buf.read(bytes, 0, bytes.length);
                 buf.close();
                 ret = ret.put(bytes);
@@ -1806,7 +1809,7 @@ public class HelperGeneric
         try
         {
             info.guardianproject.iocipher.RandomAccessFile raf = new info.guardianproject.iocipher.RandomAccessFile(
-                file_name_with_path, "rw");
+                    file_name_with_path, "rw");
             info.guardianproject.iocipher.IOCipherFileChannel inChannel = raf.getChannel();
             // inChannel.lseek(position, OsConstants.SEEK_SET);
             inChannel.write(data, position);
@@ -1956,11 +1959,11 @@ public class HelperGeneric
                 else
                 {
                     int friend_con_status = orma.selectFromFriendList().
-                        tox_public_key_stringEq(friend_pubkey).
-                        get(0).TOX_CONNECTION_real;
+                            tox_public_key_stringEq(friend_pubkey).
+                            get(0).TOX_CONNECTION_real;
                     int relay_con_status = orma.selectFromFriendList().
-                        tox_public_key_stringEq(relay_).
-                        get(0).TOX_CONNECTION_real;
+                            tox_public_key_stringEq(relay_).
+                            get(0).TOX_CONNECTION_real;
 
                     if ((friend_con_status != TOX_CONNECTION_NONE.value) ||
                         (relay_con_status != TOX_CONNECTION_NONE.value))
@@ -2012,8 +2015,8 @@ public class HelperGeneric
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
         int raw_message_length_int = raw_message_length_buf.
-            array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
-            array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
+                array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
+                array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
         // Log.i(TAG,
         //      "tox_friend_send_message_wrapper:message=" + message + " res=" + res + " len=" + raw_message_length_int);
         result.error_num = res;
@@ -2082,7 +2085,7 @@ public class HelperGeneric
                 MainActivity.semaphore_tox_savedata.acquire();
                 long start_timestamp = System.currentTimeMillis();
                 MainActivity.update_savedata_file(TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
-                    TrifaSetPatternActivity.StringToBytes2(MainActivity.PREF__DB_secrect_key))));
+                        TrifaSetPatternActivity.StringToBytes2(MainActivity.PREF__DB_secrect_key))));
                 long end_timestamp = System.currentTimeMillis();
                 MainActivity.semaphore_tox_savedata.release();
                 Log.i(TAG,
@@ -2248,7 +2251,7 @@ public class HelperGeneric
                                     b.setSmallIcon(R.drawable.circle_orange);
                                     b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                     Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                        RingtoneManager.TYPE_NOTIFICATION);
+                                            RingtoneManager.TYPE_NOTIFICATION);
 
                                     if (MainActivity.PREF__notification_sound)
                                     {
@@ -2262,10 +2265,10 @@ public class HelperGeneric
                                     }
 
                                     b.setContentTitle(MainActivity.context_s.getString(
-                                        R.string.MainActivity_notification_new_message_title));
+                                            R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
                                     b.setContentText(MainActivity.context_s.getString(
-                                        R.string.MainActivity_notification_new_message3));
+                                            R.string.MainActivity_notification_new_message3));
                                     Notification notification3 = b.build();
                                     MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -2325,8 +2328,8 @@ public class HelperGeneric
                                                      msg_id_buffer.limit());
             // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
-                msg_id_as_hex_string).count();
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
+                    msg_id_as_hex_string).count();
 
             if (already_have_message > 0)
             {
@@ -2466,7 +2469,7 @@ public class HelperGeneric
                                     b.setSmallIcon(R.drawable.circle_orange);
                                     b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                     Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                        RingtoneManager.TYPE_NOTIFICATION);
+                                            RingtoneManager.TYPE_NOTIFICATION);
 
                                     if (MainActivity.PREF__notification_sound)
                                     {
@@ -2480,10 +2483,10 @@ public class HelperGeneric
                                     }
 
                                     b.setContentTitle(MainActivity.context_s.getString(
-                                        R.string.MainActivity_notification_new_message_title));
+                                            R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
                                     b.setContentText(MainActivity.context_s.getString(
-                                        R.string.MainActivity_notification_new_message4));
+                                            R.string.MainActivity_notification_new_message4));
                                     Notification notification3 = b.build();
                                     MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -2545,8 +2548,8 @@ public class HelperGeneric
                                                      msg_id_buffer.limit());
             Log.i(TAG, "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
-                msg_id_as_hex_string).count();
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
+                    msg_id_as_hex_string).count();
 
             if (already_have_message > 0)
             {
@@ -2687,7 +2690,7 @@ public class HelperGeneric
                                     b.setSmallIcon(R.drawable.circle_orange);
                                     b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                     Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                        RingtoneManager.TYPE_NOTIFICATION);
+                                            RingtoneManager.TYPE_NOTIFICATION);
 
                                     if (MainActivity.PREF__notification_sound)
                                     {
@@ -2701,10 +2704,10 @@ public class HelperGeneric
                                     }
 
                                     b.setContentTitle(MainActivity.context_s.getString(
-                                        R.string.MainActivity_notification_new_message_title));
+                                            R.string.MainActivity_notification_new_message_title));
                                     b.setAutoCancel(true);
                                     b.setContentText(MainActivity.context_s.getString(
-                                        R.string.MainActivity_notification_new_message5));
+                                            R.string.MainActivity_notification_new_message5));
                                     Notification notification3 = b.build();
                                     MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
                                     // -- notification ------------------
@@ -2814,6 +2817,12 @@ public class HelperGeneric
         {
             final long video_frame_age = capture_ts;
 
+            if (java_video_encoder_first_frame_in == 1)
+            {
+                Callstate.java_video_encoder_first_frame_in = 0;
+                Callstate.java_video_encoder_delay_start_ts = System.currentTimeMillis();
+            }
+
             final Thread new_thread = new Thread()
             {
                 @Override
@@ -2825,13 +2834,13 @@ public class HelperGeneric
                         {
                             byte[] buf = new byte[buf2.length];
                             buf = YV12totoNV12(buf2, buf, frame_width_px, frame_height_px);
-                            feed_h264_encoder(buf, frame_width_px, frame_height_px);
+                            feed_h264_encoder(buf, frame_width_px, frame_height_px, video_frame_age);
                         }
                         else // (PREF__camera_get_preview_format == "NV21")
                         {
                             byte[] buf = new byte[buf2.length];
                             buf = NV21toNV12(buf2, buf, frame_width_px, frame_height_px);
-                            feed_h264_encoder(buf, frame_width_px, frame_height_px);
+                            feed_h264_encoder(buf, frame_width_px, frame_height_px, video_frame_age);
                         }
                     }
                     catch (Exception e)
@@ -2869,7 +2878,7 @@ public class HelperGeneric
 
                                     if (global_sps_pps_nal_unit_bytes != null)
                                     {
-                                        if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                                        if (send_sps_pps_every_x_frames_current >= send_sps_pps_every_x_frames)
                                         {
                                             // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
                                             MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
@@ -2878,26 +2887,43 @@ public class HelperGeneric
                                             data_length = data_length + global_sps_pps_nal_unit_bytes.length;
                                             send_sps_pps_every_x_frames_current = 0;
 
-                                            video_frame_age_values[video_frame_age_values_cur_index] = (int) (
-                                                System.currentTimeMillis() - video_frame_age);
-                                            video_frame_age_values_cur_index++;
-                                            if (video_frame_age_values_cur_index >=
-                                                video_frame_age_values_cur_index_count)
+                                            if (set_vdelay_every_x_frames_current >= set_vdelay_every_x_frames)
                                             {
-                                                video_frame_age_values_cur_index = 0;
+                                                set_vdelay_every_x_frames_current = 0;
+
+                                                video_frame_age_values[video_frame_age_values_cur_index] = (int) (
+                                                        System.currentTimeMillis() - video_frame_age);
+                                                video_frame_age_values_cur_index++;
+                                                if (video_frame_age_values_cur_index >=
+                                                    video_frame_age_values_cur_index_count)
+                                                {
+                                                    video_frame_age_values_cur_index = 0;
+                                                }
+
+                                                video_frame_age_mean = 0;
+                                                for (int kk = 0; kk < video_frame_age_values_cur_index_count; kk++)
+                                                {
+                                                    video_frame_age_mean =
+                                                            video_frame_age_mean + video_frame_age_values[kk];
+                                                }
+
+                                                video_frame_age_mean = video_frame_age_mean / 10;
+
+                                                if (1 == 1)
+                                                {
+                                                    toxav_option_set(friendnum,
+                                                                     TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS.value,
+                                                                     video_frame_age_mean + Callstate.delay_add);
+                                                }
+                                                else
+                                                {
+                                                    toxav_option_set(friendnum,
+                                                                     TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS.value,
+                                                                     Callstate.java_video_encoder_delay);
+                                                }
                                             }
 
-                                            video_frame_age_mean = 0;
-                                            for (int kk = 0; kk < video_frame_age_values_cur_index_count; kk++)
-                                            {
-                                                video_frame_age_mean =
-                                                    video_frame_age_mean + video_frame_age_values[kk];
-                                            }
-
-                                            video_frame_age_mean = video_frame_age_mean / 10;
-
-                                            toxav_option_set(friendnum, TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS.value,
-                                                             video_frame_age_mean);
+                                            set_vdelay_every_x_frames_current++;
 
                                         }
 
@@ -2910,10 +2936,61 @@ public class HelperGeneric
                                     // Log.i(TAG,
                                     //      "H264:video_frame_age=" + (System.currentTimeMillis() - video_frame_age));
 
-                                    MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
-                                                                                 frame_height_px, data_length,
-                                                                                 (int) (System.currentTimeMillis() -
-                                                                                        video_frame_age));
+                                    if (Callstate.java_video_encoder_delay_set == 0)
+                                    {
+                                        Callstate.java_video_encoder_delay = (System.currentTimeMillis() -
+                                                                              Callstate.java_video_encoder_delay_start_ts);
+                                        Callstate.java_video_encoder_delay_set = 1;
+                                        Log.i(TAG,
+                                              "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms");
+                                    }
+
+                                    //Log.i(TAG,
+                                    //      "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms " +
+                                    //      ((int) (System.currentTimeMillis() - h264_out_data.pts)) + " ms");
+
+                                    //Log.i(TAG, "java_video_encoder_delay=" +
+                                    //           (int) (System.currentTimeMillis() - video_frame_age) + " ms");
+
+                                    if (1 == 2)
+                                    {
+                                        MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
+                                                                                     frame_height_px, data_length,
+                                                                                     (int) (System.currentTimeMillis() -
+                                                                                            video_frame_age));
+                                    }
+                                    else if (1 == 1)
+                                    {
+                                        Callstate.delay_add = (int) (System.currentTimeMillis() - h264_out_data.pts);
+                                        if ((Callstate.delay_add < 1) || (Callstate.delay_add > 500))
+                                        {
+                                            Callstate.delay_add = 0;
+                                        }
+
+                                        // Log.i(TAG, "V:AGE:" + Callstate.delay_add);
+                                        int res = MainActivity.toxav_video_send_frame_h264_age(friendnum,
+                                                                                               frame_width_px,
+                                                                                               frame_height_px,
+                                                                                               data_length,
+                                                                                               (int) (System.currentTimeMillis() -
+                                                                                                      video_frame_age) +
+                                                                                               Callstate.delay_add);
+
+                                        // Log.i(TAG, "V:res:" + res);
+                                    }
+                                    else if (1 == 3)
+                                    {
+                                        MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
+                                                                                     frame_height_px, data_length, 200);
+                                    }
+                                    else
+                                    {
+                                        // Log.i(TAG, "V:AGE:" + (System.currentTimeMillis() - h264_out_data.pts));
+
+                                        MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
+                                                                                     frame_height_px, data_length,
+                                                                                     (int) Callstate.java_video_encoder_delay);
+                                    }
                                 }
                                 else
                                 {
@@ -2965,7 +3042,7 @@ public class HelperGeneric
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
-            feed_h264_encoder(buf, frame_width_px, frame_height_px);
+            feed_h264_encoder(buf, frame_width_px, frame_height_px, capture_ts);
 
             for (int jj = 0; jj < 2; jj++)
             {

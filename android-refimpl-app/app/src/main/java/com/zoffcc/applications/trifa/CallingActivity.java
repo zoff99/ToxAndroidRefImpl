@@ -175,8 +175,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static View video_box_left_top_01 = null;
     static View video_box_right_top_01 = null;
     final static String MIME_TYPE = "video/avc";   // H.264 Advanced Video Coding //$NON-NLS-1$
-    final static int FRAME_RATE = 15;              // ~15fps
-    final static int IFRAME_INTERVAL = 6;          // 6 seconds between I-frames
+    final static int FRAME_RATE = 15;              // ~ estimated fps
+    final static int IFRAME_INTERVAL = 10;          // n seconds between I-frames
+    final static int IFRAME_INTERVAL_START = 10;          // n seconds between I-frames
     private static MediaCodec.BufferInfo mBufferInfo;
     private static MediaCodec mEncoder;
     private static MediaPlayer mMediaPlayer = null;
@@ -186,7 +187,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static int v_bitrate_bits_per_second = 20 * 1000; // video bitrate <n> bps, in bits per second
     public static byte[] global_sps_pps_nal_unit_bytes = null;
     public static int send_sps_pps_every_x_frames_current = 0;
-    public static int send_sps_pps_every_x_frames = 15;
+    public static int send_sps_pps_every_x_frames = 0;
+    public static int set_vdelay_every_x_frames_current = 0;
+    public static int set_vdelay_every_x_frames = 20;
     private static float slider_alpha = 0.3f;
     static boolean camera_toggle_button_pressed = false;
 
@@ -195,8 +198,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static MediaFormat video_decoder_h264_format = null;
     private DetectHeadset dh = null;
     public static long calling_activity_start_ms = 0;
-    private static int BUFFER_DEQUEUE_TIMEOUT_US = 100; // fetch encoded data from encoder
-    private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 100; // feed raw data to encoder
+    private static int BUFFER_DEQUEUE_TIMEOUT_US = 150; // fetch encoded data from encoder
+    private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 150; // feed raw data to encoder
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -226,10 +229,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         else
         {
 
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
             getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-            getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
 
         super.onCreate(savedInstanceState);
@@ -417,7 +420,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     try
                     {
                         SharedPreferences settings_cs2 = PreferenceManager.getDefaultSharedPreferences(
-                            getApplicationContext());
+                                getApplicationContext());
                         settings_cs2.edit().putInt("audio_play_volume_percent", //$NON-NLS-1$
                                                    PREF__audio_play_volume_percent).apply();
                         Log.i(TAG, "pref:set:PREF__audio_play_volume_percent=" +
@@ -501,10 +504,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                          ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
                                          PREF__video_play_delay_ms);
                         video_add_delay_slider_infotext_01.setText(
-                            getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " " +
-                            getString(R.string.CallingActivity_24)); //$NON-NLS-1$ //$NON-NLS-2$
+                                getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " " +
+                                getString(R.string.CallingActivity_24)); //$NON-NLS-1$ //$NON-NLS-2$
                         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
-                            getApplicationContext());
+                                getApplicationContext());
                         settings_cs1.edit().putInt("video_play_delay_ms",
                                                    PREF__video_play_delay_ms).apply(); //$NON-NLS-1$
                         Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms); //$NON-NLS-1$
@@ -554,16 +557,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         try
         {
             final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
             caller_avatar_view.setImageDrawable(d1);
 
             String fname = get_vfs_image_filename_friend_avatar(
-                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
+                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
 
             if (fname != null)
             {
                 put_vfs_image_on_imageview_real(this, caller_avatar_view, d1, fname, false, true, main_get_friend(
-                    tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)));
+                        tox_friend_by_public_key__wrapper(Callstate.friend_pubkey)));
             }
         }
         catch (Exception e1)
@@ -626,7 +629,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             quality_slider.setPosition(PREF__video_call_quality);
 
                             SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
-                                getApplicationContext());
+                                    getApplicationContext());
                             settings_cs1.edit().putString("video_call_quality", "" + PREF__video_call_quality).apply();
                         }
                     }
@@ -674,7 +677,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             quality_slider.setPosition(PREF__video_call_quality);
 
                             SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
-                                getApplicationContext());
+                                    getApplicationContext());
                             settings_cs1.edit().putString("video_call_quality", "" + PREF__video_call_quality).apply();
                         }
                     }
@@ -721,7 +724,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             quality_slider.setPosition(PREF__video_call_quality);
 
                             SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
-                                getApplicationContext());
+                                    getApplicationContext());
                             settings_cs1.edit().putString("video_call_quality", "" + PREF__video_call_quality).apply();
                         }
                     }
@@ -791,7 +794,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         Log.i(TAG, "setOnDiscreteSliderChangeListener:pos_NEW:" + quality_slider.getPosition());
 
                         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
-                            getApplicationContext());
+                                getApplicationContext());
                         settings_cs1.edit().putString("video_call_quality", "" + PREF__video_call_quality).apply();
                     }
                     else
@@ -828,9 +831,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             misc_button_pad.setVisibility(View.VISIBLE);
 
             Drawable d8 = new IconicsDrawable(this).
-                icon(GoogleMaterial.Icon.gmd_touch_app).
-                backgroundColor(Color.TRANSPARENT).color(getResources().
-                getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                    getColor(R.color.colorPrimaryDark)).sizeDp(50);
             misc_button.setImageDrawable(d8);
 
             misc_button.setOnTouchListener(new View.OnTouchListener()
@@ -843,9 +846,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         try
                         {
                             Drawable d1a = new IconicsDrawable(v.getContext()).
-                                icon(GoogleMaterial.Icon.gmd_touch_app).
-                                backgroundColor(Color.TRANSPARENT).color(getResources().
-                                getColor(R.color.md_green_600)).sizeDp(50);
+                                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                                    getColor(R.color.md_green_600)).sizeDp(50);
                             misc_button.setImageDrawable(d1a);
                         }
                         catch (Exception e)
@@ -858,9 +861,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         try
                         {
                             Drawable d2a = new IconicsDrawable(v.getContext()).
-                                icon(GoogleMaterial.Icon.gmd_touch_app).
-                                backgroundColor(Color.TRANSPARENT).color(getResources().
-                                getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                                    icon(GoogleMaterial.Icon.gmd_touch_app).
+                                    backgroundColor(Color.TRANSPARENT).color(getResources().
+                                    getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             misc_button.setImageDrawable(d2a);
 
                             // send misc. message to friend, and do NOT save to DB
@@ -890,7 +893,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
 
         final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(
-            Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         mute_button.setImageDrawable(d1);
         mute_button.setOnTouchListener(new View.OnTouchListener()
         {
@@ -905,15 +908,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         if (trifa_is_MicrophoneMute)
                         {
                             Drawable d1a = new IconicsDrawable(v.getContext()).icon(
-                                GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
-                                getResources().getColor(R.color.md_green_600)).sizeDp(50);
+                                    GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             mute_button.setImageDrawable(d1a);
                         }
                         else
                         {
                             Drawable d1a = new IconicsDrawable(v.getContext()).icon(
-                                GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
-                                getResources().getColor(R.color.md_green_600)).sizeDp(50);
+                                    GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             mute_button.setImageDrawable(d1a);
                         }
                     }
@@ -932,8 +935,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             audio_manager_s.setMicrophoneMute(false);
                             trifa_is_MicrophoneMute = false;
                             Drawable d2a = new IconicsDrawable(v.getContext()).icon(
-                                GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
-                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                                    GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
                         }
                         else
@@ -941,8 +944,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             audio_manager_s.setMicrophoneMute(true);
                             trifa_is_MicrophoneMute = true;
                             Drawable d2a = new IconicsDrawable(v.getContext()).icon(
-                                GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
-                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                                    GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
                         }
                     }
@@ -960,12 +963,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         active_camera_type = FRONT_CAMERA_USED;
 
         final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(
-            Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50); //$NON-NLS-1$
+                Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50); //$NON-NLS-1$
         decline_button.setImageDrawable(d3);
         // #AARRGGBB
 
         final Drawable d4 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_check_circle).backgroundColor(
-            Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50); //$NON-NLS-1$
+                Color.TRANSPARENT).color(Color.parseColor("#EF088A29")).sizeDp(50); //$NON-NLS-1$
         accept_button.setImageDrawable(d4);
 
         if (Callstate.accepted_call == 1)
@@ -992,14 +995,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         if (active_camera_type == FRONT_CAMERA_USED)
         {
             final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(
-                Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
             camera_toggle_button.setImageDrawable(d5);
             Log.i(TAG, "active_camera_type(5)=" + active_camera_type); //$NON-NLS-1$
         }
         else
         {
             final Drawable d6 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(
-                Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
             camera_toggle_button.setImageDrawable(d6);
             Log.i(TAG, "active_camera_type(6)=" + active_camera_type); //$NON-NLS-1$
         }
@@ -1016,15 +1019,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     if (active_camera_type == FRONT_CAMERA_USED)
                     {
                         Drawable d2a = new IconicsDrawable(v.getContext()).icon(
-                            GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
-                            getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                                GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
                         camera_toggle_button.setImageDrawable(d2a);
                     }
                     else
                     {
                         Drawable d2a = new IconicsDrawable(v.getContext()).icon(
-                            GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
-                            getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                                GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
                         camera_toggle_button.setImageDrawable(d2a);
                     }
                 }
@@ -1035,15 +1038,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     if (active_camera_type == FRONT_CAMERA_USED)
                     {
                         Drawable d2a = new IconicsDrawable(v.getContext()).icon(
-                            GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
-                            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                                GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
                         camera_toggle_button.setImageDrawable(d2a);
                     }
                     else
                     {
                         Drawable d2a = new IconicsDrawable(v.getContext()).icon(
-                            GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
-                            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                                GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
                         camera_toggle_button.setImageDrawable(d2a);
                     }
 
@@ -1327,9 +1330,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     if ((top_text_line_str3 != "") || (top_text_line_str4 != "")) //$NON-NLS-1$ //$NON-NLS-2$
                     {
                         top_text_line.setText(
-                            top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" +
-                            //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                            top_text_line_str4);
+                                top_text_line_str1 + ":" + top_text_line_str2 + ":" + top_text_line_str3 + ":" +
+                                //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                top_text_line_str4);
                     }
                     else
                     {
@@ -2369,7 +2372,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
 
                 right_left_text_1.setText(format_timeduration_from_seconds(
-                    (System.currentTimeMillis() - Callstate.call_start_timestamp) / 1000));
+                        (System.currentTimeMillis() - Callstate.call_start_timestamp) / 1000));
             }
             else
             {
@@ -2402,15 +2405,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         Log.i(TAG, "update_audio_device_icon:headset"); //$NON-NLS-1$
                         Drawable d4 = new IconicsDrawable(ca).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(
-                            Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                                Color.TRANSPARENT).color(ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(
+                                80);
                         audio_device_icon.setImageDrawable(d4);
                     }
                     else if (Callstate.audio_device == 2)
                     {
                         Log.i(TAG, "update_audio_device_icon:bluetooth"); //$NON-NLS-1$
                         Drawable d4 = new IconicsDrawable(ca).icon(
-                            GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
-                            ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                                GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
+                                ca.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
                         audio_device_icon.setImageDrawable(d4);
                     }
                     else // audio_device == ??
@@ -2441,9 +2445,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                      ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
                                      PREF__video_play_delay_ms);
                     video_add_delay_slider_infotext_01.setText(context_s.getString(R.string.
-                                                                                       CallingActivity_0) + " " +
+                                                                                           CallingActivity_0) + " " +
                                                                PREF__video_play_delay_ms + " " + context_s.getString(
-                        R.string.CallingActivity_123)); //$NON-NLS-1$ //$NON-NLS-2$
+                            R.string.CallingActivity_123)); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 catch (Exception e)
                 {
@@ -2564,9 +2568,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         byte[] data;
         byte[] sps_pps;
+        long pts;
     }
 
-    public static void feed_h264_encoder(byte[] buf, int frame_width_px, int frame_height_px)
+    public static void feed_h264_encoder(byte[] buf, int frame_width_px, int frame_height_px, long pts)
     {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
         {
@@ -2591,7 +2596,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             try
             {
                 int inputBufferIndex = mEncoder.dequeueInputBuffer(
-                    BUFFER_DEQUEUE_FEEDER_TIMEOUT_US); // This method will return immediately if timeoutUs == 0
+                        BUFFER_DEQUEUE_FEEDER_TIMEOUT_US); // This method will return immediately if timeoutUs == 0
                 if (inputBufferIndex >= 0)
                 {
                     /* Get input buffer and fill it with our input */
@@ -2601,7 +2606,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     /* Enqueue buffer */
                     // Log.d(TAG, "feed_h264_encoder:Enqueued input index: " + inputBufferIndex);
 
-                    long ptsUsec = computePresentationTime();
+                    long ptsUsec = computePresentationTime(pts);
                     mEncoder.queueInputBuffer(inputBufferIndex, 0, buf.length, ptsUsec, 0);
                 }
             }
@@ -2711,6 +2716,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     /* Release MediaCodec buffer */
                     mEncoder.releaseOutputBuffer(encoderStatus, false);
                     ret.data = arr;
+                    ret.pts = (info.presentationTimeUs / 1000);
                     return ret;
                 }
             }
@@ -2726,10 +2732,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     /**
      * Generates the presentation time for frame N, in microseconds.
      */
-    private static long computePresentationTime()
+    private static long computePresentationTime(long ts)
     {
-        // Log.i(TAG, "computePresentationTime:" + (System.currentTimeMillis() * 1000));
-        return (System.currentTimeMillis() * 1000);
+        return (System.currentTimeMillis() * 1000) + 10;
     }
 
     static void reconfigure_h264_encoder(int bitrate_bits_per_second, int width, int height)
@@ -2830,11 +2835,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             // video_encoder_format.setInteger(MediaFormat.KEY_COLOR_STANDARD, COLOR_STANDARD_BT601_PAL);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             {
-                //++//video_encoder_format.setInteger(MediaFormat.KEY_PRIORITY, 0); // 0: realtime priority
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            {
-                //++//video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 0);
+                video_encoder_format.setInteger(MediaFormat.KEY_PRIORITY, 0); // 0: realtime priority
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             {
@@ -2858,7 +2859,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             //                                            MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
 
             video_encoder_format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
-            video_encoder_format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
+            video_encoder_format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL_START);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            {
+                video_encoder_format.setInteger(MediaFormat.KEY_INTRA_REFRESH_PERIOD, 15);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            {
+                video_encoder_format.setInteger(MediaFormat.KEY_LATENCY, 1);
+            }
 
             Log.d(TAG, "prepareEncoder:video_encoder_format: " + video_encoder_format); //$NON-NLS-1$
 
@@ -2976,8 +2987,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
                 if (encodedData == null)
                 {
-                    throw new RuntimeException(
-                        "drainEncoder:encoderOutputBuffer " + encoderStatus + " was null"); //$NON-NLS-1$ //$NON-NLS-2$
+                    throw new RuntimeException("drainEncoder:encoderOutputBuffer " + encoderStatus +
+                                               " was null"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 
                 if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)

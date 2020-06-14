@@ -20,9 +20,6 @@
 package com.zoffcc.applications.trifa;
 
 
-import android.provider.CallLog;
-import android.telecom.Call;
-
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
@@ -58,6 +55,12 @@ public class Callstate
     static boolean audio_speaker = true; // true -> loudspeaker, false -> for your ear-speaker
     static int audio_device = 0; // 0 -> phone, 1 -> headset, 2 -> bluetoothdevice
     static long play_delay = 0;
+    static long java_video_play_delay = 0;
+    static long java_video_encoder_delay = 0;
+    static int java_video_encoder_first_frame_in = 1;
+    static long java_video_encoder_delay_start_ts = 0;
+    static int java_video_encoder_delay_set = 0;
+    static int delay_add = 0;
     static long round_trip_time = 0;
     static boolean audio_group_active = false;
 
@@ -85,6 +88,12 @@ public class Callstate
         Callstate.audio_speaker = true;
         Callstate.audio_device = 0;
         Callstate.play_delay = 0;
+        Callstate.java_video_play_delay = 0;
+        Callstate.java_video_encoder_delay = 0;
+        Callstate.java_video_encoder_first_frame_in = 1;
+        Callstate.java_video_encoder_delay_set = 0;
+        Callstate.java_video_encoder_delay_start_ts = 0;
+        Callstate.delay_add = 0;
         Callstate.round_trip_time = 0;
         Callstate.audio_group_active = false;
         MainActivity.set_av_call_status(Callstate.state);

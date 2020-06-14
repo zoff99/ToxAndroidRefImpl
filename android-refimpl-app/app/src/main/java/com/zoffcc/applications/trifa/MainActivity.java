@@ -2568,6 +2568,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
     {
+        final long incoming_video_frame_ts = System.currentTimeMillis();
+
         if (Callstate.other_video_enabled == 0)
         {
             return;
@@ -2696,6 +2698,7 @@ public class MainActivity extends AppCompatActivity
                     if (video_frame_image_valid == true)
                     {
                         CallingActivity.mContentView.setBitmap(video_frame_image);
+                        Callstate.java_video_play_delay = System.currentTimeMillis() - incoming_video_frame_ts;
                     }
 
                     //Log.i("semaphore_01","release:09");
