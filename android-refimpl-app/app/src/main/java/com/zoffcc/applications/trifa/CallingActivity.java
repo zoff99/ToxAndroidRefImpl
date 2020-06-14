@@ -2867,7 +2867,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             {
-                video_encoder_format.setInteger(MediaFormat.KEY_INTRA_REFRESH_PERIOD, 15);
+                video_encoder_format.setInteger(MediaFormat.KEY_INTRA_REFRESH_PERIOD, 5);
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
