@@ -198,8 +198,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static MediaFormat video_decoder_h264_format = null;
     private DetectHeadset dh = null;
     public static long calling_activity_start_ms = 0;
-    private static int BUFFER_DEQUEUE_TIMEOUT_US = 150; // fetch encoded data from encoder
-    private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 150; // feed raw data to encoder
+    private static int BUFFER_DEQUEUE_TIMEOUT_US = 5 * 1000; // "us" fetch encoded data from encoder
+    private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 150; // "us" feed raw data to encoder
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
