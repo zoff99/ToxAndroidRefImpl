@@ -367,7 +367,7 @@ public class MainActivity extends AppCompatActivity
     public static float PREF_mic_gain_factor = 2.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int FRAME_SIZE_FIXED = 20;
+    static int FRAME_SIZE_FIXED = 40;
     static int PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED; // !! 120 seems to work also !!
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;

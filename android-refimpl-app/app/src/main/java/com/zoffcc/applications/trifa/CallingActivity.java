@@ -2524,7 +2524,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         set_calling_audio_mode();
 
         toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                         ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value, 60);
+                         ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value,
+                         TRIFAGlobals.VIDEO_DECODER_BUFFER_DELAY);
 
         Runnable myRunnable = new Runnable()
         {

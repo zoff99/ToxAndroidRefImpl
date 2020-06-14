@@ -122,7 +122,6 @@ int audio_play_buffers_in_queue = 0;
 int playing_state = _STOPPED;
 int player_state_current = _STOPPED;
 #define PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS1 2
-int PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2 = 3;
 pthread_mutex_t play_buffer_queued_count_mutex;
 int play_buffer_queued_count_mutex_valid = 0;
 
@@ -381,14 +380,13 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
     pthread_mutex_unlock(&play_buffer_queued_count_mutex);
 
-    if (audio_play_buffers_in_queue < PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS1)
+    SLAndroidSimpleBufferQueueState state;
+    (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
+
+    if (state.count < PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS1)
     {
-#ifdef DEBUG_NATIVE_AUDIO_DEEP
-        SLAndroidSimpleBufferQueueState state;
-        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "bqPlayerCallback:real_buffer_count=%d", state.count);
-#endif
 
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
@@ -499,8 +497,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     // configure audio source
     SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
                                                        (SLuint32) num_bufs};
-
-    PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2 = 3; // TODO: do not hardcode this!!
 
     SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, (SLuint32) channels, SL_SAMPLINGRATE_44_1,
                                    SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
@@ -649,6 +645,44 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
 
 #endif
 
+
+    int8_t *nextBuffer = (int8_t *) audio_play_buffer[0];
+    int nextSize = audio_play_buffer_size[0];
+    if (bqPlayerBufferQueue != NULL)
+    {
+        (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
+                                        (SLuint32) nextSize);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "createBufferQueueAudioPlayer:Enqueue=%d",
+                            (int) 0);
+        pthread_mutex_lock(&play_buffer_queued_count_mutex);
+
+        SLAndroidSimpleBufferQueueState state;
+        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "createBufferQueueAudioPlayer:Enqueue:real_buffer_count:2=%d",
+                            state.count);
+
+        audio_play_buffers_in_queue++;
+        pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+
+        (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
+                                        (SLuint32) nextSize);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "createBufferQueueAudioPlayer:Enqueue=%d",
+                            (int) 0);
+        pthread_mutex_lock(&play_buffer_queued_count_mutex);
+
+        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "createBufferQueueAudioPlayer:Enqueue:real_buffer_count:2=%d",
+                            state.count);
+
+        audio_play_buffers_in_queue++;
+        pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+    }
+
+#if 0
     // Enqueue a few buffers to get the ball rolling
     int nextSize = 0;
     int8_t *nextBuffer = NULL;
@@ -668,12 +702,16 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
             {
                 (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
                                                 (SLuint32) nextSize);
+                __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                                    "createBufferQueueAudioPlayer:Enqueue=%d",
+                                    (int) jk);
                 pthread_mutex_lock(&play_buffer_queued_count_mutex);
                 audio_play_buffers_in_queue++;
                 pthread_mutex_unlock(&play_buffer_queued_count_mutex);
             }
         }
     }
+#endif
 
     // set the player's state
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
@@ -959,6 +997,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         playing_state = _PLAYING;
         result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
                                                  (SLuint32) nextSize);
+
         if (SL_RESULT_SUCCESS != result)
         {
             audio_out_vu_value = 0.0f;
@@ -981,30 +1020,25 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
                             audio_play_buffers_in_queue);
 #endif
 
-        if (audio_play_buffers_in_queue > PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2)
-        {
-#ifdef DEBUG_NATIVE_AUDIO_DEEP
-            SLAndroidSimpleBufferQueueState state;
-            (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                "bqPlayerCallback:real_buffer_count:2=%d guess=%d", state.count,
-                                audio_play_buffers_in_queue);
-#endif
-            if (player_state_current != _PLAYING)
-            {
-                // set the player's state
-                SLresult result2;
-                result2 = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-                __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                    "player_state:res_010=%d SL_RESULT_SUCCESS=%d PLAYING inqueue=%d, need=%d",
-                                    (int) result2, (int) SL_RESULT_SUCCESS,
-                                    (int) audio_play_buffers_in_queue,
-                                    (int) PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2);
-                (void) result2;
+        //if (audio_play_buffers_in_queue >= PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS2)
+        //{
+        SLAndroidSimpleBufferQueueState state;
+        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
 
-                player_state_current = _PLAYING;
-            }
+        if (player_state_current != _PLAYING)
+        {
+            // set the player's state
+            SLresult result2;
+            result2 = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                                "player_state:res_010=%d SL_RESULT_SUCCESS=%d PLAYING inqueue=%d",
+                                (int) result2, (int) SL_RESULT_SUCCESS,
+                                (int) state.count);
+            (void) result2;
+
+            player_state_current = _PLAYING;
         }
+        //}
     }
 
     return 0;

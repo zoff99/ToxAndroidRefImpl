@@ -33,7 +33,7 @@ public class NativeAudio
 {
     private static final String TAG = "trifa.NativeAudio";
 
-    public static final int n_audio_in_buffer_max_count = 10;
+    public static final int n_audio_in_buffer_max_count = 4;
     public static ByteBuffer[] n_audio_buffer = new ByteBuffer[n_audio_in_buffer_max_count];
     public static int n_cur_buf = 0;
     public static int n_buf_size_in_bytes = 0;
