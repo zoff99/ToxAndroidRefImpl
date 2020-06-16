@@ -215,6 +215,9 @@ float volumeMultiplier = -20.0f;
 
 #define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 60
 long global_group_audio_acitve_num = -1;
+long global_videocall_audio_acitve_num = -1;
+int global_videocall_audio_sample_rate = 48000;
+int global_videocall_audio_channels = 2;
 long global_group_audio_peerbuffers = 0;
 uint64_t global_group_audio_last_process_incoming = 0;
 int16_t *global_group_audio_peerbuffers_buffer = NULL;
@@ -343,8 +346,10 @@ jstring c_safe_string_from_java(const char *instr, size_t len);
 void videocall_audio_alloc_peer_buffer();
 void videocall_audio_free_peer_buffer();
 uint32_t videocall_audio_get_samples_in_buffer();
+uint32_t videocall_audio_any_have_sample_count_in_buffer_count(uint32_t sample_count);
 void videocall_audio_add_buffer(const int16_t *pcm, uint32_t num_samples);
 void videocall_audio_read_buffer(uint32_t num_samples, int16_t *ret_buffer);
+int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_output, int channles, int sample_rate);
 
 int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, uint32_t *sample_count_new);
 void group_audio_alloc_peer_buffer(uint32_t global_group_audio_acitve_number);
@@ -1864,17 +1869,29 @@ void android_toxav_callback_audio_receive_frame_cb(uint32_t friend_number, size_
 void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int16_t *pcm, size_t sample_count,
                                    uint8_t channels, uint32_t sampling_rate, void *user_data)
 {
-
-    android_toxav_callback_audio_receive_frame_cb(friend_number, sample_count, channels, sampling_rate);
-
     pthread_mutex_lock(&group_audio___mutex);
     if (!global_group_audio_peerbuffers_buffer)
     {
         videocall_audio_alloc_peer_buffer();
     }
+
+    if (global_videocall_audio_acitve_num == -1)
+    {
+        global_videocall_audio_acitve_num = friend_number;
+    }
+
+    global_videocall_audio_sample_rate = sampling_rate;
+    global_videocall_audio_channels = channels;
+
     pthread_mutex_unlock(&group_audio___mutex);
 
     pthread_mutex_lock(&group_audio___mutex);
+    
+    // dbg(9, "toxav_audio_receive_frame_cb_:sample_count=%d sampling_rate=%d channels=%d",
+    //    sample_count,
+    //    sampling_rate,
+    //    channels);
+
     videocall_audio_add_buffer(pcm, (sample_count * channels));
     pthread_mutex_unlock(&group_audio___mutex);
 }
@@ -2816,6 +2833,11 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(JNIEnv *
 jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1group_1audio(JNIEnv *env, jobject thiz, jint delta_new, jint want_ms_output)
 {
     return (jint)process_incoming_group_audio_on_iterate(delta_new, want_ms_output);
+}
+
+jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1videocall_1audio(JNIEnv *env, jobject thiz, jint delta_new, jint want_ms_output, jint channels, jint sample_rate)
+{
+    return (jint)process_incoming_videocall_audio_on_iterate(delta_new, want_ms_output, channels, sample_rate);
 }
 
 JNIEXPORT void JNICALL
@@ -4188,6 +4210,65 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     pthread_mutex_unlock(&group_audio___mutex);
 }
 
+int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_output, int channles, int sample_rate)
+{
+    int64_t start_time = current_time_monotonic_default();
+
+    pthread_mutex_lock(&group_audio___mutex);
+
+    if (audio_buffer_pcm_2 == NULL)
+    {
+        // callback with sample_count == 0
+        android_toxav_callback_audio_receive_frame_cb(
+            global_videocall_audio_acitve_num,
+            0,
+            global_videocall_audio_channels,
+            global_videocall_audio_sample_rate);
+    }
+
+    if (audio_buffer_pcm_2 != NULL)
+    {
+        if (global_group_audio_peerbuffers_buffer)
+        {
+            const int want_sample_count = (int)(sample_rate * want_ms_output / 1000) * channles;
+
+            uint32_t num_bufs_ready = videocall_audio_any_have_sample_count_in_buffer_count(want_sample_count);
+
+            if (num_bufs_ready < 1)
+            {
+                pthread_mutex_unlock(&group_audio___mutex);
+                return (int32_t)(current_time_monotonic_default() - start_time);
+            }
+
+
+            int16_t *temp_buf = (int16_t *)calloc(1, want_sample_count * 2);
+            // dbg(9, "process_incoming_videocall_audio_on_iterate:want_sample_count=%d sample_rate=%d want_ms_output=%d channles=%d",
+            //        want_sample_count,
+            //        sample_rate,
+            //        want_ms_output,
+            //        channles);
+
+            if (temp_buf)
+            {
+                videocall_audio_read_buffer(want_sample_count, temp_buf);
+                memcpy((void *)audio_buffer_pcm_2, (void *)temp_buf, (size_t)(want_sample_count * 2));
+
+                android_toxav_callback_audio_receive_frame_cb(
+                    global_videocall_audio_acitve_num,
+                    (size_t)(want_sample_count / global_videocall_audio_channels),
+                    global_videocall_audio_channels,
+                    global_videocall_audio_sample_rate);
+
+                free(temp_buf);
+            }
+        }
+    }
+
+    pthread_mutex_unlock(&group_audio___mutex);
+
+    return (int32_t)(current_time_monotonic_default() - start_time);
+}
+
 int process_incoming_group_audio_on_iterate(int delta_new, int want_ms_output)
 {
     int64_t start_time = current_time_monotonic_default();
@@ -5531,6 +5612,20 @@ uint32_t videocall_audio_get_samples_in_buffer()
     return (uint32_t)(Pipe_getUsed(
                 &global_group_audio_peerbuffers_buffer_start_pos[peernumber],
                 &global_group_audio_peerbuffers_buffer_end_pos[peernumber]) * 2);
+}
+
+uint32_t videocall_audio_any_have_sample_count_in_buffer_count(uint32_t sample_count)
+{
+    uint32_t ret = 0;
+
+    uint32_t has_samples;
+    has_samples = videocall_audio_get_samples_in_buffer();
+    if (has_samples >= sample_count)
+    {
+        ret++;
+    }
+
+    return ret;
 }
 
 void videocall_audio_add_buffer(const int16_t *pcm, uint32_t num_samples)

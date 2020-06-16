@@ -41,6 +41,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -58,6 +59,7 @@ import com.google.speech.levelmeter.BarLevelDrawable;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
+import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -71,9 +73,12 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.set_audio_delay;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
+import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
+import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.format_timeduration_from_seconds;
@@ -99,6 +104,7 @@ import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_p
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
@@ -118,6 +124,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static final int BACK_CAMERA_USED = 2;
     static int active_camera_type = FRONT_CAMERA_USED;
     static CustomVideoImageView mContentView;
+    private Thread Videocall_audio_play_thread = null;
+    private boolean Videocall_audio_play_thread_running = false;
     static ViewGroup calling_activity_top_viewgroup_vg;
     static ImageView caller_avatar_view;
     static ImageButton accept_button = null;
@@ -1586,7 +1594,66 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             toggle_osd_view_including_cam_preview(!Callstate.audio_call);
         }
 
-        Log.i(TAG, "onResume:99"); //$NON-NLS-1$
+
+        Videocall_audio_play_thread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    this.setName("t_va_play");
+                    android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+                    // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    Log.i(TAG, "Videocall_audio_play_thread:starting ...");
+                    int delta = 0;
+                    final int sleep_millis = NativeAudio.n_buf_iterate_ms; // "x" ms is what native audio wants
+                    int sleep_millis_current = sleep_millis;
+                    Videocall_audio_play_thread_running = true;
+                    long d1 = 0;
+                    long d2 = 0;
+                    while (Videocall_audio_play_thread_running)
+                    {
+                        d1 = SystemClock.uptimeMillis();
+
+                        MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
+                                                                 NativeAudio.sampling_rate);
+                        delta = (int) (SystemClock.uptimeMillis() - d1);
+
+                        sleep_millis_current = sleep_millis - delta;
+                        if (sleep_millis_current < 1)
+                        {
+                            sleep_millis_current = 1;
+                        }
+                        else if (sleep_millis_current > sleep_millis + 5)
+                        {
+                            sleep_millis_current = sleep_millis + 5;
+                        }
+
+                        Thread.sleep(sleep_millis_current); // sleep
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                Log.i(TAG, "Videocall_audio_play_thread:finished");
+            }
+        };
+
+        Videocall_audio_play_thread.start();
+
+        Log.i(TAG, "onResume:99");
     }
 
     void toggle_camera()
@@ -1647,6 +1714,20 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     protected void onPause()
     {
+        // singal group audio play thread to stop
+        Videocall_audio_play_thread_running = false;
+        try
+        {
+            Log.i(TAG, "Videocall_audio_play_thread:waiting to stop ...");
+            Videocall_audio_play_thread.join();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Videocall_audio_play_thread = null;
+        Log.i(TAG, "Videocall_audio_play_thread:done");
+
         super.onPause();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {

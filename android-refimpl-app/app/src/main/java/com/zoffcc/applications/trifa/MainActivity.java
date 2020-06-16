@@ -90,9 +90,7 @@ import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
@@ -132,7 +130,6 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
-import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
@@ -244,7 +241,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -320,10 +317,9 @@ public class MainActivity extends AppCompatActivity
     static ByteBuffer video_buffer_2 = null;
     final static int audio_in_buffer_max_count = 2; // how many out play buffers? [we are now only using buffer "0" !!]
     public final static int audio_out_buffer_mult = 1;
-    static int audio_in_buffer_element_count = 0;
-    static ByteBuffer[] audio_buffer_2 = new ByteBuffer[audio_in_buffer_max_count];
-    public static long[] audio_buffer_2_ts = new long[n_audio_in_buffer_max_count];
-    static ByteBuffer audio_buffer_play = null;
+    static ByteBuffer audio_buffer_2 = null; // given to JNI with set_JNI_audio_buffer2() for incoming audio (group and call)
+    // public static long[] audio_buffer_2_ts = new long[n_audio_in_buffer_max_count];
+    // static ByteBuffer audio_buffer_play = null;
     static int audio_buffer_play_length = 0;
     static int[] audio_buffer_2_read_length = new int[audio_in_buffer_max_count];
     static TrifaToxService tox_service_fg = null;
@@ -551,7 +547,7 @@ public class MainActivity extends AppCompatActivity
             channelName = "New Message Sound and Vibrate";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             notification_channel_newmessage_sound_and_vibrate = new NotificationChannel(
-                channelId_newmessage_sound_and_vibrate, channelName, importance);
+                    channelId_newmessage_sound_and_vibrate, channelName, importance);
             notification_channel_newmessage_sound_and_vibrate.setDescription(channelId_newmessage_sound_and_vibrate);
             notification_channel_newmessage_sound_and_vibrate.enableVibration(true);
             nmn3.createNotificationChannel(notification_channel_newmessage_sound_and_vibrate);
@@ -698,42 +694,42 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "waiting_for_orbot_info:F1");
                     HelperGeneric.waiting_for_orbot_info(false);
                     OrbotHelper.get(this).statusTimeout(120 * 1000).
-                        addStatusCallback(new StatusCallback()
-                        {
-                            @Override
-                            public void onEnabled(Intent statusIntent)
+                            addStatusCallback(new StatusCallback()
                             {
-                            }
+                                @Override
+                                public void onEnabled(Intent statusIntent)
+                                {
+                                }
 
-                            @Override
-                            public void onStarting()
-                            {
-                            }
+                                @Override
+                                public void onStarting()
+                                {
+                                }
 
-                            @Override
-                            public void onStopping()
-                            {
-                            }
+                                @Override
+                                public void onStopping()
+                                {
+                                }
 
-                            @Override
-                            public void onDisabled()
-                            {
-                                // we got a broadcast with a status of off, so keep waiting
-                            }
+                                @Override
+                                public void onDisabled()
+                                {
+                                    // we got a broadcast with a status of off, so keep waiting
+                                }
 
-                            @Override
-                            public void onStatusTimeout()
-                            {
-                                // throw new RuntimeException("Orbot status request timed out");
-                                Log.i(TAG, "waiting_for_orbot_info:EEO1:" + "Orbot status request timed out");
-                            }
+                                @Override
+                                public void onStatusTimeout()
+                                {
+                                    // throw new RuntimeException("Orbot status request timed out");
+                                    Log.i(TAG, "waiting_for_orbot_info:EEO1:" + "Orbot status request timed out");
+                                }
 
-                            @Override
-                            public void onNotYetInstalled()
-                            {
-                            }
-                        }).
-                        init(); // allow 60 seconds to connect to Orbot
+                                @Override
+                                public void onNotYetInstalled()
+                                {
+                                }
+                            }).
+                            init(); // allow 60 seconds to connect to Orbot
                 }
                 else
                 {
@@ -753,42 +749,42 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     OrbotHelper.get(this).statusTimeout(120 * 1000).
-                        addStatusCallback(new StatusCallback()
-                        {
-                            @Override
-                            public void onEnabled(Intent statusIntent)
+                            addStatusCallback(new StatusCallback()
                             {
-                            }
+                                @Override
+                                public void onEnabled(Intent statusIntent)
+                                {
+                                }
 
-                            @Override
-                            public void onStarting()
-                            {
-                            }
+                                @Override
+                                public void onStarting()
+                                {
+                                }
 
-                            @Override
-                            public void onStopping()
-                            {
-                            }
+                                @Override
+                                public void onStopping()
+                                {
+                                }
 
-                            @Override
-                            public void onDisabled()
-                            {
-                                // we got a broadcast with a status of off, so keep waiting
-                            }
+                                @Override
+                                public void onDisabled()
+                                {
+                                    // we got a broadcast with a status of off, so keep waiting
+                                }
 
-                            @Override
-                            public void onStatusTimeout()
-                            {
-                                // throw new RuntimeException("Orbot status request timed out");
-                                Log.i(TAG, "waiting_for_orbot_info:EEO2:" + "Orbot status request timed out");
-                            }
+                                @Override
+                                public void onStatusTimeout()
+                                {
+                                    // throw new RuntimeException("Orbot status request timed out");
+                                    Log.i(TAG, "waiting_for_orbot_info:EEO2:" + "Orbot status request timed out");
+                                }
 
-                            @Override
-                            public void onNotYetInstalled()
-                            {
-                            }
-                        }).
-                        init(); // allow 60 seconds to connect to Orbot
+                                @Override
+                                public void onNotYetInstalled()
+                                {
+                                }
+                            }).
+                            init(); // allow 60 seconds to connect to Orbot
                 }
             }
             else
@@ -826,7 +822,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 PREF__min_audio_samplingrate_out = Integer.parseInt(
-                    settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
+                        settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
             }
         }
         catch (Exception e)
@@ -882,7 +878,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             PREF__X_audio_recording_frame_size = Integer.parseInt(
-                settings.getString("X_audio_recording_frame_size", "" + 40));
+                    settings.getString("X_audio_recording_frame_size", "" + 40));
         }
         catch (Exception e)
         {
@@ -937,10 +933,10 @@ public class MainActivity extends AppCompatActivity
             top_imageview.setBackgroundColor(Color.TRANSPARENT);
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
             final Drawable d1 = new IconicsDrawable(this).
-                icon(FontAwesome.Icon.faw_exclamation_circle).
-                paddingDp(20).
-                color(getResources().getColor(R.color.md_red_600)).
-                sizeDp(100);
+                    icon(FontAwesome.Icon.faw_exclamation_circle).
+                    paddingDp(20).
+                    color(getResources().getColor(R.color.md_red_600)).
+                    sizeDp(100);
             top_imageview.setImageDrawable(d1);
         }
         else
@@ -955,8 +951,8 @@ public class MainActivity extends AppCompatActivity
         // --------- status spinner ---------
         spinner_own_status = (Spinner) findViewById(R.id.spinner_own_status);
         ArrayList<String> own_online_status_string_values = new ArrayList<String>(
-            Arrays.asList(getString(R.string.MainActivity_available), getString(R.string.MainActivity_away),
-                          getString(R.string.MainActivity_busy)));
+                Arrays.asList(getString(R.string.MainActivity_available), getString(R.string.MainActivity_away),
+                              getString(R.string.MainActivity_busy)));
         ArrayAdapter<String> myAdapter = new OwnStatusSpinnerAdapter(this, R.layout.own_status_spinner_item,
                                                                      own_online_status_string_values);
 
@@ -1015,176 +1011,177 @@ public class MainActivity extends AppCompatActivity
         // -------- drawer ------------
         // -------- drawer ------------
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(
-            R.string.MainActivity_profile).withIcon(GoogleMaterial.Icon.gmd_face);
+                R.string.MainActivity_profile).withIcon(GoogleMaterial.Icon.gmd_face);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(
-            R.string.MainActivity_settings).withIcon(GoogleMaterial.Icon.gmd_settings);
+                R.string.MainActivity_settings).withIcon(GoogleMaterial.Icon.gmd_settings);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(
-            R.string.MainActivity_logout_login).withIcon(GoogleMaterial.Icon.gmd_refresh);
+                R.string.MainActivity_logout_login).withIcon(GoogleMaterial.Icon.gmd_refresh);
         PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(
-            R.string.MainActivity_maint).withIcon(GoogleMaterial.Icon.gmd_build);
+                R.string.MainActivity_maint).withIcon(GoogleMaterial.Icon.gmd_build);
         PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(
-            R.string.MainActivity_about).withIcon(GoogleMaterial.Icon.gmd_info);
+                R.string.MainActivity_about).withIcon(GoogleMaterial.Icon.gmd_info);
         PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName(
-            R.string.MainActivity_exit).withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
+                R.string.MainActivity_exit).withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
         final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
-            color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
+                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
         profile_d_item = new ProfileDrawerItem().
-            withName("me").
-            withIcon(d1);
+                withName("me").
+                withIcon(d1);
         // Create the AccountHeader
         main_drawer_header = new AccountHeaderBuilder().
-            withSelectionListEnabledForSingleProfile(false).
-            withActivity(this).
-            withCompactStyle(true).
-            addProfiles(profile_d_item).
-            withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
-            {
-                @Override
-                public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                withSelectionListEnabledForSingleProfile(false).
+                withActivity(this).
+                withCompactStyle(true).
+                addProfiles(profile_d_item).
+                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
                 {
-                    return false;
-                }
-            }).build();
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                    {
+                        return false;
+                    }
+                }).build();
         // create the drawer and remember the `Drawer` result object
         main_drawer = new DrawerBuilder().
-            withActivity(this).
-            withInnerShadow(false).
-            withRootView(R.id.drawer_container).
-            withShowDrawerOnFirstLaunch(false).
-            withActionBarDrawerToggleAnimated(true).
-            withActionBarDrawerToggle(true).
-            withToolbar(toolbar).
-            addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(), item6).
-            withTranslucentStatusBar(false).
-            withAccountHeader(main_drawer_header).
-            withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-            {
-                @Override
-                public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                withActivity(this).
+                withInnerShadow(false).
+                withRootView(R.id.drawer_container).
+                withShowDrawerOnFirstLaunch(false).
+                withActionBarDrawerToggleAnimated(true).
+                withActionBarDrawerToggle(true).
+                withToolbar(toolbar).
+                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(),
+                               item6).
+                withTranslucentStatusBar(false).
+                withAccountHeader(main_drawer_header).
+                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                 {
-                    Log.i(TAG, "drawer:item=" + position);
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                    {
+                        Log.i(TAG, "drawer:item=" + position);
 
-                    if (position == 1)
-                    {
-                        // profile
-                        try
+                        if (position == 1)
                         {
-                            if (Callstate.state == 0)
+                            // profile
+                            try
                             {
-                                Log.i(TAG, "start profile activity");
-                                Intent intent = new Intent(context_s, ProfileActivity.class);
-                                startActivityForResult(intent, ProfileActivity_ID);
+                                if (Callstate.state == 0)
+                                {
+                                    Log.i(TAG, "start profile activity");
+                                    Intent intent = new Intent(context_s, ProfileActivity.class);
+                                    startActivityForResult(intent, ProfileActivity_ID);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
                             }
                         }
-                        catch (Exception e)
+                        else if (position == 3)
                         {
-                            e.printStackTrace();
-                        }
-                    }
-                    else if (position == 3)
-                    {
-                        // settings
-                        try
-                        {
-                            if (Callstate.state == 0)
+                            // settings
+                            try
                             {
-                                Log.i(TAG, "start settings activity");
-                                Intent intent = new Intent(context_s, SettingsActivity.class);
-                                startActivityForResult(intent, SettingsActivity_ID);
+                                if (Callstate.state == 0)
+                                {
+                                    Log.i(TAG, "start settings activity");
+                                    Intent intent = new Intent(context_s, SettingsActivity.class);
+                                    startActivityForResult(intent, SettingsActivity_ID);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
                             }
                         }
-                        catch (Exception e)
+                        else if (position == 4)
                         {
-                            e.printStackTrace();
-                        }
-                    }
-                    else if (position == 4)
-                    {
-                        // logout/login
-                        try
-                        {
-                            if (is_tox_started)
+                            // logout/login
+                            try
                             {
-                                global_stop_tox();
+                                if (is_tox_started)
+                                {
+                                    global_stop_tox();
+                                }
+                                else
+                                {
+                                    global_start_tox();
+                                }
                             }
-                            else
+                            catch (Exception e)
                             {
-                                global_start_tox();
+                                e.printStackTrace();
                             }
                         }
-                        catch (Exception e)
+                        else if (position == 6)
                         {
-                            e.printStackTrace();
+                            // About
+                            try
+                            {
+                                Log.i(TAG, "start aboutpage activity");
+                                Intent intent = new Intent(context_s, Aboutpage.class);
+                                startActivityForResult(intent, AboutpageActivity_ID);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    else if (position == 6)
-                    {
-                        // About
-                        try
+                        else if (position == 5)
                         {
-                            Log.i(TAG, "start aboutpage activity");
-                            Intent intent = new Intent(context_s, Aboutpage.class);
-                            startActivityForResult(intent, AboutpageActivity_ID);
+                            // Maintenance
+                            try
+                            {
+                                Log.i(TAG, "start Maintenance activity");
+                                Intent intent = new Intent(context_s, MaintenanceActivity.class);
+                                startActivityForResult(intent, MaintenanceActivity_ID);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            // -- clear Glide cache --
+                            // -- clear Glide cache --
+                            // clearCache();
+                            // -- clear Glide cache --
+                            // -- clear Glide cache --
                         }
-                        catch (Exception e)
+                        else if (position == 8)
                         {
-                            e.printStackTrace();
-                        }
-                    }
-                    else if (position == 5)
-                    {
-                        // Maintenance
-                        try
-                        {
-                            Log.i(TAG, "start Maintenance activity");
-                            Intent intent = new Intent(context_s, MaintenanceActivity.class);
-                            startActivityForResult(intent, MaintenanceActivity_ID);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
+                            // Exit
+                            try
+                            {
+                                GroupAudioService.stop_me();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            try
+                            {
+                                if (is_tox_started)
+                                {
+                                    tox_service_fg.stop_tox_fg();
+                                    tox_service_fg.stop_me(true);
+                                }
+                                else
+                                {
+                                    // just exit
+                                    tox_service_fg.stop_me(true);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
 
-                        // -- clear Glide cache --
-                        // -- clear Glide cache --
-                        // clearCache();
-                        // -- clear Glide cache --
-                        // -- clear Glide cache --
+                        return true;
                     }
-                    else if (position == 8)
-                    {
-                        // Exit
-                        try
-                        {
-                            GroupAudioService.stop_me();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-
-                        try
-                        {
-                            if (is_tox_started)
-                            {
-                                tox_service_fg.stop_tox_fg();
-                                tox_service_fg.stop_me(true);
-                            }
-                            else
-                            {
-                                // just exit
-                                tox_service_fg.stop_me(true);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    return true;
-                }
-            }).build();
+                }).build();
         //        DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.material_drawer_layout);
         //        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.faw_envelope_open, R.string.faw_envelope_open);
         //
@@ -1253,10 +1250,10 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 orma = builder.name(dbs_path).
-                    readOnMainThread(AccessThreadConstraint.NONE).
-                    writeOnMainThread(AccessThreadConstraint.NONE).
-                    trace(ORMA_TRACE).
-                    build();
+                        readOnMainThread(AccessThreadConstraint.NONE).
+                        writeOnMainThread(AccessThreadConstraint.NONE).
+                        trace(ORMA_TRACE).
+                        build();
                 // Log.i(TAG, "db:open=OK:path=" + dbs_path);
             }
             catch (Exception e)
@@ -1288,10 +1285,10 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 orma = builder.name(dbs_path).
-                    readOnMainThread(AccessThreadConstraint.WARNING).
-                    writeOnMainThread(AccessThreadConstraint.WARNING).
-                    trace(ORMA_TRACE).
-                    build();
+                        readOnMainThread(AccessThreadConstraint.WARNING).
+                        writeOnMainThread(AccessThreadConstraint.WARNING).
+                        trace(ORMA_TRACE).
+                        build();
                 // Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
             }
 
@@ -1621,7 +1618,7 @@ public class MainActivity extends AppCompatActivity
                             init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
                                  PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                                  TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
-                                     TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+                                         TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
@@ -1737,8 +1734,8 @@ public class MainActivity extends AppCompatActivity
 
                 init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
                      PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
-                     TrifaSetPatternActivity.bytesToString(
-                         TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+                     TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
+                             TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
                 Log.i(TAG, "set_all_conferences_inactive:001");
                 HelperConference.set_all_conferences_inactive();
                 tox_service_fg.tox_thread_start_fg();
@@ -1855,10 +1852,10 @@ public class MainActivity extends AppCompatActivity
             top_imageview.setBackgroundColor(Color.TRANSPARENT);
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
             final Drawable d1 = new IconicsDrawable(this).
-                icon(FontAwesome.Icon.faw_exclamation_circle).
-                paddingDp(20).
-                color(getResources().getColor(R.color.md_red_600)).
-                sizeDp(100);
+                    icon(FontAwesome.Icon.faw_exclamation_circle).
+                    paddingDp(20).
+                    color(getResources().getColor(R.color.md_red_600)).
+                    sizeDp(100);
             top_imageview.setImageDrawable(d1);
         }
         else
@@ -1923,7 +1920,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 PREF__min_audio_samplingrate_out = Integer.parseInt(
-                    settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
+                        settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
             }
         }
         catch (Exception e)
@@ -1983,7 +1980,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             PREF__X_audio_recording_frame_size = Integer.parseInt(
-                settings.getString("X_audio_recording_frame_size", "" + 40));
+                    settings.getString("X_audio_recording_frame_size", "" + 40));
         }
         catch (Exception e)
         {
@@ -2022,7 +2019,7 @@ public class MainActivity extends AppCompatActivity
         try
         {
             profile_d_item.withIcon(
-                HelperGeneric.get_drawable_from_vfs_image(HelperGeneric.get_vfs_image_filename_own_avatar()));
+                    HelperGeneric.get_drawable_from_vfs_image(HelperGeneric.get_vfs_image_filename_own_avatar()));
             main_drawer_header.updateProfile(profile_d_item);
         }
         catch (Exception e)
@@ -2033,7 +2030,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(
-                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                        getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                 profile_d_item.withIcon(d1);
                 main_drawer_header.updateProfile(profile_d_item);
             }
@@ -2066,21 +2063,21 @@ public class MainActivity extends AppCompatActivity
                     if (resolve_activity != null)
                     {
                         AlertDialog ad = new AlertDialog.Builder(this).
-                            setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
+                                setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
                                 {
-                                    return;
-                                }
-                            }).
-                            setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
-                                              new DialogInterface.OnClickListener()
-                                              {
-                                                  public void onClick(DialogInterface dialog, int id)
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        return;
+                                    }
+                                }).
+                                setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
+                                                  new DialogInterface.OnClickListener()
                                                   {
-                                                      startActivity(intent);
-                                                  }
-                                              }).create();
+                                                      public void onClick(DialogInterface dialog, int id)
+                                                      {
+                                                          startActivity(intent);
+                                                      }
+                                                  }).create();
                         ad.setTitle(getString(R.string.MainActivity_info_dialog_title));
                         ad.setMessage(getString(R.string.MainActivity_add_to_batt_opt));
                         ad.setCancelable(false);
@@ -2240,6 +2237,8 @@ public class MainActivity extends AppCompatActivity
 
     // ----------- TRIfA internal -----------
     public static native int jni_iterate_group_audio(int delta_new, int want_ms_output);
+
+    public static native int jni_iterate_videocall_audio(int delta_new, int want_ms_output, int channels, int sample_rate);
     // ----------- TRIfA internal -----------
 
     public static native long tox_kill();
@@ -2430,13 +2429,17 @@ public class MainActivity extends AppCompatActivity
 
     public static native void set_audio_play_volume_percent(int volume_percent);
 
+    // ----------- TRIfA internal -----------
+    // buffer is for incoming video (call)
     public static native long set_JNI_video_buffer(ByteBuffer buffer, int frame_width_px, int frame_height_px);
 
+    // buffer2 is for sending video (call)
     public static native void set_JNI_video_buffer2(ByteBuffer buffer2, int frame_width_px, int frame_height_px);
 
+    // buffer is for sending audio (group and call)
     public static native void set_JNI_audio_buffer(ByteBuffer audio_buffer);
 
-    // buffer2 is for incoming audio
+    // buffer2 is for incoming audio (group and call)
     public static native void set_JNI_audio_buffer2(ByteBuffer audio_buffer2);
 
     // for AEC (libfilteraudio)
@@ -2447,6 +2450,7 @@ public class MainActivity extends AppCompatActivity
 
     // for AEC (libfilteraudio)
     public static native void set_filteraudio_active(int filteraudio_active);
+    // ----------- TRIfA internal -----------
 
     /**
      * Send an audio frame to a friend.
@@ -2605,7 +2609,8 @@ public class MainActivity extends AppCompatActivity
             // allocate new video buffer on 1 frame
             allocate_video_buffer_1((int) frame_width_px, (int) frame_height_px, ystride, ustride, vstride);
             temp_string_a =
-                "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
+                    "" + (int) ((Callstate.call_first_video_frame_received - Callstate.call_start_timestamp) / 1000) +
+                    "s";
             CallingActivity.update_top_text_line(temp_string_a, 3);
             Callstate.frame_width_px = frame_width_px;
             Callstate.frame_height_px = frame_height_px;
@@ -2618,7 +2623,7 @@ public class MainActivity extends AppCompatActivity
             if ((count_video_frame_received > 20) || ((last_video_frame_sent + 2000) < System.currentTimeMillis()))
             {
                 VIDEO_FRAME_RATE_INCOMING = (int) ((((float) count_video_frame_received / ((float) (
-                    (System.currentTimeMillis() - last_video_frame_received) / 1000.0f))) / 1.0f) + 0.5);
+                        (System.currentTimeMillis() - last_video_frame_received) / 1000.0f))) / 1.0f) + 0.5);
                 // Log.i(TAG, "VIDEO_FRAME_RATE_INCOMING=" + VIDEO_FRAME_RATE_INCOMING + " fps");
                 HelperGeneric.update_fps();
                 last_video_frame_received = System.currentTimeMillis();
@@ -2948,7 +2953,6 @@ public class MainActivity extends AppCompatActivity
         //      "audio_play:android_toxav_callback_audio_receive_frame_cb_method:" + friend_number + " " + sample_count +
         //      " " + channels + " " + sampling_rate);
 
-        // long timestamp_audio_frame = System.currentTimeMillis();
         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) != friend_number)
         {
             // not the friend we are in call with now
@@ -2977,53 +2981,40 @@ public class MainActivity extends AppCompatActivity
                   "audio_play:read:init sample_count=" + sample_count + " channels=" + channels + " sampling_rate=" +
                   sampling_rate);
             temp_string_a =
-                "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
+                    "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) +
+                    "s";
             CallingActivity.update_top_text_line(temp_string_a, 4);
             // HINT: PCM_16 needs 2 bytes per sample per channel
-            AudioReceiver.buffer_size =
-                ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult;  // TODO: this is really bad
+            AudioReceiver.buffer_size = ((int) ((48000 * 2) * 2)) * audio_out_buffer_mult;  // TODO: this is really bad
             AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f *
                                                 0.9f); // TODO: this is bad also
             Log.i(TAG, "audio_play:read:init buffer_size=" + AudioReceiver.buffer_size);
             Log.i(TAG, "audio_play:read:init sleep_millis=" + AudioReceiver.sleep_millis);
+
             // reset audio in buffers
-            int i = 0;
-
-            for (i = 0; i < audio_in_buffer_max_count; i++)
+            try
             {
-                try
+                if (audio_buffer_2 != null)
                 {
-                    if (audio_buffer_2 != null)
-                    {
-                        if (audio_buffer_2[i] != null)
-                        {
-                            audio_buffer_2[i].clear();
-                        }
-                    }
+                    audio_buffer_2.clear();
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    audio_buffer_2[i] = null;
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                audio_buffer_2[i] = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
-                audio_buffer_2_read_length[i] = 0;
-                Log.i(TAG, "audio_play:audio_buffer_2[" + i + "] size=" + AudioReceiver.buffer_size);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
 
-            audio_in_buffer_element_count = 0;
-            audio_buffer_play = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
-            // always write to buffer[0] in the pipeline !! -----------
-            set_JNI_audio_buffer2(audio_buffer_2[0]);
+
+            if (audio_buffer_2 == null)
+            {
+                audio_buffer_2 = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+                Log.i(TAG, "audio_play:audio_buffer_2[" + 0 + "] size=" + AudioReceiver.buffer_size);
+
+                // audio_buffer_play = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+                // always write to buffer[0] in the pipeline !! -----------
+                set_JNI_audio_buffer2(audio_buffer_2);
+            }
+            audio_buffer_2_read_length[0] = 0;
 
             int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
 
@@ -3036,7 +3027,25 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "audio_play:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
                 init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
             }
+        }
 
+        // Log.i(TAG, "audio_play:NativeAudio Play:001a:" + NativeAudio.channel_count + " " + channels_);
+
+        if (sampling_rate_ != sampling_rate)
+        {
+            sampling_rate_ = sampling_rate;
+        }
+
+        if (channels_ != channels)
+        {
+            channels_ = channels;
+        }
+
+        // Log.i(TAG, "audio_play:NativeAudio Play:001b:" + NativeAudio.channel_count + " " + channels_);
+
+        if (sample_count == 0)
+        {
+            return;
         }
 
         // TODO: dirty hack, "make good"
@@ -3044,7 +3053,24 @@ public class MainActivity extends AppCompatActivity
         {
             if (PREF__use_native_audio_play)
             {
-                // Log.i(TAG, "audio_play:NativeAudio Play:001");
+                if (audio_engine_starting)
+                {
+                    // native audio engine is down. lets wait for it to get up ...
+                    while (audio_engine_starting == true)
+                    {
+                        try
+                        {
+                            Thread.sleep(20);
+                            Log.i(TAG, "audio_play:sleep --------");
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                // Log.i(TAG, "audio_play:NativeAudio Play:001c:" + NativeAudio.channel_count + " " + channels_);
                 if ((NativeAudio.sampling_rate != (int) sampling_rate_) || (NativeAudio.channel_count != channels_))
                 {
                     Log.i(TAG, "audio_play:values_changed");
@@ -3053,74 +3079,78 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "audio_play:NativeAudio restart Engine");
                     // TODO: locking? or something like that
                     NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
-
-                    if (native_aec_lib_ready)
-                    {
-                        destroy_buffers();
-                        int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
-                        Log.i(TAG,
-                              "audio_play:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
-                        init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
-                    }
-
                 }
 
-                audio_buffer_2[0].position(0);
+                audio_buffer_2.position(0);
                 int incoming_bytes = (int) ((sample_count * channels) * 2);
 
-                // -------------- apply AudioProcessing: AEC -----------------------
-                if (native_aec_lib_ready)
+                if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
                 {
-                    AudioProcessing.audio_buffer.position(0);
-                    audio_buffer_2[0].position(0);
-                    // Log.i(TAG, "audio_play:buf_len1=" + audio_buffer_2[0].remaining());
-                    // Log.i(TAG, "audio_play:buf_len2=" + AudioProcessing.audio_buffer.remaining());
+                    int remain_bytes = incoming_bytes - (NativeAudio.n_buf_size_in_bytes -
+                                                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    int remain_start_pos = (incoming_bytes - remain_bytes);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(
+                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2.array(),
+                                                                          audio_buffer_2.arrayOffset(),
+                                                                          Math.min(incoming_bytes,
+                                                                                   NativeAudio.n_buf_size_in_bytes -
+                                                                                   NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]));
 
-                    if (AEC_DEBUG_DUMP)
+                    if (remain_bytes > 0)
                     {
+                        //audio_buffer_2.position(remain_start_pos);
+                        audio_buffer_2.position(0);
+                        int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
 
-                        BufferedWriter debug_audio_writer_play_s = null;
-                        try
+                        if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
                         {
-                            debug_audio_writer_play_s = new BufferedWriter(
-                                new FileWriter("/sdcard/audio_play_s.txt", true));
-                            long ts = (System.currentTimeMillis() - calling_activity_start_ms) * 1000;
-                            int value = 0;
-                            for (int xx = 0; xx < 160; xx++)
-                            {
-                                value = audio_buffer_2[0].getShort(xx * 2);
-                                debug_audio_writer_play_s.write(("" + ts) + "," + value + "\n");
-                                ts = ts + 16;
-                            }
-
-                            if (debug_audio_writer_play_s != null)
-                            {
-                                debug_audio_writer_play_s.close();
-                            }
-
-                            debug_audio_writer_play_s = new BufferedWriter(
-                                new FileWriter("/sdcard/audio_play_s_ts.txt", true));
-                            debug_audio_writer_play_s.write("" + System.currentTimeMillis() + "\n");
-
-                            if (debug_audio_writer_play_s != null)
-                            {
-                                debug_audio_writer_play_s.close();
-                            }
-
+                            NativeAudio.n_cur_buf = 0;
                         }
-                        catch (Exception e)
+                        else
                         {
-                            e.printStackTrace();
+                            NativeAudio.n_cur_buf++;
+                        }
+
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(0);
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2.array(), remain_start_pos,
+                                                                              remain_bytes);
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = remain_bytes;
+                    }
+                    else if (remain_bytes == 0)
+                    {
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
+                        int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+
+                        if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
+                        {
+                            NativeAudio.n_cur_buf = 0;
+                        }
+                        else
+                        {
+                            NativeAudio.n_cur_buf++;
                         }
                     }
-
-                    AudioProcessing.audio_buffer.put(audio_buffer_2[0]);
-                    play_buffer();
-
-                    audio_buffer_2[0].position(0);
+                    else
+                    {
+                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] =
+                                NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
+                    }
                 }
-                // -------------- apply AudioProcessing: AEC -----------------------
+                else
+                {
+                    NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
 
+                    if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
+                    {
+                        NativeAudio.n_cur_buf = 0;
+                    }
+                    else
+                    {
+                        NativeAudio.n_cur_buf++;
+                    }
+                }
             } // PREF__use_native_audio_play -----
         }
         catch (Exception e)
@@ -3152,52 +3182,37 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "group_audio_receive_frame:read:init sample_count=" + sample_count + " channels=" + channels +
                        " sampling_rate=" + sampling_rate);
             temp_string_a =
-                "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) + "s";
+                    "" + (int) ((Callstate.call_first_audio_frame_received - Callstate.call_start_timestamp) / 1000) +
+                    "s";
             // HINT: PCM_16 needs 2 bytes per sample per channel
-            AudioReceiver.buffer_size =
-                ((int) ((sample_count * channels) * 2)) * audio_out_buffer_mult;  // TODO: this is really bad
+            AudioReceiver.buffer_size = ((int) ((48000 * 2) * 2)) * audio_out_buffer_mult; // TODO: this is really bad
             AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f *
                                                 0.9f); // TODO: this is bad also
             Log.i(TAG, "group_audio_receive_frame:read:init buffer_size=" + AudioReceiver.buffer_size);
             Log.i(TAG, "group_audio_receive_frame:read:init sleep_millis=" + AudioReceiver.sleep_millis);
             // reset audio in buffers
-            int i = 0;
-
-            for (i = 0; i < audio_in_buffer_max_count; i++)
+            try
             {
-                try
+                if (audio_buffer_2 != null)
                 {
-                    if (audio_buffer_2 != null)
-                    {
-                        if (audio_buffer_2[i] != null)
-                        {
-                            audio_buffer_2[i].clear();
-                        }
-                    }
+                    audio_buffer_2.clear();
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    audio_buffer_2[i] = null;
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                audio_buffer_2[i] = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
-                audio_buffer_2_read_length[i] = 0;
-                Log.i(TAG, "group_audio_receive_frame:audio_buffer_2[" + i + "] size=" + AudioReceiver.buffer_size);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
 
-            audio_in_buffer_element_count = 0;
-            audio_buffer_play = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
-            // always write to buffer[0] in the pipeline !! -----------
-            set_JNI_audio_buffer2(audio_buffer_2[0]);
+            if (audio_buffer_2 == null)
+            {
+                audio_buffer_2 = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+                Log.i(TAG, "group_audio_receive_frame:audio_buffer_2[" + 0 + "] size=" + AudioReceiver.buffer_size);
+
+                // audio_buffer_play = ByteBuffer.allocateDirect(AudioReceiver.buffer_size);
+                // always write to buffer[0] in the pipeline !! -----------
+                set_JNI_audio_buffer2(audio_buffer_2);
+            }
+            audio_buffer_2_read_length[0] = 0;
 
             int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
 
@@ -3212,6 +3227,21 @@ public class MainActivity extends AppCompatActivity
                 init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
             }
 
+        }
+
+        if (sampling_rate_ != sampling_rate)
+        {
+            sampling_rate_ = sampling_rate;
+        }
+
+        if (channels_ != channels)
+        {
+            channels_ = channels;
+        }
+
+        if (sample_count == 0)
+        {
+            return;
         }
 
         // TODO: dirty hack, "make good"
@@ -3258,17 +3288,17 @@ public class MainActivity extends AppCompatActivity
 
                 }
 
-                audio_buffer_2[0].position(0);
+                audio_buffer_2.position(0);
                 int incoming_bytes = (int) ((sample_count * channels) * 2);
 
                 // -------------- apply AudioProcessing: AEC -----------------------
                 if (native_aec_lib_ready)
                 {
                     AudioProcessing.audio_buffer.position(0);
-                    audio_buffer_2[0].position(0);
-                    AudioProcessing.audio_buffer.put(audio_buffer_2[0]);
+                    audio_buffer_2.position(0);
+                    AudioProcessing.audio_buffer.put(audio_buffer_2);
                     play_buffer();
-                    audio_buffer_2[0].position(0);
+                    audio_buffer_2.position(0);
                 }
                 // -------------- apply AudioProcessing: AEC -----------------------
 
@@ -3278,17 +3308,17 @@ public class MainActivity extends AppCompatActivity
                                                          NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
                     int remain_start_pos = (incoming_bytes - remain_bytes);
                     NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(
-                        NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
-                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
-                                                                          audio_buffer_2[0].arrayOffset(),
+                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
+                    NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2.array(),
+                                                                          audio_buffer_2.arrayOffset(),
                                                                           Math.min(incoming_bytes,
                                                                                    NativeAudio.n_buf_size_in_bytes -
                                                                                    NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]));
 
                     if (remain_bytes > 0)
                     {
-                        //audio_buffer_2[0].position(remain_start_pos);
-                        audio_buffer_2[0].position(0);
+                        //audio_buffer_2.position(remain_start_pos);
+                        audio_buffer_2.position(0);
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
 
@@ -3302,8 +3332,8 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].position(0);
-                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2[0].array(),
-                                                                              remain_start_pos, remain_bytes);
+                        NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(audio_buffer_2.array(), remain_start_pos,
+                                                                              remain_bytes);
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = remain_bytes;
                     }
                     else if (remain_bytes == 0)
@@ -3323,7 +3353,7 @@ public class MainActivity extends AppCompatActivity
                     else
                     {
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] =
-                            NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
+                                NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] + incoming_bytes;
                     }
                 }
                 else
@@ -3598,11 +3628,11 @@ public class MainActivity extends AppCompatActivity
         try
         {
             final Message m = orma.selectFromMessage().
-                msg_id_hashEq(message_id_hash_as_hex_string).
-                tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                directionEq(1).
-                readEq(false).
-                toList().get(0);
+                    msg_id_hashEq(message_id_hash_as_hex_string).
+                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    directionEq(1).
+                    readEq(false).
+                    toList().get(0);
 
             if (m != null)
             {
@@ -3615,7 +3645,7 @@ public class MainActivity extends AppCompatActivity
                         try
                         {
                             if (!HelperRelay.is_any_relay(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
+                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
                             {
                                 // only update if the "read receipt" comes from a friend, but not it's relay!
                                 m.raw_msgv2_bytes = "";
@@ -3660,11 +3690,11 @@ public class MainActivity extends AppCompatActivity
         {
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
             final Message m = orma.selectFromMessage().
-                message_idEq(message_id).
-                tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                directionEq(1).
-                orderByIdDesc().
-                toList().get(0);
+                    message_idEq(message_id).
+                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    directionEq(1).
+                    orderByIdDesc().
+                    toList().get(0);
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
 
             // Log.i(TAG, "friend_read_receipt:m=" + m);
@@ -3829,7 +3859,7 @@ public class MainActivity extends AppCompatActivity
                         // now check if this is "potentially" a double message, we can not be sure a 100%
                         // since there is no uniqe key for each message
                         ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds(
-                            real_conference_id, 20);
+                                real_conference_id, 20);
 
                         // Log.i(TAG, "friend_sync_message_v2_cb:last_cm=" + cm);
                         // Log.i(TAG, "friend_sync_message_v2_cb:real_sender_peer_pubkey=" + real_sender_peer_pubkey);
@@ -3850,9 +3880,9 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         HelperGeneric.conference_message_add_from_sync(
-                            HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
-                            real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
-                            (msg_wrapped_sec * 1000) + msg_wrapped_ms);
+                                HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
+                                real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
+                                (msg_wrapped_sec * 1000) + msg_wrapped_ms);
                     }
                     else
                     {
@@ -3883,11 +3913,11 @@ public class MainActivity extends AppCompatActivity
                 // Log.i(TAG, "friend_sync_message_v2_cb:message_id_hash_as_hex_string=" + message_id_hash_as_hex_string +
                 //            " friendpubkey=" + real_sender_as_hex_string);
                 final Message m = orma.selectFromMessage().
-                    msg_id_hashEq(message_id_hash_as_hex_string).
-                    tox_friendpubkeyEq(real_sender_as_hex_string).
-                    directionEq(1).
-                    readEq(false).
-                    toList().get(0);
+                        msg_id_hashEq(message_id_hash_as_hex_string).
+                        tox_friendpubkeyEq(real_sender_as_hex_string).
+                        directionEq(1).
+                        readEq(false).
+                        toList().get(0);
 
                 if (m != null)
                 {
@@ -4053,11 +4083,11 @@ public class MainActivity extends AppCompatActivity
         try
         {
             Filetransfer ft = orma.selectFromFiletransfer().
-                directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
-                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                file_numberEq(file_number).
-                orderByIdDesc().
-                get(0);
+                    directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    file_numberEq(file_number).
+                    orderByIdDesc().
+                    get(0);
 
             if (ft == null)
             {
@@ -4132,12 +4162,12 @@ public class MainActivity extends AppCompatActivity
                         long row_id = orma.insertIntoFileDB(file_);
                         // Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
                         filedb_id = orma.selectFromFileDB().
-                            tox_public_key_stringEq(ft.tox_public_key_string).
-                            and().file_nameEq(ft.file_name).
-                            and().path_nameEq(ft.path_name).
-                            and().directionEq(ft.direction).
-                            and().filesizeEq(ft.filesize).
-                            orderByIdDesc().get(0).id;
+                                tox_public_key_stringEq(ft.tox_public_key_string).
+                                and().file_nameEq(ft.file_name).
+                                and().path_nameEq(ft.path_name).
+                                and().directionEq(ft.direction).
+                                and().filesizeEq(ft.filesize).
+                                orderByIdDesc().get(0).id;
                         // Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
                     }
 
@@ -4311,7 +4341,7 @@ public class MainActivity extends AppCompatActivity
         {
             String filename_corrected = get_incoming_filetransfer_local_filename(filename,
                                                                                  HelperFriend.tox_friend_get_public_key__wrapper(
-                                                                                     friend_number));
+                                                                                         friend_number));
 
             Log.i(TAG, "file_recv:incoming regular file");
             Filetransfer f = new Filetransfer();
@@ -4418,12 +4448,12 @@ public class MainActivity extends AppCompatActivity
         try
         {
             f = orma.selectFromFiletransfer().
-                directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
-                file_numberEq(file_number).
-                and().
-                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                orderByIdDesc().
-                get(0);
+                    directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
+                    file_numberEq(file_number).
+                    and().
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    orderByIdDesc().
+                    get(0);
 
             // Log.i(TAG, "file_recv_chunk:filesize==" + f.filesize);
 
@@ -4435,7 +4465,7 @@ public class MainActivity extends AppCompatActivity
                 if (VFS_ENCRYPT)
                 {
                     info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
-                        f.path_name + "/" + f.file_name);
+                            f.path_name + "/" + f.file_name);
                     info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
                     // Log.i(TAG, "file_recv_chunk:f1=" + f1.getAbsolutePath());
                     // Log.i(TAG, "file_recv_chunk:f2=" + f2.getAbsolutePath());
@@ -4468,7 +4498,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     info.guardianproject.iocipher.FileOutputStream fos = null;
                     fos = cache_ft_fos.get(
-                        HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                     if (f.fos_open)
                     {
@@ -4488,7 +4518,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     java.io.FileOutputStream fos = null;
                     fos = cache_ft_fos_normal.get(
-                        HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                     if (f.fos_open)
                     {
@@ -4524,7 +4554,7 @@ public class MainActivity extends AppCompatActivity
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                        f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
+                            f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
                 }
 
@@ -4593,14 +4623,15 @@ public class MainActivity extends AppCompatActivity
                         fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
                         // Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos.put(
-                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                fos);
                         f.fos_open = true;
                         HelperFiletransfer.update_filetransfer_db_fos_open(f);
                     }
                     else
                     {
                         fos = cache_ft_fos.get(
-                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                         if (fos == null)
                         {
@@ -4608,8 +4639,8 @@ public class MainActivity extends AppCompatActivity
                             // Log.i(TAG,
                             //       "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos.put(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                fos);
+                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                    fos);
                             f.fos_open = true;
                             HelperFiletransfer.update_filetransfer_db_fos_open(f);
                         }
@@ -4629,14 +4660,15 @@ public class MainActivity extends AppCompatActivity
                         fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
                         // Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                         cache_ft_fos_normal.put(
-                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number, fos);
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                fos);
                         f.fos_open = true;
                         HelperFiletransfer.update_filetransfer_db_fos_open(f);
                     }
                     else
                     {
                         fos = cache_ft_fos_normal.get(
-                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
 
                         if (fos == null)
                         {
@@ -4644,8 +4676,8 @@ public class MainActivity extends AppCompatActivity
                             // Log.i(TAG,
                             //      "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
                             cache_ft_fos_normal.put(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                fos);
+                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
+                                    fos);
                             f.fos_open = true;
                             HelperFiletransfer.update_filetransfer_db_fos_open(f);
                         }
@@ -4791,7 +4823,7 @@ public class MainActivity extends AppCompatActivity
         // strip first 3 bytes of cookie to get the conference_id.
         // this is aweful and hardcoded
         String conference_identifier = HelperGeneric.bytes_to_hex(
-            Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
+                Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
         Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
 
         // invite also my ToxProxy -------------
@@ -4837,9 +4869,9 @@ public class MainActivity extends AppCompatActivity
         {
             // TODO: cache me!!
             conf_temp = orma.selectFromConferenceDB().
-                tox_conference_numberEq(conference_number).
-                and().
-                conference_activeEq(true).toList().get(0);
+                    tox_conference_numberEq(conference_number).
+                    and().
+                    conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
         }
         catch (Exception e)
@@ -4975,7 +5007,7 @@ public class MainActivity extends AppCompatActivity
                                 b.setSmallIcon(R.drawable.circle_orange);
                                 b.setLights(Color.parseColor("#ffce00"), 500, 500);
                                 Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                    RingtoneManager.TYPE_NOTIFICATION);
+                                        RingtoneManager.TYPE_NOTIFICATION);
 
                                 if (PREF__notification_sound)
                                 {
@@ -4989,7 +5021,7 @@ public class MainActivity extends AppCompatActivity
                                 }
 
                                 b.setContentTitle(
-                                    context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                        context_s.getString(R.string.MainActivity_notification_new_message_title));
                                 b.setAutoCancel(true);
                                 b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
                                 Notification notification3 = b.build();
@@ -5034,16 +5066,16 @@ public class MainActivity extends AppCompatActivity
                 {
                     // TODO: cache me!!
                     conf_temp2 = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                        and().
-                        conference_activeEq(true).
-                        get(0);
+                            and().
+                            conference_activeEq(true).
+                            get(0);
 
                     if (conf_temp2 != null)
                     {
                         // update it in the Database
                         orma.updateConferenceDB().
-                            conference_identifierEq(conf_temp2.conference_identifier).
-                            name(title).execute();
+                                conference_identifierEq(conf_temp2.conference_identifier).
+                                name(title).execute();
                     }
                 }
                 catch (Exception e)
@@ -5093,9 +5125,9 @@ public class MainActivity extends AppCompatActivity
             {
                 // TODO: cache me!!
                 conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                    and().
-                    conference_activeEq(true).
-                    get(0);
+                        and().
+                        conference_activeEq(true).
+                        get(0);
             }
             catch (Exception e)
             {
@@ -5169,7 +5201,7 @@ public class MainActivity extends AppCompatActivity
                         // Log.i(TAG, "namelist_change_cb:INFO:" + " 001");
 
                         if (conference_message_list_activity.get_current_conf_id().equals(
-                            conf_temp.conference_identifier))
+                                conf_temp.conference_identifier))
                         {
                             String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
                                                                                           peer_number);
@@ -5227,9 +5259,9 @@ public class MainActivity extends AppCompatActivity
             {
                 // TODO: cache me!!
                 conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                    and().
-                    conference_activeEq(true).
-                    get(0);
+                        and().
+                        conference_activeEq(true).
+                        get(0);
             }
             catch (Exception e)
             {
@@ -5245,7 +5277,7 @@ public class MainActivity extends AppCompatActivity
                         // Log.i(TAG, "peer_list_changed_cb:INFO:" + " 001.1");
 
                         if (conference_message_list_activity.get_current_conf_id().equals(
-                            conf_temp.conference_identifier))
+                                conf_temp.conference_identifier))
                         {
                             // Log.i(TAG, "peer_list_changed_cb:INFO:" + " 002.1 " + conference_number);
                             conference_message_list_activity.update_group_all_users();
@@ -5303,9 +5335,9 @@ public class MainActivity extends AppCompatActivity
             {
                 // TODO: cache me!!
                 conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                    and().
-                    conference_activeEq(true).
-                    get(0);
+                        and().
+                        conference_activeEq(true).
+                        get(0);
             }
             catch (Exception e)
             {
@@ -5389,7 +5421,7 @@ public class MainActivity extends AppCompatActivity
                             Log.i(TAG, "namelist_change_cb:INFO:" + " 001.1");
 
                             if (conference_message_list_activity.get_current_conf_id().equals(
-                                conf_temp.conference_identifier))
+                                    conf_temp.conference_identifier))
                             {
                                 String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
                                                                                               peer_number);
@@ -5417,7 +5449,7 @@ public class MainActivity extends AppCompatActivity
                             Log.i(TAG, "namelist_change_cb:INFO:" + " 001");
 
                             if (conference_message_list_activity.get_current_conf_id().equals(
-                                conf_temp.conference_identifier))
+                                    conf_temp.conference_identifier))
                             {
                                 String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
                                                                                               peer_number);
@@ -5463,7 +5495,7 @@ public class MainActivity extends AppCompatActivity
                         if (conference_message_list_activity != null)
                         {
                             if (conference_message_list_activity.get_current_conf_id().equals(
-                                conf_temp.conference_identifier))
+                                    conf_temp.conference_identifier))
                             {
                                 String peer_pubkey_temp2 = tox_conference_peer_get_public_key(conference_number,
                                                                                               peer_number);
@@ -5479,9 +5511,9 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         String name_from_cacheDB = orma.selectFromConferencePeerCacheDB().
-                            conference_identifierEq(conf_temp.conference_identifier).
-                            peer_pubkeyEq(tox_conference_peer_get_public_key(conference_number, peer_number)).
-                            orderByLast_update_timestampAsc().get(0).peer_name;
+                                conference_identifierEq(conf_temp.conference_identifier).
+                                peer_pubkeyEq(tox_conference_peer_get_public_key(conference_number, peer_number)).
+                                orderByLast_update_timestampAsc().get(0).peer_name;
 
                         if (name_from_cacheDB != null)
                         {
@@ -5535,8 +5567,8 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         orma.deleteFromConferencePeerCacheDB().
-                            conference_identifierEq(conf_temp.conference_identifier).
-                            peer_pubkeyEq(pubkey_save).execute();
+                                conference_identifierEq(conf_temp.conference_identifier).
+                                peer_pubkeyEq(pubkey_save).execute();
                         Log.i(TAG, "namelist_change_cb:deleteFromConferencePeerCacheDB");
                     }
                     catch (Exception e)
@@ -5555,7 +5587,7 @@ public class MainActivity extends AppCompatActivity
                                   "namelist_change_cb:selectFromConferencePeerCacheDB().count=" + count_cache_entries);
 
                             for (ConferencePeerCacheDB entry : orma.selectFromConferencePeerCacheDB().offset(0).limit(
-                                50))
+                                    50))
                             {
                                 Log.i(TAG, "namelist_change_cb:delete peer cache entry ID=" + entry.id);
                                 orma.deleteFromConferencePeerCacheDB().idEq(entry.id).execute();
@@ -5637,7 +5669,7 @@ public class MainActivity extends AppCompatActivity
                 String friend_tox_id1 = data.getStringExtra("toxid");
                 String friend_tox_id = "";
                 friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst(
-                    "TOX:", "").replaceFirst("Tox:", "");
+                        "TOX:", "").replaceFirst("Tox:", "");
                 HelperFriend.add_friend_real(friend_tox_id);
             }
             else
@@ -5701,9 +5733,8 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-                    intents.add(
-                        new LabeledIntent(intent, info.activityInfo.packageName, info.loadLabel(getPackageManager()),
-                                          info.icon));
+                    intents.add(new LabeledIntent(intent, info.activityInfo.packageName,
+                                                  info.loadLabel(getPackageManager()), info.icon));
                 }
 
                 try
@@ -5718,15 +5749,15 @@ public class MainActivity extends AppCompatActivity
                     email_app.printStackTrace();
                     Log.i(TAG, "email:" + "Error starting Email App");
                     new AlertDialog.Builder(c).setMessage(
-                        R.string.MainActivity_error_starting_email_app).setPositiveButton(
-                        R.string.MainActivity_button_ok, null).show();
+                            R.string.MainActivity_error_starting_email_app).setPositiveButton(
+                            R.string.MainActivity_button_ok, null).show();
                 }
             }
             else
             {
                 Log.i(TAG, "email:" + "No Email App found");
                 new AlertDialog.Builder(c).setMessage(R.string.MainActivity_no_email_app_found).setPositiveButton(
-                    R.string.MainActivity_button_ok, null).show();
+                        R.string.MainActivity_button_ok, null).show();
             }
         }
         catch (ActivityNotFoundException e)
@@ -5851,7 +5882,7 @@ public class MainActivity extends AppCompatActivity
                                 try
                                 {
                                     info.guardianproject.iocipher.File f_vfs = new info.guardianproject.iocipher.File(
-                                        file_.path_name + "/" + file_.file_name);
+                                            file_.path_name + "/" + file_.file_name);
 
                                     if (f_vfs.exists())
                                     {
@@ -6122,7 +6153,7 @@ public class MainActivity extends AppCompatActivity
                                         try
                                         {
                                             MainActivity.conference_message_list_fragment.adapter.remove_item(
-                                                m_to_delete);
+                                                    m_to_delete);
                                         }
                                         catch (Exception e)
                                         {

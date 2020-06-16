@@ -22,8 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.media.audiofx.EnvironmentalReverb;
-import android.media.audiofx.LoudnessEnhancer;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
@@ -48,7 +46,7 @@ public class AudioReceiver extends Thread
 
     static int sleep_millis = 50; // TODO: hardcoded is bad!!!!
     final static int buffer_multiplier = 4;
-    static int buffer_size = 1920 * buffer_multiplier; // TODO: hardcoded is bad!!!!
+    static int buffer_size = 48000 * 2 * 2 * buffer_multiplier; // TODO: hardcoded is bad!!!!
     AudioTrack track = null;
 
     public AudioReceiver()
@@ -177,7 +175,21 @@ public class AudioReceiver extends Thread
         // use best buffer size for low latency audio play
         if (buffer_size33 > 0)
         {
-            NativeAudio.n_buf_size_in_bytes = buffer_size33 * 5;
+            int factor = 10;
+
+            float got_ms_iteration =
+                    1000.0f / ((float) sampleRate / (((float) (buffer_size33 * 10) / 2.0f) / (float) channels));
+
+            if (got_ms_iteration > 40)
+            {
+                factor = 5;
+            }
+            else if (got_ms_iteration < 20)
+            {
+                factor = 20;
+            }
+
+            NativeAudio.n_buf_size_in_bytes = buffer_size33 * factor;
             Log.i(TAG, "audio_play:read:init min buffer size(4)=" + NativeAudio.n_buf_size_in_bytes);
         }
         else
