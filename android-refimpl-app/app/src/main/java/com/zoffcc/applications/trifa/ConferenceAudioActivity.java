@@ -31,8 +31,10 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -55,6 +57,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
+import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
@@ -146,7 +149,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         else
         {
             getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
 
         super.onCreate(savedInstanceState);
@@ -180,28 +183,28 @@ public class ConferenceAudioActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).
-            color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
+                color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
 
         conference_message_profile_item = new ProfileDrawerItem().
-            withName(getString(R.string.ConferenceAudioActivity_10)). //$NON-NLS-1$
-            withIcon(drawer_header_icon);
+                withName(getString(R.string.ConferenceAudioActivity_10)). //$NON-NLS-1$
+                withIcon(drawer_header_icon);
 
         // Create the AccountHeader
         conference_message_drawer_header = new AccountHeaderBuilder().
-            withActivity(this).
-            withSelectionListEnabledForSingleProfile(false).
-            withTextColor(getResources().getColor(R.color.md_dark_primary_text)).
-            withHeaderBackground(R.color.colorHeader).
-            withCompactStyle(true).
-            addProfiles(conference_message_profile_item).
-            withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
-            {
-                @Override
-                public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                withActivity(this).
+                withSelectionListEnabledForSingleProfile(false).
+                withTextColor(getResources().getColor(R.color.md_dark_primary_text)).
+                withHeaderBackground(R.color.colorHeader).
+                withCompactStyle(true).
+                addProfiles(conference_message_profile_item).
+                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
                 {
-                    return false;
-                }
-            }).build();
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                    {
+                        return false;
+                    }
+                }).build();
 
         //        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).
         //                withIdentifier(1L).
@@ -214,35 +217,35 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         // create the drawer and remember the `Drawer` result object
         conference_message_drawer = new DrawerBuilder().
-            withActivity(this).
-            withAccountHeader(conference_message_drawer_header).
-            withInnerShadow(false).
-            withRootView(R.id.drawer_container).
-            withShowDrawerOnFirstLaunch(false).
-            withActionBarDrawerToggleAnimated(true).
-            withActionBarDrawerToggle(true).
-            withToolbar(toolbar).
-            withTranslucentStatusBar(false).
-            withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-            {
-                @Override
-                public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                withActivity(this).
+                withAccountHeader(conference_message_drawer_header).
+                withInnerShadow(false).
+                withRootView(R.id.drawer_container).
+                withShowDrawerOnFirstLaunch(false).
+                withActionBarDrawerToggleAnimated(true).
+                withActionBarDrawerToggle(true).
+                withToolbar(toolbar).
+                withTranslucentStatusBar(false).
+                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                 {
-                    Log.i(TAG, "drawer:item=" + position); //$NON-NLS-1$
-                    if (position == 1)
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
                     {
-                        // profile
-                        try
+                        Log.i(TAG, "drawer:item=" + position); //$NON-NLS-1$
+                        if (position == 1)
                         {
+                            // profile
+                            try
+                            {
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
+                        return true;
                     }
-                    return true;
-                }
-            }).build();
+                }).build();
 
 
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
@@ -321,7 +324,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     try
                     {
                         SharedPreferences settings_cs2 = PreferenceManager.getDefaultSharedPreferences(
-                            getApplicationContext());
+                                getApplicationContext());
                         settings_cs2.edit().putInt("audio_group_play_volume_percent", //$NON-NLS-1$
                                                    PREF__audio_group_play_volume_percent).apply();
                         Log.i(TAG, "pref:set:PREF__audio_group_play_volume_percent=" + //$NON-NLS-1$
@@ -363,7 +366,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     {
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg_pressed);
                         AudioGroupPushToTalkButton.setText(
-                            getString(R.string.ConferenceAudioActivity_18)); //$NON-NLS-1$
+                                getString(R.string.ConferenceAudioActivity_18)); //$NON-NLS-1$
                         push_to_talk_active = true;
                     }
                     catch (Exception e)
@@ -377,7 +380,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     {
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
                         AudioGroupPushToTalkButton.setText(
-                            getString(R.string.ConferenceAudioActivity_17)); //$NON-NLS-1$
+                                getString(R.string.ConferenceAudioActivity_17)); //$NON-NLS-1$
                         push_to_talk_active = false;
                         update_group_audio_send_icon(0);
                         AudioRecording.global_audio_group_send_res = -999;
@@ -398,14 +401,14 @@ public class ConferenceAudioActivity extends AppCompatActivity
         set_conference_connection_status_icon();
 
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
-            icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-            color(getResources().
-                getColor(R.color.colorPrimaryDark)).
-            sizeDp(80);
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                color(getResources().
+                        getColor(R.color.colorPrimaryDark)).
+                sizeDp(80);
 
         // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
 
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
@@ -468,7 +471,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         group_audio_player_icon = (ImageButton) findViewById(R.id.group_audio_player_icon);
         group_audio_player_icon.setVisibility(View.VISIBLE);
         Drawable d677 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_lock).backgroundColor(
-            Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         group_audio_player_icon.setImageDrawable(d677);
 
         group_audio_player_icon.setOnTouchListener(new View.OnTouchListener()
@@ -561,7 +564,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         else
         {
             getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
 
         try
@@ -690,7 +693,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 {
                     Log.i(TAG, "Group_audio_play_thread:starting ...");
                     int delta = 0;
-                    final int sleep_millis = 60; // 60ms is the maximum that JNI can buffer!
+                    final int sleep_millis = NativeAudio.n_buf_iterate_ms; // "x" ms is what native audio wants
                     int sleep_millis_current = sleep_millis;
                     Group_audio_play_thread_running = true;
                     long d1 = 0;
@@ -717,7 +720,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                         //{
                         //    Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
                         //}
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 330000)); // sleep
+                        Thread.sleep(sleep_millis_current); // sleep
                     }
                 }
                 catch (Exception e)
@@ -866,13 +869,13 @@ public class ConferenceAudioActivity extends AppCompatActivity
         else if (state == 1)
         {
             Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_play_circle_outline).backgroundColor(
-                Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                    Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
             group_audio_send_icon.setImageDrawable(d4);
         }
         else
         {
             Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_report).backgroundColor(
-                Color.TRANSPARENT).color(caa.getResources().getColor(R.color.md_red_800)).sizeDp(80);
+                    Color.TRANSPARENT).color(caa.getResources().getColor(R.color.md_red_800)).sizeDp(80);
             group_audio_send_icon.setImageDrawable(d4);
         }
     }
@@ -897,15 +900,16 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     {
                         Log.i(TAG, "update_group_audio_device_icon:headset"); //$NON-NLS-1$
                         Drawable d4 = new IconicsDrawable(caa).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(
-                            Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                                Color.TRANSPARENT).color(caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(
+                                80);
                         group_audio_device_icon.setImageDrawable(d4);
                     }
                     else if (Callstate.audio_device == 2)
                     {
                         Log.i(TAG, "update_group_audio_device_icon:bluetooth"); //$NON-NLS-1$
                         Drawable d4 = new IconicsDrawable(caa).icon(
-                            GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
-                            caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                                GoogleMaterial.Icon.gmd_bluetooth_audio).backgroundColor(Color.TRANSPARENT).color(
+                                caa.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
                         group_audio_device_icon.setImageDrawable(d4);
                     }
                     else // audio_device == ??
@@ -1090,9 +1094,9 @@ public class ConferenceAudioActivity extends AppCompatActivity
                             if (peer_count > -1)
                             {
                                 ml_maintext.setText(
-                                    f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count + " " +
-                                    getString(R.string.GroupActivityOffline) + " " +
-                                    frozen_peer_count); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                        f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count +
+                                        " " + getString(R.string.GroupActivityOffline) + " " +
+                                        frozen_peer_count); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                             }
                             else
                             {
@@ -1269,7 +1273,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                                         try
                                         {
                                             fl_temp = orma.selectFromFriendList().
-                                                tox_public_key_stringEq(peer_pubkey).toList().get(0);
+                                                    tox_public_key_stringEq(peer_pubkey).toList().get(0);
 
                                             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
                                             {
@@ -1277,8 +1281,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
                                                 try
                                                 {
                                                     f1 = new info.guardianproject.iocipher.File(
-                                                        fl_temp.avatar_pathname + "/" +
-                                                        fl_temp.avatar_filename); //$NON-NLS-1$
+                                                            fl_temp.avatar_pathname + "/" +
+                                                            fl_temp.avatar_filename); //$NON-NLS-1$
                                                     if (f1.length() > 0)
                                                     {
                                                         have_avatar_for_pubkey = true;
@@ -1307,42 +1311,42 @@ public class ConferenceAudioActivity extends AppCompatActivity
                                         {
                                             new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
                                                                                           peer_pubkey).
-                                                withIdentifier(peernum).
-                                                withName(name3).
-                                                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-                                                {
-                                                    @Override
-                                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                    withIdentifier(peernum).
+                                                    withName(name3).
+                                                    withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                                                     {
-                                                        Intent intent = new Intent(view.getContext(),
-                                                                                   ConferencePeerInfoActivity.class);
-                                                        intent.putExtra("peer_pubkey", peer_pubkey); //$NON-NLS-1$
-                                                        intent.putExtra("conf_id", conf_id); //$NON-NLS-1$
-                                                        view.getContext().startActivity(intent);
-                                                        return true;
-                                                    }
-                                                });
+                                                        @Override
+                                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                        {
+                                                            Intent intent = new Intent(view.getContext(),
+                                                                                       ConferencePeerInfoActivity.class);
+                                                            intent.putExtra("peer_pubkey", peer_pubkey); //$NON-NLS-1$
+                                                            intent.putExtra("conf_id", conf_id); //$NON-NLS-1$
+                                                            view.getContext().startActivity(intent);
+                                                            return true;
+                                                        }
+                                                    });
                                         }
                                         catch (Exception e)
                                         {
                                             e.printStackTrace();
                                             new_item = new ConferenceCustomDrawerPeerItem(false, null).
-                                                withIdentifier(peernum).
-                                                withName(name3).
-                                                withIcon(GoogleMaterial.Icon.gmd_face).
-                                                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-                                                {
-                                                    @Override
-                                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                    withIdentifier(peernum).
+                                                    withName(name3).
+                                                    withIcon(GoogleMaterial.Icon.gmd_face).
+                                                    withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                                                     {
-                                                        Intent intent = new Intent(view.getContext(),
-                                                                                   ConferencePeerInfoActivity.class);
-                                                        intent.putExtra("peer_pubkey", peer_pubkey); //$NON-NLS-1$
-                                                        intent.putExtra("conf_id", conf_id); //$NON-NLS-1$
-                                                        view.getContext().startActivity(intent);
-                                                        return true;
-                                                    }
-                                                });
+                                                        @Override
+                                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                        {
+                                                            Intent intent = new Intent(view.getContext(),
+                                                                                       ConferencePeerInfoActivity.class);
+                                                            intent.putExtra("peer_pubkey", peer_pubkey); //$NON-NLS-1$
+                                                            intent.putExtra("conf_id", conf_id); //$NON-NLS-1$
+                                                            view.getContext().startActivity(intent);
+                                                            return true;
+                                                        }
+                                                    });
                                         }
 
                                         // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);

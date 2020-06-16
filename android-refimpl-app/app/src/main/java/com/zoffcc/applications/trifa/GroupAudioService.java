@@ -284,7 +284,7 @@ public class GroupAudioService extends Service
                 {
                     Log.i(TAG, "GAThread:starting ...");
                     int delta = 0;
-                    final int sleep_millis = 60; // 60ms is the maximum that JNI can buffer!
+                    final int sleep_millis = NativeAudio.n_buf_iterate_ms; // "x" ms is what native audio wants
                     int sleep_millis_current = sleep_millis;
                     running = true;
                     long d1 = 0;

@@ -91,42 +91,7 @@ public class AudioReceiver extends Thread
 
                 System.out.println("NativeAudio:[2]sampleRate=" + sampleRate + " channels=" + channels);
 
-                if (1 == 1)
-                {
-
-                    int buffer_size22 = AudioTrack.getMinBufferSize(sampleRate, channels, FORMAT);
-                    Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
-                    Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
-
-                    String sampleRateStr = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
-                    {
-                        sampleRateStr = audio_manager_s.getProperty(
-                            AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE); // in decimal Hz
-                        int sampleRate__ = Integer.parseInt(sampleRateStr);
-                        Log.i(TAG, "audio_play:PROPERTY_OUTPUT_SAMPLE_RATE=" + sampleRate__);
-
-                        String framesPerBuffer = audio_manager_s.getProperty(
-                            AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER); // in decimal PCM frames
-                        int framesPerBufferInt = Integer.parseInt(framesPerBuffer);
-                        Log.i(TAG, "audio_play:PROPERTY_OUTPUT_FRAMES_PER_BUFFER=" + framesPerBufferInt);
-                    }
-                }
-
-                NativeAudio.n_buf_size_in_bytes = (sampleRate * channels * 2) / 10; // = 100ms // (48000*1*2) = 96000;
-
-                for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
-                {
-                    NativeAudio.n_audio_buffer[i] = ByteBuffer.allocateDirect(NativeAudio.n_buf_size_in_bytes);
-                    NativeAudio.n_bytes_in_buffer[i] = 0;
-                    NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer[i], NativeAudio.n_buf_size_in_bytes, i);
-                }
-
-                NativeAudio.n_cur_buf = 0;
-                for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
-                {
-                    NativeAudio.n_bytes_in_buffer[i] = 0;
-                }
+                reinit_audio_play_buffers(sampleRate, channels);
 
                 NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count);
             }
@@ -167,6 +132,79 @@ public class AudioReceiver extends Thread
         NativeAudio.shutdownEngine();
 
         System.out.println("NativeAudio:shutdown");
+    }
+
+    public static void reinit_audio_play_buffers(int sampleRate, int channels)
+    {
+        int channel_config = AudioFormat.CHANNEL_OUT_MONO;
+        if (channels == 2)
+        {
+            channel_config = AudioFormat.CHANNEL_OUT_STEREO;
+
+        }
+        int buffer_size22 = AudioTrack.getMinBufferSize(sampleRate, channel_config, FORMAT);
+        Log.i(TAG, "audio_play:read:init min buffer size(x)=" + buffer_size);
+        Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
+        int buffer_size33 = -1;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
+        {
+            String sampleRateStr = null;
+
+            try
+            {
+                sampleRateStr = audio_manager_s.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE); // in decimal Hz
+                int sampleRate__ = Integer.parseInt(sampleRateStr);
+                Log.i(TAG, "audio_play:PROPERTY_OUTPUT_SAMPLE_RATE=" + sampleRate__);
+
+                String framesPerBuffer = audio_manager_s.getProperty(
+                        AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER); // in decimal PCM frames
+                int framesPerBufferInt = Integer.parseInt(framesPerBuffer);
+                Log.i(TAG, "audio_play:PROPERTY_OUTPUT_FRAMES_PER_BUFFER=" + framesPerBufferInt);
+
+                int buffer_size33_b = (channels * 2) * framesPerBufferInt;
+                if ((buffer_size33_b > 20) && (buffer_size33_b < 10000))
+                {
+                    buffer_size33 = buffer_size33_b;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        // use best buffer size for low latency audio play
+        if (buffer_size33 > 0)
+        {
+            NativeAudio.n_buf_size_in_bytes = buffer_size33 * 5;
+            Log.i(TAG, "audio_play:read:init min buffer size(4)=" + NativeAudio.n_buf_size_in_bytes);
+        }
+        else
+        {
+            // NativeAudio.n_buf_size_in_bytes = buffer_size22;
+            NativeAudio.n_buf_size_in_bytes = (sampleRate * channels * 2) / 10; // = 100ms // (48000*1*2) = 96000;
+            Log.i(TAG, "audio_play:read:init min buffer size(5)=" + NativeAudio.n_buf_size_in_bytes);
+        }
+
+        float interate_ms =
+                1000.0f / ((float) sampleRate / (((float) NativeAudio.n_buf_size_in_bytes / 2.0f) / (float) channels));
+        NativeAudio.n_buf_iterate_ms = (int) interate_ms;
+        Log.i(TAG, "audio_play:read:init:interate_ms=" + interate_ms);
+
+        for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
+        {
+            NativeAudio.n_audio_buffer[i] = ByteBuffer.allocateDirect(NativeAudio.n_buf_size_in_bytes);
+            NativeAudio.n_bytes_in_buffer[i] = 0;
+            NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer[i], NativeAudio.n_buf_size_in_bytes, i);
+        }
+
+        NativeAudio.n_cur_buf = 0;
+        for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
+        {
+            NativeAudio.n_bytes_in_buffer[i] = 0;
+        }
+
     }
 
 }

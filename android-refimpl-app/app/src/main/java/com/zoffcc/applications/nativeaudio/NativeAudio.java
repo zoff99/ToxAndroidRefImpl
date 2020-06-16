@@ -26,6 +26,7 @@ import com.zoffcc.applications.trifa.AudioRecording;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 
+import static com.zoffcc.applications.trifa.AudioReceiver.reinit_audio_play_buffers;
 import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
 import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 
@@ -37,6 +38,7 @@ public class NativeAudio
     public static ByteBuffer[] n_audio_buffer = new ByteBuffer[n_audio_in_buffer_max_count];
     public static int n_cur_buf = 0;
     public static int n_buf_size_in_bytes = 0;
+    public static int n_buf_iterate_ms = 20;
     public static int[] n_bytes_in_buffer = new int[n_audio_in_buffer_max_count];
     public static int sampling_rate = 48000;
     public static int channel_count = 2;
@@ -145,6 +147,9 @@ public class NativeAudio
         }
 
         NativeAudio.createEngine(n_audio_in_buffer_max_count);
+
+        reinit_audio_play_buffers(sampleRate, channels);
+
         NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, n_audio_in_buffer_max_count);
         NativeAudio.createAudioRecorder((int) AudioRecording.SMAPLINGRATE_TOX, n_rec_audio_in_buffer_max_count);
 
