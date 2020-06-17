@@ -2940,6 +2940,14 @@ public class HelperGeneric
                                     {
                                         Callstate.java_video_encoder_delay = (System.currentTimeMillis() -
                                                                               Callstate.java_video_encoder_delay_start_ts);
+
+
+                                        if ((Callstate.java_video_encoder_delay < 3) ||
+                                            (Callstate.java_video_encoder_delay > 300))
+                                        {
+                                            Callstate.java_video_encoder_delay = 120;
+                                        }
+
                                         Callstate.java_video_encoder_delay_set = 1;
                                         Log.i(TAG,
                                               "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms");

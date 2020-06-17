@@ -100,7 +100,7 @@ public class TRIFAGlobals
     static long last_video_frame_received = -1;
     static int count_video_frame_received = 0;
 
-    final static int VIDEO_DECODER_BUFFER_DELAY = 200 + 200; // delay video this many milliseconds
+    final static int VIDEO_DECODER_BUFFER_DELAY = 1; // 200 + 200; // delay video this many milliseconds
 
     final static int VIDEO_ENCODER_MAX_QUANTIZER_LOW = 63;
     final static int VIDEO_ENCODER_MAX_QUANTIZER_MED = 45;

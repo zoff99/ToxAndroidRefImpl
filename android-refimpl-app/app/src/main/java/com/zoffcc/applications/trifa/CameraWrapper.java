@@ -584,6 +584,7 @@ public class CameraWrapper
             data = _data;
             cb = _cb;
             // num = (int) ((Math.random() * 10000f));
+            capture_ts = System.currentTimeMillis();
         }
 
         @Override
@@ -596,8 +597,6 @@ public class CameraWrapper
             catch (Exception e)
             {
             }
-
-            capture_ts = System.currentTimeMillis();
 
             // Log.i(TAG, "doInBackground:start:#" + num);
             try

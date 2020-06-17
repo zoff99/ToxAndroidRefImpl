@@ -61,7 +61,7 @@
         android:title="@string/pref_title_video_cam_resolution" />
 
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="fps_half"
         android:summary="@string/pref_description_fps_half"
         android:title="@string/pref_title_fps_half" />

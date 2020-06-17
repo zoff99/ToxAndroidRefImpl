@@ -77,8 +77,8 @@ public class AudioReceiver extends Thread
         {
             if (PREF__use_native_audio_play)
             {
-                NativeAudio.sampling_rate = 48000;
-                NativeAudio.channel_count = 2;
+                // NativeAudio.sampling_rate = 48000;
+                // NativeAudio.channel_count = 2;
 
                 NativeAudio.createEngine(NativeAudio.n_audio_in_buffer_max_count);
 
@@ -180,7 +180,7 @@ public class AudioReceiver extends Thread
             float got_ms_iteration =
                     1000.0f / ((float) sampleRate / (((float) (buffer_size33 * 10) / 2.0f) / (float) channels));
 
-            if (got_ms_iteration > 40)
+            if (got_ms_iteration > 60)
             {
                 factor = 5;
             }

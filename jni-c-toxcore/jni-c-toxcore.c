@@ -1875,11 +1875,11 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
         videocall_audio_alloc_peer_buffer();
     }
 
-    if (global_videocall_audio_acitve_num == -1)
-    {
-        global_videocall_audio_acitve_num = friend_number;
-    }
-
+    // TODO: check that incoming audio is actually coming from the correct friend!
+    //if (global_videocall_audio_acitve_num == -1)
+    //{
+    global_videocall_audio_acitve_num = friend_number;
+    //}
     global_videocall_audio_sample_rate = sampling_rate;
     global_videocall_audio_channels = channels;
 
@@ -4236,13 +4236,29 @@ int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_outpu
 
             if (num_bufs_ready < 1)
             {
+                // send empty buffer
+                memset((void *)audio_buffer_pcm_2, 0, (size_t)(want_sample_count * 2));
+
+                // dbg(9, "process_incoming_videocall_audio_on_iterate:send:empty:want_sample_count=%d sample_rate=%d want_ms_output=%d channles=%d",
+                //        want_sample_count,
+                //        sample_rate,
+                //        want_ms_output,
+                //        channles);
+
+                android_toxav_callback_audio_receive_frame_cb(
+                    global_videocall_audio_acitve_num,
+                    (size_t)(want_sample_count / global_videocall_audio_channels),
+                    global_videocall_audio_channels,
+                    global_videocall_audio_sample_rate);
+
+                
                 pthread_mutex_unlock(&group_audio___mutex);
                 return (int32_t)(current_time_monotonic_default() - start_time);
             }
 
 
             int16_t *temp_buf = (int16_t *)calloc(1, want_sample_count * 2);
-            // dbg(9, "process_incoming_videocall_audio_on_iterate:want_sample_count=%d sample_rate=%d want_ms_output=%d channles=%d",
+            //dbg(9, "process_incoming_videocall_audio_on_iterate:want_sample_count=%d sample_rate=%d want_ms_output=%d channles=%d",
             //        want_sample_count,
             //        sample_rate,
             //        want_ms_output,
@@ -4252,6 +4268,24 @@ int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_outpu
             {
                 videocall_audio_read_buffer(want_sample_count, temp_buf);
                 memcpy((void *)audio_buffer_pcm_2, (void *)temp_buf, (size_t)(want_sample_count * 2));
+
+                // ------------ change PCM volume here ------------
+                if (want_sample_count > 0)
+                {
+                    if(audio_play_volume_percent_c < 100)
+                    {
+                        if(audio_play_volume_percent_c == 0)
+                        {
+                            change_audio_volume_pcm_null((int16_t *)audio_buffer_pcm_2, (size_t)(want_sample_count * 2));
+                        }
+                        else
+                        {
+                            change_audio_volume_pcm((int16_t *)audio_buffer_pcm_2, (size_t)(want_sample_count));
+                        }
+                    }
+                }
+
+                // ------------ change PCM volume here ------------
 
                 android_toxav_callback_audio_receive_frame_cb(
                     global_videocall_audio_acitve_num,
@@ -4274,134 +4308,89 @@ int process_incoming_group_audio_on_iterate(int delta_new, int want_ms_output)
     int64_t start_time = current_time_monotonic_default();
 
     pthread_mutex_lock(&group_audio___mutex);
-    // dbg(9, "process_incoming_group_audio_on_iterate:START");
 
     if (global_group_audio_acitve_num == -1)
     {
         pthread_mutex_unlock(&group_audio___mutex);
-        // dbg(9, "process_incoming_group_audio_on_iterate:RET:01");
         return (int32_t)(current_time_monotonic_default() - start_time);
     }
 
     int16_t *pcm_mixed = NULL;
-    int need_process_output = 0;
 
-    // const int tolerance_ms = delta_new;
     const int want_sample_count_40ms = (int)(48000*want_ms_output/1000);
-    // int64_t global_group_audio_last_process_incoming_last = 0;
+    int j = 1;
+    int loops = 1;
 
-#if 0
-    if ((global_group_audio_last_process_incoming + (PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS - tolerance_ms)) <= current_time_monotonic_default())
+    if (audio_buffer_pcm_2 == NULL)
     {
-        uint32_t count_ready_buffers = group_audio_any_have_sample_count_in_buffer_count(want_sample_count_40ms);
-        if (count_ready_buffers > 0)
-        {
-            // *** //
-            dbg(9, "process_incoming_group_audio_on_iterate:delta=%d ms", (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming));
-            // delta = (int32_t)(current_time_monotonic_default() - global_group_audio_last_process_incoming) - PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS;
-            // dbg(9, "process_incoming_group_audio_on_iterate:delta2=%d ms", delta);
-            global_group_audio_last_process_incoming_last = global_group_audio_last_process_incoming;
-            global_group_audio_last_process_incoming = current_time_monotonic_default();
-            need_process_output = 2;
-        }
-    }
-    else if (global_group_audio_last_process_incoming == 0)
-    {
-        uint32_t count_ready_buffers = group_audio_any_have_sample_count_in_buffer_count(want_sample_count_40ms);
-        if (count_ready_buffers > 0)
-        {
-            global_group_audio_last_process_incoming = current_time_monotonic_default();
-            need_process_output = 1;
-        }
+        pthread_mutex_unlock(&group_audio___mutex);
+
+        JNIEnv *jnienv2;
+        jnienv2 = jni_getenv();
+        (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                 android_toxav_callback_group_audio_receive_frame_cb_method,
+                                 (jlong)(unsigned long long)global_group_audio_acitve_num,
+                                 (jlong)(unsigned long long)0,
+                                 (jlong)0, (jint)1,
+                                 (jlong)48000
+                                );
+
+        pthread_mutex_lock(&group_audio___mutex);
+
     }
 
-
-#else
-
-    need_process_output = 2;
-
-#endif
-
-
-    if (need_process_output > 0)
+    for(j=0;j < loops;j++)
     {
-        int j = 1;
-        int loops = 1;
-
-#if 0
-        if (need_process_output == 2)
+        if (audio_buffer_pcm_2 != NULL)
         {
-            loops = ((int)(global_group_audio_last_process_incoming - global_group_audio_last_process_incoming_last))
-                         / (int)PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS;
+            pcm_mixed = group_audio_get_mixed_output_buffer(want_sample_count_40ms);
 
-            if (loops > 2)
+            if (pcm_mixed)
             {
-                loops = 2;
-            }
-            else if (loops == 0)
-            {
-                loops = 1;
-            }
-            // *** // dbg(9, "process_incoming_group_audio_on_iterate:loops=%d delta ms=%d", loops, ((int)(global_group_audio_last_process_incoming - global_group_audio_last_process_incoming_last)));
-        }
-#endif
+                // memset((void *)audio_buffer_pcm_2, 0,(size_t)audio_buffer_pcm_2_size);
+                memcpy((void *)audio_buffer_pcm_2, (void *)pcm_mixed, (size_t)(want_sample_count_40ms * 2));
 
-        if (audio_buffer_pcm_2 == NULL)
-        {
-            pthread_mutex_unlock(&group_audio___mutex);
-            // dbg(9, "process_incoming_group_audio_on_iterate:JNI:1:UN");
-            JNIEnv *jnienv2;
-            jnienv2 = jni_getenv();
-            (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-                                     android_toxav_callback_group_audio_receive_frame_cb_method,
-                                     (jlong)(unsigned long long)global_group_audio_acitve_num,
-                                     (jlong)(unsigned long long)0,
-                                     (jlong)want_sample_count_40ms, (jint)1,
-                                     (jlong)48000
-                                    );
-            // dbg(9, "process_incoming_group_audio_on_iterate:JNI:1:LOCK");
-            pthread_mutex_lock(&group_audio___mutex);
+                pthread_mutex_unlock(&group_audio___mutex);
 
-        }
-
-        for(j=0;j < loops;j++)
-        {
-            if (audio_buffer_pcm_2 != NULL)
-            {
-                pcm_mixed = group_audio_get_mixed_output_buffer(want_sample_count_40ms);
-
-                if (pcm_mixed)
-                {
-                    // memset((void *)audio_buffer_pcm_2, 0,(size_t)audio_buffer_pcm_2_size);
-                    memcpy((void *)audio_buffer_pcm_2, (void *)pcm_mixed, (size_t)(want_sample_count_40ms * 1 * 2));
-                    // FFF1
-                    // dbg(9, "FFF1");
-                    // free(pcm_mixed);
-
-                    pthread_mutex_unlock(&group_audio___mutex);
-                    // dbg(9, "process_incoming_group_audio_on_iterate:JNI:2:UN");
-
-                    JNIEnv *jnienv2;
-                    jnienv2 = jni_getenv();
-                    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
-                                             android_toxav_callback_group_audio_receive_frame_cb_method,
-                                             (jlong)(unsigned long long)global_group_audio_acitve_num,
-                                             (jlong)(unsigned long long)0,
-                                             (jlong)want_sample_count_40ms, (jint)1,
-                                             (jlong)48000
-                                            );
-                    // dbg(9, "process_incoming_group_audio_on_iterate:JNI:2:LOCK");
-                    pthread_mutex_lock(&group_audio___mutex);
-                }
+                JNIEnv *jnienv2;
+                jnienv2 = jni_getenv();
+                (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                         android_toxav_callback_group_audio_receive_frame_cb_method,
+                                         (jlong)(unsigned long long)global_group_audio_acitve_num,
+                                         (jlong)(unsigned long long)0,
+                                         (jlong)want_sample_count_40ms, (jint)1,
+                                         (jlong)48000
+                                        );
+                pthread_mutex_lock(&group_audio___mutex);
             }
             else
             {
-                // audio_buffer_pcm_2 still NULL, there must be some problem
+                // send empty buffer
+                memset((void *)audio_buffer_pcm_2, 0,(size_t)audio_buffer_pcm_2_size);
+
+                pthread_mutex_unlock(&group_audio___mutex);
+
+                dbg(9, "process_incoming_group_audio_on_iterate:send_empty_buffer");
+
+
+                JNIEnv *jnienv2;
+                jnienv2 = jni_getenv();
+                (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                         android_toxav_callback_group_audio_receive_frame_cb_method,
+                                         (jlong)(unsigned long long)global_group_audio_acitve_num,
+                                         (jlong)(unsigned long long)0,
+                                         (jlong)want_sample_count_40ms, (jint)1,
+                                         (jlong)48000
+                                        );
+                pthread_mutex_lock(&group_audio___mutex);
             }
+        }
+        else
+        {
+            // audio_buffer_pcm_2 still NULL, there must be some problem
         }
     }
 
-    // dbg(9, "process_incoming_group_audio_on_iterate:END");
     pthread_mutex_unlock(&group_audio___mutex);
 
     return (int32_t)(current_time_monotonic_default() - start_time);

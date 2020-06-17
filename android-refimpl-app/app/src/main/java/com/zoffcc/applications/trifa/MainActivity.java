@@ -197,6 +197,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_C
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_H264;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_VP8;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_NETWORK_ROUND_TRIP_MS;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_PLAY_BUFFER_ENTRIES;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_PLAY_DELAY;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_ACCEPTING_A;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_ACCEPTING_V;
@@ -349,7 +350,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview buffer size!!
     static boolean PREF__set_fps = false;
-    static boolean PREF__fps_half = true;
+    static boolean PREF__fps_half = false;
     static boolean PREF__conference_show_system_messages = false;
     static boolean PREF__X_battery_saving_mode = false;
     static int PREF__X_battery_saving_timeout = 15; // in minutes
@@ -363,7 +364,7 @@ public class MainActivity extends AppCompatActivity
     public static float PREF_mic_gain_factor = 2.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
-    static int FRAME_SIZE_FIXED = 20;
+    static int FRAME_SIZE_FIXED = 40;
     static int PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED; // !! 120 seems to work also !!
     static boolean PREF__X_zoom_incoming_video = false;
     static boolean PREF__use_software_aec = true;
@@ -598,7 +599,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__fps_half = settings.getBoolean("fps_half", true);
+        PREF__fps_half = settings.getBoolean("fps_half", false);
         PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
         PREF__set_fps = settings.getBoolean("set_fps", false);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
@@ -1785,7 +1786,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__fps_half = settings.getBoolean("fps_half", true);
+        PREF__fps_half = settings.getBoolean("fps_half", false);
         PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
         PREF__set_fps = settings.getBoolean("set_fps", false);
         PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
@@ -2903,6 +2904,19 @@ public class MainActivity extends AppCompatActivity
             // Log.i(TAG,
             //      "android_toxav_callback_call_comm_cb_method:TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE:" + comm_number);
         }
+        else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_PLAY_BUFFER_ENTRIES.value)
+        {
+            if (comm_number < 0)
+            {
+            }
+            else if (comm_number > 9900)
+            {
+            }
+            else
+            {
+                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_buffer_entries=:" + comm_number);
+            }
+        }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_NETWORK_ROUND_TRIP_MS.value)
         {
             if (comm_number < 0)
@@ -2916,7 +2930,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 Callstate.round_trip_time = comm_number;
-                // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:round_trip_time=:" + Callstate.round_trip_time);
+                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:round_trip_time=:" + Callstate.round_trip_time);
             }
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_PLAY_DELAY.value)
@@ -2932,7 +2946,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 Callstate.play_delay = comm_number;
-                // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
+                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
             }
         }
 

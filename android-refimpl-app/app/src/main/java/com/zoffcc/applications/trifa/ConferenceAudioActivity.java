@@ -698,6 +698,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     Group_audio_play_thread_running = true;
                     long d1 = 0;
                     long d2 = 0;
+
                     while (Group_audio_play_thread_running)
                     {
                         d1 = SystemClock.uptimeMillis();
@@ -720,7 +721,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                         //{
                         //    Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
                         //}
-                        Thread.sleep(sleep_millis_current); // sleep
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 300)); // sleep
                     }
                 }
                 catch (Exception e)

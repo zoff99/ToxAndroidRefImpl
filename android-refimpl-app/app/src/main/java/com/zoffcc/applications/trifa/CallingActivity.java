@@ -1621,6 +1621,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     Videocall_audio_play_thread_running = true;
                     long d1 = 0;
                     long d2 = 0;
+
                     while (Videocall_audio_play_thread_running)
                     {
                         d1 = SystemClock.uptimeMillis();
@@ -1639,7 +1640,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             sleep_millis_current = sleep_millis + 5;
                         }
 
-                        Thread.sleep(sleep_millis_current); // sleep
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 300)); // sleep
                     }
                 }
                 catch (Exception e)

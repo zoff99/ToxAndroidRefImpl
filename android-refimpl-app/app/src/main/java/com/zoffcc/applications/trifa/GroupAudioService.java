@@ -289,6 +289,7 @@ public class GroupAudioService extends Service
                     running = true;
                     long d1 = 0;
                     long d2 = 0;
+
                     while (running)
                     {
                         d1 = SystemClock.uptimeMillis();
@@ -311,7 +312,7 @@ public class GroupAudioService extends Service
                         //{
                         //    Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
                         //}
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 330000)); // sleep
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 300)); // sleep
                     }
                 }
                 catch (Exception e)
