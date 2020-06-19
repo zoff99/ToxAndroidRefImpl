@@ -251,7 +251,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         setContentView(R.layout.activity_calling);
 
         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        PREF__video_play_delay_ms = settings_cs1.getInt("video_play_delay_ms", 0); //$NON-NLS-1$
+        PREF__video_play_delay_ms = settings_cs1.getInt("video_play_delay_ms2", 0); //$NON-NLS-1$
         Log.i(TAG, "pref:get:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms); //$NON-NLS-1$
         PREF__audio_play_volume_percent = settings_cs1.getInt("audio_play_volume_percent", 100); //$NON-NLS-1$
         Log.i(TAG, "pref:get:PREF__audio_play_volume_percent=" + PREF__audio_play_volume_percent); //$NON-NLS-1$
@@ -513,9 +513,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                 getString(R.string.CallingActivity_24)); //$NON-NLS-1$ //$NON-NLS-2$
                         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
                                 getApplicationContext());
-                        settings_cs1.edit().putInt("video_play_delay_ms",
-                                                   PREF__video_play_delay_ms).apply(); //$NON-NLS-1$
-                        Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms); //$NON-NLS-1$
+                        settings_cs1.edit().putInt("video_play_delay_ms2",
+                                                   PREF__video_play_delay_ms).apply();
+                        Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
 
                         if (PREF__video_play_delay_ms > 490)
                         {
