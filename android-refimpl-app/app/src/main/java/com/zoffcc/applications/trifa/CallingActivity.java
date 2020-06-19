@@ -134,14 +134,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static ImageView audio_device_icon = null;
     static TextView top_text_line = null;
     static CallingActivity ca = null;
-    static String top_text_line_str1 = ""; //$NON-NLS-1$
-    static String top_text_line_str2 = ""; //$NON-NLS-1$
-    static String top_text_line_str3 = ""; //$NON-NLS-1$
-    static String top_text_line_str4 = ""; //$NON-NLS-1$
+    static String top_text_line_str1 = "";
+    static String top_text_line_str2 = "";
+    static String top_text_line_str3 = "";
+    static String top_text_line_str4 = "";
     Handler callactivity_handler = null;
     static Handler callactivity_handler_s = null;
     static boolean trifa_is_MicrophoneMute = false;
-    private static final String TAG = "trifa.CallingActivity"; //$NON-NLS-1$
+    private static final String TAG = "trifa.CallingActivity";
     static CameraSurfacePreview cameraSurfacePreview = null;
     static float mPreviewRate = -1f;
     // static int front_camera_id = -1;
@@ -508,13 +508,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                          ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
                                          PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
+
                         video_add_delay_slider_infotext_01.setText(
                                 getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " " +
-                                getString(R.string.CallingActivity_24)); //$NON-NLS-1$ //$NON-NLS-2$
+                                getString(R.string.CallingActivity_24));
+
                         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
                                 getApplicationContext());
-                        settings_cs1.edit().putInt("video_play_delay_ms2",
-                                                   PREF__video_play_delay_ms).apply();
+
+                        settings_cs1.edit().putInt("video_play_delay_ms2", PREF__video_play_delay_ms).apply();
                         Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
 
                         if (PREF__video_play_delay_ms > 490)
@@ -2524,10 +2526,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                      ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
                                      PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
+
                     video_add_delay_slider_infotext_01.setText(context_s.getString(R.string.
                                                                                            CallingActivity_0) + " " +
-                                                               PREF__video_play_delay_ms + " " + context_s.getString(
-                            R.string.CallingActivity_123)); //$NON-NLS-1$ //$NON-NLS-2$
+                                                               PREF__video_play_delay_ms + " " +
+                                                               context_s.getString(R.string.CallingActivity_123));
                 }
                 catch (Exception e)
                 {
