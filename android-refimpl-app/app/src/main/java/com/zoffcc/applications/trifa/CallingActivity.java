@@ -198,7 +198,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static float slider_alpha = 0.3f;
     static boolean camera_toggle_button_pressed = false;
 
-
     private static MediaCodec.BufferInfo mBufferInfo_h264_decoder;
     private static MediaCodec mDecoder_h264;
     private static MediaFormat video_decoder_h264_format = null;
