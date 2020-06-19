@@ -38,7 +38,7 @@ public class NativeAudio
     public static ByteBuffer[] n_audio_buffer = new ByteBuffer[n_audio_in_buffer_max_count];
     public static int n_cur_buf = 0;
     public static int n_buf_size_in_bytes = 0;
-    public static int n_buf_iterate_ms = 20;
+    public static int n_buf_iterate_ms = 40; // fixed ms interval for audio play (call and groups)
     public static int[] n_bytes_in_buffer = new int[n_audio_in_buffer_max_count];
     public static int sampling_rate = 48000;
     public static int channel_count = 2;

@@ -2292,7 +2292,7 @@ void *thread_audio_av(void *data)
     ToxAV *av = (ToxAV *) data;
     pthread_t id = pthread_self();
     dbg(2, "AV audio Thread #%d: starting", (int) id);
-    long av_iterate_interval = 1;
+    // long av_iterate_interval = 1;
 
     pthread_setname_np(pthread_self(), "t_a_iter()");
 
@@ -2306,7 +2306,7 @@ void *thread_audio_av(void *data)
         toxav_audio_iterate(av);
         delta = (int)(current_time_monotonic_default() - start_time);
         // dbg(9, "AV audio Thread #%d running ...", (int) id);
-        av_iterate_interval = toxav_iteration_interval(av);
+        // av_iterate_interval = toxav_iteration_interval(av);
 
         //usleep((av_iterate_interval / 2) * 1000);
         if(global_av_call_active == 1)

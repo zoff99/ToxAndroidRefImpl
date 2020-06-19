@@ -25,9 +25,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,6 +38,10 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static com.zoffcc.applications.trifa.HelperConference.add_conference_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_files;
@@ -48,6 +49,8 @@ import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_filet
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
@@ -61,12 +64,10 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
-import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_new;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_add_av_groupchat;
-import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
@@ -174,27 +175,27 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         if (fl.notification_silent)
         {
             final Drawable d_notification = new IconicsDrawable(context).
-                icon(GoogleMaterial.Icon.gmd_notifications_off).
-                color(context.getResources().
-                    getColor(R.color.colorPrimaryDark)).
-                alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+                    icon(GoogleMaterial.Icon.gmd_notifications_off).
+                    color(context.getResources().
+                            getColor(R.color.colorPrimaryDark)).
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
         }
         else
         {
             final Drawable d_notification = new IconicsDrawable(context).
-                icon(GoogleMaterial.Icon.gmd_notifications_active).
-                color(context.getResources().
-                    getColor(R.color.colorPrimaryDark)).
-                alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
+                    icon(GoogleMaterial.Icon.gmd_notifications_active).
+                    color(context.getResources().
+                            getColor(R.color.colorPrimaryDark)).
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
         }
 
         final Drawable d_lock = new IconicsDrawable(context).
-            icon(FontAwesome.Icon.faw_lock).color(context.getResources().
-            getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                icon(FontAwesome.Icon.faw_lock).color(context.getResources().
+                getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         textView.setText(fl.name);
         try
@@ -237,20 +238,27 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     if (f1.length() > 0)
                     {
                         // Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + fl.avatar_filename);
-
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
+
+                        //                        GlideApp.
+                        //                                with(avatar.getContext()).
+                        //                                load(new info.guardianproject.iocipher.FileInputStream(f1)).
+                        //                                diskCacheStrategy(DiskCacheStrategy.NONE).
+                        //                                placeholder(d_lock).
+                        //                                priority(Priority.HIGH).
+                        //                                skipMemoryCache(false).
+                        //                                apply(glide_options).
+                        //                                into(avatar);
+
                         GlideApp.
-                            with(avatar.getContext()).
-                            load(f1).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                fl.avatar_update_timestamp)).
-                            placeholder(d_lock).
-                            priority(Priority.HIGH).
-                            skipMemoryCache(false).
-                            apply(glide_options).
-                            into(avatar);
+                                with(avatar.getContext()).
+                                load(f1).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                placeholder(d_lock).
+                                priority(Priority.HIGH).
+                                skipMemoryCache(false).
+                                apply(glide_options).
+                                into(avatar);
 
                         need_create_identicon = false;
                     }
@@ -290,17 +298,17 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                             final RequestOptions glide_options = new RequestOptions().fitCenter();
                             GlideApp.
-                                with(avatar.getContext()).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                    "_avatar_" + new_avatar_pathname + "/" + FRIEND_AVATAR_FILENAME + "_" +
-                                    fl.avatar_update_timestamp)).
-                                placeholder(d_lock).
-                                priority(Priority.HIGH).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(avatar);
+                                    with(avatar.getContext()).
+                                    load(f1).
+                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                    signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                            "_avatar_" + new_avatar_pathname + "/" + FRIEND_AVATAR_FILENAME + "_" +
+                                            fl.avatar_update_timestamp)).
+                                    placeholder(d_lock).
+                                    priority(Priority.HIGH).
+                                    skipMemoryCache(false).
+                                    apply(glide_options).
+                                    into(avatar);
                         }
                         else
                         {
@@ -337,16 +345,16 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
                     final RequestOptions glide_options = new RequestOptions().fitCenter();
                     GlideApp.
-                        with(context).
-                        load(byteArray).
-                        placeholder(d_lock).
-                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                        signature(new com.bumptech.glide.signature.StringSignatureZ(
-                            "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                            fl.avatar_update_timestamp)).
-                        skipMemoryCache(false).
-                        apply(glide_options).
-                        into(avatar);
+                            with(context).
+                            load(byteArray).
+                            placeholder(d_lock).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                    "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                    fl.avatar_update_timestamp)).
+                            skipMemoryCache(false).
+                            apply(glide_options).
+                            into(avatar);
                 }
             }
         }
@@ -444,7 +452,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         try
         {
             int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
-                fl.tox_public_key_string).and().is_newEq(true).count();
+                    fl.tox_public_key_string).and().is_newEq(true).count();
             if (new_messages_count > 0)
             {
                 if (new_messages_count > 300)
@@ -486,14 +494,14 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 {
                     this.friendlist.notification_silent = true;
                     orma.updateFriendList().tox_public_key_stringEq(this.friendlist.tox_public_key_string).
-                        notification_silent(this.friendlist.notification_silent).execute();
+                            notification_silent(this.friendlist.notification_silent).execute();
 
                     final Drawable d_notification = new IconicsDrawable(context).
-                        icon(GoogleMaterial.Icon.gmd_notifications_off).
-                        color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).
-                        alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(
-                        FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+                            icon(GoogleMaterial.Icon.gmd_notifications_off).
+                            color(context.getResources().
+                                    getColor(R.color.colorPrimaryDark)).
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(
+                            FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
                     f_notification.setImageDrawable(d_notification);
 
                     try
@@ -524,13 +532,13 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 {
                     this.friendlist.notification_silent = false;
                     orma.updateFriendList().tox_public_key_stringEq(this.friendlist.tox_public_key_string).
-                        notification_silent(this.friendlist.notification_silent).execute();
+                            notification_silent(this.friendlist.notification_silent).execute();
 
                     final Drawable d_notification = new IconicsDrawable(context).
-                        icon(GoogleMaterial.Icon.gmd_notifications_active).
-                        color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).
-                        alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
+                            icon(GoogleMaterial.Icon.gmd_notifications_active).
+                            color(context.getResources().
+                                    getColor(R.color.colorPrimaryDark)).
+                            alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
                     f_notification.setImageDrawable(d_notification);
 
                     try
