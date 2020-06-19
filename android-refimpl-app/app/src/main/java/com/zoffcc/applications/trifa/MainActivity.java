@@ -2914,7 +2914,7 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_buffer_entries=:" + comm_number);
+                // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_buffer_entries=:" + comm_number);
             }
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_NETWORK_ROUND_TRIP_MS.value)
@@ -2930,7 +2930,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 Callstate.round_trip_time = comm_number;
-                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:round_trip_time=:" + Callstate.round_trip_time);
+                // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:round_trip_time=:" + Callstate.round_trip_time);
             }
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_PLAY_DELAY.value)
@@ -2946,7 +2946,7 @@ public class MainActivity extends AppCompatActivity
             else
             {
                 Callstate.play_delay = comm_number;
-                Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
+                // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_delay=:" + Callstate.play_delay);
             }
         }
 
