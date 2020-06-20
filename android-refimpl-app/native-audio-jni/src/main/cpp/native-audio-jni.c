@@ -1381,19 +1381,16 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
 
     player_state_current = _STOPPED;
 
-    SLAndroidSimpleBufferQueueState state;
-    (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "player_state:real_buffer_count(before clear)=%d",
-                        state.count);
-
     if (bqPlayerBufferQueue != NULL)
     {
+        SLAndroidSimpleBufferQueueState state;
+        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "player_state:real_buffer_count(before clear)=%d",
+                            state.count);
+
         (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
     }
-
-    (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "player_state:real_buffer_count(after clear)=%d",
-                        state.count);
 
     if (play_buffer_queued_count_mutex_valid == 1)
     {
