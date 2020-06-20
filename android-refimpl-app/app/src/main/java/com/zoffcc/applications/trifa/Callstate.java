@@ -62,6 +62,7 @@ public class Callstate
     static int java_video_encoder_delay_set = 0;
     static int delay_add = 0;
     static long round_trip_time = 0;
+    static int play_buffer_entries = 0;
     static boolean audio_group_active = false;
 
     static void reset_values()
@@ -95,6 +96,7 @@ public class Callstate
         Callstate.java_video_encoder_delay_start_ts = 0;
         Callstate.delay_add = 0;
         Callstate.round_trip_time = 0;
+        Callstate.play_buffer_entries = 0;
         Callstate.audio_group_active = false;
         MainActivity.set_av_call_status(Callstate.state);
     }

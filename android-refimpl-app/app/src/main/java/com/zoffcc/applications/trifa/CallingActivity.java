@@ -102,7 +102,6 @@ import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.DECODER_VIDEO_ADD_DELAY_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRATE_HIGH;
@@ -251,7 +250,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         setContentView(R.layout.activity_calling);
 
         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        PREF__video_play_delay_ms = settings_cs1.getInt("video_play_delay_ms2", 0); //$NON-NLS-1$
+        PREF__video_play_delay_ms = settings_cs1.getInt("video_play_delay_ms3", 100); //$NON-NLS-1$
         Log.i(TAG, "pref:get:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms); //$NON-NLS-1$
         PREF__audio_play_volume_percent = settings_cs1.getInt("audio_play_volume_percent", 100); //$NON-NLS-1$
         Log.i(TAG, "pref:get:PREF__audio_play_volume_percent=" + PREF__audio_play_volume_percent); //$NON-NLS-1$
@@ -505,9 +504,23 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     try
                     {
                         PREF__video_play_delay_ms = progress_value * 3;
-                        toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                         ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
-                                         PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
+                        //toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                        //                 ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
+                        //                 PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
+
+                        try
+                        {
+                            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value,
+                                                       PREF__video_play_delay_ms);
+                            Log.i(TAG, "decoder buffer set to ms=" + TRIFAGlobals.VIDEO_DECODER_BUFFER_DELAY + ":res=" +
+                                       res);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "TOXAV_DECODER_VIDEO_BUFFER_MS:EE:" + e.getMessage());
+                        }
 
                         video_add_delay_slider_infotext_01.setText(
                                 getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " " +
@@ -516,7 +529,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
                                 getApplicationContext());
 
-                        settings_cs1.edit().putInt("video_play_delay_ms2", PREF__video_play_delay_ms).apply();
+                        settings_cs1.edit().putInt("video_play_delay_ms3", PREF__video_play_delay_ms).apply();
                         Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
 
                         if (PREF__video_play_delay_ms > 490)
@@ -2523,9 +2536,23 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
-                    toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
-                                     PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
+                    //toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                    //                 ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
+                    //                 PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
+
+                    try
+                    {
+                        int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                   ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value,
+                                                   PREF__video_play_delay_ms);
+                        Log.i(TAG,
+                              "decoder buffer set to ms=" + TRIFAGlobals.VIDEO_DECODER_BUFFER_DELAY + ":res=" + res);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "TOXAV_DECODER_VIDEO_BUFFER_MS:EE:" + e.getMessage());
+                    }
 
                     video_add_delay_slider_infotext_01.setText(context_s.getString(R.string.
                                                                                            CallingActivity_0) + " " +

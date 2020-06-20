@@ -1465,7 +1465,7 @@ public class HelperGeneric
                             {
                                 CallingActivity.top_text_line.setText(
                                         Callstate.friend_alias_name + " " + Callstate.round_trip_time + "/" +
-                                        Callstate.play_delay + "/" + Callstate.java_video_play_delay);
+                                        Callstate.play_delay + "/" + Callstate.play_buffer_entries);
                             }
                             catch (Exception e)
                             {

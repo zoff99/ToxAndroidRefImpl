@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity
     static String PREF__camera_get_preview_format = "YV12"; // "YV12"; // "NV21";
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
-    static int PREF__video_play_delay_ms = 0;
+    static int PREF__video_play_delay_ms = 100;
     static int PREF__audio_group_play_volume_percent = 100;
     static boolean PREF__auto_accept_image = true;
     static boolean PREF__auto_accept_video = false;
@@ -2908,12 +2908,15 @@ public class MainActivity extends AppCompatActivity
         {
             if (comm_number < 0)
             {
+                Callstate.play_buffer_entries = 0;
             }
             else if (comm_number > 9900)
             {
+                Callstate.play_buffer_entries = 99;
             }
             else
             {
+                Callstate.play_buffer_entries = (int) comm_number;
                 // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:play_buffer_entries=:" + comm_number);
             }
         }
