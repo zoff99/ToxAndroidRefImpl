@@ -1242,57 +1242,54 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
         result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
         result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
 
-        // enque the buffer
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:1:Enqueue -> %d",
-                            rec_buf_pointer_next);
-        result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer, nextSize);
-        if (SL_RESULT_SUCCESS != result)
-        {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:02:result=%d",
-                                (int) result);
-            return -2;
-        }
+        // enqueue buffers ----------------
+        SLAndroidSimpleBufferQueueState state;
+        result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer,
+                                (SLuint32) nextSize);
+
+        (*recorderBufferQueue)->GetState(recorderBufferQueue, &state);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "bqRecorderCallback:Enqueue:more_buffers:%d", state.count);
 
         rec_buf_pointer_next++;
+        if (rec_buf_pointer_next >= num_rec_bufs)
+        {
+            rec_buf_pointer_next = 0;
+        }
+
+        rec_buf_pointer_start++;
+        if (rec_buf_pointer_start >= num_rec_bufs)
+        {
+            rec_buf_pointer_start = 0;
+        }
+        // enqueue buffers ----------------
+
+        // enqueue buffers ----------------
+        result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer,
+                                                 (SLuint32) nextSize);
+        (*recorderBufferQueue)->GetState(recorderBufferQueue, &state);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "bqRecorderCallback:Enqueue:more_buffers:%d", state.count);
+
+        rec_buf_pointer_next++;
+        if (rec_buf_pointer_next >= num_rec_bufs)
+        {
+            rec_buf_pointer_next = 0;
+        }
+
+        rec_buf_pointer_start++;
+        if (rec_buf_pointer_start >= num_rec_bufs)
+        {
+            rec_buf_pointer_start = 0;
+        }
+        // enqueue buffers ----------------
 
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "StartREC:A003:ENQU-01:max_num_bufs=%d,bs=%d,bn=%d",
                             (int) num_rec_bufs, (int) rec_buf_pointer_start,
                             (int) rec_buf_pointer_next);
 
-#if 0
-        if (num_rec_bufs > 1)
-        {
-            int jj = 1;
-            for (jj = 1; jj < (num_rec_bufs - 1); jj++)
-            {
 
-                nextBuffer = (short *) audio_rec_buffer[rec_buf_pointer_next];
-                nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
-
-                if (nextSize > 0)
-                {
-                    // enque the buffer
-                    result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer,
-                                                             nextSize);
-                    if (SL_RESULT_SUCCESS != result)
-                    {
-                        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:07:result=%d",
-                                            (int) result);
-                    }
-
-                    rec_buf_pointer_next++;
-
-                    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                        "StartREC:A003:ENQU-02:max_num_bufs=%d,bs=%d,bn=%d,jj=%d",
-                                        (int) num_rec_bufs, (int) rec_buf_pointer_start,
-                                        (int) rec_buf_pointer_next,
-                                        (int) jj);
-
-                }
-            }
-        }
-#endif
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:SET:002:_RECORDING");
         rec_state = _RECORDING;
 
