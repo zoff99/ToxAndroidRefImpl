@@ -506,7 +506,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        PREF__video_play_delay_ms = progress_value * 3;
+                        PREF__video_play_delay_ms = progress_value * 5;
                         //toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                         //                 ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
                         //                 PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
@@ -2571,11 +2571,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                     {
-                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 3), true);
+                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 5), true);
                     }
                     else
                     {
-                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 3));
+                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 5));
                     }
                 }
                 catch (Exception ee)
