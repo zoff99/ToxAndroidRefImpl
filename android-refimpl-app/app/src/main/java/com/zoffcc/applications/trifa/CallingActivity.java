@@ -1637,13 +1637,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     Videocall_audio_play_thread_running = true;
                     long d1 = 0;
                     long d2 = 0;
+                    int res = 0;
 
                     while (Videocall_audio_play_thread_running)
                     {
                         d1 = SystemClock.uptimeMillis();
 
-                        MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
-                                                                 NativeAudio.sampling_rate);
+                        res = MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
+                                                                       NativeAudio.sampling_rate, 0);
+                        if (res == -1)
+                        {
+                            Thread.sleep(5);
+                            MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
+                                                                     NativeAudio.sampling_rate, 1);
+                        }
+
                         delta = (int) (SystemClock.uptimeMillis() - d1);
 
                         sleep_millis_current = sleep_millis - delta;

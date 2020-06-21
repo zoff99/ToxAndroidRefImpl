@@ -2240,7 +2240,7 @@ public class MainActivity extends AppCompatActivity
     // ----------- TRIfA internal -----------
     public static native int jni_iterate_group_audio(int delta_new, int want_ms_output);
 
-    public static native int jni_iterate_videocall_audio(int delta_new, int want_ms_output, int channels, int sample_rate);
+    public static native int jni_iterate_videocall_audio(int delta_new, int want_ms_output, int channels, int sample_rate, int send_emtpy_buffer);
     // ----------- TRIfA internal -----------
 
     public static native long tox_kill();
