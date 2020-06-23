@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall \
+add_subdirectory(filter_audio)
+
+set(CMAKE_C_FLAGS1 "${CMAKE_C_FLAGS} -Wall \
 -Wextra \
 -Weverything \
 -Wno-cast-align \
@@ -32,13 +34,17 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall \
 -Werror \
 ")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -fPIC")
+set(CMAKE_C_FLAGS2 "${CMAKE_C_FLAGS} -Wall")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS1} -std=c99 -fPIC")
 
 add_library(native-audio-jni SHARED
-            native-audio-jni.c)
+        native-audio-jni.c
+        )
 
 # Include libraries needed for native-audio-jni lib
 target_link_libraries(native-audio-jni
-                      android
-                      log
-                      OpenSLES)
+        android
+        filter_audio
+        log
+        OpenSLES)

@@ -41,12 +41,14 @@
  */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <assert.h>
 #include <jni.h>
 #include <string.h>
 #include <pthread.h>
 #include <math.h>
-
+#include <sys/types.h>
+#include <stdbool.h>
 
 // ------------------
 // com.zoffcc.applications.trifa W/libOpenSLES: Leaving BufferQueue::Enqueue (SL_RESULT_BUFFER_INSUFFICIENT)
@@ -60,9 +62,12 @@
 #include <SLES/OpenSLES_Android.h>
 
 // for native asset manager
-#include <sys/types.h>
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
+
+
+// filter_audio lib for software AEC
+#include "filter_audio/filter_audio.h"
 
 /*---------------------------------------------------------------------------*/
 /* Android AudioPlayer and AudioRecorder configuration                       */
@@ -126,6 +131,9 @@ int player_state_current = _STOPPED;
 pthread_mutex_t play_buffer_queued_count_mutex;
 int play_buffer_queued_count_mutex_valid = 0;
 
+Filter_Audio *filteraudio = NULL;
+bool filteraudio_used = false;
+
 uint8_t *audio_rec_buffer[20];
 long audio_rec_buffer_size[20];
 int rec_buf_pointer_start = 0;
@@ -185,6 +193,12 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_isRecording(JNIEnv *en
 jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopREC(JNIEnv *env, jclass clazz);
 
 float audio_vu(const int16_t *pcm_data, uint32_t sample_count);
+
+void start_filter_audio(uint32_t in_samplerate);
+
+void stop_filter_audio();
+
+void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms);
 // ----- function defs ------
 
 
@@ -320,6 +334,17 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         // signal Java code that a new record data is available in buffer #cur_rec_buf
         if ((NativeAudio_class) && (rec_buffer_ready_method) && (rec_state == _RECORDING))
         {
+            if (filteraudio_used)
+            {
+                filter_audio(filteraudio,
+                             (int16_t *) audio_rec_buffer[rec_buf_pointer_start],
+                             (unsigned int) (
+                                     audio_rec_buffer_size[rec_buf_pointer_start] /
+                                     2));
+
+                // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:AEC:res=%d", res_filter);
+            }
+
             // TODO: make this better? faster?
             // --------------------------------------------------
             // increase GAIN manually and rather slow:
@@ -764,6 +789,17 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
+    if ((channels == 1) && (sampleRate == 48000))
+    {
+        filteraudio_used = true;
+        start_filter_audio(sampleRate);
+        set_delay_ms_filter_audio(80, 40);
+    }
+    else
+    {
+        filteraudio_used = false;
+    }
+
     player_state_current = _STOPPED;
     playing_state = _STOPPED;
 }
@@ -1068,6 +1104,12 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         }
         else
         {
+            if (filteraudio_used)
+            {
+                pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
+                                  (unsigned int) (nextSize / 2));
+            }
+
             pthread_mutex_lock(&play_buffer_queued_count_mutex);
             audio_play_buffers_in_queue++;
             pthread_mutex_unlock(&play_buffer_queued_count_mutex);
@@ -1245,7 +1287,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
         // enqueue buffers ----------------
         SLAndroidSimpleBufferQueueState state;
         result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer,
-                                (SLuint32) nextSize);
+                                                 (SLuint32) nextSize);
 
         (*recorderBufferQueue)->GetState(recorderBufferQueue, &state);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
@@ -1357,6 +1399,12 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
 {
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "shutdownEngine");
 
+    if (filteraudio_used)
+    {
+        stop_filter_audio();
+        filteraudio_used = false;
+    }
+
     playing_state = _SHUTDOWN;
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:SET:002:_SHUTDOWN");
     rec_state = _SHUTDOWN;
@@ -1461,4 +1509,57 @@ jfloat Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1vu_1in(JNIEnv *
 jfloat Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1vu_1out(JNIEnv *env, jclass clazz)
 {
     return (jfloat) audio_out_vu_value;
+}
+
+void start_filter_audio(uint32_t in_samplerate)
+{
+    /* Prepare filter_audio */
+    filteraudio = new_filter_audio(in_samplerate);
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "filter_audio: prepare. samplerate=%d",
+                        (int) in_samplerate);
+
+    if (filteraudio != NULL)
+    {
+        /* Enable/disable filters. 1 to enable, 0 to disable. */
+        int echo_ = 1;
+        int noise_ = 0;
+        int gain_ = 0;
+        int vad_ = 0;
+        enable_disable_filters(filteraudio, echo_, noise_, gain_, vad_);
+    }
+}
+
+void stop_filter_audio()
+{
+    /* Shutdown filter_audio */
+    if (filteraudio != NULL)
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "filter_audio: shutdown");
+        kill_filter_audio(filteraudio);
+        filteraudio = NULL;
+    }
+}
+
+void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms)
+{
+    /* It's essential that echo delay is set correctly; it's the most important part of the
+     * echo cancellation process. If the delay is not set to the acceptable values the AEC
+     * will not be able to recover. Given that it's not that easy to figure out the exact
+     * time it takes for a signal to get from Output to the Input, setting it to suggested
+     * input device latency + frame duration works really good and gives the filter ability
+     * to adjust it internally after some time (usually up to 6-7 seconds in my tests when
+     * the error is about 20%).
+     */
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "filter_audio: set delay in ms=%d",
+                        (int) (input_latency_ms + frame_duration_ms));
+
+    if (filteraudio)
+    {
+        set_echo_delay_ms(filteraudio, (input_latency_ms + frame_duration_ms));
+    }
+
 }
