@@ -349,7 +349,7 @@ uint32_t videocall_audio_get_samples_in_buffer();
 uint32_t videocall_audio_any_have_sample_count_in_buffer_count(uint32_t sample_count);
 void videocall_audio_add_buffer(const int16_t *pcm, uint32_t num_samples);
 void videocall_audio_read_buffer(uint32_t num_samples, int16_t *ret_buffer);
-int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_output, int channles, int sample_rate);
+int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_output, int channles, int sample_rate, int send_empty_buffer);
 
 int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, uint32_t sampling_rate, uint32_t *sample_count_new);
 void group_audio_alloc_peer_buffer(uint32_t global_group_audio_acitve_number);
@@ -2835,9 +2835,9 @@ jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1group_1audio(
     return (jint)process_incoming_group_audio_on_iterate(delta_new, want_ms_output);
 }
 
-jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1videocall_1audio(JNIEnv *env, jobject thiz, jint delta_new, jint want_ms_output, jint channels, jint sample_rate)
+jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1videocall_1audio(JNIEnv *env, jobject thiz, jint delta_new, jint want_ms_output, jint channels, jint sample_rate, jint send_empty_buffer)
 {
-    return (jint)process_incoming_videocall_audio_on_iterate(delta_new, want_ms_output, channels, sample_rate);
+    return (jint)process_incoming_videocall_audio_on_iterate(delta_new, want_ms_output, channels, sample_rate, send_empty_buffer);
 }
 
 JNIEXPORT void JNICALL
@@ -4210,10 +4210,9 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
     pthread_mutex_unlock(&group_audio___mutex);
 }
 
-int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_output, int channles, int sample_rate)
+int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_output, int channles, int sample_rate,
+                                                int send_empty_buffer)
 {
-    int64_t start_time = current_time_monotonic_default();
-
     pthread_mutex_lock(&group_audio___mutex);
 
     if (audio_buffer_pcm_2 == NULL)
@@ -4236,28 +4235,31 @@ int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_outpu
 
             if (num_bufs_ready < 1)
             {
-                // send empty buffer
-                memset((void *)audio_buffer_pcm_2, 0, (size_t)(want_sample_count * 2));
+                if (send_empty_buffer == 1)
+                {
+                    // send empty buffer
+                    memset((void *)audio_buffer_pcm_2, 0, (size_t)(want_sample_count * 2));
 
-                // dbg(9, "process_incoming_videocall_audio_on_iterate:send:empty:want_sample_count=%d sample_rate=%d want_ms_output=%d channles=%d",
-                //        want_sample_count,
-                //        sample_rate,
-                //        want_ms_output,
-                //        channles);
+                    // dbg(9, "process_incoming_videocall_audio_on_iterate:send:empty:want_sample_count=%d sample_rate=%d want_ms_output=%d channles=%d",
+                    //        want_sample_count,
+                    //        sample_rate,
+                    //        want_ms_output,
+                    //        channles);
 
-                android_toxav_callback_audio_receive_frame_cb(
-                    global_videocall_audio_acitve_num,
-                    (size_t)(want_sample_count / global_videocall_audio_channels),
-                    global_videocall_audio_channels,
-                    global_videocall_audio_sample_rate);
-
-                
+                    android_toxav_callback_audio_receive_frame_cb(
+                        global_videocall_audio_acitve_num,
+                        (size_t)(want_sample_count / global_videocall_audio_channels),
+                        global_videocall_audio_channels,
+                        global_videocall_audio_sample_rate);
+                }
                 pthread_mutex_unlock(&group_audio___mutex);
-                return (int32_t)(current_time_monotonic_default() - start_time);
+                return -1;
             }
 
 
-            int16_t *temp_buf = (int16_t *)calloc(1, want_sample_count * 2);
+            int16_t *temp_buf = global___audio_group_temp_buf; // (int16_t *)calloc(1, buf_size * 2);
+            // int16_t *temp_buf = (int16_t *)calloc(1, want_sample_count * 2);
+
             //dbg(9, "process_incoming_videocall_audio_on_iterate:want_sample_count=%d sample_rate=%d want_ms_output=%d channles=%d",
             //        want_sample_count,
             //        sample_rate,
@@ -4293,14 +4295,14 @@ int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_outpu
                     global_videocall_audio_channels,
                     global_videocall_audio_sample_rate);
 
-                free(temp_buf);
+                // free(temp_buf);
             }
         }
     }
 
     pthread_mutex_unlock(&group_audio___mutex);
 
-    return (int32_t)(current_time_monotonic_default() - start_time);
+    return 0;
 }
 
 int process_incoming_group_audio_on_iterate(int delta_new, int want_ms_output)
@@ -5533,7 +5535,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
         if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
         {
-            yieldcpu(1); // sleep 1 ms
             res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
                                               (uint8_t)channels, (uint32_t)sampling_rate, &error);
 
@@ -5542,6 +5543,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
                 yieldcpu(1); // sleep 1 ms
                 res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
                                                   (uint8_t)channels, (uint32_t)sampling_rate, &error);
+
+                if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+                {
+                    res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
+                                                      (uint8_t)channels, (uint32_t)sampling_rate, &error);
+                }
+
             }
         }
 
