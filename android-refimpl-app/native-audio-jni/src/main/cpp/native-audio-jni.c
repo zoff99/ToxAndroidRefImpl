@@ -69,6 +69,11 @@
 // filter_audio lib for software AEC
 #include "filter_audio/filter_audio.h"
 
+#ifdef WEBRTC_AEC
+// webrtc lib for software AEC
+#include "webrtc/echo_control_mobile.h"
+#endif
+
 /*---------------------------------------------------------------------------*/
 /* Android AudioPlayer and AudioRecorder configuration                       */
 /*---------------------------------------------------------------------------*/
@@ -131,8 +136,14 @@ int player_state_current = _STOPPED;
 pthread_mutex_t play_buffer_queued_count_mutex;
 int play_buffer_queued_count_mutex_valid = 0;
 
+// --------- AEC ---------
 Filter_Audio *filteraudio = NULL;
 bool filteraudio_used = false;
+// --------- AEC ---------
+#ifdef WEBRTC_AEC
+void *webrtc_aecmInst = NULL;
+#endif
+// --------- AEC ---------
 
 uint8_t *audio_rec_buffer[20];
 long audio_rec_buffer_size[20];
@@ -792,8 +803,18 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     if ((channels == 1) && (sampleRate == 48000))
     {
         filteraudio_used = true;
+        // filteraudio
         start_filter_audio(sampleRate);
         set_delay_ms_filter_audio(80, 40);
+#ifdef WEBRTC_AEC
+        // webrtc
+        WebRtcAecm_Create(&webrtc_aecmInst);
+        WebRtcAecm_Init(webrtc_aecmInst, sampleRate);
+        AecmConfig config;
+        config.echoMode = AecmTrue;
+        config.cngMode = 3;
+        WebRtcAecm_set_config(webrtc_aecmInst, config);
+#endif
     }
     else
     {
@@ -1401,7 +1422,13 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
 
     if (filteraudio_used)
     {
+        // filteraudio
         stop_filter_audio();
+        // webrtc
+#ifdef WEBRTC_AEC
+        WebRtcAecm_Free(webrtc_aecmInst);
+        webrtc_aecmInst = NULL;
+#endif
         filteraudio_used = false;
     }
 

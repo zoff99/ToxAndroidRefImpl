@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 add_subdirectory(filter_audio)
+add_subdirectory(webrtc)
 
 set(CMAKE_C_FLAGS1 "${CMAKE_C_FLAGS} -Wall \
 -Wextra \
@@ -48,3 +49,5 @@ target_link_libraries(native-audio-jni
         filter_audio
         log
         OpenSLES)
+
+# webrtc
