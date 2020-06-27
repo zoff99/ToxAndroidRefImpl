@@ -135,6 +135,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_action
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_view_including_cam_preview;
+import static com.zoffcc.applications.trifa.CallingActivity.update_calling_friend_connection_status;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.GroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
@@ -3620,6 +3621,18 @@ public class MainActivity extends AppCompatActivity
                 f.TOX_CONNECTION_real = a_TOX_CONNECTION;
                 f.TOX_CONNECTION_on_off_real = HelperGeneric.get_toxconnection_wrapper(f.TOX_CONNECTION);
                 HelperFriend.update_friend_in_db_connection_status_real(f);
+            }
+
+            // update connection status bar color on calling activity
+            if (friend_number == tox_friend_by_public_key__wrapper(Callstate.friend_pubkey))
+            {
+                try
+                {
+                    update_calling_friend_connection_status(a_TOX_CONNECTION);
+                }
+                catch(Exception e)
+                {
+                }
             }
         }
     }

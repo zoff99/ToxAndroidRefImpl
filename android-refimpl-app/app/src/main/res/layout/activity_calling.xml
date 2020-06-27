@@ -31,6 +31,17 @@
                 android:layout_marginTop="0dp"
                 android:background="@android:color/black" />
 
+            <LinearLayout
+                android:id="@+id/calling_friend_online_status"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginLeft="0dp"
+                android:elevation="25dp"
+                android:background="#04b431"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/top_text_line"
                 android:layout_width="match_parent"

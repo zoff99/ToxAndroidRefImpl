@@ -100,6 +100,7 @@ import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -133,6 +134,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static ImageButton mute_button = null;
     ImageButton misc_button = null;
     TextView misc_button_pad = null;
+    static View calling_friend_online_status = null;
     static ImageView audio_device_icon = null;
     static TextView top_text_line = null;
     static CallingActivity ca = null;
@@ -267,6 +269,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
         misc_button = (ImageButton) findViewById(R.id.misc_button);
         misc_button_pad = (TextView) findViewById(R.id.misc_button_pad);
+        calling_friend_online_status = (View) findViewById(R.id.calling_friend_online_status);
+
+        int conn_status = tox_friend_get_connection_status(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
+        if (conn_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_UDP.value)
+        {
+            calling_friend_online_status.setBackgroundColor(Color.parseColor("#04b431"));
+        }
+        else if (conn_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value)
+        {
+            calling_friend_online_status.setBackgroundColor(Color.parseColor("#ffce00"));
+        }
+        else
+        {
+            calling_friend_online_status.setBackgroundColor(Color.parseColor("#ff0000"));
+        }
 
         audio_bar_in_v = (BarLevelDrawable) findViewById(R.id.audio_bar_in_v);
         audio_bar_out_v = (BarLevelDrawable) findViewById(R.id.audio_bar_out_v);
@@ -1322,6 +1339,36 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         // Log.i(TAG, "update_top_text_line(1):top_text_line_str3=" + top_text_line_str3);
         update_top_text_line(top_text_line_str3, 3);
+    }
+
+    synchronized public static void update_calling_friend_connection_status(final int conn_status)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (conn_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_UDP.value)
+                    {
+                        calling_friend_online_status.setBackgroundColor(Color.parseColor("#04b431"));
+                    }
+                    else if (conn_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value)
+                    {
+                        calling_friend_online_status.setBackgroundColor(Color.parseColor("#ffce00"));
+                    }
+                    else
+                    {
+                        calling_friend_online_status.setBackgroundColor(Color.parseColor("#ff0000"));
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+        callactivity_handler_s.post(myRunnable);
     }
 
     synchronized public static void update_top_text_line(String text2, int linenum)
