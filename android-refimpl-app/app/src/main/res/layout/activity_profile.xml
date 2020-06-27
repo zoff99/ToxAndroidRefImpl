@@ -84,7 +84,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="20dp"
                     android:hint="Nick"
-                    android:imeOptions="actionUnspecified"
+                    android:imeOptions="flagNoPersonalizedLearning"
                     android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true"/>
@@ -118,7 +118,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="20dp"
                     android:hint="Status"
-                    android:imeOptions="actionUnspecified"
+                    android:imeOptions="flagNoPersonalizedLearning"
                     android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true"/>

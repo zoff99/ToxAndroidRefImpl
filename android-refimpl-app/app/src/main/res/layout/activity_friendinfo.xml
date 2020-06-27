@@ -132,7 +132,7 @@
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
                         android:hint="@string/layout___alias"
-                        android:imeOptions="actionUnspecified"
+                        android:imeOptions="flagNoPersonalizedLearning"
                         android:inputType="text"
                         android:maxLines="1"
                         android:singleLine="true" />

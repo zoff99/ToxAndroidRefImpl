@@ -154,7 +154,7 @@
                     android:layout_weight="1"
                     android:cursorVisible="true"
                     android:ellipsize="end"
-                    android:imeOptions="actionSend"
+                    android:imeOptions="flagNoPersonalizedLearning|actionSend"
                     android:inputType="textMultiLine"
                     android:maxLines="5"
                     android:singleLine="false"
