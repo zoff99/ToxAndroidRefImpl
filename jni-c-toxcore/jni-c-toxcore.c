@@ -466,7 +466,8 @@ static uint64_t current_time_monotonic_default()
 
 
 Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port,
-                int local_discovery_enabled_, const uint8_t *passphrase, size_t passphrase_len)
+                int local_discovery_enabled_, const uint8_t *passphrase, size_t passphrase_len,
+                int enable_ipv6, int force_udp_mode)
 {
     if (pthread_mutex_init(&group_audio___mutex, NULL) != 0)
     {
@@ -479,7 +480,14 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     dbg(9, "1006");
     tox_options_default(&options);
     // uint16_t tcp_port = 33776;
-    options.ipv6_enabled = true;
+    if (enable_ipv6 == 1)
+    {
+        options.ipv6_enabled = true;
+    }
+    else
+    {
+        options.ipv6_enabled = false;
+    }
 
     if(orbot_enabled == 1)
     {
@@ -2338,7 +2346,7 @@ void *thread_audio_av(void *data)
 
 void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, jobject thiz, jobject datadir,
         jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port,
-        jstring passphrase_j)
+        jstring passphrase_j, jint enable_ipv6, jint force_udp_mode)
 {
     const char *s = NULL;
     // SET GLOBAL JNIENV here, this is bad!!
@@ -2447,10 +2455,17 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     tox_set_filetransfer_resumable(true);
     // tox_set_filetransfer_resumable(false);
     // -------- resumable FTs: not working fully yet, so turn it off --------
+
+    if (force_udp_mode == 1)
+    {
+        tox_set_force_udp_only_mode(true);
+    }
+
     // ----------- create Tox instance -----------
     const char *proxy_host_str = (*env)->GetStringUTFChars(env, proxy_host, NULL);
     tox_global = create_tox((int)udp_enabled, (int)orbot_enabled, (const char *)proxy_host_str, (uint16_t)proxy_port,
-                            (int)local_discovery_enabled, (const uint8_t *)passphrase, (size_t)passphrase_len);
+                            (int)local_discovery_enabled, (const uint8_t *)passphrase, (size_t)passphrase_len,
+                            (int)enable_ipv6, (int)force_udp_mode);
     (*env)->ReleaseStringUTFChars(env, proxy_host, proxy_host_str);
     dbg(9, "tox_global=%p", tox_global);
     // ----------- create Tox instance -----------
@@ -2554,10 +2569,11 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, jobject datadir, jint udp_enabled,
-        jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j)
+        jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j,
+        jint enable_ipv6, jint force_udp_mode)
 {
     COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled,
-                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j));
+                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j, enable_ipv6, force_udp_mode));
 }
 
 

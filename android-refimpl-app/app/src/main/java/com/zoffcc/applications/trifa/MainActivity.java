@@ -348,6 +348,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
     static boolean PREF__local_discovery_enabled = false;
+    static boolean PREF__ipv6_enabled = true;
     static boolean PREF__audiorec_asynctask = true;
     static boolean PREF__cam_recording_hint = false; // careful with this paramter!! it can break camerapreview buffer size!!
     static boolean PREF__set_fps = false;
@@ -362,6 +363,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_audio_rec_effects = false;
     static boolean PREF__window_security = false;
     static int PREF__X_eac_delay_ms = 60;
+    static boolean PREF__force_udp_only = false;
     public static float PREF_mic_gain_factor = 2.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
@@ -607,6 +609,7 @@ public class MainActivity extends AppCompatActivity
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
+        PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
         try
@@ -1617,10 +1620,23 @@ public class MainActivity extends AppCompatActivity
                                 PREF__local_discovery_enabled_to_int = 1;
                             }
 
+                            int PREF__ipv6_enabled_to_int = 0;
+                            if (PREF__ipv6_enabled)
+                            {
+                                PREF__ipv6_enabled_to_int = 1;
+                            }
+
+                            int PREF__force_udp_only_to_int = 0;
+                            if (PREF__force_udp_only)
+                            {
+                                PREF__force_udp_only_to_int = 1;
+                            }
+
                             init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
                                  PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                                  TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
-                                         TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+                                         TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))),
+                                 PREF__ipv6_enabled_to_int, PREF__force_udp_only_to_int);
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
@@ -1734,10 +1750,24 @@ public class MainActivity extends AppCompatActivity
                     PREF__local_discovery_enabled_to_int = 1;
                 }
 
+                int PREF__ipv6_enabled_to_int = 0;
+                if (PREF__ipv6_enabled)
+                {
+                    PREF__ipv6_enabled_to_int = 1;
+                }
+
+                int PREF__force_udp_only_to_int = 0;
+                if (PREF__force_udp_only)
+                {
+                    PREF__force_udp_only_to_int = 1;
+                }
+
                 init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
                      PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                      TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
-                             TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
+                             TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))), PREF__ipv6_enabled_to_int,
+                     PREF__force_udp_only_to_int);
+
                 Log.i(TAG, "set_all_conferences_inactive:001");
                 HelperConference.set_all_conferences_inactive();
                 tox_service_fg.tox_thread_start_fg();
@@ -1794,6 +1824,7 @@ public class MainActivity extends AppCompatActivity
         PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
+        PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
         try
@@ -2213,7 +2244,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase_hash);
+    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase_hash, int enable_ipv6, int force_udp_only_mode);
 
     public native String getNativeLibAPI();
 

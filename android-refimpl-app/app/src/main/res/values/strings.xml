@@ -119,6 +119,9 @@
     <string name="pref_title_udp_enabled">enable UDP</string>
     <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
 
+    <string name="pref_title_force_udp_only">force UDP mode</string>
+    <string name="pref_description_force_udp_only">this will force UDP only mode, some contacts may not be reachable with this setting turned on\nChange needs RESTART!</string>
+
     <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
     <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
 
