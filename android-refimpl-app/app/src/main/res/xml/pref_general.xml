@@ -2,6 +2,12 @@
 
     <SwitchPreference
         android:defaultValue="true"
+        android:key="use_incognito_keyboard"
+        android:summary="@string/pref_description_use_incognito_keyboard"
+        android:title="@string/pref_title_use_incognito_keyboard" />
+
+    <SwitchPreference
+        android:defaultValue="true"
         android:key="auto_accept_image"
         android:summary="@string/pref_description_auto_accept_image"
         android:title="@string/pref_title_auto_accept_image" />

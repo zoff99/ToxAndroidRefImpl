@@ -45,6 +45,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -74,6 +75,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMessage.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
@@ -234,6 +236,15 @@ public class MessageListActivity extends AppCompatActivity
         ml_friend_typing.setText("");
         attachemnt_instead_of_send = true;
         ml_button_01.setImageDrawable(add_attachement_icon);
+
+        if (PREF__use_incognito_keyboard)
+        {
+            ml_new_message.setImeOptions(EditorInfo.IME_ACTION_SEND|EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
+        }
+        else
+        {
+            ml_new_message.setImeOptions(EditorInfo.IME_ACTION_SEND);
+        }
 
         ml_new_message.addTextChangedListener(new TextWatcher()
         {

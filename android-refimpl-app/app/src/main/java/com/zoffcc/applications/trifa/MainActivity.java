@@ -365,6 +365,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__window_security = false;
     public static int PREF__X_eac_delay_ms = 80;
     static boolean PREF__force_udp_only = false;
+    static boolean PREF__use_incognito_keyboard = true;
     public static float PREF_mic_gain_factor = 2.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
@@ -612,6 +613,7 @@ public class MainActivity extends AppCompatActivity
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
+        PREF__use_incognito_keyboard = settings.getBoolean("use_incognito_keyboard", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
         try
@@ -1828,6 +1830,7 @@ public class MainActivity extends AppCompatActivity
         PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
+        PREF__use_incognito_keyboard = settings.getBoolean("use_incognito_keyboard", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
         try
