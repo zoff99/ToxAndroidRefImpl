@@ -3081,7 +3081,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         ByteBuffer[] encoderOutputBuffers = mEncoder.getOutputBuffers();
         while (true)
         {
-            int encoderStatus = mEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
+            int encoderStatus = MediaCodec.INFO_TRY_AGAIN_LATER;
+
+            try
+            {
+                encoderStatus = mEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
+            }
+            catch (IllegalStateException e)
+            {
+                Log.d(TAG, "drainEncoder:dequeueOutputBuffer:EE:" + e.getMessage());
+            }
+
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER)
             {
                 break;      // out of while
@@ -3095,7 +3105,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 // should happen before receiving buffers, and should only happen once
                 MediaFormat newFormat = mEncoder.getOutputFormat();
-                Log.d(TAG, "drainEncoder:encoder output video_encoder_format changed: " + newFormat); //$NON-NLS-1$
+                Log.d(TAG, "drainEncoder:encoder output video_encoder_format changed: " + newFormat);
             }
             else if (encoderStatus < 0)
             {
