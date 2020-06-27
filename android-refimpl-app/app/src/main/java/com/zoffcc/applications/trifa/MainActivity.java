@@ -362,7 +362,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_native_audio_play = true;
     static boolean PREF__use_audio_rec_effects = false;
     static boolean PREF__window_security = false;
-    static int PREF__X_eac_delay_ms = 60;
+    public static int PREF__X_eac_delay_ms = 80;
     static boolean PREF__force_udp_only = false;
     public static float PREF_mic_gain_factor = 2.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
@@ -1847,11 +1847,11 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__X_eac_delay_ms = Integer.parseInt(settings.getString("X_eac_delay_ms", "60"));
+            PREF__X_eac_delay_ms = Integer.parseInt(settings.getString("X_eac_delay_ms", "80"));
         }
         catch (Exception e)
         {
-            PREF__X_eac_delay_ms = 60;
+            PREF__X_eac_delay_ms = 80;
             e.printStackTrace();
         }
 
@@ -1877,8 +1877,6 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "PREF_mic_gain_factor:E=" + PREF_mic_gain_factor);
             e.printStackTrace();
         }
-
-        set_audio_frame_duration_ms(PREF__X_eac_delay_ms);
 
         if (PREF__U_keep_nospam == true)
         {

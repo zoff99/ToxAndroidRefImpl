@@ -28,6 +28,7 @@ import java.util.concurrent.Semaphore;
 
 import static com.zoffcc.applications.trifa.AudioReceiver.reinit_audio_play_buffers;
 import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_eac_delay_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 
 public class NativeAudio
@@ -150,7 +151,7 @@ public class NativeAudio
 
         reinit_audio_play_buffers(sampleRate, channels);
 
-        NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, n_audio_in_buffer_max_count);
+        NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, n_audio_in_buffer_max_count, PREF__X_eac_delay_ms);
         NativeAudio.createAudioRecorder((int) AudioRecording.SMAPLINGRATE_TOX, n_rec_audio_in_buffer_max_count);
 
         NativeAudio.n_cur_buf = 0;
@@ -200,7 +201,7 @@ public class NativeAudio
     public static native float get_vu_out();
     // ---------------------
 
-    public static native void createBufferQueueAudioPlayer(int sampleRate, int channels, int num_bufs);
+    public static native void createBufferQueueAudioPlayer(int sampleRate, int channels, int num_bufs, int eac_delay_ms);
 
     public static native void set_JNI_audio_buffer(ByteBuffer buffer, long buffer_size_in_bytes, int num);
 

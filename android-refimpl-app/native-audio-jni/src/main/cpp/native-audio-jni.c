@@ -546,7 +546,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                                                                                        jclass clazz,
                                                                                        jint sampleRate,
                                                                                        jint channels,
-                                                                                       jint num_bufs)
+                                                                                       jint num_bufs,
+                                                                                       jint eac_delay_ms)
 {
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                         "createBufferQueueAudioPlayer:start:engineEngine=%p",
@@ -805,7 +806,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         filteraudio_used = true;
         // filteraudio
         start_filter_audio(sampleRate);
-        set_delay_ms_filter_audio(80, 40);
+        set_delay_ms_filter_audio(eac_delay_ms, 40);
 #ifdef WEBRTC_AEC
         // webrtc
         WebRtcAecm_Create(&webrtc_aecmInst);

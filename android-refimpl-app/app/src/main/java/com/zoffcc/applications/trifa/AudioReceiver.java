@@ -28,6 +28,7 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.nio.ByteBuffer;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_eac_delay_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 
@@ -91,7 +92,8 @@ public class AudioReceiver extends Thread
 
                 reinit_audio_play_buffers(sampleRate, channels);
 
-                NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count);
+                NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count,
+                                                         PREF__X_eac_delay_ms);
             }
         }
         catch (Exception e)
