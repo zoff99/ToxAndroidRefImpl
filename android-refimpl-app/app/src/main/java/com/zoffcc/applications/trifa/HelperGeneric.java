@@ -53,6 +53,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 
@@ -2762,7 +2763,10 @@ public class HelperGeneric
 
     static void save_sps_pps_nal(byte[] sps_pps_nal_unit_bytes)
     {
-        global_sps_pps_nal_unit_bytes = sps_pps_nal_unit_bytes;
+        if (sps_pps_nal_unit_bytes != null)
+        {
+            global_sps_pps_nal_unit_bytes = Arrays.copyOf(sps_pps_nal_unit_bytes, sps_pps_nal_unit_bytes.length);
+        }
     }
 
     public static byte[] YV12totoNV12(byte[] input, byte[] output, int width, int height)
@@ -2881,10 +2885,12 @@ public class HelperGeneric
                                         if (send_sps_pps_every_x_frames_current >= send_sps_pps_every_x_frames)
                                         {
                                             // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
-                                            MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
-                                            // toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
-                                            //                            global_sps_pps_nal_unit_bytes.length);
-                                            data_length = data_length + global_sps_pps_nal_unit_bytes.length;
+                                            if (h264_out_data.sps_pps == null)
+                                            {
+                                                // only add sps/pps if this NALU does not contain it already
+                                                MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
+                                                data_length = data_length + global_sps_pps_nal_unit_bytes.length;
+                                            }
                                             send_sps_pps_every_x_frames_current = 0;
 
                                             if (set_vdelay_every_x_frames_current >= set_vdelay_every_x_frames)

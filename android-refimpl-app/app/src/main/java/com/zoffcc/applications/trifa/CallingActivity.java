@@ -88,6 +88,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__h264_encoder_use_intra_refresh;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encoding;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_call_quality;
@@ -2984,7 +2985,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             {
-                video_encoder_format.setInteger(MediaFormat.KEY_INTRA_REFRESH_PERIOD, 5);
+                if (PREF__h264_encoder_use_intra_refresh)
+                {
+                    video_encoder_format.setInteger(MediaFormat.KEY_INTRA_REFRESH_PERIOD, 5);
+                }
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

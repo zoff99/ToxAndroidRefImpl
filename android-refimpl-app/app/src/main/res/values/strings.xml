@@ -128,6 +128,9 @@
     <string name="pref_title_fps_half">lower fps</string>
     <string name="pref_description_fps_half">Video Framerate 1/2 : so 12fps instead of 25fps</string>
 
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 intra refresh</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">H264 encoder should use intra refresh frames</string>
+
     <string name="pref_title_set_fps">set fps</string>
     <string name="pref_description_set_fps">try to set 15fps video framerate, this may crash on some phones</string>
 
