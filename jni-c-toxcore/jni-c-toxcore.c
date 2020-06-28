@@ -3838,6 +3838,19 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1nospam(JNIEnv *e
     return (jlong)nospam;
 }
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1do_1not_1sync_1av(JNIEnv *env, jobject thiz, jint do_not_sync_av)
+{
+    if (do_not_sync_av == 1)
+    {
+        tox_set_do_not_sync_av(true);
+    }
+    else
+    {
+        tox_set_do_not_sync_av(false);
+    }
+}
+
 // -----------------------
 // TODO
 // -----------------------

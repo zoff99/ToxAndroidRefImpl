@@ -362,6 +362,7 @@ public class MainActivity extends AppCompatActivity
     static String PREF__X_misc_button_msg = "t"; // TODO: hardcoded for now!
     static boolean PREF__U_keep_nospam = false;
     static boolean PREF__use_native_audio_play = true;
+    static boolean PREF__tox_set_do_not_sync_av = false;
     static boolean PREF__use_audio_rec_effects = false;
     static boolean PREF__window_security = false;
     public static int PREF__X_eac_delay_ms = 80;
@@ -1833,6 +1834,7 @@ public class MainActivity extends AppCompatActivity
         PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
         PREF__use_incognito_keyboard = settings.getBoolean("use_incognito_keyboard", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
+        PREF__tox_set_do_not_sync_av = settings.getBoolean("X_tox_set_do_not_sync_av", false);
 
         try
         {
@@ -2277,6 +2279,8 @@ public class MainActivity extends AppCompatActivity
     public static native int jni_iterate_group_audio(int delta_new, int want_ms_output);
 
     public static native int jni_iterate_videocall_audio(int delta_new, int want_ms_output, int channels, int sample_rate, int send_emtpy_buffer);
+
+    public static native int tox_set_do_not_sync_av(int do_not_sync_av);
     // ----------- TRIfA internal -----------
 
     public static native long tox_kill();
@@ -3630,7 +3634,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     update_calling_friend_connection_status(a_TOX_CONNECTION);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                 }
             }
