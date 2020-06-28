@@ -156,7 +156,7 @@
 
         <EditTextPreference
             android:defaultValue="80"
-            android:key="X_eac_delay_ms"
+            android:key="X_eac_delay_ms_2"
             android:maxLength="3"
             android:numeric="integer"
             android:inputType="number"

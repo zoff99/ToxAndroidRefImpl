@@ -1856,7 +1856,7 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__X_eac_delay_ms = Integer.parseInt(settings.getString("X_eac_delay_ms", "80"));
+            PREF__X_eac_delay_ms = Integer.parseInt(settings.getString("X_eac_delay_ms_2", "80"));
         }
         catch (Exception e)
         {
