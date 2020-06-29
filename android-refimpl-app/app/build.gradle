@@ -36,8 +36,14 @@ buildscript {
 // gradlew :app:androidDependencies.
 
 apply plugin: 'com.android.application'
-apply plugin: 'witness'
-apply from: 'witness.gradle'
+// -----------------------------------------------
+// gradle witness deactivated because f-droid is not allowing it anymore, sadly.
+// https://gitlab.com/fdroid/fdroiddata/-/issues/2078
+// https://gitlab.com/fdroid/fdroiddata/-/blob/master/metadata/com.zoffcc.applications.trifa.yml#L31
+// -----------------------------------------------
+// apply plugin: 'witness'
+// apply from: 'witness.gradle'
+// -----------------------------------------------
 
 android {
     compileSdkVersion 28
