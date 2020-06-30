@@ -1611,7 +1611,7 @@ public class TrifaToxService extends Service
                         }
                         else
                         {
-                            tox_iteration_interval_ms = 4; // if we are in a video/audio call iterate more often
+                            tox_iteration_interval_ms = 10; // if we are in a video/audio call iterate more often
 
                             /*
                             if (!tox_iterate_thread_high_prio)
