@@ -2264,7 +2264,7 @@ void *thread_video_av(void *data)
     pthread_t id = pthread_self();
     dbg(9, "2003");
     dbg(2, "AV video Thread #%d: starting", (int) id);
-    long av_iterate_interval = 1;
+    // long av_iterate_interval = 1;
 
     pthread_setname_np(pthread_self(), "t_v_iter()");
 
@@ -2273,7 +2273,7 @@ void *thread_video_av(void *data)
     {
         toxav_iterate(av);
         // dbg(9, "AV video Thread #%d running ...", (int) id);
-        av_iterate_interval = toxav_iteration_interval(av);
+        // av_iterate_interval = toxav_iteration_interval(av);
 
         //usleep((av_iterate_interval / 2) * 1000);
         if(global_av_call_active == 1)
@@ -2305,7 +2305,7 @@ void *thread_audio_av(void *data)
     pthread_setname_np(pthread_self(), "t_a_iter()");
 
     int delta = 0;
-    int want_iterate_ms = 5;
+    int want_iterate_ms = 10;
     int will_sleep_ms = want_iterate_ms;
     int64_t start_time = current_time_monotonic_default();
     while(toxav_audio_thread_stop != 1)
