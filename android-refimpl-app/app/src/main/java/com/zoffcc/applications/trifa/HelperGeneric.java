@@ -105,6 +105,7 @@ public class HelperGeneric
     static int video_frame_age_values_cur_index = 0;
     final static int video_frame_age_values_cur_index_count = 10;
     static long[] video_frame_age_values = new long[video_frame_age_values_cur_index_count];
+    static byte[] buf_video_send_frame = null;
 
     public static void clearCache_s()
     {
@@ -2816,6 +2817,17 @@ public class HelperGeneric
 
     static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
     {
+        try
+        {
+            // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+            // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
@@ -2836,15 +2848,31 @@ public class HelperGeneric
                     {
                         if (MainActivity.PREF__camera_get_preview_format.equals("YV12"))
                         {
-                            byte[] buf = new byte[buf2.length];
-                            buf = YV12totoNV12(buf2, buf, frame_width_px, frame_height_px);
-                            feed_h264_encoder(buf, frame_width_px, frame_height_px, video_frame_age);
+                            if (buf_video_send_frame == null)
+                            {
+                                buf_video_send_frame = new byte[buf2.length];
+                            }
+                            else if (buf_video_send_frame.length < buf2.length)
+                            {
+                                buf_video_send_frame = new byte[buf2.length];
+                            }
+                            buf_video_send_frame = YV12totoNV12(buf2, buf_video_send_frame, frame_width_px,
+                                                                frame_height_px);
+                            feed_h264_encoder(buf_video_send_frame, frame_width_px, frame_height_px, video_frame_age);
                         }
                         else // (PREF__camera_get_preview_format == "NV21")
                         {
-                            byte[] buf = new byte[buf2.length];
-                            buf = NV21toNV12(buf2, buf, frame_width_px, frame_height_px);
-                            feed_h264_encoder(buf, frame_width_px, frame_height_px, video_frame_age);
+                            if (buf_video_send_frame == null)
+                            {
+                                buf_video_send_frame = new byte[buf2.length];
+                            }
+                            else if (buf_video_send_frame.length < buf2.length)
+                            {
+                                buf_video_send_frame = new byte[buf2.length];
+                            }
+                            buf_video_send_frame = NV21toNV12(buf2, buf_video_send_frame, frame_width_px,
+                                                              frame_height_px);
+                            feed_h264_encoder(buf_video_send_frame, frame_width_px, frame_height_px, video_frame_age);
                         }
                     }
                     catch (Exception e)
@@ -2862,15 +2890,13 @@ public class HelperGeneric
                 {
                     try
                     {
-                        for (int jj = 0; jj < 3; jj++)
+                        for (int jj = 0; jj < 2; jj++)
                         {
                             CallingActivity.h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
 
                             if (h264_out_data != null)
                             {
-                                byte[] buf_out = h264_out_data.data;
-
-                                if (buf_out != null)
+                                if (h264_out_data.data != null)
                                 {
                                     if (h264_out_data.sps_pps != null)
                                     {
@@ -2936,8 +2962,8 @@ public class HelperGeneric
                                         send_sps_pps_every_x_frames_current++;
                                     }
 
-                                    MainActivity.video_buffer_2.put(buf_out);
-                                    data_length = data_length + buf_out.length;
+                                    MainActivity.video_buffer_2.put(h264_out_data.data);
+                                    data_length = data_length + h264_out_data.data.length;
 
                                     // Log.i(TAG,
                                     //      "H264:video_frame_age=" + (System.currentTimeMillis() - video_frame_age));
@@ -2955,8 +2981,8 @@ public class HelperGeneric
                                         }
 
                                         Callstate.java_video_encoder_delay_set = 1;
-                                        Log.i(TAG,
-                                              "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms");
+                                        //Log.i(TAG,
+                                        //      "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms");
                                     }
 
                                     //Log.i(TAG,
@@ -2966,45 +2992,23 @@ public class HelperGeneric
                                     //Log.i(TAG, "java_video_encoder_delay=" +
                                     //           (int) (System.currentTimeMillis() - video_frame_age) + " ms");
 
-                                    if (1 == 2)
-                                    {
-                                        MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
-                                                                                     frame_height_px, data_length,
-                                                                                     (int) (System.currentTimeMillis() -
-                                                                                            video_frame_age));
-                                    }
-                                    else if (1 == 1)
-                                    {
-                                        Callstate.delay_add = (int) (System.currentTimeMillis() - h264_out_data.pts);
-                                        if ((Callstate.delay_add < 1) || (Callstate.delay_add > 500))
-                                        {
-                                            Callstate.delay_add = 0;
-                                        }
 
-                                        // Log.i(TAG, "V:AGE:" + Callstate.delay_add);
-                                        int res = MainActivity.toxav_video_send_frame_h264_age(friendnum,
-                                                                                               frame_width_px,
-                                                                                               frame_height_px,
-                                                                                               data_length,
-                                                                                               (int) (System.currentTimeMillis() -
-                                                                                                      video_frame_age) +
-                                                                                               Callstate.delay_add);
-
-                                        // Log.i(TAG, "V:res:" + res);
-                                    }
-                                    else if (1 == 3)
+                                    Callstate.delay_add = (int) (System.currentTimeMillis() - h264_out_data.pts);
+                                    if ((Callstate.delay_add < 1) || (Callstate.delay_add > 25))
                                     {
-                                        MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
-                                                                                     frame_height_px, data_length, 200);
+                                        Callstate.delay_add = 10;
                                     }
-                                    else
-                                    {
-                                        // Log.i(TAG, "V:AGE:" + (System.currentTimeMillis() - h264_out_data.pts));
 
-                                        MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
-                                                                                     frame_height_px, data_length,
-                                                                                     (int) Callstate.java_video_encoder_delay);
-                                    }
+                                    //Log.i(TAG, "V:AGE:" + Callstate.delay_add + " : " + video_frame_age + " : " +
+                                    //           ((int) (System.currentTimeMillis() - video_frame_age)));
+                                    MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
+                                                                                 frame_height_px, data_length,
+                                                                                 (int) (System.currentTimeMillis() -
+                                                                                        video_frame_age) +
+                                                                                 Callstate.delay_add);
+
+                                    // Log.i(TAG, "V:res:" + res);
+
                                 }
                                 else
                                 {
@@ -3012,7 +3016,6 @@ public class HelperGeneric
                                 }
                             }
                         }
-
                     }
                     catch (Exception e)
                     {
@@ -3031,7 +3034,7 @@ public class HelperGeneric
                 e.printStackTrace();
             }
 
-            if (1 == 1)
+            if (1 == 2)
             {
                 try
                 {

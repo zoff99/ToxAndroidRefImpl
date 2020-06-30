@@ -31,9 +31,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.Process;
-
-import androidx.core.app.NotificationCompat;
-
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -47,6 +44,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.core.app.NotificationCompat;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
@@ -59,6 +57,17 @@ import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.change_notification;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_combined_connection_status;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_toxconnection_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.hex_to_bytes;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
@@ -67,21 +76,12 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__force_udp_only;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
-import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
-import static com.zoffcc.applications.trifa.HelperGeneric.change_notification;
 import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.conference_message_list_activity;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_combined_connection_status;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_toxconnection_wrapper;
-import static com.zoffcc.applications.trifa.HelperGeneric.hex_to_bytes;
-import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
-import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
@@ -89,13 +89,12 @@ import static com.zoffcc.applications.trifa.MainActivity.receiver2;
 import static com.zoffcc.applications.trifa.MainActivity.receiver3;
 import static com.zoffcc.applications.trifa.MainActivity.receiver4;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
-import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_type;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
-import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_iteration_interval;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name_size;
@@ -1080,7 +1079,7 @@ public class TrifaToxService extends Service
                 // --------------- bootstrap ---------------
                 // --------------- bootstrap ---------------
 
-                long tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
+                long tox_iteration_interval_ms = tox_iteration_interval();
                 Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
 
                 boolean tox_iterate_thread_high_prio = false;
@@ -1591,6 +1590,7 @@ public class TrifaToxService extends Service
                         {
                             tox_iteration_interval_ms = 5; // if we are in a group audio call iterate more often
 
+                            /*
                             if (!tox_iterate_thread_high_prio)
                             {
                                 try
@@ -1599,24 +1599,52 @@ public class TrifaToxService extends Service
                                     this.setName("tox_iterate()+");
                                     // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
                                     // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-                                    //android.os.Process.setThreadPriority(
-                                    //        android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                                    android.os.Process.setThreadPriority(
+                                            android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
                                 }
                                 catch (Exception e)
                                 {
                                     e.printStackTrace();
                                 }
                             }
+                            */
                         }
                         else
                         {
-                            tox_iteration_interval_ms = 5; // if we are in a video/audio call iterate more often
+                            tox_iteration_interval_ms = 4; // if we are in a video/audio call iterate more often
+
+                            /*
+                            if (!tox_iterate_thread_high_prio)
+                            {
+                                try
+                                {
+                                    tox_iterate_thread_high_prio = true;
+                                    this.setName("tox_iterate()+");
+                                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+                                    // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+                                    android.os.Process.setThreadPriority(
+                                            android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+                            */
+
+                            /*
+                            long tox_iteration_interval_should_be = tox_iteration_interval();
+                            if (tox_iteration_interval_should_be < tox_iteration_interval_ms)
+                            {
+                                tox_iteration_interval_ms = tox_iteration_interval_should_be;
+                            }
+                            */
                         }
                     }
                     else
                     {
                         // tox_iteration_interval_ms = Math.max(100, MainActivity.tox_iteration_interval());
-                        tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
+                        tox_iteration_interval_ms = tox_iteration_interval();
                         // Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
 
                         if (tox_iterate_thread_high_prio)

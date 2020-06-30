@@ -590,6 +590,7 @@ public class CameraWrapper
         @Override
         protected Void doInBackground(Void... voids)
         {
+/*
             try
             {
                 Thread.currentThread().setName("t_vcam_get");
@@ -597,6 +598,7 @@ public class CameraWrapper
             catch (Exception e)
             {
             }
+*/
 
             // Log.i(TAG, "doInBackground:start:#" + num);
             try

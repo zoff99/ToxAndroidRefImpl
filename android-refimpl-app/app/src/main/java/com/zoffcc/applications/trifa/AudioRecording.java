@@ -269,6 +269,7 @@ public class AudioRecording extends Thread
         @Override
         protected String doInBackground(Void... voids)
         {
+/*
             try
             {
                 Thread.currentThread().setName("t_s_outN:" + bufnum_);
@@ -276,6 +277,7 @@ public class AudioRecording extends Thread
             catch (Exception e)
             {
             }
+*/
 
             try
             {

@@ -194,21 +194,23 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static int video_encoder_width = 640; // start a dummy start value, DO NOT CHANGE
     private static int video_encoder_height = 480; // start a dummy start value, DO NOT CHANGE
     private static int v_bitrate_bits_per_second = 20 * 1000; // video bitrate <n> bps, in bits per second
+    private static long encode_last_v_bitrate_change = -1;
     public static byte[] global_sps_pps_nal_unit_bytes = null;
     public static int send_sps_pps_every_x_frames_current = 0;
-    public static int send_sps_pps_every_x_frames = 0;
+    public static int send_sps_pps_every_x_frames = 2;
     public static int set_vdelay_every_x_frames_current = 0;
-    public static int set_vdelay_every_x_frames = 20;
+    public static int set_vdelay_every_x_frames = 100;
     private static float slider_alpha = 0.3f;
     static boolean camera_toggle_button_pressed = false;
+    static byte[] arr_h264_enc = null;
 
     private static MediaCodec.BufferInfo mBufferInfo_h264_decoder;
     private static MediaCodec mDecoder_h264;
     private static MediaFormat video_decoder_h264_format = null;
     private DetectHeadset dh = null;
     public static long calling_activity_start_ms = 0;
-    private static int BUFFER_DEQUEUE_TIMEOUT_US = 5 * 1000; // "us" fetch encoded data from encoder
-    private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 150; // "us" feed raw data to encoder
+    private static int BUFFER_DEQUEUE_TIMEOUT_US = 0; // "us" fetch encoded data from encoder
+    private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 0; // "us" feed raw data to encoder
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -1731,7 +1733,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     void toggle_camera()
     {
-        Runnable myRunnable = new Runnable()
+        Thread openThread = new Thread()
         {
             @Override
             public void run()
@@ -1744,14 +1746,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         CameraWrapper.camera_preview_size2 = null;
                         active_camera_type = BACK_CAMERA_USED;
-                        Log.i(TAG, "active_camera_type(8a)=" + active_camera_type); //$NON-NLS-1$
+                        Log.i(TAG, "active_camera_type(8a)=" + active_camera_type);
                         CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, false);
                     }
                     else
                     {
                         CameraWrapper.camera_preview_size2 = null;
                         active_camera_type = FRONT_CAMERA_USED;
-                        Log.i(TAG, "active_camera_type(8b)=" + active_camera_type); //$NON-NLS-1$
+                        Log.i(TAG, "active_camera_type(8b)=" + active_camera_type);
                         CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
                     }
                 }
@@ -1760,7 +1762,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 }
             }
         };
-        callactivity_handler_s.post(myRunnable);
+        openThread.start();
     }
 
     // -------------------------------------------------------
@@ -1917,7 +1919,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
 
                 // wait for 1 seconds to actually get a camera preview. if not, restart camera
-                int WAIT_SECONDS = 1;
+                int WAIT_SECONDS = 2;
                 long startup_ts = System.currentTimeMillis();
                 for (int j = 0; j < 100 * WAIT_SECONDS; j++)
                 {
@@ -2913,15 +2915,22 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             try
             {
-                Bundle bitrate_new = new Bundle();
-                video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
-                v_bitrate_bits_per_second = bitrate_bits_per_second;
-                bitrate_new.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, v_bitrate_bits_per_second);
-                mEncoder.setParameters(bitrate_new);
+                // change encoder bitrate only every x seconds max.
+                if ((encode_last_v_bitrate_change + 1000) < System.currentTimeMillis())
+                {
+                    encode_last_v_bitrate_change = System.currentTimeMillis();
+                    v_bitrate_bits_per_second = bitrate_bits_per_second;
+                    if (bitrate_bits_per_second >= 150)
+                    {
+                        Bundle bitrate_new = new Bundle();
+                        video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
+                        bitrate_new.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, v_bitrate_bits_per_second);
+                        mEncoder.setParameters(bitrate_new);
+                    }
+                }
             }
             catch (Exception e)
             {
-
             }
         }
         else
