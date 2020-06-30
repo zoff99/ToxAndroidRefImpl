@@ -17,6 +17,21 @@
  * Boston, MA  02110-1301, USA.
  */
 
+/*
+ * 
+ * 
+ * 
+ *   #00  pc 0000000000021d94  /system/lib64/libc.so (abort+124)
+  #01  pc 0000000000086510  /system/lib64/libc.so (__fortify_fatal(char const*, ...)+120)
+  #02  pc 0000000000085bbc  /system/lib64/libc.so (HandleUsingDestroyedMutex(pthread_mutex_t*, char const*)+52)
+  #03  pc 0000000000086484  /system/lib64/libc.so (pthread_mutex_destroy+156)
+  #04  pc 0000000000003418  /data/app/com.zoffcc.applications.trifa-YJ_OMRyjHK_UrWc1hYmuvw==/lib/arm64/libnative-audio-jni.so (Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine+452)
+  #05  pc 0000000000031220  /data/app/com.zoffcc.applications.trifa-YJ_OMRyjHK_UrWc1hYmuvw==/oat/arm64/base.odex (offset 0x2c000) (com.zoffcc.applications.nativeaudio.AudioProcessing.destroy [DEDUPED]+144)
+  #06  pc 000000000002c114  /dev/ashmem/dalvik-jit-code-cache_4541_4541 (deleted)
+ * 
+ * 
+ * 
+
 
 #include <ctype.h>
 #include <stdio.h>
