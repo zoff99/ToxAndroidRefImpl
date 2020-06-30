@@ -2738,6 +2738,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static class h264_encoder_output_data
     {
         byte[] data;
+        int data_len;
         byte[] sps_pps;
         long pts;
     }
@@ -2796,6 +2797,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         h264_encoder_output_data ret = new h264_encoder_output_data();
         ret.data = null;
+        ret.data_len = 0;
         ret.sps_pps = null;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
@@ -2830,8 +2832,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // Log.d(TAG, "fetch_from_h264_encoder:old_format: " + video_encoder_format);
                 MediaFormat newFormat = mEncoder.getOutputFormat();
                 // Log.d(TAG, "fetch_from_h264_encoder:new_format: " + newFormat);
-                ByteBuffer csd0 = newFormat.getByteBuffer("csd-0"); //$NON-NLS-1$
-                ByteBuffer csd1 = newFormat.getByteBuffer("csd-1"); //$NON-NLS-1$
+                //**//ByteBuffer csd0 = newFormat.getByteBuffer("csd-0"); //$NON-NLS-1$
+                //**//ByteBuffer csd1 = newFormat.getByteBuffer("csd-1"); //$NON-NLS-1$
                 // System.out.println("fetch_from_h264_encoder:csd-0:len=" + csd0.limit());
                 // System.out.println("fetch_from_h264_encoder:csd-1:len=" + csd1.limit());
 
@@ -2861,8 +2863,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     compressed.position(info.offset);
                     compressed.limit(info.offset + info.size);
                     /* Copy to byte array for further processing */
-                    byte[] arr = new byte[compressed.remaining()];
-                    compressed.get(arr);
+                    ret.data_len = compressed.remaining();
+
+                    if (arr_h264_enc == null)
+                    {
+                        arr_h264_enc = new byte[ret.data_len];
+                    }
+                    else if (arr_h264_enc.length < ret.data_len)
+                    {
+                        arr_h264_enc = new byte[ret.data_len];
+                    }
+                    compressed.get(arr_h264_enc, 0, ret.data_len);
                     compressed.position(info.offset);
 
                     if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)
@@ -2875,7 +2886,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         //
                         // --> "csd-0" or SPS/PPS data
                         //
-                        ret.sps_pps = arr;
+                        ret.sps_pps = arr_h264_enc;
                         //System.out.println(
                         //        "fetch_from_h264_encoder:SPS_PPS:len=" + arr.length + " data=" + arr.toString());
                     }
@@ -2886,7 +2897,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     /* Release MediaCodec buffer */
                     mEncoder.releaseOutputBuffer(encoderStatus, false);
-                    ret.data = arr;
+                    ret.data = arr_h264_enc;
                     ret.pts = (info.presentationTimeUs / 1000);
                     return ret;
                 }

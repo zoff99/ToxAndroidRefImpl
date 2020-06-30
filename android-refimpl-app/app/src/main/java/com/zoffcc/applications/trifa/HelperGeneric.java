@@ -2762,11 +2762,11 @@ public class HelperGeneric
         }
     }
 
-    static void save_sps_pps_nal(byte[] sps_pps_nal_unit_bytes)
+    static void save_sps_pps_nal(byte[] sps_pps_nal_unit_bytes, int length)
     {
         if (sps_pps_nal_unit_bytes != null)
         {
-            global_sps_pps_nal_unit_bytes = Arrays.copyOf(sps_pps_nal_unit_bytes, sps_pps_nal_unit_bytes.length);
+            global_sps_pps_nal_unit_bytes = Arrays.copyOf(sps_pps_nal_unit_bytes, length);
         }
     }
 
@@ -2817,16 +2817,16 @@ public class HelperGeneric
 
     static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
     {
-        try
-        {
+        //try
+        //{
             // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
             // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        //}
+        //catch (Exception e)
+        //{
+        //    e.printStackTrace();
+        //}
 
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
@@ -2896,13 +2896,13 @@ public class HelperGeneric
 
                             if (h264_out_data != null)
                             {
+                                if (h264_out_data.sps_pps != null)
+                                {
+                                    save_sps_pps_nal(h264_out_data.sps_pps, h264_out_data.data_len);
+                                }
+
                                 if (h264_out_data.data != null)
                                 {
-                                    if (h264_out_data.sps_pps != null)
-                                    {
-                                        save_sps_pps_nal(h264_out_data.sps_pps);
-                                    }
-
                                     MainActivity.video_buffer_2.rewind();
                                     long data_length = 0;
 
@@ -2962,8 +2962,8 @@ public class HelperGeneric
                                         send_sps_pps_every_x_frames_current++;
                                     }
 
-                                    MainActivity.video_buffer_2.put(h264_out_data.data);
-                                    data_length = data_length + h264_out_data.data.length;
+                                    MainActivity.video_buffer_2.put(h264_out_data.data, 0, h264_out_data.data_len);
+                                    data_length = data_length + h264_out_data.data_len;
 
                                     // Log.i(TAG,
                                     //      "H264:video_frame_age=" + (System.currentTimeMillis() - video_frame_age));
@@ -3066,13 +3066,13 @@ public class HelperGeneric
                 CallingActivity.h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
                 byte[] buf_out = h264_out_data.data;
 
+                if (h264_out_data.sps_pps != null)
+                {
+                    save_sps_pps_nal(h264_out_data.sps_pps, h264_out_data.data_len);
+                }
+
                 if (buf_out != null)
                 {
-                    if (h264_out_data.sps_pps != null)
-                    {
-                        save_sps_pps_nal(h264_out_data.sps_pps);
-                    }
-
                     if (global_sps_pps_nal_unit_bytes != null)
                     {
                         if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
@@ -3089,9 +3089,9 @@ public class HelperGeneric
                     }
 
                     MainActivity.video_buffer_2.rewind();
-                    MainActivity.video_buffer_2.put(buf_out);
+                    MainActivity.video_buffer_2.put(buf_out, 0, h264_out_data.data_len);
                     MainActivity.toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
-                                                             buf_out.length);
+                                                             h264_out_data.data_len);
                 }
                 else
                 {
