@@ -5341,7 +5341,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1uv_1r
 
     if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
     {
-        yieldcpu(1); // sleep 1 ms
+        // yieldcpu(1); // sleep 1 ms
 
         res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                      (uint16_t)frame_height_px,
@@ -5395,7 +5395,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv
 
     if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
     {
-        yieldcpu(1); // sleep 1 ms
+        // yieldcpu(1); // sleep 1 ms
 
         res = toxav_video_send_frame(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                      (uint16_t)frame_height_px,
@@ -5428,7 +5428,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264_
 
     if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
     {
-        yieldcpu(1); // sleep 1 ms
+        // yieldcpu(1); // sleep 1 ms
         res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                           (uint16_t)frame_height_px,
                                           (uint8_t *)video_buffer_2,
@@ -5462,7 +5462,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(
 
     if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
     {
-        yieldcpu(1); // sleep 1 ms
+        // yieldcpu(1); // sleep 1 ms
         res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                           (uint16_t)frame_height_px,
                                           (uint8_t *)video_buffer_2,
@@ -5569,12 +5569,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
             if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
             {
-                yieldcpu(1); // sleep 1 ms
+                // yieldcpu(1); // sleep 1 ms
                 res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
                                                   (uint8_t)channels, (uint32_t)sampling_rate, &error);
 
                 if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
                 {
+                    yieldcpu(1); // sleep 1 ms
                     res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
                                                       (uint8_t)channels, (uint32_t)sampling_rate, &error);
                 }
