@@ -1136,11 +1136,11 @@ public class TrifaToxService extends Service
                 {
                     try
                     {
-                        if (tox_iteration_interval_ms < 2)
+                        if (tox_iteration_interval_ms < 1)
                         {
                             //Log.i(TAG, "tox_iterate:(tox_iteration_interval_ms < 2ms!!):" + tox_iteration_interval_ms +
                             //           "ms");
-                            Thread.sleep(2);
+                            Thread.sleep(1);
                         }
                         else
                         {
@@ -1611,7 +1611,7 @@ public class TrifaToxService extends Service
                         }
                         else
                         {
-                            tox_iteration_interval_ms = 5; // if we are in a video/audio call iterate more often
+                            tox_iteration_interval_ms = 20; // if we are in a video/audio call iterate more often
 
 /*
                             if (!tox_iterate_thread_high_prio)
