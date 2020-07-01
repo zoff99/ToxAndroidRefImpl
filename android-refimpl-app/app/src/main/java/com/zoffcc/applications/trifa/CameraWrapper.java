@@ -29,6 +29,7 @@ import android.view.SurfaceHolder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.CallingActivity.device_orientation;
@@ -57,7 +58,6 @@ public class CameraWrapper
     static int camera_video_rotate_angle = 0;
     private boolean mIsPreviewing = false;
     static byte[] data_new = null;
-    static byte[] data_new2 = null;
     private CameraPreviewCallback mCameraPreviewCallback;
     // private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
@@ -518,9 +518,8 @@ public class CameraWrapper
             int bitsperpixel = ImageFormat.getBitsPerPixel(previewFormat);
             float byteperpixel = (float) bitsperpixel / 8.0f;
             Camera.Size camerasize = mCameraParamters2.getPreviewSize();
-            int frame_bytesize = (int) (
-                ((float) mCameraParamters.getPreviewSize().width * (float) mCameraParamters.getPreviewSize().height) *
-                byteperpixel);
+            int frame_bytesize = (int) (((float) mCameraParamters.getPreviewSize().width *
+                                         (float) mCameraParamters.getPreviewSize().height) * byteperpixel);
             Log.i(TAG,
                   "initCamera:bitsperpixel=" + bitsperpixel + " byteperpixel=" + byteperpixel + " frame_bytesize=" +
                   frame_bytesize);
@@ -532,7 +531,7 @@ public class CameraWrapper
             Log.i(TAG, "initCamera:previewFormats:ImageFormat.YUY2=" + ImageFormat.YUY2);
             Camera.Size s = mCameraParamters.getPreviewSize();
             mCamera.setPreviewCallbackWithBuffer(
-                mCameraPreviewCallback);    // assign the callback called when a frame is shown by the camera preview (for frame processing)
+                    mCameraPreviewCallback);    // assign the callback called when a frame is shown by the camera preview (for frame processing)
             // **broken ** // setupCallback((3 * s.width * s.height / 2));
             setupCallback(frame_bytesize);
             // mCamera.addCallbackBuffer(new byte[3 * s.width * s.height / 2]);  // create a reusable buffer for the data passed to onPreviewFrame call (in order to avoid GC)
@@ -564,7 +563,7 @@ public class CameraWrapper
 
     private void setupCallback(int bufferSize)
     {
-        for (int i = 0; i <= CAMPREVIEW_NUM_BUFFERS; ++i)
+        for (int i = 0; i < CAMPREVIEW_NUM_BUFFERS; ++i)
         {
             byte[] cameraBuffer = new byte[bufferSize];
             mCamera.addCallbackBuffer(cameraBuffer);
@@ -579,7 +578,7 @@ public class CameraWrapper
         CameraPreviewCallback cb;
         long capture_ts;
 
-        proccesImageOnBackground(byte[] _data, CameraPreviewCallback _cb)
+        proccesImageOnBackground(final byte[] _data, CameraPreviewCallback _cb)
         {
             data = _data;
             cb = _cb;
@@ -621,13 +620,27 @@ public class CameraWrapper
                             {
                                 if (PREF__camera_get_preview_format.equals("YV12"))
                                 {
-                                    data_new = new byte[data.length];
+                                    if (data_new == null)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
+                                    else if (data_new.length < data.length)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
                                     data_new = YV12rotate90(data, data_new, camera_preview_size2.width,
                                                             camera_preview_size2.height);
                                 }
                                 else
                                 {
-                                    data_new = new byte[data.length];
+                                    if (data_new == null)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
+                                    else if (data_new.length < data.length)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
                                     data_new = NV21rotate90(data, data_new, camera_preview_size2.width,
                                                             camera_preview_size2.height);
                                 }
@@ -639,7 +652,7 @@ public class CameraWrapper
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new,
                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                  Callstate.friend_pubkey),
+                                                                                                                      Callstate.friend_pubkey),
                                                                                                               camera_preview_size2.height,
                                                                                                               camera_preview_size2.width,
                                                                                                               capture_ts);
@@ -654,7 +667,7 @@ public class CameraWrapper
                                 {
                                     HelperGeneric.toxav_video_send_frame_wrapper(data_new,
                                                                                  tox_friend_by_public_key__wrapper(
-                                                                                     Callstate.friend_pubkey),
+                                                                                         Callstate.friend_pubkey),
                                                                                  camera_preview_size2.height,
                                                                                  camera_preview_size2.width,
                                                                                  capture_ts);
@@ -666,13 +679,27 @@ public class CameraWrapper
 
                                 if (PREF__camera_get_preview_format.equals("YV12"))
                                 {
-                                    data_new = new byte[data.length];
+                                    if (data_new == null)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
+                                    else if (data_new.length < data.length)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
                                     data_new = YV12rotate270(data, data_new, camera_preview_size2.width,
                                                              camera_preview_size2.height);
                                 }
                                 else
                                 {
-                                    data_new = new byte[data.length];
+                                    if (data_new == null)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
+                                    else if (data_new.length < data.length)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
                                     data_new = NV21rotate270(data, data_new, camera_preview_size2.width,
                                                              camera_preview_size2.height);
                                 }
@@ -684,7 +711,7 @@ public class CameraWrapper
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new,
                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                  Callstate.friend_pubkey),
+                                                                                                                      Callstate.friend_pubkey),
                                                                                                               camera_preview_size2.height,
                                                                                                               camera_preview_size2.width,
                                                                                                               capture_ts);
@@ -699,7 +726,7 @@ public class CameraWrapper
                                 {
                                     HelperGeneric.toxav_video_send_frame_wrapper(data_new,
                                                                                  tox_friend_by_public_key__wrapper(
-                                                                                     Callstate.friend_pubkey),
+                                                                                         Callstate.friend_pubkey),
                                                                                  camera_preview_size2.height,
                                                                                  camera_preview_size2.width,
                                                                                  capture_ts);
@@ -709,20 +736,34 @@ public class CameraWrapper
                             {
                                 if (PREF__camera_get_preview_format.equals("YV12"))
                                 {
-                                    data_new2 = new byte[data.length];
-                                    data_new2 = YV12rotate180(data, data_new2, camera_preview_size2.width,
+                                    if (data_new == null)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
+                                    else if (data_new.length < data.length)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
+                                    data_new = YV12rotate180(data, data_new, camera_preview_size2.width,
                                                               camera_preview_size2.height);
                                 }
                                 else
                                 {
-                                    data_new2 = new byte[data.length];
-                                    data_new2 = NV21rotate180(data, data_new2, camera_preview_size2.width,
+                                    if (data_new == null)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
+                                    else if (data_new.length < data.length)
+                                    {
+                                        data_new = new byte[data.length];
+                                    }
+                                    data_new = NV21rotate180(data, data_new, camera_preview_size2.width,
                                                               camera_preview_size2.height);
                                 }
 
 
                                 MainActivity.video_buffer_2.rewind();
-                                MainActivity.video_buffer_2.put(data_new2);
+                                MainActivity.video_buffer_2.put(data_new);
 
                                 // -------------------------------------------------
                                 // android has the order YVU (instead of YUV) !!
@@ -730,9 +771,9 @@ public class CameraWrapper
                                 // -------------------------------------------------
                                 if (PREF__UV_reversed)
                                 {
-                                    video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new2,
+                                    video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new,
                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                  Callstate.friend_pubkey),
+                                                                                                                      Callstate.friend_pubkey),
                                                                                                               camera_preview_size2.width,
                                                                                                               camera_preview_size2.height,
                                                                                                               capture_ts);
@@ -745,9 +786,9 @@ public class CameraWrapper
                                 }
                                 else
                                 {
-                                    HelperGeneric.toxav_video_send_frame_wrapper(data_new2,
+                                    HelperGeneric.toxav_video_send_frame_wrapper(data_new,
                                                                                  tox_friend_by_public_key__wrapper(
-                                                                                     Callstate.friend_pubkey),
+                                                                                         Callstate.friend_pubkey),
                                                                                  camera_preview_size2.width,
                                                                                  camera_preview_size2.height,
                                                                                  capture_ts);
@@ -766,7 +807,7 @@ public class CameraWrapper
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data,
                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                  Callstate.friend_pubkey),
+                                                                                                                      Callstate.friend_pubkey),
                                                                                                               camera_preview_size2.width,
                                                                                                               camera_preview_size2.height,
                                                                                                               capture_ts);
@@ -781,7 +822,7 @@ public class CameraWrapper
                                 {
                                     HelperGeneric.toxav_video_send_frame_wrapper(data,
                                                                                  tox_friend_by_public_key__wrapper(
-                                                                                     Callstate.friend_pubkey),
+                                                                                         Callstate.friend_pubkey),
                                                                                  camera_preview_size2.width,
                                                                                  camera_preview_size2.height,
                                                                                  capture_ts);
@@ -799,7 +840,7 @@ public class CameraWrapper
                                     ((last_video_frame_sent + 2000) < System.currentTimeMillis()))
                                 {
                                     VIDEO_FRAME_RATE_OUTGOING = (int) ((((float) count_video_frame_sent / ((float) (
-                                        (System.currentTimeMillis() - last_video_frame_sent) / 1000.0f))) / 1.0f) +
+                                            (System.currentTimeMillis() - last_video_frame_sent) / 1000.0f))) / 1.0f) +
                                                                        0.5);
                                     // Log.i(TAG, "VIDEO_FRAME_RATE_OUTGOING=" + VIDEO_FRAME_RATE_OUTGOING + " fps");
                                     update_fps();
@@ -847,7 +888,7 @@ public class CameraWrapper
                     try
                     {
                         mCamera.addCallbackBuffer(
-                            data); // return the data buffer for then next onPreviewFrame call (no GC)
+                                data); // return the data buffer for then next onPreviewFrame call (no GC)
                     }
                     catch (Exception e)
                     {
@@ -905,7 +946,7 @@ public class CameraWrapper
         }
 
         @Override
-        public void onPreviewFrame(byte[] data, Camera camera)
+        public void onPreviewFrame(final byte[] data, Camera camera)
         {
             // ----------------------------
             if (data == null)
@@ -989,8 +1030,6 @@ public class CameraWrapper
                 {
                     if (!Callstate.audio_call)
                     {
-                        byte[] data_copy_ = new byte[data.length];
-                        System.arraycopy(data, 0, data_copy_, 0, data.length);
                         myProccesImageOnBackground = (proccesImageOnBackground) new proccesImageOnBackground(data,
                                                                                                              this).execute();
                     }

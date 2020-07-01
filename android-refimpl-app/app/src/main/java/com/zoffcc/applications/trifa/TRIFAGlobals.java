@@ -117,7 +117,7 @@ public class TRIFAGlobals
     final static int GLOBAL_INIT_PLAY_DELAY = 100;
     final static String GLOBAL_PLAY_DELAY_SETTING_NAME = "video_play_delay_ms4";
 
-    static final int CAMPREVIEW_NUM_BUFFERS = 2;
+    static final int CAMPREVIEW_NUM_BUFFERS = 3;
 
     static final String ORBOT_PROXY_HOST = "127.0.0.1";
     static final long ORBOT_PROXY_PORT = 9050;
