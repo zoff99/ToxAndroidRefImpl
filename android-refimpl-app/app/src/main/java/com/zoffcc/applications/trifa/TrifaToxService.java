@@ -1580,9 +1580,15 @@ public class TrifaToxService extends Service
                     {
                         e.printStackTrace();
                     }
+
                     // Log.i(TAG, "tox_iterate:--START--");
-                    //**// long s_time = System.currentTimeMillis();
+                    long s_time = System.currentTimeMillis();
                     MainActivity.tox_iterate();
+                    long e_time = System.currentTimeMillis();
+                    if ((e_time - s_time) > 20)
+                    {
+                        Log.i(TAG, "tox_iterate:--END--:" + (e_time - s_time) + "ms");
+                    }
 
                     if ((Callstate.state != 0) || (Callstate.audio_group_active))
                     {
@@ -1613,25 +1619,22 @@ public class TrifaToxService extends Service
                         {
                             tox_iteration_interval_ms = 20; // if we are in a video/audio call iterate more often
 
-/*
                             if (!tox_iterate_thread_high_prio)
                             {
                                 try
                                 {
                                     tox_iterate_thread_high_prio = true;
                                     this.setName("tox_iterate()+");
-                                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+                                    android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
                                     // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-                                    android.os.Process.setThreadPriority(
-                                            android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                                    // android.os.Process.setThreadPriority(
+                                    //        android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
                                 }
                                 catch (Exception e)
                                 {
                                     e.printStackTrace();
                                 }
                             }
-*/
-
 
                             /*
                             long tox_iteration_interval_should_be = tox_iteration_interval();

@@ -577,9 +577,13 @@ public class CameraWrapper
         private int num = -1;
         CameraPreviewCallback cb;
         long capture_ts;
+        long s_time;
 
         proccesImageOnBackground(final byte[] _data, CameraPreviewCallback _cb)
         {
+            Log.i(TAG, "proccesImageOnBackground:--START--");
+            s_time = System.currentTimeMillis();
+
             data = _data;
             cb = _cb;
             // num = (int) ((Math.random() * 10000f));
@@ -873,6 +877,8 @@ public class CameraWrapper
 
             // Log.i(TAG, "doInBackground:END:#" + num);
 
+            Log.i(TAG, "proccesImageOnBackground:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
+
             return null;
         }
 
@@ -883,6 +889,9 @@ public class CameraWrapper
             // Log.i(TAG, "doInBackground:end:#" + num);
             if (data != null)
             {
+                Log.i(TAG, "onPostExecute:--START--");
+                long s_time_3 = System.currentTimeMillis();
+
                 if (mCamera != null)
                 {
                     try
@@ -895,6 +904,8 @@ public class CameraWrapper
                         e.printStackTrace();
                     }
                 }
+
+                Log.i(TAG, "onPostExecute:--END--:" + (System.currentTimeMillis() - s_time_3) + "ms");
             }
         }
 
