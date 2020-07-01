@@ -1671,7 +1671,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     this.setName("t_va_play");
                     android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
                     // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                    // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
                 }
                 catch (Exception e)
                 {

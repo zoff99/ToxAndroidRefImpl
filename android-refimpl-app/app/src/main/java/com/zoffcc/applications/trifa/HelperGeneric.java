@@ -2817,16 +2817,16 @@ public class HelperGeneric
 
     static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
     {
-        //try
-        //{
-            // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+        try
+        {
+            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
             // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
             // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        //}
-        //catch (Exception e)
-        //{
-        //    e.printStackTrace();
-        //}
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
