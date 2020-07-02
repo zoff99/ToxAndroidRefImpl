@@ -2278,7 +2278,7 @@ void *thread_video_av(void *data)
         //usleep((av_iterate_interval / 2) * 1000);
         if(global_av_call_active == 1)
         {
-            usleep(5 * 1000);
+            usleep(10 * 1000);
         }
         else
         {
@@ -2305,7 +2305,7 @@ void *thread_audio_av(void *data)
     pthread_setname_np(pthread_self(), "t_a_iter()");
 
     int delta = 0;
-    int want_iterate_ms = 10;
+    int want_iterate_ms = 5;
     int will_sleep_ms = want_iterate_ms;
     int64_t start_time = current_time_monotonic_default();
     while(toxav_audio_thread_stop != 1)
@@ -3848,6 +3848,19 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1do_1not_1sync_1av(JNIE
     else
     {
         tox_set_do_not_sync_av(false);
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1onion_1active(JNIEnv *env, jobject thiz, jint active)
+{
+    if (active == 1)
+    {
+        tox_set_onion_active(true);
+    }
+    else
+    {
+        tox_set_onion_active(false);
     }
 }
 
