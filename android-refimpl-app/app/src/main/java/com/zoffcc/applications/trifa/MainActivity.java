@@ -2280,7 +2280,9 @@ public class MainActivity extends AppCompatActivity
 
     public static native int jni_iterate_videocall_audio(int delta_new, int want_ms_output, int channels, int sample_rate, int send_emtpy_buffer);
 
-    public static native int tox_set_do_not_sync_av(int do_not_sync_av);
+    public static native void tox_set_do_not_sync_av(int do_not_sync_av);
+
+    public static native void tox_set_onion_active(int active);
     // ----------- TRIfA internal -----------
 
     public static native long tox_kill();

@@ -2817,8 +2817,8 @@ public class HelperGeneric
 
     static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
     {
-        Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--START--:");
-        long s_time_a = System.currentTimeMillis();
+        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--START--:");
+        // long s_time_a = System.currentTimeMillis();
 
 /*
         try
@@ -2851,8 +2851,8 @@ public class HelperGeneric
                 {
                     try
                     {
-                        Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--START--:");
-                        long s_time = System.currentTimeMillis();
+                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--START--:");
+                        // long s_time = System.currentTimeMillis();
 
                         if (MainActivity.PREF__camera_get_preview_format.equals("YV12"))
                         {
@@ -2883,7 +2883,7 @@ public class HelperGeneric
                             feed_h264_encoder(buf_video_send_frame, frame_width_px, frame_height_px, video_frame_age);
                         }
 
-                        Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
+                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
                     }
                     catch (Exception e)
                     {
@@ -2900,8 +2900,8 @@ public class HelperGeneric
                 {
                     try
                     {
-                        Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:fetch:--START--:");
-                        long s_time = System.currentTimeMillis();
+                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:fetch:--START--:");
+                        // long s_time = System.currentTimeMillis();
 
                         for (int jj = 0; jj < 2; jj++)
                         {
@@ -3014,15 +3014,15 @@ public class HelperGeneric
 
                                     Log.i(TAG, "V:AGE:" + Callstate.delay_add + " : " + video_frame_age + " : " +
                                                ((int) (System.currentTimeMillis() - video_frame_age)));
-                                    Log.i(TAG, "toxav_video_send_frame_h264_age:--START--");
-                                    long s_time_send = System.currentTimeMillis();
+                                    // Log.i(TAG, "toxav_video_send_frame_h264_age:--START--");
+                                    // long s_time_send = System.currentTimeMillis();
                                     MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
                                                                                  frame_height_px, data_length,
                                                                                  (int) (System.currentTimeMillis() -
                                                                                         video_frame_age) +
                                                                                  Callstate.delay_add);
 
-                                    Log.i(TAG, "toxav_video_send_frame_h264_age:--END--:" + (System.currentTimeMillis() - s_time_send) + "ms");
+                                    // Log.i(TAG, "toxav_video_send_frame_h264_age:--END--:" + (System.currentTimeMillis() - s_time_send) + "ms");
                                 }
                                 else
                                 {
@@ -3031,7 +3031,7 @@ public class HelperGeneric
                             }
                         }
 
-                        Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:fetch:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
+                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:fetch:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
 
                     }
                     catch (Exception e)
@@ -3063,7 +3063,7 @@ public class HelperGeneric
                 }
             }
 
-            Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--END--:" + (System.currentTimeMillis() - s_time_a) + "ms");
+            // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--END--:" + (System.currentTimeMillis() - s_time_a) + "ms");
 
             return 0;
         }

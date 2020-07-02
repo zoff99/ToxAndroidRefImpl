@@ -101,6 +101,7 @@ import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
+import static com.zoffcc.applications.trifa.MainActivity.tox_set_onion_active;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -1532,6 +1533,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         super.onResume();
 
+        tox_set_onion_active(0);
+
         try
         {
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -1669,9 +1672,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 try
                 {
                     this.setName("t_va_play");
-                    android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
                     // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-                    // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
                 }
                 catch (Exception e)
                 {
@@ -1898,6 +1901,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         Log.i(TAG, "onPause:on_call_ended_actions"); //$NON-NLS-1$
         on_call_ended_actions();
+
+        tox_set_onion_active(1);
+
     }
 
     // ---------------
