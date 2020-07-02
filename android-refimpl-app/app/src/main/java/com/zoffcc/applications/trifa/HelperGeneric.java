@@ -3012,8 +3012,8 @@ public class HelperGeneric
                                         Callstate.delay_add = 10;
                                     }
 
-                                    Log.i(TAG, "V:AGE:" + Callstate.delay_add + " : " + video_frame_age + " : " +
-                                               ((int) (System.currentTimeMillis() - video_frame_age)));
+                                    //Log.i(TAG, "V:AGE:" + Callstate.delay_add + " : " + video_frame_age + " : " +
+                                    //           ((int) (System.currentTimeMillis() - video_frame_age)));
                                     // Log.i(TAG, "toxav_video_send_frame_h264_age:--START--");
                                     // long s_time_send = System.currentTimeMillis();
                                     MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
