@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
@@ -45,6 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import info.guardianproject.netcipher.client.StrongBuilder;
@@ -308,6 +310,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+        final Context this_context = this;
+
         button_export_savedata.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -315,7 +319,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             {
                 try
                 {
-                    export_savedata_unsecure();
+                    export_savedata_unsecure(this_context);
                 }
                 catch (Exception e)
                 {
@@ -331,7 +335,25 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             {
                 try
                 {
-                    import_toxsave_file_unsecure();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
+                    builder.setTitle("Import Tox Savedata");
+                    builder.setMessage("Tox Savedata File will be imported unencrypted from this location:" + "\n\n" +
+                                       MainActivity.SD_CARD_FILES_EXPORT_DIR + "/" + "I_WANT_TO_IMPORT_savedata.tox");
+
+                    builder.setPositiveButton("Yes, I want to wipe all data and import",
+                                              new DialogInterface.OnClickListener()
+                                              {
+                                                  public void onClick(DialogInterface dialog, int id)
+                                                  {
+                                                      import_toxsave_file_unsecure(this_context);
+                                                      return;
+                                                  }
+                                              });
+                    builder.setNegativeButton("Cancel", null);
+
+                    // create and show the alert dialog
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
                 catch (Exception e)
                 {
@@ -727,7 +749,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         super.onPause();
     }
 
-    public static void export_savedata_unsecure()
+    public static void export_savedata_unsecure(final Context context)
     {
         // create directory in case it does not exist yet
         try
@@ -741,6 +763,17 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         // passphrase is unused for now!
         export_savedata_file_unsecure("_", SD_CARD_FILES_EXPORT_DIR + "/" + "unsecure_export_savedata.tox");
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Export Tox Savedata");
+        builder.setMessage(
+                "Tox Savedata File will be exported unencrypted to this location:" + "\n\n" + SD_CARD_FILES_EXPORT_DIR +
+                "/" + "unsecure_export_savedata.tox");
+
+        builder.setPositiveButton("OK", null);
+
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     public static String files_and_sizes_in_dir(File directory)

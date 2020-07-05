@@ -22,7 +22,9 @@ package com.zoffcc.applications.trifa;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +37,7 @@ import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -58,8 +61,10 @@ import java.util.Date;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 
+import static android.content.Context.MODE_PRIVATE;
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
@@ -72,6 +77,8 @@ import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_f
 import static com.zoffcc.applications.trifa.Callstate.java_video_encoder_first_frame_in;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
+import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
@@ -3126,28 +3133,94 @@ public class HelperGeneric
         }
     }
 
-    static void import_toxsave_file_unsecure()
+    static void import_toxsave_file_unsecure(final Context context)
     {
         MainActivity.global_stop_tox();
         File f_src = new File(MainActivity.SD_CARD_FILES_EXPORT_DIR + "/" + "I_WANT_TO_IMPORT_savedata.tox");
+
+        if (!f_src.exists())
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Import Tox Savedata");
+            builder.setMessage("Import ERROR:" + "\n\n" + "import file does not exist");
+
+            builder.setPositiveButton("Ok", null);
+
+            // create and show the alert dialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            return;
+        }
+
+
         File f_dst = new File(MainActivity.app_files_directory + "/" + "savedata.tox");
         try
         {
             ls_file(f_src);
             ls_file(f_dst);
 
+            // write toxsave data
             io_file_copy(f_src, f_dst);
 
             ls_file(f_dst);
+
+            try
+            {
+                // delete unencrypted import file
+                f_src.delete();
+            }
+            catch (Exception e)
+            {
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
 
-        // after importing the file. just stop the app hard
-        // tox_service_fg.stop_me(true);
-        MainActivity.exit();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Import Tox Savedata");
+        builder.setMessage("Import OK:" + "\n\n" + "Now TRIfA will restart");
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
+            {
+                // -----------------------------------------
+                // wipe password
+                // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+                //settings.edit().putString("DB_secrect_key", "").commit();
+                // -----------------------------------------
+                // wipe database
+                String dbs_path = context.getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+                File f_dbs = new File(dbs_path);
+                f_dbs.delete();
+                // wipe encrypted filesystem
+                String encfs_path = context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+                File encfs_dbs = new File(encfs_path);
+                encfs_dbs.delete();
+                //
+                String encfs_path2 =
+                        context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-shm";
+                File encfs_dbs2 = new File(encfs_path2);
+                encfs_dbs2.delete();
+                //
+                String encfs_path3 =
+                        context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-wal";
+                File encfs_dbs3 = new File(encfs_path3);
+                encfs_dbs3.delete();
+                //
+                // after importing the file. just stop the app hard
+                // tox_service_fg.stop_me(true);
+                MainActivity.exit();
+                return;
+            }
+        });
+
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     static void ls_file(File f)
