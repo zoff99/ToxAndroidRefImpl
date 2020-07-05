@@ -14,6 +14,15 @@ download_full="1"
 build_yasm="1"
 ## ----------------------
 
+## ----------------------
+_FFMPEG_VERSION_="n4.1.6"
+_OPUS_VERSION_="v1.3.1"
+_VPX_VERSION_="v1.8.2"
+_LIBSODIUM_VERSION_="1.0.18"
+_X264_VERSION_="1771b556ee45207f8711744ccbd5d42a3949b14c"
+## ----------------------
+
+
 
 ## set this to make c-toxcore log more verbose -------------
 export DEBUG_TOXCORE_LOGGING=" -DMIN_LOGGER_LEVEL=1 "
@@ -255,7 +264,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -298,7 +307,7 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     cd $_s_;git clone https://code.videolan.org/videolan/x264.git
-    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_/x264/; git checkout "$_X264_VERSION_" # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -314,7 +323,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
@@ -339,7 +348,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- OPUS ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -355,7 +364,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBSODIUM ---
-    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_;git clone --depth=1 --branch="$_LIBSODIUM_VERSION_" https://github.com/jedisct1/libsodium.git
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -793,7 +802,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -836,7 +845,7 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     cd $_s_;git clone https://code.videolan.org/videolan/x264.git
-    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_/x264/; git checkout "$_X264_VERSION_" # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -856,7 +865,7 @@ if [ "$full""x" == "1x" ]; then
 # ls -al /root/work//arm64_inst//toolchains//arm64/lib/gcc/aarch64-linux-android/4.9.x/include/arm_neon.h
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     cd $_s_;wget 'https://raw.githubusercontent.com/cmeng-git/vpx-android/de613e367ea86190955a836c3c0f2bc0f260562f/patches/10.libvpx_configure.sh.patch' -O aa.patch
     cd $_s_; patch -p1 < aa.patch
     rm -Rf "$_BLD_"
@@ -885,7 +894,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- OPUS ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -901,7 +910,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBSODIUM ---
-    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_;git clone --depth=1 --branch="$_LIBSODIUM_VERSION_" https://github.com/jedisct1/libsodium.git
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -1347,7 +1356,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -1391,7 +1400,7 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     cd $_s_;git clone https://code.videolan.org/videolan/x264.git
-    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_/x264/; git checkout "$_X264_VERSION_" # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -1409,7 +1418,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
@@ -1436,7 +1445,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- OPUS ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -1452,7 +1461,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBSODIUM ---
-    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_;git clone --depth=1 --branch="$_LIBSODIUM_VERSION_" https://github.com/jedisct1/libsodium.git
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -1750,7 +1759,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -1794,7 +1803,7 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     cd $_s_;git clone https://code.videolan.org/videolan/x264.git
-    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_/x264/; git checkout "$_X264_VERSION_" # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -1812,7 +1821,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
@@ -1841,7 +1850,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- OPUS ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -1857,7 +1866,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBSODIUM ---
-    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_;git clone --depth=1 --branch="$_LIBSODIUM_VERSION_" https://github.com/jedisct1/libsodium.git
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
