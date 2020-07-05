@@ -17,7 +17,7 @@ build_yasm="1"
 ## ----------------------
 _FFMPEG_VERSION_="n4.1.6"
 _OPUS_VERSION_="v1.3.1"
-_VPX_VERSION_="v1.8.2"
+_VPX_VERSION_="v1.8.0"
 _LIBSODIUM_VERSION_="1.0.18"
 _X264_VERSION_="1771b556ee45207f8711744ccbd5d42a3949b14c"
 ## ----------------------
