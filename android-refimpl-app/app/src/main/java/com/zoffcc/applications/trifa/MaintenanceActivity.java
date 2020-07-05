@@ -30,8 +30,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +45,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import info.guardianproject.netcipher.client.StrongBuilder;
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder2;
 import okhttp3.OkHttpClient;
@@ -55,14 +55,14 @@ import okhttp3.Response;
 
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_tcprelay_nodes_into_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_udp_nodes_into_db;
+import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
+import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SelectLanguageActivity_ID;
-import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
-import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -240,7 +240,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 try
                 {
                     getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE).
-                        edit().putString(RECENT_EMOJIS, "").commit();
+                            edit().putString(RECENT_EMOJIS, "").commit();
                 }
                 catch (Exception e)
                 {
@@ -286,8 +286,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     {
                         Log.i(TAG, "StrongOkHttpClientBuilder:002T");
                         StrongOkHttpClientBuilder2 bb = StrongOkHttpClientBuilder2.
-                            forMaxSecurity(MaintenanceActivity.this).
-                            withTorValidation();
+                                forMaxSecurity(MaintenanceActivity.this).
+                                withTorValidation();
                         bb.build(MaintenanceActivity.this);
                         Log.i(TAG, "StrongOkHttpClientBuilder:003T");
                     }
@@ -520,8 +520,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
 
         text_sqlstats.setText(
-            "Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " +
-            num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
+                "Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " +
+                num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
 
         maint_handler_s = maint_handler;
     }
@@ -550,11 +550,11 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 {
                     Log.i(TAG, "onConnected:002");
                     Request request = new Request.Builder().url(TOX_NODELIST_URL).
-                        build();
+                            build();
 
                     Response response = okHttpClient.
-                        newCall(request).
-                        execute();
+                            newCall(request).
+                            execute();
                     Log.i(TAG, "onConnected:003");
 
                     // Type type = new TypeToken<List<NodeListJS>>()
@@ -729,8 +729,18 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
     public static void export_savedata_unsecure()
     {
+        // create directory in case it does not exist yet
+        try
+        {
+            File export_dir = new File(SD_CARD_FILES_EXPORT_DIR + "/");
+            export_dir.mkdirs();
+        }
+        catch (Exception e)
+        {
+        }
         // passphrase is unused for now!
         export_savedata_file_unsecure("_", SD_CARD_FILES_EXPORT_DIR + "/" + "unsecure_export_savedata.tox");
+
     }
 
     public static String files_and_sizes_in_dir(File directory)
@@ -755,12 +765,12 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         if ((file.length() / 1024 / 1024) < 1)
                         {
                             ret.append("\n").append(file.getName()).append("  \t").append(file.length()).append(
-                                " Bytes");
+                                    " Bytes");
                         }
                         else
                         {
                             ret.append("\n").append(file.getName()).append("  \t").append(
-                                file.length() / 1024 / 1024).append(" MBytes");
+                                    file.length() / 1024 / 1024).append(" MBytes");
                         }
                         size_sum = size_sum + file.length();
                         // Log.i(TAG, "files_and_sizes_in_dir:size_sum=" + size_sum);
