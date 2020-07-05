@@ -628,7 +628,15 @@ public class TrifaToxService extends Service
 
                 HelperGeneric.update_savedata_file_wrapper(); // save on tox shutdown
 
-                ToxServiceThread.interrupt();
+                try
+                {
+                    ToxServiceThread.interrupt();
+                }
+                catch (Exception e)
+                {
+
+                }
+
                 Log.i(TAG, "stop_tox_fg:003");
                 try
                 {
@@ -1120,7 +1128,13 @@ public class TrifaToxService extends Service
                 }
 
 
-                load_and_add_all_conferences();
+                try
+                {
+                    load_and_add_all_conferences();
+                }
+                catch (Exception e)
+                {
+                }
 
                 global_self_last_went_offline_timestamp = System.currentTimeMillis();
                 Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp +
@@ -1417,9 +1431,22 @@ public class TrifaToxService extends Service
                                                     "BATTERY_SAVINGS_MODE__finish__connecting");
 
                                             // update all friends again
-                                            load_and_add_all_friends();
+                                            try
+                                            {
+                                                load_and_add_all_friends();
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
                                             // load conferences again
-                                            load_and_add_all_conferences();
+                                            try
+                                            {
+                                                load_and_add_all_conferences();
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+
                                             Log.i(TAG, "BATTERY SAVINGS MODE, load_and_add_all_conferences");
 
                                             // iterate a few times ---------------------
