@@ -25,11 +25,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Px;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +53,11 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
+
+import androidx.annotation.Px;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
@@ -138,28 +140,28 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).
-            color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
+                color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
 
         conference_message_profile_item = new ProfileDrawerItem().
-            withName("Userlist").
-            withIcon(drawer_header_icon);
+                withName("Userlist").
+                withIcon(drawer_header_icon);
 
         // Create the AccountHeader
         conference_message_drawer_header = new AccountHeaderBuilder().
-            withActivity(this).
-            withSelectionListEnabledForSingleProfile(false).
-            withTextColor(getResources().getColor(R.color.md_dark_primary_text)).
-            withHeaderBackground(R.color.colorHeader).
-            withCompactStyle(true).
-            addProfiles(conference_message_profile_item).
-            withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
-            {
-                @Override
-                public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                withActivity(this).
+                withSelectionListEnabledForSingleProfile(false).
+                withTextColor(getResources().getColor(R.color.md_dark_primary_text)).
+                withHeaderBackground(R.color.colorHeader).
+                withCompactStyle(true).
+                addProfiles(conference_message_profile_item).
+                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
                 {
-                    return false;
-                }
-            }).build();
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+                    {
+                        return false;
+                    }
+                }).build();
 
         //        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).
         //                withIdentifier(1L).
@@ -172,35 +174,35 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         // create the drawer and remember the `Drawer` result object
         conference_message_drawer = new DrawerBuilder().
-            withActivity(this).
-            withAccountHeader(conference_message_drawer_header).
-            withInnerShadow(false).
-            withRootView(R.id.drawer_container).
-            withShowDrawerOnFirstLaunch(false).
-            withActionBarDrawerToggleAnimated(true).
-            withActionBarDrawerToggle(true).
-            withToolbar(toolbar).
-            withTranslucentStatusBar(false).
-            withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-            {
-                @Override
-                public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                withActivity(this).
+                withAccountHeader(conference_message_drawer_header).
+                withInnerShadow(false).
+                withRootView(R.id.drawer_container).
+                withShowDrawerOnFirstLaunch(false).
+                withActionBarDrawerToggleAnimated(true).
+                withActionBarDrawerToggle(true).
+                withToolbar(toolbar).
+                withTranslucentStatusBar(false).
+                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                 {
-                    Log.i(TAG, "drawer:item=" + position);
-                    if (position == 1)
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
                     {
-                        // profile
-                        try
+                        Log.i(TAG, "drawer:item=" + position);
+                        if (position == 1)
                         {
+                            // profile
+                            try
+                            {
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
+                        return true;
                     }
-                    return true;
-                }
-            }).build();
+                }).build();
 
 
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
@@ -221,10 +223,10 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         setUpEmojiPopup();
 
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
-            icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-            color(getResources().
-                getColor(R.color.colorPrimaryDark)).
-            sizeDp(80);
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                color(getResources().
+                        getColor(R.color.colorPrimaryDark)).
+                sizeDp(80);
 
         insert_emoji.setImageDrawable(d1);
 
@@ -239,13 +241,13 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         attachemnt_instead_of_send = true;
         ml_button_01.setImageDrawable(send_message_icon);
 
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
         if (PREF__use_incognito_keyboard)
@@ -288,8 +290,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                             if (peer_count > -1)
                             {
                                 ml_maintext.setText(
-                                    f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count + " " +
-                                    getString(R.string.GroupActivityOffline) + " " + frozen_peer_count);
+                                        f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count +
+                                        " " + getString(R.string.GroupActivityOffline) + " " + frozen_peer_count);
                             }
                             else
                             {
@@ -398,24 +400,24 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     private void setUpEmojiPopup()
     {
         emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(
-            new OnEmojiBackspaceClickListener()
-            {
-                @Override
-                public void onEmojiBackspaceClick(View v)
+                new OnEmojiBackspaceClickListener()
                 {
+                    @Override
+                    public void onEmojiBackspaceClick(View v)
+                    {
 
-                }
+                    }
 
-            }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
+                }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
         {
             @Override
             public void onEmojiPopupShown()
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                    icon(FontAwesome.Icon.faw_keyboard).
-                    color(getResources().
-                        getColor(R.color.colorPrimaryDark)).
-                    sizeDp(80);
+                        icon(FontAwesome.Icon.faw_keyboard).
+                        color(getResources().
+                                getColor(R.color.colorPrimaryDark)).
+                        sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.about_icon_email);
@@ -433,10 +435,10 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             public void onEmojiPopupDismiss()
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                    icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                    color(getResources().
-                        getColor(R.color.colorPrimaryDark)).
-                    sizeDp(80);
+                        icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                        color(getResources().
+                                getColor(R.color.colorPrimaryDark)).
+                        sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
@@ -485,6 +487,23 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         {
             main_handler_s.post(myRunnable);
         }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+        if (event.getAction() == KeyEvent.ACTION_DOWN)
+        {
+            switch (event.getKeyCode())
+            {
+                case KeyEvent.KEYCODE_ENTER:
+                case KeyEvent.KEYCODE_NUMPAD_ENTER:
+                    Log.i(TAG, "dispatchKeyEvent:KEYCODE_ENTER");
+                    send_message_onclick(null);
+                    return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     synchronized public void send_message_onclick(View view)
@@ -609,7 +628,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     try
                     {
                         amode = MainActivity.conference_message_list_activity.startSupportActionMode(
-                            new ToolbarActionMode(context));
+                                new ToolbarActionMode(context));
                         v.setBackgroundColor(Color.GRAY);
                         ret.is_selected = true;
                         selected_conference_messages.add(message_.id);
@@ -855,7 +874,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                         try
                                         {
                                             fl_temp = orma.selectFromFriendList().
-                                                tox_public_key_stringEq(peer_pubkey).toList().get(0);
+                                                    tox_public_key_stringEq(peer_pubkey).toList().get(0);
 
                                             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
                                             {
@@ -863,7 +882,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                                 try
                                                 {
                                                     f1 = new info.guardianproject.iocipher.File(
-                                                        fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                                                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                                                     if (f1.length() > 0)
                                                     {
                                                         have_avatar_for_pubkey = true;
@@ -892,45 +911,45 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                         {
                                             new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
                                                                                           peer_pubkey).
-                                                withIdentifier(peernum).
-                                                withName(name3).
-                                                withBadge("" + peernum).withBadgeStyle(
-                                                new BadgeStyle().withTextColor(Color.WHITE).withColorRes(
-                                                    R.color.md_red_700)).
-                                                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-                                                {
-                                                    @Override
-                                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                    withIdentifier(peernum).
+                                                    withName(name3).
+                                                    withBadge("" + peernum).withBadgeStyle(
+                                                    new BadgeStyle().withTextColor(Color.WHITE).withColorRes(
+                                                            R.color.md_red_700)).
+                                                    withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                                                     {
-                                                        Intent intent = new Intent(view.getContext(),
-                                                                                   ConferencePeerInfoActivity.class);
-                                                        intent.putExtra("peer_pubkey", peer_pubkey);
-                                                        intent.putExtra("conf_id", conf_id);
-                                                        view.getContext().startActivity(intent);
-                                                        return true;
-                                                    }
-                                                });
+                                                        @Override
+                                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                        {
+                                                            Intent intent = new Intent(view.getContext(),
+                                                                                       ConferencePeerInfoActivity.class);
+                                                            intent.putExtra("peer_pubkey", peer_pubkey);
+                                                            intent.putExtra("conf_id", conf_id);
+                                                            view.getContext().startActivity(intent);
+                                                            return true;
+                                                        }
+                                                    });
                                         }
                                         catch (Exception e)
                                         {
                                             e.printStackTrace();
                                             new_item = new ConferenceCustomDrawerPeerItem(false, null).
-                                                withIdentifier(peernum).
-                                                withName(name3).
-                                                withIcon(GoogleMaterial.Icon.gmd_face).
-                                                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-                                                {
-                                                    @Override
-                                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                    withIdentifier(peernum).
+                                                    withName(name3).
+                                                    withIcon(GoogleMaterial.Icon.gmd_face).
+                                                    withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                                                     {
-                                                        Intent intent = new Intent(view.getContext(),
-                                                                                   ConferencePeerInfoActivity.class);
-                                                        intent.putExtra("peer_pubkey", peer_pubkey);
-                                                        intent.putExtra("conf_id", conf_id);
-                                                        view.getContext().startActivity(intent);
-                                                        return true;
-                                                    }
-                                                });
+                                                        @Override
+                                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                        {
+                                                            Intent intent = new Intent(view.getContext(),
+                                                                                       ConferencePeerInfoActivity.class);
+                                                            intent.putExtra("peer_pubkey", peer_pubkey);
+                                                            intent.putExtra("conf_id", conf_id);
+                                                            view.getContext().startActivity(intent);
+                                                            return true;
+                                                        }
+                                                    });
                                         }
 
                                         // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);

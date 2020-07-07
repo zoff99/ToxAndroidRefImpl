@@ -35,13 +35,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import androidx.annotation.Px;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +63,11 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import java.io.File;
 
+import androidx.annotation.Px;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
+
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.insert_into_filetransfer_db;
@@ -73,12 +75,14 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.update_filetransf
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperMessage.insert_into_message_db;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
@@ -86,8 +90,6 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
-import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
-import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FILE_PICK_METHOD;
@@ -209,10 +211,10 @@ public class MessageListActivity extends AppCompatActivity
         setUpEmojiPopup();
 
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
-            icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-            color(getResources().
-                getColor(R.color.colorPrimaryDark)).
-            sizeDp(80);
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                color(getResources().
+                        getColor(R.color.colorPrimaryDark)).
+                sizeDp(80);
 
         insert_emoji.setImageDrawable(d1);
         // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
@@ -229,9 +231,9 @@ public class MessageListActivity extends AppCompatActivity
         });
 
         final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
         ml_friend_typing.setText("");
         attachemnt_instead_of_send = true;
@@ -239,7 +241,7 @@ public class MessageListActivity extends AppCompatActivity
 
         if (PREF__use_incognito_keyboard)
         {
-            ml_new_message.setImeOptions(EditorInfo.IME_ACTION_SEND|EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
+            ml_new_message.setImeOptions(EditorInfo.IME_ACTION_SEND | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
         }
         else
         {
@@ -362,11 +364,11 @@ public class MessageListActivity extends AppCompatActivity
         });
 
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
         final Drawable d3 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_video).color(
-            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_video_icon.setImageDrawable(d3);
 
         final long fn = friendnum;
@@ -453,9 +455,9 @@ public class MessageListActivity extends AppCompatActivity
             if (need_migrate_old_msg_date == true)
             {
                 orma.getConnection().execSQL(
-                    "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
-                    " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
-                    " and msg_version='0'");
+                        "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
+                        " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
+                        " and msg_version='0'");
                 Log.i(TAG, "onCreate:migrate_old_msg_date");
 
                 // now remember that we did that, and don't do it again
@@ -486,9 +488,9 @@ public class MessageListActivity extends AppCompatActivity
             if (need_migrate_old_ft_date == true)
             {
                 orma.getConnection().execSQL(
-                    "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
-                    " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
-                    " and TRIFA_MESSAGE_TYPE ='1'");
+                        "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
+                        " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
+                        " and TRIFA_MESSAGE_TYPE ='1'");
                 Log.i(TAG, "onCreate:migrate_old_ft_date");
 
                 // now remember that we did that, and don't do it again
@@ -581,24 +583,24 @@ public class MessageListActivity extends AppCompatActivity
 
 
         emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(
-            new OnEmojiBackspaceClickListener()
-            {
-                @Override
-                public void onEmojiBackspaceClick(View v)
+                new OnEmojiBackspaceClickListener()
                 {
+                    @Override
+                    public void onEmojiBackspaceClick(View v)
+                    {
 
-                }
+                    }
 
-            }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
+                }).setOnEmojiPopupShownListener(new OnEmojiPopupShownListener()
         {
             @Override
             public void onEmojiPopupShown()
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                    icon(FontAwesome.Icon.faw_keyboard).
-                    color(getResources().
-                        getColor(R.color.colorPrimaryDark)).
-                    sizeDp(80);
+                        icon(FontAwesome.Icon.faw_keyboard).
+                        color(getResources().
+                                getColor(R.color.colorPrimaryDark)).
+                        sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.about_icon_email);
@@ -616,10 +618,10 @@ public class MessageListActivity extends AppCompatActivity
             public void onEmojiPopupDismiss()
             {
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                    icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                    color(getResources().
-                        getColor(R.color.colorPrimaryDark)).
-                    sizeDp(80);
+                        icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                        color(getResources().
+                                getColor(R.color.colorPrimaryDark)).
+                        sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
@@ -649,8 +651,8 @@ public class MessageListActivity extends AppCompatActivity
                 try
                 {
                     int tox_user_status_friend = TrifaToxService.orma.selectFromFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                        toList().get(0).TOX_USER_STATUS;
+                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                            toList().get(0).TOX_USER_STATUS;
 
                     if (tox_user_status_friend == 0)
                     {
@@ -709,7 +711,6 @@ public class MessageListActivity extends AppCompatActivity
             main_handler_s.post(myRunnable);
         }
     }
-
 
     public void send_attatchment(View view)
     {
@@ -819,6 +820,23 @@ public class MessageListActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+        if (event.getAction() == KeyEvent.ACTION_DOWN)
+        {
+            switch (event.getKeyCode())
+            {
+                case KeyEvent.KEYCODE_ENTER:
+                case KeyEvent.KEYCODE_NUMPAD_ENTER:
+                    Log.i(TAG, "dispatchKeyEvent:KEYCODE_ENTER");
+                    send_message_onclick(null);
+                    return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
     /* HINT: send a message to a friend */
     synchronized public void send_message_onclick(View view)
     {
@@ -829,7 +847,10 @@ public class MessageListActivity extends AppCompatActivity
         {
             if (attachemnt_instead_of_send)
             {
-                send_attatchment(view);
+                if (view != null)
+                {
+                    send_attatchment(view);
+                }
             }
             else
             {
