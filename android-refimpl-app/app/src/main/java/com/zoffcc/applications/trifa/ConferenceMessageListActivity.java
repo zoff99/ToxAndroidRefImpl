@@ -30,6 +30,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -207,6 +208,19 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
         ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
+
+        // give focus to text input
+        ml_new_message.requestFocus();
+        try
+        {
+            // hide softkeyboard initially
+            // since it takes a lot of screen space
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        }
+        catch(Exception e)
+        {
+        }
+
         insert_emoji = (ImageView) findViewById(R.id.insert_emoji);
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
