@@ -588,7 +588,7 @@ echo "-------- compiler version --------"
 echo ""
 echo ""
 
-git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
@@ -1137,7 +1137,7 @@ echo "-------- compiler version --------"
 echo ""
 echo ""
 
-git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
 
 set -x
@@ -1543,7 +1543,7 @@ echo "compiling jni-c-toxcore ..."
 # make certain warnings into errors!
 WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
 
-git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
@@ -1950,7 +1950,7 @@ echo "compiling jni-c-toxcore ..."
 # make certain warnings into errors!
 WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
 
-git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
