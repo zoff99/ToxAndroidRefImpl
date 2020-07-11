@@ -417,10 +417,10 @@ cp -av /root/work/jni-c-toxcore $_s_/
 
 
 # --- filter_audio ---
-cd $_s_/jni-c-toxcore/filter_audio; make clean; make
-cd $_s_/jni-c-toxcore/filter_audio; ls -hal
-cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/
-cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/arm-linux-androideabi/sysroot/usr/include/
+#cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+#cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+#cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/
+#cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/arm-linux-androideabi/sysroot/usr/include/
 # --- filter_audio ---
 
 
@@ -602,7 +602,6 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libx264.a \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavutil.a \
-    ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
     -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
 
@@ -963,10 +962,10 @@ cp -av /root/work/jni-c-toxcore $_s_/
 
 
 # --- filter_audio ---
-cd $_s_/jni-c-toxcore/filter_audio; make clean; make
-cd $_s_/jni-c-toxcore/filter_audio; ls -hal
-cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
-cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
+#cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+#cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+#cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
+#cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
 # --- filter_audio ---
 
 
@@ -1148,7 +1147,6 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libx264.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavutil.a \
-    ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
     -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
 
@@ -1514,10 +1512,10 @@ cp -av /root/work/jni-c-toxcore $_s_/
 
 
 # --- filter_audio ---
-cd $_s_/jni-c-toxcore/filter_audio; make clean; make
-cd $_s_/jni-c-toxcore/filter_audio; ls -hal
-cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/x86/sysroot/usr/lib/
-cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/x86/sysroot/usr/include/
+#cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+#cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+#cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/x86/sysroot/usr/lib/
+#cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/x86/sysroot/usr/include/
 # --- filter_audio ---
 
 
@@ -1550,7 +1548,6 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     "$_toolchain_"/x86/sysroot/usr/lib/libx264.a \
     "$_toolchain_"/x86/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/x86/sysroot/usr/lib/libavutil.a \
-    ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
     -lm "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
 
@@ -1919,10 +1916,10 @@ cp -av /root/work/jni-c-toxcore $_s_/
 
 
 # --- filter_audio ---
-cd $_s_/jni-c-toxcore/filter_audio; make clean; make
-cd $_s_/jni-c-toxcore/filter_audio; ls -hal
-cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
-cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
+#cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+#cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+#cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
+#cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
 # --- filter_audio ---
 
 
@@ -1955,7 +1952,6 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libx264.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavutil.a \
-    ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
     -lm "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
 
