@@ -1140,6 +1140,8 @@ echo ""
 git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
 
+set -x
+
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
@@ -1162,6 +1164,8 @@ res=$?
 
 echo "... done"
 
+
+set +x
 
 if [ $res -ne 0 ]; then
     echo "ERROR"
