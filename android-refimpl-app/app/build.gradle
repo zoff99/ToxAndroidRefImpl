@@ -30,6 +30,15 @@ buildscript {
 
 apply plugin: 'com.android.application'
 
+def getGitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--verify', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
 android {
     compileSdkVersion 28
     buildToolsVersion "29.0.2"
@@ -163,6 +172,8 @@ android {
         multiDexEnabled true
 
         vectorDrawables.useSupportLibrary = true
+
+        buildConfigField "String", "GitHash", "\"${getGitHash()}\""
     }
 
     buildTypes {
@@ -465,6 +476,7 @@ project.task('calculateChecksums').doLast {
 class WitnessPluginExtension {
     List verify
 }
+
 project.extensions.create("dependencyVerification", WitnessPluginExtension)
 apply from: 'witness.gradle'
 

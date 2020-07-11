@@ -28,7 +28,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -40,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatActivity;
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
 
@@ -59,9 +59,9 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         try
         {
             AboutPage aboutPage = new AboutPage(this).
-                isRTL(false).
-                setImage(R.drawable.web_hi_res_512).
-                addWebsite(getString(R.string.Aboutpage_1)); //$NON-NLS-1$
+                    isRTL(false).
+                    setImage(R.drawable.web_hi_res_512).
+                    addWebsite(getString(R.string.Aboutpage_1)); //$NON-NLS-1$
 
             mehdi.sakout.aboutpage.Element e001 = new mehdi.sakout.aboutpage.Element();
             e001.setTitle(getString(R.string.Aboutpage_2)); //$NON-NLS-1$
@@ -72,7 +72,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                     try
                     {
                         progressDialog2 = ProgressDialog.show(Aboutpage.this, "", getString(
-                            R.string.Aboutpage_4)); //$NON-NLS-1$ //$NON-NLS-2$
+                                R.string.Aboutpage_4)); //$NON-NLS-1$ //$NON-NLS-2$
 
                         progressDialog2.setCanceledOnTouchOutside(false);
                         progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
@@ -97,7 +97,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             });
             aboutPage.addItem(e001);
             aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
-                                     MainActivity.versionName); //$NON-NLS-1$
+                                     MainActivity.versionName + "\n\n" + "TRIfA commit hash:" + BuildConfig.GitHash);
 
             Element tox_link = new Element();
             tox_link.setTitle(getString(R.string.Aboutpage_6)); //$NON-NLS-1$
@@ -281,8 +281,8 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         MainApplication.last_stack_trace_as_string = ""; // reset last stacktrace //$NON-NLS-1$
 
         // String DATA_DEBUG_DIR = new File(getExternalFilesDir(null).getAbsolutePath() + "/crashes").toString();
-        String DATA_DEBUG_DIR = new File(
-            Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes").toString(); //$NON-NLS-1$
+        String DATA_DEBUG_DIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+                                         "/trifa/crashes").toString(); //$NON-NLS-1$
 
         String date = new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.GERMAN).format(new Date()); //$NON-NLS-1$
         String full_file_name = DATA_DEBUG_DIR + "/crash_" + date + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$
