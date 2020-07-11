@@ -6207,14 +6207,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibGITHASH(JNIEnv *env,
 #if defined(GIT_HASH)
     if (strlen(GIT_HASH) < 8)
     {
-        return (*env)->NewStringUTF(env, "00000000");
+        return (*env)->NewStringUTF(env, "00000002");
     }
     else
     {
         return (*env)->NewStringUTF(env, GIT_HASH);
     }
 #else
-    return (*env)->NewStringUTF(env, "00000000");
+    return (*env)->NewStringUTF(env, "00000001");
 #endif
 
 #pragma GCC diagnostic pop
