@@ -14,6 +14,15 @@ download_full="1"
 build_yasm="1"
 ## ----------------------
 
+## ----------------------
+_FFMPEG_VERSION_="n4.1.6"
+_OPUS_VERSION_="v1.3.1"
+_VPX_VERSION_="v1.8.0"
+_LIBSODIUM_VERSION_="1.0.18"
+_X264_VERSION_="1771b556ee45207f8711744ccbd5d42a3949b14c"
+## ----------------------
+
+
 
 ## set this to make c-toxcore log more verbose -------------
 ## keep this empty for release maven artifact
@@ -256,7 +265,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -299,7 +308,7 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     cd $_s_;git clone https://code.videolan.org/videolan/x264.git
-    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_/x264/; git checkout "$_X264_VERSION_" # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -315,7 +324,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
@@ -340,7 +349,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- OPUS ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -356,7 +365,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBSODIUM ---
-    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_;git clone --depth=1 --branch="$_LIBSODIUM_VERSION_" https://github.com/jedisct1/libsodium.git
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -378,6 +387,13 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
+# ------ set c-toxcore git commit hash ------
+git_hash_for_toxcore=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_toxcore"":YY"
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+cd $_s_/c-toxcore/toxcore/ ; sed -i -e 's;^.*TOX_GIT_COMMIT_HASH.*$;#define TOX_GIT_COMMIT_HASH "'$git_hash_for_toxcore'";' tox.h
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+# ------ set c-toxcore git commit hash ------
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
@@ -409,10 +425,10 @@ cp -av /root/work/jni-c-toxcore $_s_/
 
 
 # --- filter_audio ---
-cd $_s_/jni-c-toxcore/filter_audio; make clean; make
-cd $_s_/jni-c-toxcore/filter_audio; ls -hal
-cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/
-cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/arm-linux-androideabi/sysroot/usr/include/
+#cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+#cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+#cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/
+#cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/arm-linux-androideabi/sysroot/usr/include/
 # --- filter_audio ---
 
 
@@ -580,8 +596,12 @@ echo "-------- compiler version --------"
 echo ""
 echo ""
 
+git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_jni"":YY"
+
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
+    -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/arm-linux-androideabi/sysroot/usr/include \
@@ -594,7 +614,6 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libx264.a \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavutil.a \
-    ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
     -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
 
@@ -794,7 +813,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -837,7 +856,7 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     cd $_s_;git clone https://code.videolan.org/videolan/x264.git
-    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_/x264/; git checkout "$_X264_VERSION_" # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -857,7 +876,7 @@ if [ "$full""x" == "1x" ]; then
 # ls -al /root/work//arm64_inst//toolchains//arm64/lib/gcc/aarch64-linux-android/4.9.x/include/arm_neon.h
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     cd $_s_;wget 'https://raw.githubusercontent.com/cmeng-git/vpx-android/de613e367ea86190955a836c3c0f2bc0f260562f/patches/10.libvpx_configure.sh.patch' -O aa.patch
     cd $_s_; patch -p1 < aa.patch
     rm -Rf "$_BLD_"
@@ -886,7 +905,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- OPUS ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -902,7 +921,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBSODIUM ---
-    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_;git clone --depth=1 --branch="$_LIBSODIUM_VERSION_" https://github.com/jedisct1/libsodium.git
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -924,6 +943,13 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
+# ------ set c-toxcore git commit hash ------
+git_hash_for_toxcore=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_toxcore"":YY"
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+cd $_s_/c-toxcore/toxcore/ ; sed -i -e 's;^.*TOX_GIT_COMMIT_HASH.*$;#define TOX_GIT_COMMIT_HASH "'$git_hash_for_toxcore'";' tox.h
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+# ------ set c-toxcore git commit hash ------
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
@@ -955,10 +981,10 @@ cp -av /root/work/jni-c-toxcore $_s_/
 
 
 # --- filter_audio ---
-cd $_s_/jni-c-toxcore/filter_audio; make clean; make
-cd $_s_/jni-c-toxcore/filter_audio; ls -hal
-cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
-cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
+#cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+#cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+#cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
+#cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
 # --- filter_audio ---
 
 
@@ -1126,8 +1152,14 @@ echo "-------- compiler version --------"
 echo ""
 echo ""
 
+git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_jni"":YY"
+
+set -x
+
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
+    -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include \
@@ -1140,7 +1172,6 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libx264.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavutil.a \
-    ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
     -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
 
@@ -1148,6 +1179,8 @@ res=$?
 
 echo "... done"
 
+
+set +x
 
 if [ $res -ne 0 ]; then
     echo "ERROR"
@@ -1348,7 +1381,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -1392,7 +1425,7 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     cd $_s_;git clone https://code.videolan.org/videolan/x264.git
-    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_/x264/; git checkout "$_X264_VERSION_" # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -1410,7 +1443,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
@@ -1437,7 +1470,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- OPUS ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -1453,7 +1486,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBSODIUM ---
-    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_;git clone --depth=1 --branch="$_LIBSODIUM_VERSION_" https://github.com/jedisct1/libsodium.git
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -1475,6 +1508,13 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
+# ------ set c-toxcore git commit hash ------
+git_hash_for_toxcore=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_toxcore"":YY"
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+cd $_s_/c-toxcore/toxcore/ ; sed -i -e 's;^.*TOX_GIT_COMMIT_HASH.*$;#define TOX_GIT_COMMIT_HASH "'$git_hash_for_toxcore'";' tox.h
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+# ------ set c-toxcore git commit hash ------
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
@@ -1506,10 +1546,10 @@ cp -av /root/work/jni-c-toxcore $_s_/
 
 
 # --- filter_audio ---
-cd $_s_/jni-c-toxcore/filter_audio; make clean; make
-cd $_s_/jni-c-toxcore/filter_audio; ls -hal
-cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/x86/sysroot/usr/lib/
-cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/x86/sysroot/usr/include/
+#cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+#cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+#cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/x86/sysroot/usr/lib/
+#cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/x86/sysroot/usr/include/
 # --- filter_audio ---
 
 
@@ -1525,11 +1565,14 @@ echo "compiling jni-c-toxcore ..."
 # make certain warnings into errors!
 WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
 
+git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_jni"":YY"
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
     -Wno-pointer-sign -Wno-unused-but-set-variable \
     $WARNS \
+    -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/x86/sysroot/usr/include \
@@ -1542,7 +1585,6 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     "$_toolchain_"/x86/sysroot/usr/lib/libx264.a \
     "$_toolchain_"/x86/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/x86/sysroot/usr/lib/libavutil.a \
-    ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
     -lm "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
 
@@ -1751,7 +1793,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
-    cd $_s_/libav/; git checkout n4.1.4
+    cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -1795,7 +1837,7 @@ if [ "$full""x" == "1x" ]; then
     # --- X264 ---
     # export CXXFLAGS=" -g -O3 $CF2 ";export CFLAGS=" -g -O3 $CF2 "
     cd $_s_;git clone https://code.videolan.org/videolan/x264.git
-    cd $_s_/x264/; git checkout 1771b556ee45207f8711744ccbd5d42a3949b14c # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
+    cd $_s_/x264/; git checkout "$_X264_VERSION_" # 0a84d986e7020f8344f00752e3600b9769cc1e85 # stable
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
@@ -1813,7 +1855,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch=v1.8.0 https://github.com/webmproject/libvpx.git
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
@@ -1842,7 +1884,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- OPUS ---
-    cd $_s_;git clone --depth=1 --branch=v1.3.1 https://github.com/xiph/opus.git
+    cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -1858,7 +1900,7 @@ if [ "$full""x" == "1x" ]; then
 
 
     # --- LIBSODIUM ---
-    cd $_s_;git clone --depth=1 --branch=1.0.13 https://github.com/jedisct1/libsodium.git
+    cd $_s_;git clone --depth=1 --branch="$_LIBSODIUM_VERSION_" https://github.com/jedisct1/libsodium.git
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
@@ -1880,6 +1922,13 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
+# ------ set c-toxcore git commit hash ------
+git_hash_for_toxcore=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_toxcore"":YY"
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+cd $_s_/c-toxcore/toxcore/ ; sed -i -e 's;^.*TOX_GIT_COMMIT_HASH.*$;#define TOX_GIT_COMMIT_HASH "'$git_hash_for_toxcore'";' tox.h
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+# ------ set c-toxcore git commit hash ------
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
@@ -1911,10 +1960,10 @@ cp -av /root/work/jni-c-toxcore $_s_/
 
 
 # --- filter_audio ---
-cd $_s_/jni-c-toxcore/filter_audio; make clean; make
-cd $_s_/jni-c-toxcore/filter_audio; ls -hal
-cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
-cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
+#cd $_s_/jni-c-toxcore/filter_audio; make clean; make
+#cd $_s_/jni-c-toxcore/filter_audio; ls -hal
+#cp -av $_s_/jni-c-toxcore/filter_audio/libfilteraudio.a "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/
+#cp -av $_s_/jni-c-toxcore/filter_audio/filter_audio.h "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include/
 # --- filter_audio ---
 
 
@@ -1930,11 +1979,14 @@ echo "compiling jni-c-toxcore ..."
 # make certain warnings into errors!
 WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
 
+git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_jni"":YY"
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
     -Wno-pointer-sign -Wno-unused-but-set-variable \
     $WARNS \
+    -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include \
@@ -1947,7 +1999,6 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libx264.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavutil.a \
-    ./filter_audio/libfilteraudio.a \
     coffeecatch.c coffeejni.c \
     -lm "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
 
