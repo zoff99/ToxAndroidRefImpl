@@ -386,6 +386,13 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
+# ------ set c-toxcore git commit hash ------
+git_hash_for_toxcore=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_toxcore"":YY"
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+cd $_s_/c-toxcore/toxcore/ ; sed -i -e 's;^.*TOX_GIT_COMMIT_HASH.*$;#define TOX_GIT_COMMIT_HASH "'$git_hash_for_toxcore'";' tox.h
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+# ------ set c-toxcore git commit hash ------
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
@@ -935,6 +942,13 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
+# ------ set c-toxcore git commit hash ------
+git_hash_for_toxcore=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_toxcore"":YY"
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+cd $_s_/c-toxcore/toxcore/ ; sed -i -e 's;^.*TOX_GIT_COMMIT_HASH.*$;#define TOX_GIT_COMMIT_HASH "'$git_hash_for_toxcore'";' tox.h
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+# ------ set c-toxcore git commit hash ------
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
@@ -1493,6 +1507,13 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
+# ------ set c-toxcore git commit hash ------
+git_hash_for_toxcore=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_toxcore"":YY"
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+cd $_s_/c-toxcore/toxcore/ ; sed -i -e 's;^.*TOX_GIT_COMMIT_HASH.*$;#define TOX_GIT_COMMIT_HASH "'$git_hash_for_toxcore'";' tox.h
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+# ------ set c-toxcore git commit hash ------
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
@@ -1900,6 +1921,13 @@ cd $_s_;rm -Rf c-toxcore
 cd $_s_;git clone https://github.com/zoff99/c-toxcore c-toxcore
 cd $_s_;cd c-toxcore;git checkout "zoff99/zoxcore_local_fork"
 
+# ------ set c-toxcore git commit hash ------
+git_hash_for_toxcore=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_toxcore"":YY"
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+cd $_s_/c-toxcore/toxcore/ ; sed -i -e 's;^.*TOX_GIT_COMMIT_HASH.*$;#define TOX_GIT_COMMIT_HASH "'$git_hash_for_toxcore'";' tox.h
+cat $_s_/c-toxcore/toxcore/tox.h | grep 'TOX_GIT_COMMIT_HASH'
+# ------ set c-toxcore git commit hash ------
 
 cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
