@@ -279,6 +279,7 @@ echo "###### ------------------------------"
 cd ~/
 
 # use keystore in circleCI Environment Variables -----------------------
+# HINT: create content of env var with: "cat debug.keystore | base64 --wrap=0"
 echo $seckeystore |base64 -d > ~/.android/debug.keystore
 # use keystore in circleCI Environment Variables -----------------------
 
