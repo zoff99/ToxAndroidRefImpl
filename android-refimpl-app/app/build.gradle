@@ -254,7 +254,7 @@ dependencies {
     //
     //
     //
-    implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.52@aar'
+    implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.53@aar'
     //
     //
     //
