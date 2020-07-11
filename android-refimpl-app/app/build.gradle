@@ -33,7 +33,7 @@ apply plugin: 'com.android.application'
 def getGitHash = { ->
     def stdout = new ByteArrayOutputStream()
     exec {
-        commandLine 'git', 'rev-parse', '--verify', '--short', 'HEAD'
+        commandLine 'git', 'rev-parse', '--verify', '--short=8', 'HEAD'
         standardOutput = stdout
     }
     return stdout.toString().trim()
