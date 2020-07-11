@@ -6197,6 +6197,28 @@ size_t Pipe_getFree(size_t *_rptr, size_t *_wptr)
 // --------------- _toxfuncs_ ---------------
 
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibTOXGITHASH(JNIEnv *env, jobject thiz)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunreachable-code-return"
+
+#if defined(TOX_GIT_COMMIT_HASH)
+    if (strlen(TOX_GIT_COMMIT_HASH) < 2)
+    {
+        return (*env)->NewStringUTF(env, "00000002");
+    }
+    else
+    {
+        return (*env)->NewStringUTF(env, TOX_GIT_COMMIT_HASH);
+    }
+#else
+    return (*env)->NewStringUTF(env, "00000001");
+#endif
+
+#pragma GCC diagnostic pop
+}
+
 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibGITHASH(JNIEnv *env, jobject thiz)

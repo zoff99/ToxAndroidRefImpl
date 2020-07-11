@@ -98,7 +98,8 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             aboutPage.addItem(e001);
             aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
                                      MainActivity.versionName + "\n\n" + "TRIfA commit hash:" + BuildConfig.GitHash +
-                                     "\n" + "JNI commit hash:" + MainActivity.getNativeLibGITHASH());
+                                     "\n" + "JNI commit hash:" + MainActivity.getNativeLibGITHASH() + "\n" +
+                                     "c-toxcore commit hash:" + MainActivity.getNativeLibTOXGITHASH());
 
             Element tox_link = new Element();
             tox_link.setTitle(getString(R.string.Aboutpage_6)); //$NON-NLS-1$
