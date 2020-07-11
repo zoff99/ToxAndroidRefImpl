@@ -588,8 +588,12 @@ echo "-------- compiler version --------"
 echo ""
 echo ""
 
+git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_jni"":YY"
+
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
+    -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/arm-linux-androideabi/sysroot/usr/include \
@@ -1133,8 +1137,12 @@ echo "-------- compiler version --------"
 echo ""
 echo ""
 
+git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_jni"":YY"
+
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
+    -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include \
@@ -1531,11 +1539,14 @@ echo "compiling jni-c-toxcore ..."
 # make certain warnings into errors!
 WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
 
+git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_jni"":YY"
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
     -Wno-pointer-sign -Wno-unused-but-set-variable \
     $WARNS \
+    -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/x86/sysroot/usr/include \
@@ -1935,11 +1946,14 @@ echo "compiling jni-c-toxcore ..."
 # make certain warnings into errors!
 WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
 
+git_hash_for_jni=$(git rev-parse --verify --short HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
+echo "XX:""$git_hash_for_jni"":YY"
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
     -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
     -Wno-pointer-sign -Wno-unused-but-set-variable \
     $WARNS \
+    -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
     -std=gnu99 -I"$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/include \

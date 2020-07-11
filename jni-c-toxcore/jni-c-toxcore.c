@@ -6198,6 +6198,27 @@ size_t Pipe_getFree(size_t *_rptr, size_t *_wptr)
 
 
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibGITHASH(JNIEnv *env, jobject thiz)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunreachable-code-return"
+
+#if defined(GIT_HASH)
+    if (strlen(GIT_HASH) < 8)
+    {
+        return (*env)->NewStringUTF(env, "00000000");
+    }
+    else
+    {
+        return (*env)->NewStringUTF(env, GIT_HASH);
+    }
+#else
+    return (*env)->NewStringUTF(env, "00000000");
+#endif
+
+#pragma GCC diagnostic pop
+}
 
 // JNIEXPORT void JNICALL
 // Java_com_zoffcc_applications_trifa_MainActivity_toxloop(JNIEnv* env, jobject thiz)
@@ -6209,6 +6230,7 @@ size_t Pipe_getFree(size_t *_rptr, size_t *_wptr)
 // taken from:
 // https://github.com/googlesamples/android-ndk/blob/master/hello-jni/app/src/main/cpp/hello-jni.c
 // ------------------------------------------------------------------------------------------------
+
 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibAPI(JNIEnv *env, jobject thiz)
