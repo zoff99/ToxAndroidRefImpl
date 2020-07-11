@@ -277,6 +277,11 @@ echo "###### ------------------------------"
 
 # ----- debug signing key -----
 cd ~/
+
+# use keystore in circleCI Environment Variables -----------------------
+echo $seckeystore |base64 -d > ~/.android/debug.keystore
+# use keystore in circleCI Environment Variables -----------------------
+
 ls -al ~/.android/debug.keystore
 if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
     echo "*** generating new signer key ***"
