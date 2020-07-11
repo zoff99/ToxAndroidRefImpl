@@ -6205,7 +6205,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibGITHASH(JNIEnv *env,
 #pragma GCC diagnostic ignored "-Wunreachable-code-return"
 
 #if defined(GIT_HASH)
-    if (strlen(GIT_HASH) < 8)
+    if (strlen(GIT_HASH) < 2)
     {
         return (*env)->NewStringUTF(env, "00000002");
     }
