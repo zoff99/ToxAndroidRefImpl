@@ -61,10 +61,21 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             AboutPage aboutPage = new AboutPage(this).
                     isRTL(false).
                     setImage(R.drawable.web_hi_res_512).
-                    addWebsite(getString(R.string.Aboutpage_1)); //$NON-NLS-1$
+                    addWebsite(getString(R.string.Aboutpage_1));
+
+            aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
+                                     MainActivity.versionName + "\n\n" + "TRIfA commit hash:" + BuildConfig.GitHash +
+                                     "\n" + "JNI commit hash:" + MainActivity.getNativeLibGITHASH() + "\n" +
+                                     "c-toxcore commit hash:" + MainActivity.getNativeLibTOXGITHASH());
+
+            Element tox_link = new Element();
+            tox_link.setTitle(getString(R.string.Aboutpage_6));
+            Intent tox_faq_page = new Intent(Intent.ACTION_VIEW, Uri.parse("https://tox.zoff.cc"));
+            tox_link.setIntent(tox_faq_page);
+            aboutPage.addItem(tox_link);
 
             mehdi.sakout.aboutpage.Element e001 = new mehdi.sakout.aboutpage.Element();
-            e001.setTitle(getString(R.string.Aboutpage_2)); //$NON-NLS-1$
+            e001.setTitle(getString(R.string.Aboutpage_2));
             e001.setOnClickListener(new View.OnClickListener()
             {
                 public void onClick(View v)
@@ -96,16 +107,27 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                 }
             });
             aboutPage.addItem(e001);
-            aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
-                                     MainActivity.versionName + "\n\n" + "TRIfA commit hash:" + BuildConfig.GitHash +
-                                     "\n" + "JNI commit hash:" + MainActivity.getNativeLibGITHASH() + "\n" +
-                                     "c-toxcore commit hash:" + MainActivity.getNativeLibTOXGITHASH());
 
-            Element tox_link = new Element();
-            tox_link.setTitle(getString(R.string.Aboutpage_6)); //$NON-NLS-1$
-            Intent tox_faq_page = new Intent(Intent.ACTION_VIEW, Uri.parse("https://tox.zoff.cc")); //$NON-NLS-1$
-            tox_link.setIntent(tox_faq_page);
-            aboutPage.addItem(tox_link);
+            Element trifa_commit = new Element();
+            trifa_commit.setTitle("TRIfA commit hash link");
+            Intent trifa_commit_page = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                    "https://github.com/zoff99/ToxAndroidRefImpl/commit/" + BuildConfig.GitHash));
+            trifa_commit.setIntent(trifa_commit_page);
+            aboutPage.addItem(trifa_commit);
+
+            Element jni_commit = new Element();
+            jni_commit.setTitle("JNI commit hash link");
+            Intent jni_commit_page = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                    "https://github.com/zoff99/ToxAndroidRefImpl/commit/" + MainActivity.getNativeLibGITHASH()));
+            jni_commit.setIntent(jni_commit_page);
+            aboutPage.addItem(jni_commit);
+
+            Element ct_commit = new Element();
+            ct_commit.setTitle("c-toxcore commit hash link");
+            Intent ct_commit_page = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                    "https://github.com/zoff99/c-toxcore/commit/" + MainActivity.getNativeLibTOXGITHASH()));
+            ct_commit.setIntent(ct_commit_page);
+            aboutPage.addItem(ct_commit);
 
             //  --------------------------------
             Element el2 = null;
