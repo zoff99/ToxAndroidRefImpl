@@ -26,5 +26,7 @@ A clear and concise description of what you expected to happen.
  - Android OS Version: [e.g. Android 9]
  - Device:
 
+**Add screenshots, if possible**
+
 **Additional context**
 Add any other context about the problem here.
