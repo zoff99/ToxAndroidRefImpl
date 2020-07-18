@@ -9,7 +9,7 @@ import java.security.MessageDigest
 // Zoff (c) in 2020
 //
 // run: "gradlew -q calculateChecksums"
-// to generate/update the "witness.gradle" file
+// to generate new checksums. you need to put those manually into 'witness.gradle'
 // ----------------------------------------------------
 
 class DependencyKey implements Comparable<DependencyKey> {
