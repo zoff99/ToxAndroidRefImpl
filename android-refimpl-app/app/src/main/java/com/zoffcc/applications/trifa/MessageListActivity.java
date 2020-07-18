@@ -843,7 +843,7 @@ public class MessageListActivity extends AppCompatActivity
             {
                 case KeyEvent.KEYCODE_ENTER:
                 case KeyEvent.KEYCODE_NUMPAD_ENTER:
-                    Log.i(TAG, "dispatchKeyEvent:KEYCODE_ENTER");
+                    // Log.i(TAG, "dispatchKeyEvent:KEYCODE_ENTER");
                     send_message_onclick(null);
                     return true;
             }
