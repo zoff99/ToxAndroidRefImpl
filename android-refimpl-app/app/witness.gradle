@@ -19,7 +19,7 @@ dependencyVerification {
         'androidx.documentfile:documentfile:1.0.0:documentfile-1.0.0.aar:865a061ef2fad16522f8433536b8d47208c46ff7c7745197dfa1eeb481869487',
         'androidx.drawerlayout:drawerlayout:1.0.0:drawerlayout-1.0.0.aar:9402442cdc5a43cf62fb14f8cf98c63342d4d9d9b805c8033c6cf7e802749ac1',
         'androidx.exifinterface:exifinterface:1.0.0:exifinterface-1.0.0.aar:ee48be10aab8f54efff4c14b77d11e10b9eeee4379d5ef6bf297a2923c55cc11',
-        'androidx.fragment:fragment:1.2.4:fragment-1.2.4.aar:1dc194942574302bf35dae7b81b82273505ec2d38f81d9258ad5c0448daddd82',
+        'androidx.fragment:fragment:1.2.5:fragment-1.2.5.aar:d19e82d142def6c4e136da70bf92f194c0ecc61d14ab4e84567b2ced0920fa93',
         'androidx.interpolator:interpolator:1.0.0:interpolator-1.0.0.aar:33193135a64fe21fa2c35eec6688f1a76e512606c0fc83dc1b689e37add7732a',
         'androidx.legacy:legacy-support-core-ui:1.0.0:legacy-support-core-ui-1.0.0.aar:0d1260c6e7e6a337f875df71b516931e703f716e90889817cd3a20fa5ac3d947',
         'androidx.legacy:legacy-support-core-utils:1.0.0:legacy-support-core-utils-1.0.0.aar:a7edcf01d5b52b3034073027bc4775b78a4764bb6202bb91d61c829add8dd1c7',
