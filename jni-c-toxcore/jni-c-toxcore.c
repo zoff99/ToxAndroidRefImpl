@@ -77,8 +77,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 46
-static const char global_version_string[] = "0.99.46";
+#define VERSION_PATCH 47
+static const char global_version_string[] = "0.99.47";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -4414,7 +4414,7 @@ int process_incoming_group_audio_on_iterate(int delta_new, int want_ms_output)
 
                 pthread_mutex_unlock(&group_audio___mutex);
 
-                dbg(9, "process_incoming_group_audio_on_iterate:send_empty_buffer");
+                // dbg(9, "process_incoming_group_audio_on_iterate:send_empty_buffer");
 
 
                 JNIEnv *jnienv2;
