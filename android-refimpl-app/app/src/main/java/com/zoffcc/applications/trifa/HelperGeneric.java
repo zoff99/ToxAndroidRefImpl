@@ -2900,13 +2900,10 @@ public class HelperGeneric
                 if ((global_self_last_went_online_timestamp + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
                     System.currentTimeMillis())
                 {
-                    if (global_last_activity_for_battery_savings_ts != -1)
+                    if ((global_last_activity_for_battery_savings_ts +
+                         SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) < System.currentTimeMillis())
                     {
-                        if ((global_last_activity_for_battery_savings_ts +
-                             SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) < System.currentTimeMillis())
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
