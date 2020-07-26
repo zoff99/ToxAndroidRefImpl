@@ -57,6 +57,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.battery_saving_can_sleep;
 import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.change_notification;
@@ -114,14 +115,12 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.DEBUG_BATTERY_OPTIMIZAT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_NODES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
@@ -1158,391 +1157,331 @@ public class TrifaToxService extends Service
                         }
                         else
                         {
-                            if (PREF__X_battery_saving_mode)
+                            if ((PREF__X_battery_saving_mode) && (battery_saving_can_sleep()))
                             {
-                                //Log.i(TAG,
-                                //      "BATTERY_OPTIMIZATION:global_showing_messageview=" + global_showing_messageview +
-                                //      " global_showing_anygroupview=" + global_showing_anygroupview +
-                                //      " Callstate.state=" + Callstate.state + " Callstate.audio_group_active=" +
-                                //      Callstate.audio_group_active + " global_self_connection_status=" +
-                                //      global_self_connection_status);
+                                need_wakeup_now = false;
 
-                                if ((global_self_connection_status != TOX_CONNECTION_NONE.value) &&
-                                    (!global_showing_messageview) && (!global_showing_anygroupview) &&
-                                    (Callstate.state == 0) && (!Callstate.audio_group_active))
+                                // set the used value to the new value
+                                BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
+                                Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
+                                           BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS + " PREF__X_battery_saving_timeout:" +
+                                           PREF__X_battery_saving_timeout);
+
+
+                                Log.i(TAG, "entering BATTERY SAVINGS MODE ...");
+                                TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__enter");
+
+                                long current_timestamp_ = System.currentTimeMillis();
+                                global_self_last_entered_battery_saving_timestamp = current_timestamp_;
+
+                                trifa_service_thread = Thread.currentThread();
+
+                                // ---------------------------------------------------------
+                                Intent intent_wakeup = new Intent(getApplicationContext(), WakeupAlarmReceiver.class);
+                                // intentWakeFullBroacastReceiver.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+                                PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 1001,
+                                                                                       intent_wakeup,
+                                                                                       PendingIntent.FLAG_CANCEL_CURRENT);
+                                getApplicationContext();
+                                AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(
+                                        ALARM_SERVICE);
+
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                                 {
-                                    //Log.i(TAG, "BATTERY_OPTIMIZATION:global_self_last_went_online_timestamp=" +
-                                    //           global_self_last_went_online_timestamp +
-                                    //           " global_last_activity_for_battery_savings_ts=" +
-                                    //           global_last_activity_for_battery_savings_ts +
-                                    //           " System.currentTimeMillis()=" + System.currentTimeMillis() +
-                                    //           " global_self_connection_status=" + global_self_connection_status);
+                                    //alarmManager.setExactAndAllowWhileIdle(
+                                    //        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                    //        SystemClock.elapsedRealtime() +
+                                    //        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                    //        (int) (Math.random() * 15000d) + 5000, alarmIntent);
 
-                                    if ((global_self_last_went_online_timestamp +
-                                         SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
-                                        System.currentTimeMillis())
-                                    {
-                                        if ((global_last_activity_for_battery_savings_ts +
-                                             SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) <
-                                            System.currentTimeMillis())
-                                        {
-                                            need_wakeup_now = false;
-
-                                            // set the used value to the new value
-                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS =
-                                                    PREF__X_battery_saving_timeout * 1000 * 60;
-                                            Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
-                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                       " PREF__X_battery_saving_timeout:" +
-                                                       PREF__X_battery_saving_timeout);
+                                    Log.i(TAG, "get BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
+                                               BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS);
 
 
-                                            Log.i(TAG, "entering BATTERY SAVINGS MODE ...");
-                                            TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__enter");
-
-                                            long current_timestamp_ = System.currentTimeMillis();
-                                            global_self_last_entered_battery_saving_timestamp = current_timestamp_;
-
-                                            trifa_service_thread = Thread.currentThread();
-
-                                            // ---------------------------------------------------------
-                                            Intent intent_wakeup = new Intent(getApplicationContext(),
-                                                                              WakeupAlarmReceiver.class);
-                                            // intentWakeFullBroacastReceiver.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-                                            PendingIntent alarmIntent = PendingIntent.getBroadcast(
-                                                    getApplicationContext(), 1001, intent_wakeup,
-                                                    PendingIntent.FLAG_CANCEL_CURRENT);
-                                            getApplicationContext();
-                                            AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(
-                                                    ALARM_SERVICE);
-
-
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                                            {
-                                                //alarmManager.setExactAndAllowWhileIdle(
-                                                //        AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                                //        SystemClock.elapsedRealtime() +
-                                                //        BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                //        (int) (Math.random() * 15000d) + 5000, alarmIntent);
-
-                                                Log.i(TAG, "get BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
-                                                           BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS);
-
-
-                                                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-                                                                                       System.currentTimeMillis() +
-                                                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                                                       (int) (Math.random() * 15000d) +
-                                                                                       5000, alarmIntent);
-                                            }
-                                            else
-                                            {
-                                                //alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                                //                      SystemClock.elapsedRealtime() +
-                                                //                      BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                //                      (int) (Math.random() * 15000d) + 5000,
-                                                //                      alarmIntent);
-
-                                                alarmManager.setExact(AlarmManager.RTC_WAKEUP,
-                                                                      System.currentTimeMillis() +
-                                                                      BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                                      (int) (Math.random() * 15000d) + 5000,
-                                                                      alarmIntent);
-                                            }
-
-
-                                            //MARSHMALLOW OR ABOVE
-                                            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                                            {
-                                                //alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-                                                //                                       System.currentTimeMillis() +
-                                                //                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                //                                       (int) (Math.random() * 15000d) +
-                                                //                                       5000, alarmIntent);
-
-                                                //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                                //                                 SystemClock.elapsedRealtime() +
-                                                //                                 AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                                                //                                 AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                                                //                                 alarmIntent);
-
-                                            }
-
-                                            // ---------------------------------------------------------
-
-
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
-                                                                   long_date_time_format_or_empty(
-                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
-
-                                            if (!need_wakeup_now)
-                                            {
-                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
-                                                {
-                                                    set_all_friends_offline();
-                                                    set_all_conferences_inactive();
-                                                }
-                                            }
-                                            // so that the app knows we went offline
-                                            global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                                            global_self_connection_status = TOX_CONNECTION_NONE.value;
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-
-                                            if (!need_wakeup_now)
-                                            {
-                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
-                                                {
-                                                    try
-                                                    {
-                                                        Thread.sleep(30 * 1000);
-                                                    }
-                                                    catch (Exception es)
-                                                    {
-                                                    }
-                                                }
-                                            }
-                                            MainActivity.tox_iterate();
-
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
-                                                                   long_date_time_format_or_empty(
-                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
-
-                                            if (!need_wakeup_now)
-                                            {
-                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
-                                                {
-                                                    set_all_friends_offline();
-                                                    set_all_conferences_inactive();
-                                                }
-                                            }
-                                            // so that the app knows we went offline
-                                            global_self_connection_status = TOX_CONNECTION_NONE.value;
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-
-                                            Log.i(TAG, "entering BATTERY SAVINGS MODE ... 30s");
-
-                                            if (!need_wakeup_now)
-                                            {
-                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
-                                                {
-                                                    try
-                                                    {
-                                                        Thread.sleep(30 * 1000);
-                                                    }
-                                                    catch (Exception es)
-                                                    {
-                                                    }
-                                                }
-                                            }
-                                            MainActivity.tox_iterate();
-
-                                            Log.i(TAG, "entering BATTERY SAVINGS MODE ... 60s");
-
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            change_notification(0, "sleep: " +
-                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                           1000) / 60) + "min (" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
-                                                                   long_date_time_format_or_empty(
-                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
-
-                                            if (!need_wakeup_now)
-                                            {
-                                                if ((!global_showing_messageview) && (!global_showing_anygroupview))
-                                                {
-                                                    set_all_friends_offline();
-                                                    set_all_conferences_inactive();
-                                                }
-                                            }
-                                            // so that the app knows we went offline
-                                            global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                                            global_self_connection_status = TOX_CONNECTION_NONE.value;
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-                                            // --------------- set everything to offline ---------------
-
-                                            long sleep_in_sec = BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
-                                            // add some random value, so that the sleep is not always exactly the same
-                                            sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
-                                            sleep_in_sec = sleep_in_sec / 1000;
-                                            sleep_in_sec = sleep_in_sec / 10; // now in 10s of seconds!!
-
-                                            Log.i(TAG,
-                                                  "entering BATTERY SAVINGS MODE ... sleep for " + (10 * sleep_in_sec) +
-                                                  "s");
-
-                                            for (int ii = 0; ii < sleep_in_sec; ii++)
-                                            {
-                                                if ((global_showing_messageview) || (global_showing_anygroupview))
-                                                {
-                                                    // if the user opens the message view, or any group view -> go online, to be able to send messages
-                                                    Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
-                                                    TrifaToxService.write_debug_file(
-                                                            "BATTERY_SAVINGS_MODE__finish__msgview");
-                                                    break;
-                                                }
-
-                                                if (need_wakeup_now)
-                                                {
-                                                    break;
-                                                }
-
-                                                try
-                                                {
-                                                    Thread.sleep(10 * 1000); // sleep very long!!
-                                                    //Log.i(TAG,
-                                                    //      "BATTERY SAVINGS MODE (sleep " + ii + "/" + sleep_in_sec +
-                                                    //      ")");
-                                                }
-                                                catch (Exception es)
-                                                {
-                                                    TrifaToxService.write_debug_file(
-                                                            "BATTERY_SAVINGS_MODE__finish__interrupted");
-                                                    break;
-                                                }
-                                            }
-
-                                            Log.i(TAG, "finish BATTERY SAVINGS MODE, connecting again");
-                                            TrifaToxService.write_debug_file(
-                                                    "BATTERY_SAVINGS_MODE__finish__connecting");
-
-                                            // update all friends again
-                                            try
-                                            {
-                                                load_and_add_all_friends();
-                                            }
-                                            catch (Exception e)
-                                            {
-                                            }
-                                            // load conferences again
-                                            try
-                                            {
-                                                load_and_add_all_conferences();
-                                            }
-                                            catch (Exception e)
-                                            {
-                                            }
-
-                                            Log.i(TAG, "BATTERY SAVINGS MODE, load_and_add_all_conferences");
-
-                                            // iterate a few times ---------------------
-                                            MainActivity.tox_iterate();
-                                            try
-                                            {
-                                                Thread.sleep(10);
-                                            }
-                                            catch (Exception es)
-                                            {
-                                            }
-                                            MainActivity.tox_iterate();
-                                            try
-                                            {
-                                                Thread.sleep(10);
-                                            }
-                                            catch (Exception es)
-                                            {
-                                            }
-                                            MainActivity.tox_iterate();
-                                            try
-                                            {
-                                                Thread.sleep(10);
-                                            }
-                                            catch (Exception es)
-                                            {
-                                            }
-                                            // iterate a few times ---------------------
-
-                                            need_wakeup_now = false;
-                                            trifa_service_thread = null;
-
-                                            // bootstrap_single_wrapper("127.3.2.1",9988, "AAA236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9FFF");
-
-                                            int TOX_CONNECTION_a = tox_self_get_connection_status();
-                                            if (TOX_CONNECTION_a == TOX_CONNECTION_NONE.value)
-                                            {
-                                                bootstrapping = true;
-                                                global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                                                Log.i(TAG, "BATTERY SAVINGS MODE, bootstrapping");
-                                                change_notification(TOX_CONNECTION_a,
-                                                                    ""); // set to real connection status
-                                                bootstrap_me();
-                                                TrifaToxService.write_debug_file(
-                                                        "BATTERY_SAVINGS_MODE__finish__bootstrapping");
-                                            }
-                                            else
-                                            {
-                                                bootstrapping = false;
-                                                global_self_last_went_online_timestamp = System.currentTimeMillis();
-                                                global_self_last_went_offline_timestamp = -1;
-                                                change_notification(TOX_CONNECTION_a,
-                                                                    ""); // set to real connection status
-                                                Log.i(TAG, "BATTERY SAVINGS MODE, already_online");
-
-                                                TrifaToxService.write_debug_file(
-                                                        "BATTERY_SAVINGS_MODE__finish__already_online");
-                                            }
-
-
-                                            BATTERY_OPTIMIZATION_LAST_SLEEP3 = BATTERY_OPTIMIZATION_LAST_SLEEP2;
-                                            BATTERY_OPTIMIZATION_LAST_SLEEP2 = BATTERY_OPTIMIZATION_LAST_SLEEP1;
-                                            BATTERY_OPTIMIZATION_LAST_SLEEP1 = (int) (
-                                                    (System.currentTimeMillis() - current_timestamp_) / 1000 / 60);
-                                            if ((BATTERY_OPTIMIZATION_LAST_SLEEP1 < 0) ||
-                                                (BATTERY_OPTIMIZATION_LAST_SLEEP1 > (3 * 3600 * 1000)))
-                                            {
-                                                BATTERY_OPTIMIZATION_LAST_SLEEP1 = -1;
-                                            }
-
-
-                                            // set the used value to the new value
-                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS =
-                                                    PREF__X_battery_saving_timeout * 1000 * 60;
-                                            Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
-                                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
-                                                       " PREF__X_battery_saving_timeout:" +
-                                                       PREF__X_battery_saving_timeout);
-
-                                            // global_self_connection_status = tox_self_get_connection_status();
-
-                                        }
-                                        else
-                                        {
-                                            Thread.sleep(tox_iteration_interval_ms);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Thread.sleep(tox_iteration_interval_ms);
-                                    }
+                                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                                                                           System.currentTimeMillis() +
+                                                                           BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                                           (int) (Math.random() * 15000d) + 5000,
+                                                                           alarmIntent);
                                 }
                                 else
                                 {
-                                    Thread.sleep(tox_iteration_interval_ms);
+                                    //alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                    //                      SystemClock.elapsedRealtime() +
+                                    //                      BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                    //                      (int) (Math.random() * 15000d) + 5000,
+                                    //                      alarmIntent);
+
+                                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +
+                                                                                   BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                                                                   (int) (Math.random() * 15000d) +
+                                                                                   5000, alarmIntent);
                                 }
+
+
+                                //MARSHMALLOW OR ABOVE
+                                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                {
+                                    //alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                                    //                                       System.currentTimeMillis() +
+                                    //                                       BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
+                                    //                                       (int) (Math.random() * 15000d) +
+                                    //                                       5000, alarmIntent);
+
+                                    //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                    //                                 SystemClock.elapsedRealtime() +
+                                    //                                 AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                                    //                                 AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                                    //                                 alarmIntent);
+
+                                }
+
+                                // ---------------------------------------------------------
+
+
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                change_notification(0, "sleep: " +
+                                                       (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) +
+                                                       "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
+                                                       BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
+                                                       BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
+                                                       long_date_time_format_or_empty(
+                                                               global_self_last_entered_battery_saving_timestamp)); // set to offline
+
+                                if (!need_wakeup_now)
+                                {
+                                    if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                    {
+                                        set_all_friends_offline();
+                                        set_all_conferences_inactive();
+                                    }
+                                }
+                                // so that the app knows we went offline
+                                global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                                global_self_connection_status = TOX_CONNECTION_NONE.value;
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+
+                                if (!need_wakeup_now)
+                                {
+                                    if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                    {
+                                        try
+                                        {
+                                            Thread.sleep(30 * 1000);
+                                        }
+                                        catch (Exception es)
+                                        {
+                                        }
+                                    }
+                                }
+                                MainActivity.tox_iterate();
+
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                change_notification(0, "sleep: " +
+                                                       (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) +
+                                                       "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
+                                                       BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
+                                                       BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
+                                                       long_date_time_format_or_empty(
+                                                               global_self_last_entered_battery_saving_timestamp)); // set to offline
+
+                                if (!need_wakeup_now)
+                                {
+                                    if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                    {
+                                        set_all_friends_offline();
+                                        set_all_conferences_inactive();
+                                    }
+                                }
+                                // so that the app knows we went offline
+                                global_self_connection_status = TOX_CONNECTION_NONE.value;
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+
+                                Log.i(TAG, "entering BATTERY SAVINGS MODE ... 30s");
+
+                                if (!need_wakeup_now)
+                                {
+                                    if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                    {
+                                        try
+                                        {
+                                            Thread.sleep(30 * 1000);
+                                        }
+                                        catch (Exception es)
+                                        {
+                                        }
+                                    }
+                                }
+                                MainActivity.tox_iterate();
+
+                                Log.i(TAG, "entering BATTERY SAVINGS MODE ... 60s");
+
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                change_notification(0, "sleep: " +
+                                                       (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) +
+                                                       "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
+                                                       BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
+                                                       BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
+                                                       long_date_time_format_or_empty(
+                                                               global_self_last_entered_battery_saving_timestamp)); // set to offline
+
+                                if (!need_wakeup_now)
+                                {
+                                    if ((!global_showing_messageview) && (!global_showing_anygroupview))
+                                    {
+                                        set_all_friends_offline();
+                                        set_all_conferences_inactive();
+                                    }
+                                }
+                                // so that the app knows we went offline
+                                global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                                global_self_connection_status = TOX_CONNECTION_NONE.value;
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+                                // --------------- set everything to offline ---------------
+
+                                long sleep_in_sec = BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
+                                // add some random value, so that the sleep is not always exactly the same
+                                sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
+                                sleep_in_sec = sleep_in_sec / 1000;
+                                sleep_in_sec = sleep_in_sec / 10; // now in 10s of seconds!!
+
+                                Log.i(TAG, "entering BATTERY SAVINGS MODE ... sleep for " + (10 * sleep_in_sec) + "s");
+
+                                for (int ii = 0; ii < sleep_in_sec; ii++)
+                                {
+                                    if ((global_showing_messageview) || (global_showing_anygroupview))
+                                    {
+                                        // if the user opens the message view, or any group view -> go online, to be able to send messages
+                                        Log.i(TAG, "finish BATTERY SAVINGS MODE (Message view opened)");
+                                        TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__msgview");
+                                        break;
+                                    }
+
+                                    if (need_wakeup_now)
+                                    {
+                                        break;
+                                    }
+
+                                    try
+                                    {
+                                        Thread.sleep(10 * 1000); // sleep very long!!
+                                        //Log.i(TAG,
+                                        //      "BATTERY SAVINGS MODE (sleep " + ii + "/" + sleep_in_sec +
+                                        //      ")");
+                                    }
+                                    catch (Exception es)
+                                    {
+                                        TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__interrupted");
+                                        break;
+                                    }
+                                }
+
+                                Log.i(TAG, "finish BATTERY SAVINGS MODE, connecting again");
+                                TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__connecting");
+
+                                // update all friends again
+                                try
+                                {
+                                    load_and_add_all_friends();
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                                // load conferences again
+                                try
+                                {
+                                    load_and_add_all_conferences();
+                                }
+                                catch (Exception e)
+                                {
+                                }
+
+                                Log.i(TAG, "BATTERY SAVINGS MODE, load_and_add_all_conferences");
+
+                                // iterate a few times ---------------------
+                                MainActivity.tox_iterate();
+                                try
+                                {
+                                    Thread.sleep(10);
+                                }
+                                catch (Exception es)
+                                {
+                                }
+                                MainActivity.tox_iterate();
+                                try
+                                {
+                                    Thread.sleep(10);
+                                }
+                                catch (Exception es)
+                                {
+                                }
+                                MainActivity.tox_iterate();
+                                try
+                                {
+                                    Thread.sleep(10);
+                                }
+                                catch (Exception es)
+                                {
+                                }
+                                // iterate a few times ---------------------
+
+                                need_wakeup_now = false;
+                                trifa_service_thread = null;
+
+                                // bootstrap_single_wrapper("127.3.2.1",9988, "AAA236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9FFF");
+
+                                int TOX_CONNECTION_a = tox_self_get_connection_status();
+                                if (TOX_CONNECTION_a == TOX_CONNECTION_NONE.value)
+                                {
+                                    bootstrapping = true;
+                                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                                    Log.i(TAG, "BATTERY SAVINGS MODE, bootstrapping");
+                                    change_notification(TOX_CONNECTION_a, ""); // set to real connection status
+                                    bootstrap_me();
+                                    TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__bootstrapping");
+                                }
+                                else
+                                {
+                                    bootstrapping = false;
+                                    global_self_last_went_online_timestamp = System.currentTimeMillis();
+                                    global_self_last_went_offline_timestamp = -1;
+                                    change_notification(TOX_CONNECTION_a, ""); // set to real connection status
+                                    Log.i(TAG, "BATTERY SAVINGS MODE, already_online");
+
+                                    TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__already_online");
+                                }
+
+
+                                BATTERY_OPTIMIZATION_LAST_SLEEP3 = BATTERY_OPTIMIZATION_LAST_SLEEP2;
+                                BATTERY_OPTIMIZATION_LAST_SLEEP2 = BATTERY_OPTIMIZATION_LAST_SLEEP1;
+                                BATTERY_OPTIMIZATION_LAST_SLEEP1 = (int) (
+                                        (System.currentTimeMillis() - current_timestamp_) / 1000 / 60);
+                                if ((BATTERY_OPTIMIZATION_LAST_SLEEP1 < 0) ||
+                                    (BATTERY_OPTIMIZATION_LAST_SLEEP1 > (3 * 3600 * 1000)))
+                                {
+                                    BATTERY_OPTIMIZATION_LAST_SLEEP1 = -1;
+                                }
+
+
+                                // set the used value to the new value
+                                BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
+                                Log.i(TAG, "set BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
+                                           BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS + " PREF__X_battery_saving_timeout:" +
+                                           PREF__X_battery_saving_timeout);
+
+                                // global_self_connection_status = tox_self_get_connection_status();
                             }
                             else
                             {

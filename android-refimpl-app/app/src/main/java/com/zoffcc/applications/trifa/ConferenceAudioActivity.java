@@ -156,7 +156,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
         Log.i(TAG, "onCreate:002"); //$NON-NLS-1$
 
         do_not_close_on_pause = false;
-        Callstate.audio_group_active = true;
 
         conferences_av_handler = new Handler(getMainLooper());
         conferences_av_handler_s = conferences_av_handler;
@@ -1457,8 +1456,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
         // Log.i(TAG, "toxav_groupchat_disable_av:B:gnum=" + tox_conference_by_confid__wrapper(conf_id));
         // Log.i(TAG, "toxav_groupchat_disable_av:B:gid=" + conf_id);
         toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
-
-        Callstate.audio_group_active = false;
 
         conf_id = "-1"; //$NON-NLS-1$
 

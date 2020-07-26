@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -4182,7 +4182,6 @@ public class MainActivity extends AppCompatActivity
                     // avatar transfer finished -----------
                     ByteBuffer avatar_chunk = ByteBuffer.allocateDirect(1);
                     int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, 0);
-                    global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
                     // Log.i(TAG, "file_chunk_request:res(2)=" + res);
                     // remove FT from DB
                     HelperFiletransfer.delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
@@ -4208,7 +4207,6 @@ public class MainActivity extends AppCompatActivity
                                 avatar_chunk.put(bytes_chunck);
                                 int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk,
                                                               avatar_chunk_length);
-                                global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
                                 // Log.i(TAG, "file_chunk_request:res(1)=" + res);
                                 // int res = tox_hash(hash_bytes, avatar_bytes, avatar_bytes.capacity());
                             }
@@ -4278,7 +4276,6 @@ public class MainActivity extends AppCompatActivity
                     // transfer finished -----------
                     ByteBuffer avatar_chunk = ByteBuffer.allocateDirect(1);
                     int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, 0);
-                    global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
                     // Log.i(TAG, "file_chunk_request:res(2)=" + res);
                     // remove FT from DB
                     HelperFiletransfer.delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
@@ -4295,7 +4292,6 @@ public class MainActivity extends AppCompatActivity
                     ByteBuffer file_chunk = ByteBuffer.allocateDirect((int) file_chunk_length);
                     file_chunk.put(bytes_chunck);
                     int res = tox_file_send_chunk(friend_number, file_number, position, file_chunk, file_chunk_length);
-                    global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
                     // Log.i(TAG, "file_chunk_request:res(1)=" + res);
 
                     if (ft.filesize < UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES)

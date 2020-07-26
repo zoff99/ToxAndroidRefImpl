@@ -37,6 +37,7 @@ import java.util.List;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceMessageListFragment extends Fragment
@@ -217,7 +218,17 @@ public class ConferenceMessageListFragment extends Fragment
         Log.i(TAG, "onResume");
         super.onResume();
 
+        global_showing_anygroupview = true;
         MainActivity.conference_message_list_fragment = this;
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        global_showing_anygroupview = false;
+        MainActivity.conference_message_list_fragment = null;
     }
 
     synchronized void modify_message(final ConferenceMessage m)
