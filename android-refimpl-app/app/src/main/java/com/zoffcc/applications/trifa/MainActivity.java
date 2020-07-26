@@ -3479,7 +3479,7 @@ public class MainActivity extends AppCompatActivity
                 global_self_last_went_online_timestamp = System.currentTimeMillis();
                 global_self_last_went_offline_timestamp = -1;
 
-                Log.i(TAG, "self_connection_status:went_offline");
+                Log.i(TAG, "self_connection_status:went_online");
                 // TODO: stop any active calls
             }
             else
