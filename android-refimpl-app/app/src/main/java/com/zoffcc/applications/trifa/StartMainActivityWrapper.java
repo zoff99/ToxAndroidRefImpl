@@ -23,9 +23,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_EMPTY_THE_LIST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
@@ -49,6 +53,25 @@ public class StartMainActivityWrapper extends AppCompatActivity
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         String DB_secrect_key__tmp = settings.getString("DB_secrect_key", "");
+
+        try
+        {
+            Bundle extras = getIntent().getExtras();
+            Log.i(TAG, "change_msg_notification:extras=" + extras + " i=" + getIntent());
+            String should_clear_notification_list = getIntent().getStringExtra("CLEAR_NEW_MESSAGE_NOTIFICATION");
+            Log.i(TAG, "change_msg_notification:extra:" + should_clear_notification_list);
+            if (should_clear_notification_list != null)
+            {
+                if (should_clear_notification_list.equalsIgnoreCase("1"))
+                {
+                    change_msg_notification(NOTIFICATION_EDIT_ACTION_EMPTY_THE_LIST.value, "");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "change_msg_notification:EE01:" + e.getMessage());
+        }
 
         if (DB_secrect_key__tmp.isEmpty())
         {

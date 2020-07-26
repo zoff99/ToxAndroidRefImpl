@@ -19,11 +19,8 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,8 +30,6 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -60,7 +55,6 @@ import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.NotificationCompat;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
@@ -75,11 +69,13 @@ import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_f
 import static com.zoffcc.applications.trifa.Callstate.java_video_encoder_first_frame_in;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
@@ -414,110 +410,8 @@ public class HelperGeneric
 
         if (do_notification)
         {
-            // Log.i(TAG, "noti_and_badge:005conf:");
-            // start "new" notification
-            Runnable myRunnable = new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        // allow notification every n seconds
-                        if ((MainActivity.Notification_new_message_last_shown_timestamp +
-                             MainActivity.Notification_new_message_every_millis) < System.currentTimeMillis())
-                        {
-                            if (MainActivity.PREF__notification)
-                            {
-                                MainActivity.Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                Intent notificationIntent = new Intent(MainActivity.context_s,
-                                                                       StartMainActivityWrapper.class);
-                                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.context_s, 0,
-                                                                                        notificationIntent, 0);
-                                // -- notification ------------------
-                                // -- notification -----------------
-                                NotificationCompat.Builder b;
-
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                                {
-                                    if ((MainActivity.PREF__notification_sound) &&
-                                        (MainActivity.PREF__notification_vibrate))
-                                    {
-                                        b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                           MainActivity.channelId_newmessage_sound_and_vibrate);
-                                    }
-                                    else if ((MainActivity.PREF__notification_sound) &&
-                                             (!MainActivity.PREF__notification_vibrate))
-                                    {
-                                        b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                           MainActivity.channelId_newmessage_sound);
-                                    }
-                                    else if ((!MainActivity.PREF__notification_sound) &&
-                                             (MainActivity.PREF__notification_vibrate))
-                                    {
-                                        b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                           MainActivity.channelId_newmessage_vibrate);
-                                    }
-                                    else
-                                    {
-                                        b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                           MainActivity.channelId_newmessage_silent);
-                                    }
-                                }
-                                else
-                                {
-                                    b = new NotificationCompat.Builder(MainActivity.context_s);
-                                }
-
-                                b.setContentIntent(pendingIntent);
-                                b.setSmallIcon(R.drawable.circle_orange);
-                                b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                                Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                        RingtoneManager.TYPE_NOTIFICATION);
-
-                                if (MainActivity.PREF__notification_sound)
-                                {
-                                    b.setSound(default_notification_sound);
-                                }
-
-                                if (MainActivity.PREF__notification_vibrate)
-                                {
-                                    long[] vibrate_pattern = {100, 300};
-                                    b.setVibrate(vibrate_pattern);
-                                }
-
-                                b.setContentTitle(MainActivity.context_s.getString(
-                                        R.string.MainActivity_notification_new_message_title));
-                                b.setAutoCancel(true);
-                                b.setContentText(MainActivity.context_s.getString(
-                                        R.string.MainActivity_notification_new_message));
-                                Notification notification3 = b.build();
-                                MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
-                                // -- notification ------------------
-                                // -- notification ------------------
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            };
-
-            try
-            {
-                if (MainActivity.main_handler_s != null)
-                {
-                    MainActivity.main_handler_s.post(myRunnable);
-                }
-            }
-            catch (Exception e)
-            {
-            }
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier);
         }
-
     }
 
     public static void update_friend_connection_status_helper(int a_TOX_CONNECTION, FriendList f, boolean from_relay)
@@ -2203,108 +2097,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                Log.i(TAG, "noti_and_badge:005:");
-                // start "new" notification
-                Runnable myRunnable = new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            // allow notification every n seconds
-                            if ((MainActivity.Notification_new_message_last_shown_timestamp +
-                                 MainActivity.Notification_new_message_every_millis) < System.currentTimeMillis())
-                            {
-                                if (MainActivity.PREF__notification)
-                                {
-                                    MainActivity.Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                    Intent notificationIntent = new Intent(MainActivity.context_s,
-                                                                           StartMainActivityWrapper.class);
-                                    notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.context_s, 0,
-                                                                                            notificationIntent, 0);
-                                    // -- notification ------------------
-                                    // -- notification ------------------
-                                    NotificationCompat.Builder b;
-
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                                    {
-                                        if ((MainActivity.PREF__notification_sound) &&
-                                            (MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_sound_and_vibrate);
-                                        }
-                                        else if ((MainActivity.PREF__notification_sound) &&
-                                                 (!MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_sound);
-                                        }
-                                        else if ((!MainActivity.PREF__notification_sound) &&
-                                                 (MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_vibrate);
-                                        }
-                                        else
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_silent);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        b = new NotificationCompat.Builder(MainActivity.context_s);
-                                    }
-
-                                    b.setContentIntent(pendingIntent);
-                                    b.setSmallIcon(R.drawable.circle_orange);
-                                    b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                                    Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                            RingtoneManager.TYPE_NOTIFICATION);
-
-                                    if (MainActivity.PREF__notification_sound)
-                                    {
-                                        b.setSound(default_notification_sound);
-                                    }
-
-                                    if (MainActivity.PREF__notification_vibrate)
-                                    {
-                                        long[] vibrate_pattern = {100, 300};
-                                        b.setVibrate(vibrate_pattern);
-                                    }
-
-                                    b.setContentTitle(MainActivity.context_s.getString(
-                                            R.string.MainActivity_notification_new_message_title));
-                                    b.setAutoCancel(true);
-                                    b.setContentText(MainActivity.context_s.getString(
-                                            R.string.MainActivity_notification_new_message3));
-                                    Notification notification3 = b.build();
-                                    MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
-                                    // -- notification ------------------
-                                    // -- notification ------------------
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-
-                try
-                {
-                    if (MainActivity.main_handler_s != null)
-                    {
-                        MainActivity.main_handler_s.post(myRunnable);
-                    }
-                }
-                catch (Exception e)
-                {
-                }
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
             }
         }
         else if (msg_type == 1)
@@ -2421,108 +2214,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                Log.i(TAG, "noti_and_badge:005:");
-                // start "new" notification
-                Runnable myRunnable = new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            // allow notification every n seconds
-                            if ((MainActivity.Notification_new_message_last_shown_timestamp +
-                                 MainActivity.Notification_new_message_every_millis) < System.currentTimeMillis())
-                            {
-                                if (MainActivity.PREF__notification)
-                                {
-                                    MainActivity.Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                    Intent notificationIntent = new Intent(MainActivity.context_s,
-                                                                           StartMainActivityWrapper.class);
-                                    notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.context_s, 0,
-                                                                                            notificationIntent, 0);
-                                    // -- notification ------------------
-                                    // -- notification ------------------
-                                    NotificationCompat.Builder b;
-
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                                    {
-                                        if ((MainActivity.PREF__notification_sound) &&
-                                            (MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_sound_and_vibrate);
-                                        }
-                                        else if ((MainActivity.PREF__notification_sound) &&
-                                                 (!MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_sound);
-                                        }
-                                        else if ((!MainActivity.PREF__notification_sound) &&
-                                                 (MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_vibrate);
-                                        }
-                                        else
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_silent);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        b = new NotificationCompat.Builder(MainActivity.context_s);
-                                    }
-
-                                    b.setContentIntent(pendingIntent);
-                                    b.setSmallIcon(R.drawable.circle_orange);
-                                    b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                                    Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                            RingtoneManager.TYPE_NOTIFICATION);
-
-                                    if (MainActivity.PREF__notification_sound)
-                                    {
-                                        b.setSound(default_notification_sound);
-                                    }
-
-                                    if (MainActivity.PREF__notification_vibrate)
-                                    {
-                                        long[] vibrate_pattern = {100, 300};
-                                        b.setVibrate(vibrate_pattern);
-                                    }
-
-                                    b.setContentTitle(MainActivity.context_s.getString(
-                                            R.string.MainActivity_notification_new_message_title));
-                                    b.setAutoCancel(true);
-                                    b.setContentText(MainActivity.context_s.getString(
-                                            R.string.MainActivity_notification_new_message4));
-                                    Notification notification3 = b.build();
-                                    MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
-                                    // -- notification ------------------
-                                    // -- notification ------------------
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-
-                try
-                {
-                    if (MainActivity.main_handler_s != null)
-                    {
-                        MainActivity.main_handler_s.post(myRunnable);
-                    }
-                }
-                catch (Exception e)
-                {
-                }
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
             }
         }
         else if (msg_type == 2)
@@ -2642,108 +2334,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                Log.i(TAG, "noti_and_badge:005:");
-                // start "new" notification
-                Runnable myRunnable = new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            // allow notification every n seconds
-                            if ((MainActivity.Notification_new_message_last_shown_timestamp +
-                                 MainActivity.Notification_new_message_every_millis) < System.currentTimeMillis())
-                            {
-                                if (MainActivity.PREF__notification)
-                                {
-                                    MainActivity.Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                    Intent notificationIntent = new Intent(MainActivity.context_s,
-                                                                           StartMainActivityWrapper.class);
-                                    notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.context_s, 0,
-                                                                                            notificationIntent, 0);
-                                    // -- notification ------------------
-                                    // -- notification ------------------
-                                    NotificationCompat.Builder b;
-
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                                    {
-                                        if ((MainActivity.PREF__notification_sound) &&
-                                            (MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_sound_and_vibrate);
-                                        }
-                                        else if ((MainActivity.PREF__notification_sound) &&
-                                                 (!MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_sound);
-                                        }
-                                        else if ((!MainActivity.PREF__notification_sound) &&
-                                                 (MainActivity.PREF__notification_vibrate))
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_vibrate);
-                                        }
-                                        else
-                                        {
-                                            b = new NotificationCompat.Builder(MainActivity.context_s,
-                                                                               MainActivity.channelId_newmessage_silent);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        b = new NotificationCompat.Builder(MainActivity.context_s);
-                                    }
-
-                                    b.setContentIntent(pendingIntent);
-                                    b.setSmallIcon(R.drawable.circle_orange);
-                                    b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                                    Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                            RingtoneManager.TYPE_NOTIFICATION);
-
-                                    if (MainActivity.PREF__notification_sound)
-                                    {
-                                        b.setSound(default_notification_sound);
-                                    }
-
-                                    if (MainActivity.PREF__notification_vibrate)
-                                    {
-                                        long[] vibrate_pattern = {100, 300};
-                                        b.setVibrate(vibrate_pattern);
-                                    }
-
-                                    b.setContentTitle(MainActivity.context_s.getString(
-                                            R.string.MainActivity_notification_new_message_title));
-                                    b.setAutoCancel(true);
-                                    b.setContentText(MainActivity.context_s.getString(
-                                            R.string.MainActivity_notification_new_message5));
-                                    Notification notification3 = b.build();
-                                    MainActivity.nmn3.notify(MainActivity.Notification_new_message_ID, notification3);
-                                    // -- notification ------------------
-                                    // -- notification ------------------
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-
-                try
-                {
-                    if (MainActivity.main_handler_s != null)
-                    {
-                        MainActivity.main_handler_s.post(myRunnable);
-                    }
-                }
-                catch (Exception e)
-                {
-                }
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
             }
         }
     }

@@ -65,6 +65,8 @@ import static com.zoffcc.applications.trifa.HelperConference.is_conference_activ
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
@@ -77,6 +79,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
@@ -398,6 +401,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+
+        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, conf_id);
 
         // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 

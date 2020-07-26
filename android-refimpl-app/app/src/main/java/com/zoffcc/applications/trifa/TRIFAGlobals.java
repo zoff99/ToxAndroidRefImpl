@@ -208,4 +208,17 @@ public class TRIFAGlobals
         }
     }
 
+    public static enum NOTIFICATION_EDIT_ACTION
+    {
+        NOTIFICATION_EDIT_ACTION_CLEAR(0), NOTIFICATION_EDIT_ACTION_ADD(1), NOTIFICATION_EDIT_ACTION_REMOVE(
+            2), NOTIFICATION_EDIT_ACTION_EMPTY_THE_LIST(3);
+
+        public int value;
+
+        private NOTIFICATION_EDIT_ACTION(int value)
+        {
+            this.value = value;
+        }
+    }
+
 }

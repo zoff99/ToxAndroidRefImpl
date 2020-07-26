@@ -24,7 +24,6 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothHeadset;
 import android.content.ActivityNotFoundException;
@@ -46,7 +45,6 @@ import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -110,7 +108,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
 import androidx.renderscript.Allocation;
 import androidx.renderscript.Element;
 import androidx.renderscript.RenderScript;
@@ -144,6 +141,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
@@ -159,6 +157,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BIT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
@@ -5023,103 +5022,7 @@ public class MainActivity extends AppCompatActivity
 
         if (do_notification)
         {
-            Log.i(TAG, "noti_and_badge:005conf:");
-            // start "new" notification
-            Runnable myRunnable = new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        // allow notification every n seconds
-                        if ((Notification_new_message_last_shown_timestamp + Notification_new_message_every_millis) <
-                            System.currentTimeMillis())
-                        {
-                            if (PREF__notification)
-                            {
-                                Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
-                                Intent notificationIntent = new Intent(context_s, StartMainActivityWrapper.class);
-                                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0,
-                                                                                        notificationIntent, 0);
-                                // -- notification ------------------
-                                // -- notification -----------------
-                                NotificationCompat.Builder b;
-
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                                {
-                                    if ((PREF__notification_sound) && (PREF__notification_vibrate))
-                                    {
-                                        b = new NotificationCompat.Builder(context_s,
-                                                                           MainActivity.channelId_newmessage_sound_and_vibrate);
-                                    }
-                                    else if ((PREF__notification_sound) && (!PREF__notification_vibrate))
-                                    {
-                                        b = new NotificationCompat.Builder(context_s,
-                                                                           MainActivity.channelId_newmessage_sound);
-                                    }
-                                    else if ((!PREF__notification_sound) && (PREF__notification_vibrate))
-                                    {
-                                        b = new NotificationCompat.Builder(context_s,
-                                                                           MainActivity.channelId_newmessage_vibrate);
-                                    }
-                                    else
-                                    {
-                                        b = new NotificationCompat.Builder(context_s,
-                                                                           MainActivity.channelId_newmessage_silent);
-                                    }
-                                }
-                                else
-                                {
-                                    b = new NotificationCompat.Builder(context_s);
-                                }
-
-                                b.setContentIntent(pendingIntent);
-                                b.setSmallIcon(R.drawable.circle_orange);
-                                b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                                Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                        RingtoneManager.TYPE_NOTIFICATION);
-
-                                if (PREF__notification_sound)
-                                {
-                                    b.setSound(default_notification_sound);
-                                }
-
-                                if (PREF__notification_vibrate)
-                                {
-                                    long[] vibrate_pattern = {100, 300};
-                                    b.setVibrate(vibrate_pattern);
-                                }
-
-                                b.setContentTitle(
-                                        context_s.getString(R.string.MainActivity_notification_new_message_title));
-                                b.setAutoCancel(true);
-                                b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
-                                Notification notification3 = b.build();
-                                nmn3.notify(Notification_new_message_ID, notification3);
-                                // -- notification ------------------
-                                // -- notification ------------------
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            };
-
-            try
-            {
-                if (main_handler_s != null)
-                {
-                    main_handler_s.post(myRunnable);
-                }
-            }
-            catch (Exception e)
-            {
-            }
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier);
         }
     }
 
