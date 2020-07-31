@@ -477,7 +477,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         });
 
         debug_output_clear();
-        debug_output_append("audio_pkt_incoming=" + debug__audio_pkt_incoming);
+        debug_output_append("debug__audio_pkt_incoming=" + debug__audio_pkt_incoming);
         debug_output_append("debug__audio_frame_played=" + debug__audio_frame_played);
         debug_output_append("debug__audio_play_buf_count_max=" + debug__audio_play_buf_count_max);
         debug_output_append("debug__audio_play_buf01=" + debug__audio_play_buf01);
