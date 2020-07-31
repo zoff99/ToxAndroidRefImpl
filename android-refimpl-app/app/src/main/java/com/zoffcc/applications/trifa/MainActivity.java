@@ -320,6 +320,17 @@ public class MainActivity extends AppCompatActivity
     final static int audio_in_buffer_max_count = 2; // how many out play buffers? [we are now only using buffer "0" !!]
     public final static int audio_out_buffer_mult = 1;
     static ByteBuffer audio_buffer_2 = null; // given to JNI with set_JNI_audio_buffer2() for incoming audio (group and call)
+    static long debug__audio_pkt_incoming = 0;
+    static long debug__audio_frame_played = 0;
+    static long debug__audio_play_buf_count_max = -1;
+    static long debug__audio_play_buf01 = 0;
+    static long debug__audio_play_buf02 = 0;
+    static long debug__audio_play_buf03 = 0;
+    static long debug__audio_play_buf04 = 0;
+    static long debug__audio_play_buf05 = 0;
+    static long debug__audio_play_buf06 = 0;
+    static long debug__audio_play_factor = 0;
+    static long debug__audio_play_iter = 0;
     // public static long[] audio_buffer_2_ts = new long[n_audio_in_buffer_max_count];
     // static ByteBuffer audio_buffer_play = null;
     static int audio_buffer_play_length = 0;
@@ -3094,6 +3105,8 @@ public class MainActivity extends AppCompatActivity
 
         // Log.i(TAG, "audio_play:NativeAudio Play:001a:" + NativeAudio.channel_count + " " + channels_);
 
+        debug__audio_pkt_incoming++;
+
         if (sampling_rate_ != sampling_rate)
         {
             sampling_rate_ = sampling_rate;
@@ -3163,8 +3176,10 @@ public class MainActivity extends AppCompatActivity
                     if (remain_bytes > 0)
                     {
                         //audio_buffer_2.position(remain_start_pos);
+                        debug__audio_frame_played++;
                         audio_buffer_2.position(0);
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
+
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
 
                         if (NativeAudio.n_cur_buf + 1 >= n_audio_in_buffer_max_count)
@@ -3183,6 +3198,7 @@ public class MainActivity extends AppCompatActivity
                     }
                     else if (remain_bytes == 0)
                     {
+                        debug__audio_frame_played++;
                         NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] = 0;
                         int res = NativeAudio.PlayPCM16(NativeAudio.n_cur_buf);
 

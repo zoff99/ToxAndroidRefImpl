@@ -64,6 +64,17 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SelectLanguageActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_frame_played;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_pkt_incoming;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf01;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf02;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf03;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf04;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf05;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf06;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf_count_max;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_factor;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_iter;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -89,6 +100,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     MediaPlayer mMediaPlayer = null;
 
     TextView text_sqlstats = null;
+    TextView debug_output = null;
 
     Handler maint_handler_s = null;
 
@@ -122,6 +134,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_export_savedata = (Button) findViewById(R.id.button_export_savedata);
         button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
+        debug_output = (TextView) findViewById(R.id.debug_output);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -463,6 +476,18 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+        debug_output_clear();
+        debug_output_append("audio_pkt_incoming=" + debug__audio_pkt_incoming);
+        debug_output_append("debug__audio_frame_played=" + debug__audio_frame_played);
+        debug_output_append("debug__audio_play_buf_count_max=" + debug__audio_play_buf_count_max);
+        debug_output_append("debug__audio_play_buf01=" + debug__audio_play_buf01);
+        debug_output_append("debug__audio_play_buf02=" + debug__audio_play_buf02);
+        debug_output_append("debug__audio_play_buf03=" + debug__audio_play_buf03);
+        debug_output_append("debug__audio_play_buf04=" + debug__audio_play_buf04);
+        debug_output_append("debug__audio_play_buf05=" + debug__audio_play_buf05);
+        debug_output_append("debug__audio_play_buf06=" + debug__audio_play_buf06);
+        debug_output_append("debug__audio_play_factor=" + debug__audio_play_factor);
+        debug_output_append("debug__audio_play_iter=" + debug__audio_play_iter);
 
         String num_msgs = "*ERROR*";
         try
@@ -557,6 +582,16 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             int id = msg.what;
         }
     };
+
+    void debug_output_clear()
+    {
+        debug_output.setText("");
+    }
+
+    void debug_output_append(String log_line)
+    {
+        debug_output.setText(debug_output.getText().toString() + log_line + "\n");
+    }
 
     @Override
     public void onConnected(final OkHttpClient okHttpClient)

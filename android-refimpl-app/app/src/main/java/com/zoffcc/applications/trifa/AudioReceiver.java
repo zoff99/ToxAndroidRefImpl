@@ -31,6 +31,15 @@ import java.nio.ByteBuffer;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_eac_delay_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf01;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf02;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf03;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf04;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf05;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf06;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf_count_max;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_factor;
+import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_iter;
 
 public class AudioReceiver extends Thread
 {
@@ -90,6 +99,8 @@ public class AudioReceiver extends Thread
 
                 reinit_audio_play_buffers(sampleRate, channels);
 
+                debug__audio_play_buf_count_max = NativeAudio.n_audio_in_buffer_max_count;
+
                 NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, NativeAudio.n_audio_in_buffer_max_count,
                                                          PREF__X_eac_delay_ms);
             }
@@ -145,6 +156,9 @@ public class AudioReceiver extends Thread
         Log.i(TAG, "audio_play:read:init min buffer size(2)=" + buffer_size22);
         int buffer_size33 = -1;
 
+        debug__audio_play_buf01 = buffer_size;
+        debug__audio_play_buf02 = buffer_size22;
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
         {
             String sampleRateStr = null;
@@ -164,6 +178,7 @@ public class AudioReceiver extends Thread
                 if ((buffer_size33_b > 20) && (buffer_size33_b < 10000))
                 {
                     buffer_size33 = buffer_size33_b;
+                    debug__audio_play_buf03 = buffer_size33;
                 }
             }
             catch (Exception e)
@@ -189,20 +204,29 @@ public class AudioReceiver extends Thread
                 factor = 20;
             }
 
+            debug__audio_play_factor = factor;
+
             NativeAudio.n_buf_size_in_bytes = buffer_size33 * factor;
             Log.i(TAG, "audio_play:read:init min buffer size(4)=" + NativeAudio.n_buf_size_in_bytes);
+
+            debug__audio_play_buf04 = NativeAudio.n_buf_size_in_bytes;
         }
         else
         {
             // NativeAudio.n_buf_size_in_bytes = buffer_size22;
             NativeAudio.n_buf_size_in_bytes = (sampleRate * channels * 2) / 10; // = 100ms // (48000*1*2) = 96000;
             Log.i(TAG, "audio_play:read:init min buffer size(5)=" + NativeAudio.n_buf_size_in_bytes);
+
+            debug__audio_play_buf05 = NativeAudio.n_buf_size_in_bytes;
         }
 
         float interate_ms =
                 1000.0f / ((float) sampleRate / (((float) NativeAudio.n_buf_size_in_bytes / 2.0f) / (float) channels));
         NativeAudio.n_buf_iterate_ms = (int) interate_ms;
         Log.i(TAG, "audio_play:read:init:interate_ms=" + interate_ms);
+
+        debug__audio_play_iter = NativeAudio.n_buf_iterate_ms;
+        debug__audio_play_buf06 = NativeAudio.n_buf_size_in_bytes;
 
         for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
         {

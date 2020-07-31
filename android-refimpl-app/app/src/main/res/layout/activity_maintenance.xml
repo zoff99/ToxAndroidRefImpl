@@ -207,6 +207,35 @@
                 android:textColor="@null"
                 android:textSize="16sp"/>
 
+            <TextView
+                android:id="@+id/debug_output"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text="-- DEBUG --"
+                android:background="@null"
+                android:textColor="@color/md_black_1000"
+                android:textSize="16sp"/>
+
+
+            <TextView
+                android:id="@+id/dummy_0004"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text=""
+                android:background="@null"
+                android:textColor="@null"
+                android:textSize="16sp"/>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
