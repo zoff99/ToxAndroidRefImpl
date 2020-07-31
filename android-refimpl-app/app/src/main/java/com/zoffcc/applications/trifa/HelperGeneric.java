@@ -112,6 +112,7 @@ public class HelperGeneric
     final static int video_frame_age_values_cur_index_count = 10;
     static long[] video_frame_age_values = new long[video_frame_age_values_cur_index_count];
     static byte[] buf_video_send_frame = null;
+    static long last_log_battery_savings_criteria_ts = -1;
 
     public static void clearCache_s()
     {
@@ -2892,6 +2893,22 @@ public class HelperGeneric
 
     static boolean battery_saving_can_sleep()
     {
+        if ((last_log_battery_savings_criteria_ts + 1000) < System.currentTimeMillis())
+        {
+            last_log_battery_savings_criteria_ts = System.currentTimeMillis();
+            Log.i(TAG, "battery_saving_can_sleep:global_self_connection_status:"+global_self_connection_status+
+                       " global_showing_messageview="+global_showing_messageview+
+                       " global_showing_anygroupview="+global_showing_anygroupview+
+                       " Callstate.state="+Callstate.state+
+                       " Callstate.audio_group_active="+Callstate.audio_group_active+
+                       " global_self_last_went_online_timestamp="+global_self_last_went_online_timestamp+
+                       " global_self_last_went_online_timestamp2="+(System.currentTimeMillis()-global_self_last_went_online_timestamp)+
+                       " global_last_activity_for_battery_savings_ts="+global_last_activity_for_battery_savings_ts+
+                       " global_last_activity_for_battery_savings_ts2="+(System.currentTimeMillis()-global_last_activity_for_battery_savings_ts)+
+                       " SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE="+SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE+
+                       " System.currentTimeMillis()="+System.currentTimeMillis());
+        }
+
         if ((global_self_connection_status != TOX_CONNECTION_NONE.value) && (!global_showing_messageview) &&
             (!global_showing_anygroupview) && (Callstate.state == 0) && (!Callstate.audio_group_active))
         {
