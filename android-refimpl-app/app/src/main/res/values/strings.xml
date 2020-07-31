@@ -167,6 +167,9 @@
     <string name="pref_title_X_eac_delay_ms">AEC delay</string>
     <string name="pref_description_X_eac_delay_ms">!! Expermimental !!\nAEC delay in ms</string>
 
+    <string name="pref_title_X_audio_play_buffer_custom">Audio play buffer</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Expermimental !!\nAudio play buffer in bytes, set to "0" to disable custom setting</string>
+
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
 
     <string name="pref_header_data_sync">Data &#038; sync</string>

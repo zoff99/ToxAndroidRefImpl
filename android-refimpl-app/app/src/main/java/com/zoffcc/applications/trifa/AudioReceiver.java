@@ -29,6 +29,7 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 import java.nio.ByteBuffer;
 
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_eac_delay_ms;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_play_buffer_custom;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf01;
@@ -218,6 +219,14 @@ public class AudioReceiver extends Thread
             Log.i(TAG, "audio_play:read:init min buffer size(5)=" + NativeAudio.n_buf_size_in_bytes);
 
             debug__audio_play_buf05 = NativeAudio.n_buf_size_in_bytes;
+        }
+
+        if (PREF__X_audio_play_buffer_custom > 0)
+        {
+            if (PREF__X_audio_play_buffer_custom < 500000)
+            {
+                NativeAudio.n_buf_size_in_bytes = PREF__X_audio_play_buffer_custom;
+            }
         }
 
         float interate_ms =

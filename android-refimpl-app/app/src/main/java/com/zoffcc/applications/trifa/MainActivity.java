@@ -355,6 +355,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__higher_video_quality = 0;
     static int PREF__higher_audio_quality = 1;
     static int PREF__video_call_quality = 0;
+    static int PREF__X_audio_play_buffer_custom = 0;
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
@@ -1873,6 +1874,17 @@ public class MainActivity extends AppCompatActivity
             PREF__X_eac_delay_ms = 80;
             e.printStackTrace();
         }
+
+        try
+        {
+            PREF__X_audio_play_buffer_custom = Integer.parseInt(settings.getString("X_audio_play_buffer_custom", "0"));
+        }
+        catch (Exception e)
+        {
+            PREF__X_audio_play_buffer_custom = 0;
+            e.printStackTrace();
+        }
+
 
         try
         {

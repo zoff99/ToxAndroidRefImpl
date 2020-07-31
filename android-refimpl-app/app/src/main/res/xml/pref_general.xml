@@ -163,6 +163,15 @@
             android:summary="@string/pref_description_X_eac_delay_ms"
             android:title="@string/pref_title_X_eac_delay_ms" />
 
+        <EditTextPreference
+            android:defaultValue="0"
+            android:key="X_audio_play_buffer_custom"
+            android:maxLength="6"
+            android:numeric="integer"
+            android:inputType="number"
+            android:summary="@string/pref_description_X_audio_play_buffer_custom"
+            android:title="@string/pref_title_X_audio_play_buffer_custom" />
+
         <ListPreference
             android:defaultValue="40"
             android:entries="@array/X_audio_recording_frame_size_titles"
