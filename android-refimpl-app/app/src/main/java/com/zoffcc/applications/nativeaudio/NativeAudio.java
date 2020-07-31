@@ -35,7 +35,7 @@ public class NativeAudio
 {
     private static final String TAG = "trifa.NativeAudio";
 
-    public static final int n_audio_in_buffer_max_count = 5;
+    public static final int n_audio_in_buffer_max_count = 10; // NORM= 5;
     public static ByteBuffer[] n_audio_buffer = new ByteBuffer[n_audio_in_buffer_max_count];
     public static int n_cur_buf = 0;
     public static int n_buf_size_in_bytes = 0;
@@ -151,7 +151,8 @@ public class NativeAudio
 
         reinit_audio_play_buffers(sampleRate, channels);
 
-        NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, n_audio_in_buffer_max_count, PREF__X_eac_delay_ms);
+        NativeAudio.createBufferQueueAudioPlayer(sampleRate, channels, n_audio_in_buffer_max_count,
+                                                 PREF__X_eac_delay_ms);
         NativeAudio.createAudioRecorder((int) AudioRecording.SMAPLINGRATE_TOX, n_rec_audio_in_buffer_max_count);
 
         NativeAudio.n_cur_buf = 0;
