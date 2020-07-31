@@ -2893,7 +2893,7 @@ public class HelperGeneric
 
     static boolean battery_saving_can_sleep()
     {
-        if ((last_log_battery_savings_criteria_ts + 1000) < System.currentTimeMillis())
+        if ((last_log_battery_savings_criteria_ts + 60000) < System.currentTimeMillis())
         {
             last_log_battery_savings_criteria_ts = System.currentTimeMillis();
             Log.i(TAG, "battery_saving_can_sleep:global_self_connection_status:"+global_self_connection_status+
