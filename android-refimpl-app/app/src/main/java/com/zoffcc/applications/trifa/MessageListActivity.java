@@ -418,6 +418,14 @@ public class MessageListActivity extends AppCompatActivity
     @Override
     protected void onPause()
     {
+        try
+        {
+            Log.i(TAG, "is_at_bottom=" + MainActivity.message_list_fragment.is_at_bottom);
+        }
+        catch (Exception e)
+        {
+        }
+
         Log.i(TAG, "onPause");
         super.onPause();
 
@@ -521,6 +529,14 @@ public class MessageListActivity extends AppCompatActivity
             Log.i(TAG, "onCreate:migrate_old_ft_date:EE:" + e.getMessage());
         }
         // ----- convert filetransfer messages which did not contain a sent timestamp -----
+
+        try
+        {
+            Log.i(TAG, "is_at_bottom=" + MainActivity.message_list_fragment.is_at_bottom);
+        }
+        catch (Exception e)
+        {
+        }
 
         message_list_activity = this;
         wakeup_tox_thread();
