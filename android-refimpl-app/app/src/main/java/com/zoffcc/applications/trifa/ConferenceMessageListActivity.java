@@ -402,8 +402,6 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onResume");
         super.onResume();
 
-        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, conf_id);
-
         // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
         if (conf_id.equals("-1"))
@@ -411,6 +409,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             conf_id = conf_id_prev;
             // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
         }
+
+        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, conf_id);
 
         MainActivity.conference_message_list_activity = this;
         wakeup_tox_thread();
