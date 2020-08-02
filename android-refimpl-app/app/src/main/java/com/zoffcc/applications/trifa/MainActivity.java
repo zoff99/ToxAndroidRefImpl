@@ -2506,10 +2506,10 @@ public class MainActivity extends AppCompatActivity
     // buffer2 is for sending video (call)
     public static native void set_JNI_video_buffer2(ByteBuffer buffer2, int frame_width_px, int frame_height_px);
 
-    // buffer is for sending audio (group and call)
+    // audio_buffer is for sending audio (group and call)
     public static native void set_JNI_audio_buffer(ByteBuffer audio_buffer);
 
-    // buffer2 is for incoming audio (group and call)
+    // audio_buffer2 is for incoming audio (group and call)
     public static native void set_JNI_audio_buffer2(ByteBuffer audio_buffer2);
 
     // for AEC (libfilteraudio)
