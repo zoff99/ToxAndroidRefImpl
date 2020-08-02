@@ -2909,8 +2909,10 @@ public class HelperGeneric
                        " System.currentTimeMillis()="+System.currentTimeMillis());
         }
 
-        if ((global_self_connection_status != TOX_CONNECTION_NONE.value) && (!global_showing_messageview) &&
-            (!global_showing_anygroupview) && (Callstate.state == 0) && (!Callstate.audio_group_active))
+        if ((!global_showing_messageview) &&
+            (!global_showing_anygroupview) &&
+            (Callstate.state == 0) &&
+            (!Callstate.audio_group_active))
         {
             if (global_self_last_went_online_timestamp != -1)
             {
