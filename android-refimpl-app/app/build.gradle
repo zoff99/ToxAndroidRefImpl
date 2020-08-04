@@ -56,6 +56,11 @@ android {
     }
 
     packagingOptions {
+        pickFirst 'lib/armeabi-v7a/libsqlcipher.so'
+        pickFirst 'lib/arm64-v8a/libsqlcipher.so'
+        pickFirst 'lib/x86/libsqlcipher.so'
+        pickFirst 'lib/x86_64/libsqlcipher.so'
+        //
         exclude 'META-INF/LICENSE.txt'
         exclude 'LICENSE.txt'
         exclude 'META-INF/LICENSE'
@@ -273,7 +278,7 @@ dependencies {
     androidTestImplementation 'androidx.multidex:multidex:2.0.1'
     androidTestImplementation 'androidx.multidex:multidex-instrumentation:2.0.0'
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
-    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
+    implementation 'info.guardianproject.iocipher:IOCipher:0.4.2'
     implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
     implementation 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
     implementation 'com.google.code.gson:gson:2.8.5'

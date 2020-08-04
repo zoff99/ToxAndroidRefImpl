@@ -103,7 +103,7 @@ dependencyVerification {
         'commons-codec:commons-codec:1.10:commons-codec-1.10.jar:4241dfa94e711d435f29a4604a3e2de5c4aa3c165e23bd066be6fc1fc4309569',
         'commons-logging:commons-logging:1.2:commons-logging-1.2.jar:daddea1ea0be0f56978ab3006b8ac92834afeefbd9b7e4e6316fca57df0fa636',
         'de.hdodenhof:circleimageview:2.2.0:circleimageview-2.2.0.aar:bc34761dcd5036229ac1ffed6b5b1bef722ad5b097a2c8bba1c5ed2cd4b5c82b',
-        'info.guardianproject.iocipher:IOCipher:0.5:IOCipher-0.5.aar:6948cacd89cc6d8c372cb74e786d0c5bddc112d318d4d761039271626f890185',
+        'info.guardianproject.iocipher:IOCipher:0.4.2:IOCipher-0.4.2.aar:985d707b96e5ac5b25142eccdedfeef1a486af5d946785368067f09643f49b31',
         'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1:netcipher-okhttp3-2.0.0-alpha1.jar:548b24763c57d273e1e3650e9974644f91c6a79350961905476456b6a485c905',
         'info.guardianproject.netcipher:netcipher:2.0.0-beta1:netcipher-2.0.0-beta1.jar:ea12ebfc601ac8b6c5d2227367f971ee1059f3901b7791bd291b65dcefb53e5a',
         'io.reactivex.rxjava2:rxjava:2.2.2:rxjava-2.2.2.jar:6e9ef979524bfa23de907a057fd73818ed54438678f36d6d2dd874c8dd5fb4d0',
