@@ -15,7 +15,7 @@ jobs:
         java-version: 1.8
 
     - name: locate NDK
-      run: find / -name sdkmanager;type -a sdkmanager
+      run: find / -name sdkmanager 2>/dev/null;type -a sdkmanager
 
     - name: Install NDK
       run: echo "y" | sudo /usr/local/lib/android/tools/bin/sdkmanager --install "ndk;20.0.5594570" --sdk_root=${ANDROID_SDK_ROOT}
