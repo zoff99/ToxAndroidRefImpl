@@ -26,3 +26,4 @@ android-refimpl-app/gwitness/gwit/pluginUnderTestMetadata/
 tools/script
 tools/workspace
 tools/artefacts
+android-refimpl-app/native-audio-jni/.cxx/
