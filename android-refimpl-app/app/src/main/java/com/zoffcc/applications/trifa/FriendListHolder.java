@@ -112,6 +112,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     progressDialog.dismiss();
                 }
             }
+
+            progressDialog = null;
         }
         catch (Exception e)
         {

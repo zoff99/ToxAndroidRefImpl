@@ -81,6 +81,8 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                     progressDialog.dismiss();
                 }
             }
+
+            progressDialog = null;
         }
         catch (Exception e)
         {

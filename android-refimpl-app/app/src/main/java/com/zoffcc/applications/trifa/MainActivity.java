@@ -499,6 +499,34 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        try
+        {
+            if (ConferenceListHolder.progressDialog != null)
+            {
+                if (ConferenceListHolder.progressDialog.isShowing())
+                {
+                    ConferenceListHolder.progressDialog.dismiss();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (ConferenceListHolder.progressDialog != null)
+            {
+                ConferenceListHolder.progressDialog = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
         setContentView(R.layout.activity_main);
 
         if (PREF__window_security)
