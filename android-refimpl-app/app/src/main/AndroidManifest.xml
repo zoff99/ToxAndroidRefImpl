@@ -63,7 +63,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:allowBackup,android:label,android:icon">
+        tools:replace="android:allowBackup,android:label">
 
         <activity
             android:name=".StartMainActivityWrapper"
