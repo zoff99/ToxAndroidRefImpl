@@ -141,7 +141,7 @@ android {
     }
 
     lintOptions {
-        checkReleaseBuilds false
+        // checkReleaseBuilds false
         abortOnError false
         absolutePaths false
         // lintConfig file("lint.xml")
