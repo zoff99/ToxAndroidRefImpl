@@ -69,6 +69,8 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.vfs__detach;
+import static com.zoffcc.applications.trifa.HelperGeneric.vfs__unmount;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
@@ -151,6 +153,7 @@ public class TrifaToxService extends Service
     static long last_resend_pending_messages_ms = -1;
     static long last_resend_pending_messages2_ms = -1;
     static boolean need_wakeup_now = false;
+    static int tox_thread_starting_up = 0;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -343,25 +346,12 @@ public class TrifaToxService extends Service
      */
     void stop_me(boolean exit_app)
     {
-        Log.i(TAG, "stop_me:001");
-
-        try
-        {
-            Log.i(TAG, "stop_me:002");
-            nmn2.cancel(ONGOING_NOTIFICATION_ID);
-            Log.i(TAG, "stop_me:003");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "stop_me:EEn1" + e.getMessage());
-        }
-
+        Log.i(TAG, "stop_me:001:tox_thread_starting_up=" + tox_thread_starting_up);
         stopForeground(true);
 
         try
         {
-            Log.i(TAG, "stop_me:002");
+            Log.i(TAG, "stop_me:002:tox_thread_starting_up=" + tox_thread_starting_up);
             nmn2.cancel(ONGOING_NOTIFICATION_ID);
             Log.i(TAG, "stop_me:003");
         }
@@ -375,13 +365,13 @@ public class TrifaToxService extends Service
         {
             try
             {
-                Log.i(TAG, "stop_me:004");
+                Log.i(TAG, "stop_me:004:tox_thread_starting_up=" + tox_thread_starting_up);
                 Thread t = new Thread()
                 {
                     @Override
                     public void run()
                     {
-                        Log.i(TAG, "stop_me:005");
+                        Log.i(TAG, "stop_me:005:tox_thread_starting_up=" + tox_thread_starting_up);
                         set_filteraudio_active(0);
                         long i = 0;
                         while (is_tox_started)
@@ -392,7 +382,7 @@ public class TrifaToxService extends Service
                                 break;
                             }
 
-                            Log.i(TAG, "stop_me:006");
+                            Log.i(TAG, "stop_me:006:tox_thread_starting_up=" + tox_thread_starting_up);
 
                             try
                             {
@@ -403,7 +393,7 @@ public class TrifaToxService extends Service
                                 e.printStackTrace();
                             }
                         }
-                        Log.i(TAG, "stop_me:006a");
+                        Log.i(TAG, "stop_me:006a:tox_thread_starting_up=" + tox_thread_starting_up);
 
                         if (VFS_ENCRYPT)
                         {
@@ -411,59 +401,11 @@ public class TrifaToxService extends Service
                             {
                                 if (vfs.isMounted())
                                 {
-                                    Log.i(TAG, "VFS:unmount:start");
-                                    try
-                                    {
-                                        Log.i(TAG, "stop_me:vfs:sleep:001");
-                                        Thread.sleep(2500);
-                                        Log.i(TAG, "stop_me:vfs:sleep:002");
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-
-                                    try
-                                    {
-                                        Runnable myRunnable = new Runnable()
-                                        {
-                                            @Override
-                                            public void run()
-                                            {
-                                                // vfs.detachThread();
-                                            }
-                                        };
-                                        if (main_handler_s != null)
-                                        {
-                                            main_handler_s.post(myRunnable);
-                                        }
-                                        vfs.detachThread();
-                                        Log.i(TAG, "VFS:detachThread[1a]:OK");
-                                    }
-                                    catch (Exception e5)
-                                    {
-                                        Log.i(TAG, "VFS:detachThread[1a]:EE5:" + e5.getMessage());
-                                        e5.printStackTrace();
-                                    }
-
-                                    try
-                                    {
-                                        /*
-                                         * TODO: fix this on exit
-                                         * UPDATE: seems fixed now with the later unmount, see further down
-                                         * com.zoffcc.applications.trifa W/System.err: java.lang.IllegalStateException: Cannot unmount when threads are still active! (1 threads)
-                                         * com.zoffcc.applications.trifa W/System.err:     at info.guardianproject.iocipher.VirtualFileSystem.unmount(Native Method)
-                                         *
-                                         * https://github.com/guardianproject/IOCipher/blob/480b64685ace4aee416afe4f8e6c1e8b72f640f4/jni/info_guardianproject_iocipher_VirtualFileSystem.cpp#L215
-                                         */
-                                        vfs.unmount();
-                                        Log.i(TAG, "VFS:unmount[1]:OK");
-                                    }
-                                    catch (Exception e5)
-                                    {
-                                        Log.i(TAG, "VFS:unmount[1]:EE5:" + e5.getMessage());
-                                        e5.printStackTrace();
-                                    }
+                                    Log.i(TAG, "VFS:unmount:start:vfs.isMounted()=" + vfs.isMounted());
+                                    vfs__detach();
+                                    Thread.sleep(300);
+                                    Log.i(TAG, "VFS:unmount:start:vfs.isMounted()=" + vfs.isMounted());
+                                    vfs__unmount();
                                 }
                                 else
                                 {
@@ -533,55 +475,6 @@ public class TrifaToxService extends Service
 
                         try
                         {
-                            Runnable myRunnable = new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    vfs.detachThread();
-                                }
-                            };
-                            if (main_handler_s != null)
-                            {
-                                main_handler_s.post(myRunnable);
-                            }
-                            // vfs.detachThread();
-
-                            try
-                            {
-                                Log.i(TAG, "stop_me:dt001");
-                                Thread.sleep(1200);
-                                Log.i(TAG, "stop_me:dt002");
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                            vfs.detachThread();
-
-                            Log.i(TAG, "VFS:detachThread[3a]:OK");
-                        }
-                        catch (Exception e55)
-                        {
-                            Log.i(TAG, "VFS:detachThread[3a]:EE55:" + e55.getMessage());
-                            e55.printStackTrace();
-                        }
-
-                        try
-                        {
-                            Log.i(TAG, "VFS:unmount[3b]:trying ...");
-                            vfs.unmount();
-                            Log.i(TAG, "VFS:unmount[3b]:OK");
-                        }
-                        catch (Exception e55)
-                        {
-                            Log.i(TAG, "VFS:unmount[3b]:EE55:" + e55.getMessage());
-                            e55.printStackTrace();
-                        }
-
-                        try
-                        {
                             Log.i(TAG, "stop_me:012");
                             Thread.sleep(300);
                             Log.i(TAG, "stop_me:013");
@@ -622,10 +515,10 @@ public class TrifaToxService extends Service
             @Override
             public void run()
             {
+                HelperGeneric.update_savedata_file_wrapper(); // save on tox shutdown
+
                 Log.i(TAG, "stop_tox_fg:002");
                 stop_me = true;
-
-                HelperGeneric.update_savedata_file_wrapper(); // save on tox shutdown
 
                 try
                 {
@@ -925,6 +818,8 @@ public class TrifaToxService extends Service
             public void run()
             {
 
+                tox_thread_starting_up = 0;
+
                 try
                 {
                     // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
@@ -1145,6 +1040,7 @@ public class TrifaToxService extends Service
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
+                tox_thread_starting_up = 1;
                 while (!stop_me)
                 {
                     try
@@ -1816,6 +1712,7 @@ public class TrifaToxService extends Service
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
 
+                tox_thread_starting_up = 2;
 
                 try
                 {
@@ -1837,6 +1734,7 @@ public class TrifaToxService extends Service
 
                 try
                 {
+                    // this stops Tox
                     MainActivity.tox_kill();
                 }
                 catch (Exception e)

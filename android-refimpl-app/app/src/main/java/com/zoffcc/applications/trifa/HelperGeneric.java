@@ -72,6 +72,8 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
@@ -98,6 +100,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILETRANSFER_SIZE_MSGV2;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 public class HelperGeneric
 {
@@ -1991,8 +1994,8 @@ public class HelperGeneric
             {
                 MainActivity.semaphore_tox_savedata.acquire();
                 long start_timestamp = System.currentTimeMillis();
-                MainActivity.update_savedata_file(TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
-                        TrifaSetPatternActivity.StringToBytes2(MainActivity.PREF__DB_secrect_key))));
+                MainActivity.update_savedata_file(TrifaSetPatternActivity.bytesToString(
+                        TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
                 long end_timestamp = System.currentTimeMillis();
                 MainActivity.semaphore_tox_savedata.release();
                 Log.i(TAG,
@@ -2896,22 +2899,22 @@ public class HelperGeneric
         if ((last_log_battery_savings_criteria_ts + 60000) < System.currentTimeMillis())
         {
             last_log_battery_savings_criteria_ts = System.currentTimeMillis();
-            Log.i(TAG, "battery_saving_can_sleep:global_self_connection_status:"+global_self_connection_status+
-                       " global_showing_messageview="+global_showing_messageview+
-                       " global_showing_anygroupview="+global_showing_anygroupview+
-                       " Callstate.state="+Callstate.state+
-                       " Callstate.audio_group_active="+Callstate.audio_group_active+
-                       " global_self_last_went_online_timestamp="+global_self_last_went_online_timestamp+
-                       " global_self_last_went_online_timestamp2="+(System.currentTimeMillis()-global_self_last_went_online_timestamp)+
-                       " global_last_activity_for_battery_savings_ts="+global_last_activity_for_battery_savings_ts+
-                       " global_last_activity_for_battery_savings_ts2="+(System.currentTimeMillis()-global_last_activity_for_battery_savings_ts)+
-                       " SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE="+SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE+
-                       " System.currentTimeMillis()="+System.currentTimeMillis());
+            Log.i(TAG, "battery_saving_can_sleep:global_self_connection_status:" + global_self_connection_status +
+                       " global_showing_messageview=" + global_showing_messageview + " global_showing_anygroupview=" +
+                       global_showing_anygroupview + " Callstate.state=" + Callstate.state +
+                       " Callstate.audio_group_active=" + Callstate.audio_group_active +
+                       " global_self_last_went_online_timestamp=" + global_self_last_went_online_timestamp +
+                       " global_self_last_went_online_timestamp2=" +
+                       (System.currentTimeMillis() - global_self_last_went_online_timestamp) +
+                       " global_last_activity_for_battery_savings_ts=" + global_last_activity_for_battery_savings_ts +
+                       " global_last_activity_for_battery_savings_ts2=" +
+                       (System.currentTimeMillis() - global_last_activity_for_battery_savings_ts) +
+                       " SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE=" +
+                       SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE + " System.currentTimeMillis()=" +
+                       System.currentTimeMillis());
         }
 
-        if ((!global_showing_messageview) &&
-            (!global_showing_anygroupview) &&
-            (Callstate.state == 0) &&
+        if ((!global_showing_messageview) && (!global_showing_anygroupview) && (Callstate.state == 0) &&
             (!Callstate.audio_group_active))
         {
             if (global_self_last_went_online_timestamp != -1)
@@ -2929,5 +2932,69 @@ public class HelperGeneric
         }
 
         return false;
+    }
+
+    static void vfs__detach()
+    {
+        try
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    Log.i(TAG, "VFS:detachThread:" + Thread.currentThread().getId() + ":" +
+                               Thread.currentThread().getName());
+                    vfs.detachThread();
+                    Log.i(TAG, "VFS:detachThread:OK");
+                }
+            };
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
+            Thread.sleep(800);
+            Log.i(TAG, "VFS:detachThread:END");
+        }
+        catch (Exception e5)
+        {
+            Log.i(TAG, "VFS:detachThread:EE5:" + e5.getMessage());
+            e5.printStackTrace();
+        }
+    }
+
+    static void vfs__unmount()
+    {
+        try
+        {
+            Log.i(TAG, "VFS:unmount:start ...");
+
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (vfs.isMounted())
+                    {
+                        Log.i(TAG,
+                              "VFS:unmount:" + Thread.currentThread().getId() + ":" + Thread.currentThread().getName());
+                        vfs.unmount();
+                    }
+                    Log.i(TAG, "VFS:unmount:OK");
+                }
+            };
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
+            Thread.sleep(700);
+            Log.i(TAG, "VFS:unmount:END");
+        }
+        catch (Exception e5)
+        {
+            Log.i(TAG, "VFS:unmount:EE01:" + e5.getMessage());
+            e5.printStackTrace();
+        }
+
     }
 }

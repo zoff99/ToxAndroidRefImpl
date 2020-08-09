@@ -1367,14 +1367,19 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (!vfs.isMounted())
                         {
+                            Log.i(TAG, "VFS:mount:[1]:start:" + Thread.currentThread().getId() + ":" +
+                                       Thread.currentThread().getName());
                             vfs.mount(dbFile, PREF__DB_secrect_key);
+                            Log.i(TAG, "VFS:mount:[1]:end");
                         }
                     }
                     catch (Exception ee)
                     {
                         Log.i(TAG, "vfs:EE1:" + ee.getMessage());
                         ee.printStackTrace();
+                        Log.i(TAG, "VFS:mount:[2]:start");
                         vfs.mount(dbFile, PREF__DB_secrect_key);
+                        Log.i(TAG, "VFS:mount:[2]:end");
                     }
 
                     // Log.i(TAG, "vfs:open(1)=OK:path=" + dbFile);
@@ -1415,7 +1420,9 @@ public class MainActivity extends AppCompatActivity
                         // Log.i(TAG, "vfs:path=" + dbFile);
                         vfs = VirtualFileSystem.get();
                         vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
+                        Log.i(TAG, "VFS:mount:[3]:start");
                         vfs.mount(PREF__DB_secrect_key);
+                        Log.i(TAG, "VFS:mount:[3]:end");
                         // Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
                     }
                     catch (Exception e2)
