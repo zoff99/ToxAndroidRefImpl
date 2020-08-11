@@ -21,7 +21,6 @@ package com.zoffcc.applications.trifa;
 
 import android.app.ActivityManager;
 import android.app.Application;
-import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -30,7 +29,6 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import androidx.multidex.MultiDex;
 import android.util.Log;
 
 import com.yariksoffice.lingver.Lingver;
@@ -49,8 +47,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.multidex.MultiDex;
+
+import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_cancel;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
-import static com.zoffcc.applications.trifa.TrifaToxService.ONGOING_NOTIFICATION_ID;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 
 
@@ -109,10 +109,10 @@ public class MainApplication extends Application
 
         Log.i(TAG, "MainApplication:" + randnum + ":" + "crashes[load]=" + crashes);
         last_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong(
-            "last_crash_time", 0);
+                "last_crash_time", 0);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "last_crash_time[load]=" + last_crash_time);
         prevlast_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong(
-            "prevlast_crash_time", 0);
+                "prevlast_crash_time", 0);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "prevlast_crash_time[load]=" + prevlast_crash_time);
 
         if (CATCH_EXCEPTIONS)
@@ -140,7 +140,7 @@ public class MainApplication extends Application
         try
         {
             final Process process = Runtime.getRuntime().exec(
-                "ps -w -e -T -o PID,TID,CMDLINE,CMD,PRI,NI,STAT,PCY,CPU"); // |grep -i trifa
+                    "ps -w -e -T -o PID,TID,CMDLINE,CMD,PRI,NI,STAT,PCY,CPU"); // |grep -i trifa
 
             final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             final StringBuilder log = new StringBuilder();
@@ -202,7 +202,7 @@ public class MainApplication extends Application
                 // some problems with the params?
                 final Process process2 = Runtime.getRuntime().exec("logcat -d");
                 final BufferedReader bufferedReader2 = new BufferedReader(
-                    new InputStreamReader(process2.getInputStream()));
+                        new InputStreamReader(process2.getInputStream()));
                 final StringBuilder log2 = new StringBuilder();
 
                 String line2;
@@ -252,8 +252,8 @@ public class MainApplication extends Application
             FileOutputStream fOut = new FileOutputStream(myFile);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
             myOutWriter.append(
-                "Errormesage:\n" + last_stack_trace_as_string + "\n\n===================================\n\n" +
-                log_detailed);
+                    "Errormesage:\n" + last_stack_trace_as_string + "\n\n===================================\n\n" +
+                    log_detailed);
             myOutWriter.close();
             fOut.close();
             // also save to crash file ----
@@ -330,7 +330,7 @@ public class MainApplication extends Application
             // try to shutdown service (but don't exit the app yet!)
             if (is_tox_started)
             {
-                tox_service_fg.stop_tox_fg();
+                tox_service_fg.stop_tox_fg(false);
                 tox_service_fg.stop_me(false);
             }
         }
@@ -349,8 +349,7 @@ public class MainApplication extends Application
         try
         {
             // remove the notification
-            NotificationManager nmn2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            nmn2.cancel(ONGOING_NOTIFICATION_ID);
+            tox_notification_cancel(this);
         }
         catch (Exception e3)
         {

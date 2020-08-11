@@ -1214,7 +1214,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (is_tox_started)
                                 {
-                                    tox_service_fg.stop_tox_fg();
+                                    tox_service_fg.stop_tox_fg(true);
                                     tox_service_fg.stop_me(true);
                                 }
                                 else
@@ -1773,7 +1773,7 @@ public class MainActivity extends AppCompatActivity
         {
             if (is_tox_started)
             {
-                tox_service_fg.stop_tox_fg();
+                tox_service_fg.stop_tox_fg(false);
             }
         }
         catch (Exception e)
@@ -3553,7 +3553,7 @@ public class MainActivity extends AppCompatActivity
 
         // -- notification ------------------
         // -- notification ------------------
-        HelperGeneric.change_notification(a_TOX_CONNECTION, "");
+        HelperToxNotification.tox_notification_change_wrapper(a_TOX_CONNECTION, "");
         // -- notification ------------------
         // -- notification ------------------
     }

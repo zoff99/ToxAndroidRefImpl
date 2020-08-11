@@ -73,7 +73,9 @@ import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_not
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.nmn3;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
@@ -777,73 +779,6 @@ public class HelperGeneric
         catch (Exception e)
         {
             Log.i(TAG, "copy_real_file_to_vfs_file:EE:" + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    static void change_notification(int a_TOXCONNECTION, final String message)
-    {
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash_app_java(1);
-        // crash_app_C();
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        // crash -----------------
-        Log.i(TAG, "change_notification");
-        final int a_TOXCONNECTION_f = a_TOXCONNECTION;
-
-        try
-        {
-            Thread t = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    long counter = 0;
-
-                    while (MainActivity.tox_service_fg == null)
-                    {
-                        counter++;
-
-                        if (counter > 10)
-                        {
-                            break;
-                        }
-
-                        // Log.i(TAG, "change_notification:sleep");
-
-                        try
-                        {
-                            Thread.sleep(100);
-                        }
-                        catch (Exception e)
-                        {
-                            // e.printStackTrace();
-                        }
-                    }
-
-                    Log.i(TAG, "change_notification:change");
-
-                    try
-                    {
-                        MainActivity.tox_service_fg.change_notification_fg(a_TOXCONNECTION_f, message);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            t.start();
-        }
-        catch (Exception e)
-        {
             e.printStackTrace();
         }
     }
@@ -2965,9 +2900,11 @@ public class HelperGeneric
 
     static void vfs__unmount()
     {
+        Log.i(TAG, "VFS:unmount:start ...");
+
         try
         {
-            Log.i(TAG, "VFS:unmount:start ...");
+            Log.i(TAG, "VFS:unmount:start[2] ...");
 
             Runnable myRunnable = new Runnable()
             {

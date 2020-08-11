@@ -24,15 +24,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.Process;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
@@ -44,7 +43,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import androidx.core.app.NotificationCompat;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
@@ -60,7 +58,6 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.HelperGeneric.battery_saving_can_sleep;
 import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
-import static com.zoffcc.applications.trifa.HelperGeneric.change_notification;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_combined_connection_status;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_toxconnection_wrapper;
@@ -75,6 +72,10 @@ import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_m
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
+import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_cancel;
+import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change;
+import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change_wrapper;
+import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_setup;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__force_udp_only;
@@ -84,9 +85,9 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.conference_message_list_activity;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
 import static com.zoffcc.applications.trifa.MainActivity.receiver2;
 import static com.zoffcc.applications.trifa.MainActivity.receiver3;
@@ -137,7 +138,6 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTIO
 
 public class TrifaToxService extends Service
 {
-    static int ONGOING_NOTIFICATION_ID = 1030;
     static final String TAG = "trifa.ToxService";
     Notification notification2 = null;
     NotificationManager nmn2 = null;
@@ -175,170 +175,6 @@ public class TrifaToxService extends Service
         start_me();
     }
 
-    void change_notification_fg(int a_TOXCONNECTION, String message)
-    {
-        Log.i(TAG, "change_notification_fg");
-
-        NotificationCompat.Builder b = null;
-        Notification.Builder b_new = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
-            Log.i(TAG, "change_notification_fg:SDK:" + android.os.Build.VERSION.SDK_INT + " -> O:" +
-                       android.os.Build.VERSION_CODES.O);
-            b_new = new Notification.Builder(this, MainActivity.channelId_toxservice);
-            b = null;
-        }
-        else
-        {
-            b_new = null;
-            b = new NotificationCompat.Builder(this);
-        }
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
-            b_new.setOnlyAlertOnce(false);
-            try
-            {
-                b_new.setSound(null, null);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            b.setOnlyAlertOnce(false);
-        }
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        if (bootstrapping)
-        {
-            Log.i(TAG, "change_notification_fg:bootstrapping=true");
-            notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-            {
-                b_new.setSmallIcon(R.drawable.circle_orange_notification);
-            }
-            else
-            {
-                b.setSmallIcon(R.drawable.circle_orange_notification);
-            }
-
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                {
-                    b_new.setColor(Color.parseColor("#ffce00"));
-                }
-                else
-                {
-                    b.setColor(Color.parseColor("#ffce00"));
-                }
-            }
-            notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping" + " " + message);
-        }
-        else
-        {
-            Log.i(TAG, "change_notification_fg:bootstrapping=FALSE");
-
-            if (a_TOXCONNECTION == 0)
-            {
-                notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                {
-                    b_new.setSmallIcon(R.drawable.circle_red_notification);
-                }
-                else
-                {
-                    b.setSmallIcon(R.drawable.circle_red_notification);
-                }
-
-                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                    {
-                        b_new.setColor(Color.parseColor("#ff0000"));
-                    }
-                    else
-                    {
-                        b.setColor(Color.parseColor("#ff0000"));
-                    }
-                }
-                notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE" + " " + message);
-            }
-            else
-            {
-                if (a_TOXCONNECTION == 1)
-                {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                    {
-                        b_new.setSmallIcon(R.drawable.circle_green_notification);
-                    }
-                    else
-                    {
-                        b.setSmallIcon(R.drawable.circle_green_notification);
-                    }
-                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    {
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                        {
-                            b_new.setColor(Color.parseColor("#04b431"));
-                        }
-                        else
-                        {
-                            b.setColor(Color.parseColor("#04b431"));
-                        }
-                    }
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]" + " " + message);
-                    // get_network_connections();
-                }
-                else // if (a_TOXCONNECTION__f == 2)
-                {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                    {
-                        b_new.setSmallIcon(R.drawable.circle_green_notification);
-                    }
-                    else
-                    {
-                        b.setSmallIcon(R.drawable.circle_green_notification);
-                    }
-                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    {
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-                        {
-                            b_new.setColor(Color.parseColor("#04b431"));
-                        }
-                        else
-                        {
-                            b.setColor(Color.parseColor("#04b431"));
-                        }
-                    }
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]" + " " + message);
-                    // get_network_connections();
-                }
-            }
-        }
-        notification_view.setTextViewText(R.id.text, "");
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
-            b_new.setContentIntent(pendingIntent);
-            b_new.setContent(notification_view);
-            notification2 = b_new.build();
-        }
-        else
-        {
-            b.setContentIntent(pendingIntent);
-            b.setContent(notification_view);
-            notification2 = b.build();
-        }
-        nmn2.notify(ONGOING_NOTIFICATION_ID, notification2);
-    }
-
     /*
      *
      * ------ this really stops the whole thing ------
@@ -349,17 +185,11 @@ public class TrifaToxService extends Service
         Log.i(TAG, "stop_me:001:tox_thread_starting_up=" + tox_thread_starting_up);
         stopForeground(true);
 
-        try
-        {
-            Log.i(TAG, "stop_me:002:tox_thread_starting_up=" + tox_thread_starting_up);
-            nmn2.cancel(ONGOING_NOTIFICATION_ID);
-            Log.i(TAG, "stop_me:003");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "stop_me:EEn1" + e.getMessage());
-        }
+        Log.i(TAG, "stop_me:002:tox_thread_starting_up=" + tox_thread_starting_up);
+        tox_notification_cancel(this);
+        Log.i(TAG, "stop_me:003");
+
+        final Context static_context = this;
 
         if (exit_app)
         {
@@ -397,18 +227,24 @@ public class TrifaToxService extends Service
 
                         if (VFS_ENCRYPT)
                         {
+                            Log.i(TAG, "stop_me:006b");
                             try
                             {
+                                Log.i(TAG, "stop_me:006c");
                                 if (vfs.isMounted())
                                 {
-                                    Log.i(TAG, "VFS:unmount:start:vfs.isMounted()=" + vfs.isMounted());
+                                    Log.i(TAG, "stop_me:006d");
+                                    Log.i(TAG, "VFS:detach:start:vfs.isMounted()=" + vfs.isMounted());
                                     vfs__detach();
+                                    Log.i(TAG, "stop_me:006e");
                                     Thread.sleep(300);
                                     Log.i(TAG, "VFS:unmount:start:vfs.isMounted()=" + vfs.isMounted());
                                     vfs__unmount();
+                                    Log.i(TAG, "stop_me:006f");
                                 }
                                 else
                                 {
+                                    Log.i(TAG, "stop_me:006g");
                                     Log.i(TAG, "VFS:unmount:NOT MOUNTED");
                                 }
                             }
@@ -416,6 +252,7 @@ public class TrifaToxService extends Service
                             {
                                 e.printStackTrace();
                                 Log.i(TAG, "VFS:unmount:EE:" + e.getMessage());
+                                Log.i(TAG, "stop_me:006h");
                             }
                         }
 
@@ -457,17 +294,9 @@ public class TrifaToxService extends Service
                             e.printStackTrace();
                         }
 
-                        try
-                        {
-                            Log.i(TAG, "stop_me:008");
-                            nmn2.cancel(ONGOING_NOTIFICATION_ID);
-                            Log.i(TAG, "stop_me:009");
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.i(TAG, "stop_me:EEn2" + e.getMessage());
-                        }
+                        Log.i(TAG, "stop_me:008");
+                        tox_notification_cancel(static_context);
+                        Log.i(TAG, "stop_me:009");
 
                         Log.i(TAG, "stop_me:010");
                         stopSelf();
@@ -483,6 +312,10 @@ public class TrifaToxService extends Service
                         {
                             e.printStackTrace();
                         }
+
+                        Log.i(TAG, "stop_me:014");
+                        tox_notification_cancel(static_context);
+                        Log.i(TAG, "stop_me:015");
 
                         MainActivity.exit();
 
@@ -507,17 +340,20 @@ public class TrifaToxService extends Service
         }
     }
 
-    void stop_tox_fg()
+    static boolean stop_tox_fg_done = false;
+
+    void stop_tox_fg(final boolean want_exit)
     {
+        stop_tox_fg_done = false;
         Log.i(TAG, "stop_tox_fg:001");
         Runnable myRunnable = new Runnable()
         {
             @Override
             public void run()
             {
+                Log.i(TAG, "stop_tox_fg:002:a");
                 HelperGeneric.update_savedata_file_wrapper(); // save on tox shutdown
-
-                Log.i(TAG, "stop_tox_fg:002");
+                Log.i(TAG, "stop_tox_fg:002:b");
                 stop_me = true;
 
                 try
@@ -544,7 +380,7 @@ public class TrifaToxService extends Service
 
                 stop_me = false; // reset flag again!
                 Log.i(TAG, "stop_tox_fg:007");
-                change_notification(0, ""); // set to offline
+                tox_notification_change_wrapper(0, ""); // set to offline
                 Log.i(TAG, "stop_tox_fg:008");
                 set_all_friends_offline();
                 Log.i(TAG, "set_all_conferences_inactive:003");
@@ -557,16 +393,25 @@ public class TrifaToxService extends Service
 
                 Log.i(TAG, "stop_tox_fg:009");
 
-                // nmn2.cancel(ONGOING_NOTIFICATION_ID); // -> cant remove notification because of foreground service
-                // ** // MainActivity.exit();
+                if (want_exit)
+                {
+                    tox_notification_cancel(context_s);
+                    Log.i(TAG, "stop_tox_fg:clear_tox_notification");
+                }
+
+                stop_tox_fg_done = true;
+                Log.i(TAG, "stop_tox_fg:thread:done");
             }
         };
 
+        Log.i(TAG, "stop_tox_fg:HH:001");
         if (main_handler_s != null)
         {
+            Log.i(TAG, "stop_tox_fg:HH:002");
             main_handler_s.post(myRunnable);
+            Log.i(TAG, "stop_tox_fg:HH:003");
         }
-
+        Log.i(TAG, "stop_tox_fg:HH:004");
         Log.i(TAG, "stop_tox_fg:099");
     }
 
@@ -959,7 +804,7 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "bootrapping:set to true[1]");
                     try
                     {
-                        tox_service_fg.change_notification_fg(0, ""); // set notification to "bootstrapping"
+                        tox_notification_change(context_s, nmn2, 0, ""); // set notification to "bootstrapping"
                     }
                     catch (Exception e)
                     {
@@ -1139,13 +984,14 @@ public class TrifaToxService extends Service
                                 // --------------- set everything to offline ---------------
                                 // --------------- set everything to offline ---------------
                                 // --------------- set everything to offline ---------------
-                                change_notification(0, "sleep: " +
-                                                       (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) +
-                                                       "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                       BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                       BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
-                                                       long_date_time_format_or_empty(
-                                                               global_self_last_entered_battery_saving_timestamp)); // set to offline
+                                tox_notification_change_wrapper(0, "sleep: " +
+                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                           1000) / 60) + "min (" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
+                                                                   long_date_time_format_or_empty(
+                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
 
                                 if (!need_wakeup_now)
                                 {
@@ -1180,13 +1026,14 @@ public class TrifaToxService extends Service
                                 // --------------- set everything to offline ---------------
                                 // --------------- set everything to offline ---------------
                                 // --------------- set everything to offline ---------------
-                                change_notification(0, "sleep: " +
-                                                       (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) +
-                                                       "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                       BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                       BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
-                                                       long_date_time_format_or_empty(
-                                                               global_self_last_entered_battery_saving_timestamp)); // set to offline
+                                tox_notification_change_wrapper(0, "sleep: " +
+                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                           1000) / 60) + "min (" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
+                                                                   long_date_time_format_or_empty(
+                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
 
                                 if (!need_wakeup_now)
                                 {
@@ -1224,13 +1071,14 @@ public class TrifaToxService extends Service
                                 // --------------- set everything to offline ---------------
                                 // --------------- set everything to offline ---------------
                                 // --------------- set everything to offline ---------------
-                                change_notification(0, "sleep: " +
-                                                       (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS / 1000) / 60) +
-                                                       "min (" + BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
-                                                       BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
-                                                       BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
-                                                       long_date_time_format_or_empty(
-                                                               global_self_last_entered_battery_saving_timestamp)); // set to offline
+                                tox_notification_change_wrapper(0, "sleep: " +
+                                                                   (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                           1000) / 60) + "min (" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
+                                                                   BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
+                                                                   long_date_time_format_or_empty(
+                                                                           global_self_last_entered_battery_saving_timestamp)); // set to offline
 
                                 if (!need_wakeup_now)
                                 {
@@ -1344,7 +1192,8 @@ public class TrifaToxService extends Service
                                     bootstrapping = true;
                                     global_self_last_went_offline_timestamp = System.currentTimeMillis();
                                     Log.i(TAG, "BATTERY SAVINGS MODE, bootstrapping");
-                                    change_notification(TOX_CONNECTION_a, ""); // set to real connection status
+                                    tox_notification_change_wrapper(TOX_CONNECTION_a,
+                                                                    ""); // set to real connection status
                                     bootstrap_me();
                                     TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__bootstrapping");
                                 }
@@ -1353,7 +1202,8 @@ public class TrifaToxService extends Service
                                     bootstrapping = false;
                                     global_self_last_went_online_timestamp = System.currentTimeMillis();
                                     global_self_last_went_offline_timestamp = -1;
-                                    change_notification(TOX_CONNECTION_a, ""); // set to real connection status
+                                    tox_notification_change_wrapper(TOX_CONNECTION_a,
+                                                                    ""); // set to real connection status
                                     Log.i(TAG, "BATTERY SAVINGS MODE, already_online");
 
                                     TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__already_online");
@@ -1403,17 +1253,17 @@ public class TrifaToxService extends Service
                                         Log.i(TAG, "bootrapping:set to true[2]");
                                         try
                                         {
-                                            tox_service_fg.change_notification_fg(0, "sleep: " +
-                                                                                     (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                                             1000) / 60) + "min (" +
-                                                                                     BATTERY_OPTIMIZATION_LAST_SLEEP1 +
-                                                                                     "/" +
-                                                                                     BATTERY_OPTIMIZATION_LAST_SLEEP2 +
-                                                                                     "/" +
-                                                                                     BATTERY_OPTIMIZATION_LAST_SLEEP3 +
-                                                                                     ") " +
-                                                                                     long_date_time_format_or_empty(
-                                                                                             global_self_last_entered_battery_saving_timestamp)); // set notification to "bootstrapping"
+                                            tox_notification_change(context_s, nmn2, 0, "sleep: " +
+                                                                                        (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                                                1000) / 60) + "min (" +
+                                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP1 +
+                                                                                        "/" +
+                                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP2 +
+                                                                                        "/" +
+                                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP3 +
+                                                                                        ") " +
+                                                                                        long_date_time_format_or_empty(
+                                                                                                global_self_last_entered_battery_saving_timestamp)); // set notification to "bootstrapping"
                                         }
                                         catch (Exception e)
                                         {
@@ -1760,69 +1610,8 @@ public class TrifaToxService extends Service
     void start_me()
     {
         Log.i(TAG, "start_me");
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-        // -- notification ------------------
-        // -- notification ------------------
-        nmn2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        notification_view = new RemoteViews(getPackageName(), R.layout.custom_notification);
-        Log.i(TAG, "contentView=" + notification_view);
-        notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-        notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
-        notification_view.setTextViewText(R.id.text, "");
-
-        NotificationCompat.Builder b = null;
-        Notification.Builder b_new = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
-            b_new = new Notification.Builder(this, MainActivity.channelId_toxservice);
-            b = null;
-        }
-        else
-        {
-            b_new = null;
-            b = new NotificationCompat.Builder(this);
-        }
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
-            b_new.setContent(notification_view);
-            b_new.setOnlyAlertOnce(false);
-            try
-            {
-                b_new.setSound(null, null);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-            b_new.setContentIntent(pendingIntent);
-            b_new.setSmallIcon(R.drawable.circle_red_notification);
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            {
-                b_new.setColor(Color.parseColor("#ff0000"));
-            }
-            notification2 = b_new.build();
-        }
-        else
-        {
-            b.setContent(notification_view);
-            b.setOnlyAlertOnce(false);
-            b.setContentIntent(pendingIntent);
-            b.setSmallIcon(R.drawable.circle_red_notification);
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            {
-                b.setColor(Color.parseColor("#ff0000"));
-            }
-            notification2 = b.build();
-        }
-        // -- notification ------------------
-        // -- notification ------------------
-
-        startForeground(ONGOING_NOTIFICATION_ID, notification2);
+        notification2 = tox_notification_setup(this, nmn2);
+        startForeground(HelperToxNotification.ONGOING_NOTIFICATION_ID, notification2);
     }
 
     static void bootstrap_me()
