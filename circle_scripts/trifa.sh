@@ -304,7 +304,8 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     :
 else
     echo "Building TRIfA app"
-    ./gradlew :app:dependencies
+    ./gradlew :app:dependencies || echo "OK"
+    ./gradlew assembleDebug # this is a workaround to build problems, not sure how to fix it otherwise
     ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
 fi
 # --------- GRADLE - build app -------------
