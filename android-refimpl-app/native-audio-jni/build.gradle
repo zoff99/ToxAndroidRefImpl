@@ -3,6 +3,7 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion = 29
     buildToolsVersion = '29.0.3'
+    compileOptions.encoding = 'UTF-8'
 
     defaultConfig {
         minSdkVersion 19
@@ -23,6 +24,15 @@ android {
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+        }
     }
 
     externalNativeBuild {
