@@ -27,8 +27,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -55,26 +53,28 @@ import java.io.File;
 import java.net.URLConnection;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
-import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
-import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
-import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
-import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
-import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.HelperGeneric.copy_real_file_to_vfs_file;
-import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_network_connections;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.send_avatar_to_friend;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_new_random_nospam_value;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
+import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
+import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
+import static com.zoffcc.applications.trifa.MainActivity.clipboard;
+import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
-import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_SELF_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
@@ -265,8 +265,7 @@ public class ProfileActivity extends AppCompatActivity
             properties.selection_mode = DialogConfigs.SINGLE_MODE;
             properties.selection_type = DialogConfigs.FILE_SELECT;
             properties.root = new File("/");
-            properties.error_dir = new File(
-                Environment.getExternalStorageDirectory().getAbsolutePath());
+            properties.error_dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
             properties.offset = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
             // TODO: hardcoded is always bad
             properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF"};
@@ -293,18 +292,17 @@ public class ProfileActivity extends AppCompatActivity
                                 {
 
                                     String avatar_file_name_corrected = TrifaSetPatternActivity.filter_out_specials_from_filepath(
-                                        src_filename.toLowerCase());
+                                            src_filename.toLowerCase());
 
-                                    Log.i(TAG,
-                                        "select_avatar:p=" + src_path + " f=" + avatar_file_name_corrected);
-                                    copy_real_file_to_vfs_file(src_path, src_filename,
-                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
+                                    Log.i(TAG, "select_avatar:p=" + src_path + " f=" + avatar_file_name_corrected);
+                                    copy_real_file_to_vfs_file(src_path, src_filename, VFS_PREFIX + VFS_OWN_AVATAR_DIR,
+                                                               "avatar.png");
 
                                     String mimeType = URLConnection.guessContentTypeFromName(
-                                        avatar_file_name_corrected.toLowerCase());
+                                            avatar_file_name_corrected.toLowerCase());
 
                                     set_g_opts("VFS_OWN_AVATAR_FNAME",
-                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+                                               VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
 
                                     //if (mimeType.equalsIgnoreCase("image/gif"))
                                     //{
@@ -320,13 +318,13 @@ public class ProfileActivity extends AppCompatActivity
                                     //}
 
                                     put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d1,
-                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
-                                            "avatar.png", true, false, null);
+                                                                    VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
+                                                                    "avatar.png", true, false, null);
                                     Log.i(TAG, "select_avatar:put_vfs_image_on_imageview");
 
 
                                     List<FriendList> fl = orma.selectFromFriendList().
-                                        toList();
+                                            toList();
 
                                     if (fl != null)
                                     {
@@ -342,12 +340,11 @@ public class ProfileActivity extends AppCompatActivity
                                                 // iterate over all online friends, and send them our new avatar
                                                 if (n.TOX_CONNECTION != TOX_CONNECTION_NONE.value)
                                                 {
-                                                    Log.i(TAG,
-                                                        "select_avatar:send_avatar_to_friend:online:i=" + i);
+                                                    Log.i(TAG, "select_avatar:send_avatar_to_friend:online:i=" + i);
 
                                                     send_avatar_to_friend(
-                                                        HelperFriend.tox_friend_by_public_key__wrapper(
-                                                            n.tox_public_key_string));
+                                                            HelperFriend.tox_friend_by_public_key__wrapper(
+                                                                    n.tox_public_key_string));
                                                 }
                                             }
                                         }
