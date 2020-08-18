@@ -31,7 +31,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -44,6 +43,7 @@ import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -54,6 +54,8 @@ import com.mikepenz.iconics.IconicsDrawable;
 import java.io.File;
 import java.net.URLConnection;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
@@ -86,7 +88,8 @@ import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 public class ProfileActivity extends AppCompatActivity
 {
     static final String TAG = "trifa.ProfileActy";
-    de.hdodenhof.circleimageview.CircleImageView profile_icon = null;
+    CircleImageView profile_icon = null;
+    FloatingActionButton profile_icon_edit = null;
     ImageView mytoxid_imageview = null;
     TextView mytoxid_textview = null;
     EditText mynick_edittext = null;
@@ -107,19 +110,20 @@ public class ProfileActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        profile_icon = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.profile_icon);
-        mytoxid_imageview = (ImageView) findViewById(R.id.mytoxid_imageview);
-        mytoxid_textview = (TextView) findViewById(R.id.mytoxid_textview);
-        mynick_edittext = (EditText) findViewById(R.id.mynick_edittext);
-        mystatus_message_edittext = (EditText) findViewById(R.id.mystatus_message_edittext);
-        my_identicon_imageview = (ImageView) findViewById(R.id.my_identicon_imageview);
+        profile_icon = findViewById(R.id.profile_icon);
+        profile_icon_edit = findViewById(R.id.profile_icon_edit);
+        mytoxid_imageview = findViewById(R.id.mytoxid_imageview);
+        mytoxid_textview = findViewById(R.id.mytoxid_textview);
+        mynick_edittext = findViewById(R.id.mynick_edittext);
+        mystatus_message_edittext = findViewById(R.id.mystatus_message_edittext);
+        my_identicon_imageview = findViewById(R.id.my_identicon_imageview);
 
-        new_nospam_button = (Button) findViewById(R.id.new_nospam_button);
-        remove_own_relay_button = (Button) findViewById(R.id.remove_relay_button);
-        my_relay_toxid_textview = (TextView) findViewById(R.id.my_relay_toxid_textview);
-        copy_toxid_button = (Button) findViewById(R.id.copy_toxid_button);
+        new_nospam_button = findViewById(R.id.new_nospam_button);
+        remove_own_relay_button = findViewById(R.id.remove_relay_button);
+        my_relay_toxid_textview = findViewById(R.id.my_relay_toxid_textview);
+        copy_toxid_button = findViewById(R.id.copy_toxid_button);
 
-        mytox_network_connections = (TextView) findViewById(R.id.mytox_network_connections);
+        mytox_network_connections = findViewById(R.id.mytox_network_connections);
         mytox_network_connections.setText(get_network_connections());
 
         new_nospam_button.setOnClickListener(new View.OnClickListener()
@@ -239,7 +243,7 @@ public class ProfileActivity extends AppCompatActivity
             }
         });
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // don't show keyboard when activity starts
@@ -255,134 +259,122 @@ public class ProfileActivity extends AppCompatActivity
 
         update_toxid_display();
 
-        profile_icon.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
+        profile_icon_edit.setOnClickListener(v -> {
+            // select new avatar image
+            DialogProperties properties = new DialogProperties();
+            properties.selection_mode = DialogConfigs.SINGLE_MODE;
+            properties.selection_type = DialogConfigs.FILE_SELECT;
+            properties.root = new File("/");
+            properties.error_dir = new File(
+                Environment.getExternalStorageDirectory().getAbsolutePath());
+            properties.offset = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+            // TODO: hardcoded is always bad
+            properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF"};
+            FilePickerDialog dialog = new FilePickerDialog(ProfileActivity.this, properties);
+            dialog.setTitle("Select Avatar");
+
+            dialog.setDialogSelectionListener(new DialogSelectionListener()
             {
-                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                @Override
+                public void onSelectedFilePaths(String[] files)
                 {
-                    // select new avatar image
-                    DialogProperties properties = new DialogProperties();
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                    properties.selection_type = DialogConfigs.FILE_SELECT;
-                    properties.root = new java.io.File("/");
-                    properties.error_dir = new java.io.File(
-                            Environment.getExternalStorageDirectory().getAbsolutePath());
-                    properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                    // TODO: hardcoded is always bad
-                    properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF"};
-                    FilePickerDialog dialog = new FilePickerDialog(ProfileActivity.this, properties);
-                    dialog.setTitle("Select Avatar");
-
-                    dialog.setDialogSelectionListener(new DialogSelectionListener()
+                    try
                     {
-                        @Override
-                        public void onSelectedFilePaths(String[] files)
+                        Log.i(TAG, "select_avatar:" + files);
+                        String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
+                        String src_filename = new File(files[0]).getName();
+
+                        File f_real = new File(src_path + "/" + src_filename);
+                        if (f_real.canRead())
                         {
-                            try
+                            if (f_real.length() <= AVATAR_SELF_MAX_BYTE_SIZE)
                             {
-                                Log.i(TAG, "select_avatar:" + files);
-                                String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
-                                String src_filename = new File(files[0]).getName();
-
-                                java.io.File f_real = new java.io.File(src_path + "/" + src_filename);
-                                if (f_real.canRead())
+                                if (f_real.length() > 0)
                                 {
-                                    if (f_real.length() <= AVATAR_SELF_MAX_BYTE_SIZE)
+
+                                    String avatar_file_name_corrected = TrifaSetPatternActivity.filter_out_specials_from_filepath(
+                                        src_filename.toLowerCase());
+
+                                    Log.i(TAG,
+                                        "select_avatar:p=" + src_path + " f=" + avatar_file_name_corrected);
+                                    copy_real_file_to_vfs_file(src_path, src_filename,
+                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
+
+                                    String mimeType = URLConnection.guessContentTypeFromName(
+                                        avatar_file_name_corrected.toLowerCase());
+
+                                    set_g_opts("VFS_OWN_AVATAR_FNAME",
+                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+
+                                    //if (mimeType.equalsIgnoreCase("image/gif"))
+                                    //{
+                                    //    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".gif");
+                                    //}
+                                    //else if (mimeType.equalsIgnoreCase("image/jpeg"))
+                                    //{
+                                    //    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".jpg");
+                                    //}
+                                    //else
+                                    //{
+                                    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".png");
+                                    //}
+
+                                    put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d1,
+                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
+                                            "avatar.png", true, false, null);
+                                    Log.i(TAG, "select_avatar:put_vfs_image_on_imageview");
+
+
+                                    List<FriendList> fl = orma.selectFromFriendList().
+                                        toList();
+
+                                    if (fl != null)
                                     {
-                                        if (f_real.length() > 0)
+                                        if (fl.size() > 0)
                                         {
-
-                                            String avatar_file_name_corrected = TrifaSetPatternActivity.filter_out_specials_from_filepath(
-                                                    src_filename.toLowerCase());
-
-                                            Log.i(TAG,
-                                                  "select_avatar:p=" + src_path + " f=" + avatar_file_name_corrected);
-                                            copy_real_file_to_vfs_file(src_path, src_filename,
-                                                                       VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
-
-                                            String mimeType = URLConnection.guessContentTypeFromName(
-                                                    avatar_file_name_corrected.toLowerCase());
-
-                                            set_g_opts("VFS_OWN_AVATAR_FNAME",
-                                                       VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
-
-                                            //if (mimeType.equalsIgnoreCase("image/gif"))
-                                            //{
-                                            //    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".gif");
-                                            //}
-                                            //else if (mimeType.equalsIgnoreCase("image/jpeg"))
-                                            //{
-                                            //    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".jpg");
-                                            //}
-                                            //else
-                                            //{
-                                            set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".png");
-                                            //}
-
-                                            put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d1,
-                                                                            VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
-                                                                            "avatar.png", true, false, null);
-                                            Log.i(TAG, "select_avatar:put_vfs_image_on_imageview");
-
-
-                                            List<FriendList> fl = orma.selectFromFriendList().
-                                                    toList();
-
-                                            if (fl != null)
+                                            int i = 0;
+                                            for (i = 0; i < fl.size(); i++)
                                             {
-                                                if (fl.size() > 0)
+                                                FriendList n = fl.get(i);
+
+                                                // Log.i(TAG, "select_avatar:send_avatar_to_friend:i=" + i);
+
+                                                // iterate over all online friends, and send them our new avatar
+                                                if (n.TOX_CONNECTION != TOX_CONNECTION_NONE.value)
                                                 {
-                                                    int i = 0;
-                                                    for (i = 0; i < fl.size(); i++)
-                                                    {
-                                                        FriendList n = fl.get(i);
+                                                    Log.i(TAG,
+                                                        "select_avatar:send_avatar_to_friend:online:i=" + i);
 
-                                                        // Log.i(TAG, "select_avatar:send_avatar_to_friend:i=" + i);
-
-                                                        // iterate over all online friends, and send them our new avatar
-                                                        if (n.TOX_CONNECTION != TOX_CONNECTION_NONE.value)
-                                                        {
-                                                            Log.i(TAG,
-                                                                  "select_avatar:send_avatar_to_friend:online:i=" + i);
-
-                                                            send_avatar_to_friend(
-                                                                    HelperFriend.tox_friend_by_public_key__wrapper(
-                                                                            n.tox_public_key_string));
-                                                        }
-                                                    }
+                                                    send_avatar_to_friend(
+                                                        HelperFriend.tox_friend_by_public_key__wrapper(
+                                                            n.tox_public_key_string));
                                                 }
                                             }
-
-
                                         }
                                     }
-                                    else
-                                    {
-                                        Log.i(TAG, "select_avatar:TOO BIG:" + f_real.length());
-                                    }
-                                }
-                                else
-                                {
-                                    Log.i(TAG, "select_avatar:CAN NOT READ:" + src_path + " f=" + src_filename);
+
+
                                 }
                             }
-                            catch (Exception e)
+                            else
                             {
-                                e.printStackTrace();
-                                Log.i(TAG, "select_avatar:EE1:" + e.getMessage());
+                                Log.i(TAG, "select_avatar:TOO BIG:" + f_real.length());
                             }
                         }
-                    });
+                        else
+                        {
+                            Log.i(TAG, "select_avatar:CAN NOT READ:" + src_path + " f=" + src_filename);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "select_avatar:EE1:" + e.getMessage());
+                    }
+                }
+            });
 
-                    dialog.show();
-                }
-                else
-                {
-                }
-                return true;
-            }
+            dialog.show();
         });
 
         try
