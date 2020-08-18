@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -14,7 +13,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
 
     <ScrollView
@@ -27,7 +26,7 @@
             android:orientation="vertical">
 
             <RelativeLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_marginLeft="15dp"
@@ -39,9 +38,10 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_icon"
-                    android:layout_width="256dp"
-                    android:layout_height="256dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
                     android:layout_gravity="center"
+                    android:layout_marginTop="25dp"
                     app:civ_border_color="#40000000"
                     app:civ_border_width="2dp"
                     tools:src="@mipmap/ic_launcher_round" />
@@ -52,7 +52,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignEnd="@id/profile_icon"
                     android:layout_alignBottom="@id/profile_icon"
-                    android:layout_margin="12dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="10dp"
                     android:tint="@color/design_default_color_on_primary"
                     app:srcCompat="@drawable/ic_baseline_edit_24" />
             </RelativeLayout>
@@ -99,25 +100,25 @@
                 android:id="@+id/remove_relay_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="5dp"
-                android:text="@string/layout___remove_own_relay"/>
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/layout___remove_own_relay" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
                 android:layout_weight="0"
-                android:paddingBottom="15dp"
                 android:paddingLeft="4dp"
                 android:paddingRight="2dp"
-                android:layout_marginLeft="20dp"
+                android:paddingBottom="15dp"
                 android:text="@string/layout___relay_pubkey"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/my_relay_toxid_textview"
@@ -127,8 +128,8 @@
                 android:layout_marginRight="20dp"
                 android:fontFamily="monospace"
                 android:gravity="fill_horizontal"
-                android:paddingBottom="15dp"
                 android:paddingTop="12dp"
+                android:paddingBottom="15dp"
                 android:textAlignment="gravity"
                 android:textIsSelectable="true"
                 android:textSize="16sp"
@@ -140,25 +141,25 @@
                 android:id="@+id/new_nospam_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="5dp"
-                android:text="@string/layout___new_random_nospam"/>
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/layout___new_random_nospam" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
                 android:layout_weight="0"
-                android:paddingBottom="15dp"
                 android:paddingLeft="4dp"
                 android:paddingRight="2dp"
-                android:layout_marginLeft="20dp"
+                android:paddingBottom="15dp"
                 android:text="@string/layout___own_pubkey"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/mytoxid_textview"
@@ -168,8 +169,8 @@
                 android:layout_marginRight="20dp"
                 android:fontFamily="monospace"
                 android:gravity="fill_horizontal"
-                android:paddingBottom="15dp"
                 android:paddingTop="12dp"
+                android:paddingBottom="15dp"
                 android:textAlignment="gravity"
                 android:textIsSelectable="true"
                 android:textSize="16sp"
@@ -181,37 +182,37 @@
                 android:id="@+id/copy_toxid_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="5dp"
-                android:text="@string/layout___copy_toxid"/>
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/layout___copy_toxid" />
 
             <ImageView
                 android:id="@+id/mytoxid_imageview"
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
-                android:paddingBottom="15dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:scaleType="fitCenter"
                 android:paddingTop="15dp"
-                android:src="@mipmap/ic_launcher_round"/>
+                android:paddingBottom="15dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_launcher_round" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
                 android:layout_marginLeft="7dp"
                 android:layout_marginRight="7dp"
+                android:layout_marginBottom="0dp"
                 android:gravity="center_horizontal"
-                android:paddingBottom="0dp"
                 android:paddingTop="14dp"
+                android:paddingBottom="0dp"
                 android:text="@string/layout___your_toxidenticon"
                 android:textColor="@color/md_black_1000"
                 android:textSize="18sp"
-                android:textStyle="normal"/>
+                android:textStyle="normal" />
 
 
             <ImageView
@@ -219,25 +220,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:paddingBottom="15dp"
                 android:paddingTop="15dp"
-                android:src="@mipmap/ic_launcher_round"/>
+                android:paddingBottom="15dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_launcher_round" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_weight="0"
+                android:layout_marginLeft="20dp"
                 android:layout_marginTop="40dp"
-                android:paddingBottom="15dp"
+                android:layout_weight="0"
                 android:paddingLeft="4dp"
                 android:paddingRight="2dp"
-                android:layout_marginLeft="20dp"
+                android:paddingBottom="15dp"
                 android:text="@string/layout___active_network_connections"
                 android:textAlignment="textStart"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/mytox_network_connections"
@@ -253,22 +254,22 @@
                 android:textIsSelectable="true"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:typeface="monospace"/>
+                android:typeface="monospace" />
 
             <TextView
                 android:id="@+id/dummy_0004"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
                 android:layout_weight="0"
-                android:paddingBottom="15dp"
                 android:paddingLeft="4dp"
                 android:paddingRight="2dp"
-                android:layout_marginLeft="20dp"
+                android:paddingBottom="15dp"
                 android:text=""
                 android:textAlignment="textStart"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
