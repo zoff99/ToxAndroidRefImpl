@@ -11,12 +11,20 @@ android {
 
         externalNativeBuild {
             cmake {
+                // arguments "-DANDROID_ARM_NEON=TRUE"
                 // arguments "-G\"BorlandMakeFiles\""
                 cFlags "-g -O3"
                 cppFlags "-g -O3"
                 // targets 'native-audio-jni'
                 // armeabi-v7a, arm64-v8a, x86, x86_64
                 // * does not work * // abiFilters "armeabi-v7a", "x86"
+                // cppFlags "-fexceptions"
+            }
+
+            ndk {
+                // Specifies the ABI configurations of your native
+                // libraries Gradle should build and package with your APK.
+                abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
             }
         }
     }
