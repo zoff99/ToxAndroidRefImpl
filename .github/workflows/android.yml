@@ -17,8 +17,8 @@ jobs:
     - name: Install NDK
       run: echo "y" | sudo /usr/local/lib/android/sdk/tools/bin/sdkmanager --install "ndk;21.0.6113669" --sdk_root=${ANDROID_SDK_ROOT}
 
-    - name: Build with Gradle _dummy_
-      run: cd android-refimpl-app ; ./gradlew assembleDebug ; echo "OK"
+    #- name: Build with Gradle _dummy_
+    #  run: cd android-refimpl-app ; ./gradlew assembleDebug ; echo "OK"
     - name: Build with Gradle
       run: cd android-refimpl-app ; ./gradlew :app:build
 
