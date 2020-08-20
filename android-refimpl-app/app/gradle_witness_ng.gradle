@@ -203,11 +203,11 @@ project.task('printDependencies').doLast {
 assemble.dependsOn pinChecksums
 build.dependsOn pinChecksums
 
-// tasks.matching { task ->
-//     task.name.startsWith('assemble')
-// }.all { task ->
-//     task.dependsOn pinChecksums
-// }
+tasks.matching { task ->
+    task.name.startsWith('assemble')
+}.all { task ->
+    task.dependsOn pinChecksums
+}
 
 // --- gradle witness NG ---
 // --- gradle witness NG ---
