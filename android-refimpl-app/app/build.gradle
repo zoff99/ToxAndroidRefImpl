@@ -328,3 +328,9 @@ dependencies {
 }
 
 apply from: 'gradle_witness_ng.gradle'
+
+tasks.matching { task ->
+    task.name.startsWith('assemble')
+}.all { task ->
+    task.dependsOn ':native-audio-jni:externalNativeBuildRelease'
+}
