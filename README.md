@@ -11,13 +11,12 @@ Build Status
 **CircleCI:** [![CircleCI](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003.png?style=badge)](https://circleci.com/gh/zoff99/ToxAndroidRefImpl/tree/zoff99%2Fdev003)
 [![Android CI](https://github.com/zoff99/ToxAndroidRefImpl/workflows/Android%20CI/badge.svg)](https://github.com/zoff99/ToxAndroidRefImpl/actions?query=workflow%3A%22Android+CI%22)
 **Bintray:** [![Download](https://api.bintray.com/packages/zoff99/maven/trifajni/images/download.svg)](https://bintray.com/zoff99/maven/trifajni/_latestVersion)
-**Weblate:** [![Translations](https://weblate.tox.zoff.cc/widgets/trifa-a-tox-client-for-android/-/svg-badge.svg)](https://weblate.tox.zoff.cc/engage/trifa-a-tox-client-for-android/?utm_source=widget)
-
+**Weblate:** [![Translations](https://hosted.weblate.org/widgets/trifa-a-tox-client-for-android/-/svg-badge.svg)](https://hosted.weblate.org/engage/trifa-a-tox-client-for-android/)
 
 Help Translate the App in your Language
 =
-translate this file and make a PR on github<br>
-https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/android-refimpl-app/app/src/main/res/values/strings.xml
+Use Weblate:
+https://hosted.weblate.org/engage/trifa-a-tox-client-for-android/
 
 Offline Messages \*NEW\* \*NEW\*
 =
