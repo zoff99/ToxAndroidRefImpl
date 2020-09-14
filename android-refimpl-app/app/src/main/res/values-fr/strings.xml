@@ -1,13 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="add_friend_activity_name">Ajouter un ami</string>
     <string name="message_list_activity_name">Bavarder</string>
     <string name="conference_message_list_activity_name">Conférence texte</string>
     <string name="conference_audio_activity_name">Conférence audio</string>
-
     <string name="set_password_message_empty">Le mot de passe est vide</string>
     <string name="set_password_message_password_invalid">Mot de passe trop court</string>
     <string name="set_password_message_password_dont_match">Les mots de passe ne correspondent pas</string>
-
     <string name="title_activity_calling">Appel</string>
     <string name="title_activity_profile">Profil</string>
     <string name="title_activity_settings">Réglages</string>
@@ -19,30 +18,19 @@
     <string name="title_activity_check_password">Entrer le mot de passe</string>
     <string name="title_activity_share">ouvrir avec TRIfA</string>
     <string name="title_activity_maintenance">Entretien</string>
-
-
     <string-array name="spinner_own_status_array">
         <item>En ligne</item>
         <item>Un moyen</item>
         <item>Occupé</item>
     </string-array>
-
     <string name="settings_toolbar_title">Réglages</string>
-
-    
-    
-    
     <string name="pref_header_general">Général</string>
-
     <string name="pref_title_auto_accept_image">accepter automatiquement l\'image</string>
     <string name="pref_description_auto_accept_image">accepter automatiquement les images et les photos d\'une taille maximale de 3 Mo</string>
-
     <string name="pref_title_video_uv_reversed">inverser les UV en vidéo</string>
     <string name="pref_description_video_uv_reversed">Inverser l\'ordre des plans UV dans la vidéo de la caméra</string>
-
     <string name="pref_title_software_echo_cancel">Annulation d\'écho</string>
     <string name="pref_description_software_echo_cancel">Utiliser l\'annulation d\'écho logiciel</string>
-
     <string name="pref_title_higher_video_quality">Qualité vidéo</string>
     <string name="pref_description_higher_video_quality">Utilisez une meilleure qualité vidéo. \nLe changement doit redémarrer!</string>
     <string-array name="pref_higher_video_quality_titles">
@@ -55,7 +43,6 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-
     <string name="pref_title_camera_get_preview_format">Format d\'aperçu de la caméra</string>
     <string name="pref_description_camera_get_preview_format">Le format d\'aperçu de l\'appareil photo semble être au mauvais format sur certains téléphones</string>
     <string-array name="pref_camera_get_preview_format_titles">
@@ -66,7 +53,6 @@
         <item>YV12</item>
         <item>NV21</item>
     </string-array>
-
     <string name="pref_title_higher_audio_quality">Qualité audio</string>
     <string name="pref_description_higher_audio_quality">Utilisez une meilleure qualité audio. \nLe changement doit redémarrer!</string>
     <string-array name="pref_higher_audio_quality_titles">
@@ -79,49 +65,34 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-
     <string name="pref_title_udp_enabled">activer UDP</string>
     <string name="pref_description_udp_enabled">pour la plupart des appareils mobiles, UDP génèrera beaucoup plus de trafic Internet. \nChanger les besoins RESTART! \nLe paramètre par défaut est OFF</string>
-
     <string name="pref_title_orbot_enabled">activer Tor Proxy</string>
     <string name="pref_description_orbot_enabled">Vous devez installer Orbot pour l\'utiliser. \nLe changement doit redémarrer!</string>
-
     <string name="pref_title_fps_half">fps inférieur</string>
     <string name="pref_description_fps_half">Fréquence d\'images 1/2: donc 12 ips au lieu de 25 ips</string>
-
     <string name="pref_title_set_fps">définir fps</string>
     <string name="pref_description_set_fps">essayez de définir une fréquence d\'images de 15 ips, cela peut se bloquer sur certains téléphones</string>
-
     <string name="pref_title_display_name">Afficher un nom</string>
     <string name="pref_default_display_name">John Smith</string>
-
     <string name="pref_title_conference_show_system_messages">Messages système</string>
     <string name="pref_description_conference_show_system_messages">afficher les messages système dans les conférences</string>
-
     <string name="pref_title_local_discovery_enabled">Découverte LAN</string>
     <string name="pref_description_local_discovery_enabled">utiliser des nœuds sur un réseau local pour démarrer</string>
-
     <string name="pref_title_U_keep_nospam">garder NoSpam</string>
     <string name="pref_description_U_keep_nospam">conserver la valeur NoSpam. Ce n\'est pas sûr, activez uniquement si vous savez ce que vous faites!</string>
-
     <string name="pref_title_allow_screen_off_in_audio_call">Éteignez l\'écran</string>
     <string name="pref_description_allow_screen_off_in_audio_call">Si vous rencontrez des problèmes avec la désactivation de l\'écran dans un Audiocall, désactivez-la</string>
-
     <string name="pref_title_X_zoom_incoming_video">Fenêtre Zoom Videocall</string>
     <string name="pref_description_X_zoom_incoming_video">permet de pincer-zoomer la fenêtre Videocall. Cela ne fonctionne pas pleinement!</string>
-
     <string name="pref_title_X_use_native_audio_play">Système audio natif</string>
     <string name="pref_description_X_use_native_audio_play">!! Expermimental !! \nUtilisez l\'audio natif pour lire le son</string>
-
     <string name="pref_title_X_battery_saving_mode">Mode d\'économie de batterie</string>
     <string name="pref_description_X_battery_saving_mode">!! Expermimental !! \ncela permettra d\'économiser un peu plus de batterie, mais le message prendra plus de temps à envoyer et à recevoir. \nProbablement d\'autres mauvais effets aussi!</string>
-
     <string name="pref_title_X_misc_button_enabled">Divers Bouton</string>
     <string name="pref_description_X_misc_button_enabled">!! Expermimental !! \najoutez un bouton sur l\'écran d\'appel pour envoyer un message fixe</string>
-
     <string name="pref_title_X_eac_delay_ms">Retard AEC</string>
     <string name="pref_description_X_eac_delay_ms">!! Expermimental !! \nAEC delay en ms</string>
-
     <string name="pref_title_add_friends_to_messages">Ajouter des amis aux messages</string>
     <string-array name="pref_example_list_titles">
         <item>Toujours</item>
@@ -133,9 +104,7 @@
         <item>0</item>
         <item>-1</item>
     </string-array>
-
     <string name="pref_header_data_sync">Les données</string>
-
     <string name="pref_title_sync_frequency">Fréquence de synchronisation</string>
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>
@@ -153,8 +122,6 @@
         <item>360</item>
         <item>-1</item>
     </string-array>
-
-
     <string name="pref_title_min_audio_samplingrate_out">Taux d\'échantillonnage audio</string>
     <string name="pref_description_min_audio_samplingrate_out">Le réglage par défaut est 48000 Hz</string>
     <string-array name="pref_min_audio_samplingrate_out_titles">
@@ -169,8 +136,6 @@
         <item>16000</item>
         <item>48000</item>
     </string-array>
-
-
     <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
     <string name="pref_description_X_audio_recording_frame_size">Le réglage par défaut est de 40 ms</string>
     <string-array name="X_audio_recording_frame_size_titles">
@@ -185,7 +150,6 @@
         <item>40</item>
         <item>20</item>
     </string-array>
-
     <string name="pref_title_X_battery_saving_timeout">Temps hors ligne en mode Économie de batterie</string>
     <string name="pref_description_X_battery_saving_timeout">Le réglage par défaut est de 15 minutes</string>
     <string-array name="X_battery_saving_timeout_titles">
@@ -206,43 +170,27 @@
         <item>60</item>
         <item>120</item>
     </string-array>
-
     <string-array name="list_preference_entries">
         <item>Entrée 1</item>
         <item>Entrée 2</item>
         <item>Entrée 3</item>
     </string-array>
-
     <string-array name="list_preference_entry_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
     </string-array>
-
     <string-array name="multi_select_list_preference_default_value"/>
-
     <string name="pref_title_system_sync_settings">Paramètres de synchronisation du système</string>
-
     <string name="pref_header_notifications">Notifications</string>
-
     <string name="pref_title_new_message_notifications">Notifications de nouveaux messages</string>
-
     <string name="pref_title_ringtone">Sonnerie</string>
     <string name="pref_ringtone_silent">Silencieux</string>
-
     <string name="pref_title_vibrate">Vibrer</string>
     <string name="pref_title_sound">Du son</string>
     <string name="add_friend_activity_help">Collez le Tox ID d\'un ami dans la zone de texte ci-dessus ou appuyez sur le     Bouton de code QR pour scanner le code d\'un ami avec un appareil photo.</string>
     <string name="add_friend_activity_add">Ajouter un ami</string>
     <string name="cancel">Annuler</string>
-    
-    
-    
-
-
-    
-    
-    
     <string name="MainActivity_profile">Profil</string>
     <string name="MainActivity_settings">Réglages</string>
     <string name="MainActivity_logout_login">Déconnexion /Connexion</string>
@@ -268,34 +216,22 @@
     <string name="MainActivity_notification_new_message3">nouveau message</string>
     <string name="MainActivity_notification_new_message4">nouveau message</string>
     <string name="MainActivity_notification_new_message5">nouveau message</string>
-
     <string name="Aboutpage_0">TRIfA Crashlog</string>
-    <string name="Aboutpage_2">envoyer un rapport de plantage par e-mail</string>
+    <string name="Aboutpage_2">envoyer un rapport de plantage par courriel</string>
     <string name="Aboutpage_4">lecture des informations de plantage ...</string>
     <string name="Aboutpage_5a">TRIfA a Tox Client pour Android</string>
     <string name="Aboutpage_5b">Version:</string>
     <string name="Aboutpage_6">Qu\'est-ce que Tox?</string>
     <string name="Aboutpage_8">bibliothèques utilisées:</string>
-
     <string name="AddFriendActivity_3">ToxID incorrect</string>
     <string name="AddFriendActivity_4">Pas de ToxID</string>
-
     <string name="CallingActivity_0">Délai vidéo:</string>
     <string name="CallingActivity_23">Délai vidéo:</string>
-
     <string name="ConferenceAudioActivity_10">Liste d\'utilisateur</string>
     <string name="ConferenceAudioActivity_17">Push to Talk</string>
     <string name="ConferenceAudioActivity_18">parlant ...</string>
     <string name="GroupActivityActive">Actif:</string>
     <string name="GroupActivityOffline">Hors ligne:</string>
-    
-    
-    
-
-
-    
-    
-    
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">scanner le code QR</string>
     <string name="layout___enter_pass_longtext">Entrez le mot de passe \nIl n\'y a AUCUNE option de récupération!</string>
@@ -345,7 +281,11 @@
     <string name="layout___online">En ligne</string>
     <string name="layout___copy">Copie</string>
     <string name="layout___export">Exportation</string>
-    
-    
-    
+    <string name="pref_description_global_font_size">Sélectionner une taille de police</string>
+    <string name="pref_title_global_font_size">Taille de la police</string>
+    <string name="pref_description_video_cam_resolution">Quelle résolution utiliser pour l’appel vidéo</string>
+    <string name="pref_title_video_cam_resolution">Résolution de la caméra</string>
+    <string name="pref_description_auto_accept_video">accepter automatiquement les vidéos jusqu\'à 10 Mo</string>
+    <string name="pref_title_auto_accept_video">accepter automatiquement les vidéos</string>
+    <string name="conference_audio_activity_player_name">Lecteur de conférence audio</string>
 </resources>
