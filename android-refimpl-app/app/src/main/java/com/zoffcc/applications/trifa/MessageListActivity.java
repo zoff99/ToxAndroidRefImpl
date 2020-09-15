@@ -47,6 +47,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -69,6 +70,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 
+import static android.widget.Toast.LENGTH_LONG;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.insert_into_filetransfer_db;
@@ -1296,13 +1298,37 @@ public class MessageListActivity extends AppCompatActivity
                                     last_video_frame_received = -1;
                                     count_video_frame_received = 0;
                                     count_video_frame_sent = 0;
+
                                     if (Callstate.audio_call)
                                     {
-                                        MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, 0);
+                                        int res1 = MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, 0);
+                                        if (res1 != 1)
+                                        {
+                                            Log.i(TAG, "toxav_call:audio_call:RES=" + res1);
+                                            try
+                                            {
+                                                Toast.makeText(context_s, "Call Start ERROR", LENGTH_LONG);
+                                            }
+                                            catch(Exception e)
+                                            {
+                                            }
+                                        }
                                     }
                                     else
                                     {
-                                        MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                        int res2 = MainActivity.toxav_call(fn, GLOBAL_AUDIO_BITRATE,
+                                                                           GLOBAL_VIDEO_BITRATE);
+                                        if (res2 != 1)
+                                        {
+                                            Log.i(TAG, "toxav_call:video_call:RES=" + res2);
+                                            try
+                                            {
+                                                Toast.makeText(context_s, "Call Start ERROR", LENGTH_LONG);
+                                            }
+                                            catch(Exception e)
+                                            {
+                                            }
+                                        }
                                     }
                                     Log.i(TAG, "CALL_OUT:002");
                                 }

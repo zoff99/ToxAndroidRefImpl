@@ -1146,23 +1146,34 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         if (Callstate.accepted_call != 1)
                         {
-                            Callstate.accepted_call = 1;
-
                             Log.i(TAG, "answer button pressed"); //$NON-NLS-1$
 
                             if (Callstate.audio_call)
                             {
-                                toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                int res1 = toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                              GLOBAL_AUDIO_BITRATE, 0);
+
+                                if (res1 != 1)
+                                {
+                                    return true;
+                                }
                                 Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
                             }
                             else
                             {
-                                toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                int res2 = toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                              GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+
+                                if (res2 != 1)
+                                {
+                                    return true;
+                                }
+
                                 Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
 
                             }
+
+                            Callstate.accepted_call = 1;
 
                             caller_avatar_view.setVisibility(View.GONE);
                             accept_button.setVisibility(View.GONE);
