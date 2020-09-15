@@ -19,8 +19,10 @@ jobs:
 
     #- name: Build with Gradle _dummy_
     #  run: cd android-refimpl-app ; ./gradlew assembleDebug ; echo "OK"
+    #- name: Build with Gradle
+    #  run: cd android-refimpl-app ; ./gradlew :app:build
     - name: Build with Gradle
-      run: cd android-refimpl-app ; ./gradlew :app:build
+      run: cd android-refimpl-app ; ./gradlew assembleRelease
 
     - name: upload apk
       uses: actions/upload-artifact@v1
