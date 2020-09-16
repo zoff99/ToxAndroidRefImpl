@@ -101,7 +101,7 @@
     <string name="title_activity_check_password">Digite a senha</string>
     <string name="title_activity_set_password">Definir Senha</string>
     <string name="title_activity_aboutpage">Sobre</string>
-    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_conferencepeerinfo">Informações sobre o par</string>
     <string name="pref_title_X_battery_saving_mode">Modo de Economia de Bateria</string>
     <string name="pref_description_X_use_native_audio_play">!! Experimental !!
 \nUsar o Áudio Nativo para Reproduzir Som</string>
@@ -126,7 +126,7 @@
     <string name="layout___status">Estado:</string>
     <string name="layout___alias">Pseudônimo</string>
     <string name="layout___remove_friends_relay">remover o Relé de Amigos</string>
-    <string name="layout___friends_relay_pubkey">Relé de Chave Pública dos Amigos:</string>
+    <string name="layout___friends_relay_pubkey">Relé de Chaves Públicas dos Amigos:</string>
     <string name="layout___waiting_for_orbot">esperando pelo Orbot…</string>
     <string name="layout___clear_glide_cache">limpar o Glide Cache</string>
     <string name="layout___set_app_language">definir o idioma do aplicativo</string>
@@ -168,4 +168,40 @@
     <string name="conference_message_list_activity_name">Conferência de Texto</string>
     <string name="message_list_activity_name">Bate-papo</string>
     <string name="add_friend_activity_name">Adicionar Amigo</string>
+    <string name="layout___enter_pass_longtext">Digite a senha
+\nNÃO há opção de recuperação!</string>
+    <string name="MainActivity_add_to_batt_opt">Favor adicionar TRIfA à lista de exceções para otimização da bateria!</string>
+    <string name="add_friend_activity_help">Cole o Tox ID de um amigo na caixa de texto acima ou toque no botão do código QR para ler o código de um amigo com uma câmera.</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Experimental !!
+\nBuffer de reprodução de áudio em bytes, definido como 0 para desativar a configuração personalizada</string>
+    <string name="pref_description_X_eac_delay_ms">!! Experimental !!!
+\nAtraso AEC em ms</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! Experimental !!!
+\nNão sincroniza Vídeo ou Áudio. Use esta configuração se você tiver problemas de Videochamada, como último recurso.</string>
+    <string name="pref_description_X_misc_button_enabled">!! Experimental !!
+\nAdiciona um botão na tela da chamada para enviar uma mensagem fixa</string>
+    <string name="pref_description_X_battery_saving_mode">!! Experimental !!
+\nIsto economizará um pouco mais de bateria, mas a mensagem demorará mais para ser enviada e recebida.
+\nProvavelmente também alguns outros efeitos negativos!</string>
+    <string name="pref_description_local_discovery_enabled">usar os nós na LAN local para inicializar</string>
+    <string name="pref_description_set_fps">tente definir a taxa de quadros de vídeo de 15 fps, isto pode travar em alguns telefones</string>
+    <string name="pref_description_use_incognito_keyboard">desative para dizer ao teclado para não aprender com as palavras digitadas</string>
+    <string name="pref_description_fps_half">Taxa de quadros de vídeo 1/2: então 12 fps em vez de 25 fps</string>
+    <string name="pref_description_orbot_enabled">Você precisa instalar o Orbot para usar isto.
+\nA mudança precisa REINICIAR!</string>
+    <string name="pref_description_force_udp_only">isto forçará o modo somente UDP, alguns contatos podem não ser acessíveis com esta configuração ativada
+\nA mudança precisa REINICIAR!</string>
+    <string name="pref_description_udp_enabled">para a maioria dos dispositivos móveis, o UDP vai causar muito mais tráfego na internet.
+\nA mudança precisa REINICIAR!
+\nA configuração padrão é OFF (desligado)</string>
+    <string name="pref_header_notifications">Notificações</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">O codificador H264 deve usar quadros intra de atualização</string>
+    <string name="pref_description_higher_audio_quality">Usa uma melhor qualidade de áudio.
+\nA mudança precisa REINICIAR!</string>
+    <string name="pref_description_mic_gain_factor">Defina um ganho maior se o seu microfone gravar com volume baixo</string>
+    <string name="pref_description_camera_get_preview_format">O formato de pré-visualização da câmera parece ter um formato incorreto em alguns telefones</string>
+    <string name="pref_description_video_cam_resolution">Que resolução usar para as chamadas de vídeo</string>
+    <string name="pref_description_higher_video_quality">Usa melhor qualidade de vídeo.
+\nA mudança precisa REINICIAR!</string>
+    <string name="pref_description_video_uv_reversed">Inverea a ordem dos planos UV no vídeo da câmera</string>
 </resources>
