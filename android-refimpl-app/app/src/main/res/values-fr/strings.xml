@@ -11,8 +11,8 @@
     <string name="title_activity_profile">Profil</string>
     <string name="title_activity_settings">Réglages</string>
     <string name="title_activity_crash">crash</string>
-    <string name="title_activity_friendinfo">Friendinfo</string>
-    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_friendinfo">Infos sur l\'ami</string>
+    <string name="title_activity_conferencepeerinfo">Infos sur le pair</string>
     <string name="title_activity_aboutpage">À propos de</string>
     <string name="title_activity_set_password">Définir le mot de passe</string>
     <string name="title_activity_check_password">Entrer le mot de passe</string>
@@ -32,7 +32,8 @@
     <string name="pref_title_software_echo_cancel">Annulation d\'écho</string>
     <string name="pref_description_software_echo_cancel">Utiliser l\'annulation d\'écho logiciel</string>
     <string name="pref_title_higher_video_quality">Qualité vidéo</string>
-    <string name="pref_description_higher_video_quality">Utilisez une meilleure qualité vidéo. \nLe changement doit redémarrer!</string>
+    <string name="pref_description_higher_video_quality">Utilisez une meilleure qualité vidéo.
+\nLe changement doit redémarrer !</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>faible bande passante \n(250 kb /s)</item>
         <item>bande passante normale \n(2500 kb /s)</item>
@@ -54,7 +55,8 @@
         <item>NV21</item>
     </string-array>
     <string name="pref_title_higher_audio_quality">Qualité audio</string>
-    <string name="pref_description_higher_audio_quality">Utilisez une meilleure qualité audio. \nLe changement doit redémarrer!</string>
+    <string name="pref_description_higher_audio_quality">Utilisez une meilleure qualité audio.
+\nLe changement doit redémarrer !</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>faible \n(6 kb /s)</item>
         <item>normal \n(32 kb /s)</item>
@@ -66,11 +68,14 @@
         <item>2</item>
     </string-array>
     <string name="pref_title_udp_enabled">activer UDP</string>
-    <string name="pref_description_udp_enabled">pour la plupart des appareils mobiles, UDP génèrera beaucoup plus de trafic Internet. \nChanger les besoins RESTART! \nLe paramètre par défaut est OFF</string>
+    <string name="pref_description_udp_enabled">pour la plupart des appareils mobiles, UDP génèrera beaucoup plus de trafic Internet.
+\nChanger les besoins RESTART !
+\nLe paramètre par défaut est OFF</string>
     <string name="pref_title_orbot_enabled">activer Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">Vous devez installer Orbot pour l\'utiliser. \nLe changement doit redémarrer!</string>
+    <string name="pref_description_orbot_enabled">Vous devez installer Orbot pour l\'utiliser.
+\nLe changement doit redémarrer !</string>
     <string name="pref_title_fps_half">fps inférieur</string>
-    <string name="pref_description_fps_half">Fréquence d\'images 1/2: donc 12 ips au lieu de 25 ips</string>
+    <string name="pref_description_fps_half">Fréquence d\'images 1/2 : donc 12 ips au lieu de 25 ips</string>
     <string name="pref_title_set_fps">définir fps</string>
     <string name="pref_description_set_fps">essayez de définir une fréquence d\'images de 15 ips, cela peut se bloquer sur certains téléphones</string>
     <string name="pref_title_display_name">Afficher un nom</string>
@@ -80,19 +85,24 @@
     <string name="pref_title_local_discovery_enabled">Découverte LAN</string>
     <string name="pref_description_local_discovery_enabled">utiliser des nœuds sur un réseau local pour démarrer</string>
     <string name="pref_title_U_keep_nospam">garder NoSpam</string>
-    <string name="pref_description_U_keep_nospam">conserver la valeur NoSpam. Ce n\'est pas sûr, activez uniquement si vous savez ce que vous faites!</string>
+    <string name="pref_description_U_keep_nospam">conserver la valeur NoSpam. Ce n\'est pas sûr, activez uniquement si vous savez ce que vous faites !</string>
     <string name="pref_title_allow_screen_off_in_audio_call">Éteignez l\'écran</string>
     <string name="pref_description_allow_screen_off_in_audio_call">Si vous rencontrez des problèmes avec la désactivation de l\'écran dans un Audiocall, désactivez-la</string>
     <string name="pref_title_X_zoom_incoming_video">Fenêtre Zoom Videocall</string>
-    <string name="pref_description_X_zoom_incoming_video">permet de pincer-zoomer la fenêtre Videocall. Cela ne fonctionne pas pleinement!</string>
+    <string name="pref_description_X_zoom_incoming_video">permet de pincer-zoomer la fenêtre Videocall. Cela ne fonctionne pas pleinement !</string>
     <string name="pref_title_X_use_native_audio_play">Système audio natif</string>
-    <string name="pref_description_X_use_native_audio_play">!! Expermimental !! \nUtilisez l\'audio natif pour lire le son</string>
+    <string name="pref_description_X_use_native_audio_play">! ! Expérimental ! !
+\nUtilisez l\'audio natif pour lire le son</string>
     <string name="pref_title_X_battery_saving_mode">Mode d\'économie de batterie</string>
-    <string name="pref_description_X_battery_saving_mode">!! Expermimental !! \ncela permettra d\'économiser un peu plus de batterie, mais le message prendra plus de temps à envoyer et à recevoir. \nProbablement d\'autres mauvais effets aussi!</string>
+    <string name="pref_description_X_battery_saving_mode">! ! Expérimental ! !
+\ncela permettra d\'économiser un peu plus de batterie, mais le message prendra plus de temps à envoyer et à recevoir.
+\nProbablement d\'autres mauvais effets aussi !</string>
     <string name="pref_title_X_misc_button_enabled">Divers Bouton</string>
-    <string name="pref_description_X_misc_button_enabled">!! Expermimental !! \najoutez un bouton sur l\'écran d\'appel pour envoyer un message fixe</string>
+    <string name="pref_description_X_misc_button_enabled">! ! Expérimental ! !
+\najoutez un bouton sur l\'écran d\'appel pour envoyer un message fixe</string>
     <string name="pref_title_X_eac_delay_ms">Retard AEC</string>
-    <string name="pref_description_X_eac_delay_ms">!! Expermimental !! \nAEC delay en ms</string>
+    <string name="pref_description_X_eac_delay_ms">! ! Expérimental ! !
+\ndélai AEC en ms</string>
     <string name="pref_title_add_friends_to_messages">Ajouter des amis aux messages</string>
     <string-array name="pref_example_list_titles">
         <item>Toujours</item>
@@ -136,7 +146,7 @@
         <item>16000</item>
         <item>48000</item>
     </string-array>
-    <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
+    <string name="pref_title_X_audio_recording_frame_size">Taille du cadre de codage audio</string>
     <string name="pref_description_X_audio_recording_frame_size">Le réglage par défaut est de 40 ms</string>
     <string-array name="X_audio_recording_frame_size_titles">
         <item>120</item>
@@ -203,7 +213,7 @@
     <string name="MainActivity_no_button">non</string>
     <string name="MainActivity_ok_take_me_there_button">OK, emmène-moi là-bas</string>
     <string name="MainActivity_info_dialog_title">INFO</string>
-    <string name="MainActivity_add_to_batt_opt">Veuillez ajouter TRIfA à la liste d\'exceptions pour l\'optimisation de la batterie!</string>
+    <string name="MainActivity_add_to_batt_opt">Veuillez ajouter TRIfA à la liste d\'exceptions pour l\'optimisation de la batterie !</string>
     <string name="MainActivity_friend_is_typing">un ami tape ...</string>
     <string name="MainActivity_notification_new_message">nouveau message</string>
     <string name="MainActivity_notification_new_message2">nouveau message</string>
@@ -216,34 +226,35 @@
     <string name="MainActivity_notification_new_message3">nouveau message</string>
     <string name="MainActivity_notification_new_message4">nouveau message</string>
     <string name="MainActivity_notification_new_message5">nouveau message</string>
-    <string name="Aboutpage_0">TRIfA Crashlog</string>
+    <string name="Aboutpage_0">Registre de crash de TRIfA</string>
     <string name="Aboutpage_2">envoyer un rapport de plantage par courriel</string>
     <string name="Aboutpage_4">lecture des informations de plantage ...</string>
     <string name="Aboutpage_5a">TRIfA a Tox Client pour Android</string>
-    <string name="Aboutpage_5b">Version:</string>
-    <string name="Aboutpage_6">Qu\'est-ce que Tox?</string>
-    <string name="Aboutpage_8">bibliothèques utilisées:</string>
+    <string name="Aboutpage_5b">Version :</string>
+    <string name="Aboutpage_6">Qu\'est-ce que Tox \?</string>
+    <string name="Aboutpage_8">bibliothèques utilisées :</string>
     <string name="AddFriendActivity_3">ToxID incorrect</string>
     <string name="AddFriendActivity_4">Pas de ToxID</string>
-    <string name="CallingActivity_0">Délai vidéo:</string>
-    <string name="CallingActivity_23">Délai vidéo:</string>
+    <string name="CallingActivity_0">Délai vidéo :</string>
+    <string name="CallingActivity_23">Délai vidéo :</string>
     <string name="ConferenceAudioActivity_10">Liste d\'utilisateur</string>
-    <string name="ConferenceAudioActivity_17">Push to Talk</string>
+    <string name="ConferenceAudioActivity_17">Appuyer pour parler</string>
     <string name="ConferenceAudioActivity_18">parlant ...</string>
-    <string name="GroupActivityActive">Actif:</string>
-    <string name="GroupActivityOffline">Hors ligne:</string>
+    <string name="GroupActivityActive">Actifs :</string>
+    <string name="GroupActivityOffline">Hors ligne :</string>
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">scanner le code QR</string>
-    <string name="layout___enter_pass_longtext">Entrez le mot de passe \nIl n\'y a AUCUNE option de récupération!</string>
+    <string name="layout___enter_pass_longtext">Entrez le mot de passe
+\nIl n\'y a AUCUNE option de récupération !</string>
     <string name="layout___unlock">Ouvrir</string>
     <string name="layout___name">Nom</string>
     <string name="layout___push_to_talk">Poussez pour parler</string>
-    <string name="layout___nick">Pseudo:</string>
-    <string name="layout___pubkey">Pubkey:</string>
-    <string name="layout___status">Statut:</string>
+    <string name="layout___nick">Pseudo :</string>
+    <string name="layout___pubkey">clé publique :</string>
+    <string name="layout___status">État :</string>
     <string name="layout___alias">Alias</string>
     <string name="layout___remove_friends_relay">supprimer Friends Relay</string>
-    <string name="layout___friends_relay_pubkey">Amis Pubkey Relais:</string>
+    <string name="layout___friends_relay_pubkey">Relais de Clés Publiques des Amis :</string>
     <string name="layout___waiting_for_orbot">en attendant Orbot ...</string>
     <string name="layout___clear_glide_cache">effacer le Glide Cache</string>
     <string name="layout___set_app_language">définir la langue de l\'application</string>
@@ -259,14 +270,18 @@
     <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA * NON SÉCURISÉ *</string>
     <string name="layout___click_image_to_change_your_avatar">cliquez sur Image pour changer votre Avatar</string>
     <string name="layout___remove_own_relay">supprimer son propre relais</string>
-    <string name="layout___relay_pubkey">Relais Pubkey:</string>
+    <string name="layout___relay_pubkey">Relais de Clés Publiques :</string>
     <string name="layout___new_random_nospam">nouveau NOSPAM aléatoire</string>
-    <string name="layout___own_pubkey">Propre Pubkey:</string>
+    <string name="layout___own_pubkey">Clé Publique Propre :</string>
     <string name="layout___copy_toxid">copier ToxID</string>
     <string name="layout___your_toxidenticon">Votre ToxIdenticon</string>
-    <string name="layout___active_network_connections">Connexions réseau actives:</string>
+    <string name="layout___active_network_connections">Connexions réseau actives :</string>
     <string name="layout___error_getting_active_network_connections">* erreur lors de l\'obtention des connexions réseau actives *</string>
-    <string name="layout___set_password_or_skip">Définissez le mot de passe ou ignorez. \n \nLorsque vous choisissez de sauter un \nmot de passe sera généré automatiquement \nIl n\'y a AUCUNE option de récupération!</string>
+    <string name="layout___set_password_or_skip">Définissez le mot de passe ou ignorez.
+\n
+\nLorsque vous choisissez de sauter un
+\nmot de passe sera généré automatiquement
+\nIl n\'y a AUCUNE option de récupération !</string>
     <string name="layout___password">Mot de passe</string>
     <string name="layout___password_again">Mot de passe à nouveau</string>
     <string name="layout___set_password">Définir le mot de passe</string>
@@ -288,4 +303,19 @@
     <string name="pref_description_auto_accept_video">accepter automatiquement les vidéos jusqu\'à 10 Mo</string>
     <string name="pref_title_auto_accept_video">accepter automatiquement les vidéos</string>
     <string name="conference_audio_activity_player_name">Lecteur de conférence audio</string>
+    <string name="pref_description_X_audio_play_buffer_custom">! ! Expérimental ! !
+\nTampon de lecture audio en octets, réglez sur 0 pour désactiver le paramètre personnalisé</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Tampon de lecture audio</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">! ! Expérimental ! !
+\nNe pas synchroniser la vidéo ou l\'audio. Utilisez ce paramètre si vous avez des problèmes de vidéoconférence, en dernier recours.</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">NE PAS synchroniser AV</string>
+    <string name="pref_description_use_incognito_keyboard">désactivez pour dire au clavier de ne pas apprendre de vos mots saisis</string>
+    <string name="pref_title_use_incognito_keyboard">Clavier incognito</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">L’encodeur H264 doit utiliser des cadres intra-actualisation</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">Rafraîchissement intra H264</string>
+    <string name="pref_description_force_udp_only">cela forcera le mode UDP uniquement, certains contacts peuvent ne pas être joignables avec ce paramètre activé
+\nLe changement a besoin de redémarrer !</string>
+    <string name="pref_title_force_udp_only">forcer le mode UDP</string>
+    <string name="pref_description_mic_gain_factor">Définissez un gain plus élevé si votre microphone enregistre avec un faible volume</string>
+    <string name="pref_title_mic_gain_factor">Gain micro</string>
 </resources>
