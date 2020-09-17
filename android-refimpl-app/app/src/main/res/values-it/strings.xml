@@ -11,8 +11,8 @@
     <string name="title_activity_profile">Profilo</string>
     <string name="title_activity_settings">impostazioni</string>
     <string name="title_activity_crash">schianto</string>
-    <string name="title_activity_friendinfo">Friendinfo</string>
-    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_friendinfo">Informazioni sul amico</string>
+    <string name="title_activity_conferencepeerinfo">Informazioni sul pare</string>
     <string name="title_activity_aboutpage">Di</string>
     <string name="title_activity_set_password">Impostare la password</string>
     <string name="title_activity_check_password">Inserire la password</string>
@@ -136,7 +136,7 @@
         <item>16000</item>
         <item>48000</item>
     </string-array>
-    <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
+    <string name="pref_title_X_audio_recording_frame_size">Dimensione del frame di ricodificazione audio</string>
     <string name="pref_description_X_audio_recording_frame_size">L\'impostazione predefinita è 40 ms</string>
     <string-array name="X_audio_recording_frame_size_titles">
         <item>120</item>
@@ -216,7 +216,7 @@
     <string name="MainActivity_notification_new_message3">nuovo messaggio</string>
     <string name="MainActivity_notification_new_message4">nuovo messaggio</string>
     <string name="MainActivity_notification_new_message5">nuovo messaggio</string>
-    <string name="Aboutpage_0">TRIfA Crashlog</string>
+    <string name="Aboutpage_0">Registro dei crash del TRIfA</string>
     <string name="Aboutpage_2">invia un rapporto di crash via e-mail</string>
     <string name="Aboutpage_4">leggere le informazioni sugli arresti anomali ...</string>
     <string name="Aboutpage_5a">TRIfA un client Tox per Android</string>
@@ -224,11 +224,11 @@
     <string name="Aboutpage_6">Che cos\'è Tox?</string>
     <string name="Aboutpage_8">librerie usate:</string>
     <string name="AddFriendActivity_3">ToxID errato</string>
-    <string name="AddFriendActivity_4">No ToxID</string>
+    <string name="AddFriendActivity_4">Nessun ToxID</string>
     <string name="CallingActivity_0">Ritardo video:</string>
     <string name="CallingActivity_23">Ritardo video:</string>
     <string name="ConferenceAudioActivity_10">Lista degli utenti</string>
-    <string name="ConferenceAudioActivity_17">Push to Talk</string>
+    <string name="ConferenceAudioActivity_17">Premi per parlare</string>
     <string name="ConferenceAudioActivity_18">parlando ...</string>
     <string name="GroupActivityActive">Attivo:</string>
     <string name="GroupActivityOffline">Disconnesso:</string>
@@ -237,8 +237,8 @@
     <string name="layout___enter_pass_longtext">Inserisci la password \nNESSUNA opzione di recupero!</string>
     <string name="layout___unlock">Sbloccare</string>
     <string name="layout___name">Nome</string>
-    <string name="layout___push_to_talk">Push to talk</string>
-    <string name="layout___nick">Nick:</string>
+    <string name="layout___push_to_talk">Premi per parlare</string>
+    <string name="layout___nick">Soprannome:</string>
     <string name="layout___pubkey">pubkey:</string>
     <string name="layout___status">Stato:</string>
     <string name="layout___alias">Alias</string>
@@ -291,4 +291,16 @@
     <string name="pref_description_auto_accept_video">auto accettare video fino a 10 MByte di dimensione</string>
     <string name="pref_title_auto_accept_video">accettare automaticamente i video</string>
     <string name="conference_audio_activity_player_name">Lettore di audioconferenza</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Sperimentale!!
+\nBuffer di riproduzione audio in byte, impostato a 0 per disabilitare l\'impostazione personalizzata</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Buffer di riproduzione audio</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! Sperimentale !!
+\nNon sincronizza video o audio. Usa questa impostazione se hai problemi con la videocall, come ultima risorsa.</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">NON sincronizzare AV</string>
+    <string name="pref_description_use_incognito_keyboard">disattivare per dire alla tastiera di non imparare dalle parole inserite</string>
+    <string name="pref_title_use_incognito_keyboard">Tastiera in incognito</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">Aggiornamento intra H264</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">Il codificatore H264 dovrebbe utilizzare frame di aggiornamento intra</string>
+    <string name="pref_description_force_udp_only">questo forzerà la modalità solo UDP, alcuni contatti potrebbero non essere raggiungibili con questa impostazione attivata
+\nIl cambiamento ha bisogno di RESTART!</string>
 </resources>
