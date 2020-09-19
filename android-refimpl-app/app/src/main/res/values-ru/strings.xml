@@ -6,7 +6,7 @@
     <string name="conference_audio_activity_name">Аудио Конференция</string>
     <string name="set_password_message_empty">Пароль пуст</string>
     <string name="set_password_message_password_invalid">Пароль слишком короткий</string>
-    <string name="set_password_message_password_dont_match">Пароли не соответствуют</string>
+    <string name="set_password_message_password_dont_match">Пароли не совпадают</string>
     <string name="title_activity_calling">Вызов</string>
     <string name="title_activity_profile">Профиль</string>
     <string name="title_activity_settings">настройки</string>
