@@ -219,6 +219,7 @@ long global_videocall_audio_acitve_num = -1;
 int global_videocall_audio_sample_rate = 48000;
 int global_videocall_audio_channels = 2;
 long global_group_audio_peerbuffers = 0;
+uint64_t global_call_audio_last_pts = 0;
 uint64_t global_group_audio_last_process_incoming = 0;
 int16_t *global_group_audio_peerbuffers_buffer = NULL;
 size_t *global_group_audio_peerbuffers_buffer_start_pos = NULL; // byte position inside the buffer where valid data starts
@@ -258,10 +259,12 @@ jmethodID android_tox_log_cb_method = NULL;
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_video_receive_frame_pts_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_h264_cb_method = NULL;
 jmethodID android_toxav_callback_call_state_cb_method = NULL;
 jmethodID android_toxav_callback_bit_rate_status_cb_method = NULL;
 jmethodID android_toxav_callback_audio_receive_frame_cb_method = NULL;
+jmethodID android_toxav_callback_audio_receive_frame_pts_cb_method = NULL;
 jmethodID android_toxav_callback_group_audio_receive_frame_cb_method = NULL;
 jmethodID android_toxav_callback_call_comm_cb_method = NULL;
 // -------- _AV-callbacks_ -----
@@ -1862,6 +1865,20 @@ void android_toxav_callback_audio_receive_frame_cb(uint32_t friend_number, size_
                                     );
 }
 
+void android_toxav_callback_audio_receive_frame_pts_cb(uint32_t friend_number, size_t sample_count, uint8_t channels,
+        uint32_t sampling_rate, uint64_t pts)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_audio_receive_frame_pts_cb_method,
+                                     (jlong)(unsigned long long)friend_number,
+                                     (jlong)sample_count, (jint)channels,
+                                     (jlong)sampling_rate,
+                                     (jlong)(unsigned long long)pts
+                                    );
+}
+
 /**
  * The function type for the audio_receive_frame callback. The callback can be
  * called multiple times per single iteration depending on the amount of queued
@@ -1894,12 +1911,44 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
     pthread_mutex_unlock(&group_audio___mutex);
 
     pthread_mutex_lock(&group_audio___mutex);
+
+    // dbg(9, "toxav_audio_receive_frame_cb_:sample_count=%d sampling_rate=%d channels=%d",
+    //    sample_count,
+    //    sampling_rate,
+    //    channels);
+
+    global_call_audio_last_pts = 0;
+    videocall_audio_add_buffer(pcm, (sample_count * channels));
+    pthread_mutex_unlock(&group_audio___mutex);
+}
+
+void toxav_audio_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, const int16_t *pcm, size_t sample_count,
+                                   uint8_t channels, uint32_t sampling_rate, void *user_data, uint64_t pts)
+{
+    pthread_mutex_lock(&group_audio___mutex);
+    if (!global_group_audio_peerbuffers_buffer)
+    {
+        videocall_audio_alloc_peer_buffer();
+    }
+
+    // TODO: check that incoming audio is actually coming from the correct friend!
+    //if (global_videocall_audio_acitve_num == -1)
+    //{
+    global_videocall_audio_acitve_num = friend_number;
+    //}
+    global_videocall_audio_sample_rate = sampling_rate;
+    global_videocall_audio_channels = channels;
+
+    pthread_mutex_unlock(&group_audio___mutex);
+
+    pthread_mutex_lock(&group_audio___mutex);
     
     // dbg(9, "toxav_audio_receive_frame_cb_:sample_count=%d sampling_rate=%d channels=%d",
     //    sample_count,
     //    sampling_rate,
     //    channels);
 
+    global_call_audio_last_pts = pts;
     videocall_audio_add_buffer(pcm, (sample_count * channels));
     pthread_mutex_unlock(&group_audio___mutex);
 }
@@ -1917,6 +1966,19 @@ void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint1
                                     );
 }
 
+void android_toxav_callback_video_receive_frame_pts_cb(uint32_t friend_number, uint16_t width, uint16_t height,
+        int32_t ystride, int32_t ustride, int32_t vstride, uint64_t pts)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_toxav_callback_video_receive_frame_pts_cb_method, (jlong)(unsigned long long)friend_number,
+                                     (jlong)(unsigned long long)width, (jlong)(unsigned long long)height,
+                                     (jlong)(unsigned long long)ystride,
+                                     (jlong)(unsigned long long)ustride, (jlong)(unsigned long long)vstride,
+                                     (jlong)(unsigned long long)pts
+                                    );
+}
 
 void android_toxav_callback_video_receive_frame_h264_cb(uint32_t friend_number, uint32_t buf_size)
 {
@@ -2148,6 +2210,52 @@ void toxav_video_receive_frame_cb_(ToxAV *av, uint32_t friend_number, uint16_t w
     }
 
     android_toxav_callback_video_receive_frame_cb(friend_number, width, height, ystride, ustride, vstride);
+}
+
+void toxav_video_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, uint16_t width, uint16_t height,
+                                   const uint8_t *y, const uint8_t *u, const uint8_t *v, int32_t ystride, int32_t ustride, int32_t vstride,
+                                   void *user_data, uint64_t pts)
+{
+    if(video_buffer_1 != NULL)
+    {
+        if((y) && (u) && (v))
+        {
+            // dbg(9, "[V0]ys=%d us=%d vs=%d",
+            //    (int)video_buffer_1_y_size,
+            //    (int)video_buffer_1_u_size,
+            //    (int)video_buffer_1_v_size);
+            int actual_y_size = max(width, abs(ystride)) * height;
+            int actual_u_size = max(width/2, abs(ustride)) * (height/2);
+            int actual_v_size = max(width/2, abs(vstride)) * (height/2);
+            video_buffer_1_u = (uint8_t *)(video_buffer_1 + actual_y_size);
+            video_buffer_1_v = (uint8_t *)(video_buffer_1 + actual_y_size + actual_u_size);
+
+            if((actual_y_size + actual_u_size + actual_v_size) > video_buffer_1_size)
+            {
+                dbg(9, "Video buffer too small for incoming frame frame=%d buffer=%d",
+                    (int)(actual_y_size + actual_u_size + actual_v_size),
+                    (int)video_buffer_1_size);
+                // clear out any data in the video buffer
+                // TODO: with all "0" the video frame is all green!
+                memset(video_buffer_1, 0, video_buffer_1_size);
+            }
+            else
+            {
+                // copy the Y layer into the buffer
+                //dbg(9, "[V1]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+                memcpy(video_buffer_1, y, (size_t)(actual_y_size));
+                // copy the U layer into the buffer
+                //dbg(9, "[V2]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+                memcpy(video_buffer_1_u, u, (size_t)(actual_u_size));
+                // copy the V layer into the buffer
+                //dbg(9, "[V3]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+                memcpy(video_buffer_1_v, v, (size_t)(actual_v_size));
+                //dbg(9, "[V4]video_buffer_1=%p,y=%p,u=%p,v=%p", video_buffer_1, y, u, v);
+            }
+        }
+    }
+
+    android_toxav_callback_video_receive_frame_pts_cb(friend_number, width, height, ystride, ustride, vstride, pts);
 }
 
 void toxav_video_receive_frame_h264_cb_(ToxAV *av, uint32_t friend_number, const uint8_t *buf,
@@ -2500,6 +2608,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_toxav_callback_video_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_video_receive_frame_cb_method", "(JJJJJJ)V");
     toxav_callback_video_receive_frame(tox_av_global, toxav_video_receive_frame_cb_, &mytox_CC);
+    android_toxav_callback_video_receive_frame_pts_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_toxav_callback_video_receive_frame_pts_cb_method", "(JJJJJJJ)V");
+    toxav_callback_video_receive_frame_pts(tox_av_global, toxav_video_receive_frame_pts_cb_, &mytox_CC);
+
     // --------------------
     // --------------------
     android_toxav_callback_video_receive_frame_h264_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -2513,11 +2625,15 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_toxav_callback_bit_rate_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_bit_rate_status_cb_method", "(JJJ)V");
     toxav_callback_bit_rate_status(tox_av_global, toxav_bit_rate_status_cb_, &mytox_CC);
+
     android_toxav_callback_audio_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_audio_receive_frame_cb_method", "(JJIJ)V");
+    android_toxav_callback_audio_receive_frame_pts_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_toxav_callback_audio_receive_frame_pts_cb_method", "(JJIJJ)V");
     android_toxav_callback_group_audio_receive_frame_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_group_audio_receive_frame_cb_method", "(JJJIJ)V");
     toxav_callback_audio_receive_frame(tox_av_global, toxav_audio_receive_frame_cb_, &mytox_CC);
+    toxav_callback_audio_receive_frame_pts(tox_av_global, toxav_audio_receive_frame_pts_cb_, &mytox_CC);
 #ifdef TOX_HAVE_TOXAV_CALLBACKS_002
     android_toxav_callback_call_comm_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_call_comm_cb_method", "(JJJ)V");
@@ -4260,11 +4376,12 @@ int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_outpu
     if (audio_buffer_pcm_2 == NULL)
     {
         // callback with sample_count == 0
-        android_toxav_callback_audio_receive_frame_cb(
+        android_toxav_callback_audio_receive_frame_pts_cb(
             global_videocall_audio_acitve_num,
             0,
             global_videocall_audio_channels,
-            global_videocall_audio_sample_rate);
+            global_videocall_audio_sample_rate,
+            global_call_audio_last_pts);
     }
 
     if (audio_buffer_pcm_2 != NULL)
@@ -4288,11 +4405,12 @@ int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_outpu
                     //        want_ms_output,
                     //        channles);
 
-                    android_toxav_callback_audio_receive_frame_cb(
+                    android_toxav_callback_audio_receive_frame_pts_cb(
                         global_videocall_audio_acitve_num,
                         (size_t)(want_sample_count / global_videocall_audio_channels),
                         global_videocall_audio_channels,
-                        global_videocall_audio_sample_rate);
+                        global_videocall_audio_sample_rate,
+                        global_call_audio_last_pts);
                 }
                 pthread_mutex_unlock(&group_audio___mutex);
                 return -1;
@@ -4331,11 +4449,12 @@ int process_incoming_videocall_audio_on_iterate(int delta_new, int want_ms_outpu
 
                 // ------------ change PCM volume here ------------
 
-                android_toxav_callback_audio_receive_frame_cb(
+                android_toxav_callback_audio_receive_frame_pts_cb(
                     global_videocall_audio_acitve_num,
                     (size_t)(want_sample_count / global_videocall_audio_channels),
                     global_videocall_audio_channels,
-                    global_videocall_audio_sample_rate);
+                    global_videocall_audio_sample_rate,
+                    global_call_audio_last_pts);
 
                 // free(temp_buf);
             }

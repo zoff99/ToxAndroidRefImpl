@@ -2676,6 +2676,33 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static void android_toxav_callback_video_receive_frame_pts_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride, long pts)
+    {
+/*
+        if (pts != 0)
+        {
+            long ts1 = System.currentTimeMillis();
+            global_last_video_ts_no_correction = ts1;
+            int pts_delta = (int) (pts - global_last_video_pts);
+            int local_delta = (int) (ts1 - global_last_video_ts);
+            int abs1 = Math.abs((int) (ts1 - global_last_video_ts));
+            int abs2 = Math.abs((int) (pts - global_last_video_pts));
+            int local_delta_correction = pts_delta - local_delta;
+            int local_delta_correction_abs = Math.abs(local_delta - pts_delta);
+
+            Log.i(TAG, "V:pts_delta=" + pts_delta + " local_delta=" + local_delta + " local_delta_correction=" +
+                       local_delta_correction + " local_delta_correction_abs=" + local_delta_correction_abs);
+
+            Log.i(TAG, "V:pts=" + pts);
+
+            global_last_video_pts = pts;
+            global_last_video_ts = ts1;
+        }
+*/
+        android_toxav_callback_video_receive_frame_cb_method(friend_number, frame_width_px, frame_height_px, ystride,
+                                                             ustride, vstride);
+    }
+
     static void android_toxav_callback_video_receive_frame_cb_method(long friend_number, long frame_width_px, long frame_height_px, long ystride, long ustride, long vstride)
     {
         final long incoming_video_frame_ts = System.currentTimeMillis();
@@ -3072,6 +3099,49 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             Log.i(TAG, "android_toxav_callback_call_comm_cb_method:EE:" + e.getMessage());
         }
+    }
+
+    static long global_last_audio_ts_no_correction = 0;
+    static long global_last_audio_pts = 0;
+    static long global_last_audio_ts = 0;
+
+    static long global_last_video_ts_no_correction = 0;
+    static long global_last_video_pts = 0;
+    static long global_last_video_ts = 0;
+
+    static void android_toxav_callback_audio_receive_frame_pts_cb_method(long friend_number, long sample_count, int channels, long sampling_rate, long pts)
+    {
+/*
+        if (pts != 0)
+        {
+            long ts1 = System.currentTimeMillis();
+            global_last_audio_ts_no_correction = ts1;
+            int pts_delta = (int) (pts - global_last_audio_pts);
+            int local_delta = (int) (ts1 - global_last_audio_ts);
+            int abs1 = Math.abs((int) (ts1 - global_last_audio_ts));
+            int abs2 = Math.abs((int) (pts - global_last_audio_pts));
+            int local_delta_correction = pts_delta - local_delta;
+            int local_delta_correction_abs = Math.abs(local_delta - pts_delta);
+
+            int audio_pkt_to_video_pkt_delta = (int) (global_last_audio_ts_no_correction -
+                                                      global_last_video_ts_no_correction);
+            // audio_to_video_out_of_sync < 0  ... audio is too late
+            // audio_to_video_out_of_sync == 0 ... audio in sync with video
+            // audio_to_video_out_of_sync > 0  ... audio is too early
+            int audio_to_video_out_of_sync = (int) (pts - global_last_video_pts) - audio_pkt_to_video_pkt_delta;
+
+            Log.i(TAG, "pts_delta=" + pts_delta + " local_delta=" + local_delta + " local_delta_correction=" +
+                       local_delta_correction + " local_delta_correction_abs=" + local_delta_correction_abs);
+            Log.i(TAG, "audio_pkt_to_video_pkt_delta=" + audio_pkt_to_video_pkt_delta);
+
+            Log.i(TAG, "A:pts=" + pts);
+
+            global_last_audio_pts = pts;
+            global_last_audio_ts = ts1;
+        }
+*/
+
+        android_toxav_callback_audio_receive_frame_cb_method(friend_number, sample_count, channels, sampling_rate);
     }
 
     static void android_toxav_callback_audio_receive_frame_cb_method(long friend_number, long sample_count, int channels, long sampling_rate)
