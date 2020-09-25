@@ -457,9 +457,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     fl.tox_public_key_string).and().is_newEq(true).count();
             if (new_messages_count > 0)
             {
-                if (new_messages_count > 300)
+                if (new_messages_count > 99)
                 {
-                    unread_count.setText("+");
+                    unread_count.setText("+"); //("∞");
                 }
                 else
                 {
