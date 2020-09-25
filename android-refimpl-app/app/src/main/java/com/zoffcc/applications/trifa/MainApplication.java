@@ -75,12 +75,25 @@ public class MainApplication extends Application
     @Override
     public void onCreate()
     {
-        randnum = (int) (Math.random() * 1000d);
-
         // Lingver.init(this, Locale.ENGLISH);
-        Lingver.init(this, Locale.getDefault());
+        //
+        if (Locale.getDefault().getLanguage().equals(new Locale("ar").getLanguage()))
+        {
+            // RTL is not fully working yet, so use english for now
+            Lingver.init(this, Locale.ENGLISH);
+        }
+        else if (Locale.getDefault().getLanguage().equals(new Locale("fa").getLanguage()))
+        {
+            // RTL is not fully working yet, so use english for now
+            Lingver.init(this, Locale.ENGLISH);
+        }
+        else
+        {
+            Lingver.init(this, Locale.getDefault());
+        }
         // Lingver.getInstance().setFollowSystemLocale(this);
 
+        randnum = (int) (Math.random() * 1000d);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "onCreate");
         super.onCreate();
 
