@@ -3129,20 +3129,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv *env, jobject t
     COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(env, thiz));
 }
 
-void Java_com_zoffcc_applications_trifa_MainActivity_exit__real(JNIEnv *env, jobject thiz) __attribute__((noreturn));
-void Java_com_zoffcc_applications_trifa_MainActivity_exit__real(JNIEnv *env, jobject thiz)
+JNIEXPORT void JNICALL Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv *env, jobject thiz) __attribute__((noreturn));
+JNIEXPORT void JNICALL Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv *env, jobject thiz)
 {
     dbg(9, "Exit Program");
     exit(0);
 }
-
-
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv *env, jobject thiz)
-{
-    COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_exit__real(env, thiz));
-}
-
 
 
 
