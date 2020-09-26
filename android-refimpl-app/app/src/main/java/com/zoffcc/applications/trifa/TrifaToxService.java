@@ -237,7 +237,7 @@ public class TrifaToxService extends Service
                                     Log.i(TAG, "VFS:detach:start:vfs.isMounted()=" + vfs.isMounted());
                                     vfs__detach();
                                     Log.i(TAG, "stop_me:006e");
-                                    Thread.sleep(300);
+                                    Thread.sleep(1);
                                     Log.i(TAG, "VFS:unmount:start:vfs.isMounted()=" + vfs.isMounted());
                                     vfs__unmount();
                                     Log.i(TAG, "stop_me:006f");
@@ -346,7 +346,7 @@ public class TrifaToxService extends Service
     {
         stop_tox_fg_done = false;
         Log.i(TAG, "stop_tox_fg:001");
-        Runnable myRunnable = new Runnable()
+        Thread t = new Thread()
         {
             @Override
             public void run()
@@ -382,14 +382,12 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "stop_tox_fg:007");
                 tox_notification_change_wrapper(0, ""); // set to offline
                 Log.i(TAG, "stop_tox_fg:008");
-                set_all_friends_offline();
+                //*crash*//set_all_friends_offline();
                 Log.i(TAG, "set_all_conferences_inactive:003");
-                set_all_conferences_inactive();
+                //*crash*//set_all_conferences_inactive();
 
                 // so that the app knows we went offline
                 global_self_connection_status = TOX_CONNECTION_NONE.value;
-
-                is_tox_started = false;
 
                 Log.i(TAG, "stop_tox_fg:009");
 
@@ -399,18 +397,26 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "stop_tox_fg:clear_tox_notification");
                 }
 
+                try
+                {
+                    Log.i(TAG, "stop_tox_fg:010a");
+                    Thread.sleep(500);
+                    Log.i(TAG, "stop_tox_fg:010b");
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 stop_tox_fg_done = true;
+                is_tox_started = false;
+
                 Log.i(TAG, "stop_tox_fg:thread:done");
             }
         };
 
         Log.i(TAG, "stop_tox_fg:HH:001");
-        if (main_handler_s != null)
-        {
-            Log.i(TAG, "stop_tox_fg:HH:002");
-            main_handler_s.post(myRunnable);
-            Log.i(TAG, "stop_tox_fg:HH:003");
-        }
+        t.start();
         Log.i(TAG, "stop_tox_fg:HH:004");
         Log.i(TAG, "stop_tox_fg:099");
     }
@@ -1601,6 +1607,10 @@ public class TrifaToxService extends Service
                     e.printStackTrace();
                 }
 
+                //Log.i(TAG, "VFS:detachThread:(TrifaToxService):" + Thread.currentThread().getId() + ":" +
+                //           Thread.currentThread().getName());
+                //vfs.detachThread();
+                //Log.i(TAG, "VFS:detachThread:(TrifaToxService):OK");
             }
         };
 

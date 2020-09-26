@@ -73,9 +73,7 @@ import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_not
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
-import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.nmn3;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
@@ -2873,6 +2871,10 @@ public class HelperGeneric
     {
         try
         {
+            //Log.i(TAG, "VFS:detachThread:" + Thread.currentThread().getId() + ":" + Thread.currentThread().getName());
+            //vfs.detachThread();
+            //Log.i(TAG, "VFS:detachThread:OK");
+
             Runnable myRunnable = new Runnable()
             {
                 @Override
@@ -2886,9 +2888,10 @@ public class HelperGeneric
             };
             if (main_handler_s != null)
             {
-                main_handler_s.post(myRunnable);
+                //main_handler_s.post(myRunnable);
             }
-            Thread.sleep(800);
+            //Thread.sleep(400);
+
             Log.i(TAG, "VFS:detachThread:END");
         }
         catch (Exception e5)
@@ -2920,11 +2923,20 @@ public class HelperGeneric
                     Log.i(TAG, "VFS:unmount:OK");
                 }
             };
-            if (main_handler_s != null)
+            //if (main_handler_s != null)
+            //{
+            //    main_handler_s.post(myRunnable);
+            //}
+
+            if (vfs.isMounted())
             {
-                main_handler_s.post(myRunnable);
+                Log.i(TAG, "VFS:unmount:" + Thread.currentThread().getId() + ":" + Thread.currentThread().getName());
+                vfs.unmount();
             }
-            Thread.sleep(700);
+            Log.i(TAG, "VFS:unmount:OK");
+
+
+            Thread.sleep(10);
             Log.i(TAG, "VFS:unmount:END");
         }
         catch (Exception e5)
