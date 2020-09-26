@@ -9,11 +9,11 @@
     <string name="set_password_message_password_dont_match">Пароли не совпадают</string>
     <string name="title_activity_calling">Вызов</string>
     <string name="title_activity_profile">Профиль</string>
-    <string name="title_activity_settings">настройки</string>
-    <string name="title_activity_crash">авария</string>
+    <string name="title_activity_settings">Настройки</string>
+    <string name="title_activity_crash">Ошибка</string>
     <string name="title_activity_friendinfo">Friendinfo</string>
     <string name="title_activity_conferencepeerinfo">Peerinfo</string>
-    <string name="title_activity_aboutpage">Около</string>
+    <string name="title_activity_aboutpage">О программе</string>
     <string name="title_activity_set_password">Установка пароля</string>
     <string name="title_activity_check_password">Введите пароль</string>
     <string name="title_activity_share">открыть с TRIfA</string>
