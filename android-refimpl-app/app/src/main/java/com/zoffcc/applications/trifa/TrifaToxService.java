@@ -382,9 +382,9 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "stop_tox_fg:007");
                 tox_notification_change_wrapper(0, ""); // set to offline
                 Log.i(TAG, "stop_tox_fg:008");
-                //*crash*//set_all_friends_offline();
+                set_all_friends_offline();
                 Log.i(TAG, "set_all_conferences_inactive:003");
-                //*crash*//set_all_conferences_inactive();
+                set_all_conferences_inactive();
 
                 // so that the app knows we went offline
                 global_self_connection_status = TOX_CONNECTION_NONE.value;
