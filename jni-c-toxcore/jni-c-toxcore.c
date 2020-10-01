@@ -77,8 +77,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 47
-static const char global_version_string[] = "0.99.47";
+#define VERSION_PATCH 48
+static const char global_version_string[] = "0.99.48";
 // ----------- version -----------
 // ----------- version -----------
 
