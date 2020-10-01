@@ -38,7 +38,7 @@
     <string name="layout___reset_favorite_emoji_list">redefinir a lista de Emojis favoritos</string>
     <string name="layout___run_analyze_on_sql_database">executar ANALYZE no banco de dados Sql</string>
     <string name="layout___run_vacuum_on_sql_database">executar o VACUUM no banco de dados Sql</string>
-    <string name="layout___set_app_language">definir o idioma da aplicação</string>
+    <string name="layout___set_app_language">definir o idioma da app</string>
     <string name="layout___clear_glide_cache">limpar o Glide Cache</string>
     <string name="layout___waiting_for_orbot">a esperar pelo Orbot…</string>
     <string name="layout___friends_relay_pubkey">Relé de Chaves Públicas dos Amigos:</string>
@@ -76,7 +76,7 @@
     <string name="MainActivity_toast_msgs_deleted">Mensagens apagadas</string>
     <string name="MainActivity_toast_msg_exported">Mensagens exportadas</string>
     <string name="MainActivity_toast_msg_deleted">Mensagens apagadas</string>
-    <string name="MainActivity_no_email_app_found">Nenhuma aplicação de e-mail encontrada</string>
+    <string name="MainActivity_no_email_app_found">Nenhuma app de e-mail encontrada</string>
     <string name="MainActivity_error_starting_email_app">Erro ao iniciar a aplicação de e-mail</string>
     <string name="MainActivity_button_ok">OK</string>
     <string name="MainActivity_notification_new_message2">Nova Mensagem</string>
