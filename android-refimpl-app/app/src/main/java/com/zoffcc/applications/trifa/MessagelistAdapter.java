@@ -70,7 +70,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 return new MessageListHolder_text_incoming_not_read(view, this.context);
             case Message_model.TEXT_INCOMING_HAVE_READ:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
-                return new MessageListHolder_text_incoming_read___unused___(view, this.context);
+                // return new MessageListHolder_text_incoming_read___unused___(view, this.context);
+                return new MessageListHolder_error(view, this.context);
 
             case Message_model.TEXT_OUTGOING_NOT_READ:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent, false);
@@ -250,7 +251,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                     ((MessageListHolder_text_incoming_not_read) holder).bindMessageList(m2);
                     break;
                 case Message_model.TEXT_INCOMING_HAVE_READ:
-                    ((MessageListHolder_text_incoming_read___unused___) holder).bindMessageList(m2);
+                    //((MessageListHolder_text_incoming_read___unused___) holder).bindMessageList(m2);
                     break;
                 case Message_model.TEXT_OUTGOING_NOT_READ:
                     ((MessageListHolder_text_outgoing_not_read) holder).bindMessageList(m2);
