@@ -26,8 +26,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -44,14 +42,20 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.HelperGeneric.StringSignature2;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
+import static com.zoffcc.applications.trifa.HelperGeneric.isColorLight;
+import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
@@ -132,15 +136,19 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
-        textView.setOnClickListener(new View.OnClickListener() {
+        textView.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 layout_message_container.performClick();
             }
         });
-        textView.setOnLongClickListener(new View.OnLongClickListener() {
+        textView.setOnLongClickListener(new View.OnLongClickListener()
+        {
             @Override
-            public boolean onLongClick(View view) {
+            public boolean onLongClick(View view)
+            {
                 layout_message_container.performLongClick();
                 return true;
             }
@@ -217,6 +225,49 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_SIZE[PREF__global_font_size]));
         }
 
+        int peer_color_fg = context.getResources().getColor(R.color.colorPrimaryDark);
+        int peer_color_bg = context.getResources().getColor(R.color.material_drawer_background);
+        int alpha_value = 160;
+        // int peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
+
+        final int linkcolor = lightenColor(Color.BLUE, 0.3f);
+        textView.setMentionModeColor(linkcolor);
+        textView.setHashtagModeColor(linkcolor);
+        textView.setUrlModeColor(linkcolor);
+        textView.setPhoneModeColor(linkcolor);
+        textView.setEmailModeColor(linkcolor);
+        textView.setCustomModeColor(linkcolor);
+        textView.setLinkTextColor(linkcolor);
+        //
+        textView.setTextColor(Color.BLACK);
+
+        try
+        {
+            peer_color_bg = ChatColors.get_shade(
+                    ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())],
+                    m.tox_peerpubkey);
+            // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
+            textView.setTextColor(Color.BLACK);
+
+            if (!isColorLight(peer_color_bg))
+            {
+                textView.setTextColor(darkenColor(Color.WHITE, 0.1f));
+                //
+                final int linkcolor_for_other_bg = darkenColor(Color.YELLOW, 0.1f);
+                textView.setMentionModeColor(linkcolor_for_other_bg);
+                textView.setHashtagModeColor(linkcolor_for_other_bg);
+                textView.setUrlModeColor(linkcolor_for_other_bg);
+                textView.setPhoneModeColor(linkcolor_for_other_bg);
+                textView.setEmailModeColor(linkcolor_for_other_bg);
+                textView.setCustomModeColor(linkcolor_for_other_bg);
+                textView.setLinkTextColor(linkcolor_for_other_bg);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         textView.setAutoLinkText(m.text);
 
         date_time.setText(long_date_time_format(m.sent_timestamp));
@@ -251,11 +302,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             }
         });
 
-        int peer_color_fg = context.getResources().getColor(R.color.colorPrimaryDark);
-        int peer_color_bg = context.getResources().getColor(R.color.material_drawer_background);
-        int alpha_value = 160;
-        // int peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
-
 
         boolean have_avatar_for_pubkey = false;
         // Log.i(TAG, "have_avatar_for_pubkey:00a01:" + have_avatar_for_pubkey);
@@ -266,7 +312,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             // Log.i(TAG, "have_avatar_for_pubkey:00a01x:" + m.tox_peername + ":" + m.tox_peerpubkey);
 
             fl_temp = orma.selectFromFriendList().
-                tox_public_key_stringEq(m.tox_peerpubkey).get(0);
+                    tox_public_key_stringEq(m.tox_peerpubkey).get(0);
 
             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
             {
@@ -274,7 +320,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 try
                 {
                     f1 = new info.guardianproject.iocipher.File(
-                        fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                     if (f1.length() > 0)
                     {
                         have_avatar_for_pubkey = true;
@@ -301,31 +347,20 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             fl_temp = null;
         }
 
-        try
-        {
-            peer_color_bg = ChatColors.get_shade(
-                ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())], m.tox_peerpubkey);
-            // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
         // we need to do the rounded corner background manually here, to change the color ---------------
         GradientDrawable shape = new GradientDrawable();
         shape.setShape(GradientDrawable.RECTANGLE);
         shape.setCornerRadii(
-            new float[]{CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX});
+                new float[]{CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX});
         shape.setColor(peer_color_bg);
         // shape.setStroke(3, borderColor);
         textView_container.setBackground(shape);
         // we need to do the rounded corner background manually here, to change the color ---------------
 
         final Drawable smiley_face = new IconicsDrawable(context).
-            icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-            backgroundColor(peer_color_bg).
-            color(peer_color_fg).sizeDp(70);
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                backgroundColor(peer_color_bg).
+                color(peer_color_fg).sizeDp(70);
 
         try
         {
@@ -339,7 +374,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                     try
                     {
                         f1 = new info.guardianproject.iocipher.File(
-                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
+                                fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                     }
                     catch (Exception e)
                     {
@@ -354,15 +389,15 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                             // Log.i(TAG, "have_avatar_for_pubkey:001");
                             final RequestOptions glide_options = new RequestOptions().fitCenter();
                             GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(false).
-                                signature(StringSignature2(
-                                    "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename + "_" +
-                                    fl_temp.avatar_update_timestamp)).
-                                apply(glide_options).
-                                into(img_avatar);
+                                    with(context).
+                                    load(f1).
+                                    diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                    skipMemoryCache(false).
+                                    signature(StringSignature2(
+                                            "_conf_avatar_" + fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename +
+                                            "_" + fl_temp.avatar_update_timestamp)).
+                                    apply(glide_options).
+                                    into(img_avatar);
                             // Log.i(TAG, "have_avatar_for_pubkey:002");
                         }
                     }
@@ -444,23 +479,23 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(url).setTitle(title).
-            setCancelable(false).
-            setPositiveButton("OK", new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int id)
+                setCancelable(false).
+                setPositiveButton("OK", new DialogInterface.OnClickListener()
                 {
-                    try
+                    public void onClick(DialogInterface dialog, int id)
                     {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        c.startActivity(intent);
+                        try
+                        {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            c.startActivity(intent);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                    dialog.dismiss();
-                }
-            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -475,27 +510,27 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(email_addr).setTitle(title).
-            setCancelable(false).
-            setPositiveButton("OK", new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int id)
+                setCancelable(false).
+                setPositiveButton("OK", new DialogInterface.OnClickListener()
                 {
-                    try
+                    public void onClick(DialogInterface dialog, int id)
                     {
-                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
-                                                        Uri.fromParts("mailto", email_addr, null));
-                        emailIntent.setType("message/rfc822");
-                        // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-                        // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                        c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                        try
+                        {
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                            Uri.fromParts("mailto", email_addr, null));
+                            emailIntent.setType("message/rfc822");
+                            // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                            // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                            c.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                    dialog.dismiss();
-                }
-            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -510,25 +545,25 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
         builder.setMessage(toxid.toUpperCase()).setTitle(title).
-            setCancelable(false).
-            setPositiveButton("OK", new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int id)
+                setCancelable(false).
+                setPositiveButton("OK", new DialogInterface.OnClickListener()
                 {
-                    try
+                    public void onClick(DialogInterface dialog, int id)
                     {
-                        String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
-                                                                                                 "").replaceFirst(
-                            "TOX:", "").replaceFirst("Tox:", "");
-                        add_friend_real(friend_tox_id);
+                        try
+                        {
+                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
+                                                                                                     "").replaceFirst(
+                                    "TOX:", "").replaceFirst("Tox:", "");
+                            add_friend_real(friend_tox_id);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                    dialog.dismiss();
-                }
-            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
@@ -554,7 +589,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         public boolean onLongClick(final View v)
         {
             ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(
-                context, v, is_selected, message_);
+                    context, v, is_selected, message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }
