@@ -1,1 +1,1 @@
-TRIfA Tox клиент
+TRIfA - Tox-клиент
