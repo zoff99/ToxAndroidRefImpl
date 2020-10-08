@@ -1,0 +1,19 @@
+<b>TRIfA - Yeni Bir Anında Mesajlaşma Türü</b><br>
+
+İster şirketler ister hükümetler olsun, dijital gözetim günümüzde çok yaygındır.<br>
+Tox, sizi başka kimse dinlemeden arkadaşlarınıza ve ailenize bağlayan kullanımı kolay bir yazılımdır.<br>
+Diğer önemli hizmetler özellikler için ödeme yapmanızı gerektirse de, Tox tamamen ücretsizdir ve reklamsız olarak gelir — sonsuza kadar.<br><br>
+
+<b>Şifreli:</b><br>
+Tox ile yaptığınız her şey açık kaynaklı kütüphaneler kullanılarak şifrelenir. Sohbetlerinizi yalnızca konuştuğunuz kişilerdir görebilir.<br><br>
+
+<b>Dağıtılmış:</b><br>
+Tox'un baskın yapılabilecek, kapatılabilecek veya verileri vermeye zorlanabilecek merkezi sunucuları yoktur — ağ, kullanıcılarından oluşur. Sunucu kesintilerine veda edin!<br><br>
+
+<b>Özgür:</b><br>
+Tox, ücretsiz olmasının yanı sıra özgür bir yazılımdır. Bu, Tox'un — kullanmak, değiştirmek ve paylaşmak üzere — sizin olduğu anlamına gelir çünkü Tox kullanıcılar tarafından ve kullanıcılar için geliştirilir.<br><br>
+
+<b>Daha Fazla Bilgi:</b><br>
+* <a href="https://tox.zoff.cc">Tox hakkında</a><br>
+* <a href="https://matrix.to/#/#trifa:matrix.org">Matrix üzerinde tartışmaya katılın</a><br>
+* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Tox IRC kanalına katılın</a><br>
