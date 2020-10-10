@@ -497,6 +497,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createEngine(JNIEnv *e
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createEngine");
 
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "createEngine:pthread_mutex_init");
     pthread_mutex_init(&play_buffer_queued_count_mutex, NULL);
     play_buffer_queued_count_mutex_valid = 1;
 
@@ -1512,7 +1514,17 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         engineEngine = NULL;
     }
 
-    pthread_mutex_destroy(&play_buffer_queued_count_mutex);
+    if (play_buffer_queued_count_mutex_valid == 1)
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "shutdownEngine:pthread_mutex_destroy");
+        pthread_mutex_destroy(&play_buffer_queued_count_mutex);
+    }
+    else
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "shutdownEngine:mutex already destroyed");
+    }
     play_buffer_queued_count_mutex_valid = 0;
 }
 
