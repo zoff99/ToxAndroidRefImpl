@@ -215,9 +215,9 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
 
             if (new_messages_count > 0)
             {
-                if (new_messages_count > 300)
+                if (new_messages_count > 99)
                 {
-                    unread_count.setText("+");
+                    unread_count.setText("+"); //("∞");
                 }
                 else
                 {
