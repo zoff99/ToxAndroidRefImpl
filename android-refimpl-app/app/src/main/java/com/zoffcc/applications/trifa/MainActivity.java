@@ -1836,10 +1836,37 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
-        unregisterReceiver(receiver1);
-        unregisterReceiver(receiver2);
-        unregisterReceiver(receiver3);
-        unregisterReceiver(receiver4);
+        try
+        {
+            unregisterReceiver(receiver1);
+        }
+        catch(Exception e)
+        {
+        }
+
+        try
+        {
+            unregisterReceiver(receiver2);
+        }
+        catch(Exception e)
+        {
+        }
+
+        try
+        {
+            unregisterReceiver(receiver3);
+        }
+        catch(Exception e)
+        {
+        }
+
+        try
+        {
+            unregisterReceiver(receiver4);
+        }
+        catch(Exception e)
+        {
+        }
     }
 
     @Override
