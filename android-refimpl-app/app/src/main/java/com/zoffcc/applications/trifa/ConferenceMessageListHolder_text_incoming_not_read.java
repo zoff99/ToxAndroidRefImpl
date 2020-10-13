@@ -51,7 +51,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.StringSignature2;
 import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
-import static com.zoffcc.applications.trifa.HelperGeneric.isColorLight;
+import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
@@ -249,7 +249,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
             textView.setTextColor(Color.BLACK);
 
-            if (!isColorLight(peer_color_bg))
+            if (isColorDarkBrightness(peer_color_bg))
             {
                 textView.setTextColor(darkenColor(Color.WHITE, 0.1f));
                 //

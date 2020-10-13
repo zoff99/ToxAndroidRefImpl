@@ -57,6 +57,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.graphics.Color.blue;
+import static android.graphics.Color.green;
+import static android.graphics.Color.red;
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
@@ -1749,18 +1752,63 @@ public class HelperGeneric
         return !(hsv[2] < 0.5);
     }
 
+    public static float getColorLuminance(int color)
+    {
+        double gamma = 2.2;
+        double r = Math.pow((Color.red(color) / 255.0), gamma);
+        double g = Math.pow((Color.green(color) / 255.0), gamma);
+        double b = Math.pow((Color.blue(color) / 255.0), gamma);
+
+        return (float) ((0.2126 * r) + (0.7152 * g) + (0.0722 * b));
+    }
+
+    public static boolean isColorDarkLum(int color)
+    {
+        if (getColorLuminance(color) <= 0.5)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static double getColorDarkBrightness(int color)
+    {
+        double luminosity = Math.sqrt(Math.pow(Color.red(color), 2) * 0.299 + Math.pow(Color.green(color), 2) * 0.587 +
+                                      Math.pow(Color.blue(color), 2) * 0.114);
+
+        return luminosity;
+    }
+
+    public static boolean isColorDarkBrightness(int color)
+    {
+        double luminosity = Math.sqrt(Math.pow(Color.red(color), 2) * 0.299 + Math.pow(Color.green(color), 2) * 0.587 +
+                                      Math.pow(Color.blue(color), 2) * 0.114);
+
+        if (luminosity > 146)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     public static int lightenColor(int inColor, float inAmount)
     {
-        return Color.argb(Color.alpha(inColor), (int) Math.min(255, Color.red(inColor) + 255 * inAmount),
-                          (int) Math.min(255, Color.green(inColor) + 255 * inAmount),
-                          (int) Math.min(255, Color.blue(inColor) + 255 * inAmount));
+        return Color.argb(Color.alpha(inColor), (int) Math.min(255, red(inColor) + 255 * inAmount),
+                          (int) Math.min(255, green(inColor) + 255 * inAmount),
+                          (int) Math.min(255, blue(inColor) + 255 * inAmount));
     }
 
     public static int darkenColor(int inColor, float inAmount)
     {
-        return Color.argb(Color.alpha(inColor), (int) Math.max(0, Color.red(inColor) - 255 * inAmount),
-                          (int) Math.max(0, Color.green(inColor) - 255 * inAmount),
-                          (int) Math.max(0, Color.blue(inColor) - 255 * inAmount));
+        return Color.argb(Color.alpha(inColor), (int) Math.max(0, red(inColor) - 255 * inAmount),
+                          (int) Math.max(0, green(inColor) - 255 * inAmount),
+                          (int) Math.max(0, blue(inColor) - 255 * inAmount));
     }
 
     static int get_toxconnection_wrapper(int TOX_CONNECTION_)
