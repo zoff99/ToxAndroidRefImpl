@@ -13,7 +13,7 @@
     <string name="title_activity_settings">设置</string>
     <string name="title_activity_crash">崩溃</string>
     <string name="title_activity_friendinfo">好友信息</string>
-    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_conferencepeerinfo">对等客户端信息</string>
     <string name="title_activity_aboutpage">关于</string>
     <string name="title_activity_set_password">设置密码</string>
     <string name="title_activity_check_password">输入密码</string>
@@ -210,7 +210,7 @@
     <string name="pref_ringtone_silent">静音</string>
     <string name="pref_title_vibrate">振动</string>
     <string name="pref_title_sound">声音</string>
-    <string name="add_friend_activity_help">在上方文本框中粘贴好友的 Tox ID 或点击二维码按钮扫描好友的二维码</string>
+    <string name="add_friend_activity_help">在上方文本框中粘贴好友的 Tox ID 或点击二维码按钮用相机扫描好友的二维码。</string>
     <string name="add_friend_activity_add">添加好友</string>
     <string name="cancel">取消</string>
     <!-- Strings related to Settings -->
@@ -259,7 +259,7 @@
     <string name="ConferenceAudioActivity_17">推送到聊天</string>
     <string name="ConferenceAudioActivity_18">正在聊天 ...</string>
     <string name="GroupActivityActive">在线：</string>
-    <string name="GroupActivityOffline">离线|</string>
+    <string name="GroupActivityOffline">离线:</string>
     <!-- Java Source texts -->
     <!-- Java Source texts -->
     <!-- Java Source texts -->
@@ -293,7 +293,7 @@
     <string name="layout___im_port_tox_savadata_unsecure">导入 tox 保存数据 *不安全*</string>
     <string name="layout___click_image_to_change_your_avatar">点击图像更改你的头像</string>
     <string name="layout___remove_own_relay">移除自己的中继</string>
-    <string name="layout___relay_pubkey">中继公钥</string>
+    <string name="layout___relay_pubkey">中继公钥:</string>
     <string name="layout___new_random_nospam">新建随机 NOSPAM</string>
     <string name="layout___own_pubkey">自己的公钥：</string>
     <string name="layout___copy_toxid">复制 ToxID</string>
