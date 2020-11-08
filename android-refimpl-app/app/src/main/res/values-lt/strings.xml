@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_description_video_uv_reversed">Apversti UV plokščių tvarką kameros vaizde</string>
+    <string name="title_activity_conferencepeerinfo">Bendro informacija</string>
+    <string name="pref_title_X_battery_saving_mode">Baterijos taupymo režimas</string>
+    <string name="pref_description_force_udp_only">Tai priverstinai įjungs tik UDP režimą, kai kurie kontaktai gali būti nepasiekiami, kai įjungtas šis režimas
+\nPokyčiui pritaikyti reikia PALEISTI IŠ NAUJO!</string>
+    <string name="pref_title_force_udp_only">Priverstinai naudoti UDP režimą</string>
+    <string name="pref_description_udp_enabled">Daugeliui mobilių prietaisų UDP padidins interneto srautą.
+\nPokyčiui pritaikyti reikia PALEISTI IŠ NAUJO
+\nNumatytasis režimas IŠJUNGTA</string>
+    <string name="title_activity_calling">Skambinti</string>
+    <string name="pref_title_mic_gain_factor">Mikrofono stiprumas</string>
+    <string name="title_activity_crash">Triktis</string>
+    <string name="layout___peer_name">Bendro vardas</string>
+    <string name="layout___relay_pubkey">Relay viešasis raktas:</string>
+    <string name="layout___remove_own_relay">Pašalinti savo Relay</string>
+    <string name="layout___friends_relay_pubkey">Draugų Relay viešas raktas:</string>
+    <string name="layout___remove_friends_relay">Pašalinti Draugų Relay</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Bandoma !!
+\nGarso grotuvo buferis bitais, nustatykite į 0, kad išjungtumėte reguliavimą</string>
+    <string name="pref_description_local_discovery_enabled">Naudotis mazgus vietiniame LAN, kad prijungti bootstrap</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">H264 enkoderis turėtų naudoti intra atnaujinimo kadrus</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 intra atnaujinimas</string>
+    <string name="pref_title_video_uv_reversed">Invertuoti vaizdo UV</string>
+    <string name="layout___export">Eksportuoti</string>
+    <string name="layout___copy">Kopijuoti</string>
+    <string name="layout___online">Prisijungės /-usi</string>
+    <string name="layout___add_as_toxproxy">Pridėti kaip ToxProxy</string>
+    <string name="layout___create_audio_group">Sukurti skambučio grupę</string>
+    <string name="layout___create_text_group">Sukurti susirašinėjimo grupę</string>
+    <string name="layout___info">Informacija</string>
+    <string name="layout___delete">Ištrinti</string>
+    <string name="layout___leave">Palikti</string>
+    <string name="layout___skip">Praleisti</string>
+    <string name="layout___set_password">Nustatyti slaptažodį</string>
+    <string name="layout___password_again">Pakartokite slaptažodį</string>
+    <string name="layout___password">Slaptažodis</string>
+    <string name="layout___set_password_or_skip">Nustatykite slaptažodį arba praleiskite.
+\n
+\nJei praleidžiate
+\nslaptažodis bus automatiškai sugeneruotas
+\nNĖRA slaptažodžio grąžinimo galimybės!</string>
+    <string name="layout___error_getting_active_network_connections">*Klaida gaunant aktyvius tinklo ryšius*</string>
+    <string name="layout___active_network_connections">Aktyvūs tinklo ryšiai:</string>
+    <string name="layout___your_toxidenticon">Tavo Tox atpažinimo ikona</string>
+    <string name="layout___copy_toxid">Kopijuoti ToxID</string>
+    <string name="layout___own_pubkey">Esamas viešasis raktas:</string>
+    <string name="layout___new_random_nospam">Naujas automatiškai sugeneruotas NOSPAM</string>
+    <string name="layout___click_image_to_change_your_avatar">Spausti nuotrauką, kad pakeisti Avatarą</string>
+    <string name="layout___im_port_tox_savadata_unsecure">Importuoti Tox duomenis *NESAUGU*</string>
+    <string name="layout___export_tox_savedata_unsecure">Eksportuoti tox duomenis *nesaugu*</string>
+    <string name="layout___test_ringtone_sound">Išbandyti skambučio garsą</string>
+    <string name="layout___test_notification_sound">Išbandyti pranešimo garsą</string>
+    <string name="layout___reset_bootstrapnodes_to_default">Atstatyti Bootstrap mazgus į numatytas reikšmes</string>
+    <string name="layout___update_bootstrapnodes_from_internet">Atnaujinti Bootstrap mazgus iš interneto</string>
+    <string name="layout___delete_all_avatar_icons">Ištrinti visas Avataro ikonas</string>
+    <string name="layout___reset_favorite_emoji_list">Išvalyti mėgstamiausių emoji sąrašą</string>
+    <string name="layout___run_analyze_on_sql_database">Paleisti ANALYZE Sql duomenų bazėje</string>
+    <string name="layout___run_vacuum_on_sql_database">Paleisti VACUUM Sql Duomenų bazėje</string>
+    <string name="layout___set_app_language">Nustatyti programos kalbą</string>
+    <string name="layout___clear_glide_cache">Išvalyti laikinus Glide duomenis</string>
+    <string name="layout___waiting_for_orbot">Laukiama Orbot...</string>
+    <string name="layout___alias">Slapyvardis</string>
+    <string name="layout___status">Būsena:</string>
+    <string name="layout___pubkey">Viešas raktas:</string>
+    <string name="layout___nick">Slapyvardis:</string>
+    <string name="layout___push_to_talk">Spausti, kad kalbėti</string>
+    <string name="layout___name">Vardas</string>
+    <string name="layout___unlock">Atrakinti</string>
+    <string name="layout___enter_pass_longtext">Įvesti slaptažodį
+\nNĖRA slaptažodžio susigrąžinimo būdo!</string>
+    <string name="layout___scan_qr_code">Skenuoti QR kodą</string>
+    <string name="layout___toxid">ToxID</string>
+    <string name="GroupActivityOffline">Atsijungę:</string>
+    <string name="GroupActivityActive">Aktyvūs:</string>
+    <string name="ConferenceAudioActivity_18">Kalbama...</string>
+    <string name="ConferenceAudioActivity_17">Spausti, kad kalbėti</string>
+    <string name="ConferenceAudioActivity_10">Vartotojų sąrašas</string>
+    <string name="CallingActivity_23">Vaizdo užlaikymas:</string>
+    <string name="CallingActivity_0">Vaizdo užlaikymas:</string>
+    <string name="AddFriendActivity_4">Neįvestas ToxID</string>
+    <string name="AddFriendActivity_3">Neteisingas ToxID</string>
+    <string name="Aboutpage_8">Naudotos bibliotekos:</string>
+    <string name="Aboutpage_6">Kas yra Tox\?</string>
+    <string name="Aboutpage_5b">Versija:</string>
+    <string name="Aboutpage_5a">TRIfA, Tox klientas skirtas Android</string>
+    <string name="Aboutpage_4">Skaitoma trikties informacija...</string>
+    <string name="Aboutpage_2">Siųsti trikties ataskaitą El. paštu</string>
+    <string name="Aboutpage_0">TRIfA trikties ataskaita</string>
+    <string name="MainActivity_notification_new_message5">Nauja žinutė</string>
+    <string name="MainActivity_notification_new_message4">Nauja žinutė</string>
+    <string name="MainActivity_notification_new_message3">Nauja žinutė</string>
+    <string name="MainActivity_toast_msgs_deleted">Žinutės ištrintos</string>
+    <string name="MainActivity_toast_msg_exported">Žinutės eksportuotos</string>
+    <string name="MainActivity_toast_msg_deleted">Žinutės ištrintos</string>
+    <string name="MainActivity_no_email_app_found">Nerasta El. Pašto programėlė</string>
+    <string name="MainActivity_error_starting_email_app">Klaida leidžiant El. pašto programėlę</string>
+    <string name="MainActivity_button_ok">Gerai</string>
+    <string name="MainActivity_notification_new_message2">Nauja žinutė</string>
+    <string name="MainActivity_notification_new_message">Nauja žinutė</string>
+    <string name="MainActivity_friend_is_typing">Draugas rašo...</string>
+    <string name="MainActivity_add_to_batt_opt">Prašome pridėti TRIfA prie baterijos optimizacijos išimčių!</string>
+    <string name="MainActivity_info_dialog_title">INFO</string>
+    <string name="MainActivity_ok_take_me_there_button">Gerai, nuveskite mane ten</string>
+    <string name="MainActivity_no_button">Ne</string>
+    <string name="MainActivity_available">Pasiekiamas /-a</string>
+    <string name="MainActivity_busy">Užsimėmęs /-usi</string>
+    <string name="MainActivity_away">Pasišalinęs /-usi</string>
+    <string name="MainActivity_exit">Išeiti</string>
+    <string name="MainActivity_about">Apie</string>
+    <string name="MainActivity_maint">Palaikymas</string>
+    <string name="MainActivity_logout_login">Atsijungti/Prisijungti</string>
+    <string name="MainActivity_settings">Nustatymai</string>
+    <string name="MainActivity_profile">Profilis</string>
+    <string name="cancel">Atšaukti</string>
+    <string name="add_friend_activity_add">Pridėti Draugą</string>
+    <string name="add_friend_activity_help">Įklijuoti draugo TOX ID teksto lauke viršuje arba spauskite QR kodo mygtuką, kad kamera nuskenuotumėte draugo kodą.</string>
+    <string name="pref_title_sound">Garsas</string>
+    <string name="pref_title_vibrate">Vibruoti</string>
+    <string name="pref_ringtone_silent">Tylus</string>
+    <string name="pref_title_ringtone">Skambėjimo garsas</string>
+    <string name="pref_title_new_message_notifications">Naujų žinučių pranešimai</string>
+    <string name="pref_header_notifications">Pranešimai</string>
+    <string name="pref_title_system_sync_settings">Sistemos sinchronizavimo nustatymai</string>
+    <string name="pref_description_X_battery_saving_timeout">Numatyta reikšmė yra 15 minučių</string>
+    <string name="pref_title_X_battery_saving_timeout">Laiko nustatymas, baterijos taupymo režime neprisijungus</string>
+    <string name="pref_description_X_audio_recording_frame_size">Numatytas dydis yra 40 ms</string>
+    <string name="pref_title_X_audio_recording_frame_size">Garso įrašymo dažnio dydis</string>
+    <string name="pref_description_min_audio_samplingrate_out">Numatytoji reikšmė 48000 Hz</string>
+    <string name="pref_title_min_audio_samplingrate_out">Garso pavyzdžių dažnis</string>
+    <string name="pref_title_sync_frequency">Sinchronizavimo dažnis</string>
+    <string name="pref_header_data_sync">Duomenys ir sinchronizavimas</string>
+    <string name="pref_title_add_friends_to_messages">Pridėti draugų prie žinučių</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Garso grotuvo buferis</string>
+    <string name="pref_description_X_eac_delay_ms">!! Bandoma !!
+\nAEC užlaikymas ms</string>
+    <string name="pref_title_X_eac_delay_ms">AEC užlaikymas</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! Bandoma !!
+\nNesinchronizuoti Vaizdo ar Garso. Įjungti tik paskutiniu atveju, kai turite vaizdo skambučio problemų.</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">NEsinchronizuoti AV</string>
+    <string name="pref_description_X_misc_button_enabled">!! Bandoma !!
+\nPridėti mygtuką skambinimo lange, fiksuotos žinutės siuntimui</string>
+    <string name="pref_title_X_misc_button_enabled">Kt. Mygtukas</string>
+    <string name="pref_description_X_battery_saving_mode">!! Bandoma !!
+\nTai mažiau iškraus bateriją, tačiau užtruks ilgiau siųsti ir gauti žinutes.
+\nGali būti ir kitų blogų efektų!</string>
+    <string name="pref_description_X_use_native_audio_play">!! Bandoma !!
+\nNaudoti vietinę garso išvestį garsui leisti</string>
+    <string name="pref_title_X_use_native_audio_play">Vietinė garso sistema</string>
+    <string name="pref_description_X_zoom_incoming_video">Leisti pirštais priartinti vaizdo skambučio langą. Neveikia visiškai!</string>
+    <string name="pref_title_X_zoom_incoming_video">Priartinti vaizdo skambučio langą</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Jei yra problemų su ekrano išsijunginėju skambučio metu, išjunkite</string>
+    <string name="pref_title_allow_screen_off_in_audio_call">Išjungti ekraną</string>
+    <string name="pref_description_U_keep_nospam">Išlaikyti NoSpam reikšmę. Nesaugu, įjunkite tik jei žinote ką darote!</string>
+    <string name="pref_title_U_keep_nospam">Išlaikyti NoSpam</string>
+    <string name="pref_title_local_discovery_enabled">LAN radimas</string>
+    <string name="pref_description_conference_show_system_messages">Rodyti sistemos pranešimus konferencijose</string>
+    <string name="pref_title_conference_show_system_messages">Sistemos pranešimai</string>
+    <string name="pref_description_set_fps">Bandyti nustatyti 15kps vaizdo kadrų dažnį, dėl to programa gali neveikti kai kuriuose telefonuose</string>
+    <string name="pref_title_set_fps">Nustatyti kps</string>
+    <string name="pref_description_use_incognito_keyboard">Išjunkite, norėdami, kad klaviatūra neįsimintų jūsų įvestų žodžių</string>
+    <string name="pref_title_use_incognito_keyboard">Nestebima klaviatūra</string>
+    <string name="pref_description_fps_half">Vaizdo kadrų dažnis 1/2 : 12kps, vietoje 25kps</string>
+    <string name="pref_title_fps_half">Mažiau kps (kadrų per sekundę)</string>
+    <string name="pref_description_orbot_enabled">Norint naudoti, privalote įdiegti Orbot.
+\nPokyčiui pritaikyti reikia PALEISTI IŠ NAUJO!</string>
+    <string name="pref_title_orbot_enabled">Leisti Tor Tarpininkavimą</string>
+    <string name="pref_title_udp_enabled">Leisti UDP</string>
+    <string name="pref_description_higher_audio_quality">Naudoti geresnę garso kokybę.
+\nPokyčiui pritaikyti būtina PALEISTI IŠ NAUJO!</string>
+    <string name="pref_title_higher_audio_quality">Garso kokybė</string>
+    <string name="pref_description_mic_gain_factor">Nustatyti didesnį stiprumą, jei jūsų mikrofonas įrašo žemu garsu</string>
+    <string name="pref_description_camera_get_preview_format">Pristatomasis kameros formatas kai kuriuose telefonuose gali būti netikslus</string>
+    <string name="pref_title_camera_get_preview_format">Parodomasis kameros formatas</string>
+    <string name="pref_description_global_font_size">Pasirinkti šrifto dydį</string>
+    <string name="pref_title_global_font_size">Šrifto dydis</string>
+    <string name="pref_description_video_cam_resolution">Kokią raišką naudoti vaizdo skambučiams</string>
+    <string name="pref_title_video_cam_resolution">Kameros raiška</string>
+    <string name="pref_description_higher_video_quality">Naudoti geresnę vaizdo kokybę
+\nPokyčiui pritaikyti būtina PALEISTI IŠ NAUJO!</string>
+    <string name="pref_title_higher_video_quality">Vaizdo kokybė</string>
+    <string name="pref_description_software_echo_cancel">Naudoti programinės įrangos aido blokavimą</string>
+    <string name="pref_title_software_echo_cancel">Aido blokavimas</string>
+    <string name="pref_description_auto_accept_video">Automatiškai priimti vaizdo įrašus iki 10 MBaitų dydžio</string>
+    <string name="pref_title_auto_accept_video">Automatiškai priimti vaizdo įrašus</string>
+    <string name="pref_description_auto_accept_image">Automatiškai priimti paveikslėlius ir nuotraukas iki 3MBaitų dydžio</string>
+    <string name="pref_title_auto_accept_image">Automatiškai priimti paveikslėlius</string>
+    <string name="pref_header_general">Bendri</string>
+    <string name="settings_toolbar_title">Nustatymai</string>
+    <string name="title_activity_maintenance">Palaikymas</string>
+    <string name="title_activity_share">Atverti su TRIfA</string>
+    <string name="title_activity_check_password">Įveskite slaptažodį</string>
+    <string name="title_activity_set_password">Nustatyti slaptažodį</string>
+    <string name="title_activity_aboutpage">Apie</string>
+    <string name="title_activity_friendinfo">Draugo informacija</string>
+    <string name="title_activity_settings">Nustatymai</string>
+    <string name="title_activity_profile">Profilis</string>
+    <string name="set_password_message_password_dont_match">Slaptažodžiai nesutampa</string>
+    <string name="set_password_message_password_invalid">Slaptažodis per trumpas</string>
+    <string name="set_password_message_empty">Slaptažodis tuščias</string>
+    <string name="conference_audio_activity_player_name">Garsinės konferencijos grotuvas</string>
+    <string name="conference_audio_activity_name">Garsinė konferencija</string>
+    <string name="conference_message_list_activity_name">Rašytinė konferencija</string>
+    <string name="message_list_activity_name">Pokalbis</string>
+    <string name="add_friend_activity_name">Pridėti draugą</string>
+</resources>
