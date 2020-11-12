@@ -13,8 +13,8 @@
     <string name="title_activity_profile">Profil</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="title_activity_crash">Absturz</string>
-    <string name="title_activity_friendinfo">Friendinfo</string>
-    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_friendinfo">Info über Freund</string>
+    <string name="title_activity_conferencepeerinfo">Info über Peer</string>
     <string name="title_activity_aboutpage">Über</string>
     <string name="title_activity_set_password">Passwort festlegen</string>
     <string name="title_activity_check_password">Passwort eingeben</string>
@@ -96,8 +96,8 @@
     <string name="pref_title_X_eac_delay_ms">AEC Verzögerung</string>
     <string name="pref_description_X_eac_delay_ms">!! Experimentelle !! \nAEC Verzögerung in ms</string>
     <string name="pref_title_add_friends_to_messages">Fügen Sie Nachrichten zu Freunden hinzu</string>
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string name="pref_header_data_sync">Daten &amp; Synchronisation</string>
+    <string name="pref_title_sync_frequency">Synchronisations-Häufigkeit</string>
     <string-array name="pref_sync_frequency_titles">
         <item>15 Minuten</item>
         <item>30 Minuten</item>
@@ -128,7 +128,7 @@
         <item>16000</item>
         <item>48000</item>
     </string-array>
-    <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
+    <string name="pref_title_X_audio_recording_frame_size">Framegröße für Audioaufnahmen</string>
     <string name="pref_description_X_audio_recording_frame_size">Die Standardeinstellung ist 40 ms</string>
     <string-array name="X_audio_recording_frame_size_titles">
         <item>120</item>
@@ -186,7 +186,7 @@
     <string name="MainActivity_profile">Profil</string>
     <string name="MainActivity_settings">Einstellungen</string>
     <string name="MainActivity_logout_login">Abmelden/Anmelden</string>
-    <string name="MainActivity_maint">Maintenance</string>
+    <string name="MainActivity_maint">Wartung</string>
     <string name="MainActivity_about">Über</string>
     <string name="MainActivity_exit">Beenden</string>
     <string name="MainActivity_available">Verfügbar</string>
@@ -208,7 +208,7 @@
     <string name="MainActivity_notification_new_message3">neue Nachricht</string>
     <string name="MainActivity_notification_new_message4">neue Nachricht</string>
     <string name="MainActivity_notification_new_message5">neue Nachricht</string>
-    <string name="Aboutpage_0">TRIfA Crashlog</string>
+    <string name="Aboutpage_0">TRIfA-Crashlog</string>
     <string name="Aboutpage_2">Absturzbericht per E-Mail senden</string>
     <string name="Aboutpage_4">Absturzinformationen lesen ...</string>
     <string name="Aboutpage_5a">TRIfA ein Tox Client für Android</string>
@@ -231,13 +231,13 @@
     <string name="layout___name">Name</string>
     <string name="layout___push_to_talk">Drücken, um zu sprechen</string>
     <string name="layout___nick">Nick:</string>
-    <string name="layout___pubkey">Pubkey:</string>
+    <string name="layout___pubkey">Öffentlicher Schlüssel:</string>
     <string name="layout___status">Status:</string>
     <string name="layout___alias">Alias</string>
-    <string name="layout___remove_friends_relay">remove Friends Relay</string>
-    <string name="layout___friends_relay_pubkey">Friends Relay Pubkey:</string>
+    <string name="layout___remove_friends_relay">Friends Relay entfernen</string>
+    <string name="layout___friends_relay_pubkey">Öffentlicher Schlüssel des Friends Relay:</string>
     <string name="layout___waiting_for_orbot">Warten auf Orbot ...</string>
-    <string name="layout___clear_glide_cache">clear Glide Cache</string>
+    <string name="layout___clear_glide_cache">Glide-Cache leeren</string>
     <string name="layout___set_app_language">App-Sprache einstellen</string>
     <string name="layout___run_vacuum_on_sql_database">Führen Sie VACUUM in der SQL-Datenbank aus</string>
     <string name="layout___run_analyze_on_sql_database">Führen Sie ANALYZE in der SQL-Datenbank aus</string>
@@ -281,4 +281,18 @@
     <string name="pref_title_global_font_size">Schriftgröße</string>
     <string name="pref_title_video_cam_resolution">Kameraauflösung</string>
     <string name="conference_audio_activity_player_name">Audio Konferenz-Player</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Experimentell !!
+\nAudiopuffer in Bytes; auf 0 setzen, um die benutzdefinierte Einstellung zu deaktivieren</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Audiopuffer</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! Experimentell !!
+\nVideo und Audio nicht synchronisieren. Benutze diese Einstellung als letztes Mittel der Wahl, falls du Probleme bei Videoanrufen hast.</string>
+    <string name="pref_description_use_incognito_keyboard">Ausschalten, damit das Keyboard nicht von deinen eingegebenen Wörtern lernt</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">H.264-Enkoder soll sog. Intra-Refresh-Frames nutzen</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H.264-Intra-Refresh</string>
+    <string name="pref_description_force_udp_only">Dies wird den ausschließlichen UDP-Modus erzwingen, mit dieser Option kannst du manche Kontakte möglicherweise nicht erreichen.
+\nDiese Änderung benötigt einen Neustart!</string>
+    <string name="pref_description_mic_gain_factor">Erhöhe den Boost, falls dein Mikrofon nur leise aufnimmt</string>
+    <string name="pref_title_mic_gain_factor">Mikrofon-Boost</string>
+    <string name="pref_description_global_font_size">Textgröße auswählen</string>
+    <string name="pref_description_video_cam_resolution">Auflösung für Videoanrufe</string>
 </resources>
