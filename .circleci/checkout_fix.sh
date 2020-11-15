@@ -22,7 +22,9 @@ $CHECKOUT_KEY
 EOF
 )
 
-export GIT_SSH_COMMAND='ssh -i $SSH_CONFIG_DIR/id_rsa -o UserKnownHostsFile=$SSH_CONFIG_DIR/known_hosts'
+export GIT_SSH_COMMAND='' # 'ssh -i $SSH_CONFIG_DIR/id_rsa -o UserKnownHostsFile=$SSH_CONFIG_DIR/known_hosts'
+
+export CIRCLE_REPOSITORY_URL=$(echo "$CIRCLE_REPOSITORY_URL" | sed -e 's#^git@github.com:#https://github.com/#')
 
 # use git+ssh instead of https
 # --> broken # git config --global url."ssh://git@github.com".insteadOf "https://github.com" || true
