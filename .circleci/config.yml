@@ -16,6 +16,7 @@ jobs:
       - image: ubuntu:16.04
 
     steps:
+      - run: apt install -y --no-install-recommends git
       - checkout
 
       - run: &apt_install
