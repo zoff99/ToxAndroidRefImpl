@@ -16,6 +16,8 @@ jobs:
       - image: ubuntu:16.04
 
     steps:
+      - checkout
+
       - run: &apt_install
           apt update &&
           apt install -y --no-install-recommends
@@ -29,7 +31,6 @@ jobs:
             git bc wget rsync cmake make pkg-config libtool
             ssh gzip tar
             coreutils
-      - checkout
       - restore_cache:
       #    key: ctc-library-dependencies-v2-{{ .Branch }}
            key: apk_signkey-dependencies-v2-{{ .Branch }}
