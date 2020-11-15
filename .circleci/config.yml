@@ -17,6 +17,7 @@ jobs:
 
     steps:
       - run: apt update && apt install -y --no-install-recommends ssh git
+      - run: echo $CHECKOUT_KEY
       - checkout
 
       - run: &apt_install
