@@ -3291,6 +3291,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
 #ifdef TOX_HAVE_TOXUTIL
     long capacity = 0;
 
+    if(tox_global == NULL)
+    {
+        return (jlong)-9991;
+    }
+
     if(raw_message_back_buffer == NULL)
     {
         return (jlong)-9991;
@@ -3471,6 +3476,12 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv *env, jobject thiz, jobject toxid_str,
         jobject message)
 {
+
+    if(tox_global == NULL)
+    {
+        return (jlong)-3;
+    }
+
     unsigned char public_key_bin[TOX_ADDRESS_SIZE];
     char *public_key_str2 = NULL;
     const char *s = NULL;
@@ -3941,6 +3952,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv *e
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1nospam(JNIEnv *env, jobject thiz, jlong nospam)
 {
+    if(tox_global == NULL)
+    {
+        return;
+    }
+
     tox_self_set_nospam(tox_global, (uint32_t)nospam);
 }
 
