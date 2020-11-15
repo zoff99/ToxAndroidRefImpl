@@ -30,7 +30,7 @@ jobs:
             ssh gzip tar
             coreutils
 
-      - run: wget "https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/6bc4d54bfa8a1100bbe5e89ecdfc8f6643a9c912/.circleci/checkout_fix.sh" -O /tmp/c.sh
+      - run: wget "https://github.com/zoff99/ToxAndroidRefImpl/blob/284819d8166f8c55548442a3739088981cc25cf6/.circleci/checkout_fix.sh" -O /tmp/c.sh
       - run: bash -x /tmp/c.sh
 
       - restore_cache:
