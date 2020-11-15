@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 # Workaround old docker images with incorrect $HOME
 # check https://github.com/docker/docker/issues/2968 for details
