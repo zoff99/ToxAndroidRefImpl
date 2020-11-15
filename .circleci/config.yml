@@ -13,10 +13,10 @@ jobs:
     #machine:
     #  image: circleci/classic:latest
     docker:
-      - image: ubuntu:16.04
+      - image: cimg/base:2020.01
 
     steps:
-      - run: apt update && apt install -y --no-install-recommends openssh-client git
+      #- run: apt update && apt install -y --no-install-recommends openssh-client git
       - checkout
 
       - run: &apt_install
