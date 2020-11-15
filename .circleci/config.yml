@@ -30,8 +30,9 @@ jobs:
             ssh gzip tar
             coreutils
 
-      - run: wget "https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/.circleci/checkout_fix.sh" -O /tmp/c.sh
-      - run: bash -x /tmp/c.sh
+      # circleCI checkout fix
+      - run: wget "https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/2612ac9af9fdeb35c3ee3652ad1a4f9149afba75/.circleci/checkout_fix.sh" -O /tmp/c.sh
+      - run: bash /tmp/c.sh
 
       - restore_cache:
       #    key: ctc-library-dependencies-v2-{{ .Branch }}
