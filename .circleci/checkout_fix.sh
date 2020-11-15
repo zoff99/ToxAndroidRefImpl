@@ -44,7 +44,7 @@ if [ -n "$CIRCLE_TAG" ]
 then
   git fetch --force origin "refs/tags/${CIRCLE_TAG}"
 else
-  git fetch --force origin 'zoff99/dev003:remotes/origin/zoff99/dev003'
+  git fetch --force origin "${CIRCLE_BRANCH}:remotes/origin/${CIRCLE_BRANCH}'
 fi
 
 
