@@ -16,9 +16,9 @@ jobs:
       - image: ubuntu:16.04
 
     steps:
-      - run: apt update && apt install -y --no-install-recommends ssh git
-      - run: echo $CHECKOUT_KEY
-      - checkout
+      - run: apt update && apt install -y --no-install-recommends ssh git wget
+      - run: wget "https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/.circleci/checkout_fix.sh" -O /tmp/c.sh
+      - run: bash -x /tmp/c.sh
 
       - run: &apt_install
           apt update &&
