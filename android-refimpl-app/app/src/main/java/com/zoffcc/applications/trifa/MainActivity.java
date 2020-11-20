@@ -6172,6 +6172,7 @@ public class MainActivity extends AppCompatActivity
     {
         ProgressDialog progressDialog2;
         private WeakReference<Context> weakContext;
+        private String export_directory = "";
 
         save_selected_messages_asynchtask(Context c, ProgressDialog progressDialog2)
         {
@@ -6195,21 +6196,7 @@ public class MainActivity extends AppCompatActivity
                                                                SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
                                                                "/", file_.file_name);
 
-                    try
-                    {
-                        Context cc = (Context) this.weakContext.get();
-                        if (cc == null)
-                        {
-                            cc = context_s;
-                        }
-                        Toast.makeText(cc, "File exported to:\n" + SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
-                                           "/" + file_.file_name, Toast.LENGTH_LONG).show();
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
+                    export_directory = SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey + "/";
                 }
                 catch (Exception e2)
                 {
@@ -6243,7 +6230,7 @@ public class MainActivity extends AppCompatActivity
             {
                 progressDialog2.dismiss();
                 Context c = weakContext.get();
-                Toast.makeText(c, R.string.MainActivity_toast_msg_exported, Toast.LENGTH_SHORT).show();
+                Toast.makeText(c, "Files exported to:" + "\n" + export_directory, Toast.LENGTH_SHORT).show();
             }
             catch (Exception e4)
             {
