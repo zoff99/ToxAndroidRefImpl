@@ -1840,7 +1840,7 @@ public class MainActivity extends AppCompatActivity
         {
             unregisterReceiver(receiver1);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
         }
 
@@ -1848,7 +1848,7 @@ public class MainActivity extends AppCompatActivity
         {
             unregisterReceiver(receiver2);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
         }
 
@@ -1856,7 +1856,7 @@ public class MainActivity extends AppCompatActivity
         {
             unregisterReceiver(receiver3);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
         }
 
@@ -1864,7 +1864,7 @@ public class MainActivity extends AppCompatActivity
         {
             unregisterReceiver(receiver4);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
         }
     }
@@ -6194,6 +6194,27 @@ public class MainActivity extends AppCompatActivity
                     HelperGeneric.export_vfs_file_to_real_file(file_.path_name, file_.file_name,
                                                                SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
                                                                "/", file_.file_name);
+
+                    try
+                    {
+                        Toast.makeText((Context) this.weakContext.get(),
+                                       "File exported to:\n" + SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
+                                       "/" + file_.file_name, Toast.LENGTH_SHORT).show();
+                    }
+                    catch (Exception e)
+                    {
+                        try
+                        {
+                            Toast.makeText(context_s,
+                                           "File exported to:\n" + SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
+                                           "/" + file_.file_name, Toast.LENGTH_SHORT).show();
+                        }
+                        catch (Exception e2)
+                        {
+                        }
+                        e.printStackTrace();
+                    }
+
                 }
                 catch (Exception e2)
                 {
