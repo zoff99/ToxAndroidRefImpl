@@ -19,12 +19,13 @@
 
 package com.zoffcc.applications.trifa;
 
-import androidx.annotation.NonNull;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
