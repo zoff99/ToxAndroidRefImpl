@@ -35,6 +35,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -64,6 +65,7 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
@@ -843,6 +845,11 @@ public class MessageListActivity extends AppCompatActivity
                 // it would be "*/*".
                 // intent.setType("image/*");
                 intent.setType("*/*");
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                {
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, "*/*");
+                }
 
                 startActivityForResult(intent, MEDIAPICK_ID_001);
 
