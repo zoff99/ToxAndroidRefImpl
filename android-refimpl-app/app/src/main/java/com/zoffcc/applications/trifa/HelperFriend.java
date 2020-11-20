@@ -805,6 +805,7 @@ public class HelperFriend
     {
         // (msg_type == 1) msgV2 direct message
         // (msg_type == 2) msgV2 relay message
+        // (msg_type == 3) msgV2 group confirm msg received message
         if (msg_type == 1)
         {
             // send message receipt v2
@@ -903,6 +904,12 @@ public class HelperFriend
                 }
             };
             t.start();
+        }
+        else if (msg_type == 3)
+        {
+            // send message receipt v2
+            long t_sec_receipt = (System.currentTimeMillis() / 1000);
+            MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
         }
     }
 
