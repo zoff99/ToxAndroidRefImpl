@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +36,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -50,10 +50,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.angads25.filepicker.controller.DialogSelectionListener;
-import com.github.angads25.filepicker.model.DialogConfigs;
-import com.github.angads25.filepicker.model.DialogProperties;
-import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -65,12 +61,12 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
+import androidx.documentfile.provider.DocumentFile;
 
 import static android.widget.Toast.LENGTH_LONG;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
@@ -98,7 +94,6 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.FILE_PICK_METHOD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
@@ -752,6 +747,8 @@ public class MessageListActivity extends AppCompatActivity
 
     public void send_attatchment(View view)
     {
+        Log.i(TAG, "send_attatchment:---start");
+
         String msg = "";
         if (is_friend_online(friendnum) != 0)
         {
@@ -759,107 +756,41 @@ public class MessageListActivity extends AppCompatActivity
             // add attachement ------------
 
             stop_self_typing_indicator_s();
+            // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+            // browser.
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 
-            if (FILE_PICK_METHOD == 1)
+            // Filter to only show results that can be "opened", such as a
+            // file (as opposed to a list of contacts or timezones)
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+            // Filter to show only images, using the image MIME data type.
+            // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+            // To search for all documents available via installed storage providers,
+            // it would be "*/*".
+            // intent.setType("image/*");
+            intent.setType("*/*");
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             {
-                // Method 1 ----------------
-                // Method 1 ----------------
-                // Method 1 ----------------
-                DialogProperties properties = new DialogProperties();
-                properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                properties.selection_type = DialogConfigs.FILE_SELECT;
-                properties.root = new java.io.File("/");
-                properties.error_dir = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                properties.offset = new java.io.File(Environment.getExternalStorageDirectory().getAbsolutePath());
-                properties.extensions = null;
-                // TODO: hardcoded is always bad
-                // properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF", "zip", "ZIP", "avi", "AVI", "mp4", "MP4"};
-                FilePickerDialog dialog = new FilePickerDialog(this, properties);
-                dialog.setTitle("Select File");
-
-                dialog.setDialogSelectionListener(new DialogSelectionListener()
-                {
-                    @Override
-                    public void onSelectedFilePaths(String[] files)
-                    {
-                        try
-                        {
-                            Log.i(TAG, "select_file:" + files);
-                            final String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
-                            final String src_filename = new File(files[0]).getName();
-                            Log.i(TAG, "select_file:p=" + src_path + " f=" + src_filename);
-
-                            final Thread t = new Thread()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    add_outgoing_file(src_path, src_filename);
-                                }
-                            };
-                            t.start();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.i(TAG, "select_file:EE1:" + e.getMessage());
-                        }
-                    }
-                });
-                dialog.show();
-                // Method 1 ----------------
-                // Method 1 ----------------
-                // Method 1 ----------------
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, "*/*");
             }
-            else
-            {
-                // Method 2 ----------------
-                // Method 2 ----------------
-                // Method 2 ----------------
-                //                        Log.i(TAG, "add_file:001");
-                //                        Intent intent_file1 = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                //                        Log.i(TAG, "add_file:002");
-                //                        try
-                //                        {
-                //                            startActivityForResult(intent_file1, MEDIAPICK_ID_001);
-                //                        }
-                //                        catch (Exception e)
-                //                        {
-                //                            e.printStackTrace();
-                //                            Log.i(TAG, "add_file:EE:" + e.getMessage());
-                //                        }
-                //                        Log.i(TAG, "add_file:003");
 
+            startActivityForResult(intent, MEDIAPICK_ID_001);
 
-                // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
-                // browser.
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-
-                // Filter to only show results that can be "opened", such as a
-                // file (as opposed to a list of contacts or timezones)
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-                // Filter to show only images, using the image MIME data type.
-                // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
-                // To search for all documents available via installed storage providers,
-                // it would be "*/*".
-                // intent.setType("image/*");
-                intent.setType("*/*");
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-                {
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, "*/*");
-                }
-
-                startActivityForResult(intent, MEDIAPICK_ID_001);
-
-
-                // Method 2 ----------------
-                // Method 2 ----------------
-                // Method 2 ----------------
-            }
             // add attachement ------------
             // add attachement ------------
+        }
+        else
+        {
+            try
+            {
+                Toast.makeText(this, "Friend not online", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -987,6 +918,43 @@ public class MessageListActivity extends AppCompatActivity
             {
                 try
                 {
+                    try
+                    {
+                        DocumentFile documentFile = DocumentFile.fromSingleUri(this, data.getData());
+                        String fileName = documentFile.getName();
+                        Log.i(TAG, "documentFile:fileName=" + fileName);
+                        Log.i(TAG, "documentFile:fileLength=" + documentFile.length());
+
+                        ContentResolver cr = getApplicationContext().getContentResolver();
+                        Cursor metaCursor = cr.query(data.getData(), null, null, null, null);
+                        if (metaCursor != null)
+                        {
+                            try
+                            {
+                                if (metaCursor.moveToFirst())
+                                {
+                                    String file_path = metaCursor.getString(0);
+                                    Log.i(TAG, "metaCursor_path:fp=" + file_path);
+                                    Log.i(TAG, "metaCursor_path:column names=" + metaCursor.getColumnNames().length);
+                                    int j;
+                                    for (j = 0; j < metaCursor.getColumnNames().length; j++)
+                                    {
+                                        Log.i(TAG, "metaCursor_path:column name=" + metaCursor.getColumnName(j));
+                                        Log.i(TAG, "metaCursor_path:column name=" + metaCursor.getString(j));
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                metaCursor.close();
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                     // -- get real path of file --
                     Uri selectedImage = data.getData();
                     //                    Log.i(TAG, "data_uri=" + selectedImage.toString());
@@ -1203,6 +1171,14 @@ public class MessageListActivity extends AppCompatActivity
         if (is_friend_online(friendnum) == 0)
         {
             Log.i(TAG, "TOX:friend offline");
+            try
+            {
+                Toast.makeText(this, "Friend not online", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
             return;
         }
 
@@ -1314,9 +1290,9 @@ public class MessageListActivity extends AppCompatActivity
                                             Log.i(TAG, "toxav_call:audio_call:RES=" + res1);
                                             try
                                             {
-                                                Toast.makeText(context_s, "Call Start ERROR", LENGTH_LONG);
+                                                Toast.makeText(context_s, "Call Start ERROR", LENGTH_LONG).show();
                                             }
-                                            catch(Exception e)
+                                            catch (Exception e)
                                             {
                                             }
                                         }
@@ -1330,9 +1306,9 @@ public class MessageListActivity extends AppCompatActivity
                                             Log.i(TAG, "toxav_call:video_call:RES=" + res2);
                                             try
                                             {
-                                                Toast.makeText(context_s, "Call Start ERROR", LENGTH_LONG);
+                                                Toast.makeText(context_s, "Call Start ERROR", LENGTH_LONG).show();
                                             }
-                                            catch(Exception e)
+                                            catch (Exception e)
                                             {
                                             }
                                         }
