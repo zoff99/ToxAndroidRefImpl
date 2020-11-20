@@ -6197,21 +6197,16 @@ public class MainActivity extends AppCompatActivity
 
                     try
                     {
-                        Toast.makeText((Context) this.weakContext.get(),
-                                       "File exported to:\n" + SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
-                                       "/" + file_.file_name, Toast.LENGTH_SHORT).show();
+                        Context cc = (Context) this.weakContext.get();
+                        if (cc == null)
+                        {
+                            cc = context_s;
+                        }
+                        Toast.makeText(cc, "File exported to:\n" + SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
+                                           "/" + file_.file_name, Toast.LENGTH_LONG).show();
                     }
                     catch (Exception e)
                     {
-                        try
-                        {
-                            Toast.makeText(context_s,
-                                           "File exported to:\n" + SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
-                                           "/" + file_.file_name, Toast.LENGTH_SHORT).show();
-                        }
-                        catch (Exception e2)
-                        {
-                        }
                         e.printStackTrace();
                     }
 
