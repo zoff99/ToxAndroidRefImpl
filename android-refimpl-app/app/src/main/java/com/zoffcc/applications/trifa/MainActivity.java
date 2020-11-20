@@ -140,6 +140,7 @@ import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_c
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
+import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
@@ -2464,7 +2465,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_messagev2_get_sync_message_type(ByteBuffer raw_message_buffer);
 
-    public static native int tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
+    public static native int    tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
 
     public static native long tox_util_friend_send_message_v2(long friend_number, int type, long ts_sec, String message, long length, ByteBuffer raw_message_back_buffer, ByteBuffer raw_message_back_buffer_length, ByteBuffer msgid_back_buffer);
 
@@ -4124,6 +4125,12 @@ public class MainActivity extends AppCompatActivity
                                 HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
                                 real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
                                 (msg_wrapped_sec * 1000) + msg_wrapped_ms);
+                        //TODO: bestätigung senden, dass wir die nachricht bekommen haben.
+                        // TOX_FILE_KIND_MESSAGEV2_ANSWER
+                        // send_friend_msg_receipt_v2_wrapper
+                        //ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+
+                        send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer);
                     }
                     else
                     {
