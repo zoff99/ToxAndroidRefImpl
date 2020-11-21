@@ -31,9 +31,8 @@ jobs:
             coreutils
 
       # circleCI checkout fix
-      #- run: wget "https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/.circleci/checkout_fix.sh" -O /tmp/c.sh
-      #- run: bash /tmp/c.sh
-      - checkout
+      - run: wget "https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/.circleci/checkout_fix.sh" -O /tmp/c.sh
+      - run: bash /tmp/c.sh
 
       - restore_cache:
       #    key: ctc-library-dependencies-v2-{{ .Branch }}
