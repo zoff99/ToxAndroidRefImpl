@@ -18,7 +18,9 @@
         android:layout_marginBottom="2dp"
         android:background="@drawable/friend_list_round_bg"
         android:elevation="2dp"
-        android:padding="2dip">
+        android:padding="2dip"
+        android:id="@+id/friend_line_container"
+        >
 
         <ImageView
             android:id="@+id/f_notification"

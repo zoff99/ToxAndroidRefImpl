@@ -28,7 +28,9 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
@@ -99,6 +101,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private ImageView f_notification;
     private ImageView f_relay_icon;
     private TextView f_last_online_timestamp;
+    private ViewGroup friend_line_container;
     static ProgressDialog progressDialog = null;
 
     synchronized static void remove_progress_dialog()
@@ -138,6 +141,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         f_relay_icon = (ImageView) itemView.findViewById(R.id.f_relay_icon);
         f_notification = (ImageView) itemView.findViewById(R.id.f_notification);
         f_last_online_timestamp = (TextView) itemView.findViewById(R.id.f_last_online_timestamp);
+
+        friend_line_container = (ViewGroup) itemView.findViewById(R.id.friend_line_container);
     }
 
     public void bindFriendList(FriendList fl)
@@ -155,6 +160,13 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
+
+        if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE) {
+            friend_line_container.setBackgroundResource(R.drawable.friend_list_neveronline_round_bg);
+        }
+        else {
+            friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
+        }
 
         // Log.i(TAG, "lot=" + fl.last_online_timestamp + " -> " + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
         if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_NOW)
