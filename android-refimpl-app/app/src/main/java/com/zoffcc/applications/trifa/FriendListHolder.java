@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
@@ -161,10 +160,12 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
 
-        if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE) {
+        if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
+        {
             friend_line_container.setBackgroundResource(R.drawable.friend_list_neveronline_round_bg);
         }
-        else {
+        else
+        {
             friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
         }
 
