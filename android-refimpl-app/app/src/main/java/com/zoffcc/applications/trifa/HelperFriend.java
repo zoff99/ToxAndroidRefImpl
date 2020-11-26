@@ -439,7 +439,7 @@ public class HelperFriend
                 {
                     // Log.i(TAG, "friend_request:insert:001:f=" + f);
                     long res = orma.insertIntoFriendList(f);
-                    // Log.i(TAG, "friend_request:insert:002:res=" + res);
+                    Log.i(TAG, "friend_request:insert:002:res=" + res);
                 }
                 catch (android.database.sqlite.SQLiteConstraintException | net.sqlcipher.database.SQLiteConstraintException e)
                 {
@@ -660,6 +660,12 @@ public class HelperFriend
         if (friendnum == -1)
         {
             Log.i(TAG, "add_friend_real:friend already added, or request already sent");
+
+            /*
+            // still add the friend to the DB
+            String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
+            add_friend_to_system(friend_public_key, false, null);
+            */
         }
 
         // add friend ---------------
