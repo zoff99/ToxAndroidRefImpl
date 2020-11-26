@@ -19,11 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
-import androidx.annotation.Nullable;
-
 import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
+
+import androidx.annotation.Nullable;
 
 @Table
 public class FriendList
@@ -85,6 +85,9 @@ public class FriendList
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long last_online_timestamp = -1L;
 
+    @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
+    long added_timestamp = -1L;
+
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     @Nullable
     boolean is_relay = false;
@@ -109,6 +112,7 @@ public class FriendList
         out.alias_name = in.alias_name;
         out.is_relay = in.is_relay;
         out.avatar_update_timestamp = in.avatar_update_timestamp;
+        out.added_timestamp = in.added_timestamp;
 
         return out;
     }
@@ -124,7 +128,7 @@ public class FriendList
                    ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
                    ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
                    sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name +
-                   ", avatar_update=" + avatar_update;
+                   ", avatar_update=" + avatar_update + ", added_timestamp=" + added_timestamp;
         }
         catch (Exception e)
         {

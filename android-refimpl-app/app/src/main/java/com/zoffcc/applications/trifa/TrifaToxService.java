@@ -490,6 +490,7 @@ public class TrifaToxService extends Service
                 int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
                 f.TOX_CONNECTION = combined_connection_status_;
                 f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
+                f.added_timestamp = System.currentTimeMillis();
             }
             catch (Exception e)
             {

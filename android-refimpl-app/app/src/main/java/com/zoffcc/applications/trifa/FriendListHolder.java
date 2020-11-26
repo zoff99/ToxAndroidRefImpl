@@ -76,6 +76,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SI
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ONE_HOUR_IN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
@@ -166,7 +167,14 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
         else
         {
-            friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
+            if (fl.added_timestamp > (System.currentTimeMillis() - ONE_HOUR_IN_MS))
+            {
+                friend_line_container.setBackgroundColor(context.getResources().getColor(R.color.md_amber_700));
+            }
+            else
+            {
+                friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
+            }
         }
 
         // Log.i(TAG, "lot=" + fl.last_online_timestamp + " -> " + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);

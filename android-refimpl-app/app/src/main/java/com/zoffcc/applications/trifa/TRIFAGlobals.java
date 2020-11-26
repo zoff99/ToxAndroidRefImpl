@@ -165,6 +165,8 @@ public class TRIFAGlobals
     static long LAST_ONLINE_TIMSTAMP_ONLINE_NOW = Long.MAX_VALUE - 1;
     static long LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE = -1;
 
+    static long ONE_HOUR_IN_MS = 3600 * 1000;
+
     static int CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = 10;
     static int CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = 20;
 

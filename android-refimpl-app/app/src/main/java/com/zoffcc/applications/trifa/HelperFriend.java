@@ -438,6 +438,7 @@ public class HelperFriend
                 try
                 {
                     // Log.i(TAG, "friend_request:insert:001:f=" + f);
+                    f.added_timestamp = System.currentTimeMillis();
                     long res = orma.insertIntoFriendList(f);
                     Log.i(TAG, "friend_request:insert:002:res=" + res);
                 }
@@ -504,6 +505,7 @@ public class HelperFriend
         {
             if (orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).count() == 0)
             {
+                f.added_timestamp = System.currentTimeMillis();
                 orma.insertIntoFriendList(f);
                 // Log.i(TAG, "friend added to DB: " + f.tox_public_key_string);
             }
