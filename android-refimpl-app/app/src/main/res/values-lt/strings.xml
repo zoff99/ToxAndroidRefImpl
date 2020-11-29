@@ -171,7 +171,7 @@
 \nPokyčiui pritaikyti būtina PALEISTI IŠ NAUJO!</string>
     <string name="pref_title_higher_audio_quality">Garso kokybė</string>
     <string name="pref_description_mic_gain_factor">Nustatyti didesnį stiprumą, jei jūsų mikrofonas įrašo žemu garsu</string>
-    <string name="pref_description_camera_get_preview_format">Pristatomasis kameros formatas kai kuriuose telefonuose gali būti netikslus</string>
+    <string name="pref_description_camera_get_preview_format">Parodomasis kameros formatas kai kuriuose telefonuose gali būti netikslus</string>
     <string name="pref_title_camera_get_preview_format">Parodomasis kameros formatas</string>
     <string name="pref_description_global_font_size">Pasirinkti šrifto dydį</string>
     <string name="pref_title_global_font_size">Šrifto dydis</string>
