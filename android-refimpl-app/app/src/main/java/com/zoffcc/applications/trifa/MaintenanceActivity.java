@@ -476,18 +476,74 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+        String debug__sqlite_version = "unknown";
+        try
+        {
+            Cursor cursor = orma.getConnection().rawQuery("SELECT sqlite_version()");
+            cursor.moveToFirst();
+            debug__sqlite_version = cursor.getString(0);
+            cursor.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String debug__cipher_version = "unknown";
+        try
+        {
+            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_version");
+            cursor.moveToFirst();
+            debug__cipher_version = cursor.getString(0);
+            cursor.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String debug__cipher_provider = "unknown";
+        try
+        {
+            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_provider");
+            cursor.moveToFirst();
+            debug__cipher_provider = cursor.getString(0);
+            cursor.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String debug__cipher_provider_version = "unknown";
+        try
+        {
+            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_provider_version");
+            cursor.moveToFirst();
+            debug__cipher_provider_version = cursor.getString(0);
+            cursor.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         debug_output_clear();
-        debug_output_append("debug__audio_pkt_incoming=" + debug__audio_pkt_incoming);
-        debug_output_append("debug__audio_frame_played=" + debug__audio_frame_played);
-        debug_output_append("debug__audio_play_buf_count_max=" + debug__audio_play_buf_count_max);
-        debug_output_append("debug__audio_play_buf01=" + debug__audio_play_buf01);
-        debug_output_append("debug__audio_play_buf02=" + debug__audio_play_buf02);
-        debug_output_append("debug__audio_play_buf03=" + debug__audio_play_buf03);
-        debug_output_append("debug__audio_play_buf04=" + debug__audio_play_buf04);
-        debug_output_append("debug__audio_play_buf05=" + debug__audio_play_buf05);
-        debug_output_append("debug__audio_play_buf06=" + debug__audio_play_buf06);
-        debug_output_append("debug__audio_play_factor=" + debug__audio_play_factor);
-        debug_output_append("debug__audio_play_iter=" + debug__audio_play_iter);
+        debug_output_append("cipher_version=" + debug__cipher_version);
+        debug_output_append("sqlite_version=" + debug__sqlite_version);
+        debug_output_append("cipher_provider=" + debug__cipher_provider);
+        debug_output_append("cipher_provider_version=" + debug__cipher_provider_version);
+        debug_output_append("audio_pkt_incoming=" + debug__audio_pkt_incoming);
+        debug_output_append("audio_frame_played=" + debug__audio_frame_played);
+        debug_output_append("audio_play_buf_count_max=" + debug__audio_play_buf_count_max);
+        debug_output_append("audio_play_buf01=" + debug__audio_play_buf01);
+        debug_output_append("audio_play_buf02=" + debug__audio_play_buf02);
+        debug_output_append("audio_play_buf03=" + debug__audio_play_buf03);
+        debug_output_append("audio_play_buf04=" + debug__audio_play_buf04);
+        debug_output_append("audio_play_buf05=" + debug__audio_play_buf05);
+        debug_output_append("audio_play_buf06=" + debug__audio_play_buf06);
+        debug_output_append("audio_play_factor=" + debug__audio_play_factor);
+        debug_output_append("audio_play_iter=" + debug__audio_play_iter);
 
         String num_msgs = "*ERROR*";
         try
