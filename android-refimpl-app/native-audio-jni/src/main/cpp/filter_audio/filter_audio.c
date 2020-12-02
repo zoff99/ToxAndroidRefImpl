@@ -337,7 +337,7 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         int16_t *d_h = NULL;
         int16_t temp[nsx_samples];
         // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:006");
-        memset(temp, 0, nsx_samples*sizeof(float));
+        memset(temp, 0, nsx_samples*sizeof(int16_t));
         // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:007");
         if (resample) {
             d_h = temp;
