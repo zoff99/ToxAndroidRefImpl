@@ -139,6 +139,8 @@ int play_buffer_queued_count_mutex_valid = 0;
 // --------- AEC ---------
 Filter_Audio *filteraudio = NULL;
 bool filteraudio_used = false;
+int8_t have_input_for_filter = 0;
+
 // --------- AEC ---------
 #ifdef WEBRTC_AEC
 void *webrtc_aecmInst = NULL;
@@ -347,12 +349,14 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         {
             if (filteraudio_used)
             {
-                filter_audio(filteraudio,
-                             (int16_t *) audio_rec_buffer[rec_buf_pointer_start],
-                             (unsigned int) (
-                                     audio_rec_buffer_size[rec_buf_pointer_start] /
-                                     2));
-
+                if (have_input_for_filter)
+                {
+                    filter_audio(filteraudio,
+                                 (int16_t *) audio_rec_buffer[rec_buf_pointer_start],
+                                 (unsigned int) (
+                                         audio_rec_buffer_size[rec_buf_pointer_start] /
+                                         2));
+                }
                 // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:AEC:res=%d", res_filter);
             }
 
@@ -1132,8 +1136,11 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
             {
                 pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
                                   (unsigned int) (nextSize / 2));
+                if (have_input_for_filter == 0)
+                {
+                    have_input_for_filter = 1;
+                }
             }
-
             pthread_mutex_lock(&play_buffer_queued_count_mutex);
             audio_play_buffers_in_queue++;
             pthread_mutex_unlock(&play_buffer_queued_count_mutex);
@@ -1554,6 +1561,7 @@ jfloat Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1vu_1out(JNIEnv 
 void start_filter_audio(uint32_t in_samplerate)
 {
     /* Prepare filter_audio */
+    have_input_for_filter = 0;
     filteraudio = new_filter_audio(in_samplerate);
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
@@ -1579,6 +1587,7 @@ void stop_filter_audio()
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "filter_audio: shutdown");
         kill_filter_audio(filteraudio);
+        have_input_for_filter = 0;
         filteraudio = NULL;
     }
 }

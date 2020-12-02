@@ -54,6 +54,8 @@ typedef struct {
 
 void kill_filter_audio(Filter_Audio *f_a)
 {
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "kill_filter_audio:001");
+
     if (!f_a) {
         return;
     }
@@ -70,6 +72,8 @@ void kill_filter_audio(Filter_Audio *f_a)
 
 Filter_Audio *new_filter_audio(uint32_t fs)
 {
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "new_filter_audio:001");
+
     if (fs == 0) {
         return NULL;
     }
@@ -185,6 +189,8 @@ Filter_Audio *new_filter_audio(uint32_t fs)
 
 int enable_disable_filters(Filter_Audio *f_a, int echo, int noise, int gain, int vad)
 {
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "enable_disable_filters:001");
+
     if (!f_a) {
         return -1;
     }
@@ -235,6 +241,8 @@ static void upsample_audio(Filter_Audio *f_a, int16_t *out, uint32_t out_len, co
 
 int pass_audio_output(Filter_Audio *f_a, const int16_t *data, unsigned int samples)
 {
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "pass_audio_output:001");
+
     if (!f_a || (!f_a->echo_enabled && !f_a->gain_enabled)) {
         return -1;
     }
@@ -283,6 +291,8 @@ int pass_audio_output(Filter_Audio *f_a, const int16_t *data, unsigned int sampl
 /* Tell the echo canceller how much time in ms it takes for audio to be played and recorded back after. */
 int set_echo_delay_ms(Filter_Audio *f_a, int16_t msInSndCardBuf)
 {
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_echo_delay_ms:001");
+
     if (!f_a) {
         return -1;
     }
@@ -300,12 +310,12 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:001");
     unsigned int nsx_samples = f_a->fs / 100;
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:002");
+    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:002");
     if (!samples || (samples % nsx_samples) != 0) {
         return -1;
     }
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:003");
+    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:003");
     _Bool resample = 0;
     unsigned int resampled_samples = 0;
     if (f_a->fs != 16000) {
@@ -314,31 +324,31 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         resample = 1;
     }
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:004");
+    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:004");
 
     unsigned int temp_samples = samples;
     unsigned int smp = f_a->fs / 100;
     int novoice = 1;
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:005");
+    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:005");
 
     while (temp_samples) {
         int16_t d_l[nsx_samples];
         int16_t *d_h = NULL;
         int16_t temp[nsx_samples];
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:006");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:006");
         memset(temp, 0, nsx_samples*sizeof(float));
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:007");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:007");
         if (resample) {
             d_h = temp;
             downsample_audio(f_a, d_l, d_h, data + resampled_samples, smp);
         } else {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:008");
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:008");
             memcpy(d_l, data + (samples - temp_samples), sizeof(d_l));
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:009");
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:009");
         }
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:010");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:010");
         if(f_a->vad_enabled){
             if(WebRtcVad_Process(f_a->Vad_handle, 16000, d_l, nsx_samples) == 1){
                 novoice = 0;
@@ -346,7 +356,7 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         } else {
             novoice = 0;
         }
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:011");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:011");
 
         if (f_a->gain_enabled) {
             int32_t inMicLevel = 128, outMicLevel;
@@ -355,14 +365,14 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
                 return -1;
         }
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:012");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:012");
         float d_f_l[nsx_samples];
         S16ToFloatS16(d_l, nsx_samples, d_f_l);
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:013");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:013");
 
         float d_f_h[nsx_samples];
         memset(d_f_h, 0, nsx_samples*sizeof(float));
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:014");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:014");
 
 	if (resample) {
             S16ToFloatS16(d_h, nsx_samples, d_f_h);
@@ -384,7 +394,7 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
                 return -1;
             }
         }
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:015");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:015");
 
         if (f_a->gain_enabled) {
             int32_t inMicLevel = 128, outMicLevel;
@@ -394,11 +404,11 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
                 return -1;
             }
         }
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:016");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:016");
 
         if (resample) {
             float d_f_u[smp];
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:017");
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:017");
             upsample_audio(f_a, data + resampled_samples, smp, d_l, d_h, nsx_samples);
             S16ToFloat(data + resampled_samples, smp, d_f_u);
             run_filter_zam(&f_a->hpfa, d_f_u, smp);
@@ -409,7 +419,7 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
                 run_filter_zam(&f_a->lpfb, d_f_u, smp);
             }
 
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:018");
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:018");
             run_saturator_zam(d_f_u, smp);
             FloatToS16(d_f_u, smp, data + resampled_samples);
             resampled_samples += smp;
@@ -423,24 +433,24 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
                 run_filter_zam(&f_a->lpfa, d_f_l, nsx_samples);
                 run_filter_zam(&f_a->lpfb, d_f_l, nsx_samples);
             }
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:019");
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:019");
 
             run_saturator_zam(d_f_l, nsx_samples);
 
             FloatToS16(d_f_l, nsx_samples, d_l);
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:020");
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:020");
             memcpy(data + (samples - temp_samples), d_l, sizeof(d_l));
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:021");
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:021");
         }
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:022");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:022");
         temp_samples -= nsx_samples;
 
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:023");
+        // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:023");
 
     }
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:024");
+    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:024");
 
     return !novoice;
 }
