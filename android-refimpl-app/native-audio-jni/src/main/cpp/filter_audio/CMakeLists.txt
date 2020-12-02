@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 set(CMAKE_C_FLAGS2 "${CMAKE_C_FLAGS} -Wall")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS2} -std=c99 -fPIC")
+set(CMAKE_C_LINK_LIBRARY_FLAG "-llog")
 
 set(SOURCES_FILTER_AUDIO
         filter_audio.c

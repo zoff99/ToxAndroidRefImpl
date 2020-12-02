@@ -118,7 +118,7 @@
 #endif
 #define SL_ANDROID_PERFORMANCE_POWER_SAVING ((SLuint32) 0x00000003)
 
-const char *LOGTAG = "trifa.nativeaudio";
+static const char *LOGTAG = "trifa.nativeaudio";
 // #define DEBUG_NATIVE_AUDIO_DEEP 1 // define to activate full debug logging
 
 // -----------------------------
