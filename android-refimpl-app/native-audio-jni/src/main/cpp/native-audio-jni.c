@@ -805,10 +805,10 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
 
     if ((channels == 1) && (sampleRate == 48000))
     {
-        filteraudio_used = true;
         // filteraudio
         start_filter_audio(sampleRate);
         set_delay_ms_filter_audio(eac_delay_ms, 40);
+        filteraudio_used = true;
 #ifdef WEBRTC_AEC
         // webrtc
         WebRtcAecm_Create(&webrtc_aecmInst);
@@ -1426,13 +1426,13 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
     if (filteraudio_used)
     {
         // filteraudio
+        filteraudio_used = false;
         stop_filter_audio();
         // webrtc
 #ifdef WEBRTC_AEC
         WebRtcAecm_Free(webrtc_aecmInst);
         webrtc_aecmInst = NULL;
 #endif
-        filteraudio_used = false;
     }
 
     playing_state = _SHUTDOWN;
