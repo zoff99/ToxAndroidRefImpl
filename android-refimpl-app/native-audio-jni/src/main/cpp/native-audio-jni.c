@@ -139,7 +139,6 @@ int play_buffer_queued_count_mutex_valid = 0;
 // --------- AEC ---------
 Filter_Audio *filteraudio = NULL;
 bool filteraudio_used = false;
-int8_t have_input_for_filter = 0;
 
 // --------- AEC ---------
 #ifdef WEBRTC_AEC
@@ -354,11 +353,6 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                              (unsigned int) (
                                      audio_rec_buffer_size[rec_buf_pointer_start] /
                                      2));
-
-                if (have_input_for_filter == 0)
-                {
-                    have_input_for_filter = 1;
-                }
                 // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:AEC:res=%d", res_filter);
             }
 
@@ -1136,11 +1130,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         {
             if (filteraudio_used)
             {
-                if (have_input_for_filter)
-                {
-                    pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
-                                      (unsigned int) (nextSize / 2));
-                }
+                pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
+                                  (unsigned int) (nextSize / 2));
             }
             pthread_mutex_lock(&play_buffer_queued_count_mutex);
             audio_play_buffers_in_queue++;
@@ -1562,7 +1553,6 @@ jfloat Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1vu_1out(JNIEnv 
 void start_filter_audio(uint32_t in_samplerate)
 {
     /* Prepare filter_audio */
-    have_input_for_filter = 0;
     filteraudio = new_filter_audio(in_samplerate);
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
@@ -1588,7 +1578,6 @@ void stop_filter_audio()
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "filter_audio: shutdown");
         kill_filter_audio(filteraudio);
-        have_input_for_filter = 0;
         filteraudio = NULL;
     }
 }
