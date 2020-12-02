@@ -54,7 +54,7 @@ typedef struct {
 
 void kill_filter_audio(Filter_Audio *f_a)
 {
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "kill_filter_audio:001");
+    //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "kill_filter_audio:001");
 
     if (!f_a) {
         return;
@@ -72,7 +72,7 @@ void kill_filter_audio(Filter_Audio *f_a)
 
 Filter_Audio *new_filter_audio(uint32_t fs)
 {
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "new_filter_audio:001");
+    //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "new_filter_audio:001");
 
     if (fs == 0) {
         return NULL;
@@ -189,7 +189,7 @@ Filter_Audio *new_filter_audio(uint32_t fs)
 
 int enable_disable_filters(Filter_Audio *f_a, int echo, int noise, int gain, int vad)
 {
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "enable_disable_filters:001");
+    //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "enable_disable_filters:001");
 
     if (!f_a) {
         return -1;
@@ -241,7 +241,7 @@ static void upsample_audio(Filter_Audio *f_a, int16_t *out, uint32_t out_len, co
 
 int pass_audio_output(Filter_Audio *f_a, const int16_t *data, unsigned int samples)
 {
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "pass_audio_output:001");
+    //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "pass_audio_output:001");
 
     if (!f_a || (!f_a->echo_enabled && !f_a->gain_enabled)) {
         return -1;
@@ -291,7 +291,7 @@ int pass_audio_output(Filter_Audio *f_a, const int16_t *data, unsigned int sampl
 /* Tell the echo canceller how much time in ms it takes for audio to be played and recorded back after. */
 int set_echo_delay_ms(Filter_Audio *f_a, int16_t msInSndCardBuf)
 {
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_echo_delay_ms:001");
+    //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_echo_delay_ms:001");
 
     if (!f_a) {
         return -1;
@@ -308,7 +308,7 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         return -1;
     }
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:001");
+    //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:001 %d %d", f_a->fs, samples);
     unsigned int nsx_samples = f_a->fs / 100;
     //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:002");
     if (!samples || (samples % nsx_samples) != 0) {
@@ -337,7 +337,7 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         int16_t *d_h = NULL;
         int16_t temp[nsx_samples];
         //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:006");
-        memset(temp, 0, nsx_samples*sizeof(float));
+        memset(temp, 0, nsx_samples*sizeof(int16_t));
         //__android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:007");
         if (resample) {
             d_h = temp;
