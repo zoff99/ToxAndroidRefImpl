@@ -349,13 +349,15 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         {
             if (filteraudio_used)
             {
-                if (have_input_for_filter)
+                filter_audio(filteraudio,
+                             (int16_t *) audio_rec_buffer[rec_buf_pointer_start],
+                             (unsigned int) (
+                                     audio_rec_buffer_size[rec_buf_pointer_start] /
+                                     2));
+
+                if (have_input_for_filter == 0)
                 {
-                    filter_audio(filteraudio,
-                                 (int16_t *) audio_rec_buffer[rec_buf_pointer_start],
-                                 (unsigned int) (
-                                         audio_rec_buffer_size[rec_buf_pointer_start] /
-                                         2));
+                    have_input_for_filter = 1;
                 }
                 // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:AEC:res=%d", res_filter);
             }
@@ -1134,11 +1136,10 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         {
             if (filteraudio_used)
             {
-                pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
-                                  (unsigned int) (nextSize / 2));
-                if (have_input_for_filter == 0)
+                if (have_input_for_filter)
                 {
-                    have_input_for_filter = 1;
+                    pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
+                                      (unsigned int) (nextSize / 2));
                 }
             }
             pthread_mutex_lock(&play_buffer_queued_count_mutex);
