@@ -139,7 +139,6 @@ int play_buffer_queued_count_mutex_valid = 0;
 // --------- AEC ---------
 Filter_Audio *filteraudio = NULL;
 bool filteraudio_used = false;
-
 // --------- AEC ---------
 #ifdef WEBRTC_AEC
 void *webrtc_aecmInst = NULL;
@@ -353,6 +352,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                              (unsigned int) (
                                      audio_rec_buffer_size[rec_buf_pointer_start] /
                                      2));
+
                 // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:AEC:res=%d", res_filter);
             }
 
@@ -1133,6 +1133,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
                 pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
                                   (unsigned int) (nextSize / 2));
             }
+
             pthread_mutex_lock(&play_buffer_queued_count_mutex);
             audio_play_buffers_in_queue++;
             pthread_mutex_unlock(&play_buffer_queued_count_mutex);
