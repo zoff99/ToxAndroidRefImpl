@@ -319,11 +319,9 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         resample = 1;
     }
 
-
     unsigned int temp_samples = samples;
     unsigned int smp = f_a->fs / 100;
     int novoice = 1;
-
 
     while (temp_samples) {
         int16_t d_l[nsx_samples];
@@ -421,9 +419,7 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         }
 
         temp_samples -= nsx_samples;
-
     }
-
 
     return !novoice;
 }
