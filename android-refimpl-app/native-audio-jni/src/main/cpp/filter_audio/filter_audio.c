@@ -419,6 +419,8 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         }
 
         temp_samples -= nsx_samples;
+
+
     }
 
     return !novoice;
