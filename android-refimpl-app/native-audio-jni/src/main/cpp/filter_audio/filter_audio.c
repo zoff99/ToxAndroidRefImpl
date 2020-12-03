@@ -327,7 +327,7 @@ int filter_audio(Filter_Audio *f_a, int16_t *data, unsigned int samples)
         int16_t d_l[nsx_samples];
         int16_t *d_h = NULL;
         int16_t temp[nsx_samples];
-        memset(temp, 0, nsx_samples*sizeof(float));
+        memset(temp, 0, nsx_samples*sizeof(int16_t));
         if (resample) {
             d_h = temp;
             downsample_audio(f_a, d_l, d_h, data + resampled_samples, smp);
