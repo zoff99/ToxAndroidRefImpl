@@ -119,6 +119,7 @@ import info.guardianproject.netcipher.proxy.StatusCallback;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
+import static com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
@@ -246,6 +247,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -5795,6 +5797,22 @@ public class MainActivity extends AppCompatActivity
             native_audio_lib_loaded = false;
             Log.i(TAG, "loadLibrary native-audio-jni failed!");
             e.printStackTrace();
+        }
+
+        if (NDK_STDOUT_LOGGING)
+        {
+            try
+
+            {
+                System.loadLibrary("loggingstdout");
+                Log.i(TAG, "successfully loaded loggingstdout library");
+                start_logging();
+            }
+            catch (java.lang.UnsatisfiedLinkError e)
+            {
+                Log.i(TAG, "loadLibrary loggingstdout failed!");
+                e.printStackTrace();
+            }
         }
     }
 

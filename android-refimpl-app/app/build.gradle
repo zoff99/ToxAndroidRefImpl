@@ -218,8 +218,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    // implementation project(':native-audio-jni')
     implementation project(path: ':native-audio-jni', configuration: 'default')
+    implementation project(path: ':loggingstdout', configuration: 'default')
     //
     //
     implementation('com.mikepenz:materialdrawer:6.0.9@aar') {
