@@ -241,12 +241,21 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
+    implementation ('net.zetetic:android-database-sqlcipher:4.4.2@aar') {
+        transitive = true
+    }
+    implementation ('info.guardianproject.iocipher:IOCipher:0.5') {
+        transitive = true
+    }
+    //
     implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
     implementation('com.github.maskarade.android.orma:orma:6.0.2') {
+        transitive = true
         exclude group: 'io.reactivex'
         exclude group: 'com.android.support'
     }
     implementation('com.github.maskarade.android.orma:orma-encryption:6.0.2') {
+        transitive = true
         exclude group: 'io.reactivex'
         exclude group: 'com.android.support'
     }
@@ -293,8 +302,6 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     androidTestImplementation 'androidx.multidex:multidex:2.0.1'
     androidTestImplementation 'androidx.multidex:multidex-instrumentation:2.0.0'
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
-    implementation 'info.guardianproject.iocipher:IOCipher:0.4.2.1'
     implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
     implementation 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
     implementation 'com.google.code.gson:gson:2.8.5'
@@ -307,7 +314,7 @@ dependencies {
     implementation 'com.daimajia.numberprogressbar:library:1.4@aar'
     implementation 'com.github.lawloretienne:discreteslider:0.0.9'
     implementation "com.github.YarikSOffice:lingver:1.3.0"
-    annotationProcessor 'com.github.maskarade.android.orma:orma-processor:6.0.2'
+    annotationProcessor 'com.github.maskarade.android.orma:orma-processor:6.0.3'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
     // ---------------------
     // ---------------------

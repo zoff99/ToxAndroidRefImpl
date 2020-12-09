@@ -25,6 +25,9 @@ plugins {
 
 allprojects {
     repositories {
+        maven {
+            url 'http://dl.bintray.com/zoff99/maven/'
+        }
         google()
         jcenter()
         maven {

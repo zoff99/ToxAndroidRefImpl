@@ -28,9 +28,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -41,15 +38,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.github.gfx.android.orma.AccessThreadConstraint;
-import com.github.gfx.android.orma.encryption.EncryptedDatabase;
-
 import java.io.File;
-import java.util.concurrent.ExecutionException;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import static com.zoffcc.applications.trifa.MainActivity.DB_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
-import static com.zoffcc.applications.trifa.MainActivity.ORMA_TRACE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 
 public class CheckPasswordActivity extends AppCompatActivity
@@ -57,6 +51,7 @@ public class CheckPasswordActivity extends AppCompatActivity
     private static final String TAG = "trifa.CheckPasswordActy";
 
     private UserLoginTask mAuthTask = null;
+    private static boolean migrationOccurred = false;
 
     // UI references.
     private EditText mPasswordView1;
@@ -386,14 +381,55 @@ public class CheckPasswordActivity extends AppCompatActivity
                 {
                     trifa_db = net.sqlcipher.database.SQLiteDatabase.openOrCreateDatabase(dbs_path, try_password_hash,
                                                                                           null);
+
                 }
                 catch (net.sqlcipher.database.SQLiteException e)
                 {
-                    return false;
+                    if (try_migration_to_sqlcipher4(dbs_path, try_password_hash))
+                    {
+                        try
+                        {
+                            trifa_db = net.sqlcipher.database.SQLiteDatabase.openOrCreateDatabase(dbs_path,
+                                                                                                  try_password_hash,
+                                                                                                  null);
+                        }
+                        catch (net.sqlcipher.database.SQLiteException e7)
+                        {
+                            return false;
+                        }
+                        catch (Exception e2)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-                catch (Exception e2)
+                catch (Exception e4)
                 {
-                    return false;
+                    if (try_migration_to_sqlcipher4(dbs_path, try_password_hash))
+                    {
+                        try
+                        {
+                            trifa_db = net.sqlcipher.database.SQLiteDatabase.openOrCreateDatabase(dbs_path,
+                                                                                                  try_password_hash,
+                                                                                                  null);
+                        }
+                        catch (net.sqlcipher.database.SQLiteException e7)
+                        {
+                            return false;
+                        }
+                        catch (Exception e2)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
 
                 if (trifa_db.isOpen())
@@ -435,6 +471,63 @@ public class CheckPasswordActivity extends AppCompatActivity
         }
 
         return ret;
+    }
+
+    boolean try_migration_to_sqlcipher4(final String old_db_path, final String db_pass)
+    {
+        try
+        {
+            Log.i(TAG, "try_migration_to_sqlcipher4");
+
+            net.sqlcipher.database.SQLiteDatabaseHook mHook = new net.sqlcipher.database.SQLiteDatabaseHook()
+            {
+                public void preKey(net.sqlcipher.database.SQLiteDatabase database)
+                {
+                    // database.rawExecSQL("PRAGMA kdf_iter=1000;");
+                    // database.rawExecSQL("PRAGMA cipher_default_kdf_iter=1000;");
+                    // database.rawExecSQL("PRAGMA cipher_page_size=4096;");
+                }
+
+                public void postKey(net.sqlcipher.database.SQLiteDatabase database)
+                {
+                    // database.rawExecSQL("PRAGMA cipher_compatibility=3;");
+                    net.sqlcipher.Cursor resultSet = database.rawQuery("PRAGMA cipher_migrate", null);
+
+                    migrationOccurred = false;
+
+                    if (resultSet.getCount() == 1)
+                    {
+                        resultSet.moveToFirst();
+                        String selection = resultSet.getString(0);
+
+                        migrationOccurred = selection.equals("0");
+                    }
+
+                    resultSet.close();
+                    Log.i(TAG, "migrationOccurred[1]=" + migrationOccurred);
+                }
+            };
+
+            net.sqlcipher.database.SQLiteDatabase database = net.sqlcipher.database.SQLiteDatabase.openDatabase(
+                    old_db_path, db_pass, null, net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE |
+                                                net.sqlcipher.database.SQLiteDatabase.CREATE_IF_NECESSARY, mHook);
+
+            Log.i(TAG, "database=" + database);
+            Log.i(TAG, "migrationOccurred[2]=" + migrationOccurred);
+
+            database.close();
+
+            if (migrationOccurred)
+            {
+                return true;
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "try_migration_to_sqlcipher4:EE:" + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
