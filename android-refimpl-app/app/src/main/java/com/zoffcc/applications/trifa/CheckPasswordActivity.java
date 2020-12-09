@@ -155,7 +155,7 @@ public class CheckPasswordActivity extends AppCompatActivity
                  */
                 // Show a progress spinner, and kick off a background task to
                 // perform the user login attempt.
-                showProgress(true);
+                showProgress(true, auto_generated_pass);
                 mAuthTask = new UserLoginTask(pass);
                 mAuthTask.execute((Boolean) true);
             }
@@ -218,7 +218,7 @@ public class CheckPasswordActivity extends AppCompatActivity
         {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            showProgress(true, auto_generated_pass);
             mAuthTask = new UserLoginTask(password1);
             mAuthTask.execute((Boolean) false);
         }
@@ -228,7 +228,7 @@ public class CheckPasswordActivity extends AppCompatActivity
      * Shows the progress UI and hides the login form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show)
+    private void showProgress(boolean show, final boolean auto_generated_password5)
     {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
@@ -236,9 +236,23 @@ public class CheckPasswordActivity extends AppCompatActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2)
         {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
             try
             {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(
+                        new AnimatorListenerAdapter()
+                        {
+                            @Override
+                            public void onAnimationEnd(Animator animation)
+                            {
+                                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                            }
+                        });
+
+                if ((!show) && (auto_generated_password5))
+                {
+                    return;
+                }
                 mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
                 mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(
                         new AnimatorListenerAdapter()
@@ -250,16 +264,6 @@ public class CheckPasswordActivity extends AppCompatActivity
                             }
                         });
 
-                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(
-                        new AnimatorListenerAdapter()
-                        {
-                            @Override
-                            public void onAnimationEnd(Animator animation)
-                            {
-                                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                            }
-                        });
             }
             catch (Exception e)
             {
@@ -272,6 +276,10 @@ public class CheckPasswordActivity extends AppCompatActivity
                 // The ViewPropertyAnimator APIs are not available, so simply show
                 // and hide the relevant UI components.
                 mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                if ((!show) && (auto_generated_password5))
+                {
+                    return;
+                }
                 mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
             catch (Exception e)
@@ -288,6 +296,7 @@ public class CheckPasswordActivity extends AppCompatActivity
     {
 
         private final String mPassword1;
+        private boolean auto_gen_pass_flag = false;
 
         UserLoginTask(String password1)
         {
@@ -297,6 +306,13 @@ public class CheckPasswordActivity extends AppCompatActivity
         @Override
         protected Boolean doInBackground(Boolean... params)
         {
+            try
+            {
+                auto_gen_pass_flag = params[0];
+            }
+            catch (Exception e)
+            {
+            }
             return check_password(mPassword1, params);
         }
 
@@ -304,7 +320,7 @@ public class CheckPasswordActivity extends AppCompatActivity
         protected void onPostExecute(final Boolean success)
         {
             mAuthTask = null;
-            showProgress(false);
+            showProgress(false, auto_gen_pass_flag);
 
             if (success)
             {
@@ -324,7 +340,7 @@ public class CheckPasswordActivity extends AppCompatActivity
         protected void onCancelled()
         {
             mAuthTask = null;
-            showProgress(false);
+            showProgress(false, auto_gen_pass_flag);
         }
     }
 
