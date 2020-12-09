@@ -331,6 +331,9 @@ public class CheckPasswordActivity extends AppCompatActivity
             }
             else
             {
+                mPasswordView1.setVisibility(View.VISIBLE);
+                mLoginFormView.setVisibility(View.VISIBLE);
+                showProgress(false, false);
                 mPasswordView1.setError("* Error *");
                 mPasswordView1.requestFocus();
             }
@@ -370,32 +373,60 @@ public class CheckPasswordActivity extends AppCompatActivity
             File database_dir = new File(new File(dbs_path).getParent());
             database_dir.mkdirs();
 
-            OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
             if (DB_ENCRYPT)
             {
-                builder = builder.provider(new EncryptedDatabase.Provider(try_password_hash));
-            }
-            OrmaDatabase orma2 = builder.name(dbs_path).
-                    readOnMainThread(AccessThreadConstraint.NONE).
-                    writeOnMainThread(AccessThreadConstraint.NONE).
-                    trace(ORMA_TRACE).
-                    build();
-            Log.i(TAG, "db:open=OK:path=" + dbs_path);
+                // builder = builder.provider(new EncryptedDatabase.Provider(try_password_hash));
 
-            try
+                Log.i(TAG, "Before net.sqlcipher loadLibs");
+                net.sqlcipher.database.SQLiteDatabase.loadLibs(this);
+                Log.i(TAG, "After net.sqlcipher loadLibs");
+
+                net.sqlcipher.database.SQLiteDatabase trifa_db = null;
+                try
+                {
+                    trifa_db = net.sqlcipher.database.SQLiteDatabase.openOrCreateDatabase(dbs_path, try_password_hash,
+                                                                                          null);
+                }
+                catch (net.sqlcipher.database.SQLiteException e)
+                {
+                    return false;
+                }
+                catch (Exception e2)
+                {
+                    return false;
+                }
+
+                if (trifa_db.isOpen())
+                {
+                    // Log.i(TAG, "db:open=OK:path=" + dbs_path + " trifa_db=" + trifa_db);
+                    Log.i(TAG, "db:open=OK");
+
+                    try
+                    {
+                        net.sqlcipher.Cursor resultSet = trifa_db.rawQuery("PRAGMA cipher_version", null);
+                        resultSet.moveToFirst();
+                        String cipher_version_ = resultSet.getString(0);
+                        resultSet.close();
+                        Log.i(TAG, "db:cipher_version_=" + cipher_version_);
+
+                        // remember hash ---------------
+                        PREF__DB_secrect_key__user_hash = try_password_hash;
+                        // remember hash ---------------
+
+                        ret = true;
+
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                    trifa_db.close();
+                }
+            }
+            else
             {
-                orma2.getConnection().close();
+                return false;
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            // remember hash ---------------
-            PREF__DB_secrect_key__user_hash = try_password_hash;
-            // remember hash ---------------
-
-            ret = true;
         }
         catch (Exception e)
         {
