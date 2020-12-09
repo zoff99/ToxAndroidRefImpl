@@ -38,12 +38,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import net.sqlcipher.database.SQLiteDatabase;
+
 import java.io.File;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import static com.zoffcc.applications.trifa.MainActivity.DB_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
+import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 
 public class CheckPasswordActivity extends AppCompatActivity
@@ -387,6 +390,8 @@ public class CheckPasswordActivity extends AppCompatActivity
                 {
                     if (try_migration_to_sqlcipher4(dbs_path, try_password_hash))
                     {
+                        try_migration_to_sqlcipher4_vfs(dbs_path, try_password_hash);
+
                         try
                         {
                             trifa_db = net.sqlcipher.database.SQLiteDatabase.openOrCreateDatabase(dbs_path,
@@ -411,6 +416,8 @@ public class CheckPasswordActivity extends AppCompatActivity
                 {
                     if (try_migration_to_sqlcipher4(dbs_path, try_password_hash))
                     {
+                        try_migration_to_sqlcipher4_vfs(dbs_path, try_password_hash);
+
                         try
                         {
                             trifa_db = net.sqlcipher.database.SQLiteDatabase.openOrCreateDatabase(dbs_path,
@@ -514,7 +521,6 @@ public class CheckPasswordActivity extends AppCompatActivity
 
             Log.i(TAG, "database=" + database);
             Log.i(TAG, "migrationOccurred[2]=" + migrationOccurred);
-
             database.close();
 
             if (migrationOccurred)
@@ -528,6 +534,93 @@ public class CheckPasswordActivity extends AppCompatActivity
             e.printStackTrace();
         }
         return false;
+    }
+
+    boolean try_migration_to_sqlcipher4_vfs(final String old_db_path, final String db_pass)
+    {
+        try
+        {
+            Log.i(TAG, "try_migration_to_sqlcipher4_vfs");
+
+            net.sqlcipher.database.SQLiteDatabaseHook mHook2 = new net.sqlcipher.database.SQLiteDatabaseHook()
+            {
+                public void preKey(net.sqlcipher.database.SQLiteDatabase database)
+                {
+                    database.rawExecSQL("PRAGMA cipher_page_size = 8192;");
+                }
+
+                public void postKey(net.sqlcipher.database.SQLiteDatabase database)
+                {
+                    String sql_ = "";
+                    String new_db_file_001 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + "newfile.db";
+                    sql_ = "ATTACH DATABASE '" + new_db_file_001 + "' AS sqlcipher4 KEY '" + db_pass + "';";
+                    database.rawExecSQL(sql_);
+                    database.rawExecSQL("SELECT sqlcipher_export('sqlcipher4');");
+                    database.rawExecSQL("DETACH DATABASE sqlcipher4;");
+                }
+            };
+
+            net.sqlcipher.database.SQLiteDatabase database2 = net.sqlcipher.database.SQLiteDatabase.openDatabase(
+                    old_db_path, db_pass, null,
+                    net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.CREATE_IF_NECESSARY, mHook2);
+
+            Log.i(TAG, "database=" + database2);
+            database2.close();
+
+
+            net.sqlcipher.database.SQLiteDatabaseHook mHook3 = new net.sqlcipher.database.SQLiteDatabaseHook()
+            {
+                public void preKey(net.sqlcipher.database.SQLiteDatabase database)
+                {
+                }
+
+                public void postKey(net.sqlcipher.database.SQLiteDatabase database)
+                {
+                    String new_db_file_001 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + "newpagesize.db";
+
+                    database.rawExecSQL("ATTACH DATABASE '" + new_db_file_001 + "' AS sq4nps KEY '" + db_pass + "';");
+                    database.rawExecSQL("PRAGMA sq4nps.cipher_page_size = 8192;");
+                    database.rawExecSQL("SELECT sqlcipher_export('sq4nps');");
+                    database.rawExecSQL("DETACH DATABASE sq4nps;");
+                }
+            };
+
+            String new_db_file_1 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + "newfile.db";
+
+            net.sqlcipher.database.SQLiteDatabase database3 = net.sqlcipher.database.SQLiteDatabase.openDatabase(
+                    new_db_file_1, db_pass, null, net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE |
+                                                  net.sqlcipher.database.SQLiteDatabase.CREATE_IF_NECESSARY, mHook3);
+
+            Log.i(TAG, "database=" + database3);
+
+            database3.close();
+
+            String encfs_path = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+            File encfs_dbs = new File(encfs_path);
+            encfs_dbs.delete();
+            String encfs_path2 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-shm";
+            File encfs_dbs2 = new File(encfs_path2);
+            encfs_dbs2.delete();
+            String encfs_path3 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-wal";
+            File encfs_dbs3 = new File(encfs_path3);
+            encfs_dbs3.delete();
+            // --------
+            String encfs_path_2 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + "newfile.db";
+            File encfs_dbs_2 = new File(encfs_path_2);
+            encfs_dbs_2.delete();
+            // --------
+            String encfs_path_3 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + "newpagesize.db";
+            File encfs_dbs_3 = new File(encfs_path_3);
+            File encfs_dbs_dest = new File(encfs_path);
+            encfs_dbs_3.renameTo(encfs_dbs_dest);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "try_migration_to_sqlcipher4:EE:" + e.getMessage());
+            e.printStackTrace();
+        } return false;
     }
 
     @Override
