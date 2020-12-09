@@ -28,7 +28,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -47,7 +49,7 @@ public class SetPasswordActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.SetPasswordActy";
 
-    private UserLoginTask mAuthTask = null;
+    private check_user_password_criteria mAuthTask = null;
 
     // UI references.
     private EditText mPasswordView1;
@@ -60,6 +62,8 @@ public class SetPasswordActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.i(TAG, "onCreate");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_password);
 
@@ -74,7 +78,7 @@ public class SetPasswordActivity extends AppCompatActivity
             {
                 if (id == R.id.set_button || id == EditorInfo.IME_NULL)
                 {
-                    attemptLogin();
+                    check_password_validity();
                     return true;
                 }
                 return false;
@@ -87,7 +91,7 @@ public class SetPasswordActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                attemptLogin();
+                check_password_validity();
             }
         });
 
@@ -122,7 +126,7 @@ public class SetPasswordActivity extends AppCompatActivity
         // create new key -------------
     }
 
-    private void attemptLogin()
+    private void check_password_validity()
     {
         Log.i(TAG, "attemptLogin");
 
@@ -187,16 +191,16 @@ public class SetPasswordActivity extends AppCompatActivity
         else
         {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the user password criteria check.
             showProgress(true);
-            mAuthTask = new UserLoginTask(password1, password2);
+            mAuthTask = new check_user_password_criteria(password1, password2);
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isPasswordValid(String password)
+    static boolean isPasswordValid(String password)
     {
-        //TODO: Replace this with your own logic
+        //TODO: Replace this with better criteria
         return password.length() > 7;
     }
 
@@ -214,24 +218,26 @@ public class SetPasswordActivity extends AppCompatActivity
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter()
-            {
-                @Override
-                public void onAnimationEnd(Animator animation)
-                {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(
+                    new AnimatorListenerAdapter()
+                    {
+                        @Override
+                        public void onAnimationEnd(Animator animation)
+                        {
+                            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                        }
+                    });
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter()
-            {
-                @Override
-                public void onAnimationEnd(Animator animation)
-                {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
+            mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(
+                    new AnimatorListenerAdapter()
+                    {
+                        @Override
+                        public void onAnimationEnd(Animator animation)
+                        {
+                            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                        }
+                    });
         }
         else
         {
@@ -247,13 +253,13 @@ public class SetPasswordActivity extends AppCompatActivity
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean>
+    public class check_user_password_criteria extends AsyncTask<Void, Void, Boolean>
     {
 
         private final String mPassword1;
         private final String mPassword2;
 
-        UserLoginTask(String password1, String password2)
+        check_user_password_criteria(String password1, String password2)
         {
             mPassword1 = password1;
             mPassword2 = password2;
@@ -268,7 +274,8 @@ public class SetPasswordActivity extends AppCompatActivity
                 return false;
             }
 
-            String try_password_hash = TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(mPassword1)));
+            String try_password_hash = TrifaSetPatternActivity.bytesToString(
+                    TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(mPassword1)));
 
             // remember hash ---------------
             PREF__DB_secrect_key__user_hash = try_password_hash;
