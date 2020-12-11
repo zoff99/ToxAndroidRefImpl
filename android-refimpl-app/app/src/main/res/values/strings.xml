@@ -424,6 +424,8 @@
     <string name="layout___online">Online</string>
     <string name="layout___copy">Copy</string>
     <string name="layout___export">Export</string>
+    <string name="layout___migdb_text">Migrating Database files</string>
+    <string name="layout___migdb_do_not_close">DO NOT close this screen</string>
     <!-- Layout texts -->
     <!-- Layout texts -->
     <!-- Layout texts -->

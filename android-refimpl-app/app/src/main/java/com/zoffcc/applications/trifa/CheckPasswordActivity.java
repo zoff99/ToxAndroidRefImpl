@@ -60,6 +60,8 @@ public class CheckPasswordActivity extends AppCompatActivity
     private EditText mPasswordView1;
     private View mProgressView;
     private View mLoginFormView;
+    private static TextView migration_text_01;
+    private static TextView migration_text_02;
     private boolean auto_generated_password = false;
 
     @Override
@@ -84,6 +86,11 @@ public class CheckPasswordActivity extends AppCompatActivity
                 return false;
             }
         });
+
+        migration_text_01 = (TextView) findViewById(R.id.migration_text_01);
+        migration_text_02 = (TextView) findViewById(R.id.migration_text_02);
+        migration_text_01.setVisibility(View.GONE);
+        migration_text_02.setVisibility(View.GONE);
 
         Button SignInButton = (Button) findViewById(R.id.set_button);
         SignInButton.setOnClickListener(new OnClickListener()
@@ -286,6 +293,63 @@ public class CheckPasswordActivity extends AppCompatActivity
         }
     }
 
+    static void migration_warning(final boolean show)
+    {
+        try
+        {
+            if (show)
+            {
+                Log.i(TAG, "migration_warning:show");
+                migration_text_01.post(new Runnable()
+                {
+
+                    @Override
+                    public void run()
+                    {
+                        migration_text_01.setVisibility(View.VISIBLE);
+                    }
+                });
+
+                migration_text_02.post(new Runnable()
+                {
+
+                    @Override
+                    public void run()
+                    {
+                        migration_text_02.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+            else
+            {
+                Log.i(TAG, "migration_warning:hide");
+                migration_text_01.post(new Runnable()
+                {
+
+                    @Override
+                    public void run()
+                    {
+                        migration_text_01.setVisibility(View.GONE);
+                    }
+                });
+
+                migration_text_02.post(new Runnable()
+                {
+
+                    @Override
+                    public void run()
+                    {
+                        migration_text_02.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "migration_warning:EE:" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     /**
      * asynchronous task used to check if password is correct to login into the DB
@@ -388,9 +452,10 @@ public class CheckPasswordActivity extends AppCompatActivity
                 }
                 catch (net.sqlcipher.database.SQLiteException e)
                 {
+                    migration_warning(true);
                     if (try_migration_to_sqlcipher4(dbs_path, try_password_hash))
                     {
-                        try_migration_to_sqlcipher4_vfs(dbs_path, try_password_hash);
+                        try_migration_to_sqlcipher4_vfs(try_password_hash);
 
                         try
                         {
@@ -400,24 +465,29 @@ public class CheckPasswordActivity extends AppCompatActivity
                         }
                         catch (net.sqlcipher.database.SQLiteException e7)
                         {
+                            migration_warning(false);
                             return false;
                         }
                         catch (Exception e2)
                         {
+                            migration_warning(false);
                             return false;
                         }
                     }
                     else
                     {
+                        migration_warning(false);
                         return false;
                     }
+
+                    migration_warning(false);
                 }
                 catch (Exception e4)
                 {
+                    migration_warning(true);
                     if (try_migration_to_sqlcipher4(dbs_path, try_password_hash))
                     {
-                        try_migration_to_sqlcipher4_vfs(dbs_path, try_password_hash);
-
+                        try_migration_to_sqlcipher4_vfs(try_password_hash);
                         try
                         {
                             trifa_db = net.sqlcipher.database.SQLiteDatabase.openOrCreateDatabase(dbs_path,
@@ -426,19 +496,25 @@ public class CheckPasswordActivity extends AppCompatActivity
                         }
                         catch (net.sqlcipher.database.SQLiteException e7)
                         {
+                            migration_warning(false);
                             return false;
                         }
                         catch (Exception e2)
                         {
+                            migration_warning(false);
                             return false;
                         }
                     }
                     else
                     {
+                        migration_warning(false);
                         return false;
                     }
+
+                    migration_warning(false);
                 }
 
+                migration_warning(false);
                 if (trifa_db.isOpen())
                 {
                     // Log.i(TAG, "db:open=OK:path=" + dbs_path + " trifa_db=" + trifa_db);
@@ -468,6 +544,7 @@ public class CheckPasswordActivity extends AppCompatActivity
             }
             else
             {
+                migration_warning(false);
                 return false;
             }
         }
@@ -477,6 +554,7 @@ public class CheckPasswordActivity extends AppCompatActivity
             Log.i(TAG, "db:open=ERROR:" + e.getMessage());
         }
 
+        migration_warning(false);
         return ret;
     }
 
@@ -536,37 +614,62 @@ public class CheckPasswordActivity extends AppCompatActivity
         return false;
     }
 
-    boolean try_migration_to_sqlcipher4_vfs(final String old_db_path, final String db_pass)
+    boolean try_migration_to_sqlcipher4_vfs(final String db_pass)
     {
         try
         {
             Log.i(TAG, "try_migration_to_sqlcipher4_vfs");
 
+            final String old_vfs_path = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
+
             net.sqlcipher.database.SQLiteDatabaseHook mHook2 = new net.sqlcipher.database.SQLiteDatabaseHook()
             {
                 public void preKey(net.sqlcipher.database.SQLiteDatabase database)
                 {
-                    database.rawExecSQL("PRAGMA cipher_page_size = 8192;");
                 }
 
                 public void postKey(net.sqlcipher.database.SQLiteDatabase database)
                 {
+                    database.rawExecSQL("PRAGMA cipher_compatibility=3;");
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:22:cipher_compatibility");
+
+                    database.rawExecSQL("PRAGMA cipher_page_size = 8192;");
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:22:cipher_page_size");
+
+                    net.sqlcipher.Cursor resultSet = database.rawQuery("select * from sqlite_master;", null);
+                    if (resultSet.getCount() == 1)
+                    {
+                        resultSet.moveToFirst();
+                        String selection = resultSet.getString(0);
+                        Log.i(TAG, "try_migration_to_sqlcipher4_vfs:res=" + selection);
+                    }
+                    resultSet.close();
+
                     String sql_ = "";
                     String new_db_file_001 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + "newfile.db";
                     sql_ = "ATTACH DATABASE '" + new_db_file_001 + "' AS sqlcipher4 KEY '" + db_pass + "';";
                     database.rawExecSQL(sql_);
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:ATTACH DATABASE");
                     database.rawExecSQL("SELECT sqlcipher_export('sqlcipher4');");
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:export");
                     database.rawExecSQL("DETACH DATABASE sqlcipher4;");
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:DETACH DATABASE");
                 }
             };
 
             net.sqlcipher.database.SQLiteDatabase database2 = net.sqlcipher.database.SQLiteDatabase.openDatabase(
-                    old_db_path, db_pass, null,
+                    old_vfs_path, db_pass, null,
                     net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.CREATE_IF_NECESSARY, mHook2);
 
-            Log.i(TAG, "database=" + database2);
-            database2.close();
+            Log.i(TAG, "try_migration_to_sqlcipher4_vfs:database:A=" + database2);
 
+            Log.i(TAG, "try_migration_to_sqlcipher4_vfs:database:A=" + database2.isWriteAheadLoggingEnabled());
+            Log.i(TAG, "try_migration_to_sqlcipher4_vfs:database:A=" + database2.getPath());
+            Log.i(TAG, "try_migration_to_sqlcipher4_vfs:database:A=" + database2.getPageSize());
+            Log.i(TAG, "try_migration_to_sqlcipher4_vfs:database:A=" + database2.isDatabaseIntegrityOk());
+
+            database2.rawExecSQL("select count(*) from meta_data;");
+            database2.close();
 
             net.sqlcipher.database.SQLiteDatabaseHook mHook3 = new net.sqlcipher.database.SQLiteDatabaseHook()
             {
@@ -577,11 +680,14 @@ public class CheckPasswordActivity extends AppCompatActivity
                 public void postKey(net.sqlcipher.database.SQLiteDatabase database)
                 {
                     String new_db_file_001 = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + "newpagesize.db";
-
                     database.rawExecSQL("ATTACH DATABASE '" + new_db_file_001 + "' AS sq4nps KEY '" + db_pass + "';");
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:B:ATTACH DATABASE");
                     database.rawExecSQL("PRAGMA sq4nps.cipher_page_size = 8192;");
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:B:PRAGMA cipher_page_size");
                     database.rawExecSQL("SELECT sqlcipher_export('sq4nps');");
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:B:export");
                     database.rawExecSQL("DETACH DATABASE sq4nps;");
+                    Log.i(TAG, "try_migration_to_sqlcipher4_vfs:B:DETACH DATABASE");
                 }
             };
 
@@ -591,7 +697,7 @@ public class CheckPasswordActivity extends AppCompatActivity
                     new_db_file_1, db_pass, null, net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE |
                                                   net.sqlcipher.database.SQLiteDatabase.CREATE_IF_NECESSARY, mHook3);
 
-            Log.i(TAG, "database=" + database3);
+            Log.i(TAG, "try_migration_to_sqlcipher4_vfs:database:B=" + database3);
 
             database3.close();
 
@@ -618,9 +724,10 @@ public class CheckPasswordActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            Log.i(TAG, "try_migration_to_sqlcipher4:EE:" + e.getMessage());
+            Log.i(TAG, "try_migration_to_sqlcipher4_vfs:EE:" + e.getMessage());
             e.printStackTrace();
-        } return false;
+        }
+        return false;
     }
 
     @Override
