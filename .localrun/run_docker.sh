@@ -84,7 +84,7 @@ mkdir -p /root/work/deploy/
 mkdir -p /root/.android/
 
 echo "make a local copy ..."
-redirect_cmd rsync -avz --exclude=".localrun" ./ /root/work/
+redirect_cmd rsync -avz --exclude=".localrun" --exclude="local.properties" ./ /root/work/
 
 cd /root/work/
 mkdir -p build_dir
@@ -94,6 +94,8 @@ bash ../circle_scripts/deps.sh || exit 1
 
 cd /root/work/build_dir/
 bash ../circle_scripts/trifa.sh || exit 1
+
+cp -av /root/work//artefacts//_circleci_.apk /artefacts/trifa_localrun.apk
 
 chmod a+rwx -R /workspace/
 chmod a+rwx -R /artefacts/
