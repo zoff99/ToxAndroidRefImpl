@@ -101,6 +101,9 @@ for i in $pkgs ; do
 done
 
 
+wget "https://raw.githubusercontent.com/libav/gas-preprocessor/master/gas-preprocessor.pl" -O /usr/bin/gas-preprocessor.pl
+chmod a+rx /usr/bin/gas-preprocessor.pl
+
 
 export ORIG_PATH_=$PATH
 
@@ -139,6 +142,7 @@ export AND_TOOLCHAIN_ARCH2="arm-linux-androideabi"
 export AND_PATH="$_toolchain_/arm-linux-androideabi/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
+export AND_AS="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang-as"
 export AND_GCC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
 export AND_CXX="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang++"
 export AND_READELF="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-readelf"
@@ -217,7 +221,7 @@ if [ "$full""x" == "1x" ]; then
 
 
 
-    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
+    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export AS="$AND_AS";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
     chmod u+x $_HOME_/pp
     rm -Rf "$_s_"
     mkdir -p "$_s_"
@@ -273,22 +277,10 @@ if [ "$full""x" == "1x" ]; then
     ELDFLAGS=""
     ARCH_SPECIFIC="--arch=arm --cpu=armv7-a --cross-prefix=arm-linux-androideabi- --enable-cross-compile"
 
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    echo "$AND_CC"
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-
     $_s_/libav/configure \
         --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
         ${ARCH_SPECIFIC} \
         --target-os=android \
-        --as=$AND_CC \
         --sysroot="$_toolchain_"/arm-linux-androideabi/sysroot \
         --extra-cflags="$ECFLAGS" \
         --extra-ldflags="$ELDFLAGS" \
@@ -310,6 +302,7 @@ if [ "$full""x" == "1x" ]; then
         --enable-mediacodec \
         --enable-decoder=h264_mediacodec \
         --enable-gpl --enable-decoder=h264 || exit 1
+
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
     # --- LIBAV ---
@@ -700,6 +693,7 @@ export AND_TOOLCHAIN_ARCH3="aarch64-linux-android"
 export AND_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang"
+export AND_AS="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang-as"
 export AND_GCC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang"
 export AND_CXX="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang++"
 export AND_READELF="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-readelf"
@@ -777,7 +771,7 @@ if [ "$full""x" == "1x" ]; then
 
 
 
-    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
+    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export AS="$AND_AS";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
     chmod u+x $_HOME_/pp
     rm -Rf "$_s_"
     mkdir -p "$_s_"
@@ -1254,6 +1248,7 @@ export AND_TOOLCHAIN_ARCH2="x86"
 export AND_PATH="$_toolchain_/x86/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/x86/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/x86/bin/i686-linux-android-clang"
+export AND_AS="$_toolchain_/x86/bin/i686-linux-android-clang-as"
 export AND_GCC="$_toolchain_/x86/bin/i686-linux-android-clang"
 export AND_CXX="$_toolchain_/x86/bin/i686-linux-android-clang++"
 export AND_READELF="$_toolchain_/x86/bin/i686-linux-android-readelf"
@@ -1330,7 +1325,7 @@ if [ "$full""x" == "1x" ]; then
 
 
 
-    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
+    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export AS="$AND_AS";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
     chmod u+x $_HOME_/pp
     rm -Rf "$_s_"
     mkdir -p "$_s_"
@@ -1666,6 +1661,7 @@ export AND_TOOLCHAIN_ARCH3="x86_64-linux-android"
 export AND_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang"
+export AND_CS="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang-as"
 export AND_GCC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang"
 export AND_CXX="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang++"
 export AND_READELF="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-readelf"
@@ -1742,7 +1738,7 @@ if [ "$full""x" == "1x" ]; then
 
 
 
-    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
+    echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export AS="$AND_AS";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
     chmod u+x $_HOME_/pp
     rm -Rf "$_s_"
     mkdir -p "$_s_"
