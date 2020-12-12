@@ -273,10 +273,22 @@ if [ "$full""x" == "1x" ]; then
     ELDFLAGS=""
     ARCH_SPECIFIC="--arch=arm --cpu=armv7-a --cross-prefix=arm-linux-androideabi- --enable-cross-compile"
 
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo "$AND_CC"
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
     $_s_/libav/configure \
         --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
         ${ARCH_SPECIFIC} \
         --target-os=android \
+        --as=$AND_CC \
         --sysroot="$_toolchain_"/arm-linux-androideabi/sysroot \
         --extra-cflags="$ECFLAGS" \
         --extra-ldflags="$ELDFLAGS" \
