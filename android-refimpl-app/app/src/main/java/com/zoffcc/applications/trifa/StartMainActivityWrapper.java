@@ -74,35 +74,51 @@ public class StartMainActivityWrapper extends AppCompatActivity
 
         boolean already_mounted = false;
 
+        Log.i(TAG, "0001");
         /* if the database is already mounted, then it means its already unlocked */
         try
         {
+            Log.i(TAG, "0002");
             if (vfs.isMounted())
             {
+                Log.i(TAG, "0003");
                 already_mounted = true;
+                Log.i(TAG, "0004");
             }
+            Log.i(TAG, "0005");
         }
         catch (Exception e)
         {
+            Log.i(TAG, "0006");
             e.printStackTrace();
         }
 
+        Log.i(TAG, "0007");
+
         if (already_mounted)
         {
+            Log.i(TAG, "0008");
             /* skip the password enter screen
              * jump directly to MainActivity and try to mount/use the Database
              */
             Intent pattern = new Intent(this, MainActivity.class);
             startActivity(pattern);
+
+            Log.i(TAG, "0009");
+
             finish();
         }
         else
         {
+            Log.i(TAG, "0010");
+
             /* now we need to figure out if this is the first time the user starts this app
              */
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
             boolean pw_set_screen_done = settings.getBoolean("PW_SET_SCREEN_DONE", false);
             set_pattern = !pw_set_screen_done;
+
+            Log.i(TAG, "0011");
 
             if (set_pattern)
             {
@@ -115,6 +131,8 @@ public class StartMainActivityWrapper extends AppCompatActivity
             }
             else
             {
+                Log.i(TAG, "0012");
+
                 /* the user has already started the app and set a password
                  * now prompt to enter the password
                  */

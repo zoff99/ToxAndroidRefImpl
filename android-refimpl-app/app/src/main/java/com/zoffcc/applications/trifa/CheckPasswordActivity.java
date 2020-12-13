@@ -112,20 +112,27 @@ public class CheckPasswordActivity extends AppCompatActivity
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         final String DB_secrect_key__tmp = settings.getString("DB_secrect_key", "");
 
+        Log.i(TAG, "001");
+
         if (!TextUtils.isEmpty(DB_secrect_key__tmp))
         {
+            Log.i(TAG, "002");
             mPasswordView1.setVisibility(View.INVISIBLE);
             mLoginFormView.setVisibility(View.INVISIBLE);
 
             auto_generated_password = true;
             Log.i(TAG, "auto_generated_password:true");
+            Log.i(TAG, "003");
             attemptUnlock(true, DB_secrect_key__tmp);
+            Log.i(TAG, "004");
         }
         else
         {
+            Log.i(TAG, "005");
             mPasswordView1.setVisibility(View.VISIBLE);
             mLoginFormView.setVisibility(View.VISIBLE);
         }
+        Log.i(TAG, "006");
     }
 
 
@@ -133,10 +140,15 @@ public class CheckPasswordActivity extends AppCompatActivity
     {
         Log.i(TAG, "attemptUnlock:auto_generated_pass=" + auto_generated_pass);
 
+        Log.i(TAG, "007");
+
         if (mAuthTask != null)
         {
+            Log.i(TAG, "008");
             return;
         }
+
+        Log.i(TAG, "009");
 
         try
         {
@@ -146,6 +158,8 @@ public class CheckPasswordActivity extends AppCompatActivity
         catch (Exception e)
         {
         }
+
+        Log.i(TAG, "010");
 
         if (auto_generated_pass)
         {
@@ -169,6 +183,8 @@ public class CheckPasswordActivity extends AppCompatActivity
         boolean cancel = false;
         View focusView = null;
 
+        Log.i(TAG, "011");
+
         // Reset errors.
         try
         {
@@ -189,6 +205,8 @@ public class CheckPasswordActivity extends AppCompatActivity
             cancel = true;
         }
 
+        Log.i(TAG, "012");
+
         if (!cancel)
         {
             if (TextUtils.isEmpty(password1))
@@ -196,6 +214,7 @@ public class CheckPasswordActivity extends AppCompatActivity
                 mPasswordView1.setError("Enter Password");
                 focusView = mPasswordView1;
                 cancel = true;
+                Log.i(TAG, "013");
             }
 
             // Check for a valid password, if the user entered one.
@@ -204,15 +223,22 @@ public class CheckPasswordActivity extends AppCompatActivity
                 mPasswordView1.setError("Invalid Password");
                 focusView = mPasswordView1;
                 cancel = true;
+                Log.i(TAG, "014");
             }
         }
 
         if (cancel)
         {
+            Log.i(TAG, "015");
+
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             try
             {
+                Log.i(TAG, "016");
+                showProgress(false, false);
+                mPasswordView1.setVisibility(View.VISIBLE);
+                mLoginFormView.setVisibility(View.VISIBLE);
                 focusView.requestFocus();
             }
             catch (Exception e)
@@ -221,6 +247,9 @@ public class CheckPasswordActivity extends AppCompatActivity
         }
         else
         {
+            Log.i(TAG, "018");
+
+
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true, auto_generated_pass);
