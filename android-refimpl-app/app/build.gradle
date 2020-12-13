@@ -212,6 +212,15 @@ android {
             proguardFiles = buildTypes.debug.proguardFiles
             testProguardFile 'proguard-project-test.pro'
         }
+
+        /*
+        flavorDimensions "version"
+        productFlavors {
+            full {
+                dimension "version"
+            }
+        }
+        */
     }
 }
 
