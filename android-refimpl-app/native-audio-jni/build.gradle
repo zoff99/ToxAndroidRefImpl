@@ -43,6 +43,13 @@ android {
         }
     }
 
+    flavorDimensions "version"
+    productFlavors {
+        full {
+            dimension "version"
+        }
+    }
+
     externalNativeBuild {
         cmake {
             // version "3.10.2"

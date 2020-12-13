@@ -119,7 +119,7 @@ import info.guardianproject.netcipher.proxy.StatusCallback;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
-import static com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging;
+// import static com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
@@ -5804,9 +5804,9 @@ public class MainActivity extends AppCompatActivity
             try
 
             {
-                System.loadLibrary("loggingstdout");
-                Log.i(TAG, "successfully loaded loggingstdout library");
-                start_logging();
+                //System.loadLibrary("loggingstdout");
+                //Log.i(TAG, "successfully loaded loggingstdout library");
+                //start_logging();
             }
             catch (java.lang.UnsatisfiedLinkError e)
             {
