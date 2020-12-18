@@ -76,6 +76,7 @@ import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_not
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
@@ -1903,6 +1904,10 @@ public class HelperGeneric
         long res = MainActivity.tox_util_friend_send_message_v2(friendnum_to_use, a_TOX_MESSAGE_TYPE, t_sec, message,
                                                                 message.length(), raw_message_buf,
                                                                 raw_message_length_buf, msg_id_buffer);
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:002:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
         int raw_message_length_int = raw_message_length_buf.

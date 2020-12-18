@@ -119,7 +119,6 @@ import info.guardianproject.netcipher.proxy.StatusCallback;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
-// import static com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
@@ -228,6 +227,8 @@ import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
+
+// import static com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging;
 
 /*
 
@@ -3861,6 +3862,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_read_receipt_message_v2_cb_method(final long friend_number, long ts_sec, byte[] msg_id)
     {
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:003:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
         msg_id_buffer.put(msg_id, 0, (int) TOX_HASH_LENGTH);
@@ -3928,6 +3933,10 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
     {
         // Log.i(TAG, "friend_read_receipt:friend:" + friend_number + " message_id:" + message_id);
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:004:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
         try
@@ -3991,6 +4000,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
     {
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:005:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         HelperGeneric.receive_incoming_message(1, friend_number, friend_message, raw_message, raw_message_length, null);
     }
@@ -4023,6 +4036,10 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:006:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " full rawmsg    =" + bytes_to_hex(raw_message));
         // Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " wrapped rawdata=" + bytes_to_hex(raw_data));
@@ -4136,6 +4153,11 @@ public class MainActivity extends AppCompatActivity
                     }
                     else
                     {
+                        // sync message from unkown original sender
+                        // still send "receipt" to our relay, or else it will send us this message forever
+                        Log.i(TAG, "friend_sync_message_v2_cb:send receipt for unknown message");
+                        send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer);
+
                         return;
                     }
                 }
@@ -4213,6 +4235,10 @@ public class MainActivity extends AppCompatActivity
     // --- incoming message ---
     static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
     {
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:007:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         HelperGeneric.receive_incoming_message(0, friend_number, friend_message, null, 0, null);
     }
@@ -4222,6 +4248,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_control_cb_method(long friend_number, long file_number, int a_TOX_FILE_CONTROL)
     {
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:008:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG, "file_recv_control:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_CONTROL);
 
@@ -4326,6 +4356,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_chunk_request_cb_method(long friend_number, long file_number, long position, long length)
     {
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:009:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
         // Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
@@ -4526,6 +4560,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
     {
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:010:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG,
         //       "file_recv:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" +
@@ -4685,6 +4723,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
     {
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:011:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
         // Log.i(TAG, "file_recv_chunk:--START--");

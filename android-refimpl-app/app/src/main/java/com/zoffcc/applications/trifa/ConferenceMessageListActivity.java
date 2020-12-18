@@ -65,8 +65,8 @@ import static com.zoffcc.applications.trifa.HelperConference.is_conference_activ
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
-import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
@@ -220,7 +220,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             // since it takes a lot of screen space
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
         }
 
@@ -557,6 +557,10 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         int res = tox_conference_send_message(tox_conference_by_confid__wrapper(conf_id), 0, msg);
                         // Log.i(TAG, "tox_conference_send_message:result=" + res + " m=" + m);
+                        if (PREF__X_battery_saving_mode)
+                        {
+                            Log.i(TAG, "global_last_activity_for_battery_savings_ts:001:*PING*");
+                        }
                         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
                         if (res > -1)
