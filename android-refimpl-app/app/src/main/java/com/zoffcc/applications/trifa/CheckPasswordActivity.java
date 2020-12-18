@@ -161,6 +161,8 @@ public class CheckPasswordActivity extends AppCompatActivity
 
         Log.i(TAG, "010");
 
+        boolean skip_login_form = false;
+
         if (auto_generated_pass)
         {
             if (pass == null)
@@ -174,9 +176,12 @@ public class CheckPasswordActivity extends AppCompatActivity
                  */
                 // Show a progress spinner, and kick off a background task to
                 // perform the user login attempt.
+                Log.i(TAG, "010a");
                 showProgress(true, auto_generated_pass);
+                Log.i(TAG, "010b");
                 mAuthTask = new UserLoginTask(pass);
                 mAuthTask.execute((Boolean) true);
+                skip_login_form = true;
             }
         }
 
@@ -185,76 +190,80 @@ public class CheckPasswordActivity extends AppCompatActivity
 
         Log.i(TAG, "011");
 
-        // Reset errors.
-        try
+        if (!skip_login_form)
         {
-            mPasswordView1.setError(null);
-        }
-        catch (Exception e)
-        {
-            cancel = true;
-        }
 
-        String password1 = null;
-        try
-        {
-            password1 = mPasswordView1.getText().toString();
-        }
-        catch (Exception e)
-        {
-            cancel = true;
-        }
-
-        Log.i(TAG, "012");
-
-        if (!cancel)
-        {
-            if (TextUtils.isEmpty(password1))
-            {
-                mPasswordView1.setError("Enter Password");
-                focusView = mPasswordView1;
-                cancel = true;
-                Log.i(TAG, "013");
-            }
-
-            // Check for a valid password, if the user entered one.
-            if (!TextUtils.isEmpty(password1) && !SetPasswordActivity.isPasswordValid(password1))
-            {
-                mPasswordView1.setError("Invalid Password");
-                focusView = mPasswordView1;
-                cancel = true;
-                Log.i(TAG, "014");
-            }
-        }
-
-        if (cancel)
-        {
-            Log.i(TAG, "015");
-
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
+            // Reset errors.
             try
             {
-                Log.i(TAG, "016");
-                showProgress(false, false);
-                mPasswordView1.setVisibility(View.VISIBLE);
-                mLoginFormView.setVisibility(View.VISIBLE);
-                focusView.requestFocus();
+                mPasswordView1.setError(null);
             }
             catch (Exception e)
             {
+                cancel = true;
             }
-        }
-        else
-        {
-            Log.i(TAG, "018");
+
+            String password1 = null;
+            try
+            {
+                password1 = mPasswordView1.getText().toString();
+            }
+            catch (Exception e)
+            {
+                cancel = true;
+            }
+
+            Log.i(TAG, "012");
+
+            if (!cancel)
+            {
+                if (TextUtils.isEmpty(password1))
+                {
+                    mPasswordView1.setError("Enter Password");
+                    focusView = mPasswordView1;
+                    cancel = true;
+                    Log.i(TAG, "013");
+                }
+
+                // Check for a valid password, if the user entered one.
+                if (!TextUtils.isEmpty(password1) && !SetPasswordActivity.isPasswordValid(password1))
+                {
+                    mPasswordView1.setError("Invalid Password");
+                    focusView = mPasswordView1;
+                    cancel = true;
+                    Log.i(TAG, "014");
+                }
+            }
+
+            if (cancel)
+            {
+                Log.i(TAG, "015");
+
+                // There was an error; don't attempt login and focus the first
+                // form field with an error.
+                try
+                {
+                    Log.i(TAG, "016");
+                    showProgress(false, false);
+                    mPasswordView1.setVisibility(View.VISIBLE);
+                    mLoginFormView.setVisibility(View.VISIBLE);
+                    focusView.requestFocus();
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            else
+            {
+                Log.i(TAG, "018");
 
 
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true, auto_generated_pass);
-            mAuthTask = new UserLoginTask(password1);
-            mAuthTask.execute((Boolean) false);
+                // Show a progress spinner, and kick off a background task to
+                // perform the user login attempt.
+                showProgress(true, auto_generated_pass);
+                mAuthTask = new UserLoginTask(password1);
+                mAuthTask.execute((Boolean) false);
+            }
         }
     }
 
@@ -410,11 +419,14 @@ public class CheckPasswordActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(final Boolean success)
         {
+            Log.i(TAG, "onPostExecute:001");
             mAuthTask = null;
             showProgress(false, auto_gen_pass_flag);
+            Log.i(TAG, "onPostExecute:002");
 
             if (success)
             {
+                Log.i(TAG, "onPostExecute:003");
                 // ok open main activity
                 Intent main_act = new Intent(CheckPasswordActivity.this, MainActivity.class);
                 startActivity(main_act);
