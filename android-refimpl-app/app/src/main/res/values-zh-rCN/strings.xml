@@ -331,4 +331,6 @@
     <string name="pref_description_force_udp_only">这会强制仅UDP模式，此设定开启情况下可能无法联系到某些联系人。
 \n更改需重启应用！</string>
     <string name="pref_title_force_udp_only">强制 UDP模式</string>
+    <string name="layout___migdb_do_not_close">不要关闭这个屏幕</string>
+    <string name="layout___migdb_text">正在迁移数据库文件</string>
 </resources>
