@@ -135,7 +135,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_view_incl
 import static com.zoffcc.applications.trifa.CallingActivity.update_calling_friend_connection_status;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.GroupAudioService.do_update_group_title;
-import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds;
+import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
@@ -4119,14 +4119,20 @@ public class MainActivity extends AppCompatActivity
 
                         // now check if this is "potentially" a double message, we can not be sure a 100%
                         // since there is no uniqe key for each message
-                        ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds(
-                                real_conference_id, 20);
+                        ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
+                                real_conference_id, real_sender_peer_pubkey, 80);
 
-                        // Log.i(TAG, "friend_sync_message_v2_cb:last_cm=" + cm);
-                        // Log.i(TAG, "friend_sync_message_v2_cb:real_sender_peer_pubkey=" + real_sender_peer_pubkey);
-                        // Log.i(TAG, "friend_sync_message_v2_cb:cm.tox_peerpubkey=" + cm.tox_peerpubkey);
-                        // Log.i(TAG, "friend_sync_message_v2_cb:real_sender_text=" + real_sender_text);
-                        // Log.i(TAG, "friend_sync_message_v2_cb:cm.text=" + cm.tox_peerpubkey);
+                        /*
+                        Log.i(TAG, "friend_sync_message_v2_cb:last_cm=" + cm);
+                        Log.i(TAG, "friend_sync_message_v2_cb:real_sender_peer_pubkey=" + real_sender_peer_pubkey);
+                        Log.i(TAG, "friend_sync_message_v2_cb:real_sender_text=" + real_sender_text);
+                        if (cm != null)
+                        {
+                            Log.i(TAG, "friend_sync_message_v2_cb:cm.tox_peerpubkey=" + cm.tox_peerpubkey);
+                            Log.i(TAG, "friend_sync_message_v2_cb:cm.text=" + cm.text);
+                            Log.i(TAG, "friend_sync_message_v2_cb:cm.was_synced=" + cm.was_synced);
+                        }
+                        */
 
                         if (cm != null)
                         {
@@ -4134,7 +4140,11 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (cm.text.equals(real_sender_text))
                                 {
+                                    Log.i(TAG,
+                                          "tox_callback_friend_sync_message_v2_cb_method:potentially double message");
                                     // ok it's a "potentially" double message
+                                    // just ignore it, but still send "receipt" to proxy so it won't send this message again
+                                    send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer);
                                     return;
                                 }
                             }
@@ -5207,6 +5217,7 @@ public class MainActivity extends AppCompatActivity
         m.rcvd_timestamp = System.currentTimeMillis();
         m.sent_timestamp = System.currentTimeMillis();
         m.text = message;
+        m.was_synced = false;
 
         try
         {
@@ -5353,6 +5364,7 @@ public class MainActivity extends AppCompatActivity
                 m.sent_timestamp = System.currentTimeMillis();
                 String peer_name_temp = "Unknown";
                 String peer_name_temp2 = null;
+                m.was_synced = false;
 
                 try
                 {
@@ -5567,6 +5579,7 @@ public class MainActivity extends AppCompatActivity
                 m.sent_timestamp = System.currentTimeMillis();
                 String peer_name_temp = "Unknown";
                 String peer_name_temp2 = null;
+                m.was_synced = false;
 
                 try
                 {

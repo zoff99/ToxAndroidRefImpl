@@ -552,6 +552,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     m.sent_timestamp = System.currentTimeMillis();
                     m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
                     m.text = msg;
+                    m.was_synced = false;
 
                     if ((msg != null) && (!msg.equalsIgnoreCase("")))
                     {

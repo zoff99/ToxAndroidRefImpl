@@ -386,6 +386,7 @@ public class HelperGeneric
         m.sent_timestamp = sent_timestamp_in_ms;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = message;
+        m.was_synced = true;
 
         try
         {

@@ -19,11 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
-import androidx.annotation.Nullable;
-
 import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
+
+import androidx.annotation.Nullable;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 
@@ -70,6 +70,10 @@ public class ConferenceMessage
     @Nullable
     String text = null;
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    boolean was_synced = false;
+
     static ConferenceMessage deep_copy(ConferenceMessage in)
     {
         ConferenceMessage out = new ConferenceMessage();
@@ -84,6 +88,7 @@ public class ConferenceMessage
         out.is_new = in.is_new;
         out.text = in.text;
         out.tox_peername = in.tox_peername;
+        out.was_synced = in.was_synced;
 
         return out;
     }
@@ -91,10 +96,9 @@ public class ConferenceMessage
     @Override
     public String toString()
     {
-        return "id=" + id + ", tox_peername=" + tox_peername +
-            ", tox_peerpubkey=" + "*tox_peerpubkey*" + ", direction=" + direction +
-            ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE +
-            ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp +
-            ", read=" + read + ", text=" + "xxxxxx" + ", is_new=" + is_new;
+        return "id=" + id + ", tox_peername=" + tox_peername + ", tox_peerpubkey=" + "*tox_peerpubkey*" +
+               ", direction=" + direction + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" +
+               TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp +
+               ", read=" + read + ", text=" + "xxxxxx" + ", is_new=" + is_new + ", was_synced=" + was_synced;
     }
 }

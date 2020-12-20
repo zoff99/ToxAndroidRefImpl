@@ -738,10 +738,17 @@ public class TrifaToxService extends Service
 
                     if (need_migrate_old_conf_msg_date == true)
                     {
-                        orma.getConnection().execSQL(
-                                "update ConferenceMessage set sent_timestamp=rcvd_timestamp" + " where " +
-                                " sent_timestamp='0'");
-                        Log.i(TAG, "onCreate:migrate_old_conf_msg_date");
+                        try
+                        {
+                            orma.getConnection().execSQL(
+                                    "update ConferenceMessage set sent_timestamp=rcvd_timestamp" + " where " +
+                                    " sent_timestamp='0'");
+                            Log.i(TAG, "onCreate:migrate_old_conf_msg_date");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.i(TAG, "onCreate:migrate_old_conf_msg_date:EE01");
+                        }
                         // now remember that we did that, and don't do it again
                         set_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done", "true");
                     }
@@ -752,6 +759,21 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "onCreate:migrate_old_conf_msg_date:EE:" + e.getMessage());
                 }
                 // ----- convert old conference messages which did not contain a sent timestamp -----
+
+                // ----- convert old NULL's into false -----
+                try
+                {
+                    orma.getConnection().execSQL(
+                            "update ConferenceMessage set was_synced=false" + " where " +
+                            " was_synced is NULL");
+                    Log.i(TAG, "onCreate:migrate_was_synced");
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onCreate:migrate_was_synced:EE01");
+                }
+                // ----- convert old NULL's into false -----
+
 
                 // TODO --------
                 String my_tox_id_local = get_my_toxid();
