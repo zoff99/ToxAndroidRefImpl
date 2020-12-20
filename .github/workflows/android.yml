@@ -34,4 +34,6 @@ jobs:
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
-        script: cd android-refimpl-app # ; ./gradlew connectedAndroidTest
+        # ndk: 16.1.4479499
+        ndk: 21.0.6113669
+        script: cd android-refimpl-app ; ./gradlew connectedAndroidTest
