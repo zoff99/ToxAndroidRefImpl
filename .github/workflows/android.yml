@@ -38,10 +38,13 @@ jobs:
         ndk: 21.0.6113669
         emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
         script: |
-          screencapture -T 400 -x -t png /Users/runner/screen01.png &
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           printf 'dependencyVerification {\nverify = [\n]\n}\n' > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           cd android-refimpl-app ; ./gradlew assemble
+          screencapture -T 20 -x -t png /Users/runner/screen01.png &
+          screencapture -T 30 -x -t png /Users/runner/screen02.png &
+          screencapture -T 40 -x -t png /Users/runner/screen03.png &
+          screencapture -T 50 -x -t png /Users/runner/screen04.png &
           cd android-refimpl-app ; ./gradlew connectedAndroidTest
 
     - name: upload screenshots
