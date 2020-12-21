@@ -36,10 +36,12 @@ jobs:
         api-level: 29
         # ndk: 16.1.4479499
         ndk: 21.0.6113669
+        emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
         script: cd android-refimpl-app ; screencapture -x /Users/runner/screen01.jpg ; ./gradlew connectedAndroidTest ; screencapture -x /Users/runner/screen02.jpg
 
     - name: upload screenshots
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: macscreen
-        path: /Users/runner/screen02.jpg
+        path: |
+          /Users/runner/screen*.jpg
