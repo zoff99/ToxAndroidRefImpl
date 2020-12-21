@@ -30,6 +30,9 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
+    - name: install cliclick
+      run:  brew install cliclick
+
     - name: android test
       uses: reactivecircus/android-emulator-runner@v2
       with:
@@ -41,6 +44,7 @@ jobs:
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           printf 'dependencyVerification {\nverify = [\n]\n}\n' > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           cd android-refimpl-app ; ./gradlew assemble
+          cliclick -m verbose m:12,34
           screencapture -T 20 -x -t png /Users/runner/screen01.png &
           screencapture -T 30 -x -t png /Users/runner/screen02.png &
           screencapture -T 40 -x -t png /Users/runner/screen03.png &
