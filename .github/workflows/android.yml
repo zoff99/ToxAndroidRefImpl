@@ -39,9 +39,9 @@ jobs:
         emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
         script: |
           cd android-refimpl-app
-          \( screencapture -T 400 -x -t png /Users/runner/screen01.png & \)
+          { screencapture -T 400 -x -t png /Users/runner/screen01.png & }
           ./gradlew assemble
-          \( screencapture -T 70 -x -t png /Users/runner/screen02.png & \)
+          { screencapture -T 70 -x -t png /Users/runner/screen02.png & }
           ./gradlew connectedAndroidTest
 
     - name: upload screenshots
