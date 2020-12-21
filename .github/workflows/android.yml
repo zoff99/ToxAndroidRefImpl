@@ -45,12 +45,12 @@ jobs:
           printf 'dependencyVerification {\nverify = [\n]\n}\n' > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           cd android-refimpl-app ; ./gradlew assemble
           cliclick -m verbose m:12,34
-          screencapture -T 35 -x -t png /Users/runner/screen01.png &
-          screencapture -T 40 -x -t png /Users/runner/screen02.png &
-          screencapture -T 41 -x -t png /Users/runner/screen03.png &
-          screencapture -T 42 -x -t png /Users/runner/screen04.png &
-          screencapture -T 43 -x -t png /Users/runner/screen05.png &
-          screencapture -T 45 -x -t png /Users/runner/screen06.png &
+          screencapture -T 42 -x -t png /Users/runner/screen01.png &
+          screencapture -T 43 -x -t png /Users/runner/screen02.png &
+          screencapture -T 43 -x -t png /Users/runner/screen03.png &
+          screencapture -T 44 -x -t png /Users/runner/screen04.png &
+          screencapture -T 45 -x -t png /Users/runner/screen05.png &
+          screencapture -T 46 -x -t png /Users/runner/screen06.png &
           screencapture -T 50 -x -t png /Users/runner/screen07.png &
           cd android-refimpl-app ; ./gradlew connectedAndroidTest
 
