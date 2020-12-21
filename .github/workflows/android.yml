@@ -38,12 +38,9 @@ jobs:
         ndk: 21.0.6113669
         emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
         script: |
-          echo 'screencapture -T 400 -x -t png /Users/runner/screen01.png &' > /Users/runner/a.sh
-          chmod a+x /Users/runner/a.sh
-          /Users/runner/a.sh
-          cd android-refimpl-app
-          ./gradlew assemble
-          ./gradlew connectedAndroidTest
+          screencapture -T 400 -x -t png /Users/runner/screen01.png &
+          cd android-refimpl-app ; ./gradlew assemble
+          cd android-refimpl-app ; ./gradlew connectedAndroidTest
 
     - name: upload screenshots
       uses: actions/upload-artifact@v2
