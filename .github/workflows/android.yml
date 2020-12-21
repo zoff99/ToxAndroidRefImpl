@@ -36,4 +36,10 @@ jobs:
         api-level: 29
         # ndk: 16.1.4479499
         ndk: 21.0.6113669
-        script: cd android-refimpl-app ; ./gradlew connectedAndroidTest
+        script: cd android-refimpl-app ; screencapture -x /Users/runner/screen01.jpg ; ./gradlew connectedAndroidTest ; screencapture -x /Users/runner/screen02.jpg
+
+    - name: upload screenshots
+      uses: actions/upload-artifact@v1
+      with:
+        name: macscreen
+        path: /Users/runner/screen02.jpg
