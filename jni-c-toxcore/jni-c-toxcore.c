@@ -864,7 +864,7 @@ void get_my_toxid(Tox *tox, char *toxid_str)
     tox_self_get_address(tox, tox_id_bin);
     char tox_id_hex_local[TOX_ADDRESS_SIZE*2 + 1];
     CLEAR(tox_id_hex_local);
-    sodium_bin2hex(tox_id_hex_local, (TOX_ADDRESS_SIZE * 2), tox_id_bin, TOX_ADDRESS_SIZE);
+    sodium_bin2hex(tox_id_hex_local, (TOX_ADDRESS_SIZE * 2 + 1), tox_id_bin, TOX_ADDRESS_SIZE);
 
     for(size_t i = 0; i < (TOX_ADDRESS_SIZE * 2); i ++)
     {
@@ -888,7 +888,7 @@ void toxid_bin_to_hex(const uint8_t *toxid, char *toxid_str)
 {
     char tox_id_hex_local[TOX_ADDRESS_SIZE*2 + 1];
     CLEAR(tox_id_hex_local);
-    sodium_bin2hex(tox_id_hex_local, (TOX_ADDRESS_SIZE * 2), toxid, TOX_ADDRESS_SIZE);
+    sodium_bin2hex(tox_id_hex_local, (TOX_ADDRESS_SIZE * 2 + 1), toxid, TOX_ADDRESS_SIZE);
 
     for(size_t i = 0; i < (TOX_ADDRESS_SIZE * 2); i ++)
     {
@@ -902,7 +902,7 @@ void toxpk_bin_to_hex(const uint8_t *public_key, char *public_key_str)
 {
     char tox_pk_hex_local[TOX_PUBLIC_KEY_SIZE*2 + 1];
     CLEAR(tox_pk_hex_local);
-    sodium_bin2hex(tox_pk_hex_local, (TOX_PUBLIC_KEY_SIZE * 2), public_key, TOX_PUBLIC_KEY_SIZE);
+    sodium_bin2hex(tox_pk_hex_local, (TOX_PUBLIC_KEY_SIZE * 2 + 1), public_key, TOX_PUBLIC_KEY_SIZE);
 
     for(size_t i = 0; i < (TOX_PUBLIC_KEY_SIZE * 2); i ++)
     {
