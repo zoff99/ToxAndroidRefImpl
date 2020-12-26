@@ -77,8 +77,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 48
-static const char global_version_string[] = "0.99.48";
+#define VERSION_PATCH 50
+static const char global_version_string[] = "0.99.50";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -863,9 +863,10 @@ void get_my_toxid(Tox *tox, char *toxid_str)
     uint8_t tox_id_bin[TOX_ADDRESS_SIZE];
     tox_self_get_address(tox, tox_id_bin);
     char tox_id_hex_local[TOX_ADDRESS_SIZE*2 + 1];
-    sodium_bin2hex(tox_id_hex_local, sizeof(tox_id_hex_local), tox_id_bin, sizeof(tox_id_bin));
+    CLEAR(tox_id_hex_local);
+    sodium_bin2hex(tox_id_hex_local, (TOX_ADDRESS_SIZE * 2 + 1), tox_id_bin, TOX_ADDRESS_SIZE);
 
-    for(size_t i = 0; i < sizeof(tox_id_hex_local)-1; i ++)
+    for(size_t i = 0; i < (TOX_ADDRESS_SIZE * 2); i ++)
     {
         tox_id_hex_local[i] = toupper(tox_id_hex_local[i]);
     }
@@ -873,22 +874,42 @@ void get_my_toxid(Tox *tox, char *toxid_str)
     snprintf(toxid_str, (size_t)(TOX_ADDRESS_SIZE*2 + 1), "%s", (const char *)tox_id_hex_local);
 }
 
-void toxid_hex_to_bin(unsigned char *public_key, const char *toxid_str)
+void toxpk_hex_to_bin(unsigned char *public_key, const char *public_key_str)
 {
-    sodium_hex2bin(public_key, TOX_ADDRESS_SIZE, toxid_str, (TOX_ADDRESS_SIZE*2), NULL, NULL, NULL);
+    sodium_hex2bin(public_key, TOX_PUBLIC_KEY_SIZE, public_key_str, (TOX_PUBLIC_KEY_SIZE*2), NULL, NULL, NULL);
 }
 
-void toxid_bin_to_hex(const uint8_t *public_key, char *toxid_str)
+void toxid_hex_to_bin(unsigned char *toxid, const char *toxid_str)
+{
+    sodium_hex2bin(toxid, TOX_ADDRESS_SIZE, toxid_str, (TOX_ADDRESS_SIZE*2), NULL, NULL, NULL);
+}
+
+void toxid_bin_to_hex(const uint8_t *toxid, char *toxid_str)
 {
     char tox_id_hex_local[TOX_ADDRESS_SIZE*2 + 1];
-    sodium_bin2hex(tox_id_hex_local, sizeof(tox_id_hex_local), public_key, TOX_ADDRESS_SIZE);
+    CLEAR(tox_id_hex_local);
+    sodium_bin2hex(tox_id_hex_local, (TOX_ADDRESS_SIZE * 2 + 1), toxid, TOX_ADDRESS_SIZE);
 
-    for(size_t i = 0; i < sizeof(tox_id_hex_local)-1; i ++)
+    for(size_t i = 0; i < (TOX_ADDRESS_SIZE * 2); i ++)
     {
         tox_id_hex_local[i] = toupper(tox_id_hex_local[i]);
     }
 
     snprintf(toxid_str, (size_t)(TOX_ADDRESS_SIZE*2 + 1), "%s", (const char *)tox_id_hex_local);
+}
+
+void toxpk_bin_to_hex(const uint8_t *public_key, char *public_key_str)
+{
+    char tox_pk_hex_local[TOX_PUBLIC_KEY_SIZE*2 + 1];
+    CLEAR(tox_pk_hex_local);
+    sodium_bin2hex(tox_pk_hex_local, (TOX_PUBLIC_KEY_SIZE * 2 + 1), public_key, TOX_PUBLIC_KEY_SIZE);
+
+    for(size_t i = 0; i < (TOX_PUBLIC_KEY_SIZE * 2); i ++)
+    {
+        tox_pk_hex_local[i] = toupper(tox_pk_hex_local[i]);
+    }
+
+    snprintf(public_key_str, (size_t)(TOX_PUBLIC_KEY_SIZE*2 + 1), "%s", (const char *)tox_pk_hex_local);
 }
 
 void print_tox_id(Tox *tox)
@@ -1243,12 +1264,12 @@ void android_tox_callback_friend_request_cb(const uint8_t *public_key, const uin
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-    char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
-    CLEAR(tox_id_hex);
-    toxid_bin_to_hex(public_key, tox_id_hex);
-    tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
-    // dbg(9, "pubkey string=%s", tox_id_hex);
-    jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, tox_id_hex);
+    char tox_pk_hex[TOX_PUBLIC_KEY_SIZE*2 + 1];
+    CLEAR(tox_pk_hex);
+    toxpk_bin_to_hex(public_key, tox_pk_hex);
+    tox_pk_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+    // dbg(9, "pubkey string=%s", tox_pk_hex);
+    jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, tox_pk_hex);
     jstring js2 = c_safe_string_from_java((char *)message, length);
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_friend_request_cb_method, js1, js2, (jlong)(unsigned long long)length);
@@ -2759,9 +2780,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_export_1savedata_1file_1uns
 int add_tcp_relay_single(Tox *tox, const char *ip, uint16_t port, const char *key_hex)
 {
     unsigned char key_bin[TOX_PUBLIC_KEY_SIZE];
-    toxid_hex_to_bin(key_bin, key_hex);
-    int res1 = sodium_hex2bin(key_bin, sizeof(key_bin), key_hex, sizeof(key_hex)-1, NULL, NULL, NULL);
-    dbg(9, "sodium_hex2bin:res=%d", res1);
+    toxpk_hex_to_bin(key_bin, key_hex);
     TOX_ERR_BOOTSTRAP error;
     bool res = tox_add_tcp_relay(tox, ip, port, key_bin, &error); // also try as TCP relay
 
@@ -2834,9 +2853,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single(JNIEnv *
 int bootstrap_single(Tox *tox, const char *ip, uint16_t port, const char *key_hex)
 {
     unsigned char key_bin[TOX_PUBLIC_KEY_SIZE];
-    toxid_hex_to_bin(key_bin, key_hex);
-    int res1 = sodium_hex2bin(key_bin, sizeof(key_bin), key_hex, sizeof(key_hex)-1, NULL, NULL, NULL);
-    dbg(9, "sodium_hex2bin:res=%d", res1);
+    toxpk_hex_to_bin(key_bin, key_hex);
     TOX_ERR_BOOTSTRAP error;
     bool res = tox_bootstrap(tox, ip, port, key_bin, &error);
 
@@ -3006,11 +3023,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1public_1key(JN
     }
     else
     {
-        char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1]; // need this wrong size for next call
-        CLEAR(tox_id_hex);
-        toxid_bin_to_hex(public_key, tox_id_hex);
-        tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
-        result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
+        char tox_pk_hex[TOX_PUBLIC_KEY_SIZE*2 + 1];
+        CLEAR(tox_pk_hex);
+        toxpk_bin_to_hex(public_key, tox_pk_hex);
+        tox_pk_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+        result = (*env)->NewStringUTF(env, tox_pk_hex); // C style string to Java String
     }
 
     return result;
@@ -3044,7 +3061,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNI
 
     public_key_str2 = strdup(s);
     (*env)->ReleaseStringUTFChars(env, public_key_str, s);
-    toxid_hex_to_bin(public_key_bin, public_key_str2);
+    toxpk_hex_to_bin(public_key_bin, public_key_str2);
     TOX_ERR_FRIEND_BY_PUBLIC_KEY error;
     uint32_t friendnum = tox_friend_by_public_key(tox_global, (uint8_t *)public_key_bin, &error);
 
@@ -3540,7 +3557,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
     s = (*env)->GetStringUTFChars(env, public_key_str, NULL);
     public_key_str2 = strdup(s);
     (*env)->ReleaseStringUTFChars(env, public_key_str, s);
-    toxid_hex_to_bin(public_key_bin, public_key_str2);
+    toxpk_hex_to_bin(public_key_bin, public_key_str2);
     uint32_t friendnum = tox_friend_add_norequest(tox_global, (uint8_t *)public_key_bin, NULL);
 
     if(public_key_str2)
@@ -4108,11 +4125,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1messa
     }
     else
     {
-        char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1]; // need this wrong size for next call
-        CLEAR(tox_id_hex);
-        toxid_bin_to_hex(public_key, tox_id_hex);
-        tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
-        result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
+        char tox_pk_hex[TOX_PUBLIC_KEY_SIZE*2 + 1];
+        CLEAR(tox_pk_hex);
+        toxpk_bin_to_hex(public_key, tox_pk_hex);
+        tox_pk_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+        result = (*env)->NewStringUTF(env, tox_pk_hex); // C style string to Java String
     }
 
     return result;
@@ -4938,11 +4955,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1publ
     }
     else
     {
-        char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1]; // need this wrong size for next call
-        CLEAR(tox_id_hex);
-        toxid_bin_to_hex(public_key, tox_id_hex);
-        tox_id_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
-        result = (*env)->NewStringUTF(env, tox_id_hex); // C style string to Java String
+        char tox_pk_hex[TOX_PUBLIC_KEY_SIZE*2 + 1];
+        CLEAR(tox_pk_hex);
+        toxpk_bin_to_hex(public_key, tox_pk_hex);
+        tox_pk_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+        result = (*env)->NewStringUTF(env, tox_pk_hex); // C style string to Java String
     }
 
     return result;
