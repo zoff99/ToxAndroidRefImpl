@@ -1,6 +1,6 @@
 <b>TRIfA - Der etwas andere Messenger</b><br>
 
-Whether it's corporations or governments, digital surveillance today is widespread.<br>
+Ob private Unternehmen oder Regierungen, digitale Überwachung ist heute weit verbreitet.<br>
 Tox is easy-to-use software that connects you with friends and family without anyone else listening in.<br>
 While other big-name services require you to pay for features, Tox is completely free and comes without advertising — forever.<br><br>
 

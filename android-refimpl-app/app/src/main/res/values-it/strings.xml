@@ -303,4 +303,6 @@
     <string name="pref_description_h264_encoder_use_intra_refresh">Il codificatore H264 dovrebbe utilizzare frame di aggiornamento intra</string>
     <string name="pref_description_force_udp_only">questo forzerà la modalità solo UDP, alcuni contatti potrebbero non essere raggiungibili con questa impostazione attivata
 \nIl cambiamento ha bisogno di RESTART!</string>
+    <string name="layout___migdb_do_not_close">NON CHIUDERE questa schermata</string>
+    <string name="layout___migdb_text">Spostare database</string>
 </resources>
