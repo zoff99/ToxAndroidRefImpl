@@ -1,19 +1,19 @@
-<b>TRIfA - Der etwas andere Messenger</b><br>
+<b> TRIfA - Eine neue Art von Instant Messaging </ b> <br>
 
-Ob private Unternehmen oder Regierungen, digitale Überwachung ist heute weit verbreitet.<br>
-Tox is easy-to-use software that connects you with friends and family without anyone else listening in.<br>
-While other big-name services require you to pay for features, Tox is completely free and comes without advertising — forever.<br><br>
+Ob es sich um Unternehmen oder Regierungen handelt, die digitale Überwachung ist heute weit verbreitet. <br>
+Tox ist eine benutzerfreundliche Software, die Sie mit Freunden und Familie verbindet, ohne dass jemand anderes zuhört. <br>
+Während andere namhafte Dienste die Bezahlung von Funktionen erfordern, ist Tox völlig kostenlos und wird ohne Werbung geliefert - für immer. <br> <br>
 
-<b>Encrypted:</b><br>
-Everything you do with Tox is encrypted using open-source libraries. The only people who can see your conversations are the people you're talking with.<br><br>
+<b> verschlüsselt: </ b> <br>
+Alles, was Sie mit Tox tun, wird mit Open-Source-Bibliotheken verschlüsselt. Die einzigen Personen, die Ihre Gespräche sehen können, sind die Personen, mit denen Sie sprechen. <br> <br>
 
-<b>Distributed:</b><br>
-Tox has no central servers that can be raided, shut down, or forced to turn over data — the network is made up of its users. Say goodbye to server outages!<br><br>
+<b> Verteilt: </ b> <br>
+Tox hat keine zentralen Server, die überfallen, heruntergefahren oder gezwungen werden können, Daten zu übergeben - das Netzwerk besteht aus seinen Benutzern. Verabschieden Sie sich von Serverausfällen! <br> <br>
 
-<b>Free:</b><br>
-Tox is free software. That's free as in freedom, as well as in price. This means Tox is yours — to use, modify, and share — because Tox is developed by and for the users.<br><br>
+<b> Kostenlos: </ b> <br>
+Tox ist freie Software. Das ist kostenlos, sowohl in der Freiheit als auch im Preis. Dies bedeutet, dass Tox Ihnen gehört - zum Verwenden, Ändern und Teilen -, da Tox von und für die Benutzer entwickelt wurde. <br> <br>
 
-<b>Mehr Informationen:</b><br>
-* <a href="https://tox.zoff.cc">was ist Tox?</a><br>
-* <a href="https://matrix.to/#/#trifa:matrix.org">unser Matrix Kanal</a><br>
-* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Tox IRC Kanal</a><br>
+<b> Weitere Informationen: </ b> <br>
+* <a href="https://tox.zoff.cc"> über Tox </a> <br>
+* <a href="https://matrix.to/#/#trifa:matrix.org"> Nehmen Sie an der Diskussion über Matrix teil </a> <br>
+* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org"> Treten Sie dem Tox IRC Channel bei </a> <br>
