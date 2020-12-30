@@ -204,4 +204,6 @@
     <string name="pref_description_higher_video_quality">Usa melhor qualidade de vídeo.
 \nA mudança precisa REINICIAR!</string>
     <string name="pref_description_video_uv_reversed">Inverea a ordem dos planos UV no vídeo da câmera</string>
+    <string name="layout___migdb_do_not_close">NÃO FECHE esta tela</string>
+    <string name="layout___migdb_text">Migrando arquivos do banco de dados</string>
 </resources>
