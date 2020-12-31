@@ -1,19 +1,19 @@
-<b> TRIfA - Eine neue Art von Instant Messaging </ b> <br>
+<b>TRIfA - Der etwas andere Messenger</ b> <br>
 
-Ob es sich um Unternehmen oder Regierungen handelt, die digitale Überwachung ist heute weit verbreitet. <br>
-Tox ist eine benutzerfreundliche Software, die Sie mit Freunden und Familie verbindet, ohne dass jemand anderes zuhört. <br>
-Während andere namhafte Dienste die Bezahlung von Funktionen erfordern, ist Tox völlig kostenlos und wird ohne Werbung geliefert - für immer. <br> <br>
+Ob es sich um Unternehmen oder Regierungen handelt, die digitale Überwachung ist heute weit verbreitet.<br>
+Tox ist eine benutzerfreundliche Software, die Sie mit Freunden und Familie verbindet, ohne dass jemand anderes zuhört.<br>
+Während andere namhafte Dienste die Bezahlung von Funktionen erfordern, ist Tox völlig kostenlos und wird ohne Werbung geliefert - für immer.<br> <br>
 
-<b> verschlüsselt: </ b> <br>
-Alles, was Sie mit Tox tun, wird mit Open-Source-Bibliotheken verschlüsselt. Die einzigen Personen, die Ihre Gespräche sehen können, sind die Personen, mit denen Sie sprechen. <br> <br>
+<b>Verschlüsselt:</b><br>
+Alles, was Sie mit Tox tun, wird mit Open-Source-Bibliotheken verschlüsselt. Die einzigen Personen, die Ihre Gespräche sehen können, sind die Personen, mit denen Sie sprechen.<br><br>
 
-<b> Verteilt: </ b> <br>
-Tox hat keine zentralen Server, die überfallen, heruntergefahren oder gezwungen werden können, Daten zu übergeben - das Netzwerk besteht aus seinen Benutzern. Verabschieden Sie sich von Serverausfällen! <br> <br>
+<b>Verteilt:</b><br>
+Tox hat keine zentralen Server, die überfallen, heruntergefahren oder gezwungen werden können, Daten zu übergeben - das Netzwerk besteht aus seinen Benutzern. Verabschieden Sie sich von Serverausfällen!<br><br>
 
-<b> Kostenlos: </ b> <br>
-Tox ist freie Software. Das ist kostenlos, sowohl in der Freiheit als auch im Preis. Dies bedeutet, dass Tox Ihnen gehört - zum Verwenden, Ändern und Teilen -, da Tox von und für die Benutzer entwickelt wurde. <br> <br>
+<b>Kostenlos:</b><br>
+Tox ist freie Software. Das ist kostenlos, sowohl in der Freiheit als auch im Preis. Dies bedeutet, dass Tox Ihnen gehört - zum Verwenden, Ändern und Teilen -, da Tox von und für die Benutzer entwickelt wurde.<br><br>
 
-<b> Weitere Informationen: </ b> <br>
-* <a href="https://tox.zoff.cc"> über Tox </a> <br>
-* <a href="https://matrix.to/#/#trifa:matrix.org"> Nehmen Sie an der Diskussion über Matrix teil </a> <br>
-* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org"> Treten Sie dem Tox IRC Channel bei </a> <br>
+<b>Weitere Informationen:</b><br>
+* <a href="https://tox.zoff.cc">was ist Tox?</a> <br>
+* <a href="https://matrix.to/#/#trifa:matrix.org">Nehmen Sie an der Diskussion über Matrix teil</a><br>
+* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Treten Sie dem Tox IRC Channel bei</a><br>
