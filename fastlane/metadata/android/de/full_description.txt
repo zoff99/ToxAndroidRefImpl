@@ -14,6 +14,6 @@ Tox hat keine zentralen Server, die überfallen, heruntergefahren oder gezwungen
 Tox ist freie Software. Das ist kostenlos, sowohl in der Freiheit als auch im Preis. Dies bedeutet, dass Tox Ihnen gehört - zum Verwenden, Ändern und Teilen -, da Tox von und für die Benutzer entwickelt wurde.<br><br>
 
 <b>Weitere Informationen:</b><br>
-* <a href="https://tox.zoff.cc">was ist Tox?</a> <br>
+* <a href="https://tox.zoff.cc">was ist Tox?</a><br>
 * <a href="https://matrix.to/#/#trifa:matrix.org">Nehmen Sie an der Diskussion über Matrix teil</a><br>
 * <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Treten Sie dem Tox IRC Channel bei</a><br>
