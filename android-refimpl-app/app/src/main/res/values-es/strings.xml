@@ -303,4 +303,6 @@
     <string name="pref_description_auto_accept_video">aceptar automáticamente videos de hasta 10 MB de tamaño</string>
     <string name="pref_title_auto_accept_video">aceptar videos automáticamente</string>
     <string name="conference_audio_activity_player_name">Reproductor de audioconferencia</string>
+    <string name="layout___migdb_do_not_close">NO CIERRE esta pantalla</string>
+    <string name="layout___migdb_text">Migrando los archivos de la base de datos</string>
 </resources>

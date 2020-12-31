@@ -204,4 +204,6 @@
     <string name="conference_message_list_activity_name">Conferência de Texto</string>
     <string name="message_list_activity_name">Bate-papo</string>
     <string name="add_friend_activity_name">Adicionar Amigo</string>
+    <string name="layout___migdb_do_not_close">NÃO FECHE esta tela</string>
+    <string name="layout___migdb_text">Migrando ficheiros do banco de dados</string>
 </resources>

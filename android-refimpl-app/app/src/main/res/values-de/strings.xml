@@ -295,4 +295,6 @@
     <string name="pref_title_mic_gain_factor">Mikrofon-Boost</string>
     <string name="pref_description_global_font_size">Textgröße auswählen</string>
     <string name="pref_description_video_cam_resolution">Auflösung für Videoanrufe</string>
+    <string name="layout___migdb_do_not_close">Diesen Bildschirm NICHT schließen</string>
+    <string name="layout___migdb_text">Migrieren von Datenbankdateien</string>
 </resources>
