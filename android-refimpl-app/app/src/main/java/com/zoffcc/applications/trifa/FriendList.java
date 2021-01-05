@@ -86,6 +86,9 @@ public class FriendList
     long last_online_timestamp = -1L;
 
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
+    long last_online_timestamp_real = -1L;
+
+    @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long added_timestamp = -1L;
 
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
@@ -109,6 +112,7 @@ public class FriendList
         out.notification_silent = in.notification_silent;
         out.sort = in.sort;
         out.last_online_timestamp = in.last_online_timestamp;
+        out.last_online_timestamp_real = in.last_online_timestamp_real;
         out.alias_name = in.alias_name;
         out.is_relay = in.is_relay;
         out.avatar_update_timestamp = in.avatar_update_timestamp;

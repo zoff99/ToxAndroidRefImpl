@@ -136,6 +136,17 @@ public class HelperFriend
                 {
                 }
 
+                try
+                {
+                    orma.updateFriendList().
+                            last_online_timestamp_realEq(LAST_ONLINE_TIMSTAMP_ONLINE_NOW).
+                            last_online_timestamp_real(System.currentTimeMillis()).
+                            execute();
+                }
+                catch (Exception e)
+                {
+                }
+
                 // ------ DEBUG ------
                 // ------ set all friends to "never" seen online ------
                 // ------ DEBUG ------
@@ -235,6 +246,20 @@ public class HelperFriend
         }
     }
 
+    synchronized static void update_friend_in_db_last_online_timestamp_real(FriendList f)
+    {
+        try
+        {
+            orma.updateFriendList().
+                    tox_public_key_stringEq(f.tox_public_key_string).
+                    last_online_timestamp_real(f.last_online_timestamp_real).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
     synchronized static void update_friend_in_db_name(FriendList f)
     {
         orma.updateFriendList().

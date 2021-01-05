@@ -453,6 +453,19 @@ public class HelperGeneric
             }
         }
 
+        if (!from_relay)
+        {
+            if (went_online)
+            {
+                f.last_online_timestamp_real = LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+            }
+            else
+            {
+                f.last_online_timestamp_real = System.currentTimeMillis();
+            }
+            HelperFriend.update_friend_in_db_last_online_timestamp_real(f);
+        }
+
         if (went_online)
         {
             // Log.i(TAG, "friend_connection_status:friend status seems: ONLINE");

@@ -178,15 +178,15 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
 
         // Log.i(TAG, "lot=" + fl.last_online_timestamp + " -> " + LAST_ONLINE_TIMSTAMP_ONLINE_NOW);
-        if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_NOW)
+        if (fl.last_online_timestamp_real == LAST_ONLINE_TIMSTAMP_ONLINE_NOW)
         {
             f_last_online_timestamp.setText("now");
         }
-        else if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
+        else if (fl.last_online_timestamp_real == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
         {
             f_last_online_timestamp.setText("never");
         }
-        else if (fl.last_online_timestamp > LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
+        else if (fl.last_online_timestamp_real > LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
         {
             f_last_online_timestamp.setText("" + long_date_time_format(fl.last_online_timestamp));
         }
