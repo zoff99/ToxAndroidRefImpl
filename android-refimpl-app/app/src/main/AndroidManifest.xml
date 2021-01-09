@@ -259,6 +259,12 @@
 
         </receiver>
 
+        <receiver android:name=".MyExternReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="com.zoffcc.applications.trifa.EXTERN_RECV" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name=".GenericFileProvider"
             android:authorities="com.zoffcc.applications.trifa.provider"
