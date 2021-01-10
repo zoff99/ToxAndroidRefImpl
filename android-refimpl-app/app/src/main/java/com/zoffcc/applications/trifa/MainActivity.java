@@ -143,6 +143,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
+import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
@@ -4183,6 +4184,9 @@ public class MainActivity extends AppCompatActivity
             {
                 e2.printStackTrace();
             }
+
+            // send message receipt v2 to own relay
+            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer);
         }
         else if (msgv2_type == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
         {
@@ -4194,6 +4198,7 @@ public class MainActivity extends AppCompatActivity
             {
                 // Log.i(TAG, "friend_sync_message_v2_cb:message_id_hash_as_hex_string=" + message_id_hash_as_hex_string +
                 //            " friendpubkey=" + real_sender_as_hex_string);
+
                 final Message m = orma.selectFromMessage().
                         msg_id_hashEq(message_id_hash_as_hex_string).
                         tox_friendpubkeyEq(real_sender_as_hex_string).
@@ -4224,6 +4229,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 e.printStackTrace();
                             }
+                            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer);
                         }
                     };
 
@@ -4236,6 +4242,7 @@ public class MainActivity extends AppCompatActivity
             catch (Exception e)
             {
                 e.printStackTrace();
+                send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer);
             }
         }
     }
