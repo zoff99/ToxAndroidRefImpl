@@ -3777,6 +3777,11 @@ public class MainActivity extends AppCompatActivity
                         {
                             HelperRelay.invite_to_all_conferences_own_relay(f.tox_public_key_string);
                         }
+
+                        if(TRIFAGlobals.global_notification_token != null && HelperRelay.is_own_relay(f.tox_public_key_string))
+                        {
+                            //TODO: send my relay the current notification token
+                        }
                     }
                 }
             }

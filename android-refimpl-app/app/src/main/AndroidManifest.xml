@@ -265,6 +265,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".MyTokenReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="com.zoffcc.applications.trifa.TOKEN_CHANGED" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name=".GenericFileProvider"
             android:authorities="com.zoffcc.applications.trifa.provider"
