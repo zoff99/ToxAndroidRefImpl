@@ -11,8 +11,8 @@
     <string name="title_activity_profile">الملف الشخصي</string>
     <string name="title_activity_settings">الإعدادات</string>
     <string name="title_activity_crash">يصطدم</string>
-    <string name="title_activity_friendinfo">Friendinfo</string>
-    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_friendinfo">معلومات صديق</string>
+    <string name="title_activity_conferencepeerinfo">معلومات الأقران</string>
     <string name="title_activity_aboutpage">حول</string>
     <string name="title_activity_set_password">ضبط كلمة السر</string>
     <string name="title_activity_check_password">أدخل كلمة المرور</string>
@@ -203,7 +203,7 @@
     <string name="MainActivity_no_button">لا</string>
     <string name="MainActivity_ok_take_me_there_button">حسنا ، خذني هناك</string>
     <string name="MainActivity_info_dialog_title">INFO</string>
-    <string name="MainActivity_add_to_batt_opt">يرجى إضافة TRIfA إلى قائمة الاستثناءات لـ Batteryoptimization!</string>
+    <string name="MainActivity_add_to_batt_opt">الرجاء إضافة TRIfA إلى قائمة الاستثناءات لتحسين البطارية!</string>
     <string name="MainActivity_friend_is_typing">صديق يكتب ...</string>
     <string name="MainActivity_notification_new_message">رسالة جديدة</string>
     <string name="MainActivity_notification_new_message2">رسالة جديدة</string>
@@ -216,7 +216,7 @@
     <string name="MainActivity_notification_new_message3">رسالة جديدة</string>
     <string name="MainActivity_notification_new_message4">رسالة جديدة</string>
     <string name="MainActivity_notification_new_message5">رسالة جديدة</string>
-    <string name="Aboutpage_0">TRIfA Crashlog</string>
+    <string name="Aboutpage_0">TRIfA سجل الأعطال</string>
     <string name="Aboutpage_2">إرسال تقرير الأعطال عبر البريد الإلكتروني</string>
     <string name="Aboutpage_4">قراءة معلومات الأعطال ...</string>
     <string name="Aboutpage_5a">TRIfA عميل Tox لنظام Android</string>
@@ -239,7 +239,7 @@
     <string name="layout___name">اسم</string>
     <string name="layout___push_to_talk">اضغط للتحدث</string>
     <string name="layout___nick">نيك:</string>
-    <string name="layout___pubkey">Pubkey:</string>
+    <string name="layout___pubkey">المفتاح العمومي:</string>
     <string name="layout___status">الحالة:</string>
     <string name="layout___alias">الاسم المستعار</string>
     <string name="layout___remove_friends_relay">إزالة تتابع الأصدقاء</string>
@@ -289,4 +289,20 @@
     <string name="pref_title_auto_accept_video">إقبل الفيديوهات تلقائيا</string>
     <string name="pref_title_use_incognito_keyboard">وضع التخفّي للوحة المفاتيح</string>
     <string name="conference_audio_activity_player_name">مشغل المؤتمر الصوتي</string>
+    <string name="layout___migdb_do_not_close">عدم إغلاق هذه الشاشة</string>
+    <string name="layout___migdb_text">ترحيل ملفات قاعدة البيانات</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! التجريبيه!!
+\nالمخزن المؤقت لتشغيل الصوت بالبايت ، مضبوط على 0 لتعطيل الإعداد المخصص</string>
+    <string name="pref_title_X_audio_play_buffer_custom">المخزن المؤقت لتشغيل الصوت</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!!التجريبيه !!
+\nلا تقم بمزامنة الفيديو أو الصوت. استخدم هذا الإعداد إذا كانت لديك مشاكل في مكالمة الفيديو ، كحل أخير.</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">لا تزامن AV</string>
+    <string name="pref_description_use_incognito_keyboard">إيقاف تشغيل لإخبار لوحة المفاتيح لا للتعلم من كلماتك التي أدخلتها</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">يجب أن تستخدم أداة ترميز H264 إطارات التحديث الداخلية</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">تحديث داخلي H264</string>
+    <string name="pref_description_force_udp_only">هذا سوف يفرض وضع UDP فقط، قد لا يكون الوصول إلى بعض جهات الاتصال مع هذا الإعداد قيد التشغيل
+\nتغيير احتياجات إعادة تشغيل!</string>
+    <string name="pref_title_force_udp_only">فرض وضع UDP</string>
+    <string name="pref_description_mic_gain_factor">قم بتعيين ربح أعلى إذا كان الميكروفون الخاص بك يسجل بصوت منخفض</string>
+    <string name="pref_title_mic_gain_factor">كسب الميكروفون</string>
 </resources>
