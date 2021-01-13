@@ -24,12 +24,16 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
@@ -58,6 +62,14 @@ public class HelperToxNotification
         notification_view = new RemoteViews(c.getPackageName(), R.layout.custom_notification);
         Log.i(TAG, "contentView=" + notification_view);
         notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+
+        // TypedValue typedValue = new TypedValue();
+        // c.getTheme().resolveAttribute(R.attr.color, typedValue, true);
+        // notification_view.setTextColor(R.id.title, typedValue.data);
+
+
+        notification_view.setTextColor(R.id.title, ResourcesCompat.getColor(c.getResources(), R.color.textColorSecondary, null));
+
         notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
         notification_view.setTextViewText(R.id.text, "");
 
