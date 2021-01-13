@@ -39,6 +39,8 @@ public class TRIFAGlobals
     static boolean global_showing_anygroupview = false;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
+    static String global_notification_token = null;
+
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
     static boolean HAVE_INTERNET_CONNECTIVITY = true;
