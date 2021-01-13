@@ -143,7 +143,6 @@ import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
-import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
@@ -3725,8 +3724,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
     {
-        // Log.i(TAG, "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION);
         FriendList f = main_get_friend(friend_number);
+        //Log.i(TAG,
+        //      "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION + " f=" +
+        //      f);
 
         if (f != null)
         {
@@ -3768,13 +3769,12 @@ public class MainActivity extends AppCompatActivity
                         {
                             HelperRelay.send_relay_pubkey_to_friend(HelperRelay.get_own_relay_pubkey(),
                                                                     f.tox_public_key_string);
-                            // Log.i(TAG, "send relay pubkey to friend");
+
+                            HelperRelay.send_friend_pubkey_to_relay(HelperRelay.get_own_relay_pubkey(),
+                                                                    f.tox_public_key_string);
                         }
                         else
                         {
-                            HelperRelay.send_friend_pubkey_to_relay(HelperRelay.get_own_relay_pubkey(),
-                                                                    f.tox_public_key_string);
-                            // Log.i(TAG, "send friend pubkey to relay");
                             HelperRelay.invite_to_all_conferences_own_relay(f.tox_public_key_string);
                         }
                     }
