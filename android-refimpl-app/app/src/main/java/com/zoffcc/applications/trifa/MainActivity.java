@@ -146,6 +146,7 @@ import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_not
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
@@ -3778,9 +3779,19 @@ public class MainActivity extends AppCompatActivity
                             HelperRelay.invite_to_all_conferences_own_relay(f.tox_public_key_string);
                         }
 
-                        if(TRIFAGlobals.global_notification_token != null && HelperRelay.is_own_relay(f.tox_public_key_string))
+                        if (TRIFAGlobals.global_notification_token != null &&
+                            HelperRelay.is_own_relay(f.tox_public_key_string))
                         {
-                            //TODO: send my relay the current notification token
+                            if ((TRIFAGlobals.global_notification_token.length() > 10) &&
+                                (TRIFAGlobals.global_notification_token.length() < 300))
+                            {
+                                // send my relay the current notification token
+                                String temp_string = "A" + TRIFAGlobals.global_notification_token;
+                                byte[] data_bin = temp_string.getBytes();
+                                int data_bin_len = data_bin.length;
+                                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN.value;
+                                tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
+                            }
                         }
                     }
                 }
