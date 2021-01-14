@@ -3787,7 +3787,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 // send my relay the current notification token
                                 String temp_string = "A" + TRIFAGlobals.global_notification_token;
-                                byte[] data_bin = temp_string.getBytes();
+                                byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
                                 int data_bin_len = data_bin.length;
                                 data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN.value;
                                 tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
@@ -5495,6 +5495,18 @@ public class MainActivity extends AppCompatActivity
                 // e.printStackTrace();
             }
 
+            // --------------- BAD !! ---------------
+            // --------------- BAD !! ---------------
+            // --------------- BAD !! ---------------
+            // workaround to fix a bug, where messages would appear to be from the wrong user in a conference
+            // because toxcore changes all "peer numbers" when somebody leaves the confrence
+            // but this can happen very often. so for now, clear cache every time
+            cache_peernum_pubkey.clear();
+            cache_peername_pubkey2.clear();
+            // --------------- BAD !! ---------------
+            // --------------- BAD !! ---------------
+            // --------------- BAD !! ---------------
+
             if (conf_temp != null)
             {
                 try
@@ -5547,6 +5559,7 @@ public class MainActivity extends AppCompatActivity
     // ------------------------
     // this is an old toxcore 0.1.x callback
     // not called anymore!!
+    // android_tox_callback_conference_peer_list_changed_cb_method --> is used now instead
     static void android_tox_callback_conference_namelist_change_cb_method(long conference_number, long peer_number, int a_TOX_CONFERENCE_STATE_CHANGE)
     {
         // Log.i(TAG, "namelist_change_cb:" + "confnum=" + conference_number + " peernum=" + peer_number + " state=" + a_TOX_CONFERENCE_STATE_CHANGE);
