@@ -394,12 +394,12 @@
 
 #### TOX_FILE_KIND_MESSAGEV2_SEND
 
-|what           |Length     | Contents
-|:--------------|:----------|:-------------
-|msg id         |32         | `*uint8_t` hash (what hash function?) to uniquely identify the message
-|create ts      |4          | `uint32_t` unixtimestamp in UTC of local clock (NTP time if poosible - client?) when the user typed the message
-|create ts ms   |2          | `uint16_t` unixtimestamp ms part
-|msg txt        |[0, 4096]  | `*uint8_t` Message as a UTF8 byte string
+|what           |Length      | Contents
+|:--------------|:-----------|:-------------
+|msg id         |32          | `*uint8_t` hash (what hash function?) to uniquely identify the message
+|create ts      |4           | `uint32_t` unixtimestamp in UTC of local clock (NTP time if poosible - client?) when the user typed the message
+|create ts ms   |2           | `uint16_t` unixtimestamp ms part
+|msg txt        |[0, 4096]   | `*uint8_t` Message as a UTF8 byte string
 
 
 
@@ -415,26 +415,26 @@
 #### TOX_FILE_KIND_MESSAGEV2_ALTER
 
 
-|what        |Length     | Contents
-|:-----------|:----------|:--------------
-|msg id      |32         | `*uint8_t` hash (what hash function?) to uniquely identify the message
-|alter ts    |4          | `uint32_t` unixtimestamp in UTC of local clock (NTP time if poosible -> client?) when the user typed the message
-|alter ts ms |2          | `uint16_t` unixtimestamp ms part
-|alter type  |1          | `uint8_t` values: 0 -> delete message, 1 -> change text
-|alter id    |32         | `*uint8_t` hash to identify the message to alter/delete
-|msg txt     |[0, 4096]  | `*uint8_t` Altered Message as a UTF8 byte string or 0 length on delete
+|what        |Length      | Contents
+|:-----------|:-----------|:--------------
+|msg id      |32          | `*uint8_t` hash (what hash function?) to uniquely identify the message
+|alter ts    |4           | `uint32_t` unixtimestamp in UTC of local clock (NTP time if poosible -> client?) when the user typed the message
+|alter ts ms |2           | `uint16_t` unixtimestamp ms part
+|alter type  |1           | `uint8_t` values: 0 -> delete message, 1 -> change text
+|alter id    |32          | `*uint8_t` hash to identify the message to alter/delete
+|msg txt     |[0, 4096]   | `*uint8_t` Altered Message as a UTF8 byte string or 0 length on delete
 
 
 #### TOX_FILE_KIND_MESSAGEV2_SYNC
 
-|what           |Length     | Contents
-|:--------------|:----------|:-----------------
-|msg id         |32         | `*uint8_t` hash (what hash function?) to uniquely identify the message
-|create ts      |4          | `uint32_t` unixtimestamp in UTC of local clock (NTP time if poosible -> client?) when the user typed the message
-|create ts ms   |2          | `uint16_t` unixtimestamp ms part
-|orig sender    |32         | `*uint8_t` pubkey of the original sender
-|msgV2 type     |4          | `uint32_t` what msgV2 type is this sync message
-|msgv2 data     |[0, 4167]  | `*uint8_t` msgV2 raw data including header as raw bytes
+|what           |Length       | Contents
+|:--------------|:------------|:-----------------
+|msg id         |32           | `*uint8_t` hash (what hash function?) to uniquely identify the message
+|create ts      |4            | `uint32_t` unixtimestamp in UTC of local clock (NTP time if poosible -> client?) when the user typed the message
+|create ts ms   |2            | `uint16_t` unixtimestamp ms part
+|orig sender    |32           | `*uint8_t` pubkey of the original sender
+|msgV2 type     |4            | `uint32_t` what msgV2 type is this sync message
+|msgv2 data     |[0, 4167]    | `*uint8_t` msgV2 raw data including header as raw bytes
 
 
 
