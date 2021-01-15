@@ -2,7 +2,138 @@
 # TRIfA and ToxProxy addons
 <br>
 
-## Push Notifications Worflows
+## Offline Messages Workflows
+<br>
+<br>
+
+
+
+
+```
+         +---------------------------------------------+  
+         |                                             | 
+         | Self Hosted                                 |
+         |                                             | 
+         |+-------------------+                        | 
+         ||                   |                        | 
+         ||    ToxProxy       |                        | 
+         ||                   |                        | 
+         |+--------^----------+                        | 
+         +---------|-----------------------------------+ 
+                   |                                              
+                   |                                              
+                   +-------------------------+                    
+                                             |                     
+                                             | (1) Add ToxProxy as friend                    
+                                             |
+                     Android Device          |                     
+               +------------------------+    |  
+               |                        |    |                     
+               |                        |    |
+               |                        |    |
+               |         +-----------+  |    |
+               |         |TRIfA      |  |    |
+               |         |           +-------+
+               |         |           |  |
+               |         |           |  |
+               |         +-----------+  |
+               +------------------------+
+
+                   (2) set ToxProxy as "own Relay" in the TRIfA app
+
+
+
+
+
+```
+
+<br>
+
+
+```
+         +---------------------------------------------+  
+         |                                             | 
+         | Self Hosted                                 |
+         |                                             | 
+         |+-------------------+                        | 
+         ||                   |                        | (3) ToxProxy adds all TRIfA friends
+         ||    ToxProxy       |                        |       without friendrequest
+         ||                   |                        | 
+         |+----------^--------+                        | 
+         +-----------|---------------------------------+ 
+                     |                                            
+                     |                                            
+                     +----------------------+                     
+                                            | (2) send all friends Pubkeys to ToxProxy                      
+                                            |                       
+                                            |  
+                     Android Device         |                       
+               +------------------------+   |    
+               |                        |   |                       
+               |                        |   |  
+               |                        |   |  
+               |         +-----------+  |   |  
+               |         |TRIfA      |  |   | 
+               |         |           +------+ 
+               |         |           |  |
+               |         |           +----------------~~~>> (1) send ToxProxy PubKey to all friends
+               |         +-----------+  |                         (except Relays)
+               +------------------------+
+
+
+                                               (4) all participating Friends add ToxProxy
+                                                     without friendrequest    
+
+
+
+
+```
+
+<br>
+
+
+```
+         +---------------------------------------------+  
+         |                                             | 
+         | Self Hosted                                 |
+         |                                             | 
+         |+-------------------+                        | 
+         ||                   |                        |
+         ||    ToxProxy       |                        |  
+         ||                   |                        | 
+         |+-------------------+                        | 
+         +---------------------------------------------+ 
+                                                                  
+                                                                  
+                                                                  
+                                                            
+                                                                    
+                                               
+                     Android Device                                 
+               +------------------------+        
+               |                        |                           
+               |                        |      
+               |                        |      
+               |         +-----------+  |      
+               |         |TRIfA      |  |     
+               |         |           |  |     
+               |         |           |  |
+               |         |           <----------------~~~ (1) receive Friends ToxProxy Pubkey
+               |         +-----------+  |                                               
+               +------------------------+
+
+                   (2) add Friends ToxProxy Pubkey and mark as Relay
+
+
+
+
+```
+
+<br>
+
+
+
+## Push Notifications Workflows
 <br>
 <br>
 
