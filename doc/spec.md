@@ -233,9 +233,9 @@
                  |                                               |
                  |                                               |
   ~~~------------+                                               |
-  (1) receive offline Message                                    | (2) receive Notification Token
-                                                                 |
-                                                                 |
+  (1) receive offline Message                                    | (2) receive FCM Push Message
+                                                                 |     (empty Message,
+                                                                 |      no real Data in FCM payload!)
                      Android Device                              |
                +------------------------+                        |
                |+----+                  |                        |
