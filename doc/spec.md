@@ -432,7 +432,7 @@
 |msg id         |32           | `*uint8_t` hash (what hash function?) to uniquely identify the message
 |create ts      |4            | `uint32_t` unixtimestamp in UTC of local clock (NTP time if poosible -> client?) when the user typed the message
 |create ts ms   |2            | `uint16_t` unixtimestamp ms part
-|orig sender    |32&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           | `*uint8_t` pubkey of the original sender
+|orig sender    |32           | `*uint8_t` pubkey of the original sender
 |msgV2 type     |4            | `uint32_t` what msgV2 type is this sync message
 |msgv2 data     |[0, 4167]    | `*uint8_t` msgV2 raw data including header as raw bytes
 
