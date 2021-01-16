@@ -188,7 +188,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
         else if (fl.last_online_timestamp_real > LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
         {
-            f_last_online_timestamp.setText("" + long_date_time_format(fl.last_online_timestamp));
+            f_last_online_timestamp.setText("" + long_date_time_format(fl.last_online_timestamp_real));
         }
         else
         {
