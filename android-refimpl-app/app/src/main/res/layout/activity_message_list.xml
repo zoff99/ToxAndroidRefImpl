@@ -14,7 +14,21 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <TextView
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:text="" />
+
+        <Spinner
+            android:id="@+id/spinner_filter_msgs"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="0dp"
+            android:paddingLeft="0dp" />
+    </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -149,9 +163,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:imeOptions="flagNoPersonalizedLearning|actionSend"
             android:cursorVisible="true"
             android:ellipsize="end"
+            android:imeOptions="flagNoPersonalizedLearning|actionSend"
             android:inputType="textMultiLine"
             android:maxLines="5"
             android:singleLine="false"

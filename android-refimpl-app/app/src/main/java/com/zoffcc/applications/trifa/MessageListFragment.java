@@ -22,10 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +30,14 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -52,6 +54,7 @@ public class MessageListFragment extends Fragment
     ConversationDateHeader conversationDateHeader = null;
     MessageListActivity mla = null;
     boolean is_data_loaded = true;
+    static boolean show_only_files = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -95,11 +98,24 @@ public class MessageListFragment extends Fragment
                 // -------------------------------------------------
                 // HINT: here ordering of messages is applied !!
                 // -------------------------------------------------
-                data_values = orma.selectFromMessage().tox_friendpubkeyEq(
-                        tox_friend_get_public_key__wrapper(current_friendnum)).
-                        orderBySent_timestampAsc().
-                        orderBySent_timestamp_msAsc().
-                        toList();
+                if (show_only_files)
+                {
+                    data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                            tox_friend_get_public_key__wrapper(current_friendnum)).
+                            and().
+                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            toList();
+                }
+                else
+                {
+                    data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                            tox_friend_get_public_key__wrapper(current_friendnum)).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            toList();
+                }
                 Log.i(TAG, "loading data:001");
                 // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
                 // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
@@ -305,11 +321,24 @@ public class MessageListFragment extends Fragment
                 // -------------------------------------------------
                 // HINT: this one does not respect ordering?!
                 // -------------------------------------------------
-                adapter.add_list_clear(orma.selectFromMessage().
-                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                        orderBySent_timestampAsc().
-                        orderBySent_timestamp_msAsc().
-                        toList());
+                if (show_only_files)
+                {
+                    adapter.add_list_clear(orma.selectFromMessage().
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            and().
+                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            toList());
+                }
+                else
+                {
+                    adapter.add_list_clear(orma.selectFromMessage().
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            toList());
+                }
                 Log.i(TAG, "data_values:005c");
             }
             Log.i(TAG, "data_values:005d");

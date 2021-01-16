@@ -45,8 +45,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +64,8 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
@@ -94,6 +99,7 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.MessageListFragment.show_only_files;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
@@ -139,6 +145,7 @@ public class MessageListActivity extends AppCompatActivity
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
+    Spinner spinner_filter_msgs = null;
 
     Handler mla_handler = null;
     static Handler mla_handler_s = null;
@@ -190,12 +197,56 @@ public class MessageListActivity extends AppCompatActivity
         setContentView(R.layout.activity_message_list);
 
         message_list_activity = this;
+        show_only_files = false;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
         ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
+
+        spinner_filter_msgs = (Spinner) findViewById(R.id.spinner_filter_msgs);
+        ArrayList<String> own_online_status_string_values = new ArrayList<String>(Arrays.asList("all", "files"));
+        ArrayAdapter<String> myAdapter = new FilterMsgsSpinnerAdapter(this, R.layout.own_status_spinner_item,
+                                                                      own_online_status_string_values);
+
+        if (spinner_filter_msgs != null)
+        {
+            spinner_filter_msgs.setAdapter(myAdapter);
+            spinner_filter_msgs.setSelection(0);
+            spinner_filter_msgs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+            {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View v, int position, long id)
+                {
+                    try
+                    {
+                        if (id == 0)
+                        {
+                            // id: all messages
+                            show_only_files = false;
+                            MainActivity.message_list_fragment.update_all_messages(true);
+                        }
+                        else if (id == 1)
+                        {
+                            // id: only files
+                            show_only_files = true;
+                            MainActivity.message_list_fragment.update_all_messages(true);
+                        }
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent)
+                {
+
+                }
+            });
+        }
 
         // give focus to text input
         ml_new_message.requestFocus();

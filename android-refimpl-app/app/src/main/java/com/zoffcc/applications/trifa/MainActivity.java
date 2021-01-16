@@ -1010,7 +1010,7 @@ public class MainActivity extends AppCompatActivity
                 Arrays.asList(getString(R.string.MainActivity_available), getString(R.string.MainActivity_away),
                               getString(R.string.MainActivity_busy)));
         ArrayAdapter<String> myAdapter = new OwnStatusSpinnerAdapter(this, R.layout.own_status_spinner_item,
-                                                                     own_online_status_string_values);
+                                                                      own_online_status_string_values);
 
         if (spinner_own_status != null)
         {
