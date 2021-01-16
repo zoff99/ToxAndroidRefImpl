@@ -253,7 +253,7 @@ dependencies {
     implementation ('net.zetetic:android-database-sqlcipher:4.4.2@aar') {
         transitive = true
     }
-    implementation ('info.guardianproject.iocipher:IOCipher:0.5') {
+    implementation ('info.guardianproject.iocipher:IOCipher:0.4.2.1') {
         transitive = true
     }
     //
