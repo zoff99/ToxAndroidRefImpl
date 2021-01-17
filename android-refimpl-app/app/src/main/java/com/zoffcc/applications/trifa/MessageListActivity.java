@@ -128,7 +128,7 @@ public class MessageListActivity extends AppCompatActivity
     long friendnum_prev = -1;
     static final int MEDIAPICK_ID_001 = 8002;
     //
-    com.vanniktech.emoji.EmojiEditText ml_new_message = null;
+    static com.vanniktech.emoji.EmojiEditText ml_new_message = null;
     EmojiPopup emojiPopup = null;
     ImageView insert_emoji = null;
     TextView ml_maintext = null;
@@ -971,6 +971,42 @@ public class MessageListActivity extends AppCompatActivity
             }
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    public static void add_quote_message_text(final String quote_text)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if ((ml_new_message.getText().toString() == null) ||
+                        (ml_new_message.getText().toString().length() == 0))
+                    {
+                        ml_new_message.append(quote_text + "\n");
+                    }
+                    else
+                    {
+                        String old_text = ml_new_message.getText().toString();
+                        ml_new_message.setText("");
+                        // need to do it this way, or else the text input cursor will not be in the correct place
+                        ml_new_message.append(old_text + "\n" + quote_text + "\n");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "add_quote_message_text:EE01:" + e.getMessage());
+                }
+            }
+        };
+
+        if (mla_handler_s != null)
+        {
+            mla_handler_s.post(myRunnable);
+        }
     }
 
     /* HINT: send a message to a friend */

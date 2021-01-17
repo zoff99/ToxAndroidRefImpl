@@ -250,6 +250,8 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
+    implementation("com.daimajia.swipelayout:library:1.2.0@aar")
+    //
     implementation ('net.zetetic:android-database-sqlcipher:4.4.2@aar') {
         transitive = true
     }
