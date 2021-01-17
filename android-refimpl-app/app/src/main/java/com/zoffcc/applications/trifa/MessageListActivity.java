@@ -49,7 +49,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -166,6 +165,16 @@ public class MessageListActivity extends AppCompatActivity
         selected_messages_text_only.clear();
         selected_messages_incoming_file.clear();
 
+        try
+        {
+            // reset search and filter flags, sooner
+            show_only_files = false;
+            search_messages_text = null;
+        }
+        catch (Exception e)
+        {
+        }
+
         mla_handler = new Handler(Looper.getMainLooper())
         {
             @Override
@@ -200,7 +209,6 @@ public class MessageListActivity extends AppCompatActivity
         setContentView(R.layout.activity_message_list);
 
         message_list_activity = this;
-        show_only_files = false;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -260,6 +268,18 @@ public class MessageListActivity extends AppCompatActivity
             });
         }
 
+        try
+        {
+            // reset search and filter flags
+            messageSearchView.setQuery("", false);
+            messageSearchView.setIconified(true);
+            show_only_files = false;
+            search_messages_text = null;
+        }
+        catch (Exception e)
+        {
+        }
+
         // give focus to text input
         ml_new_message.requestFocus();
         try
@@ -300,7 +320,7 @@ public class MessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         show_only_files = false;
-                        MessageListFragment.search_messages_text = null;
+                        search_messages_text = null;
                         MainActivity.message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
@@ -314,7 +334,7 @@ public class MessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         show_only_files = false;
-                        MessageListFragment.search_messages_text = query;
+                        search_messages_text = query;
                         MainActivity.message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
