@@ -3013,4 +3013,31 @@ public class HelperGeneric
         }
 
     }
+
+    static String get_sqlite_search_string(String search_string_in)
+    {
+        String sql_like_pattern = "";
+
+        try
+        {
+            // TODO: seems default "ESCAPE" is "\"
+            // and "like" is set to caseinsensitive
+
+            // TODO: check if there is a possible SQL injection here
+            //       the good news is that only text that the user entered himself will go here
+            //       so a user would have to want to self sabotage, by trying to inject here
+            String tmp_str = search_string_in.
+                    replace("\\", "\\\\"). // \ -> \\
+                    replace("%", "\\%"). // % -> \%
+                    replace("_", "\\_"). // _ -> \_
+                    replace("'", "''"); // ' -> ''
+            // Log.i(TAG, "get_sqlite_search_string:" + tmp_str);
+            sql_like_pattern = "%" + tmp_str + "%";
+        }
+        catch (Exception e)
+        {
+        }
+
+        return sql_like_pattern;
+    }
 }

@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
@@ -55,6 +56,7 @@ public class MessageListFragment extends Fragment
     MessageListActivity mla = null;
     boolean is_data_loaded = true;
     static boolean show_only_files = false;
+    static String search_messages_text = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -110,11 +112,23 @@ public class MessageListFragment extends Fragment
                 }
                 else
                 {
-                    data_values = orma.selectFromMessage().tox_friendpubkeyEq(
-                            tox_friend_get_public_key__wrapper(current_friendnum)).
-                            orderBySent_timestampAsc().
-                            orderBySent_timestamp_msAsc().
-                            toList();
+                    if ((search_messages_text == null) || (search_messages_text.length() == 0))
+                    {
+                        data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                                tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                toList();
+                    }
+                    else
+                    {
+                        data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                                tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                                toList();
+                    }
                 }
                 Log.i(TAG, "loading data:001");
                 // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
@@ -333,11 +347,23 @@ public class MessageListFragment extends Fragment
                 }
                 else
                 {
-                    adapter.add_list_clear(orma.selectFromMessage().
-                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                            orderBySent_timestampAsc().
-                            orderBySent_timestamp_msAsc().
-                            toList());
+                    if ((search_messages_text == null) || (search_messages_text.length() == 0))
+                    {
+                        adapter.add_list_clear(orma.selectFromMessage().
+                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                toList());
+                    }
+                    else
+                    {
+                        adapter.add_list_clear(orma.selectFromMessage().
+                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                                toList());
+                    }
                 }
                 Log.i(TAG, "data_values:005c");
             }

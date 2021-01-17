@@ -89,7 +89,7 @@ public class Message
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     boolean is_new = true;
 
-    @Column(helpers = Column.Helpers.ALL)
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
     String text = null;
 

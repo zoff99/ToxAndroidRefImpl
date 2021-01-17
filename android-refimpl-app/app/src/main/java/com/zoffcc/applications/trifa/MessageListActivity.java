@@ -70,6 +70,7 @@ import java.util.Arrays;
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.documentfile.provider.DocumentFile;
 
@@ -146,6 +147,7 @@ public class MessageListActivity extends AppCompatActivity
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
     Spinner spinner_filter_msgs = null;
+    SearchView tickerSearchView = null;
 
     Handler mla_handler = null;
     static Handler mla_handler_s = null;
@@ -273,6 +275,91 @@ public class MessageListActivity extends AppCompatActivity
         set_friend_connection_status_icon();
         ml_status_icon.setImageResource(R.drawable.circle_green);
         set_friend_status_icon();
+        tickerSearchView = (SearchView) findViewById(R.id.search_view_messages);
+
+        tickerSearchView.setQueryHint("search ..."); // TODO: make translateable
+        tickerSearchView.setIconifiedByDefault(false);
+
+        TextView tickerSearchViewTextView = tickerSearchView.findViewById(androidx.appcompat.R.id.search_src_text);
+
+        tickerSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
+        {
+
+            @Override
+            public boolean onQueryTextSubmit(String query)
+            {
+                // Log.i(TAG, "search:1:" + query);
+
+                if ((query == null) || (query.length() == 0))
+                {
+                    try
+                    {
+                        // all messages
+                        show_only_files = false;
+                        MessageListFragment.search_messages_text = null;
+                        MainActivity.message_list_fragment.update_all_messages(true);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        // all messages and search string
+                        show_only_files = false;
+                        MessageListFragment.search_messages_text = query;
+                        MainActivity.message_list_fragment.update_all_messages(true);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query)
+            {
+                // Log.i(TAG, "search:2:" + query);
+
+                if ((query == null) || (query.length() == 0))
+                {
+                    try
+                    {
+                        // all messages
+                        show_only_files = false;
+                        MessageListFragment.search_messages_text = null;
+                        MainActivity.message_list_fragment.update_all_messages(true);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        // all messages and search string
+                        show_only_files = false;
+                        MessageListFragment.search_messages_text = query;
+                        MainActivity.message_list_fragment.update_all_messages(true);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+
+                return true;
+            }
+        });
+
 
         setUpEmojiPopup();
 
