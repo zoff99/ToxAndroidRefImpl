@@ -41,21 +41,29 @@ public class HelperFriend
 
     static FriendList main_get_friend(long friendnum)
     {
-        String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
-        // Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
-        FriendList f;
-        List<FriendList> fl = orma.selectFromFriendList().
-                tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
-                toList();
+        FriendList f = null;
 
-        // Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
-
-        if (fl.size() > 0)
+        try
         {
-            f = fl.get(0);
-            // Log.i(TAG, "main_get_friend:f=" + f);
+            String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
+            // Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
+            List<FriendList> fl = orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList();
+
+            // Log.i(TAG, "main_get_friend:fl=" + fl + " size=" + fl.size());
+
+            if (fl.size() > 0)
+            {
+                f = fl.get(0);
+                // Log.i(TAG, "main_get_friend:f=" + f);
+            }
+            else
+            {
+                f = null;
+            }
         }
-        else
+        catch (Exception e)
         {
             f = null;
         }
@@ -260,6 +268,7 @@ public class HelperFriend
             e.printStackTrace();
         }
     }
+
     synchronized static void update_friend_in_db_name(FriendList f)
     {
         orma.updateFriendList().
