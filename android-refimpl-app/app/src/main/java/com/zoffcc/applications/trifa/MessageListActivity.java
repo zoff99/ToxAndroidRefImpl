@@ -100,6 +100,7 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
+import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.MessageListFragment.show_only_files;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
@@ -146,8 +147,8 @@ public class MessageListActivity extends AppCompatActivity
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
-    Spinner spinner_filter_msgs = null;
-    SearchView tickerSearchView = null;
+    CustomSpinner spinner_filter_msgs = null;
+    SearchView messageSearchView = null;
 
     Handler mla_handler = null;
     static Handler mla_handler_s = null;
@@ -207,7 +208,11 @@ public class MessageListActivity extends AppCompatActivity
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
         ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
 
-        spinner_filter_msgs = (Spinner) findViewById(R.id.spinner_filter_msgs);
+        messageSearchView = (SearchView) findViewById(R.id.search_view_messages);
+        messageSearchView.setQueryHint("search ..."); // TODO: make translateable
+        messageSearchView.setIconifiedByDefault(true);
+
+        spinner_filter_msgs = (CustomSpinner) findViewById(R.id.spinner_filter_msgs);
         ArrayList<String> own_online_status_string_values = new ArrayList<String>(Arrays.asList("all", "files"));
         ArrayAdapter<String> myAdapter = new FilterMsgsSpinnerAdapter(this, R.layout.own_status_spinner_item,
                                                                       own_online_status_string_values);
@@ -226,13 +231,19 @@ public class MessageListActivity extends AppCompatActivity
                         if (id == 0)
                         {
                             // id: all messages
+                            messageSearchView.setQuery("", false);
+                            messageSearchView.setIconified(true);
                             show_only_files = false;
+                            search_messages_text = null;
                             MainActivity.message_list_fragment.update_all_messages(true);
                         }
                         else if (id == 1)
                         {
                             // id: only files
+                            messageSearchView.setQuery("", false);
+                            messageSearchView.setIconified(true);
                             show_only_files = true;
+                            search_messages_text = null;
                             MainActivity.message_list_fragment.update_all_messages(true);
                         }
                     }
@@ -245,7 +256,6 @@ public class MessageListActivity extends AppCompatActivity
                 @Override
                 public void onNothingSelected(AdapterView<?> parent)
                 {
-
                 }
             });
         }
@@ -275,14 +285,8 @@ public class MessageListActivity extends AppCompatActivity
         set_friend_connection_status_icon();
         ml_status_icon.setImageResource(R.drawable.circle_green);
         set_friend_status_icon();
-        tickerSearchView = (SearchView) findViewById(R.id.search_view_messages);
 
-        tickerSearchView.setQueryHint("search ..."); // TODO: make translateable
-        tickerSearchView.setIconifiedByDefault(false);
-
-        TextView tickerSearchViewTextView = tickerSearchView.findViewById(androidx.appcompat.R.id.search_src_text);
-
-        tickerSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
+        messageSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
         {
 
             @Override
