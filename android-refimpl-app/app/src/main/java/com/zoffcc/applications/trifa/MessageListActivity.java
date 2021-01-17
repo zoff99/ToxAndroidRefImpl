@@ -209,7 +209,7 @@ public class MessageListActivity extends AppCompatActivity
         ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
 
         messageSearchView = (SearchView) findViewById(R.id.search_view_messages);
-        messageSearchView.setQueryHint("search ..."); // TODO: make translateable
+        messageSearchView.setQueryHint(getString(R.string.messages_search_default_text));
         messageSearchView.setIconifiedByDefault(true);
 
         spinner_filter_msgs = (CustomSpinner) findViewById(R.id.spinner_filter_msgs);

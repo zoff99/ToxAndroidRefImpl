@@ -367,6 +367,8 @@
     <string name="ConferenceAudioActivity_18">talking ...</string>
     <string name="GroupActivityActive">Active:</string>
     <string name="GroupActivityOffline">Offline:</string>
+
+    <string name="messages_search_default_text">search ...</string>
     <!-- Java Source texts -->
     <!-- Java Source texts -->
     <!-- Java Source texts -->
