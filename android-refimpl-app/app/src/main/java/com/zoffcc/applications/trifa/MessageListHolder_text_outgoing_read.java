@@ -25,8 +25,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,15 +40,19 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
+import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
@@ -159,15 +161,19 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
-        textView.setOnClickListener(new View.OnClickListener() {
+        textView.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 layout_message_container.performClick();
             }
         });
-        textView.setOnLongClickListener(new View.OnLongClickListener() {
+        textView.setOnLongClickListener(new View.OnLongClickListener()
+        {
             @Override
-            public boolean onLongClick(View view) {
+            public boolean onLongClick(View view)
+            {
                 layout_message_container.performLongClick();
                 return true;
             }
@@ -204,7 +210,14 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
             textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_SIZE[PREF__global_font_size]));
         }
 
-        textView.setAutoLinkText(m.text);
+        if ((search_messages_text == null) || (search_messages_text.length() == 0))
+        {
+            textView.setAutoLinkText(m.text);
+        }
+        else
+        {
+            textView.setAutoLinkTextHighlight(m.text, search_messages_text);
+        }
 
         if (!m.read)
         {

@@ -22,19 +22,28 @@ package com.luseen.autolinklibrary;
 
 import android.content.Context;
 import android.graphics.Color;
-import androidx.annotation.ColorInt;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.FloatRange;
+import androidx.core.graphics.ColorUtils;
+
 public class EmojiTextViewLinks extends com.vanniktech.emoji.EmojiTextView
 {
+    private static final String TAG = "trifa.EmojiTextV";
+
     private static final int MIN_PHONE_NUMBER_LENGTH = 8;
     private static final int DEFAULT_COLOR = Color.RED;
 
@@ -75,6 +84,61 @@ public class EmojiTextViewLinks extends com.vanniktech.emoji.EmojiTextView
         setMovementMethod(new LinkTouchMovementMethod());
     }
 
+    /**
+     * Build a spannable String for use in highlighting text colors
+     *
+     * @param tv              The TextView to operate on
+     * @param textToHighlight The text / query that determines what to highlight
+     * @param ignoreCase      Whether or not to ignore case. If true, will ignore and "test" will have
+     *                        the same return as "TEST". If false, will return an item as highlighted
+     *                        only if it matches it case specficic.
+     * @param highlightColor  The highlight color to use. IE {@link Color#YELLOW} || {@link Color#BLUE}
+     * @param colorAlpha      Alpha to adjust how transparent the color is. 1.0 means it looks exactly
+     *                        as it should normally where as 0.0 means it is completely transparent and
+     *                        see-through. 0.5 means it is 50% transparent. Useful for darker colors
+     */
+    SpannableString buildHighlightString(TextView tv, String textToHighlight, boolean ignoreCase, @ColorInt int highlightColor, @FloatRange(from = 0.0, to = 1.0) float colorAlpha)
+    {
+        String originalText = tv.getText().toString();
+
+        SpannableString spannableString = (SpannableString) (tv.getText());
+        if (TextUtils.isEmpty(originalText) || TextUtils.isEmpty(textToHighlight))
+        {
+            return spannableString;
+        }
+        String lowercaseOriginalString = originalText.toLowerCase();
+        String lowercaseTextToHighlight = textToHighlight.toLowerCase();
+        if (colorAlpha < 1)
+        {
+            highlightColor = ColorUtils.setAlphaComponent(highlightColor, ((int) (255 * colorAlpha)));
+        }
+
+        //Search for all occurrences of the keyword in the string
+        int indexOfKeyword = (ignoreCase) ? lowercaseOriginalString.indexOf(
+                lowercaseTextToHighlight) : originalText.indexOf(textToHighlight);
+
+        while (indexOfKeyword != -1)
+        {
+            //Create a background color span on the keyword
+            spannableString.setSpan(new BackgroundColorSpan(highlightColor), indexOfKeyword,
+                                    indexOfKeyword + (textToHighlight.length()), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            //Get the next index of the keyword
+            indexOfKeyword = (ignoreCase) ? lowercaseOriginalString.indexOf(lowercaseTextToHighlight, (indexOfKeyword) +
+                                                                                                      textToHighlight.length()) : originalText.indexOf(
+                    textToHighlight, (indexOfKeyword) + textToHighlight.length());
+        }
+        return spannableString;
+    }
+
+    public void setAutoLinkTextHighlight(String text, String highlight_text)
+    {
+        SpannableString spannableString = makeSpannableString(text);
+        setText(spannableString, BufferType.SPANNABLE);
+        buildHighlightString(this, highlight_text, true, Color.YELLOW, 1.0F);
+        setMovementMethod(new LinkTouchMovementMethod());
+    }
+
     private SpannableString makeSpannableString(String text)
     {
         final SpannableString spannableString = new SpannableString(text);
@@ -91,12 +155,14 @@ public class EmojiTextViewLinks extends com.vanniktech.emoji.EmojiTextView
                 {
                     if (autoLinkOnClickListener != null)
                     {
-                        autoLinkOnClickListener.onAutoLinkTextClick(autoLinkItem.getAutoLinkMode(), autoLinkItem.getMatchedText());
+                        autoLinkOnClickListener.onAutoLinkTextClick(autoLinkItem.getAutoLinkMode(),
+                                                                    autoLinkItem.getMatchedText());
                     }
                 }
             };
 
-            spannableString.setSpan(clickableSpan, autoLinkItem.getStartPoint(), autoLinkItem.getEndPoint(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(clickableSpan, autoLinkItem.getStartPoint(), autoLinkItem.getEndPoint(),
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 
         return spannableString;
@@ -125,7 +191,8 @@ public class EmojiTextViewLinks extends com.vanniktech.emoji.EmojiTextView
                 {
                     if (matcher.group().length() > MIN_PHONE_NUMBER_LENGTH)
                     {
-                        autoLinkItems.add(new AutoLinkItem(matcher.start(), matcher.end(), matcher.group(), anAutoLinkMode));
+                        autoLinkItems.add(
+                                new AutoLinkItem(matcher.start(), matcher.end(), matcher.group(), anAutoLinkMode));
                     }
                 }
             }
@@ -133,7 +200,8 @@ public class EmojiTextViewLinks extends com.vanniktech.emoji.EmojiTextView
             {
                 while (matcher.find())
                 {
-                    autoLinkItems.add(new AutoLinkItem(matcher.start(), matcher.end(), matcher.group(), anAutoLinkMode));
+                    autoLinkItems.add(
+                            new AutoLinkItem(matcher.start(), matcher.end(), matcher.group(), anAutoLinkMode));
                 }
             }
         }

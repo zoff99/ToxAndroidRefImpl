@@ -53,6 +53,7 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.add_quote_message_text;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
+import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
@@ -265,7 +266,14 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
             textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_SIZE[PREF__global_font_size]));
         }
 
-        textView.setAutoLinkText(m.text);
+        if ((search_messages_text == null) || (search_messages_text.length() == 0))
+        {
+            textView.setAutoLinkText(m.text);
+        }
+        else
+        {
+            textView.setAutoLinkTextHighlight(m.text, search_messages_text);
+        }
 
         final String unicode_PERSONAL_COMPUTER = "\uD83D\uDCBB";
         final String unicode_INCOMING_ENVELOPE = "\uD83D\uDCE8";

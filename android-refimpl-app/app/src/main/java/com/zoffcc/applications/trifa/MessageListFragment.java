@@ -122,6 +122,15 @@ public class MessageListFragment extends Fragment
                     }
                     else
                     {
+                        /*
+                         searching for case-IN-sensitive non ascii chars is not working:
+
+                         https://sqlite.org/lang_expr.html#like
+
+                         Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                         The LIKE operator is case sensitive by default for unicode characters that are beyond
+                         the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                         */
                         data_values = orma.selectFromMessage().tox_friendpubkeyEq(
                                 tox_friend_get_public_key__wrapper(current_friendnum)).
                                 orderBySent_timestampAsc().
@@ -357,6 +366,15 @@ public class MessageListFragment extends Fragment
                     }
                     else
                     {
+                        /*
+                         searching for case-IN-sensitive non ascii chars is not working:
+
+                         https://sqlite.org/lang_expr.html#like
+
+                         Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                         The LIKE operator is case sensitive by default for unicode characters that are beyond
+                         the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                         */
                         adapter.add_list_clear(orma.selectFromMessage().
                                 tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
                                 orderBySent_timestampAsc().
