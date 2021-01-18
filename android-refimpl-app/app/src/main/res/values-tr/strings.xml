@@ -352,4 +352,5 @@
     <string name="conference_audio_activity_player_name">Sesli Konferans Oynatıcısı</string>
     <string name="layout___migdb_do_not_close">Bu ekranı KAPATMAYIN</string>
     <string name="layout___migdb_text">Veri tabanı dosyalarını taşıma</string>
+    <string name="messages_search_default_text">ara ...</string>
 </resources>
