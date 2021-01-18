@@ -58,8 +58,10 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 
+import static com.zoffcc.applications.trifa.ConferenceMessageListFragment.conf_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
@@ -106,6 +108,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
+    SearchView messageSearchView = null;
 
     // main drawer ----------
     Drawer conference_message_drawer = null;
@@ -127,6 +130,15 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         amode = null;
         amode_save_menu_item = null;
         selected_conference_messages.clear();
+
+        try
+        {
+            // reset search and filter flags, sooner
+            conf_search_messages_text = null;
+        }
+        catch (Exception e)
+        {
+        }
 
         conferences_handler = new Handler(getMainLooper());
         conferences_handler_s = conferences_handler;
@@ -212,6 +224,21 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
         ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
 
+        messageSearchView = (SearchView) findViewById(R.id.conf_search_view_messages);
+        messageSearchView.setQueryHint(getString(R.string.messages_search_default_text));
+        messageSearchView.setIconifiedByDefault(true);
+
+        try
+        {
+            // reset search and filter flags
+            messageSearchView.setQuery("", false);
+            messageSearchView.setIconified(true);
+            conf_search_messages_text = null;
+        }
+        catch (Exception e)
+        {
+        }
+
         // give focus to text input
         ml_new_message.requestFocus();
         try
@@ -236,6 +263,80 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         ml_icon.setImageResource(R.drawable.circle_red);
         set_conference_connection_status_icon();
+
+        messageSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
+        {
+
+            @Override
+            public boolean onQueryTextSubmit(String query)
+            {
+                // Log.i(TAG, "search:1:" + query);
+
+                if ((query == null) || (query.length() == 0))
+                {
+                    try
+                    {
+                        // all messages
+                        conf_search_messages_text = null;
+                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        // all messages and search string
+                        conf_search_messages_text = query;
+                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query)
+            {
+                // Log.i(TAG, "search:2:" + query);
+
+                if ((query == null) || (query.length() == 0))
+                {
+                    try
+                    {
+                        // all messages
+                        conf_search_messages_text = null;
+                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        // all messages and search string
+                        conf_search_messages_text = query;
+                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+
+                return true;
+            }
+        });
 
         setUpEmojiPopup();
 

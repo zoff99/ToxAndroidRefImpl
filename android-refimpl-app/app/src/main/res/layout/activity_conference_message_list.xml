@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,15 +8,25 @@
     android:orientation="vertical"
     tools:context="com.zoffcc.applications.trifa.MessageListActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/conf_search_view_messages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            app:iconifiedByDefault="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.appcompat.widget.Toolbar>
 
     <!-- the layout which will contain (host) the drawerLayout -->
     <FrameLayout
@@ -47,7 +56,7 @@
                     android:layout_marginRight="1dip"
                     android:padding="2dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/circle_red"/>
+                    android:src="@drawable/circle_red" />
 
                 <ImageView
                     android:id="@+id/ml_status_icon"
@@ -59,7 +68,7 @@
                     android:layout_marginRight="6dip"
                     android:padding="2dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/circle_green"/>
+                    android:src="@drawable/circle_green" />
 
 
                 <TextView
@@ -70,7 +79,7 @@
                     android:padding="8dp"
                     android:text="@string/layout___name"
                     android:textColor="@android:color/primary_text_light"
-                    android:textSize="15sp"/>
+                    android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -78,8 +87,7 @@
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:text=""
-                    android:visibility="gone">
-                </TextView>
+                    android:visibility="gone"></TextView>
 
                 <ImageButton
                     android:id="@+id/ml_phone_icon"
@@ -92,7 +100,7 @@
                     android:onClick="start_call_to_friend"
                     android:padding="7dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/circle_orange"/>
+                    android:src="@drawable/circle_orange" />
 
 
             </LinearLayout>
@@ -104,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                tools:layout="@layout/conference_message_list_layout"/>
+                tools:layout="@layout/conference_message_list_layout" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -124,7 +132,7 @@
                     android:singleLine="true"
                     android:text=""
                     android:textColor="@android:color/primary_text_light"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -145,7 +153,7 @@
                     android:padding="7dp"
                     android:scaleType="fitCenter"
                     app:srcCompat="@drawable/emoji_ios_category_people"
-                    tools:ignore="ContentDescription"/>
+                    tools:ignore="ContentDescription" />
 
                 <com.vanniktech.emoji.EmojiEditText
                     android:id="@+id/ml_new_message"
@@ -160,7 +168,7 @@
                     android:singleLine="false"
                     android:text=""
                     android:textColor="@android:color/primary_text_light"
-                    android:textSize="19sp"/>
+                    android:textSize="19sp" />
 
                 <LinearLayout
                     android:layout_width="50dp"
@@ -180,14 +188,14 @@
                         android:onClick="send_message_onclick"
                         android:padding="5dp"
                         android:scaleType="fitCenter"
-                        android:src="@android:drawable/ic_menu_send"/>
+                        android:src="@android:drawable/ic_menu_send" />
                 </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <include layout="@layout/floating_action_button_conference"/>
+        <include layout="@layout/floating_action_button_conference" />
 
     </FrameLayout>
 

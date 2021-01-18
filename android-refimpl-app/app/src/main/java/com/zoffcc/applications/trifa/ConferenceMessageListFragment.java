@@ -22,10 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +30,12 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
@@ -50,6 +52,7 @@ public class ConferenceMessageListFragment extends Fragment
     static boolean is_at_bottom = true;
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
+    static String conf_search_messages_text = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -91,21 +94,67 @@ public class ConferenceMessageListFragment extends Fragment
             {
                 if (PREF__conference_show_system_messages)
                 {
-                    // TODO: sort by sent_timestamp ?
-                    data_values = orma.selectFromConferenceMessage().
-                            conference_identifierEq(current_conf_id).
-                            orderBySent_timestampAsc().
-                            toList();
+                    if ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0))
+                    {
+                        // TODO: sort by sent_timestamp ?
+                        data_values = orma.selectFromConferenceMessage().
+                                conference_identifierEq(current_conf_id).
+                                orderBySent_timestampAsc().
+                                toList();
+                    }
+                    else
+                    {
+                        // TODO: sort by sent_timestamp ?
+                        /*
+                         searching for case-IN-sensitive non ascii chars is not working:
+
+                         https://sqlite.org/lang_expr.html#like
+
+                         Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                         The LIKE operator is case sensitive by default for unicode characters that are beyond
+                         the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                         */
+                        data_values = orma.selectFromConferenceMessage().
+                                conference_identifierEq(current_conf_id).
+                                orderBySent_timestampAsc().
+                                where(" like('" + get_sqlite_search_string(conf_search_messages_text) +
+                                      "', text, '\\')").
+                                toList();
+                    }
                 }
                 else
                 {
-                    // TODO: sort by sent_timestamp ?
-                    data_values = orma.selectFromConferenceMessage().
-                            conference_identifierEq(current_conf_id).
-                            and().
-                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                            orderBySent_timestampAsc().
-                            toList();
+                    if ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0))
+                    {
+                        // TODO: sort by sent_timestamp ?
+                        data_values = orma.selectFromConferenceMessage().
+                                conference_identifierEq(current_conf_id).
+                                and().
+                                tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                                orderBySent_timestampAsc().
+                                toList();
+                    }
+                    else
+                    {
+                        // TODO: sort by sent_timestamp ?
+                        /*
+                         searching for case-IN-sensitive non ascii chars is not working:
+
+                         https://sqlite.org/lang_expr.html#like
+
+                         Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                         The LIKE operator is case sensitive by default for unicode characters that are beyond
+                         the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                         */
+                        data_values = orma.selectFromConferenceMessage().
+                                conference_identifierEq(current_conf_id).
+                                and().
+                                tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                                orderBySent_timestampAsc().
+                                where(" like('" + get_sqlite_search_string(conf_search_messages_text) +
+                                      "', text, '\\')").
+                                toList();
+                    }
                 }
             }
         }
@@ -283,5 +332,78 @@ public class ConferenceMessageListFragment extends Fragment
         }
     }
 
+    void update_all_messages(boolean always)
+    {
+        Log.i(TAG, "update_all_messages");
+
+        try
+        {
+            // reset "new" flags for messages -------
+            if (orma != null)
+            {
+                orma.updateConferenceMessage().
+                        conference_identifierEq(current_conf_id).
+                        is_new(false).execute();
+            }
+            // reset "new" flags for messages -------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if ((always) || (data_values != null))
+            {
+                Log.i(TAG, "data_values:005a");
+                if (data_values != null)
+                {
+                    data_values.clear();
+                }
+                Log.i(TAG, "data_values:005b");
+
+                // -------------------------------------------------
+                // HINT: this one does not respect ordering?!
+                // -------------------------------------------------
+                if ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0))
+                {
+                    adapter.add_list_clear(orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).
+                            and().
+                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                            orderBySent_timestampAsc().
+                            toList());
+                }
+                else
+                {
+                    /*
+                     searching for case-IN-sensitive non ascii chars is not working:
+
+                     https://sqlite.org/lang_expr.html#like
+
+                     Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                     The LIKE operator is case sensitive by default for unicode characters that are beyond
+                     the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                     */
+                    adapter.add_list_clear(orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).
+                            and().
+                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                            orderBySent_timestampAsc().
+                            where(" like('" + get_sqlite_search_string(conf_search_messages_text) + "', text, '\\')").
+                            toList());
+                }
+                Log.i(TAG, "data_values:005c");
+            }
+            Log.i(TAG, "data_values:005d");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
+        }
+
+    }
 
 }

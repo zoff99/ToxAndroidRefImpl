@@ -45,6 +45,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.ConferenceMessageListFragment.conf_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.StringSignature2;
@@ -57,6 +58,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
@@ -268,7 +270,14 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             e.printStackTrace();
         }
 
-        textView.setAutoLinkText(m.text);
+        if ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0))
+        {
+            textView.setAutoLinkText(m.text);
+        }
+        else
+        {
+            textView.setAutoLinkTextHighlight(m.text, conf_search_messages_text);
+        }
 
         date_time.setText(long_date_time_format(m.sent_timestamp));
 
