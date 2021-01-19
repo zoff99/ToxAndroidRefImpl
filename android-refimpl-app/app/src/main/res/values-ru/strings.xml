@@ -319,4 +319,5 @@
     <string name="conference_audio_activity_player_name">Проигрыватель аудиоконференций</string>
     <string name="layout___migdb_do_not_close">НЕ закрывайте этот экран</string>
     <string name="layout___migdb_text">Перенос файлов базы данных</string>
+    <string name="messages_search_default_text">поиск ...</string>
 </resources>
