@@ -115,6 +115,9 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_BITRA
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_LOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MAX_QUANTIZER_MED;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MIN_BITRATE_HIGH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MIN_BITRATE_LOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_ENCODER_MIN_BITRATE_MED;
 
 public class CallingActivity extends AppCompatActivity implements CameraWrapper.CamOpenOverCallback, SensorEventListener
 {
@@ -664,6 +667,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
                                                     max_video_bitrate_);
 
+                        int res2 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MIN_BITRATE.value,
+                                                    VIDEO_ENCODER_MIN_BITRATE_LOW);
+
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_LOW);
@@ -712,6 +719,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
                                                     max_video_bitrate_);
 
+                        int res2 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MIN_BITRATE.value,
+                                                    VIDEO_ENCODER_MIN_BITRATE_MED);
+
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_MED);
@@ -759,6 +770,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                                     ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
                                                     max_video_bitrate_);
 
+                        int res2 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MIN_BITRATE.value,
+                                                    VIDEO_ENCODER_MIN_BITRATE_HIGH);
+
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
                                                    VIDEO_ENCODER_MAX_QUANTIZER_HIGH);
@@ -803,15 +818,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     int value = VIDEO_ENCODER_MAX_QUANTIZER_LOW;
                     int value1 = VIDEO_ENCODER_MAX_BITRATE_LOW;
+                    int value2 = VIDEO_ENCODER_MIN_BITRATE_LOW;
                     if (position == 1)
                     {
                         value = VIDEO_ENCODER_MAX_QUANTIZER_MED;
                         value1 = VIDEO_ENCODER_MAX_BITRATE_MED;
+                        value2 = VIDEO_ENCODER_MIN_BITRATE_MED;
                     }
                     else if (position == 2)
                     {
                         value = VIDEO_ENCODER_MAX_QUANTIZER_HIGH;
                         value1 = VIDEO_ENCODER_MAX_BITRATE_HIGH;
+                        value2 = VIDEO_ENCODER_MIN_BITRATE_HIGH;
                     }
 
                     if (PREF__video_cam_resolution == 2)
@@ -826,6 +844,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     int res1 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                 ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value,
                                                 value1);
+
+                    int res2 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                                ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MIN_BITRATE.value,
+                                                value2);
 
                     int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_RC_MAX_QUANTIZER.value,
@@ -1151,7 +1173,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             if (Callstate.audio_call)
                             {
                                 int res1 = toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                             GLOBAL_AUDIO_BITRATE, 0);
+                                                        GLOBAL_AUDIO_BITRATE, 0);
 
                                 if (res1 != 1)
                                 {
@@ -1162,7 +1184,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             else
                             {
                                 int res2 = toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                             GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                                        GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
 
                                 if (res2 != 1)
                                 {
@@ -1307,18 +1329,22 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
     }
 
-    public static void set_max_video_bitrate()
+    public static void set_min_and_max_video_bitrate()
     {
         try
         {
             int value1 = VIDEO_ENCODER_MAX_BITRATE_LOW;
+            int value2 = VIDEO_ENCODER_MIN_BITRATE_LOW;
+
             if (PREF__video_call_quality == 1)
             {
                 value1 = VIDEO_ENCODER_MAX_BITRATE_MED;
+                value2 = VIDEO_ENCODER_MIN_BITRATE_MED;
             }
             else if (PREF__video_call_quality == 2)
             {
                 value1 = VIDEO_ENCODER_MAX_BITRATE_HIGH;
+                value2 = VIDEO_ENCODER_MIN_BITRATE_HIGH;
             }
 
             if (PREF__video_cam_resolution == 2)
@@ -1333,11 +1359,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                        ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MAX_BITRATE.value, value1);
             Log.i(TAG, "max_v_birate_set:res=" + res);
+
+            int res2 = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                        ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_ENCODER_VIDEO_MIN_BITRATE.value, value2);
+            Log.i(TAG, "min_v_birate_set:res=" + res2);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "max_v_birate_set:EE:" + e.getMessage()); //$NON-NLS-1$
+            Log.i(TAG, "min_and_max_v_birate_set:EE:" + e.getMessage()); //$NON-NLS-1$
         }
     }
 
@@ -2704,7 +2734,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     // b) the other party accepting our call invitation
     static void on_call_started_actions()
     {
-        set_max_video_bitrate();
+        set_min_and_max_video_bitrate();
         set_av_latency();
         set_video_delay_ms();
         set_audio_play_volume();

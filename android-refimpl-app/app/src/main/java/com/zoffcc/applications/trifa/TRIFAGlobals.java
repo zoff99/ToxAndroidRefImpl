@@ -113,6 +113,10 @@ public class TRIFAGlobals
     final static int VIDEO_ENCODER_MAX_BITRATE_MED = 1200;
     final static int VIDEO_ENCODER_MAX_BITRATE_HIGH = 2500;
 
+    final static int VIDEO_ENCODER_MIN_BITRATE_LOW = 0; // use 0 here since other factors will set a limit anyway
+    final static int VIDEO_ENCODER_MIN_BITRATE_MED = 400;
+    final static int VIDEO_ENCODER_MIN_BITRATE_HIGH = 1000;
+
     final static int GLOBAL_MIN_VIDEO_BITRATE = 100;
     final static int GLOBAL_MIN_AUDIO_BITRATE = 6; // allowed values: (xx>=6) && (xx<=510)
 
