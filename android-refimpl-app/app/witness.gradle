@@ -1,6 +1,6 @@
 dependencyVerification {
     verify = [
-        'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.58:trifa-jni-lib-1.0.58.aar:83a5f5912bc3a0cc3a03a81702517c8150845dba8e0e3c4f6f9ab12c0a79cdbc',
+        'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.59:trifa-jni-lib-1.0.59.aar:ae5fca73edab8232610e9fd24d9598123fdd9bc6d3bfc2edda988f85e26ece85',
         'androidx.activity:activity:1.1.0:activity-1.1.0.aar:4f2b35916768032f7d0c20e250e28b29037ed4ce9ebf3da4fcd51bcb0c6067ef',
         'androidx.annotation:annotation-experimental:1.0.0:annotation-experimental-1.0.0.aar:b219d2b568e7e4ba534e09f8c2fd242343df6ccbdfbbe938846f5d740e6b0b11',
         'androidx.annotation:annotation:1.1.0:annotation-1.1.0.jar:d38d63edb30f1467818d50aaf05f8a692dea8b31392a049bfa991b159ad5b692',
