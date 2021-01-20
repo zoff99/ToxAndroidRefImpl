@@ -116,7 +116,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_SL
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DEBUG_BATTERY_OPTIMIZATION_LOGGING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUPBOT_TOKTOK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
@@ -764,8 +763,7 @@ public class TrifaToxService extends Service
                 try
                 {
                     orma.getConnection().execSQL(
-                            "update ConferenceMessage set was_synced=false" + " where " +
-                            " was_synced is NULL");
+                            "update ConferenceMessage set was_synced=false" + " where " + " was_synced is NULL");
                     Log.i(TAG, "onCreate:migrate_was_synced");
                 }
                 catch (Exception e)
@@ -886,15 +884,10 @@ public class TrifaToxService extends Service
                     {
                         Log.i(TAG, "need_add_bots:start");
                         add_friend_real(ECHOBOT_TOXID);
-                        add_friend_real(GROUPBOT_TOKTOK);
-                        // HINT: Disabled per request JFreegman ---------
-                        // add_friend_real(GROUPBOT_TOXID);
-                        // ----------------------------------------------
                         set_g_opts("ADD_BOTS_ON_STARTUP_done", "true");
                         Log.i(TAG, "need_add_bots=true (INSERT)");
                     }
                 }
-
 
                 try
                 {
