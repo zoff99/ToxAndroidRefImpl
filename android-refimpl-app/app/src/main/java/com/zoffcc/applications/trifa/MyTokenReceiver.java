@@ -81,9 +81,11 @@ public class MyTokenReceiver extends BroadcastReceiver
                     else
                     {
                         Log.i(TAG, "TrifaToxService NOT running");
-                        Intent open_trifa_intent = new Intent(context, StartMainActivityWrapper.class);
+                        Intent open_trifa_intent = new Intent(context.getApplicationContext(),
+                                                              StartMainActivityWrapper.class);
                         open_trifa_intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(open_trifa_intent);
+                        Log.i(TAG, "activity started");
 
                         try
                         {
@@ -97,6 +99,8 @@ public class MyTokenReceiver extends BroadcastReceiver
                 }
                 catch (Exception e)
                 {
+                    e.printStackTrace();
+                    Log.i(TAG, "TrifaToxService startup:EE01:" + e.getMessage());
                 }
 
                 try
