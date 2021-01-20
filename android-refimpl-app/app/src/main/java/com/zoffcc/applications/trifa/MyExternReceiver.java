@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -68,6 +69,34 @@ public class MyExternReceiver extends BroadcastReceiver
 
                 try
                 {
+                    if (isMyServiceRunning(TrifaToxService.class.getName(), context))
+                    {
+                        Log.i(TAG, "TrifaToxService running");
+                    }
+                    else
+                    {
+                        Log.i(TAG, "TrifaToxService NOT running");
+                        Intent open_trifa_intent = new Intent(context, StartMainActivityWrapper.class);
+                        open_trifa_intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(open_trifa_intent);
+
+                        try
+                        {
+                            Thread.sleep(20 * 1000); // wait for 20 seconds
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+
+
+                try
+                {
                     Log.i(TAG, "MyExternReceiver:" + "onReceive");
 
                     if (trifa_service_thread != null)
@@ -107,6 +136,18 @@ public class MyExternReceiver extends BroadcastReceiver
             }
         };
         t.start();
+    }
 
+    private boolean isMyServiceRunning(String serviceClassName, Context c)
+    {
+        ActivityManager manager = (ActivityManager) c.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+        {
+            if (serviceClassName.equals(service.service.getClassName()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
