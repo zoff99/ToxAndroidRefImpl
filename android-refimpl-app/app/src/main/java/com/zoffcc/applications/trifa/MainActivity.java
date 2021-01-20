@@ -142,6 +142,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_file
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -1010,7 +1011,7 @@ public class MainActivity extends AppCompatActivity
                 Arrays.asList(getString(R.string.MainActivity_available), getString(R.string.MainActivity_away),
                               getString(R.string.MainActivity_busy)));
         ArrayAdapter<String> myAdapter = new OwnStatusSpinnerAdapter(this, R.layout.own_status_spinner_item,
-                                                                      own_online_status_string_values);
+                                                                     own_online_status_string_values);
 
         if (spinner_own_status != null)
         {
@@ -3777,6 +3778,14 @@ public class MainActivity extends AppCompatActivity
                         else
                         {
                             HelperRelay.invite_to_all_conferences_own_relay(f.tox_public_key_string);
+                        }
+
+                        if (TRIFAGlobals.global_notification_token == null)
+                        {
+                            if (get_g_opts("NotificationToken") != null)
+                            {
+                                TRIFAGlobals.global_notification_token = get_g_opts("NotificationToken");
+                            }
                         }
 
                         if (TRIFAGlobals.global_notification_token != null &&

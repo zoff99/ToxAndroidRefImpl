@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
 
+import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 
 public class MyTokenReceiver extends BroadcastReceiver
@@ -72,13 +73,18 @@ public class MyTokenReceiver extends BroadcastReceiver
                 try
                 {
                     Bundle extras = intent2.getExtras();
-                    if(extras == null) {
+                    if (extras == null)
+                    {
                         Log.i(TAG, "couldn't get the token");
-                    } else {
+                    }
+                    else
+                    {
                         String tokenReceived = extras.getString("token");
-                        if(tokenReceived != null)
+                        if (tokenReceived != null)
+                        {
                             TRIFAGlobals.global_notification_token = tokenReceived;
-                        Log.i(TAG, "token received: " + tokenReceived);
+                            Log.i(TAG, "token received: " + "xxxxxxxxxxxxx");
+                        }
                     }
                 }
                 catch (Exception e)
@@ -95,6 +101,15 @@ public class MyTokenReceiver extends BroadcastReceiver
                         TrifaToxService.need_wakeup_now = true;
                         trifa_service_thread.interrupt();
                     }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    set_g_opts("NotificationToken", TRIFAGlobals.global_notification_token);
                 }
                 catch (Exception e)
                 {

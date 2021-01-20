@@ -1170,7 +1170,7 @@ public class HelperGeneric
             try
             {
                 orma.insertIntoTRIFADatabaseGlobalsNew(g_opts);
-                Log.i(TAG, "set_g_opts:(INSERT):key=" + key + " value=" + value);
+                Log.i(TAG, "set_g_opts:(INSERT):key=" + key + " value=" + "xxxxxxxxxxxxx");
             }
             catch (android.database.sqlite.SQLiteConstraintException | net.sqlcipher.database.SQLiteConstraintException e)
             {
@@ -1179,7 +1179,7 @@ public class HelperGeneric
                 try
                 {
                     orma.updateTRIFADatabaseGlobalsNew().keyEq(key).value(value).execute();
-                    Log.i(TAG, "set_g_opts:(UPDATE):key=" + key + " value=" + value);
+                    Log.i(TAG, "set_g_opts:(UPDATE):key=" + key + " value=" + "xxxxxxxxxxxxxxx");
                 }
                 catch (Exception e2)
                 {
