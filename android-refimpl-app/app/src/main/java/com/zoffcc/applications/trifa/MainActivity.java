@@ -250,9 +250,9 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
-    final static boolean ORMA_TRACE = false; // set "false" for release builds
+    final static boolean ORMA_TRACE = true; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
@@ -460,6 +460,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        super.onCreate(savedInstanceState);
+
         Log.i(TAG, "onCreate");
 
         Log.d(TAG, "Lingver_Locale: " + Lingver.getInstance().getLocale());
@@ -472,7 +474,7 @@ public class MainActivity extends AppCompatActivity
         metrics = resources.getDisplayMetrics();
         global_showing_messageview = false;
         global_showing_anygroupview = false;
-        super.onCreate(savedInstanceState);
+
         main_handler = new Handler(getMainLooper());
         main_handler_s = main_handler;
         context_s = this.getBaseContext();
