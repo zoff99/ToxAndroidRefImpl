@@ -27,6 +27,7 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 
 public class MyTokenReceiver extends BroadcastReceiver
@@ -109,7 +110,7 @@ public class MyTokenReceiver extends BroadcastReceiver
 
                 try
                 {
-                    set_g_opts("NotificationToken", TRIFAGlobals.global_notification_token);
+                    set_g_opts(NOTIFICATION_TOKEN_DB_KEY, TRIFAGlobals.global_notification_token);
                 }
                 catch (Exception e)
                 {

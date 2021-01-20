@@ -40,6 +40,7 @@ public class TRIFAGlobals
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
     static String global_notification_token = null;
+    final static String NOTIFICATION_TOKEN_DB_KEY = "NotificationToken";
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 

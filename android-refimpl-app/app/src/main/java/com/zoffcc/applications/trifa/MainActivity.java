@@ -161,6 +161,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITR
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
@@ -3782,9 +3783,9 @@ public class MainActivity extends AppCompatActivity
 
                         if (TRIFAGlobals.global_notification_token == null)
                         {
-                            if (get_g_opts("NotificationToken") != null)
+                            if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY) != null)
                             {
-                                TRIFAGlobals.global_notification_token = get_g_opts("NotificationToken");
+                                TRIFAGlobals.global_notification_token = get_g_opts(NOTIFICATION_TOKEN_DB_KEY);
                             }
                         }
 
