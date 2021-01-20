@@ -23,14 +23,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_EMPTY_THE_LIST;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 
@@ -42,9 +40,9 @@ public class StartMainActivityWrapper extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Log.i(TAG, "onCreate");
-
         super.onCreate(savedInstanceState);
+
+        Log.i(TAG, "onCreate");
 
         // need this for "dp2px" to work !! -------
         // need this for "dp2px" to work !! -------
