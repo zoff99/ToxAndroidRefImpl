@@ -40,7 +40,6 @@ public class MyTokenReceiver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent2)
     {
         // Log.i(TAG, "got intent: " + intent2);
-        //Log.i(TAG, "caller = " + intent2.getCallingActivity().getClassName());
         try
         {
             if (token_wakeup_lock == null)
@@ -80,6 +79,9 @@ public class MyTokenReceiver extends BroadcastReceiver
                     }
                     else
                     {
+                        // TODO: this is not working anymore starting with Android 10
+                        // https://developer.android.com/guide/components/activities/background-starts
+                        // thanks Google
                         Log.i(TAG, "TrifaToxService NOT running");
                         Intent open_trifa_intent = new Intent(context.getApplicationContext(),
                                                               StartMainActivityWrapper.class);
