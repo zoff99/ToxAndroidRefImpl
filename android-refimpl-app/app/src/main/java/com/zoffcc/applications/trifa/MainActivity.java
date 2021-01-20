@@ -142,7 +142,9 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_file
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -162,6 +164,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITR
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY_NEED_ACK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
@@ -2225,6 +2228,51 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        // ACK new Notification token --------------------------
+        if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK) != null)
+        {
+            // ok we have a new token, show the user a dialog to ask if we should use it
+            AlertDialog ad = new AlertDialog.Builder(this).
+                    setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            try
+                            {
+                                del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "del_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
+                            }
+                        }
+                    }).
+                    setPositiveButton(R.string.MainActivity_yes_button, new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            try
+                            {
+                                String new_token = get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                                set_g_opts(NOTIFICATION_TOKEN_DB_KEY, new_token);
+                                del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "update_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
+                            }
+                        }
+                    }).create();
+            ad.setTitle(getString(R.string.MainActivity_new_noti_token_dialog_title));
+            ad.setMessage(getString(R.string.MainActivity_new_noti_token_dialog_text));
+            ad.setCancelable(false);
+            ad.setCanceledOnTouchOutside(false);
+            ad.show();
+        }
+        // ACK new Notification token --------------------------
     }
 
     @Override

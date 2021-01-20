@@ -41,6 +41,7 @@ public class TRIFAGlobals
 
     static String global_notification_token = null;
     final static String NOTIFICATION_TOKEN_DB_KEY = "NotificationToken";
+    final static String NOTIFICATION_TOKEN_DB_KEY_NEED_ACK = "NotificationTokenNeedACK";
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 

@@ -54,7 +54,7 @@ public class StartMainActivityWrapper extends AppCompatActivity
         try
         {
             Bundle extras = getIntent().getExtras();
-            Log.i(TAG, "change_msg_notification:extras=" + extras + " i=" + getIntent());
+            // Log.i(TAG, "change_msg_notification:extras=" + extras + " i=" + getIntent());
             String should_clear_notification_list = getIntent().getStringExtra("CLEAR_NEW_MESSAGE_NOTIFICATION");
             Log.i(TAG, "change_msg_notification:extra:" + should_clear_notification_list);
             if (should_clear_notification_list != null)

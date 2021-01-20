@@ -28,7 +28,7 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY_NEED_ACK;
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 
 public class MyTokenReceiver extends BroadcastReceiver
@@ -91,7 +91,7 @@ public class MyTokenReceiver extends BroadcastReceiver
 
                         try
                         {
-                            Thread.sleep(20 * 1000); // wait for 20 seconds
+                            Thread.sleep(5 * 1000); // wait for 20 seconds
                         }
                         catch (Exception e)
                         {
@@ -105,6 +105,8 @@ public class MyTokenReceiver extends BroadcastReceiver
                     Log.i(TAG, "TrifaToxService startup:EE01:" + e.getMessage());
                 }
 
+                String tokenReceived = null;
+
                 try
                 {
                     Bundle extras = intent2.getExtras();
@@ -114,10 +116,9 @@ public class MyTokenReceiver extends BroadcastReceiver
                     }
                     else
                     {
-                        String tokenReceived = extras.getString("token");
+                        tokenReceived = extras.getString("token");
                         if (tokenReceived != null)
                         {
-                            TRIFAGlobals.global_notification_token = tokenReceived;
                             Log.i(TAG, "token received: " + "xxxxxxxxxxxxx");
                         }
                     }
@@ -144,7 +145,7 @@ public class MyTokenReceiver extends BroadcastReceiver
 
                 try
                 {
-                    set_g_opts(NOTIFICATION_TOKEN_DB_KEY, TRIFAGlobals.global_notification_token);
+                    set_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK, tokenReceived);
                 }
                 catch (Exception e)
                 {

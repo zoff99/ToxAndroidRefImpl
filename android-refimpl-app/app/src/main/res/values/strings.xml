@@ -292,7 +292,10 @@
     <string name="MainActivity_away">Away</string>
     <string name="MainActivity_busy">Busy</string>
     <string name="MainActivity_no_button">no</string>
+    <string name="MainActivity_yes_button">yes</string>
     <string name="MainActivity_ok_take_me_there_button">OK, take me there</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Token</string>
+    <string name="MainActivity_new_noti_token_dialog_text">New Notification Token received. Use this Token?</string>
     <string name="MainActivity_info_dialog_title">INFO</string>
     <string name="MainActivity_add_to_batt_opt">Please add TRIfA to the exception list for Batteryoptimization!</string>
     <string name="MainActivity_friend_is_typing">friend is typing ...</string>

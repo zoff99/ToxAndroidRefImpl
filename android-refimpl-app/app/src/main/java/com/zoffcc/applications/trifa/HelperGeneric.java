@@ -1144,6 +1144,7 @@ public class HelperGeneric
             if (orma.selectFromTRIFADatabaseGlobalsNew().keyEq(key).count() == 1)
             {
                 TRIFADatabaseGlobalsNew g_opts = orma.selectFromTRIFADatabaseGlobalsNew().keyEq(key).get(0);
+                // Log.i(TAG, "get_g_opts:(SELECT):key=" + key);
                 return g_opts.value;
             }
             else
@@ -1192,6 +1193,20 @@ public class HelperGeneric
         {
             e.printStackTrace();
             Log.i(TAG, "set_g_opts:EE2:" + e.getMessage());
+        }
+    }
+
+    static void del_g_opts(String key)
+    {
+        try
+        {
+            orma.deleteFromTRIFADatabaseGlobalsNew().keyEq(key).execute();
+            Log.i(TAG, "del_g_opts:(DELETE):key=" + key);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "del_g_opts:EE2:" + e.getMessage());
         }
     }
 
