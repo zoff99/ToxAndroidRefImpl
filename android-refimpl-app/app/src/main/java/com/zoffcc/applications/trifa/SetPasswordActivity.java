@@ -28,18 +28,16 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import static com.zoffcc.applications.trifa.MainActivity.getRandomString;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LEN_TRIFA_AUTOGEN_PASSWORD;
@@ -71,18 +69,22 @@ public class SetPasswordActivity extends AppCompatActivity
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         mPasswordView1 = (EditText) findViewById(R.id.password_1);
+        mPasswordView1.setOnEditorActionListener(new TextView.OnEditorActionListener()
+        {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent)
+            {
+                return true;
+            }
+        });
+
         mPasswordView2 = (EditText) findViewById(R.id.password_2);
         mPasswordView2.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent)
             {
-                if (id == R.id.set_button || id == EditorInfo.IME_NULL)
-                {
-                    check_password_validity();
-                    return true;
-                }
-                return false;
+                return true;
             }
         });
 
