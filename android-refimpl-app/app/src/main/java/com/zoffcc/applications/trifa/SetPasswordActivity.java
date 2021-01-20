@@ -62,9 +62,10 @@ public class SetPasswordActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        super.onCreate(savedInstanceState);
+
         Log.i(TAG, "onCreate");
 
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_password);
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
