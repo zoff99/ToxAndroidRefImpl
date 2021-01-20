@@ -55,6 +55,8 @@ public class FriendListFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        super.onCreateView(inflater, container, savedInstanceState);
+
         Log.i(TAG, "onCreateView");
         View view1 = inflater.inflate(R.layout.friend_list_layout, container, false);
         Log.i(TAG, "onCreateView:view1=" + view1);
@@ -90,8 +92,8 @@ public class FriendListFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.i(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
+        Log.i(TAG, "onActivityCreated");
 
         MainActivity.friend_list_fragment = this;
     }
@@ -99,15 +101,15 @@ public class FriendListFragment extends Fragment
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
-        Log.i(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
+        Log.i(TAG, "onViewCreated");
     }
 
     @Override
     public void onAttach(Context context)
     {
-        Log.i(TAG, "onAttach(Context)");
         super.onAttach(context);
+        Log.i(TAG, "onAttach(Context)");
 
         in_update_data = false;
     }
@@ -115,12 +117,14 @@ public class FriendListFragment extends Fragment
     @Override
     public void onAttach(Activity activity)
     {
-        Log.i(TAG, "onAttach(Activity)");
         super.onAttach(activity);
+        Log.i(TAG, "onAttach(Activity)");
     }
 
     synchronized void modify_friend(final CombinedFriendsAndConferences c, boolean is_friend)
     {
+        // Log.i(TAG, "modify_friend");
+
         if (is_friend)
         {
             final FriendList f = c.friend_item;
@@ -238,13 +242,17 @@ public class FriendListFragment extends Fragment
     @Override
     public void onStart()
     {
-        Log.i(TAG, "onStart");
         super.onStart();
+        Log.i(TAG, "onStart");
     }
 
     @Override
     public void onResume()
     {
+        super.onResume();
+
+        Log.i(TAG, "onResume");
+
         try
         {
             FriendListHolder.remove_progress_dialog();
@@ -264,7 +272,6 @@ public class FriendListFragment extends Fragment
         }
 
         Log.i(TAG, "onResume");
-        super.onResume();
 
         try
         {
@@ -405,7 +412,6 @@ public class FriendListFragment extends Fragment
     synchronized void add_all_friends_clear(final int delay)
     {
         // Log.i(TAG, "add_all_friends_clear");
-
         final Runnable myRunnable = new Runnable()
         {
             @Override
@@ -530,6 +536,7 @@ public class FriendListFragment extends Fragment
     // name is confusing, just update all friends!! already set to offline in DB
     public void set_all_friends_to_offline()
     {
+        // Log.i(TAG, "set_all_friends_to_offline");
         add_all_friends_clear(0);
     }
 }
