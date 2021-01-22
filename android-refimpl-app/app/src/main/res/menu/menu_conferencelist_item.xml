@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--<item-->
+    <!--android:id="@+id/item_info"-->
+    <!--android:title="Info"-->
+    <!--android:visible="true"-->
+    <!--app:showAsAction="ifRoom|withText"/>-->
+    <item
+        android:id="@+id/item_leave"
+        android:title="@string/layout___leave"
+        android:visible="true"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/item_delete"
+        android:title="@string/layout___delete"
+        android:visible="true"
+        app:showAsAction="ifRoom|withText"/>
+</menu>

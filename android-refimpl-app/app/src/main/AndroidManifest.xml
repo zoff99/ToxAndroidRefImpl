@@ -7,6 +7,15 @@
         android:name="android.hardware.location.network"
         android:required="false"/>
     <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false"/>
+    <uses-feature
         android:name="android.hardware.location.gps"
         android:required="false"/>
     <uses-feature
@@ -14,6 +23,9 @@
         android:required="false"/>
     <uses-feature
         android:name="android.hardware.touchscreen"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.microphone"
         android:required="false"/>
     <uses-feature
         android:name="android.hardware.camera"
@@ -30,14 +42,20 @@
         android:smallScreens="true"
         android:xlargeScreens="true"/>
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!--<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>-->
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
-    <uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!--<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>-->
+    <uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY" />
 
     <application
         android:name=".MainApplication"
@@ -45,15 +63,12 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:allowBackup,android:label,android:icon">
-
-        <!-- <meta-data -->
-        <!-- android:name="com.zoffcc.applications.trifa.MyGlideModule" -->
-        <!-- android:value="GlideModule"/> -->
+        tools:replace="android:allowBackup,android:label">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".StartMainActivityWrapper"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:launchMode="singleTask">
             <intent-filter>
@@ -63,21 +78,47 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".MainActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:launchMode="singleTask">
+        </activity>
+        <activity
             android:name=".AddFriendActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/add_friend_activity_name">
-            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>
         <activity
             android:name=".MessageListActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/message_list_activity_name">
-            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
+            android:name=".ConferenceMessageListActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/conference_message_list_activity_name">
+        </activity>
+        <activity
+            android:name=".ConferenceAudioActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/conference_audio_activity_name">
+        </activity>
+        <activity
+            android:name=".GroupAudioPlayer"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/conference_audio_activity_player_name">
         </activity>
         <activity
             android:name=".CallingActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_calling"
+            android:showWhenLocked="true"
+            android:showOnLockScreen="true"
+            android:showForAllUsers="true"
+            android:turnScreenOn="true"
+            android:screenOrientation="portrait"
             android:launchMode="singleTask"
-            android:theme="@style/FullscreenTheme">
+            android:theme="@style/FullscreenTheme"
+            tools:ignore="LockedOrientationActivity,UnusedAttribute">
         </activity>
         <activity
             android:name=".ProfileActivity"
@@ -95,6 +136,11 @@
             android:label="@string/title_activity_friendinfo">
         </activity>
         <activity
+            android:name=".ConferencePeerInfoActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_conferencepeerinfo">
+        </activity>
+        <activity
             android:name=".ImageviewerActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>
@@ -102,7 +148,34 @@
             android:name=".ImageviewerActivity_SD"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>
-
+        <activity
+            android:name=".TrifaSetPatternActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
+            android:name=".TrifaCheckPatternActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
+            android:name=".SetPasswordActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_set_password"
+            android:launchMode="singleTask">
+        </activity>
+        <activity
+            android:name=".CheckPasswordActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_check_password"
+            android:launchMode="singleTask">
+        </activity>
+        <activity
+            android:name=".FriendSelectSingleActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+        <activity
+            android:name=".SelectLanguageActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings">
@@ -111,12 +184,102 @@
             android:name=".Aboutpage"
             android:label="@string/title_activity_aboutpage">
         </activity>
+        <activity
+            android:name=".MaintenanceActivity"
+            android:label="@string/title_activity_maintenance">
+        </activity>
+        <activity
+            android:name=".ShareActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:excludeFromRecents="true"
+            android:label="@string/title_activity_share"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="audio/*"/>
+                <data android:mimeType="image/*"/>
+                <data android:mimeType="text/plain"/>
+                <data android:mimeType="video/*"/>
+            </intent-filter>
+            <!-- Intent filter for handling tox: links -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="tox"/>
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".ConnectionManager"
+            android:label="NetworkConnection">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".BootReceiver" android:enabled="false" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".PowerReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".TrifaToxService"
             android:enabled="true"
             android:exported="false">
         </service>
+
+        <service
+            android:name=".GroupAudioService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+
+        <receiver android:name=".GroupAudioService$ButtonReceiver" android:enabled="true">
+        </receiver>
+
+        <receiver android:name=".WakeupAlarmReceiver" android:enabled="true">
+
+            <intent-filter>
+                <action android:name="com.zoffcc.applications.trifa.TOXSERVICE_ALARM">
+                </action>
+            </intent-filter>
+
+        </receiver>
+
+        <receiver android:name=".MyExternReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="com.zoffcc.applications.trifa.EXTERN_RECV" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".MyTokenReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="com.zoffcc.applications.trifa.TOKEN_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name=".GenericFileProvider"
+            android:authorities="com.zoffcc.applications.trifa.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
 
 </manifest>

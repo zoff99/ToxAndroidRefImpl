@@ -9,4 +9,16 @@
         <attr name="metaButtonBarButtonStyle" format="reference"/>
     </declare-styleable>
 
+    <declare-styleable name="ZoomableTextureView">
+        <attr name="lucem_minScale" format="float" />
+        <attr name="lucem_maxScale" format="float" />
+    </declare-styleable>
+
+    <!-- for emoji 0.5.1 ?? -->
+    <attr name="cardBackgroundColor" format="color"></attr>
+    <attr name="cardCornerRadius" format="dimension"></attr>
+    <attr name="cardElevation" format="dimension"></attr>
+    <attr name="cardUseCompatPadding" format="boolean"></attr>
+    <!-- for emoji 0.5.1 ?? -->
+
 </resources>

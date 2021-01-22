@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_friend_activity_name">أضف صديق</string>
+    <string name="message_list_activity_name">دردشة</string>
+    <string name="conference_message_list_activity_name">مؤتمر نصي</string>
+    <string name="conference_audio_activity_name">مؤتمر صوتي</string>
+    <string name="set_password_message_empty">كلمة المرور فارغة</string>
+    <string name="set_password_message_password_invalid">كلمة المرور قصيرة جدًا</string>
+    <string name="set_password_message_password_dont_match">كلمة المرور غير مطابقة</string>
+    <string name="title_activity_calling">مكالمة</string>
+    <string name="title_activity_profile">الملف الشخصي</string>
+    <string name="title_activity_settings">الإعدادات</string>
+    <string name="title_activity_crash">يصطدم</string>
+    <string name="title_activity_friendinfo">معلومات صديق</string>
+    <string name="title_activity_conferencepeerinfo">معلومات الأقران</string>
+    <string name="title_activity_aboutpage">حول</string>
+    <string name="title_activity_set_password">ضبط كلمة السر</string>
+    <string name="title_activity_check_password">أدخل كلمة المرور</string>
+    <string name="title_activity_share">مفتوح مع TRIfA</string>
+    <string name="title_activity_maintenance">اعمال صيانة</string>
+    <string-array name="spinner_own_status_array">
+        <item>عبر الانترنت</item>
+        <item>بعيدا</item>
+        <item>مشغول</item>
+    </string-array>
+    <string name="settings_toolbar_title">الإعدادات</string>
+    <string name="pref_header_general">جنرال لواء</string>
+    <string name="pref_title_auto_accept_image">قبول تلقائي للصورة</string>
+    <string name="pref_description_auto_accept_image">قبول تلقائي للصور والصور بحجم يصل إلى 3 ميجا بايت</string>
+    <string name="pref_title_video_uv_reversed">عكس الأشعة فوق البنفسجية في الفيديو</string>
+    <string name="pref_description_video_uv_reversed">اعكس ترتيب الطائرات فوق البنفسجية في فيديو الكاميرا</string>
+    <string name="pref_title_software_echo_cancel">إلغاء الصدى</string>
+    <string name="pref_description_software_echo_cancel">استخدم إلغاء صدى البرنامج</string>
+    <string name="pref_title_higher_video_quality">جودة الفيديو</string>
+    <string name="pref_description_higher_video_quality">استخدام جودة فيديو أفضل. \nالتغيير يحتاج إلى RESTART!</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>نطاق ترددي منخفض \n(250 كيلو بايت /ثانية)</item>
+        <item>عرض النطاق العادي \n(2500 كيلو بايت /ثانية)</item>
+        <item>نطاق ترددي مرتفع \n(3500 كيلو بايت /ثانية)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string name="pref_title_camera_get_preview_format">تنسيق معاينة الكاميرا</string>
+    <string name="pref_description_camera_get_preview_format">يبدو أن تنسيق معاينة الكاميرا بتنسيق خاطئ على بعض الهواتف</string>
+    <string-array name="pref_camera_get_preview_format_titles">
+        <item>الافتراضي: YV12</item>
+        <item>بعض الهواتف: NV21</item>
+    </string-array>
+    <string-array name="pref_camera_get_preview_format_values">
+        <item>YV12</item>
+        <item>NV21</item>
+    </string-array>
+    <string name="pref_title_higher_audio_quality">جودة الصوت</string>
+    <string name="pref_description_higher_audio_quality">استخدام جودة صوت أفضل. \nالتغيير يحتاج إلى RESTART!</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>منخفض \n(6 كيلو بايت /ثانية)</item>
+        <item>عادي \n(32 كيلو بايت /ثانية)</item>
+        <item>عالي \n(64 كيلو بايت /ثانية)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string name="pref_title_udp_enabled">تمكين UDP</string>
+    <string name="pref_description_udp_enabled">بالنسبة لمعظم الأجهزة المحمولة ، سيتسبب UDP في حركة مرور على الإنترنت أكثر بكثير. \nالتغيير يحتاج إلى RESTART! \nإعداد الإعداد الافتراضي متوقف</string>
+    <string name="pref_title_orbot_enabled">تمكين Tor Proxy</string>
+    <string name="pref_description_orbot_enabled">تحتاج إلى تثبيت Orbot لاستخدام هذا. \nالتغيير يحتاج إلى RESTART!</string>
+    <string name="pref_title_fps_half">إطارات في الثانية أقل</string>
+    <string name="pref_description_fps_half">Video Framerate 1/2: حتى 12 إطارًا في الثانية بدلاً من 25 إطارًا في الثانية</string>
+    <string name="pref_title_set_fps">تعيين إطارا في الثانية</string>
+    <string name="pref_description_set_fps">حاول ضبط معدل إطارات الفيديو بمعدل 15 إطارًا في الثانية ، وقد يتعطل هذا في بعض الهواتف</string>
+    <string name="pref_title_display_name">اسم العرض</string>
+    <string name="pref_default_display_name">جون سميث</string>
+    <string name="pref_title_conference_show_system_messages">رسائل النظام</string>
+    <string name="pref_description_conference_show_system_messages">إظهار رسائل النظام في المؤتمرات</string>
+    <string name="pref_title_local_discovery_enabled">اكتشاف LAN</string>
+    <string name="pref_description_local_discovery_enabled">استخدام العقد على LAN المحلية للتشغيل</string>
+    <string name="pref_title_U_keep_nospam">الاحتفاظ بـ NoSpam</string>
+    <string name="pref_description_U_keep_nospam">الحفاظ على قيمة NoSpam. هذا ليس آمنًا ، قم بالتنشيط فقط إذا كنت تعرف ما تفعله!</string>
+    <string name="pref_title_allow_screen_off_in_audio_call">قم بإيقاف تشغيل الشاشة</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">إذا واجهت مشاكل مع إيقاف تشغيل الشاشة في Audiocall ، فاضبط هذا على</string>
+    <string name="pref_title_X_zoom_incoming_video">تكبير نافذة محادثة فيديو</string>
+    <string name="pref_description_X_zoom_incoming_video">السماح بتكبير /تصغير نافذة مكالمة الفيديو. هذا لا يعمل بشكل كامل!</string>
+    <string name="pref_title_X_use_native_audio_play">نظام الصوت الأصلي</string>
+    <string name="pref_description_X_use_native_audio_play">!! تجريبي !! \nاستخدم الصوت الأصلي لتشغيل الصوت</string>
+    <string name="pref_title_X_battery_saving_mode">وضع توفير البطارية</string>
+    <string name="pref_description_X_battery_saving_mode">!! تجريبي !! \nسيوفر هذا قدرًا أكبر قليلاً من طاقة البطارية ، لكن الرسالة ستستغرق وقتًا أطول في الإرسال والاستقبال. \nربما هناك بعض التأثيرات السيئة الأخرى أيضًا!</string>
+    <string name="pref_title_X_misc_button_enabled">متفرقات. زر</string>
+    <string name="pref_description_X_misc_button_enabled">!! تجريبي !! \nإضافة زر على شاشة الاتصال لإرسال رسالة ثابتة</string>
+    <string name="pref_title_X_eac_delay_ms">تأخير AEC</string>
+    <string name="pref_description_X_eac_delay_ms">!! تجريبي !! \nتأخير AEC بالميلي ثانية</string>
+    <string name="pref_title_add_friends_to_messages">أضف أصدقاء إلى الرسائل</string>
+    <string-array name="pref_example_list_titles">
+        <item>دائما</item>
+        <item>عندما يكون ذلك ممكنا</item>
+        <item>أبدا</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+    <string name="pref_header_data_sync">البيانات</string>
+    <string name="pref_title_sync_frequency">تردد المزامنة</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 دقيقة</item>
+        <item>30 دقيقة</item>
+        <item>ساعة واحدة</item>
+        <item>3 ساعات</item>
+        <item>6 ساعات</item>
+        <item>أبدا</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+    <string name="pref_title_min_audio_samplingrate_out">معدل أخذ عينات الصوت</string>
+    <string name="pref_description_min_audio_samplingrate_out">الإعداد الافتراضي هو 48000 هرتز</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>تلقاءي</item>
+        <item>8000 هرتز</item>
+        <item>16000 هرتز</item>
+        <item>48000 هرتز</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>تلقاءي</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+    <string name="pref_title_X_audio_recording_frame_size">ترميز Audiorecoding</string>
+    <string name="pref_description_X_audio_recording_frame_size">الإعداد الافتراضي هو 40 مللي ثانية</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string name="pref_title_X_battery_saving_timeout">الوقت دون اتصال في وضع Batterysavings</string>
+    <string name="pref_description_X_battery_saving_timeout">الإعداد الافتراضي هو 15 دقيقة</string>
+    <string-array name="X_battery_saving_timeout_titles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="X_battery_saving_timeout_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="list_preference_entries">
+        <item>الإدخال 1</item>
+        <item>الإدخال 2</item>
+        <item>الدخول 3</item>
+    </string-array>
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="multi_select_list_preference_default_value"/>
+    <string name="pref_title_system_sync_settings">إعدادات مزامنة النظام</string>
+    <string name="pref_header_notifications">إشعارات</string>
+    <string name="pref_title_new_message_notifications">إخطارات رسالة جديدة</string>
+    <string name="pref_title_ringtone">نغمة الرنين</string>
+    <string name="pref_ringtone_silent">صامتة</string>
+    <string name="pref_title_vibrate">تذبذب</string>
+    <string name="pref_title_sound">صوت</string>
+    <string name="add_friend_activity_help">الصق معرف التوكس لصديقك في مربع النص أعلاه أو اضغط على     زر رمز الاستجابة السريعة لمسح رمز الصديق باستخدام الكاميرا.</string>
+    <string name="add_friend_activity_add">أضف صديق</string>
+    <string name="cancel">إلغاء</string>
+    <string name="MainActivity_profile">الملف الشخصي</string>
+    <string name="MainActivity_settings">الإعدادات</string>
+    <string name="MainActivity_logout_login">تسجيل الخروج /تسجيل الدخول</string>
+    <string name="MainActivity_maint">اعمال صيانة</string>
+    <string name="MainActivity_about">حول</string>
+    <string name="MainActivity_exit">خروج</string>
+    <string name="MainActivity_available">متاح</string>
+    <string name="MainActivity_away">بعيدا</string>
+    <string name="MainActivity_busy">مشغول</string>
+    <string name="MainActivity_no_button">لا</string>
+    <string name="MainActivity_ok_take_me_there_button">حسنا ، خذني هناك</string>
+    <string name="MainActivity_info_dialog_title">INFO</string>
+    <string name="MainActivity_add_to_batt_opt">الرجاء إضافة TRIfA إلى قائمة الاستثناءات لتحسين البطارية!</string>
+    <string name="MainActivity_friend_is_typing">صديق يكتب ...</string>
+    <string name="MainActivity_notification_new_message">رسالة جديدة</string>
+    <string name="MainActivity_notification_new_message2">رسالة جديدة</string>
+    <string name="MainActivity_button_ok">حسنا</string>
+    <string name="MainActivity_error_starting_email_app">خطأ في بدء تطبيق البريد الإلكتروني</string>
+    <string name="MainActivity_no_email_app_found">لم يتم العثور على تطبيق بريد إلكتروني</string>
+    <string name="MainActivity_toast_msg_deleted">تم حذف الرسائل</string>
+    <string name="MainActivity_toast_msg_exported">تم تصدير الرسائل</string>
+    <string name="MainActivity_toast_msgs_deleted">تم حذف الرسائل</string>
+    <string name="MainActivity_notification_new_message3">رسالة جديدة</string>
+    <string name="MainActivity_notification_new_message4">رسالة جديدة</string>
+    <string name="MainActivity_notification_new_message5">رسالة جديدة</string>
+    <string name="Aboutpage_0">TRIfA سجل الأعطال</string>
+    <string name="Aboutpage_2">إرسال تقرير الأعطال عبر البريد الإلكتروني</string>
+    <string name="Aboutpage_4">قراءة معلومات الأعطال ...</string>
+    <string name="Aboutpage_5a">TRIfA عميل Tox لنظام Android</string>
+    <string name="Aboutpage_5b">الإصدار:</string>
+    <string name="Aboutpage_6">ما هو التوكس؟</string>
+    <string name="Aboutpage_8">المكتبات المستعملة:</string>
+    <string name="AddFriendActivity_3">ToxID غير صحيح</string>
+    <string name="AddFriendActivity_4">لا يوجد ToxID</string>
+    <string name="CallingActivity_0">تأخير الفيديو:</string>
+    <string name="CallingActivity_23">تأخير الفيديو:</string>
+    <string name="ConferenceAudioActivity_10">قائمة المستخدم</string>
+    <string name="ConferenceAudioActivity_17">اضغط للتحدث</string>
+    <string name="ConferenceAudioActivity_18">تتحدث ...</string>
+    <string name="GroupActivityActive">نشيط:</string>
+    <string name="GroupActivityOffline">غير متصل على الانترنت:</string>
+    <string name="layout___toxid">ToxID</string>
+    <string name="layout___scan_qr_code">مسح رمز الاستجابة السريعة</string>
+    <string name="layout___enter_pass_longtext">أدخل كلمة المرور \nلا يوجد خيار استرداد!</string>
+    <string name="layout___unlock">الغاء القفل</string>
+    <string name="layout___name">اسم</string>
+    <string name="layout___push_to_talk">اضغط للتحدث</string>
+    <string name="layout___nick">نيك:</string>
+    <string name="layout___pubkey">المفتاح العمومي:</string>
+    <string name="layout___status">الحالة:</string>
+    <string name="layout___alias">الاسم المستعار</string>
+    <string name="layout___remove_friends_relay">إزالة تتابع الأصدقاء</string>
+    <string name="layout___friends_relay_pubkey">أصدقاء ترحيل Pubkey:</string>
+    <string name="layout___waiting_for_orbot">في انتظار Orbot ...</string>
+    <string name="layout___clear_glide_cache">مسح ذاكرة التخزين المؤقت الإنزلاق</string>
+    <string name="layout___set_app_language">تعيين لغة التطبيق</string>
+    <string name="layout___run_vacuum_on_sql_database">تشغيل VACUUM على قاعدة بيانات SQL</string>
+    <string name="layout___run_analyze_on_sql_database">تشغيل ANALYZE على قاعدة بيانات SQL</string>
+    <string name="layout___reset_favorite_emoji_list">إعادة تعيين قائمة الرموز التعبيرية المفضلة</string>
+    <string name="layout___delete_all_avatar_icons">حذف جميع رموز الرمزية</string>
+    <string name="layout___update_bootstrapnodes_from_internet">تحديث Bootstrapnodes من الإنترنت</string>
+    <string name="layout___reset_bootstrapnodes_to_default">إعادة تعيين Bootstrapnodes إلى الافتراضي</string>
+    <string name="layout___test_notification_sound">اختبار صوت الإخطار</string>
+    <string name="layout___test_ringtone_sound">اختبار صوت نغمة الرنين</string>
+    <string name="layout___export_tox_savedata_unsecure">تصدير ساماتا المحفوظة * غير آمنة *</string>
+    <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA * غير آمن *</string>
+    <string name="layout___click_image_to_change_your_avatar">انقر فوق الصورة لتغيير الصورة الرمزية الخاصة بك</string>
+    <string name="layout___remove_own_relay">إزالة التتابع الخاصة</string>
+    <string name="layout___relay_pubkey">تتابع Pubkey:</string>
+    <string name="layout___new_random_nospam">NOSPAM عشوائي جديد</string>
+    <string name="layout___own_pubkey">Pubkey الخاصة:</string>
+    <string name="layout___copy_toxid">نسخ ToxID</string>
+    <string name="layout___your_toxidenticon">ToxIdenticon الخاص بك</string>
+    <string name="layout___active_network_connections">اتصالات الشبكة النشطة:</string>
+    <string name="layout___error_getting_active_network_connections">* خطأ في الحصول على اتصالات شبكة نشطة *</string>
+    <string name="layout___set_password_or_skip">تعيين كلمة المرور أو التخطي. \n\nعند تحديد تخطي \nسيتم إنشاء كلمة المرور تلقائيًا \nلا يوجد خيار استرداد!</string>
+    <string name="layout___password">كلمه السر</string>
+    <string name="layout___password_again">أدخل كلمة السر مرة أخرى</string>
+    <string name="layout___set_password">ضبط كلمة السر</string>
+    <string name="layout___skip">تخطى</string>
+    <string name="layout___leave">غادر</string>
+    <string name="layout___delete">حذف</string>
+    <string name="layout___info">معلومات</string>
+    <string name="layout___create_text_group">إنشاء مجموعة نصية</string>
+    <string name="layout___create_audio_group">إنشاء مجموعة صوتية</string>
+    <string name="layout___add_as_toxproxy">أضف باسم ToxProxy</string>
+    <string name="layout___peer_name">اسم الأقران</string>
+    <string name="layout___online">عبر الانترنت</string>
+    <string name="layout___copy">نسخ</string>
+    <string name="layout___export">تصدير</string>
+    <string name="pref_description_global_font_size">اختر حجم الخط</string>
+    <string name="pref_title_global_font_size">حجم الخط</string>
+    <string name="pref_description_video_cam_resolution">أبعاد الفيديو المستعملة في المكالمات</string>
+    <string name="pref_title_video_cam_resolution">أبعاد الكاميرا</string>
+    <string name="pref_description_auto_accept_video">إقبل تلقائيا الفيديوهات التي لا يزيد حجمها عن 10 ميغا</string>
+    <string name="pref_title_auto_accept_video">إقبل الفيديوهات تلقائيا</string>
+    <string name="pref_title_use_incognito_keyboard">وضع التخفّي للوحة المفاتيح</string>
+    <string name="conference_audio_activity_player_name">مشغل المؤتمر الصوتي</string>
+    <string name="layout___migdb_do_not_close">عدم إغلاق هذه الشاشة</string>
+    <string name="layout___migdb_text">ترحيل ملفات قاعدة البيانات</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! التجريبيه!!
+\nالمخزن المؤقت لتشغيل الصوت بالبايت ، مضبوط على 0 لتعطيل الإعداد المخصص</string>
+    <string name="pref_title_X_audio_play_buffer_custom">المخزن المؤقت لتشغيل الصوت</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!!التجريبيه !!
+\nلا تقم بمزامنة الفيديو أو الصوت. استخدم هذا الإعداد إذا كانت لديك مشاكل في مكالمة الفيديو ، كحل أخير.</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">لا تزامن AV</string>
+    <string name="pref_description_use_incognito_keyboard">إيقاف تشغيل لإخبار لوحة المفاتيح لا للتعلم من كلماتك التي أدخلتها</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">يجب أن تستخدم أداة ترميز H264 إطارات التحديث الداخلية</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">تحديث داخلي H264</string>
+    <string name="pref_description_force_udp_only">هذا سوف يفرض وضع UDP فقط، قد لا يكون الوصول إلى بعض جهات الاتصال مع هذا الإعداد قيد التشغيل
+\nتغيير احتياجات إعادة تشغيل!</string>
+    <string name="pref_title_force_udp_only">فرض وضع UDP</string>
+    <string name="pref_description_mic_gain_factor">قم بتعيين ربح أعلى إذا كان الميكروفون الخاص بك يسجل بصوت منخفض</string>
+    <string name="pref_title_mic_gain_factor">كسب الميكروفون</string>
+</resources>

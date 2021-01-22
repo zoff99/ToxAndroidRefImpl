@@ -21,8 +21,8 @@ package com.zoffcc.applications.trifa;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -33,22 +33,26 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.support.v7.widget.Toolbar;
+import android.preference.SwitchPreference;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import java.util.List;
 
 public class SettingsActivity extends AppCompatPreferenceActivity
 {
+    private static final String TAG = "trifa.SettingsActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        // setupActionBar();
     }
 
     @Override
@@ -68,16 +72,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             }
         });
     }
-
-    //    private void setupActionBar()
-    //    {
-    //        ActionBar actionBar = getSupportActionBar();
-    //        if (actionBar != null)
-    //        {
-    //            // Show the Up button in the action bar.
-    //            actionBar.setDisplayHomeAsUpEnabled(true);
-    //        }
-    //    }
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener()
     {
@@ -142,7 +136,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
      */
     private static boolean isXLargeTablet(Context context)
     {
-        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >=
+               Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     private static void bindPreferenceSummaryToValue(Preference preference)
@@ -152,7 +147,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity
 
         // Trigger the listener immediately with the preference's
         // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                                                                 PreferenceManager.getDefaultSharedPreferences(
+                                                                     preference.getContext()).getString(
+                                                                     preference.getKey(), ""));
     }
 
     /**
@@ -176,7 +174,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity
 
     protected boolean isValidFragment(String fragmentName)
     {
-        return PreferenceFragment.class.getName().equals(fragmentName) || GeneralPreferenceFragment.class.getName().equals(fragmentName) || DataSyncPreferenceFragment.class.getName().equals(fragmentName) || NotificationPreferenceFragment.class.getName().equals(fragmentName);
+        return PreferenceFragment.class.getName().equals(fragmentName) ||
+               GeneralPreferenceFragment.class.getName().equals(fragmentName) ||
+               NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -187,6 +187,71 @@ public class SettingsActivity extends AppCompatPreferenceActivity
         {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
+
+            final SwitchPreference pref = (SwitchPreference) findPreference("U_keep_nospam");
+
+
+            if (pref.isChecked() == true)
+            {
+                try
+                {
+                    final Drawable d1 = new IconicsDrawable(pref.getContext()).
+                        icon(FontAwesome.Icon.faw_exclamation_circle).
+                        color(getResources().getColor(R.color.md_red_700)).sizeDp(100);
+                    pref.setIcon(d1);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                try
+                {
+                    pref.setIcon(null);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    // Here you can enable/disable whatever you need to
+                    if (newValue == (Object) true)
+                    {
+                        try
+                        {
+                            final Drawable d1 = new IconicsDrawable(preference.getContext()).
+                                icon(FontAwesome.Icon.faw_exclamation_circle).
+                                color(getResources().getColor(R.color.md_red_600)).
+                                sizeDp(100);
+                            preference.setIcon(d1);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            preference.setIcon(null);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    return true;
+                }
+            });
         }
     }
 
@@ -200,36 +265,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             addPreferencesFromResource(R.xml.pref_notification);
 
             bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment
-    {
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_data_sync);
-            setHasOptionsMenu(true);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item)
-        {
-            int id = item.getItemId();
-            if (id == android.R.id.home)
-            {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
         }
     }
 }

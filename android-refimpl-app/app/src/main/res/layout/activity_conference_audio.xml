@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context="com.zoffcc.applications.trifa.MessageListActivity">
+
+    <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <!-- the layout which will contain (host) the drawerLayout -->
+    <FrameLayout
+        android:id="@+id/drawer_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ml_icon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="6dip"
+                    android:layout_marginRight="1dip"
+                    android:padding="2dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/circle_red" />
+
+                <ImageView
+                    android:id="@+id/ml_status_icon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="1dip"
+                    android:layout_marginRight="6dip"
+                    android:padding="2dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/circle_green" />
+
+
+                <TextView
+                    android:id="@+id/ml_maintext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:padding="8dp"
+                    android:text="@string/layout___name"
+                    android:textColor="@android:color/primary_text_light"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/friend_list_conf_av_round_bg"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="25dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:gravity="center_horizontal|bottom"
+                        android:text="Out"
+                        android:textColor="@color/md_black_1000"
+                        android:textSize="10sp" />
+
+                    <com.google.speech.levelmeter.BarLevelDrawable
+                        android:id="@+id/audio_bar_in"
+                        android:layout_width="25dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="30dp"
+                        android:elevation="10dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1000"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="6"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <ImageView
+                            android:id="@+id/group_audio_device_icon"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginTop="6dp"
+                            android:elevation="10dp"
+                            android:src="@null" />
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <ImageView
+                            android:id="@+id/group_audio_send_icon"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginTop="6dp"
+                            android:elevation="10dp"
+                            android:src="@null" />
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <ImageButton
+                            android:id="@+id/group_audio_player_icon"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginTop="6dp"
+                            android:background="@null"
+                            android:elevation="10dp"
+                            android:src="@null" />
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2" />
+
+                    <Button
+                        android:id="@+id/AudioGroupPushToTalkButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_margin="20dp"
+                        android:layout_weight="20"
+                        android:background="@drawable/button_audio_round_bg"
+                        android:elevation="20dp"
+                        android:text="@string/layout___push_to_talk"
+                        android:textAlignment="center"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2" />
+
+                    <FrameLayout
+                        android:id="@+id/group_video_box_right_volumeslider_01"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center|bottom"
+                        android:layout_marginLeft="55dp"
+                        android:layout_marginTop="0dp"
+                        android:layout_marginRight="55dp"
+                        android:layout_marginBottom="0dp"
+                        android:layout_weight="3"
+                        android:background="@null"
+                        android:elevation="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:background="@null"
+                            android:elevation="2dp"
+                            android:orientation="vertical">
+
+                            <SeekBar
+                                android:id="@+id/group_volume_slider_seekbar"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center"
+                                android:background="@null"
+                                android:elevation="8dp"
+                                android:indeterminate="false"
+                                android:max="100"
+                                android:progress="5" />
+
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="4" />
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="25dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:gravity="center_horizontal|bottom"
+                        android:text="In"
+                        android:textColor="@color/md_black_1000"
+                        android:textSize="10sp" />
+
+                    <view
+                        android:id="@+id/audio_bar_out"
+                        class="com.google.speech.levelmeter.BarLevelDrawable"
+                        android:layout_width="25dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="30dp"
+                        android:elevation="10dp" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <include layout="@layout/floating_action_button_conference" />
+
+    </FrameLayout>
+
+</LinearLayout>
+
+

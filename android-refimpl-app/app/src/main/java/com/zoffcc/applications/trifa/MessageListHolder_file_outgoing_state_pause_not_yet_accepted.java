@@ -23,14 +23,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -45,29 +45,35 @@ import com.mikepenz.iconics.IconicsDrawable;
 import java.net.URLConnection;
 
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.dp2px;
-import static com.zoffcc.applications.trifa.MainActivity.get_vfs_image_filename_own_avatar;
-import static com.zoffcc.applications.trifa.MainActivity.set_filetransfer_state_from_id;
-import static com.zoffcc.applications.trifa.MainActivity.set_message_state_from_id;
-import static com.zoffcc.applications.trifa.MainActivity.update_single_message_from_messge_id;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_state_from_id;
+import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 
 public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
-    private static final String TAG = "trifa.MessageListHolder";
+    private static final String TAG = "trifa.MessageListHldr02";
 
-    private Message message2;
     private Context context;
 
     ImageButton button_ok;
     ImageButton button_cancel;
-    ProgressBar ft_progressbar;
+    com.daimajia.numberprogressbar.NumberProgressBar ft_progressbar;
     ViewGroup ft_preview_container;
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
+    TextView date_time;
+    TextView message_text_date_string;
+    ViewGroup message_text_date;
 
     public MessageListHolder_file_outgoing_state_pause_not_yet_accepted(View itemView, Context c)
     {
@@ -79,21 +85,21 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
 
         button_ok = (ImageButton) itemView.findViewById(R.id.ft_button_ok);
         button_cancel = (ImageButton) itemView.findViewById(R.id.ft_button_cancel);
-        ft_progressbar = (ProgressBar) itemView.findViewById(R.id.ft_progressbar);
+        ft_progressbar = (com.daimajia.numberprogressbar.NumberProgressBar) itemView.findViewById(R.id.ft_progressbar);
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
-
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        date_time = (TextView) itemView.findViewById(R.id.date_time);
+        message_text_date_string = (TextView) itemView.findViewById(R.id.message_text_date_string);
+        message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
     }
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
 
         if (m == null)
         {
@@ -102,7 +108,41 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
             m = new Message();
         }
 
+        date_time.setText(long_date_time_format(m.sent_timestamp));
+
         final Message message = m;
+
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        message_text_date.setVisibility(View.GONE);
+        int my_position = this.getAdapterPosition();
+        if (my_position != RecyclerView.NO_POSITION)
+        {
+            if (MainActivity.message_list_fragment != null)
+            {
+                if (MainActivity.message_list_fragment.adapter != null)
+                {
+                    if (my_position < 1)
+                    {
+                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        {
+                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+        }
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+
 
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
 
@@ -124,7 +164,7 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
         button_cancel.setVisibility(View.VISIBLE);
 
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -194,6 +234,8 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
                     {
                         // cancel FT
                         Log.i(TAG, "button_cancel:OnTouch:001");
+                        int res = tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey), get_filetransfer_filenum_from_id(message.filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
+                        Log.i(TAG, "button_cancel:OnTouch:res=" + res);
                         set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
                         set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
 
@@ -203,9 +245,12 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
 
                         // update message view
                         update_single_message_from_messge_id(message.id, true);
+                        Log.i(TAG, "button_cancel:OnTouch:099");
                     }
                     catch (Exception e)
                     {
+                        e.printStackTrace();
+                        Log.i(TAG, "button_cancel:OnTouch:EE:" + e.getMessage());
                     }
                 }
                 else
@@ -214,8 +259,6 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
                 return true;
             }
         });
-
-
 
 
         if (is_image)

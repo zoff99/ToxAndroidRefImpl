@@ -21,14 +21,17 @@ package com.zoffcc.applications.trifa;
 
 import android.app.ActivityManager;
 import android.app.Application;
-import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.yariksoffice.lingver.Lingver;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,9 +45,12 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
+import androidx.multidex.MultiDex;
+
+import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_cancel;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
-import static com.zoffcc.applications.trifa.TrifaToxService.ONGOING_NOTIFICATION_ID;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 
 
@@ -53,7 +59,7 @@ public class MainApplication extends Application
     // -----------------------
     // -----------------------
     // -----------------------
-    final static boolean CATCH_EXCEPTIONS = true; // set true for release builds
+    final static boolean CATCH_EXCEPTIONS = true; // set "true" for release builds!
     // -----------------------
     // -----------------------
     // -----------------------
@@ -69,23 +75,57 @@ public class MainApplication extends Application
     @Override
     public void onCreate()
     {
-        randnum = (int) (Math.random() * 1000d);
+        // Lingver.init(this, Locale.ENGLISH);
+        //
+        if (Locale.getDefault().getLanguage().equals(new Locale("ar").getLanguage()))
+        {
+            // RTL is not fully working yet, so use english for now
+            Lingver.init(this, Locale.ENGLISH);
+        }
+        else if (Locale.getDefault().getLanguage().equals(new Locale("fa").getLanguage()))
+        {
+            // RTL is not fully working yet, so use english for now
+            Lingver.init(this, Locale.ENGLISH);
+        }
+        else
+        {
+            Lingver.init(this, Locale.getDefault());
+        }
+        // Lingver.getInstance().setFollowSystemLocale(this);
 
+        randnum = (int) (Math.random() * 1000d);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "onCreate");
         super.onCreate();
+
+        try
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            {
+                IntentFilter intentFilter = new IntentFilter();
+                intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+                registerReceiver(new ConnectionManager(), intentFilter);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         crashes = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getInt("crashes", 0);
 
         if (crashes > 10000)
         {
             crashes = 0;
-            PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes", crashes).commit();
+            PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes",
+                                                                                                      crashes).commit();
         }
 
         Log.i(TAG, "MainApplication:" + randnum + ":" + "crashes[load]=" + crashes);
-        last_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong("last_crash_time", 0);
+        last_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong(
+                "last_crash_time", 0);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "last_crash_time[load]=" + last_crash_time);
-        prevlast_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong("prevlast_crash_time", 0);
+        prevlast_crash_time = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).getLong(
+                "prevlast_crash_time", 0);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "prevlast_crash_time[load]=" + prevlast_crash_time);
 
         if (CATCH_EXCEPTIONS)
@@ -105,13 +145,15 @@ public class MainApplication extends Application
     protected void attachBaseContext(Context base)
     {
         super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
     public static String run_adb_command()
     {
         try
         {
-            final Process process = Runtime.getRuntime().exec("ps -w -e -T -o PID,TID,CMDLINE,CMD,PRI,NI,STAT,PCY,CPU"); // |grep -i trifa
+            final Process process = Runtime.getRuntime().exec(
+                    "ps -w -e -T -o PID,TID,CMDLINE,CMD,PRI,NI,STAT,PCY,CPU"); // |grep -i trifa
 
             final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             final StringBuilder log = new StringBuilder();
@@ -172,7 +214,8 @@ public class MainApplication extends Application
             {
                 // some problems with the params?
                 final Process process2 = Runtime.getRuntime().exec("logcat -d");
-                final BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
+                final BufferedReader bufferedReader2 = new BufferedReader(
+                        new InputStreamReader(process2.getInputStream()));
                 final StringBuilder log2 = new StringBuilder();
 
                 String line2;
@@ -212,14 +255,18 @@ public class MainApplication extends Application
             Calendar c = Calendar.getInstance();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
             String formattedDate = df.format(c.getTime());
+            // File myDir = new File(getExternalFilesDir(null).getAbsolutePath() + "/crashes");
             File myDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/trifa/crashes");
+
             myDir.mkdirs();
             File myFile = new File(myDir.getAbsolutePath() + "/crash_" + formattedDate + ".txt");
             Log.i(TAG, "MainApplication:" + randnum + ":" + "crash file=" + myFile.getAbsolutePath());
             myFile.createNewFile();
             FileOutputStream fOut = new FileOutputStream(myFile);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append("Errormesage:\n" + last_stack_trace_as_string + "\n\n===================================\n\n" + log_detailed);
+            myOutWriter.append(
+                    "Errormesage:\n" + last_stack_trace_as_string + "\n\n===================================\n\n" +
+                    log_detailed);
             myOutWriter.close();
             fOut.close();
             // also save to crash file ----
@@ -270,7 +317,8 @@ public class MainApplication extends Application
         }
 
         crashes++;
-        PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes", crashes).commit();
+        PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext()).edit().putInt("crashes",
+                                                                                                  crashes).commit();
 
         try
         {
@@ -284,8 +332,10 @@ public class MainApplication extends Application
         }
 
         Log.i(TAG, "MainApplication:" + randnum + ":" + "crashes[set]=" + crashes);
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" + (prevlast_crash_time + (60 * 1000)) + " < " + System.currentTimeMillis());
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" + (System.currentTimeMillis() - (prevlast_crash_time + (60 * 1000))));
+        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" + (prevlast_crash_time + (60 * 1000)) + " < " +
+                   System.currentTimeMillis());
+        Log.i(TAG, "MainApplication:" + randnum + ":" + "?:" +
+                   (System.currentTimeMillis() - (prevlast_crash_time + (60 * 1000))));
 
 
         try
@@ -293,7 +343,7 @@ public class MainApplication extends Application
             // try to shutdown service (but don't exit the app yet!)
             if (is_tox_started)
             {
-                tox_service_fg.stop_tox_fg();
+                tox_service_fg.stop_tox_fg(false);
                 tox_service_fg.stop_me(false);
             }
         }
@@ -306,18 +356,26 @@ public class MainApplication extends Application
         ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
         ComponentName componentInfo = taskInfo.get(0).topActivity;
-        Log.i(TAG, "MainApplication:" + randnum + ":" + "componentInfo=" + componentInfo + " class=" + componentInfo.getClassName());
+        Log.i(TAG, "MainApplication:" + randnum + ":" + "componentInfo=" + componentInfo + " class=" +
+                   componentInfo.getClassName());
 
         try
         {
-            // remove the notofication
-            NotificationManager nmn2 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            nmn2.cancel(ONGOING_NOTIFICATION_ID);
+            // remove the notification
+            tox_notification_cancel(this);
         }
         catch (Exception e3)
         {
             e3.printStackTrace();
         }
+
+        TrifaToxService.is_tox_started = false;
+        TrifaToxService.ToxServiceThread = null;
+        TrifaToxService.orma = null;
+        TrifaToxService.vfs = null;
+        TrifaToxService.trifa_service_thread = null;
+        // TrifaToxService.need_wakeup_now = true;
+        TrifaToxService.TOX_SERVICE_STARTED = false;
 
         Intent intent = new Intent(this, com.zoffcc.applications.trifa.CrashActivity.class);
         Log.i(TAG, "MainApplication:" + randnum + ":" + "xx1 intent(1)=" + intent);

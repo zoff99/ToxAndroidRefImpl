@@ -20,21 +20,32 @@
 package com.zoffcc.applications.trifa;
 
 
+import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_VP8;
 
 public class Callstate
 {
     static int state = 0; // 0 -> not in a call, 1 -> ringing/calling
     static int tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
+    static boolean audio_call = false;
     static String friend_pubkey = "-1";
-    static String friend_name = "";
+    static String friend_alias_name = "";
     static int other_audio_enabled = 1;
     static int other_video_enabled = 1;
     static int my_audio_enabled = 1;
     static int my_video_enabled = 1;
+    static long frame_width_px = -1;
+    static long frame_height_px = -1;
+    static long ystride = -1;
+    static long ustride = -1;
+    static long vstride = -1;
     static long audio_bitrate = GLOBAL_AUDIO_BITRATE;
     static long video_bitrate = GLOBAL_VIDEO_BITRATE;
+    static long video_in_bitrate = 0;
+    static long video_out_codec = VIDEO_CODEC_VP8;
+    static long video_in_codec = VIDEO_CODEC_VP8;
     static int accepted_call = 0;
     static long call_init_timestamp = -1L; // when it starts ringing (someone calls us)
     static long call_start_timestamp = -1L; // when we actually start the call (someone calls us)
@@ -43,24 +54,62 @@ public class Callstate
     static boolean camera_opened = false;
     static boolean audio_speaker = true; // true -> loudspeaker, false -> for your ear-speaker
     static int audio_device = 0; // 0 -> phone, 1 -> headset, 2 -> bluetoothdevice
+    static long play_delay = 0;
+    static long java_video_play_delay = 0;
+    static long java_video_encoder_delay = 0;
+    static int java_video_encoder_first_frame_in = 1;
+    static long java_video_encoder_delay_start_ts = 0;
+    static int java_video_encoder_delay_set = 0;
+    static int delay_add = 0;
+    static long round_trip_time = 0;
+    static int play_buffer_entries = 0;
+    static boolean audio_group_active = false;
 
     static void reset_values()
     {
         Callstate.state = 0;
+        audio_call = false;
+        set_debug_text("VIDEO");
         Callstate.call_first_video_frame_received = -1;
         Callstate.call_first_audio_frame_received = -1;
         Callstate.call_start_timestamp = -1;
         Callstate.call_init_timestamp = -1;
         Callstate.friend_pubkey = "-1";
-        Callstate.friend_name = "";
+        Callstate.friend_alias_name = "";
         Callstate.other_audio_enabled = 1;
         Callstate.other_video_enabled = 1;
         Callstate.my_audio_enabled = 1;
         Callstate.my_video_enabled = 1;
         Callstate.audio_bitrate = GLOBAL_AUDIO_BITRATE;
         Callstate.video_bitrate = GLOBAL_VIDEO_BITRATE;
+        Callstate.video_in_bitrate = 0;
+        Callstate.video_out_codec = VIDEO_CODEC_VP8;
+        Callstate.video_in_codec = VIDEO_CODEC_VP8;
         Callstate.accepted_call = 0;
         Callstate.audio_speaker = true;
         Callstate.audio_device = 0;
+        Callstate.play_delay = 0;
+        Callstate.java_video_play_delay = 0;
+        Callstate.java_video_encoder_delay = 0;
+        Callstate.java_video_encoder_first_frame_in = 1;
+        Callstate.java_video_encoder_delay_set = 0;
+        Callstate.java_video_encoder_delay_start_ts = 0;
+        Callstate.delay_add = 0;
+        Callstate.round_trip_time = 0;
+        Callstate.play_buffer_entries = 0;
+        Callstate.audio_group_active = false;
+        MainActivity.set_av_call_status(Callstate.state);
+    }
+
+    public static String codec_to_str(long v)
+    {
+        if (v == VIDEO_CODEC_VP8)
+        {
+            return "VP8";
+        }
+        else
+        {
+            return "H264";
+        }
     }
 }

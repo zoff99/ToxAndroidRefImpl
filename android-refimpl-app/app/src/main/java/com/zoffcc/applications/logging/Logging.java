@@ -51,6 +51,10 @@ public class Logging
     //
     // https://github.com/WhisperSystems/Signal-Android/blob/master/src/org/thoughtcrime/securesms/LogSubmitActivity.java
     //
+    // and new:
+    //
+    // https://github.com/signalapp/Signal-Android/blob/master/app/src/main/java/org/thoughtcrime/securesms/logsubmit/LogSectionLogcat.java
+    //
     // ------------------------------------
     private static String grabLogcat()
     {

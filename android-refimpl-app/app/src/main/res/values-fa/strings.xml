@@ -1,0 +1,351 @@
+<resources>
+    <string name="add_friend_activity_name">اضافه کردن دوست</string>
+    <string name="message_list_activity_name">گپ</string>
+    <string name="conference_message_list_activity_name">کنفرانس متن</string>
+    <string name="conference_audio_activity_name">کنفرانس صوتی</string>
+
+    <string name="set_password_message_empty">رمز عبور خالی است</string>
+    <string name="set_password_message_password_invalid">رمز خیلی کوتاه است</string>
+    <string name="set_password_message_password_dont_match">رمزهای ورود مطابقت ندارند</string>
+
+    <string name="title_activity_calling">زنگ زدن</string>
+    <string name="title_activity_profile">مشخصات</string>
+    <string name="title_activity_settings">تنظیمات</string>
+    <string name="title_activity_crash">تصادف در</string>
+    <string name="title_activity_friendinfo">Friendinfo</string>
+    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_aboutpage">در باره</string>
+    <string name="title_activity_set_password">گذاشتن رمز عبور</string>
+    <string name="title_activity_check_password">رمز عبور را وارد کنید</string>
+    <string name="title_activity_share">با TRIfA باز کنید</string>
+    <string name="title_activity_maintenance">نگهداری</string>
+
+
+    <string-array name="spinner_own_status_array">
+        <item>برخط</item>
+        <item>دور</item>
+        <item>مشغول</item>
+    </string-array>
+
+    <string name="settings_toolbar_title">تنظیمات</string>
+
+    
+    
+    
+    <string name="pref_header_general">عمومی</string>
+
+    <string name="pref_title_auto_accept_image">تصوير پذيرفتن خودکار</string>
+    <string name="pref_description_auto_accept_image">تصاویر و تصاویر را حداکثر 3 مگابایت به صورت خودکار بپذیرید</string>
+
+    <string name="pref_title_video_uv_reversed">UV معکوس در ویدئو</string>
+    <string name="pref_description_video_uv_reversed">ترتیب هواپیماهای UV در فیلم دوربین را معکوس کنید</string>
+
+    <string name="pref_title_software_echo_cancel">لغو اکو</string>
+    <string name="pref_description_software_echo_cancel">از لغو اکو نرم افزار استفاده کنید</string>
+
+    <string name="pref_title_higher_video_quality">کیفیت فیلم</string>
+    <string name="pref_description_higher_video_quality">از کیفیت فیلم بهتر استفاده کنید. \nتغییر نیاز به مجدد دارد!</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>پهنای باند کم \n(250 کیلوبایت در ثانیه)</item>
+        <item>پهنای باند معمولی \n(2500 kb /s)</item>
+        <item>پهنای باند بالا \n(3500 kb /s)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_camera_get_preview_format">قالب پیش نمایش دوربین</string>
+    <string name="pref_description_camera_get_preview_format">به نظر می رسد فرمت پیش نمایش دوربین در برخی از گوشی ها با فرمت اشتباه است</string>
+    <string-array name="pref_camera_get_preview_format_titles">
+        <item>پیش فرض: YV12</item>
+        <item>برخی از تلفن ها: NV21</item>
+    </string-array>
+    <string-array name="pref_camera_get_preview_format_values">
+        <item>YV12</item>
+        <item>NV21</item>
+    </string-array>
+
+    <string name="pref_title_higher_audio_quality">کیفیت صدا</string>
+    <string name="pref_description_higher_audio_quality">از کیفیت صوتی بهتری استفاده کنید. \تغییر نیاز به تنظیم مجدد دارد!</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>کم \n(6 کیلوبایت در ثانیه)</item>
+        <item>عادی \n(32 کیلوبایت بر ثانیه)</item>
+        <item>بالا \n(64 کیلوبایت در ثانیه)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_udp_enabled">UDP را فعال کنید</string>
+    <string name="pref_description_udp_enabled">برای اکثر دستگاه های تلفن همراه UDP باعث ترافیک اینترنت بیشتری خواهد شد. \nتغییر نیاز به RESTART دارد! \nتنظیم پیش فرض خاموش است</string>
+
+    <string name="pref_title_orbot_enabled">Tor Proxy را فعال کنید</string>
+    <string name="pref_description_orbot_enabled">برای استفاده از این ، باید Orbot را نصب کنید. \nتغییر نیاز به RESTART دارد!</string>
+
+    <string name="pref_title_fps_half">فریم در ثانیه</string>
+    <string name="pref_description_fps_half">فیلم فریم 1/2: بنابراین 12fps به جای 25fps</string>
+
+    <string name="pref_title_set_fps">تنظیم فریم در ثانیه</string>
+    <string name="pref_description_set_fps">سعی کنید ویدیوی 15 فریم در ثانیه را فریمرفت تنظیم کنید ، این ممکن است در برخی از تلفن ها خراب شود</string>
+
+    <string name="pref_title_display_name">نام نمایش</string>
+    <string name="pref_default_display_name">جان اسمیت</string>
+
+    <string name="pref_title_conference_show_system_messages">پیام های سیستم</string>
+    <string name="pref_description_conference_show_system_messages">نمایش پیام های سیستم در کنفرانس ها</string>
+
+    <string name="pref_title_local_discovery_enabled">کشف شبکه</string>
+    <string name="pref_description_local_discovery_enabled">برای راه اندازي از گره ها در LAN محلي استفاده كنيد</string>
+
+    <string name="pref_title_U_keep_nospam">NoSpam را نگه دارید</string>
+    <string name="pref_description_U_keep_nospam">مقدار NoSpam را حفظ کنید. این بی خطر نیست ، فقط اگر می دانید چه می کنید فعال کنید!</string>
+
+    <string name="pref_title_allow_screen_off_in_audio_call">صفحه را خاموش کنید</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">اگر با خاموش کردن صفحه در Audiocall مشکلی دارید ، این را خاموش کنید</string>
+
+    <string name="pref_title_X_zoom_incoming_video">پنجره بزرگنمایی Videocall</string>
+    <string name="pref_description_X_zoom_incoming_video">اجازه دهید پنجره Videocall را بزرگنمایی کنید. این به طور کامل کار نمی کند!</string>
+
+    <string name="pref_title_X_use_native_audio_play">سیستم صوتی بومی</string>
+    <string name="pref_description_X_use_native_audio_play">!! Expermimental !! \nبرای پخش صدا از صدای بومی استفاده کنید</string>
+
+    <string name="pref_title_X_battery_saving_mode">حالت پس انداز باتری</string>
+    <string name="pref_description_X_battery_saving_mode">!! Expermimental !! \nاین باتری کمی بیشتر صرفه جویی می کند ، اما ارسال و دریافت این پیام مدت زمان بیشتری خواهد برد. \nاحتمالاً برخی از اثرات بد دیگر نیز وجود دارد!</string>
+
+    <string name="pref_title_X_misc_button_enabled">متفرقه دکمه</string>
+    <string name="pref_description_X_misc_button_enabled">!! برای ارسال پیام ثابت دکمه ای را در صفحه تماس بگیرید</string>
+
+    <string name="pref_title_X_eac_delay_ms">تأخیر AEC</string>
+    <string name="pref_description_X_eac_delay_ms">!! اکسپرسیمنتال! \nتأخیر در مکاتبات کارایی</string>
+
+    <string name="pref_title_add_friends_to_messages">دوستان را به پیام ها اضافه کنید</string>
+    <string-array name="pref_example_list_titles">
+        <item>همیشه</item>
+        <item>در صورت امکان</item>
+        <item>هرگز</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_header_data_sync">داده ها</string>
+
+    <string name="pref_title_sync_frequency">فرکانس همگام سازی</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 دقیقه</item>
+        <item>30 دقیقه</item>
+        <item>1 ساعت</item>
+        <item>3 ساعت</item>
+        <item>6 ساعت</item>
+        <item>هرگز</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+
+    <string name="pref_title_min_audio_samplingrate_out">نمونه گیری صوتی</string>
+    <string name="pref_description_min_audio_samplingrate_out">تنظیم پیش فرض 48000 هرتز است</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>خودکار</item>
+        <item>8000 هرتز</item>
+        <item>16000 هرتز</item>
+        <item>48000 هرتز</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>خودکار</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+
+
+    <string name="pref_title_X_audio_recording_frame_size">فریم های صوتی Audiorecoding</string>
+    <string name="pref_description_X_audio_recording_frame_size">تنظیم پیش فرض 40 ms است</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+
+    <string name="pref_title_X_battery_saving_timeout">زمان آفلاین در حالت Batterysavings</string>
+    <string name="pref_description_X_battery_saving_timeout">تنظیم پیش فرض 15 دقیقه است</string>
+    <string-array name="X_battery_saving_timeout_titles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="X_battery_saving_timeout_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>ورودی 1</item>
+        <item>ورودی 2</item>
+        <item>ورود 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value"/>
+
+    <string name="pref_title_system_sync_settings">تنظیمات همگام سازی سیستم</string>
+
+    <string name="pref_header_notifications">اطلاعیه</string>
+
+    <string name="pref_title_new_message_notifications">اعلان های پیام جدید</string>
+
+    <string name="pref_title_ringtone">آهنگ زنگ</string>
+    <string name="pref_ringtone_silent">بی صدا</string>
+
+    <string name="pref_title_vibrate">لرزش</string>
+    <string name="pref_title_sound">صدا</string>
+    <string name="add_friend_activity_help">شناسه سم دوست را در کادر نوشتاری در بالا جایگذاری کنید یا روی ضربه بزنید     دکمه کد QR برای اسکن کد دوست با دوربین.</string>
+    <string name="add_friend_activity_add">اضافه کردن دوست</string>
+    <string name="cancel">لغو</string>
+    
+    
+    
+
+
+    
+    
+    
+    <string name="MainActivity_profile">مشخصات</string>
+    <string name="MainActivity_settings">تنظیمات</string>
+    <string name="MainActivity_logout_login">ورود /ورود</string>
+    <string name="MainActivity_maint">نگهداری</string>
+    <string name="MainActivity_about">در باره</string>
+    <string name="MainActivity_exit">خروج</string>
+    <string name="MainActivity_available">در دسترس</string>
+    <string name="MainActivity_away">دور</string>
+    <string name="MainActivity_busy">مشغول</string>
+    <string name="MainActivity_no_button">نه</string>
+    <string name="MainActivity_ok_take_me_there_button">خوب ، من را آنجا ببر</string>
+    <string name="MainActivity_info_dialog_title">اطلاعات</string>
+    <string name="MainActivity_add_to_batt_opt">لطفاً برای استفاده از Batteryoptimization ، TRIfA را به لیست استثناء اضافه کنید!</string>
+    <string name="MainActivity_friend_is_typing">دوست در حال تایپ کردن است ...</string>
+    <string name="MainActivity_notification_new_message">پیام جدید</string>
+    <string name="MainActivity_notification_new_message2">پیام جدید</string>
+    <string name="MainActivity_button_ok">خوب</string>
+    <string name="MainActivity_error_starting_email_app">خطا در شروع برنامه ایمیل</string>
+    <string name="MainActivity_no_email_app_found">هیچ برنامه ایمیل یافت نشد</string>
+    <string name="MainActivity_toast_msg_deleted">پیام ها حذف شدند</string>
+    <string name="MainActivity_toast_msg_exported">پیام ها صادر شد</string>
+    <string name="MainActivity_toast_msgs_deleted">پیام ها حذف شدند</string>
+    <string name="MainActivity_notification_new_message3">پیام جدید</string>
+    <string name="MainActivity_notification_new_message4">پیام جدید</string>
+    <string name="MainActivity_notification_new_message5">پیام جدید</string>
+
+    <string name="Aboutpage_0">TRIfA Crashlog</string>
+    <string name="Aboutpage_2">گزارش Crash را از طریق ایمیل ارسال کنید</string>
+    <string name="Aboutpage_4">خواندن اطلاعات خرابی ...</string>
+    <string name="Aboutpage_5a">TRIfA a Tox Client برای Android</string>
+    <string name="Aboutpage_5b">نسخه:</string>
+    <string name="Aboutpage_6">Tox چیست؟</string>
+    <string name="Aboutpage_8">کتابخانه های استفاده شده:</string>
+
+    <string name="AddFriendActivity_3">ToxID نادرست</string>
+    <string name="AddFriendActivity_4">بدون ToxID</string>
+
+    <string name="CallingActivity_0">تأخیر ویدیو:</string>
+    <string name="CallingActivity_23">تأخیر ویدیو:</string>
+
+    <string name="ConferenceAudioActivity_10">لیست کاربران</string>
+    <string name="ConferenceAudioActivity_17">فشار به صحبت کردن</string>
+    <string name="ConferenceAudioActivity_18">صحبت کردن ...</string>
+    <string name="GroupActivityActive">فعال:</string>
+    <string name="GroupActivityOffline">آفلاین:</string>
+    
+    
+    
+
+
+    
+    
+    
+    <string name="layout___toxid">توکسید</string>
+    <string name="layout___scan_qr_code">اسکن کد QR</string>
+    <string name="layout___enter_pass_longtext">رمز عبور را وارد کنید \nگزینه بازیابی وجود ندارد!</string>
+    <string name="layout___unlock">باز کردن</string>
+    <string name="layout___name">نام</string>
+    <string name="layout___push_to_talk">فشار به صحبت کردن</string>
+    <string name="layout___nick">بریدگی کوچک:</string>
+    <string name="layout___pubkey">Pubkey:</string>
+    <string name="layout___status">وضعیت:</string>
+    <string name="layout___alias">نام مستعار</string>
+    <string name="layout___remove_friends_relay">رله Friends را حذف کنید</string>
+    <string name="layout___friends_relay_pubkey">دوستان رله Pubkey:</string>
+    <string name="layout___waiting_for_orbot">منتظر Orbot ...</string>
+    <string name="layout___clear_glide_cache">پاک کردن حافظه نهان</string>
+    <string name="layout___set_app_language">تنظیم زبان برنامه</string>
+    <string name="layout___run_vacuum_on_sql_database">VACUUM را در بانک اطلاعات Sql اجرا کنید</string>
+    <string name="layout___run_analyze_on_sql_database">ANALYZE را در بانک اطلاعات Sql اجرا کنید</string>
+    <string name="layout___reset_favorite_emoji_list">تنظیم مجدد لیست Emoji مورد علاقه</string>
+    <string name="layout___delete_all_avatar_icons">همه نمادهای آواتار را حذف کنید</string>
+    <string name="layout___update_bootstrapnodes_from_internet">Bootstrapnodes را از اینترنت به روز کنید</string>
+    <string name="layout___reset_bootstrapnodes_to_default">تنظیم مجدد Bootstrapnodes به طور پیش فرض</string>
+    <string name="layout___test_notification_sound">تست صدای اعلان</string>
+    <string name="layout___test_ringtone_sound">تست صدای زنگ</string>
+    <string name="layout___export_tox_savedata_unsecure">صادرات توکس ذخیره شده * ناامن *</string>
+    <string name="layout___im_port_tox_savadata_unsecure">درگاه IM TOX SAVADATA * عدم اطمینان *</string>
+    <string name="layout___click_image_to_change_your_avatar">روی تصویر کلیک کنید تا آواتار خود را تغییر دهید</string>
+    <string name="layout___remove_own_relay">رله خود را حذف کنید</string>
+    <string name="layout___relay_pubkey">رله Pubkey:</string>
+    <string name="layout___new_random_nospam">NOSPAM تصادفی جدید</string>
+    <string name="layout___own_pubkey">Pubkey خود:</string>
+    <string name="layout___copy_toxid">ToxID را کپی کنید</string>
+    <string name="layout___your_toxidenticon">ToxIdenticon شما</string>
+    <string name="layout___active_network_connections">اتصالات فعال شبکه:</string>
+    <string name="layout___error_getting_active_network_connections">* در دریافت اتصالات شبکه فعال خطا *</string>
+    <string name="layout___set_password_or_skip">گذرواژه یا جست و خیز را تنظیم کنید. \n\nوقتی انتخاب می کنید برای پرش از \nکلمه کلیدی به صورت خودکار ایجاد می شود \nگزینه بازیابی وجود ندارد!</string>
+    <string name="layout___password">کلمه عبور</string>
+    <string name="layout___password_again">رمز عبور دوباره</string>
+    <string name="layout___set_password">گذاشتن رمز عبور</string>
+    <string name="layout___skip">جست و خیز</string>
+    <string name="layout___leave">ترک کردن</string>
+    <string name="layout___delete">حذف</string>
+    <string name="layout___info">اطلاعات</string>
+    <string name="layout___create_text_group">ایجاد گروه متن</string>
+    <string name="layout___create_audio_group">ایجاد گروه صوتی</string>
+    <string name="layout___add_as_toxproxy">به عنوان ToxProxy اضافه کنید</string>
+    <string name="layout___peer_name">نام همسالان</string>
+    <string name="layout___online">برخط</string>
+    <string name="layout___copy">کپی 🀄</string>
+    <string name="layout___export">صادرات</string>
+    
+    
+    
+</resources>

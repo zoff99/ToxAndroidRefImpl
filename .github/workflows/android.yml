@@ -1,0 +1,62 @@
+name: Android CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Install NDK
+      run: echo "y" | sudo /usr/local/lib/android/sdk/tools/bin/sdkmanager --install "ndk;21.0.6113669" --sdk_root=${ANDROID_SDK_ROOT}
+
+    - name: Build with Gradle
+      run: cd android-refimpl-app ; ./gradlew assembleRelease
+
+    - name: upload apk
+      uses: actions/upload-artifact@v1
+      with:
+        name: trifa
+        path: /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk
+
+  android-test:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install cliclick
+      run:  brew install cliclick
+
+    - name: android test
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        # ndk: 16.1.4479499
+        ndk: 21.0.6113669
+        emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+        script: |
+          rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+          printf 'dependencyVerification {\nverify = [\n]\n}\n' > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+          cd android-refimpl-app ; ./gradlew assemble
+          cliclick -m verbose m:12,34
+          screencapture -T 42 -x -t png /Users/runner/screen01.png &
+          screencapture -T 43 -x -t png /Users/runner/screen02.png &
+          screencapture -T 43 -x -t png /Users/runner/screen03.png &
+          screencapture -T 44 -x -t png /Users/runner/screen04.png &
+          screencapture -T 45 -x -t png /Users/runner/screen05.png &
+          screencapture -T 46 -x -t png /Users/runner/screen06.png &
+          screencapture -T 50 -x -t png /Users/runner/screen07.png &
+          cd android-refimpl-app ; ./gradlew connectedAndroidTest
+
+    - name: upload screenshots
+      uses: actions/upload-artifact@v2
+      with:
+        name: macscreen
+        path: |
+          /Users/runner/screen*.png

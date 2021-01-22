@@ -71,7 +71,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.zoffcc.applications.trifa.MainActivity.get_my_pkg_info;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_my_pkg_info;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MY_PACKAGE_NAME;
 
 
@@ -195,12 +195,18 @@ public class Collector
     }
 
     //Sequence to collect reports from detector
-    public static void updateReports()
+    public static String updateReports()
     {
         //update reports
         pull();
         //process reports (passive mode)
-        fillPackageInformation();
+        String ret = fillPackageInformation();
+
+        if (ret == null)
+        {
+            ret = "no active Connections found";
+        }
+
         //resolve remote hosts (in cache or permission.INTERNET required)
         // new AsyncDNS().execute("");
         //sorting
@@ -210,6 +216,8 @@ public class Collector
         {
             fillCertRequests();
         }
+
+        return ret;
     }
 
     //Search for resolved hostnames and add them to the resolved list
@@ -228,7 +236,8 @@ public class Collector
                 //Add to certificate validation, if port 443 (TLS), resolved hostname and not yet
                 //analyzed
                 ip = r.remoteAdd.getHostAddress();
-                if (KnownPorts.isTlsPort(r.remotePort) && hasHostName(ip) && !mCertValMap.containsKey(getDnsHostName(ip)) && !sCertValList.contains(getDnsHostName(ip)))
+                if (KnownPorts.isTlsPort(r.remotePort) && hasHostName(ip) &&
+                    !mCertValMap.containsKey(getDnsHostName(ip)) && !sCertValList.contains(getDnsHostName(ip)))
                 {
                     sCertValList.add(getDnsHostName(ip));
                 }
@@ -317,8 +326,11 @@ public class Collector
     }
 
     // fill reports with app data from Package Information Cache
-    private static void fillPackageInformation()
+    private static String fillPackageInformation()
     {
+        // String ret = "active Network Connections:\n";
+        String ret = "";
+
         for (int i = 0; i < sReportList.size(); i++)
         {
             Report r = sReportList.get(i);
@@ -326,6 +338,7 @@ public class Collector
             {
                 updatePackageCache();
             }
+
             if (sCachePackage.containsKey(r.uid))
             {
                 PackageInfo pi = sCachePackage.get(r.uid);
@@ -335,7 +348,8 @@ public class Collector
                 {
                     if (r.packageName.equals(MY_PACKAGE_NAME))
                     {
-                        Log.i(Const.LOG_TAG, "report:D:" + r.localPort + " " + r.packageName + " " + r.remotePort + " " + r.localAdd + " " + r.remoteAdd + " " + r.type);
+                        ret = ret + "l -> " + r.localAdd.getHostAddress() + ":" + r.localPort + "\n" + "r -> " +
+                              r.remoteAdd.getHostAddress() + ":" + r.remotePort + "/" + r.type + "\n\n";
                     }
                 }
             }
@@ -344,8 +358,9 @@ public class Collector
                 r.appName = "Unknown App";
                 r.appName = "app.unknown";
             }
-
         }
+
+        return ret;
     }
 
     //Make a deep copy of the report list

@@ -22,18 +22,24 @@ package com.zoffcc.applications.trifa;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.List;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListFragment extends Fragment
@@ -44,24 +50,40 @@ public class MessageListFragment extends Fragment
     long current_friendnum = -1;
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     MessagelistAdapter adapter = null;
+    static boolean is_at_bottom = true;
+    TextView scrollDateHeader = null;
+    ConversationDateHeader conversationDateHeader = null;
+    MessageListActivity mla = null;
+    boolean is_data_loaded = true;
+    static boolean show_only_files = false;
+    static String search_messages_text = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        // Log.i(TAG, "onCreateView");
+        Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
 
 
-        MessageListActivity mla = (MessageListActivity) (getActivity());
-        current_friendnum = mla.get_current_friendnum();
+        mla = (MessageListActivity) (getActivity());
+        if (mla != null)
+        {
+            current_friendnum = mla.get_current_friendnum();
+        }
         Log.i(TAG, "current_friendnum=" + current_friendnum);
+
+        // default is: at bottom
+        is_at_bottom = true;
 
         try
         {
             // reset "new" flags for messages -------
             if (orma != null)
             {
-                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                orma.updateMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        is_new(false).
+                        execute();
             }
             // reset "new" flags for messages -------
         }
@@ -75,7 +97,49 @@ public class MessageListFragment extends Fragment
             if (orma != null)
             {
                 // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+                // -------------------------------------------------
+                // HINT: here ordering of messages is applied !!
+                // -------------------------------------------------
+                if (show_only_files)
+                {
+                    data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                            tox_friend_get_public_key__wrapper(current_friendnum)).
+                            and().
+                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            toList();
+                }
+                else
+                {
+                    if ((search_messages_text == null) || (search_messages_text.length() == 0))
+                    {
+                        data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                                tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                toList();
+                    }
+                    else
+                    {
+                        /*
+                         searching for case-IN-sensitive non ascii chars is not working:
+
+                         https://sqlite.org/lang_expr.html#like
+
+                         Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                         The LIKE operator is case sensitive by default for unicode characters that are beyond
+                         the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                         */
+                        data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                                tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                                toList();
+                    }
+                }
+                Log.i(TAG, "loading data:001");
                 // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
                 // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
             }
@@ -94,12 +158,64 @@ public class MessageListFragment extends Fragment
         listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view.findViewById(R.id.msg_rv_list);
         // Log.i(TAG, "onCreateView:listingsView=" + listingsView);
 
+        scrollDateHeader = (TextView) view.findViewById(R.id.scroll_date_header);
+        scrollDateHeader.setText("");
+        scrollDateHeader.setVisibility(View.INVISIBLE);
+        conversationDateHeader = new ConversationDateHeader(view.getContext(), scrollDateHeader);
+
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setStackFromEnd(true); // pin to bottom element
         listingsView.setLayoutManager(linearLayoutManager);
         listingsView.setItemAnimator(new DefaultItemAnimator());
         listingsView.setHasFixedSize(false);
 
+        RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING)
+                {
+                    conversationDateHeader.show();
+                }
+                else if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    conversationDateHeader.hide();
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                int visibleItemCount = linearLayoutManager.getChildCount();
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
+
+                scrollDateHeader.setText(adapter.getDateHeaderText(pastVisibleItems));
+
+                if (pastVisibleItems + visibleItemCount >= totalItemCount)
+                {
+                    // Bottom of the list
+                    if (!is_at_bottom)
+                    {
+                        // Log.i(TAG, "onScrolled:at bottom");
+                        is_at_bottom = true;
+                    }
+                }
+                else
+                {
+                    if (is_at_bottom)
+                    {
+                        // Log.i(TAG, "onScrolled:NOT at bottom");
+                        is_at_bottom = false;
+                    }
+                }
+            }
+        };
+
+        listingsView.addOnScrollListener(mScrollListener);
         listingsView.setAdapter(adapter);
         // --------------
         // --------------
@@ -108,7 +224,9 @@ public class MessageListFragment extends Fragment
         // a = new MessagelistArrayAdapter(context, data_values);
         // setListAdapter(a);
 
-        MainActivity.message_list_fragment = this;
+        // MainActivity.message_list_fragment = this;
+
+        is_data_loaded = true;
 
         return view;
     }
@@ -136,20 +254,75 @@ public class MessageListFragment extends Fragment
     @Override
     public void onResume()
     {
+        global_showing_messageview = true;
+
         Log.i(TAG, "onResume");
         super.onResume();
 
+        if (!is_data_loaded)
+        {
+            try
+            {
+                // reset "new" flags for messages -------
+                if (orma != null)
+                {
+                    orma.updateMessage().tox_friendpubkeyEq(
+                            tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                    Log.i(TAG, "loading data:002");
+                }
+                // reset "new" flags for messages -------
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            update_all_messages(true);
+
+            // default is: at bottom
+            is_at_bottom = true;
+
+            //        try
+            //        {
+            //            if (orma != null)
+            //            {
+            //                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+            //                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
+            //                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+            //                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
+            //            }
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            e.printStackTrace();
+            //            // data_values is NULL here!!
+            //        }
+
+        }
+
+        is_data_loaded = false;
         MainActivity.message_list_fragment = this;
     }
 
-    void update_all_messages()
+    @Override
+    public void onPause()
+    {
+        Log.i(TAG, "onPause");
+        super.onPause();
+
+        global_showing_messageview = false;
+        MainActivity.message_list_fragment = null;
+    }
+
+    void update_all_messages(boolean always)
     {
         Log.i(TAG, "update_all_messages");
 
         try
         {
             // reset "new" flags for messages -------
-            orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+            orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(
+                    false).execute();
             // reset "new" flags for messages -------
         }
         catch (Exception e)
@@ -159,16 +332,65 @@ public class MessageListFragment extends Fragment
 
         try
         {
-            if (data_values != null)
+            if ((always) || (data_values != null))
             {
-                data_values.clear();
-                adapter.add_list_clear(orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList());
+                Log.i(TAG, "data_values:005a");
+                if (data_values != null)
+                {
+                    data_values.clear();
+                }
+                Log.i(TAG, "data_values:005b");
+
+                // -------------------------------------------------
+                // HINT: this one does not respect ordering?!
+                // -------------------------------------------------
+                if (show_only_files)
+                {
+                    adapter.add_list_clear(orma.selectFromMessage().
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            and().
+                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            toList());
+                }
+                else
+                {
+                    if ((search_messages_text == null) || (search_messages_text.length() == 0))
+                    {
+                        adapter.add_list_clear(orma.selectFromMessage().
+                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                toList());
+                    }
+                    else
+                    {
+                        /*
+                         searching for case-IN-sensitive non ascii chars is not working:
+
+                         https://sqlite.org/lang_expr.html#like
+
+                         Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                         The LIKE operator is case sensitive by default for unicode characters that are beyond
+                         the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                         */
+                        adapter.add_list_clear(orma.selectFromMessage().
+                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                                toList());
+                    }
+                }
+                Log.i(TAG, "data_values:005c");
             }
-            Log.i(TAG, "data_values:005");
+            Log.i(TAG, "data_values:005d");
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
 
     }
@@ -207,10 +429,14 @@ public class MessageListFragment extends Fragment
                 try
                 {
                     adapter.add_item(m);
-                    listingsView.scrollToPosition(adapter.getItemCount() - 1);
+                    if (is_at_bottom)
+                    {
+                        listingsView.scrollToPosition(adapter.getItemCount() - 1);
+                    }
                 }
                 catch (Exception e)
                 {
+                    Log.i(TAG, "add_message:EE1:" + e.getMessage());
                     e.printStackTrace();
                 }
             }

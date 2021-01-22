@@ -1,0 +1,33 @@
+
+
+# right-mouse -> source -> externalize strings
+
+================================================
+Aboutpage_
+
+app/src
+main.java.com.zoffcc.applications.trifa
+getString
+(R.string.${key})
+================================================
+app/src
+main.res.values
+messages.properties
+================================================
+
+## java src file:
+
+getString.(R  -->  getString.R
+
+# R.string."Aboutpage.  --> R.string."Aboutpage_
+
+cat app/src/main/java/com/zoffcc/applications/trifa/Aboutpage.java | sed -e 's#getString(R.string."\([^"]*\)"#getString(R.string.\1#g'
+
+
+## prop file:
+
+echo '<resources>' > strings_ui.xml
+cat ./app/src/main/res/values/messages.properties | awk -F'=' '{ print "<string name=\"" $1 "\">" $2 "</string>" }' >> strings_ui.xml
+echo '</resources>' >> strings_ui.xml
+
+Aboutpage.  --> Aboutpage_

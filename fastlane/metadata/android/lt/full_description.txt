@@ -1,0 +1,19 @@
+<b>TRIfA - Naujos Rūšies Momentinis Susirašinėjimas</b><br>
+
+Ar tai būtų korporacijos ar valdžia, skaitmeninis sekimas šiuo metu yra labai išplitęs.<br>
+Tox yra paprasto naudojimo programinė įranga jungianti jus su draugais ir šeima be jokio pašalinio klausymosi.<br>
+Kitos plačiai žinomos paslaugos yra mokamos, tačiau Tox yra visiškai nemokamas ir nebruka reklamų — dabar ir visados.<br><br>
+
+<b>Užšifruotas:</b><br>
+Viskas, ką darote per Tox yra užšifruomaja naudojantis atviro kodo bibliotekomis. Vieninteliai žmonės matantys jūsų pokalbį yra būtent tie, su kuriais bendraujate.<br><br>
+
+<b>Išskirstytas:</b><br>
+Tox neturi centrinių serverių, kurie gali būti užpulti, nulaužti, arba priversti atiduoti duomenis — tinklas yra sudarytas iš jo vartotojų. Atsisveikinkite su neveikenčiais serveriais!<br><br>
+
+<b>Nemokamas:</b><br>
+Tox yra laisva ir nemokama programinė įranga. Tai reiškia, kad Tox galite laisvai: naudoti, keisti ir dalintis, nes Tox yra kuriamas vartojų ir skirtas vartotojams.<br><br>
+
+<b>Daugiau informacijos:</b><br>
+* <a href="https://tox.zoff.cc">Apie Tox</a><br>
+* <a href="https://matrix.to/#/#trifa:matrix.org">Prisijunkite prie diskusijos per Matrix</a><br>
+* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Prisijunkite prie Tox IRC kanalo</a><br>

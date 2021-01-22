@@ -1,8 +1,0 @@
-.gradle
-.idea
-build
-*.iml
-local.properties
-gwit/tmp
-gwit/classes
-gwit/resources

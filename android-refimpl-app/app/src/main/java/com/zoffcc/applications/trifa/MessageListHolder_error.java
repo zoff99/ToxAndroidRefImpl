@@ -20,7 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
@@ -32,14 +32,13 @@ public class MessageListHolder_error extends RecyclerView.ViewHolder
     private static final String TAG = "trifa.MessageListHolder";
 
     private Message message;
-    private Context context;
     EmojiTextViewLinks textView;
 
     public MessageListHolder_error(View itemView, Context c)
     {
         super(itemView);
         Log.i(TAG, "MessageListHolder");
-        this.context = c;
+        Context context = c;
 
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL);
@@ -47,6 +46,6 @@ public class MessageListHolder_error extends RecyclerView.ViewHolder
 
     public void bindMessageList(Message m)
     {
-        Log.i(TAG, "bindMessageList");
+        // Log.i(TAG, "bindMessageList");
     }
 }

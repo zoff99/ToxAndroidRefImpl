@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notificationbg"
+    android:layout_width="fill_parent"
+    android:layout_height="128.0dip">
+
+    <ImageView
+        android:id="@+id/status_bar_album_art"
+        android:layout_width="60dip"
+        android:layout_height="@dimen/notification_expanded_height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/emoji_ios_1f601" />
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/status_bar_album_art"
+        android:dividerPadding="12.0dip"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:showDividers="middle">
+
+        <ImageView
+            android:id="@+id/status_bar_dummy"
+            android:layout_width="0.0dip"
+            android:layout_height="@dimen/play_controls_notification"
+            android:layout_weight="0.3"
+            android:background="@null"
+            android:padding="0dip"
+            android:src="@null" />
+
+        <ImageButton
+            android:id="@+id/status_bar_play"
+            android:layout_width="0.0dip"
+            android:layout_height="@dimen/play_controls_notification"
+            android:layout_weight="1.0"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="Pause"
+            android:padding="10.0dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/about_icon_google_play" />
+
+        <ImageView
+            android:id="@+id/status_bar_dummy"
+            android:layout_width="0.0dip"
+            android:layout_height="@dimen/play_controls_notification"
+            android:layout_weight="0.1"
+            android:background="@null"
+            android:padding="0dip"
+            android:src="@null" />
+
+        <ImageButton
+            android:id="@+id/status_bar_stop"
+            android:layout_width="0.0dip"
+            android:layout_height="@dimen/play_controls_notification"
+            android:layout_weight="1.0"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="Stop"
+            android:padding="10.0dip"
+            android:scaleType="fitCenter"
+            android:src="@drawable/about_icon_instagram" />
+
+        <ImageView
+            android:id="@+id/status_bar_dummy"
+            android:layout_width="0.0dip"
+            android:layout_height="@dimen/play_controls_notification"
+            android:layout_weight="0.3"
+            android:background="@null"
+            android:padding="0dip"
+            android:src="@null" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="1.0px"
+        android:layout_above="@+id/buttons"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/status_bar_album_art"
+        android:background="?android:dividerHorizontal" />
+
+    <ImageButton
+        android:id="@+id/status_bar_collapse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="?android:selectableItemBackground"
+        android:padding="8.0dip"
+        android:src="@null" />
+
+    <LinearLayout
+        android:id="@+id/textarea"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_vertical"
+        android:layout_toLeftOf="@id/status_bar_collapse"
+        android:layout_toRightOf="@id/status_bar_album_art"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/notification_padding"
+        android:paddingTop="8.0dip">
+
+        <Chronometer
+            android:id="@+id/status_bar_chrono2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_small" />
+
+        <TextView
+            android:id="@+id/status_bar_track_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:focusable="true"
+            android:singleLine="true"
+            android:text="Track Name"
+            android:textSize="@dimen/text_size_small"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/status_bar_artist_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:maxLines="1"
+            android:text="Artist Name" />
+
+    </LinearLayout>
+</RelativeLayout>

@@ -1,113 +1,277 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.zoffcc.applications.trifa.ProfileActivity">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_icon"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        android:paddingBottom="2dp"
-        android:paddingTop="2dp"
-        android:src="@mipmap/ic_launcher_round"
-        app:civ_border_color="#40000000"
-        app:civ_border_width="2dp"/>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/mynick_textview"
-            android:layout_width="30dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="4"
-            android:paddingBottom="15dp"
-            android:paddingRight="2dp"
-            android:paddingTop="12dp"
-            android:text="My Nick:"
-            android:textAlignment="textEnd"
-            android:textIsSelectable="true"
-            android:textSize="12sp"
-            android:textStyle="bold"/>
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/mynick_edittext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_weight="8"
-            android:text="my nick"
-            android:textSize="12sp"/>
-    </LinearLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="8dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="2dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="25dp"
+                    app:civ_border_color="#40000000"
+                    app:civ_border_width="2dp"
+                    tools:src="@mipmap/ic_launcher_round" />
 
-        <TextView
-            android:id="@+id/mystatus_message_textview"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="4"
-            android:paddingBottom="15dp"
-            android:paddingRight="2dp"
-            android:paddingTop="12dp"
-            android:text="MyStatusmessage:"
-            android:textAlignment="textEnd"
-            android:textIsSelectable="true"
-            android:textSize="12sp"
-            android:textStyle="bold"/>
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/profile_icon_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@id/profile_icon"
+                    android:layout_alignBottom="@id/profile_icon"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:tint="@color/design_default_color_on_primary"
+                    app:srcCompat="@drawable/ic_baseline_edit_24" />
+            </RelativeLayout>
 
-        <EditText
-            android:id="@+id/mystatus_message_edittext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_weight="8"
-            android:text="my nick"
-            android:textSize="12sp"/>
-    </LinearLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                android:hint="Nick">
 
-    <TextView
-        android:id="@+id/mytoxid_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:paddingBottom="15dp"
-        android:paddingTop="12dp"
-        android:text="TOXID94583458340958309458093850934805830583085389053095DUMMY"
-        android:textIsSelectable="true"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/mynick_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="flagNoPersonalizedLearning"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    tools:text="@tools:sample/first_names" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <ImageView
-        android:id="@+id/mytoxid_imageview"
-        android:layout_width="match_parent"
-        android:layout_height="190dp"
-        android:paddingBottom="15dp"
-        android:paddingTop="15dp"
-        android:src="@mipmap/ic_launcher_round"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                android:hint="Status">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/mystatus_message_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="flagNoPersonalizedLearning"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    tools:text="@tools:sample/lorem" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/remove_relay_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/layout___remove_own_relay" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text="@string/layout___relay_pubkey"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/my_relay_toxid_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:fontFamily="monospace"
+                android:gravity="fill_horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="15dp"
+                android:textAlignment="gravity"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:typeface="monospace"
+                tools:text="TOXID94583458340958309458093850934805830583085389053095DUMMY" />
+
+            <Button
+                android:id="@+id/new_nospam_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/layout___new_random_nospam" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text="@string/layout___own_pubkey"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mytoxid_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:fontFamily="monospace"
+                android:gravity="fill_horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="15dp"
+                android:textAlignment="gravity"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:typeface="monospace"
+                tools:text="TOXID94583458340958309458093850934805830583085389053095DUMMY" />
+
+            <Button
+                android:id="@+id/copy_toxid_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/layout___copy_toxid" />
+
+            <ImageView
+                android:id="@+id/mytoxid_imageview"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_launcher_round" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="7dp"
+                android:layout_marginBottom="0dp"
+                android:gravity="center_horizontal"
+                android:paddingTop="14dp"
+                android:paddingBottom="0dp"
+                android:text="@string/layout___your_toxidenticon"
+                android:textColor="@color/md_black_1000"
+                android:textSize="18sp"
+                android:textStyle="normal" />
+
+
+            <ImageView
+                android:id="@+id/my_identicon_imageview"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_gravity="center"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_launcher_round" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="40dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text="@string/layout___active_network_connections"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mytox_network_connections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:fontFamily="monospace"
+                android:gravity="fill_horizontal"
+                android:paddingBottom="15dp"
+                android:text="@string/layout___error_getting_active_network_connections"
+                android:textAlignment="gravity"
+                android:textIsSelectable="true"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/dummy_0004"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text=""
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </ScrollView>
 </LinearLayout>

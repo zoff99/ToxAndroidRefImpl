@@ -20,92 +20,123 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.l4digital.fastscroll.FastScroller;
+
 import java.util.Iterator;
 import java.util.List;
 
-public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
+public class FriendlistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
     private static final String TAG = "trifa.FriendlistAdapter";
 
-    private final List<FriendList> friendlistitems;
+    private final List<CombinedFriendsAndConferences> friendlistitems;
     private Context context;
-    private int itemResource;
 
-
-    public FriendlistAdapter(Context context, int itemResource, List<FriendList> items)
+    public FriendlistAdapter(Context context, List<CombinedFriendsAndConferences> items)
     {
-        Log.i(TAG, "FriendlistAdapter");
+        // Log.i(TAG, "FriendlistAdapter");
 
         this.friendlistitems = items;
         this.context = context;
-        this.itemResource = itemResource;
     }
 
     @Override
-    public FriendListHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        Log.i(TAG, "onCreateViewHolder");
+        // Log.i(TAG, "onCreateViewHolder");
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(this.itemResource, parent, false);
+        View view = null;
+        switch (viewType)
+        {
+            case CombinedFriendsAndConferences_model.ITEM_IS_FRIEND:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_entry, parent, false);
+                return new FriendListHolder(view, this.context);
+
+            case CombinedFriendsAndConferences_model.ITEM_IS_CONFERENCE:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_conf_entry, parent, false);
+                return new ConferenceListHolder(view, this.context);
+        }
+
+        // TODO: should never get here!?
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_entry, parent, false);
         return new FriendListHolder(view, this.context);
     }
 
     @Override
-    public void onBindViewHolder(FriendListHolder holder, int position)
+    public int getItemViewType(int position)
     {
-        Log.i(TAG, "onBindViewHolder:position=" + position);
+        CombinedFriendsAndConferences my_item = this.friendlistitems.get(position);
+
+        if (my_item.is_friend)
+        {
+            return CombinedFriendsAndConferences_model.ITEM_IS_FRIEND;
+        }
+        else // is conference
+        {
+            return CombinedFriendsAndConferences_model.ITEM_IS_CONFERENCE;
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
+    {
+        // Log.i(TAG, "onBindViewHolder:position=" + position);
 
         try
         {
-            FriendList fl2 = this.friendlistitems.get(position);
-            holder.bindFriendList(fl2);
+            CombinedFriendsAndConferences fl2 = this.friendlistitems.get(position);
+            // Log.i(TAG, "onBindViewHolder:fl2=" + fl2);
+
+            int type = getItemViewType(position);
+            // Log.i(TAG, "onBindViewHolder:type=" + type);
+
+            switch (type)
+            {
+                case CombinedFriendsAndConferences_model.ITEM_IS_FRIEND:
+                    // Log.i(TAG, "onBindViewHolder:ITEM_IS_FRIEND");
+                    ((FriendListHolder) holder).bindFriendList(fl2.friend_item);
+                    break;
+                case CombinedFriendsAndConferences_model.ITEM_IS_CONFERENCE:
+                    // Log.i(TAG, "onBindViewHolder:ITEM_IS_CONFERENCE");
+                    ((ConferenceListHolder) holder).bindFriendList(fl2.conference_item);
+                    break;
+            }
         }
         catch (Exception e)
         {
+            Log.i(TAG, "onBindViewHolder:EE1:" + e.getMessage());
             e.printStackTrace();
-            holder.bindFriendList(null);
+            ((FriendListHolder) holder).bindFriendList(null);
         }
     }
 
     @Override
     public int getItemCount()
     {
-        // Log.i(TAG, "getItemCount:" + this.friendlistitems.size());
-        return this.friendlistitems.size();
-    }
-
-    public void add_list_clear(List<FriendList> new_items)
-    {
-        // Log.i(TAG, "add_list_clear:" + new_items);
-
-        try
+        if (this.friendlistitems != null)
         {
-            // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
-            this.friendlistitems.clear();
-            this.friendlistitems.addAll(new_items);
-            this.notifyDataSetChanged();
-            // Log.i(TAG, "add_list_clear:002");
+            return this.friendlistitems.size();
         }
-        catch (Exception e)
+        else
         {
-            e.printStackTrace();
-            Log.i(TAG, "add_list_clear:EE:" + e.getMessage());
+            return 0;
         }
     }
 
-    public void add_item(FriendList new_item)
+    public void add_item(CombinedFriendsAndConferences new_item)
     {
         // Log.i(TAG, "add_item:" + new_item + ":" + this.friendlistitems.size());
 
         try
         {
             this.friendlistitems.add(new_item);
+            // TODO: use "notifyItemInserted" !!
             this.notifyDataSetChanged();
             // Log.i(TAG, "add_item:002:" + this.friendlistitems.size());
         }
@@ -122,10 +153,9 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
         this.notifyDataSetChanged();
     }
 
-    public boolean update_item(FriendList new_item)
+    public boolean update_item(CombinedFriendsAndConferences new_item_combined, boolean is_friend)
     {
         // Log.i(TAG, "update_item:" + new_item);
-
         boolean found_item = false;
 
         try
@@ -133,18 +163,41 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
             Iterator it = this.friendlistitems.iterator();
             while (it.hasNext())
             {
-                FriendList f = (FriendList) it.next();
+                CombinedFriendsAndConferences f_combined = (CombinedFriendsAndConferences) it.next();
 
-                // Log.i(TAG, "update_item:001:" + f);
-                // Log.i(TAG, "update_item:002:" + f.tox_public_key_string + ":" + new_item.tox_public_key_string);
-                if (f.tox_public_key_string.compareTo(new_item.tox_public_key_string) == 0)
+                if (is_friend)
                 {
-                    found_item = true;
-                    int pos = this.friendlistitems.indexOf(f);
-                    // Log.i(TAG, "update_item:003:" + pos);
-                    this.friendlistitems.set(pos, new_item);
-                    this.notifyDataSetChanged();
-                    break;
+                    if (f_combined.is_friend)
+                    {
+                        FriendList f = f_combined.friend_item;
+                        FriendList new_item = new_item_combined.friend_item;
+
+                        if (f.tox_public_key_string.compareTo(new_item.tox_public_key_string) == 0)
+                        {
+                            found_item = true;
+                            int pos = this.friendlistitems.indexOf(f_combined);
+                            this.friendlistitems.set(pos, new_item_combined);
+                            this.notifyItemChanged(pos);
+                            break;
+                        }
+                    }
+                }
+                else // is conference
+                {
+                    if (!f_combined.is_friend)
+                    {
+                        ConferenceDB f = f_combined.conference_item;
+                        ConferenceDB new_item = new_item_combined.conference_item;
+
+                        if (f.conference_identifier.compareTo(new_item.conference_identifier) == 0)
+                        {
+                            found_item = true;
+                            int pos = this.friendlistitems.indexOf(f_combined);
+                            this.friendlistitems.set(pos, new_item_combined);
+                            this.notifyItemChanged(pos);
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -155,5 +208,12 @@ public class FriendlistAdapter extends RecyclerView.Adapter<FriendListHolder>
         }
 
         return found_item;
+    }
+
+    @Override
+    public String getSectionText(int position)
+    {
+        // set fastscroller bluble text
+        return " ";
     }
 }

@@ -1,49 +1,86 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="#0277bd"
-              android:orientation="vertical"
-              tools:context="com.zoffcc.applications.trifa.CallingActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/calling_activity_top_viewgroup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical"
+    tools:context="com.zoffcc.applications.trifa.CallingActivity">
 
-
-    <TextView
-        android:id="@+id/top_text_line"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:gravity="center_vertical"
-        android:text="xxxxxxxx"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="20sp"/>
+    <!--android:background="#0277bd"-->
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="0dp"
         android:layout_weight="1"
         android:orientation="horizontal">
 
 
         <FrameLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
+
+            <com.zoffcc.applications.trifa.CustomVideoImageView
                 android:id="@+id/video_view"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/black"/>
+                android:layout_marginTop="0dp"
+                android:background="@android:color/black" />
 
+            <LinearLayout
+                android:id="@+id/calling_friend_online_status"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginLeft="0dp"
+                android:elevation="25dp"
+                android:background="#04b431"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/top_text_line"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:elevation="25dp"
+                android:gravity="center_vertical"
+                android:text="xxxxxxxx"
+                android:textAlignment="center"
+                android:textColor="@color/md_grey_400"
+                android:textSize="18sp" />
 
             <FrameLayout
+                android:id="@+id/debug001"
                 android:layout_width="125dp"
                 android:layout_height="125dp"
                 android:layout_gravity="top|left"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="30dp"
+                android:background="@null"
+                android:elevation="25dp">
+
+                <TextView
+                    android:id="@+id/debug001_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:gravity="center"
+                    android:text="xxxxxxxx"
+                    android:textColor="@color/md_grey_400"
+                    android:textSize="22sp" />
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:id="@+id/video_box_left_top_01"
+                android:layout_width="125dp"
+                android:layout_height="125dp"
+                android:layout_gravity="top|left"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="30dp"
                 android:background="@null">
 
                 <LinearLayout
@@ -62,17 +99,18 @@
                         android:text="1m 20s"
                         android:textColor="@color/md_grey_400"
                         android:textSize="18sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                 </LinearLayout>
             </FrameLayout>
 
-
             <FrameLayout
+                android:id="@+id/video_box_right_top_01"
                 android:layout_width="125dp"
-                android:layout_height="125dp"
+                android:layout_height="245dp"
                 android:layout_gravity="top|right"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="30dp"
+                android:alpha="0.5"
                 android:background="@null">
 
                 <LinearLayout
@@ -85,10 +123,20 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:elevation="2dp"
-                        android:text="V 4000 kbit/s"
+                        android:text="O:VP8 4000 kbit/s"
                         android:textColor="@color/md_green_700"
-                        android:textSize="15sp"
-                        android:textStyle="bold"/>
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/right_top_text_1b"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="I:VP8 4000 kbit/s"
+                        android:textColor="@color/md_green_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/right_top_text_2"
@@ -97,44 +145,202 @@
                         android:elevation="2dp"
                         android:text="A 350 kbit/s"
                         android:textColor="@color/md_red_700"
-                        android:textSize="15sp"
-                        android:textStyle="bold"/>
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/right_top_text_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="IN   0 fps"
+                        android:textColor="@color/md_green_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/right_top_text_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:elevation="2dp"
+                        android:text="Out 0 fps"
+                        android:textColor="@color/md_red_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/audio_device_icon"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_gravity="right"
+                        android:layout_marginTop="6dp"
                         android:layout_marginRight="5dp"
-                        android:layout_marginTop="5dp"
-                        android:elevation="2dp"
-                        android:src="@null"/>
+                        android:elevation="10dp"
+                        android:src="@null" />
 
                 </LinearLayout>
             </FrameLayout>
 
+            <FrameLayout
+                android:id="@+id/video_box_right_volumeslider_01"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center|right"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="45dp"
+                android:background="@null"
+                android:elevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="@null"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
+
+                    <SeekBar
+                        android:id="@+id/volume_slider_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:background="@null"
+                        android:elevation="8dp"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="5" />
+
+                </LinearLayout>
+            </FrameLayout>
 
             <FrameLayout
+                android:id="@+id/video_box_right_video_add_delay_slider_01"
+                android:layout_width="300dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center|right"
+                android:layout_marginTop="70dp"
+                android:layout_marginRight="45dp"
+                android:background="@null"
+                android:elevation="2dp">
+
+                <TextView
+                    android:id="@+id/video_add_delay_slider_infotext"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:layout_gravity="bottom"
+                    android:elevation="8dp"
+                    android:gravity="center_horizontal"
+                    android:text="Video delay: 0 ms"
+                    android:textColor="@color/md_green_600"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="@null"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
+
+                    <SeekBar
+                        android:id="@+id/video_add_delay_slider_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:background="@null"
+                        android:elevation="8dp"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="5" />
+
+                </LinearLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="0dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center_horizontal|bottom"
+                    android:text="O"
+                    android:textColor="@color/md_white_1000"
+                    android:textSize="5sp" />
+
+                <com.google.speech.levelmeter.BarLevelDrawable
+                    android:id="@+id/audio_bar_in_v"
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="30dp"
+                    android:elevation="10dp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/caller_avatar_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="2dp"
+                android:background="@android:color/black"
+                android:elevation="20dp" />
+
+            <LinearLayout
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_marginRight="0dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center_horizontal|bottom"
+                    android:text="I"
+                    android:textColor="@color/md_white_1000"
+                    android:textSize="5sp" />
+
+                <com.google.speech.levelmeter.BarLevelDrawable
+                    android:id="@+id/audio_bar_out_v"
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="30dp"
+                    android:elevation="10dp" />
+            </LinearLayout>
+
+
+            <FrameLayout
+                android:id="@+id/video_box_self_preview_01"
                 android:layout_width="125dp"
-                android:layout_height="125dp"
+                android:layout_height="166dp"
                 android:layout_gravity="bottom|right"
-                android:layout_marginBottom="5dp"
-                android:layout_marginRight="5dp">
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp">
 
                 <FrameLayout
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_gravity="bottom|right"
+                    android:layout_height="160dp"
+                    android:layout_gravity="center"
                     android:background="@drawable/border_001"
                     android:padding="5dp">
 
                     <com.zoffcc.applications.trifa.CameraSurfacePreview
                         android:id="@+id/camera_surfaceview"
-                        android:layout_width="0dip"
-                        android:layout_height="0dip"
-                        android:layout_gravity="bottom|right"
-                        android:elevation="2dp"
-                        android:gravity="center"/>
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="0dp"
+                        android:elevation="12dp"
+                        android:gravity="center"
+                        android:padding="0dp" />
                 </FrameLayout>
             </FrameLayout>
 
@@ -142,92 +348,184 @@
 
     </LinearLayout>
 
+
+    <LinearLayout
+        android:id="@+id/quality_slider_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/text_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/text_vq_low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:elevation="2dp"
+                android:gravity="left"
+                android:paddingLeft="30dp"
+                android:text="low"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_vq_med"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="2dp"
+                android:gravity="center_horizontal"
+                android:text="Video Quality"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_vq_high"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:elevation="2dp"
+                android:gravity="right"
+                android:paddingRight="30dp"
+                android:text="high"
+                android:textColor="@color/md_green_600"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <com.etiennelawlor.discreteslider.library.ui.DiscreteSlider
+            android:id="@+id/quality_slider"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="2dp"
+            android:background="@color/md_black_1000"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            app:backdropFillColor="@color/md_green_A400"
+            app:backdropStrokeColor="@color/md_black_1000"
+            app:backdropStrokeWidth="2dp"
+            app:horizontalBarThickness="4dp"
+            app:position="0"
+            app:tickMarkCount="3"
+            app:tickMarkRadius="8dp" />
+    </LinearLayout>
+
+
     <LinearLayout
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="12dp"
         android:gravity="center_horizontal">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/accept_button"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:background="@android:color/transparent"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_green"/>
+            android:src="@drawable/circle_green" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/camera_toggle_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_blue"/>
+            android:src="@drawable/circle_blue" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
+
+
+        <ImageButton
+            android:id="@+id/misc_button"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:keepScreenOn="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/circle_yellow" />
+
+        <TextView
+            android:id="@+id/misc_button_pad"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text=""></TextView>
+
 
         <ImageButton
             android:id="@+id/mute_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:clickable="true"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_orange"/>
+            android:src="@drawable/circle_orange" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
 
         <ImageButton
             android:id="@+id/decline_button"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="@dimen/calling_activity_bottom_buttons_height"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:background="@android:color/transparent"
             android:keepScreenOn="true"
             android:scaleType="fitXY"
-            android:src="@drawable/circle_red"/>
+            android:src="@drawable/circle_red" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/calling_activity_bottom_buttons_height"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="">
-        </TextView>
+            android:text=""></TextView>
     </LinearLayout>
 
 

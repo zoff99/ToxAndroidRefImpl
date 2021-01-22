@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_set_app_language"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___set_app_language"
+                android:textSize="14sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_clear_glide_cache"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___clear_glide_cache"
+                android:textSize="14sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_sql_vacuum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___run_vacuum_on_sql_database"
+                android:textSize="14sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_sql_analyze"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___run_analyze_on_sql_database"
+                android:textSize="14sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_fav_emoji_reset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___reset_favorite_emoji_list"
+                android:textSize="14sp"/>
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_avatar_icons_delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___delete_all_avatar_icons"
+                android:textSize="14sp"/>
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_update_nodelist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___update_bootstrapnodes_from_internet"
+                android:textSize="14sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_reset_nodelist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___reset_bootstrapnodes_to_default"
+                android:textSize="14sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_test_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___test_notification_sound"
+                android:textSize="14sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_test_ringtone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___test_ringtone_sound"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/text_sqlstats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/rounded_blue_bg"
+                android:padding="5dp"
+                android:text="Database Stats:\nMesssages: 102"
+                android:textColor="@color/md_black_1000"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/dummy_0001"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text=""
+                android:background="@null"
+                android:textColor="@null"
+                android:textSize="16sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_export_savedata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/rounded_orange_dark_bg"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___export_tox_savedata_unsecure"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/dummy_0002"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text=""
+                android:background="@null"
+                android:textColor="@null"
+                android:textSize="16sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_import_savedata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/rounded_red_dark_bg"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:text="@string/layout___im_port_tox_savadata_unsecure"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/dummy_0003"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text=""
+                android:background="@null"
+                android:textColor="@null"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/dummy_0006"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:textAlignment="center"
+                android:gravity="center_horizontal"
+                android:padding="5dp"
+                android:text="---- DEBUG INFORMATION ----"
+                android:background="@null"
+                android:textColor="@color/md_black_1000"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/debug_output"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text="-- DEBUG --"
+                android:background="@null"
+                android:textColor="@color/md_black_1000"
+                android:textSize="16sp"/>
+
+
+            <TextView
+                android:id="@+id/dummy_0004"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text=""
+                android:background="@null"
+                android:textColor="@null"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

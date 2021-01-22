@@ -1,2 +1,3 @@
-include ':app', ':library'
-include ':jnilib'
+include ':app'
+include ':native-audio-jni'
+// include ':loggingstdout'

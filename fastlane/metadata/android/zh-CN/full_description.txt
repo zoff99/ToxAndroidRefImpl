@@ -1,0 +1,19 @@
+<b>TRIfA - 一种新型即时消息</b><br>
+
+无论是公司还是政府，当今的数字监控都很普遍。<br>
+Tox 是一款易于使用的软件，将您与朋友和家人连接，任何人都无法监听。<br>
+尽管其他大牌服务要求您为功能付费，Tox 完全免费无广告 - 永远。<br><br>
+
+<b>加密：</b><br>
+您使用 Tox 做的所有事都使用开源库加密。只有与您聊天的人能看到您的对话。<br><br>
+
+<b>分布式：</b><br>
+Tox 没有中心化服务器可供搜查，关闭，或强制接管数据 — 网络由它的用户组成。从此告别服务器中断！<br><br>
+
+<b>自由：</b><br>
+Tox 是自由软件。自由且免费。这意味着 Tox 属于您 — 使用，修改，分发 — 因为 Tox 来自用户，为了用户。<br><br>
+
+<b>更多信息：</b><br>
+* <a href="https://tox.zoff.cc">关于 Tox</a><br>
+* <a href="https://matrix.to/#/#trifa:matrix.org">在 Matrix 上加入讨论</a><br>
+* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">加入 Tox IRC 频道</a><br>

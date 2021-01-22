@@ -1,0 +1,62 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion = 29
+    buildToolsVersion = '29.0.3'
+    compileOptions.encoding = 'UTF-8'
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 29
+
+        externalNativeBuild {
+            cmake {
+                // arguments "-DANDROID_ARM_NEON=TRUE"
+                // arguments "-G\"BorlandMakeFiles\""
+                cFlags "-g -O3"
+                cppFlags "-g -O3"
+                // targets 'native-audio-jni'
+                // armeabi-v7a, arm64-v8a, x86, x86_64
+                // * does not work * // abiFilters "armeabi-v7a", "x86"
+                // cppFlags "-fexceptions"
+            }
+
+            ndk {
+                // Specifies the ABI configurations of your native
+                // libraries Gradle should build and package with your APK.
+                abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+            }
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+
+    /*
+    flavorDimensions "version"
+    productFlavors {
+        full {
+            dimension "version"
+        }
+    }
+    */
+
+    externalNativeBuild {
+        cmake {
+            // version "3.10.2"
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
+}
+

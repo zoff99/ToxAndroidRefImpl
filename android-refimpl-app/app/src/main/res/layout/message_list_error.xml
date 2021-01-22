@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:padding="6dip">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:padding="@dimen/message_entry_padding">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -14,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:background="@android:color/holo_red_light"
-            android:minHeight="45dp"
+            android:minHeight="50dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -36,6 +37,7 @@
                 android:ellipsize="marquee"
                 android:textColorLink="@color/textblock_link_color_for_red"
                 android:text="** ERROR **"
+                app:emojiSize="@dimen/emoji_size_in_textview"
                 android:textColor="@color/md_black_1000"
                 android:textSize="20sp"/>
 

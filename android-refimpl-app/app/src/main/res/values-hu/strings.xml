@@ -1,0 +1,351 @@
+<resources>
+
+    <string name="add_friend_activity_name">Ismerős hozzáadása</string>
+    <string name="message_list_activity_name">Csevegés</string>
+    <string name="conference_message_list_activity_name">Szöveges konferencia</string>
+    <string name="conference_audio_activity_name">Audio konferencia</string>
+
+    <string name="set_password_message_empty">A jelszó üres</string>
+    <string name="set_password_message_password_invalid">A jelszó túl rövid</string>
+    <string name="set_password_message_password_dont_match">A jelszavak nem egyeznek</string>
+
+    <string name="title_activity_calling">Hívás</string>
+    <string name="title_activity_profile">Profil</string>
+    <string name="title_activity_settings">Beállítások</string>
+    <string name="title_activity_crash">csattanás</string>
+    <string name="title_activity_friendinfo">Friendinfo</string>
+    <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_aboutpage">Ról ről</string>
+    <string name="title_activity_set_password">Állítson be jelszót</string>
+    <string name="title_activity_check_password">Írd be a jelszót</string>
+    <string name="title_activity_share">nyissa meg a TRIfA-val</string>
+    <string name="title_activity_maintenance">Karbantartás</string>
+
+
+    <string-array name="spinner_own_status_array">
+        <item>Online</item>
+        <item>El</item>
+        <item>Elfoglalt</item>
+    </string-array>
+
+    <string name="settings_toolbar_title">Beállítások</string>
+
+    
+    
+    
+    <string name="pref_header_general">Tábornok</string>
+
+    <string name="pref_title_auto_accept_image">automatikus kép elfogadása</string>
+    <string name="pref_description_auto_accept_image">automatikusan elfogadja a képeket és a fényképeket legfeljebb 3 MB-os méretben</string>
+
+    <string name="pref_title_video_uv_reversed">fordított UV a videóban</string>
+    <string name="pref_description_video_uv_reversed">Fordítsa meg az UV síkok sorrendjét a kamera videóban</string>
+
+    <string name="pref_title_software_echo_cancel">Visszhang törlés</string>
+    <string name="pref_description_software_echo_cancel">Használja a szoftver visszhang törlését</string>
+
+    <string name="pref_title_higher_video_quality">Videó minőség</string>
+    <string name="pref_description_higher_video_quality">Használjon jobb videominőséget. \nMódosításra van szüksége RESTART!</string>
+    <string-array name="pref_higher_video_quality_titles">
+        <item>alacsony sávszélesség \n(250 kb /s)</item>
+        <item>normál sávszélesség \n(2500 kb /s)</item>
+        <item>nagy sávszélesség \n(3500 kb /s)</item>
+    </string-array>
+    <string-array name="pref_higher_video_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_camera_get_preview_format">Kamera előnézeti formátum</string>
+    <string name="pref_description_camera_get_preview_format">A fényképezőgép előnézeti formátuma egyes telefonokon rossz formátumúnak tűnik</string>
+    <string-array name="pref_camera_get_preview_format_titles">
+        <item>alapértelmezés: YV12</item>
+        <item>néhány telefon: NV21</item>
+    </string-array>
+    <string-array name="pref_camera_get_preview_format_values">
+        <item>YV12</item>
+        <item>NV21</item>
+    </string-array>
+
+    <string name="pref_title_higher_audio_quality">Hangminőség</string>
+    <string name="pref_description_higher_audio_quality">Használjon jobb hangminőséget. \nMódosításhoz RESTART kell!</string>
+    <string-array name="pref_higher_audio_quality_titles">
+        <item>alacsony \n(6 kb /s)</item>
+        <item>normál \n(32 kb /s)</item>
+        <item>magas \n(64 kb /s)</item>
+    </string-array>
+    <string-array name="pref_higher_audio_quality_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_udp_enabled">engedélyezze az UDP-t</string>
+    <string name="pref_description_udp_enabled">a legtöbb mobil eszköznél az UDP sokkal több internetes forgalmat fog okozni. \nMódosításhoz RESTART kell! \nA alapértelmezett beállítás KI van kapcsolva</string>
+
+    <string name="pref_title_orbot_enabled">engedélyezze a Tor Proxy alkalmazást</string>
+    <string name="pref_description_orbot_enabled">Ennek használatához telepítenie kell az Orbotot. \nA változáshoz RESTART kell!</string>
+
+    <string name="pref_title_fps_half">alsó fps</string>
+    <string name="pref_description_fps_half">Video framerate 1/2: tehát 12 kép /mp, a 25 kép /mp helyett</string>
+
+    <string name="pref_title_set_fps">set fps</string>
+    <string name="pref_description_set_fps">próbáljon meg beállítani a 15 kép /mp-es videó képkocka sebességet, mert ez egyes telefonok összeomlását okozhatja</string>
+
+    <string name="pref_title_display_name">Megjelenítendő név</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_conference_show_system_messages">Rendszerüzenetek</string>
+    <string name="pref_description_conference_show_system_messages">a rendszerüzenetek megjelenítése a konferenciákon</string>
+
+    <string name="pref_title_local_discovery_enabled">LAN felfedezés</string>
+    <string name="pref_description_local_discovery_enabled">használja a helyi LAN csomópontjait a rendszerindításhoz</string>
+
+    <string name="pref_title_U_keep_nospam">tartsa a NoSpam-ot</string>
+    <string name="pref_description_U_keep_nospam">tartsa a NoSpam értéket. Ez nem biztonságos, csak akkor aktiválja, ha tudja, mit csinál!</string>
+
+    <string name="pref_title_allow_screen_off_in_audio_call">Kapcsolja ki a képernyőt</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Ha problémákat tapasztal a képernyő kikapcsolásakor az audiohívásban, kapcsolja ki ezt</string>
+
+    <string name="pref_title_X_zoom_incoming_video">Zoom Videocall ablak</string>
+    <string name="pref_description_X_zoom_incoming_video">engedje meg, hogy nagyításra nagyítsa a Videocall ablakot. Ez nem működik teljesen!</string>
+
+    <string name="pref_title_X_use_native_audio_play">Natív audiorendszer</string>
+    <string name="pref_description_X_use_native_audio_play">!! Kísérleti !! \nHasználja a natív hangot a hang lejátszásához</string>
+
+    <string name="pref_title_X_battery_saving_mode">Akkumulátor megtakarítási mód</string>
+    <string name="pref_description_X_battery_saving_mode">!! Kísérleti jellegű! \na kicsit több energiát takarít meg, de az üzenet továbbküldése és fogadása tovább tart. \nValószínűleg más rossz hatások is!</string>
+
+    <string name="pref_title_X_misc_button_enabled">Misc. Gomb</string>
+    <string name="pref_description_X_misc_button_enabled">!! Kísérleti !! \rögzített üzenet küldéséhez nyomjon meg egy gombot a Hívás képernyőn</string>
+
+    <string name="pref_title_X_eac_delay_ms">AEC késleltetés</string>
+    <string name="pref_description_X_eac_delay_ms">!! Kísérleti !! \nAEC késleltetés ms-ban</string>
+
+    <string name="pref_title_add_friends_to_messages">Vegye fel barátait az üzenetekbe</string>
+    <string-array name="pref_example_list_titles">
+        <item>Mindig</item>
+        <item>Amikor lehetséges</item>
+        <item>Soha</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_header_data_sync">Adat</string>
+
+    <string name="pref_title_sync_frequency">Szinkronizálási frekvencia</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 perc</item>
+        <item>30 perc</item>
+        <item>1 óra</item>
+        <item>3 óra</item>
+        <item>6 óra</item>
+        <item>Soha</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+
+    <string name="pref_title_min_audio_samplingrate_out">Audio mintavétel</string>
+    <string name="pref_description_min_audio_samplingrate_out">Az alapértelmezett beállítás 48000 Hz</string>
+    <string-array name="pref_min_audio_samplingrate_out_titles">
+        <item>kocsi</item>
+        <item>8000 Hz</item>
+        <item>16000 Hz</item>
+        <item>48000 Hz</item>
+    </string-array>
+    <string-array name="pref_min_audio_samplingrate_out_values">
+        <item>kocsi</item>
+        <item>8000</item>
+        <item>16000</item>
+        <item>48000</item>
+    </string-array>
+
+
+    <string name="pref_title_X_audio_recording_frame_size">Az audiokódolás keretes méretű</string>
+    <string name="pref_description_X_audio_recording_frame_size">Az alapértelmezett beállítás 40 ms</string>
+    <string-array name="X_audio_recording_frame_size_titles">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="X_audio_recording_frame_size_values">
+        <item>120</item>
+        <item>60</item>
+        <item>40</item>
+        <item>20</item>
+    </string-array>
+
+    <string name="pref_title_X_battery_saving_timeout">Offline idő elemmegtakarítás módban</string>
+    <string name="pref_description_X_battery_saving_timeout">Az alapértelmezett beállítás 15 perc</string>
+    <string-array name="X_battery_saving_timeout_titles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="X_battery_saving_timeout_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>1. bejegyzés</item>
+        <item>2. bejegyzés</item>
+        <item>3. bejegyzés</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value"/>
+
+    <string name="pref_title_system_sync_settings">Rendszer szinkronizálási beállítások</string>
+
+    <string name="pref_header_notifications">értesítések</string>
+
+    <string name="pref_title_new_message_notifications">Új üzenet-értesítések</string>
+
+    <string name="pref_title_ringtone">Csengőhang</string>
+    <string name="pref_ringtone_silent">Csendes</string>
+
+    <string name="pref_title_vibrate">Rezeg</string>
+    <string name="pref_title_sound">Hang</string>
+    <string name="add_friend_activity_help">Illessze be barátja Tox-azonosítóját a fenti szövegmezőbe, vagy koppintson a     QR-kód gomb a barátkód beolvasásához egy kamerával.</string>
+    <string name="add_friend_activity_add">Ismerős hozzáadása</string>
+    <string name="cancel">Megszünteti</string>
+    
+    
+    
+
+
+    
+    
+    
+    <string name="MainActivity_profile">Profil</string>
+    <string name="MainActivity_settings">Beállítások</string>
+    <string name="MainActivity_logout_login">Kilépés /Belépés</string>
+    <string name="MainActivity_maint">Karbantartás</string>
+    <string name="MainActivity_about">Ról ről</string>
+    <string name="MainActivity_exit">Kijárat</string>
+    <string name="MainActivity_available">Elérhető</string>
+    <string name="MainActivity_away">El</string>
+    <string name="MainActivity_busy">Elfoglalt</string>
+    <string name="MainActivity_no_button">nem</string>
+    <string name="MainActivity_ok_take_me_there_button">OK, vigyél oda</string>
+    <string name="MainActivity_info_dialog_title">INFO</string>
+    <string name="MainActivity_add_to_batt_opt">Kérjük, vegye fel a TRIfA-t az akkumulátoroptimalizálás kivétellistájához!</string>
+    <string name="MainActivity_friend_is_typing">barátja gépel ...</string>
+    <string name="MainActivity_notification_new_message">új üzenet</string>
+    <string name="MainActivity_notification_new_message2">új üzenet</string>
+    <string name="MainActivity_button_ok">Rendben</string>
+    <string name="MainActivity_error_starting_email_app">Hiba az e-mail alkalmazás indításakor</string>
+    <string name="MainActivity_no_email_app_found">Nem található e-mail alkalmazás</string>
+    <string name="MainActivity_toast_msg_deleted">Az üzenetek törölve</string>
+    <string name="MainActivity_toast_msg_exported">Exportált üzenetek</string>
+    <string name="MainActivity_toast_msgs_deleted">Az üzenetek törölve</string>
+    <string name="MainActivity_notification_new_message3">új üzenet</string>
+    <string name="MainActivity_notification_new_message4">új üzenet</string>
+    <string name="MainActivity_notification_new_message5">új üzenet</string>
+
+    <string name="Aboutpage_0">TRIfA Crashlog</string>
+    <string name="Aboutpage_2">Küldjön összeomlási jelentést e-mailben</string>
+    <string name="Aboutpage_4">összeomlás információ olvasása ...</string>
+    <string name="Aboutpage_5a">TRIfA egy Tox kliens Androidra</string>
+    <string name="Aboutpage_5b">Változat:</string>
+    <string name="Aboutpage_6">Mi a Tox?</string>
+    <string name="Aboutpage_8">használt könyvtárak:</string>
+
+    <string name="AddFriendActivity_3">helytelen ToxID</string>
+    <string name="AddFriendActivity_4">Nincs ToxID</string>
+
+    <string name="CallingActivity_0">Video késleltetés:</string>
+    <string name="CallingActivity_23">Video késleltetés:</string>
+
+    <string name="ConferenceAudioActivity_10">Felhasználók névsora</string>
+    <string name="ConferenceAudioActivity_17">Push to Talk</string>
+    <string name="ConferenceAudioActivity_18">beszél ...</string>
+    <string name="GroupActivityActive">Aktív:</string>
+    <string name="GroupActivityOffline">Offline:</string>
+    
+    
+    
+
+
+    
+    
+    
+    <string name="layout___toxid">ToxID</string>
+    <string name="layout___scan_qr_code">QR kód beolvasása</string>
+    <string name="layout___enter_pass_longtext">Írja be a jelszót \nNEM NEM helyreállítási lehetőség!</string>
+    <string name="layout___unlock">Kinyit</string>
+    <string name="layout___name">Név</string>
+    <string name="layout___push_to_talk">Push to talk</string>
+    <string name="layout___nick">Nick:</string>
+    <string name="layout___pubkey">Publikus:</string>
+    <string name="layout___status">Állapot:</string>
+    <string name="layout___alias">Álnév</string>
+    <string name="layout___remove_friends_relay">távolítsa el a Friends Relay alkalmazást</string>
+    <string name="layout___friends_relay_pubkey">Friends Relay Pubkey:</string>
+    <string name="layout___waiting_for_orbot">várja az Orbotot ...</string>
+    <string name="layout___clear_glide_cache">törölje a Glide gyorsítótárat</string>
+    <string name="layout___set_app_language">állítsa be az alkalmazás nyelvét</string>
+    <string name="layout___run_vacuum_on_sql_database">futtassa a VACUUM-ot az SQL adatbázisban</string>
+    <string name="layout___run_analyze_on_sql_database">futtassa az ANALYZE fájlt az SQL adatbázisban</string>
+    <string name="layout___reset_favorite_emoji_list">visszaállítja a kedvenc hangulatjelek listáját</string>
+    <string name="layout___delete_all_avatar_icons">törölje az összes Avatár ikont</string>
+    <string name="layout___update_bootstrapnodes_from_internet">frissítse a Bootstrapnodes az internetről</string>
+    <string name="layout___reset_bootstrapnodes_to_default">állítsa vissza a Bootstrapnodes alapértelmezett értékére</string>
+    <string name="layout___test_notification_sound">teszt Értesítési hang</string>
+    <string name="layout___test_ringtone_sound">teszt csengőhang hang</string>
+    <string name="layout___export_tox_savedata_unsecure">export tox savedata * nem biztonságos *</string>
+    <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA * BIZTOS *</string>
+    <string name="layout___click_image_to_change_your_avatar">kattintson a képre az Avatár megváltoztatásához</string>
+    <string name="layout___remove_own_relay">távolítsa el a saját relét</string>
+    <string name="layout___relay_pubkey">Relé pubkey:</string>
+    <string name="layout___new_random_nospam">új véletlenszerű NOSPAM</string>
+    <string name="layout___own_pubkey">Saját pubkey:</string>
+    <string name="layout___copy_toxid">másolja a ToxID-t</string>
+    <string name="layout___your_toxidenticon">A ToxIdenticon</string>
+    <string name="layout___active_network_connections">aktív hálózati kapcsolatok:</string>
+    <string name="layout___error_getting_active_network_connections">* hiba aktív hálózati kapcsolatok létrehozásakor *</string>
+    <string name="layout___set_password_or_skip">Állítsa be a Jelszó beállítást vagy a kihagyást. \n \nHa úgy dönt, hogy kihagy egy \njelszót, automatikusan generálódik \nNEM NEM helyreállítási lehetőség!</string>
+    <string name="layout___password">Jelszó</string>
+    <string name="layout___password_again">Jelszó ismét</string>
+    <string name="layout___set_password">Állítson be jelszót</string>
+    <string name="layout___skip">Átugrani</string>
+    <string name="layout___leave">Elhagy</string>
+    <string name="layout___delete">Töröl</string>
+    <string name="layout___info">Info</string>
+    <string name="layout___create_text_group">Szövegcsoport létrehozása</string>
+    <string name="layout___create_audio_group">Hangcsoport létrehozása</string>
+    <string name="layout___add_as_toxproxy">add toxProxy néven</string>
+    <string name="layout___peer_name">társ neve</string>
+    <string name="layout___online">Online</string>
+    <string name="layout___copy">Másolat</string>
+    <string name="layout___export">Export</string>
+    
+    
+</resources>

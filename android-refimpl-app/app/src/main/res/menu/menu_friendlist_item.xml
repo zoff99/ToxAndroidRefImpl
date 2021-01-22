@@ -3,12 +3,39 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/item_info"
-        android:title="Info"
+        android:icon="@drawable/ic_info_outline_white_24dp"
+        android:title="@string/layout___info"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
     <item
+        android:id="@+id/item_create_conference"
+        android:icon="@drawable/ic_content_copy_white_24dp"
+        android:title="@string/layout___create_text_group"
+        android:visible="true"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/item_create_av_conference"
+        android:icon="@drawable/ic_content_copy_white_24dp"
+        android:title="@string/layout___create_audio_group"
+        android:visible="true"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/item_add_toxproxy"
+        android:icon="@drawable/ic_content_copy_white_24dp"
+        android:title="@string/layout___add_as_toxproxy"
+        android:visible="true"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/item_dummy01"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:background="@color/md_red_400"
+        android:title="   ---   "
+        android:visible="true"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/item_delete"
-        android:title="Delete"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:title="@string/layout___delete"
         android:visible="true"
         app:showAsAction="ifRoom|withText"/>
 </menu>

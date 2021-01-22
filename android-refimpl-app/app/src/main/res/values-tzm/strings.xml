@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_title_higher_audio_quality">Taɣara n Ugeṛḍ</string>
+    <string name="pref_title_higher_video_quality">Taɣara n Uvidyu</string>
+    <string name="pref_header_general">Amatay</string>
+    <string name="settings_toolbar_title">Tisɣal</string>
+    <string name="title_activity_maintenance">Tanṭṭuft</string>
+    <string name="title_activity_share">Ṛẓem s TRIfA</string>
+    <string name="title_activity_check_password">Sekcem Taguri n uzeray</string>
+    <string name="title_activity_aboutpage">Γef</string>
+    <string name="title_activity_settings">Tisɣal</string>
+    <string name="title_activity_profile">Ifres</string>
+    <string name="title_activity_calling">Γer</string>
+    <string name="message_list_activity_name">Amsawal</string>
+</resources>

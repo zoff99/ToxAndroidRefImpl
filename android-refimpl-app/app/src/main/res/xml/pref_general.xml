@@ -2,9 +2,47 @@
 
     <SwitchPreference
         android:defaultValue="true"
+        android:key="use_incognito_keyboard"
+        android:summary="@string/pref_description_use_incognito_keyboard"
+        android:title="@string/pref_title_use_incognito_keyboard" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="auto_accept_image"
+        android:summary="@string/pref_description_auto_accept_image"
+        android:title="@string/pref_title_auto_accept_image" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="auto_accept_video"
+        android:summary="@string/pref_description_auto_accept_video"
+        android:title="@string/pref_title_auto_accept_video" />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/pref_global_font_size_titles"
+        android:entryValues="@array/pref_global_font_size_values"
+        android:key="global_font_size"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="@string/pref_description_global_font_size"
+        android:title="@string/pref_title_global_font_size" />
+
+    <SwitchPreference
+        android:defaultValue="true"
         android:key="video_uv_reversed"
         android:summary="@string/pref_description_video_uv_reversed"
-        android:title="@string/pref_title_video_uv_reversed"/>
+        android:title="@string/pref_title_video_uv_reversed" />
+
+    <ListPreference
+        android:defaultValue="YV12"
+        android:entries="@array/pref_camera_get_preview_format_titles"
+        android:entryValues="@array/pref_camera_get_preview_format_values"
+        android:key="camera_get_preview_format"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="@string/pref_description_camera_get_preview_format"
+        android:title="@string/pref_title_camera_get_preview_format" />
 
     <!--<SwitchPreference-->
     <!--android:defaultValue="true"-->
@@ -14,16 +52,61 @@
 
     <SwitchPreference
         android:defaultValue="false"
-        android:key="udp_enabled"
-        android:summary="@string/pref_description_udp_enabled"
-        android:title="@string/pref_title_udp_enabled"/>
+        android:key="orbot_enabled"
+        android:summary="@string/pref_description_orbot_enabled"
+        android:title="@string/pref_title_orbot_enabled" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/pref_video_cam_resolution_titles"
+        android:entryValues="@array/pref_video_cam_resolution_values"
+        android:key="video_cam_resolution"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="@string/pref_description_video_cam_resolution"
+        android:title="@string/pref_title_video_cam_resolution" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="h264_encoder_use_intra_refresh"
+        android:summary="@string/pref_description_h264_encoder_use_intra_refresh"
+        android:title="@string/pref_title_h264_encoder_use_intra_refresh" />
 
     <SwitchPreference
         android:defaultValue="false"
-        android:key="orbot_enabled"
-        android:summary="@string/pref_description_orbot_enabled"
-        android:title="@string/pref_title_orbot_enabled"/>
+        android:key="fps_half"
+        android:summary="@string/pref_description_fps_half"
+        android:title="@string/pref_title_fps_half" />
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="set_fps"
+        android:summary="@string/pref_description_set_fps"
+        android:title="@string/pref_title_set_fps" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="allow_screen_off_in_audio_call"
+        android:summary="@string/pref_description_allow_screen_off_in_audio_call"
+        android:title="@string/pref_title_allow_screen_off_in_audio_call" />
+
+    <SeekBarPreference
+        android:defaultValue="2"
+        android:key="mic_gain_factor"
+        android:max="29"
+        android:min="0"
+        android:summary="@string/pref_description_mic_gain_factor"
+        android:title="@string/pref_title_mic_gain_factor" />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/pref_higher_audio_quality_titles"
+        android:entryValues="@array/pref_higher_audio_quality_values"
+        android:key="higher_audio_quality"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="@string/pref_description_higher_audio_quality"
+        android:title="@string/pref_title_higher_audio_quality" />
     <ListPreference
         android:defaultValue="48000"
         android:entries="@array/pref_min_audio_samplingrate_out_titles"
@@ -32,6 +115,107 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:summary="@string/pref_description_min_audio_samplingrate_out"
-        android:title="@string/pref_title_min_audio_samplingrate_out"/>
+        android:title="@string/pref_title_min_audio_samplingrate_out" />
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="conference_show_system_messages"
+        android:summary="@string/pref_description_conference_show_system_messages"
+        android:title="@string/pref_title_conference_show_system_messages" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="local_discovery_enabled"
+        android:summary="@string/pref_description_local_discovery_enabled"
+        android:title="@string/pref_title_local_discovery_enabled" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="udp_enabled"
+        android:summary="@string/pref_description_udp_enabled"
+        android:title="@string/pref_title_udp_enabled" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="force_udp_only"
+        android:summary="@string/pref_description_force_udp_only"
+        android:title="@string/pref_title_force_udp_only" />
+
+    <PreferenceCategory android:title="! unsafe !">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="U_keep_nospam"
+            android:summary="@string/pref_description_U_keep_nospam"
+            android:title="@string/pref_title_U_keep_nospam" />
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory android:title="! eXperimental !">
+
+        <EditTextPreference
+            android:defaultValue="80"
+            android:key="X_eac_delay_ms_2"
+            android:maxLength="3"
+            android:numeric="integer"
+            android:inputType="number"
+            android:summary="@string/pref_description_X_eac_delay_ms"
+            android:title="@string/pref_title_X_eac_delay_ms" />
+
+        <EditTextPreference
+            android:defaultValue="0"
+            android:key="X_audio_play_buffer_custom"
+            android:maxLength="6"
+            android:numeric="integer"
+            android:inputType="number"
+            android:summary="@string/pref_description_X_audio_play_buffer_custom"
+            android:title="@string/pref_title_X_audio_play_buffer_custom" />
+
+        <ListPreference
+            android:defaultValue="40"
+            android:entries="@array/X_audio_recording_frame_size_titles"
+            android:entryValues="@array/X_audio_recording_frame_size_values"
+            android:key="X_audio_recording_frame_size"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="@string/pref_description_X_audio_recording_frame_size"
+            android:title="@string/pref_title_X_audio_recording_frame_size" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_battery_saving_mode"
+            android:summary="@string/pref_description_X_battery_saving_mode"
+            android:title="@string/pref_title_X_battery_saving_mode" />
+
+        <ListPreference
+            android:defaultValue="15"
+            android:dependency="X_battery_saving_mode"
+            android:entries="@array/X_battery_saving_timeout_titles"
+            android:entryValues="@array/X_battery_saving_timeout_values"
+            android:key="X_battery_saving_timeout"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="@string/pref_description_X_battery_saving_timeout"
+            android:title="@string/pref_title_X_battery_saving_timeout" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_misc_button_enabled"
+            android:summary="@string/pref_description_X_misc_button_enabled"
+            android:title="@string/pref_title_X_misc_button_enabled" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_tox_set_do_not_sync_av"
+            android:summary="@string/pref_description_X_tox_set_do_not_sync_av"
+            android:title="@string/pref_title_X_tox_set_do_not_sync_av" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_zoom_incoming_video"
+            android:summary="@string/pref_description_X_zoom_incoming_video"
+            android:title="@string/pref_title_X_zoom_incoming_video" />
+
+    </PreferenceCategory>
 </PreferenceScreen>

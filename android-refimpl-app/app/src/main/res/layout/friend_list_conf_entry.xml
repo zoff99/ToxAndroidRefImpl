@@ -1,0 +1,136 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="75dp"
+    android:layout_margin="0dp"
+    android:background="@null"
+    android:elevation="0dp"
+    android:orientation="horizontal"
+    android:padding="0dip">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/f_conf_container_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="2dp"
+        android:background="@drawable/friend_list_conf_round_bg"
+        android:elevation="2dp"
+        android:padding="2dip">
+
+        <ImageView
+            android:id="@+id/f_notification"
+            android:layout_width="33dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="6dip"
+            android:padding="6dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/circle_red" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/f_avatar_icon"
+            android:layout_width="35dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="6dip"
+            android:layout_toRightOf="@id/f_notification"
+            android:src="@drawable/circle_blue"
+            app:civ_border_color="#40000000"
+            app:civ_border_width="2dp" />
+
+        <ImageView
+            android:id="@+id/f_status_icon"
+            android:layout_width="18dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="6dip"
+            android:layout_toRightOf="@id/f_avatar_icon"
+            android:scaleType="centerInside"
+            android:src="@drawable/circle_red" />
+
+        <ImageView
+            android:id="@+id/f_user_status_icon"
+            android:layout_width="10dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="6dip"
+            android:layout_toRightOf="@id/f_status_icon"
+            android:scaleType="centerInside"
+            android:src="@drawable/circle_green" />
+
+
+        <TextView
+            android:id="@+id/f_status_message"
+            android:layout_width="fill_parent"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/f_user_status_icon"
+            android:ellipsize="marquee"
+            android:fontFamily="monospace"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:text="this is my status message long line this is my status message long line this is my status message long line"
+            android:textSize="11sp"
+            android:typeface="monospace" />
+
+        <TextView
+            android:id="@+id/f_name"
+            android:layout_width="fill_parent"
+            android:layout_height="24dip"
+            android:layout_alignWithParentIfMissing="true"
+            android:layout_above="@id/f_status_message"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@id/f_user_status_icon"
+            android:gravity="center_vertical"
+            android:maxLines="2"
+            android:paddingRight="5dp"
+            android:text="example name long name long name long name long name long name"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+
+        <FrameLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:clipToPadding="false"
+            android:paddingLeft="3dp"
+            android:paddingTop="3dp"
+            android:paddingRight="3dp"
+            android:paddingBottom="3dp">
+
+            <TextView
+                android:id="@+id/f_unread_count"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:background="@drawable/widget_unread_count_background"
+                android:elevation="4dp"
+                android:paddingLeft="5dp"
+                android:paddingTop="8.5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="0.5dp"
+                android:text="120"
+                android:textAlignment="center"
+                android:textColor="#ffffff"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="invisible"></TextView>
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>
+

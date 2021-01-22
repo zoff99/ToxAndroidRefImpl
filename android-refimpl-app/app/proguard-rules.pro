@@ -1,35 +1,15 @@
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in U:\_Projekte\android\sdk\android-sdk-windows/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+-dontobfuscate
+-dontoptimize
+-keepattributes SourceFile,LineNumberTable
 
-# Add any project specific keep options here:
+#-keep class !com.google.gson.** { *; }
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-keep class com.zoffcc.applications.trifa.** { *; }
+-keep class com.github.gfx.android.orma.Schema { *; }
+-keep class javax.annotation.** { *; }
+-keep class android.graphics.** { *; }
+-keep class java.nio.file.** { *; }
+-keep class okhttp3.** { *; }
+-keep class org.codehaus.mojo.animal_sniffer.** { *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
-
-#-keepnames class * com.zoffcc.applications.trifa.MyGlideModule
-
-#-dontoptimize
-#-dontshrink
-#-dontusemixedcaseclassnames
-#-dontskipnonpubliclibraryclasses
-#-dontpreverify
-#-verbose
+-dontwarn *

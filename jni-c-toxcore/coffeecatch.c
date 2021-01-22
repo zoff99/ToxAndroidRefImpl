@@ -32,6 +32,12 @@
  *
  */
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-noreturn"
+#pragma GCC diagnostic ignored "-Wunreachable-code-break"
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 #ifdef __ANDROID__
 #define USE_UNWIND
 #define USE_CORKSCREW
@@ -119,7 +125,8 @@ typedef struct ucontext {
 
 #elif defined(__aarch64__)
 
-#elif defined(__i386__)
+#elif defined(__i386__) || defined(__x86_64__)
+
 
 /* Taken from Google Breakpad. */
 
@@ -232,7 +239,7 @@ typedef struct {
 // TODO: android studio ----------
 // TODO: android studio ----------
 #if 0
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
 #include <setjmp.h>
 void siglongjmp(jmp_buf env, int val);
 int sigsetjmp(jmp_buf env, int savemask);
@@ -1468,3 +1475,5 @@ void coffeecatch_abort(const char* exp, const char* file, int line) {
   }
   abort();
 }
+
+#pragma GCC diagnostic pop

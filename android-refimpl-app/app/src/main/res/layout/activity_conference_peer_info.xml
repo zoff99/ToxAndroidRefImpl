@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/pi_profile_icon"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="20dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:src="@mipmap/ic_launcher_round"
+                app:civ_border_color="#40000000"
+                app:civ_border_width="2dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/pi_nick_text_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="0"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="2dp"
+                    android:paddingBottom="15dp"
+                    android:text="@string/layout___nick"
+                    android:textAlignment="textStart"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/pi_nick_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="800"
+                    android:fontFamily="monospace"
+                    android:paddingLeft="4dp"
+                    android:paddingBottom="15dp"
+                    android:text="my nick er werwer werwer"
+                    android:textIsSelectable="true"
+                    android:textSize="16sp"
+                    android:typeface="monospace" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text="@string/layout___pubkey"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/pi_toxprvkey_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:fontFamily="monospace"
+                android:gravity="center_horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="15dp"
+                android:text="TOXID94583458340958309458093850934805830583085389053095DUMMY"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text=""
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

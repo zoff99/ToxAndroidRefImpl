@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_friend_conference"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:onClick="show_add_friend_conference"
+        android:src="@drawable/ic_plus_sign"
+        app:backgroundTint="@color/md_deep_purple_200"
+        app:borderWidth="0dp"
+        app:elevation="5dp"
+        app:fabSize="mini"
+        app:rippleColor="@color/colorAccent"
+        fab:fab_size="mini" />
+
+</merge>

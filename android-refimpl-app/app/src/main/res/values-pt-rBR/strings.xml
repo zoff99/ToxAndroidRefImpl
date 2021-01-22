@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Aboutpage_5a">TRIfA, um Cliente Tox para Android</string>
+    <string name="Aboutpage_2">enviar relatório de travamento por e-mail</string>
+    <string name="pref_description_X_battery_saving_timeout">A configuração padrão é de 15 minutos</string>
+    <string name="pref_title_X_battery_saving_timeout">Tempo desconectado no modo de economia de bateria</string>
+    <string name="pref_description_X_audio_recording_frame_size">A configuração padrão é de 40 ms</string>
+    <string name="pref_description_min_audio_samplingrate_out">A configuração padrão é 48.000 Hz</string>
+    <string name="pref_description_conference_show_system_messages">Mostrar Mensagens do Sistema em Conferências</string>
+    <string name="Aboutpage_4">lendo informações do travamento…</string>
+    <string name="MainActivity_no_email_app_found">Nenhum aplicativo de e-mail encontrado</string>
+    <string name="MainActivity_error_starting_email_app">Erro ao iniciar o aplicativo de e-mail</string>
+    <string name="MainActivity_friend_is_typing">o amigo está escrevendo…</string>
+    <string name="MainActivity_ok_take_me_there_button">OK, leve-me lá</string>
+    <string name="pref_title_add_friends_to_messages">Adicionar amigos às mensagens</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">NÃO sincronizar AV</string>
+    <string name="pref_description_software_echo_cancel">Usar cancelamento de eco do programa</string>
+    <string name="pref_title_video_uv_reversed">UV invertido em vídeo</string>
+    <string name="layout___add_as_toxproxy">Adicionar como TorProxy</string>
+    <string name="layout___create_audio_group">Criar Grupo de Áudio</string>
+    <string name="layout___create_text_group">Criar Grupo de Texto</string>
+    <string name="layout___scan_qr_code">escanear código QR</string>
+    <string name="ConferenceAudioActivity_17">Pressione para falar</string>
+    <string name="Aboutpage_6">O que é o Tox\?</string>
+    <string name="pref_title_new_message_notifications">Notificações de nova mensagem</string>
+    <string name="pref_title_system_sync_settings">Configurações de sincronização de sistema</string>
+    <string name="pref_header_data_sync">Dados e sincronização</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Buffer de reprodução de áudio</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">atualização intra H264</string>
+    <string name="pref_title_orbot_enabled">habilitar Tor Proxy</string>
+    <string name="pref_title_force_udp_only">forçar modo UDP</string>
+    <string name="pref_title_camera_get_preview_format">Formato de pré-visualização da câmara</string>
+    <string name="pref_description_global_font_size">Selecionar o tamanho da fonte</string>
+    <string name="layout___peer_name">nome do par</string>
+    <string name="layout___set_password">Definir Senha</string>
+    <string name="layout___password_again">Senha de novo</string>
+    <string name="ConferenceAudioActivity_18">falando...</string>
+    <string name="CallingActivity_23">Atraso de vídeo:</string>
+    <string name="CallingActivity_0">Atraso de vídeo:</string>
+    <string name="AddFriendActivity_4">Sem ToxID</string>
+    <string name="AddFriendActivity_3">ToxID incorreto</string>
+    <string name="Aboutpage_8">bibliotecas usadas:</string>
+    <string name="Aboutpage_0">Registro de travamentos do TRIfA</string>
+    <string name="MainActivity_notification_new_message5">Nova Mensagem</string>
+    <string name="MainActivity_notification_new_message4">Nova Mensagem</string>
+    <string name="MainActivity_notification_new_message3">Nova Mensagem</string>
+    <string name="MainActivity_toast_msgs_deleted">Mensagens apagadas</string>
+    <string name="MainActivity_toast_msg_exported">Mensagens exportadas</string>
+    <string name="MainActivity_toast_msg_deleted">Mensagens apagadas</string>
+    <string name="MainActivity_notification_new_message2">Nova Mensagem</string>
+    <string name="MainActivity_notification_new_message">Nova Mensagem</string>
+    <string name="add_friend_activity_add">Adicionar Amigo</string>
+    <string name="pref_title_X_audio_recording_frame_size">Tamanho de quadro de recodificação de áudio</string>
+    <string name="pref_title_min_audio_samplingrate_out">Taxa de amostragem de áudio</string>
+    <string name="pref_title_use_incognito_keyboard">Teclado Anônimo</string>
+    <string name="pref_title_fps_half">reduzir fps</string>
+    <string name="pref_title_udp_enabled">habilitar UDP</string>
+    <string name="pref_title_higher_audio_quality">Qualidade do Áudio</string>
+    <string name="pref_title_mic_gain_factor">Ganho do Microfone</string>
+    <string name="pref_title_global_font_size">Tamanho da Fonte</string>
+    <string name="pref_title_video_cam_resolution">Resolução da Câmera</string>
+    <string name="pref_title_higher_video_quality">Qualidade do Vídeo</string>
+    <string name="pref_title_software_echo_cancel">Cancelamento de Eco</string>
+    <string name="layout___export">Exportar</string>
+    <string name="layout___copy">Copiar</string>
+    <string name="layout___online">Conectado</string>
+    <string name="layout___info">Informações</string>
+    <string name="layout___delete">Apagar</string>
+    <string name="layout___leave">Sair</string>
+    <string name="layout___skip">ignorar</string>
+    <string name="layout___toxid">ToxID</string>
+    <string name="GroupActivityOffline">Desconectados:</string>
+    <string name="GroupActivityActive">Ativos:</string>
+    <string name="ConferenceAudioActivity_10">Lista de usuários</string>
+    <string name="Aboutpage_5b">Versão:</string>
+    <string name="MainActivity_button_ok">OK</string>
+    <string name="MainActivity_info_dialog_title">INFORMAÇÕES</string>
+    <string name="MainActivity_no_button">não</string>
+    <string name="MainActivity_busy">Ocupado</string>
+    <string name="MainActivity_away">Ausente</string>
+    <string name="MainActivity_available">Disponível</string>
+    <string name="MainActivity_exit">Sair</string>
+    <string name="MainActivity_about">Sobre</string>
+    <string name="MainActivity_maint">Manutenção</string>
+    <string name="MainActivity_logout_login">Logout/Login</string>
+    <string name="MainActivity_settings">Configurações</string>
+    <string name="MainActivity_profile">Perfil</string>
+    <string name="cancel">Cancelar</string>
+    <string name="pref_title_sound">Som</string>
+    <string name="pref_title_vibrate">Vibrar</string>
+    <string name="pref_ringtone_silent">Silencioso</string>
+    <string name="pref_title_ringtone">Toque de chamada</string>
+    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 3 MB de tamanho</string>
+    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 10 MB de tamanho</string>
+    <string name="pref_title_auto_accept_video">aceitar vídeos automaticamente</string>
+    <string name="pref_title_auto_accept_image">aceitar imagens automaticamente</string>
+    <string name="pref_header_general">Geral</string>
+    <string name="settings_toolbar_title">Configurações</string>
+    <string name="title_activity_maintenance">Manutenção</string>
+    <string name="title_activity_share">abrir com TRIfA</string>
+    <string name="title_activity_check_password">Digite a senha</string>
+    <string name="title_activity_set_password">Definir Senha</string>
+    <string name="title_activity_aboutpage">Sobre</string>
+    <string name="title_activity_conferencepeerinfo">Informações sobre o par</string>
+    <string name="pref_title_X_battery_saving_mode">Modo de Economia de Bateria</string>
+    <string name="pref_description_X_use_native_audio_play">!! Experimental !!
+\nUsar o Áudio Nativo para Reproduzir Som</string>
+    <string name="pref_title_X_use_native_audio_play">Sistema de Áudio Nativo</string>
+    <string name="pref_description_X_zoom_incoming_video">Permitir o zoom de pinça da janela de Chamada de Vídeo. Isso não está funcionando plenamente!</string>
+    <string name="pref_title_X_zoom_incoming_video">Ampliar a Janela de Chamada de Vídeo</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Se você tiver problemas com a tela desligando em uma Chamada de Áudio, desative esta opção</string>
+    <string name="pref_title_allow_screen_off_in_audio_call">Desligar a tela</string>
+    <string name="pref_description_U_keep_nospam">Manter o valor noSpam. Isso não é seguro, só ative se você souber o que está fazendo!</string>
+    <string name="pref_title_sync_frequency">Frequência de Sincronização</string>
+    <string name="pref_title_X_eac_delay_ms">Atraso da AEC</string>
+    <string name="pref_title_X_misc_button_enabled">Botão Diversos</string>
+    <string name="pref_title_U_keep_nospam">manter NoSpam</string>
+    <string name="pref_title_local_discovery_enabled">Descoberta da LAN</string>
+    <string name="pref_title_conference_show_system_messages">Mensagens do Sistema</string>
+    <string name="pref_title_set_fps">definir fps</string>
+    <string name="layout___unlock">Desbloquear</string>
+    <string name="layout___name">Nome</string>
+    <string name="layout___push_to_talk">Pressione para falar</string>
+    <string name="layout___nick">Apelido:</string>
+    <string name="layout___pubkey">Chave Pública:</string>
+    <string name="layout___status">Estado:</string>
+    <string name="layout___alias">Pseudônimo</string>
+    <string name="layout___remove_friends_relay">remover o Relé de Amigos</string>
+    <string name="layout___friends_relay_pubkey">Relé de Chaves Públicas dos Amigos:</string>
+    <string name="layout___waiting_for_orbot">esperando pelo Orbot…</string>
+    <string name="layout___clear_glide_cache">limpar o Glide Cache</string>
+    <string name="layout___set_app_language">definir o idioma do aplicativo</string>
+    <string name="layout___run_vacuum_on_sql_database">executar o VACUUM no banco de dados Sql</string>
+    <string name="layout___run_analyze_on_sql_database">executar ANALYZE no banco de dados Sql</string>
+    <string name="layout___reset_favorite_emoji_list">redefinir a lista de Emojis favoritos</string>
+    <string name="layout___delete_all_avatar_icons">apagar todos os ícones de Avatar</string>
+    <string name="layout___update_bootstrapnodes_from_internet">atualizar os Bootstrapnodes da Internet</string>
+    <string name="layout___reset_bootstrapnodes_to_default">redefinir Bootstrapnodes aos seus valores pré-determinados</string>
+    <string name="layout___test_ringtone_sound">testar som de toque de chamada</string>
+    <string name="layout___test_notification_sound">testar som de notificação</string>
+    <string name="layout___export_tox_savedata_unsecure">exportar dados salvos do tox *inseguro*</string>
+    <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA *INSEGURO*</string>
+    <string name="layout___click_image_to_change_your_avatar">Clique na imagem para mudar o seu Avatar</string>
+    <string name="layout___remove_own_relay">Remover seu Relé</string>
+    <string name="layout___relay_pubkey">Relé de Chave Pública:</string>
+    <string name="layout___new_random_nospam">Novo NOSPAM Aleatório</string>
+    <string name="layout___own_pubkey">Sua Chave Pública:</string>
+    <string name="layout___copy_toxid">Copiar ToxID</string>
+    <string name="layout___your_toxidenticon">Seu ToxIdenticon</string>
+    <string name="layout___active_network_connections">Conexões de Rede Ativas:</string>
+    <string name="layout___error_getting_active_network_connections">*erro ao obter conexões de rede ativas*</string>
+    <string name="layout___set_password_or_skip">Definir senha ou ignorar.
+\n
+\nQuando você opta por ignorar, uma
+\nsenha será auto-gerada.
+\nNÃO há opção de recuperação!</string>
+    <string name="layout___password">Senha</string>
+    <string name="title_activity_friendinfo">Informações do amigo</string>
+    <string name="title_activity_crash">Erro</string>
+    <string name="title_activity_settings">Configurações</string>
+    <string name="title_activity_profile">Perfil</string>
+    <string name="title_activity_calling">Chamar</string>
+    <string name="set_password_message_password_dont_match">Senhas NÃO coincidem</string>
+    <string name="set_password_message_password_invalid">Senha muito curta</string>
+    <string name="set_password_message_empty">O campo de senha está vazio</string>
+    <string name="conference_audio_activity_player_name">Reprodutor de Audioconferência</string>
+    <string name="conference_audio_activity_name">Conferência de Áudio</string>
+    <string name="conference_message_list_activity_name">Conferência de Texto</string>
+    <string name="message_list_activity_name">Bate-papo</string>
+    <string name="add_friend_activity_name">Adicionar Amigo</string>
+    <string name="layout___enter_pass_longtext">Digite a senha
+\nNÃO há opção de recuperação!</string>
+    <string name="MainActivity_add_to_batt_opt">Favor adicionar TRIfA à lista de exceções para otimização da bateria!</string>
+    <string name="add_friend_activity_help">Cole o Tox ID de um amigo na caixa de texto acima ou toque no botão do código QR para ler o código de um amigo com uma câmera.</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Experimental !!
+\nBuffer de reprodução de áudio em bytes, definido como 0 para desativar a configuração personalizada</string>
+    <string name="pref_description_X_eac_delay_ms">!! Experimental !!!
+\nAtraso AEC em ms</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! Experimental !!!
+\nNão sincroniza Vídeo ou Áudio. Use esta configuração se você tiver problemas de Videochamada, como último recurso.</string>
+    <string name="pref_description_X_misc_button_enabled">!! Experimental !!
+\nAdiciona um botão na tela da chamada para enviar uma mensagem fixa</string>
+    <string name="pref_description_X_battery_saving_mode">!! Experimental !!
+\nIsto economizará um pouco mais de bateria, mas a mensagem demorará mais para ser enviada e recebida.
+\nProvavelmente também alguns outros efeitos negativos!</string>
+    <string name="pref_description_local_discovery_enabled">usar os nós na LAN local para inicializar</string>
+    <string name="pref_description_set_fps">tente definir a taxa de quadros de vídeo de 15 fps, isto pode travar em alguns telefones</string>
+    <string name="pref_description_use_incognito_keyboard">desative para dizer ao teclado para não aprender com as palavras digitadas</string>
+    <string name="pref_description_fps_half">Taxa de quadros de vídeo 1/2: então 12 fps em vez de 25 fps</string>
+    <string name="pref_description_orbot_enabled">Você precisa instalar o Orbot para usar isto.
+\nA mudança precisa REINICIAR!</string>
+    <string name="pref_description_force_udp_only">isto forçará o modo somente UDP, alguns contatos podem não ser acessíveis com esta configuração ativada
+\nA mudança precisa REINICIAR!</string>
+    <string name="pref_description_udp_enabled">para a maioria dos dispositivos móveis, o UDP vai causar muito mais tráfego na internet.
+\nA mudança precisa REINICIAR!
+\nA configuração padrão é OFF (desligado)</string>
+    <string name="pref_header_notifications">Notificações</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">O codificador H264 deve usar quadros intra de atualização</string>
+    <string name="pref_description_higher_audio_quality">Usa uma melhor qualidade de áudio.
+\nA mudança precisa REINICIAR!</string>
+    <string name="pref_description_mic_gain_factor">Defina um ganho maior se o seu microfone gravar com volume baixo</string>
+    <string name="pref_description_camera_get_preview_format">O formato de pré-visualização da câmera parece ter um formato incorreto em alguns telefones</string>
+    <string name="pref_description_video_cam_resolution">Que resolução usar para as chamadas de vídeo</string>
+    <string name="pref_description_higher_video_quality">Usa melhor qualidade de vídeo.
+\nA mudança precisa REINICIAR!</string>
+    <string name="pref_description_video_uv_reversed">Inverea a ordem dos planos UV no vídeo da câmera</string>
+    <string name="layout___migdb_do_not_close">NÃO FECHE esta tela</string>
+    <string name="layout___migdb_text">Migrando arquivos do banco de dados</string>
+    <string name="messages_search_default_text">procurar ...</string>
+</resources>

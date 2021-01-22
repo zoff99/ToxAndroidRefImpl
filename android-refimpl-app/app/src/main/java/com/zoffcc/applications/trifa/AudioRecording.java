@@ -19,25 +19,39 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
-import android.media.MediaRecorder;
-import android.media.audiofx.AcousticEchoCanceler;
-import android.media.audiofx.AutomaticGainControl;
-import android.media.audiofx.NoiseSuppressor;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.zoffcc.applications.nativeaudio.AudioProcessing;
+import com.zoffcc.applications.nativeaudio.NativeAudio;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.nio.ByteBuffer;
 
-import static com.zoffcc.applications.trifa.MainActivity.PREF__audiorec_asynctask;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__audiosource;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.n_rec_audio_in_buffer_max_count;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.semaphore_audioprocessing_02;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
+import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
+import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
+import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
+import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk_active;
+import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group_audio_send_icon;
+import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
+import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
-import static com.zoffcc.applications.trifa.MainActivity.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_audio_send_frame;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_group_send_audio;
 
 public class AudioRecording extends Thread
 {
@@ -47,25 +61,16 @@ public class AudioRecording extends Thread
 
     // the audio recording options
     static int RECORDING_RATE = 48000; // 16000; // 44100;
-    static final int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-    static final int FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     static final int CHANNELS_TOX = 1;
-    static long SMAPLINGRATE_TOX = 48000; // 16000;
-    static boolean soft_echo_canceller_ready = false;
-
-    private int buffer_size = 0;
-    static int audio_session_id = -1;
-    AutomaticGainControl agc = null;
-    AcousticEchoCanceler aec = null;
-    NoiseSuppressor np = null;
+    public static long SMAPLINGRATE_TOX = 48000; // 16000;
+    final static int milliseconds_audio_samples_max = 120;
+    public static boolean microphone_muted = false;
+    static final boolean DEBUG_MIC_DATA_LOGGING = false;
+    static boolean audio_engine_starting = false;
+    static int global_audio_group_send_res = -9999;
 
     // -----------------------
-    private ByteBuffer _recBuffer = null;
-    private byte[] _tempBufRec = null;
-    // private int _bufferedRecSamples = 0;
-    private int buffer_mem_factor = 30;
-    private int buf_multiplier = 5;
-    private boolean android_M_bug = false;
+    static ByteBuffer _recBuffer = null;
     // -----------------------
 
     /**
@@ -73,162 +78,105 @@ public class AudioRecording extends Thread
      */
     public AudioRecording()
     {
-
-        // AcousticEchoCanceler
-        // AutomaticGainControl
-        // LoudnessEnhancer
-
-        try
-        {
-            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
         stopped = false;
         finished = false;
 
         audio_manager_s.setMicrophoneMute(false);
         audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
-        audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
         start();
     }
 
     @Override
     public void run()
     {
+        try
+        {
+            this.setName("AudioRecording");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Audio Thread [OUT]:EETPr:" + e.getMessage());
+        }
+
+        if (PREF__use_native_audio_play)
+        {
+
+            try
+            {
+                semaphore_audioprocessing_02.acquire();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        audio_engine_starting = true;
+
         Log.i(TAG, "Running Audio Thread [OUT]");
         AudioRecord recorder = null;
 
         try
         {
-            int min_sampling_rate = -1;
-            // try user set min freq first
-            min_sampling_rate = getMinSupportedSampleRate(PREF__min_audio_samplingrate_out);
-            Log.i(TAG, "Running Audio Thread [OUT]:try sampling rate:1:" + min_sampling_rate);
-            if (min_sampling_rate == -1)
+
+            if (PREF__use_native_audio_play)
             {
-                // ok, now try also with 8kHz
-                min_sampling_rate = getMinSupportedSampleRate(8000);
-                Log.i(TAG, "Running Audio Thread [OUT]:try sampling rate:2:" + min_sampling_rate);
+                SMAPLINGRATE_TOX = PREF__min_audio_samplingrate_out;
+                RECORDING_RATE = PREF__min_audio_samplingrate_out;
+
+                int sampling_rate = PREF__min_audio_samplingrate_out;
+                int channel_count = 1;
+
+
+                while (native_audio_engine_running == false)
+                {
+                    try
+                    {
+                        Thread.sleep(100);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+
+                NativeAudio.createAudioRecorder((int) SMAPLINGRATE_TOX, n_rec_audio_in_buffer_max_count);
+
+                int want_buf_size_in_bytes = (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2);
+                Log.i(TAG, "want_buf_size_in_bytes(1)=" + want_buf_size_in_bytes);
+
+                _recBuffer = ByteBuffer.allocateDirect(
+                    (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2)); // Max 120 ms @ 48 kHz
+                set_JNI_audio_buffer(_recBuffer);
+
+                // for 60 ms --> 5760 bytes
+                NativeAudio.n_rec_buf_size_in_bytes =
+                    ((sampling_rate * channel_count * 2) / 1000) * PREF__X_audio_recording_frame_size;
+
+                Log.i(TAG, "NativeAudio.n_rec_buf_size_in_bytes=" + NativeAudio.n_rec_buf_size_in_bytes +
+                           " PREF__X_audio_recording_frame_size=" + PREF__X_audio_recording_frame_size +
+                           " sampling_rate=" + sampling_rate + " channel_count=" + channel_count);
+
+                for (int i = 0; i < n_rec_audio_in_buffer_max_count; i++)
+                {
+                    NativeAudio.n_rec_audio_buffer[i] = ByteBuffer.allocateDirect(NativeAudio.n_rec_buf_size_in_bytes);
+                    NativeAudio.n_rec_bytes_in_buffer[i] = 0;
+                    NativeAudio.set_JNI_audio_rec_buffer(NativeAudio.n_rec_audio_buffer[i],
+                                                         NativeAudio.n_rec_buf_size_in_bytes, i);
+                }
+
+                NativeAudio.n_rec_cur_buf = 0;
+                for (int i = 0; i < n_rec_audio_in_buffer_max_count; i++)
+                {
+                    NativeAudio.n_rec_bytes_in_buffer[i] = 0;
+                }
             }
-
-            if (min_sampling_rate != -1)
-            {
-                RECORDING_RATE = min_sampling_rate;
-            }
-            SMAPLINGRATE_TOX = RECORDING_RATE;
-            Log.i(TAG, "Running Audio Thread [OUT]:using sampling rate:" + RECORDING_RATE + " kHz (min=" + min_sampling_rate + ")");
-
-            /*
-             * Initialize buffer to hold continuously recorded audio data, start recording
-             */
-            buffer_size = AudioRecord.getMinBufferSize(RECORDING_RATE, CHANNEL, FORMAT);
-
-            int buffer_size_M = buffer_size;
-
-            // ---------- 222 ----------
-            int want_buf_size_in_bytes = (int) (2 * (RECORDING_RATE / buffer_mem_factor));
-            Log.i(TAG, "want_buf_size_in_bytes(1)=" + want_buf_size_in_bytes);
-            if (want_buf_size_in_bytes < buffer_size)
-            {
-                want_buf_size_in_bytes = buffer_size;
-            }
-
-            //            if (want_buf_size_in_bytes < 6000)
-            //            {
-            //                want_buf_size_in_bytes = 6550;
-            //            }
-
-            if (android_M_bug)
-            {
-                want_buf_size_in_bytes = buffer_size_M;
-            }
-
-            _recBuffer = ByteBuffer.allocateDirect((want_buf_size_in_bytes * buf_multiplier) + 1024); // Max 10 ms @ 48 kHz
-            // _recBuffer = ByteBuffer.allocateDirect((want_buf_size_in_bytes)); // Max 10 ms @ 48 kHz
-            _tempBufRec = new byte[want_buf_size_in_bytes];
-            int recBufSize = buffer_size * buf_multiplier;
-
-            if (android_M_bug)
-            {
-                recBufSize = buffer_size_M;
-            }
-
-            // _bufferedRecSamples = RECORDING_RATE / 200;
-            // ---------- 222 ----------
-            Log.i(TAG, "want_buf_size_in_bytes(2)=" + want_buf_size_in_bytes);
-            Log.i(TAG, "getMinBufferSize buffer_size=" + buffer_size + " recBufSize=" + recBufSize);
-
-            set_JNI_audio_buffer(_recBuffer);
-
-            if (PREF__audiosource == 1)
-            {
-                recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, RECORDING_RATE, CHANNEL, FORMAT, recBufSize);
-            }
-            else
-            {
-                recorder = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, RECORDING_RATE, CHANNEL, FORMAT, recBufSize);
-            }
-            // recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDING_RATE, CHANNEL, FORMAT, recBufSize);
-            audio_session_id = recorder.getAudioSessionId();
-
-            Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:===============================");
-            agc = null;
-            try
-            {
-                Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:isAvailable:" + AutomaticGainControl.isAvailable());
-                agc = AutomaticGainControl.create(audio_session_id);
-                int res = agc.setEnabled(true);
-                Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:setEnabled:" + res + " audio_session_id=" + audio_session_id);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "Audio Thread [OUT]:EE1:" + e.getMessage());
-            }
-            Log.i(TAG, "Audio Thread [OUT]:AutomaticGainControl:===============================");
-
-            Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:===============================");
-            aec = null;
-            try
-            {
-                Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:isAvailable:" + AcousticEchoCanceler.isAvailable());
-                aec = AcousticEchoCanceler.create(audio_session_id);
-                int res = aec.setEnabled(true);
-                Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:setEnabled:" + res + " audio_session_id=" + audio_session_id);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "Audio Thread [OUT]:EE2:" + e.getMessage());
-            }
-            Log.i(TAG, "Audio Thread [OUT]:AcousticEchoCanceler:===============================");
-
-
-            Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:===============================");
-            aec = null;
-            try
-            {
-                Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:isAvailable:" + NoiseSuppressor.isAvailable());
-                np = NoiseSuppressor.create(audio_session_id);
-                int res = np.setEnabled(true);
-                Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:setEnabled:" + res + " audio_session_id=" + audio_session_id);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "Audio Thread [OUT]:EE2:" + e.getMessage());
-            }
-            Log.i(TAG, "Audio Thread [OUT]:NoiseSuppressor:===============================");
-
-            recorder.startRecording();
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "Audio Thread [OUT]:EE:" + e.getMessage());
         }
 
         /*
@@ -238,88 +186,62 @@ public class AudioRecording extends Thread
 
         int readBytes = 0;
         int audio_send_res2 = 0;
-        while (!stopped)
+
+        int want_to_read_bytes = (int) (((float) SMAPLINGRATE_TOX / 1000.0f) *
+                                        (float) PREF__X_audio_recording_frame_size * (float) CHANNELS_TOX * 2.0f);
+        // try to read "PREF__X_audio_recording_frame_size" of audio data
+
+        microphone_muted = false;
+
+        try
         {
-            try
+            // if (audio_manager_s.isMicrophoneMute())
+            if (trifa_is_MicrophoneMute)
             {
-                // only send audio frame if call has started
-                // Log.i(TAG, "Callstate.tox_call_state=" + Callstate.tox_call_state);
-                if (!((Callstate.tox_call_state == 0) || (Callstate.tox_call_state == 1) || (Callstate.tox_call_state == 2)))
+                microphone_muted = true;
+            }
+        }
+        catch (Exception e)
+        {
+        }
+
+
+        if (PREF__use_native_audio_play)
+        {
+            Log.i(TAG, "audio_rec:StartREC:001");
+            Log.i(TAG, "PREF_MicGainFactor=" + PREF_mic_gain_factor);
+            setMicGainFactor(PREF_mic_gain_factor);
+            NativeAudio.StartREC();
+            Log.i(TAG, "audio_rec:StartREC:002");
+
+            audio_engine_starting = false;
+
+            semaphore_audioprocessing_02.release();
+
+
+            while (!stopped)
+            {
+                try
                 {
-                    if (Callstate.my_audio_enabled == 1)
-                    {
-                        _recBuffer.rewind();
-                        readBytes = recorder.read(_tempBufRec, 0, _tempBufRec.length);
+                    Thread.sleep(500);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "audio_rec:EE2:" + e.getMessage());
+                }
 
-                        //  Log.i(TAG, "audio buffer:" + "readBytes=" + readBytes + " _tempBufRec.length=" + _tempBufRec.length + " buffer_size=" + buffer_size);
-
-                        if (readBytes != _tempBufRec.length)
-                        {
-                            Log.i(TAG, "audio buffer:" + "ERROR:readBytes != _tempBufRec.length");
-                        }
-
-                        if (PREF__audiorec_asynctask)
-                        {
-                            new send_audio_frame_to_toxcore(readBytes).execute();
-                        }
-                        else
-                        {
-                            try
-                            {
-                                _recBuffer.put(_tempBufRec);
-                                audio_send_res2 = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (readBytes / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                                if (audio_send_res2 != 0)
-                                {
-                                    Log.i(TAG, "audio:res=" + audio_send_res2 + ":" + ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res2));
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "audio:EE8:" + e.getMessage());
-                                Log.i(TAG, "audio:EE9:" + _recBuffer.limit() + " <-> " + _tempBufRec.length + " <-> " + readBytes);
-                            }
-                        }
-                    }
+                try
+                {
+                    // if (audio_manager_s.isMicrophoneMute())
+                    microphone_muted = trifa_is_MicrophoneMute;
+                }
+                catch (Exception e)
+                {
+                    microphone_muted = false;
                 }
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "Audio Thread [OUT]:EE3:" + e.getMessage());
-            }
         }
-
-        try
-        {
-            agc.release();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "Audio Thread [OUT]:EE4:" + e.getMessage());
-        }
-
-        try
-        {
-            aec.release();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "Audio Thread [OUT]:EE5:" + e.getMessage());
-        }
-
-        try
-        {
-            recorder.stop();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        recorder.release();
 
         finished = true;
 
@@ -331,33 +253,235 @@ public class AudioRecording extends Thread
         stopped = true;
     }
 
-    private class send_audio_frame_to_toxcore extends AsyncTask<Void, Void, String>
+    public static class send_audio_frame_to_toxcore_from_native extends AsyncTask<Void, Void, String>
     {
         int audio_send_res = 0;
-        int readBytes_ = 1;
+        int bufnum_ = 0;
 
-        send_audio_frame_to_toxcore(int readBytes)
+        public send_audio_frame_to_toxcore_from_native(int bufnum)
         {
-            readBytes_ = readBytes;
+            bufnum_ = bufnum;
+            // Log.i(TAG, "send_audio_frame_to_toxcore_from_native:bufnum=" + bufnum);
         }
 
         @Override
         protected String doInBackground(Void... voids)
         {
+/*
             try
             {
-                _recBuffer.put(_tempBufRec);
-                audio_send_res = toxav_audio_send_frame(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey), (long) (readBytes_ / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-                if (audio_send_res != 0)
+                Thread.currentThread().setName("t_s_outN:" + bufnum_);
+            }
+            catch (Exception e)
+            {
+            }
+*/
+
+            try
+            {
+                if (native_audio_engine_down == false)
                 {
-                    Log.i(TAG, "audio:res=" + audio_send_res + ":" + ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+
+                    // -------------- apply AudioProcessing: AEC -----------------------
+                    if (native_aec_lib_ready)
+                    {
+                        AudioProcessing.audio_rec_buffer.position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+
+                        //Log.i(TAG, "audio_rec:AEC:s:" +
+                        //           Arrays.toString(NativeAudio.n_rec_audio_buffer[bufnum_].array()));
+
+                        long save_timestamp = System.currentTimeMillis();
+
+                        if (AEC_DEBUG_DUMP)
+                        {
+
+                            BufferedWriter debug_audio_writer_rec_s = null;
+                            try
+                            {
+                                debug_audio_writer_rec_s = new BufferedWriter(
+                                    new FileWriter("/sdcard/audio_rec_s.txt", true));
+                                long ts = (save_timestamp - calling_activity_start_ms) * 1000;
+                                int value = 0;
+                                for (int xx = 0; xx < 160; xx++)
+                                {
+                                    value = NativeAudio.n_rec_audio_buffer[bufnum_].getShort(xx * 2);
+                                    debug_audio_writer_rec_s.write(("" + ts) + "," + value + "\n");
+                                    ts = ts + 16;
+                                }
+
+                                if (debug_audio_writer_rec_s != null)
+                                {
+                                    debug_audio_writer_rec_s.close();
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            debug_audio_writer_rec_s = new BufferedWriter(
+                                new FileWriter("/sdcard/audio_rec_s_ts.txt", true));
+                            debug_audio_writer_rec_s.write("" + save_timestamp + "\n");
+
+                            if (debug_audio_writer_rec_s != null)
+                            {
+                                debug_audio_writer_rec_s.close();
+                            }
+                        }
+
+                        // Log.i(TAG, "audio_rec:buf_len1=" + NativeAudio.n_rec_audio_buffer[bufnum_].remaining());
+                        // Log.i(TAG, "audio_rec:buf_len2=" + AudioProcessing.audio_rec_buffer.remaining());
+                        AudioProcessing.audio_rec_buffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
+                        AudioProcessing.record_buffer();
+                        AudioProcessing.audio_rec_buffer.position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+
+                        // Log.i(TAG, "audio_rec:AEC:d:" + Arrays.toString(AudioProcessing.audio_rec_buffer.array()));
+
+                        NativeAudio.n_rec_audio_buffer[bufnum_].put(AudioProcessing.audio_rec_buffer);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].position(0);
+                        NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+
+                        if (AEC_DEBUG_DUMP)
+                        {
+                            BufferedWriter debug_audio_writer_rec_d = null;
+                            try
+                            {
+                                debug_audio_writer_rec_d = new BufferedWriter(
+                                    new FileWriter("/sdcard/audio_rec_d.txt", true));
+                                long ts = (save_timestamp - calling_activity_start_ms) * 1000;
+                                int value = 0;
+                                for (int xx = 0; xx < 160; xx++)
+                                {
+                                    value = NativeAudio.n_rec_audio_buffer[bufnum_].getShort(xx * 2);
+                                    debug_audio_writer_rec_d.write(("" + ts) + "," + value + "\n");
+                                    ts = ts + 16;
+                                }
+
+                                if (debug_audio_writer_rec_d != null)
+                                {
+                                    debug_audio_writer_rec_d.close();
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                    // -------------- apply AudioProcessing: AEC -----------------------
+
+                    _recBuffer.rewind();
+                    NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                    _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
+
+                    if (DEBUG_MIC_DATA_LOGGING)
+                    {
+                        Log.i(TAG, "send_audio_frame_to_toxcore_from_native:1:" +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(0) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(1) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(2) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(3) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(4) + " " +
+                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(5) + " ");
+
+
+                        Log.i(TAG, "send_audio_frame_to_toxcore_from_native:2:" + _recBuffer.get(0) + " " +
+                                   _recBuffer.get(1) + " " + _recBuffer.get(2) + " " + _recBuffer.get(3) + " " +
+                                   _recBuffer.get(4) + " " + _recBuffer.get(5) + " ");
+                    }
+
+                    //Log.i(TAG,
+                    //      "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX + " SMAPLINGRATE_TOX=" +
+                    //      SMAPLINGRATE_TOX);
+
+                    if (Callstate.audio_group_active)
+                    {
+                        if (push_to_talk_active)
+                        {
+                            int audio_group_send_res = toxav_group_send_audio(
+                                tox_conference_by_confid__wrapper(ConferenceAudioActivity.conf_id),
+                                (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+
+                            //Log.i(TAG,
+                            //      "audio_group_send_res__global_audio_group_send_res=" + audio_group_send_res + " " +
+                            //      global_audio_group_send_res);
+
+                            if (audio_group_send_res != global_audio_group_send_res)
+                            {
+                                if (push_to_talk_active)
+                                {
+                                    if (audio_group_send_res == 0)
+                                    {
+                                        try
+                                        {
+                                            update_group_audio_send_icon(1);
+                                        }
+                                        catch (Exception e2)
+                                        {
+                                        }
+                                        global_audio_group_send_res = audio_group_send_res;
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            update_group_audio_send_icon(2);
+                                        }
+                                        catch (Exception e2)
+                                        {
+                                        }
+                                        global_audio_group_send_res = audio_group_send_res;
+                                    }
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        update_group_audio_send_icon(0);
+                                    }
+                                    catch (Exception e2)
+                                    {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Log.i(TAG,
+                        //       "toxav_audio_send_frame:002:native:Callstate.friend_pubkey=" + Callstate.friend_pubkey +
+                        //       " fnum=" + tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
+                        audio_send_res = toxav_audio_send_frame(
+                            tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                            ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+
+                        // if (audio_send_res != 0)
+                        // {
+                        //   Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" +
+                        //               ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                        // }
+
+                    }
+
+                    if (DEBUG_MIC_DATA_LOGGING)
+                    {
+                        if (audio_send_res != 0)
+                        {
+                            Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" +
+                                       ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                        }
+                    }
                 }
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-                Log.i(TAG, "audio:EE6:" + e.getMessage());
-                Log.i(TAG, "audio:EE7:" + _recBuffer.limit() + " <-> " + _tempBufRec.length + " <-> " + readBytes_);
+                Log.i(TAG, "send_audio_frame_to_toxcore_from_native:EE6:" + e.getMessage());
             }
 
             return null;
@@ -372,45 +496,5 @@ public class AudioRecording extends Thread
         protected void onPreExecute()
         {
         }
-    }
-
-    /*
-     * thanks to: http://stackoverflow.com/questions/8043387/android-audiorecord-supported-sampling-rates
-     */
-    int getMinSupportedSampleRate(int min_rate)
-    {
-    /*
-     * Valid Audio Sample rates
-     *
-     * @see <a
-     * href="http://en.wikipedia.org/wiki/Sampling_%28signal_processing%29"
-     * >Wikipedia</a>
-     */
-        int validSampleRates[];
-        validSampleRates = new int[]{8000, 16000, 22050,
-                //
-                32000, 37800, 44056, 44100, 47250, 48000, 50000, 50400,
-                //
-                88200, 96000, 176400, 192000, 352800, 2822400, 5644800};
-    /*
-     * Selecting default audio input source for recording since
-     * AudioFormat.CHANNEL_CONFIGURATION_DEFAULT is deprecated and selecting
-     * default encoding format.
-     */
-        for (int i = 0; i < validSampleRates.length; i++)
-        {
-            if (validSampleRates[i] >= min_rate)
-            {
-                int result = AudioRecord.getMinBufferSize(validSampleRates[i], CHANNEL, FORMAT);
-                if (result != AudioRecord.ERROR && result != AudioRecord.ERROR_BAD_VALUE && result > 0)
-                {
-                    // return the mininum supported audio sample rate
-                    return validSampleRates[i];
-                }
-            }
-        }
-        // If none of the sample rates are supported return -1 handle it in
-        // calling method
-        return -1;
     }
 }

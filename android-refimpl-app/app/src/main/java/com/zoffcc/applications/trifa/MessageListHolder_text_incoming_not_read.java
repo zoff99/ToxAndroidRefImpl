@@ -22,26 +22,41 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.daimajia.swipe.SwipeLayout;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+
+import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.add_friend_real;
-import static com.zoffcc.applications.trifa.MainActivity.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MessageListActivity.add_quote_message_text;
+import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
+import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
+import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -49,13 +64,20 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
 {
     private static final String TAG = "trifa.MessageListHolder";
 
-    private Message message;
+    private Message message_;
     private Context context;
 
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
     TextView date_time;
+    ViewGroup layout_message_container;
+    boolean is_selected = false;
+    TextView message_text_date_string;
+    ViewGroup message_text_date;
+    int swipe_state = 0;
+    int swipe_state_done = 0;
+    SwipeLayout swipeLayout = null;
 
     public MessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -69,21 +91,205 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         date_time = (TextView) itemView.findViewById(R.id.date_time);
+        layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
+        message_text_date_string = (TextView) itemView.findViewById(R.id.message_text_date_string);
+        message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
 
-        itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        swipe_state = 0;
+        swipe_state_done = 0;
+
+        swipeLayout = (SwipeLayout) itemView.findViewById(R.id.msg_swipe_container);
+        swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
+        // swipeLayout.addDrag(SwipeLayout.DragEdge.Left, itemView.findViewById(R.id.msg_swipe_bottom_wrapper));
     }
 
     public void bindMessageList(Message m)
     {
         // Log.i(TAG, "bindMessageList");
 
+        message_ = m;
+
+        swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener()
+        {
+            @Override
+            public void onClose(SwipeLayout layout)
+            {
+                // when the SurfaceView totally cover the BottomView.
+                // Log.i(TAG, "onClose: state=");
+            }
+
+            @Override
+            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset)
+            {
+                // you are swiping.
+                // Log.i(TAG, "onUpdate: " + leftOffset + " " + topOffset);
+                if (leftOffset > 60)
+                {
+                    swipeLayout.close(true);
+                    // Log.i(TAG, "onUpdate: --> close");
+                    if (swipe_state == 0)
+                    {
+                        swipe_state = 1;
+                    }
+                }
+                else if (leftOffset == 0)
+                {
+                    if (swipe_state == 1)
+                    {
+                        swipe_state = 0;
+                        Log.i(TAG, "onUpdate: --> QUOTE");
+                        add_quote_message_text(message_.text);
+                    }
+                }
+            }
+
+            @Override
+            public void onStartOpen(SwipeLayout layout)
+            {
+                // Log.i(TAG, "onStartOpen");
+            }
+
+            @Override
+            public void onOpen(SwipeLayout layout)
+            {
+                // when the BottomView totally show.
+                // Log.i(TAG, "onOpen");
+                swipeLayout.close(true);
+            }
+
+            @Override
+            public void onStartClose(SwipeLayout layout)
+            {
+                // Log.i(TAG, "onStartClose");
+            }
+
+            @Override
+            public void onHandRelease(SwipeLayout layout, float xvel, float yvel)
+            {
+                // when user's hand released.
+                // Log.i(TAG, "onHandRelease");
+                swipeLayout.close(true);
+            }
+        });
+
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
+
+        is_selected = false;
+        if (selected_messages.isEmpty())
+        {
+            is_selected = false;
+        }
+        else
+        {
+            is_selected = selected_messages.contains(m.id);
+        }
+
+        if (is_selected)
+        {
+            layout_message_container.setBackgroundColor(Color.GRAY);
+        }
+        else
+        {
+            layout_message_container.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        message_text_date.setVisibility(View.GONE);
+        int my_position = this.getAdapterPosition();
+        if (my_position != RecyclerView.NO_POSITION)
+        {
+            if (MainActivity.message_list_fragment != null)
+            {
+                if (MainActivity.message_list_fragment.adapter != null)
+                {
+                    if (my_position < 1)
+                    {
+                        message_text_date_string.setText(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        {
+                            message_text_date_string.setText(
+                                    MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+        }
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+        // --------- message date header (show only if different from previous message) ---------
+
+        itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
+
+        layout_message_container.setOnClickListener(onclick_listener);
+        layout_message_container.setOnLongClickListener(onlongclick_listener);
+
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                layout_message_container.performClick();
+            }
+        });
+        textView.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View view)
+            {
+                layout_message_container.performLongClick();
+                return true;
+            }
+        });
+
         // textView.setText("#" + m.id + ":" + m.text);
         textView.setCustomRegex(TOXURL_PATTERN);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
-        textView.setAutoLinkText(m.text);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
 
-        date_time.setText(long_date_time_format(m.rcvd_timestamp));
+        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
+        {
+            // text consits only of emojis -> increase size
+            textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_ONLY_EMOJI_SIZE[PREF__global_font_size]));
+        }
+        else
+        {
+            textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_SIZE[PREF__global_font_size]));
+        }
+
+        if ((search_messages_text == null) || (search_messages_text.length() == 0))
+        {
+            textView.setAutoLinkText(m.text);
+        }
+        else
+        {
+            textView.setAutoLinkTextHighlight(m.text, search_messages_text);
+        }
+
+        final String unicode_PERSONAL_COMPUTER = "\uD83D\uDCBB";
+        final String unicode_INCOMING_ENVELOPE = "\uD83D\uDCE8";
+        final String unicode_Mobile_Phone_With_Arrow = "\uD83D\uDCF2";
+        final String unicode_MEMO = "\uD83D\uDCDD";
+        final String unicode_ARROW_LEFT = "←";
+
+        if (m.msg_version == 1)
+        {
+            date_time.setText(unicode_ARROW_LEFT + long_date_time_format(m.sent_timestamp) + "\n" +
+                              unicode_Mobile_Phone_With_Arrow + long_date_time_format(m.rcvd_timestamp));
+        }
+        else
+        {
+            date_time.setText(long_date_time_format(m.rcvd_timestamp));
+        }
 
         textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
         {
@@ -100,11 +306,13 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
                 {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" + matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
                 }
                 else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
                 {
@@ -114,7 +322,8 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         });
 
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(24);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
+                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -148,6 +357,9 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                                 with(context).
                                 load(f1).
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                        fl.avatar_update_timestamp)).
                                 skipMemoryCache(false).
                                 apply(glide_options).
                                 into(img_avatar);
@@ -164,37 +376,13 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
     @Override
     public void onClick(View v)
     {
-        Log.i(TAG, "onClick");
-        try
-        {
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "onClick:EE:" + e.getMessage());
-        }
+        // Log.i(TAG, "onClick");
     }
 
     @Override
     public boolean onLongClick(final View v)
     {
-        Log.i(TAG, "onLongClick");
-
-        final Message m2 = this.message;
-
-        //        PopupMenu menu = new PopupMenu(v.getContext(), v);
-        //        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-        //        {
-        //            @Override
-        //            public boolean onMenuItemClick(MenuItem item)
-        //            {
-        //                int id = item.getItemId();
-        //                return true;
-        //            }
-        //        });
-        //        menu.inflate(R.menu.menu_friendlist_item);
-        //        menu.show();
-
+        // Log.i(TAG, "onLongClick");
         return true;
     }
 
@@ -249,7 +437,8 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                     {
                         try
                         {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email_addr, null));
+                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO,
+                                                            Uri.fromParts("mailto", email_addr, null));
                             emailIntent.setType("message/rfc822");
                             // emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                             // emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
@@ -283,7 +472,9 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
                     {
                         try
                         {
-                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst("TOX:", "").replaceFirst("Tox:", "");
+                            String friend_tox_id = toxid.toUpperCase().replace(" ", "").replaceFirst("tox:",
+                                                                                                     "").replaceFirst(
+                                    "TOX:", "").replaceFirst("Tox:", "");
                             add_friend_real(friend_tox_id);
                         }
                         catch (Exception e)
@@ -302,4 +493,27 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         final AlertDialog alert = builder.create();
         alert.show();
     }
+
+
+    private View.OnClickListener onclick_listener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            is_selected = onClick_message_helper(v, is_selected, message_);
+        }
+    };
+
+    private View.OnLongClickListener onlongclick_listener = new View.OnLongClickListener()
+    {
+        @Override
+        public boolean onLongClick(final View v)
+        {
+            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected,
+                                                                                           message_);
+            is_selected = res.is_selected;
+            return res.ret_value;
+        }
+    };
+
 }
