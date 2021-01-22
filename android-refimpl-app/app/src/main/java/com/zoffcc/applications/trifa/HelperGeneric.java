@@ -579,6 +579,13 @@ public class HelperGeneric
                                                                               avatar_bytes.capacity(), hash_bytes,
                                                                               avatar_filename_for_remote,
                                                                               avatar_filename_for_remote.length());
+
+                                    if (filenum < 0)
+                                    {
+                                        Log.i(TAG, "Send own Avatar: error " + filenum);
+                                        return;
+                                    }
+
                                     //Log.i(TAG, "send_avatar_to_friend:filenum=" + filenum + " fname=" +
                                     //           avatar_filename_for_remote);
                                     // save FT to db ---------------
