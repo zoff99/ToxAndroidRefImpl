@@ -18,6 +18,12 @@
         android:summary="@string/pref_description_auto_accept_video"
         android:title="@string/pref_title_auto_accept_video" />
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="auto_accept_all_upto"
+        android:summary="@string/pref_description_auto_accept_all_upto"
+        android:title="@string/pref_title_auto_accept_all_upto" />
+
     <ListPreference
         android:defaultValue="1"
         android:entries="@array/pref_global_font_size_titles"

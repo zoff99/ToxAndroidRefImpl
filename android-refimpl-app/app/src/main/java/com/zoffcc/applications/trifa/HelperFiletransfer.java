@@ -26,11 +26,12 @@ import java.net.URLConnection;
 import java.util.Random;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_message_accepted_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_all_upto;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_video;
-import static com.zoffcc.applications.trifa.HelperGeneric.set_message_accepted_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
@@ -51,13 +52,13 @@ public class HelperFiletransfer
         try
         {
             String mimeType = URLConnection.guessContentTypeFromName(
-                get_filetransfer_filename_from_id(message.filetransfer_id).toLowerCase());
+                    get_filetransfer_filename_from_id(message.filetransfer_id).toLowerCase());
             // Log.i(TAG, "check_auto_accept_incoming_filetransfer:mime-type=" + mimeType);
 
             if (PREF__auto_accept_image)
             {
                 if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                    3 * 1014 * 1024) // if file size is smaller than 3 MByte accept FT
+                    6 * 1014 * 1024) // if file size is smaller than 6 MByte accept FT
                 {
                     if (mimeType.startsWith("image"))
                     {
@@ -84,7 +85,7 @@ public class HelperFiletransfer
             if (PREF__auto_accept_video)
             {
                 if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                    10 * 1014 * 1024) // if file size is smaller than 10 MByte accept FT
+                    20 * 1014 * 1024) // if file size is smaller than 20 MByte accept FT
                 {
                     if (mimeType.startsWith("video"))
                     {
@@ -107,6 +108,31 @@ public class HelperFiletransfer
                     }
                 }
             }
+
+            if (PREF__auto_accept_all_upto)
+            {
+                if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
+                    200 * 1014 * 1024) // if file size is smaller than 200 MByte accept FT
+                {
+                    if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
+                    {
+                        // accept FT
+                        set_filetransfer_accepted_from_id(message.filetransfer_id);
+                        set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
+                        set_message_accepted_from_id(message.id);
+                        set_message_state_from_id(message.id, TOX_FILE_CONTROL_RESUME.value);
+                        tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
+                                         get_filetransfer_filenum_from_id(message.filetransfer_id),
+                                         TOX_FILE_CONTROL_RESUME.value);
+
+                        // update message view
+                        update_single_message_from_messge_id(message.id, true);
+                        // Log.i(TAG, "check_auto_accept_incoming_filetransfer:video:accepted");
+                        return true;
+                    }
+                }
+            }
+
         }
         catch (Exception e)
         {
@@ -125,7 +151,7 @@ public class HelperFiletransfer
         //           wanted_full_filename_path);
 
         info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
-            wanted_full_filename_path + "/" + result);
+                wanted_full_filename_path + "/" + result);
 
         if (f1.exists())
         {
@@ -135,8 +161,8 @@ public class HelperFiletransfer
             // Log.i(TAG, "check_auto_accept_incoming_filetransfer:new_random_log=" + new_random_log);
 
             String random_filename_addon = TrifaSetPatternActivity.filter_out_specials(
-                TrifaSetPatternActivity.bytesToString(
-                    TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2("" + new_random_log))));
+                    TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
+                            TrifaSetPatternActivity.StringToBytes2("" + new_random_log))));
 
             // Log.i(TAG, "check_auto_accept_incoming_filetransfer:random_filename_addon=" + random_filename_addon);
 
@@ -170,12 +196,12 @@ public class HelperFiletransfer
         {
             // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:friend_number=" + friend_number + " file_number=" + file_number);
             long ft_id = orma.selectFromFiletransfer().
-                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                and().
-                file_numberEq(file_number).
-                orderByIdDesc().
-                toList().
-                get(0).id;
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    and().
+                    file_numberEq(file_number).
+                    orderByIdDesc().
+                    toList().
+                    get(0).id;
             // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:ft_id=" + ft_id);
             // ----- DEBUG -----
             //            try
@@ -207,8 +233,8 @@ public class HelperFiletransfer
         try
         {
             delete_filetransfer_tmpfile(orma.selectFromFiletransfer().tox_public_key_stringEq(
-                HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(file_number).get(
-                0).id);
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(
+                    file_number).get(0).id);
         }
         catch (Exception e)
         {
@@ -225,13 +251,13 @@ public class HelperFiletransfer
             if (MainActivity.VFS_ENCRYPT)
             {
                 info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
-                    VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
+                        VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
                 f1.delete();
             }
             else
             {
                 java.io.File f1 = new java.io.File(
-                    VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
+                        VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + ft.tox_public_key_string + "/" + ft.file_name);
                 f1.delete();
             }
         }
@@ -362,11 +388,11 @@ public class HelperFiletransfer
         try
         {
             set_filetransfer_for_message_from_filetransfer_id(orma.selectFromFiletransfer().
-                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                and().
-                file_numberEq(file_number).
-                orderByIdDesc().
-                get(0).id, ft_id);
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    and().
+                    file_numberEq(file_number).
+                    orderByIdDesc().
+                    get(0).id, ft_id);
         }
         catch (Exception e)
         {
@@ -391,11 +417,11 @@ public class HelperFiletransfer
         try
         {
             long del_ft_id = orma.selectFromFiletransfer().
-                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                and().
-                file_numberEq(file_number).
-                orderByIdDesc().
-                get(0).id;
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    and().
+                    file_numberEq(file_number).
+                    orderByIdDesc().
+                    get(0).id;
             // Log.i(TAG, "delete_ft:id=" + del_ft_id);
             delete_filetransfers_from_id(del_ft_id);
         }
@@ -426,11 +452,11 @@ public class HelperFiletransfer
         try
         {
             f = orma.selectFromFiletransfer().
-                file_numberEq(file_number).
-                and().
-                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                orderByIdDesc().
-                toList().get(0);
+                    file_numberEq(file_number).
+                    and().
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    orderByIdDesc().
+                    toList().get(0);
 
             if (f.direction == TRIFA_FT_DIRECTION_INCOMING.value)
             {
@@ -529,65 +555,65 @@ public class HelperFiletransfer
     static void update_filetransfer_db_fos_open(final Filetransfer f)
     {
         orma.updateFiletransfer().
-            tox_public_key_stringEq(f.tox_public_key_string).
-            and().
-            file_numberEq(f.file_number).
-            fos_open(f.fos_open).
-            execute();
+                tox_public_key_stringEq(f.tox_public_key_string).
+                and().
+                file_numberEq(f.file_number).
+                fos_open(f.fos_open).
+                execute();
     }
 
     static void update_filetransfer_db_current_position(final Filetransfer f)
     {
         orma.updateFiletransfer().
-            tox_public_key_stringEq(f.tox_public_key_string).
-            and().
-            file_numberEq(f.file_number).
-            current_position(f.current_position).
-            execute();
+                tox_public_key_stringEq(f.tox_public_key_string).
+                and().
+                file_numberEq(f.file_number).
+                current_position(f.current_position).
+                execute();
     }
 
     static void update_filetransfer_db_full(final Filetransfer f)
     {
         orma.updateFiletransfer().
-            idEq(f.id).
-            tox_public_key_string(f.tox_public_key_string).
-            direction(f.direction).
-            file_number(f.file_number).
-            kind(f.kind).
-            state(f.state).
-            path_name(f.path_name).
-            message_id(f.message_id).
-            file_name(f.file_name).
-            fos_open(f.fos_open).
-            filesize(f.filesize).
-            current_position(f.current_position).
-            execute();
+                idEq(f.id).
+                tox_public_key_string(f.tox_public_key_string).
+                direction(f.direction).
+                file_number(f.file_number).
+                kind(f.kind).
+                state(f.state).
+                path_name(f.path_name).
+                message_id(f.message_id).
+                file_name(f.file_name).
+                fos_open(f.fos_open).
+                filesize(f.filesize).
+                current_position(f.current_position).
+                execute();
     }
 
     static void update_filetransfer_db_full_from_id(final Filetransfer f, long fid)
     {
         orma.updateFiletransfer().
-            idEq(fid).
-            tox_public_key_string(f.tox_public_key_string).
-            direction(f.direction).
-            file_number(f.file_number).
-            kind(f.kind).
-            state(f.state).
-            path_name(f.path_name).
-            message_id(f.message_id).
-            file_name(f.file_name).
-            fos_open(f.fos_open).
-            filesize(f.filesize).
-            current_position(f.current_position).
-            execute();
+                idEq(fid).
+                tox_public_key_string(f.tox_public_key_string).
+                direction(f.direction).
+                file_number(f.file_number).
+                kind(f.kind).
+                state(f.state).
+                path_name(f.path_name).
+                message_id(f.message_id).
+                file_name(f.file_name).
+                fos_open(f.fos_open).
+                filesize(f.filesize).
+                current_position(f.current_position).
+                execute();
     }
 
     static void update_filetransfer_db_messageid_from_id(final Filetransfer f, long fid)
     {
         orma.updateFiletransfer().
-            idEq(fid).
-            message_id(f.message_id).
-            execute();
+                idEq(fid).
+                message_id(f.message_id).
+                execute();
     }
 
     static long insert_into_filetransfer_db(final Filetransfer f)
