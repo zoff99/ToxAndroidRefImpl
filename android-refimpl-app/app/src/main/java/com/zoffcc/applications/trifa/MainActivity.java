@@ -4072,7 +4072,7 @@ public class MainActivity extends AppCompatActivity
         // Log.i(TAG, "friend_request:friend:" + friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2) +
         //            " friend request message:" + friend_request_message);
         String friend_public_key__ = friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2);
-        HelperFriend.add_friend_to_system(friend_public_key__, false, null);
+        HelperFriend.add_friend_to_system(friend_public_key__.toUpperCase(), false, null);
     }
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)

@@ -436,7 +436,7 @@ public class HelperFriend
                 try
                 {
                     // toxcore needs this!!
-                    Thread.sleep(120);
+                    Thread.sleep(10);
                 }
                 catch (Exception e)
                 {
@@ -448,6 +448,12 @@ public class HelperFriend
                 // ---- auto add all friends ----
                 long friendnum = MainActivity.tox_friend_add_norequest(friend_public_key); // add friend
                 Log.d(TAG, "add_friend_to_system:fnum add=" + friendnum);
+
+                if (friendnum == 0xffffffff) // 0xffffffff == UINT32_MAX
+                {
+                    // adding friend failed
+                    return;
+                }
 
                 try
                 {
@@ -480,11 +486,13 @@ public class HelperFriend
                 {
                     // e.printStackTrace();
                     Log.i(TAG, "friend_request:insert:EE1:" + e.getMessage());
+                    return;
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                     Log.i(TAG, "friend_request:insert:EE2:" + e.getMessage());
+                    return;
                 }
 
                 if (as_friends_relay)
@@ -702,6 +710,10 @@ public class HelperFriend
             String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
             add_friend_to_system(friend_public_key, false, null);
             */
+        }
+        else if (friendnum < -1)
+        {
+            Log.i(TAG, "add_friend_real:some error occured");
         }
 
         // add friend ---------------
