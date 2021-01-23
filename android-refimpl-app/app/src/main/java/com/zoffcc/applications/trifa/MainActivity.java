@@ -464,20 +464,60 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.i(TAG, "M:STARTUP:super onCreate");
         super.onCreate(savedInstanceState);
-
+        Log.i(TAG, "M:STARTUP:onCreate");
         Log.i(TAG, "onCreate");
 
+        Log.i(TAG, "M:STARTUP:Lingver set");
         Log.d(TAG, "Lingver_Locale: " + Lingver.getInstance().getLocale());
         Log.d(TAG, "Lingver_Language: " + Lingver.getInstance().getLanguage());
         // Log.d(TAG, "Actual_Language: " + resources.configuration.getLocaleCompat());
 
-        EmojiManager.install(new IosEmojiProvider());
-        // EmojiManager.install(new EmojiOneProvider());
         resources = this.getResources();
         metrics = resources.getDisplayMetrics();
         global_showing_messageview = false;
         global_showing_anygroupview = false;
+
+        Log.i(TAG, "M:STARTUP:setContentView start");
+        setContentView(R.layout.activity_main);
+        Log.i(TAG, "M:STARTUP:setContentView end");
+
+        mt = (TextView) this.findViewById(R.id.main_maintext);
+        mt.setText("...");
+        mt.setVisibility(View.VISIBLE);
+        if (native_lib_loaded)
+        {
+            Log.i(TAG, "M:STARTUP:native_lib_loaded OK");
+            mt.setText("successfully loaded native library");
+        }
+        else
+        {
+            Log.i(TAG, "M:STARTUP:native_lib_loaded failed");
+            mt.setText("loadLibrary jni-c-toxcore failed!");
+            show_wrong_credentials();
+            finish();
+            return;
+        }
+
+        Log.i(TAG, "M:STARTUP:toolbar");
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        Log.i(TAG, "M:STARTUP:EmojiManager install");
+        EmojiManager.install(new IosEmojiProvider());
+        // EmojiManager.install(new EmojiOneProvider());
+
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
+
+        if (PREF__DB_secrect_key.isEmpty())
+        {
+            // ok, use hash of user entered password
+            PREF__DB_secrect_key = PREF__DB_secrect_key__user_hash;
+        }
 
         main_handler = new Handler(getMainLooper());
         main_handler_s = main_handler;
@@ -485,6 +525,89 @@ public class MainActivity extends AppCompatActivity
         main_activity_s = this;
         TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) HelperGeneric.dp2px(10);
         TRIFAGlobals.CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = (int) HelperGeneric.dp2px(20);
+
+
+        if ((!TOX_SERVICE_STARTED) || (orma == null))
+        {
+            Log.i(TAG, "M:STARTUP:init DB");
+
+            try
+            {
+                String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+                // Log.i(TAG, "db:path=" + dbs_path);
+                File database_dir = new File(new File(dbs_path).getParent());
+                database_dir.mkdirs();
+                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+
+                if (DB_ENCRYPT)
+                {
+                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                }
+
+                orma = builder.name(dbs_path).
+                        readOnMainThread(AccessThreadConstraint.NONE).
+                        writeOnMainThread(AccessThreadConstraint.NONE).
+                        trace(ORMA_TRACE).
+                        build();
+                // Log.i(TAG, "db:open=OK:path=" + dbs_path);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "M:STARTUP:init DB:EE1");
+                Log.i(TAG, "db:EE1:" + e.getMessage());
+                String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+
+                if (DELETE_SQL_AND_VFS_ON_ERROR)
+                {
+                    try
+                    {
+                        // Log.i(TAG, "db:deleting database:" + dbs_path);
+                        new File(dbs_path).delete();
+                    }
+                    catch (Exception e3)
+                    {
+                        e3.printStackTrace();
+                        Log.i(TAG, "db:EE3:" + e3.getMessage());
+                    }
+                }
+
+                // Log.i(TAG, "db:path(2)=" + dbs_path);
+                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
+
+                if (DB_ENCRYPT)
+                {
+                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                }
+
+                try
+                {
+                    orma = builder.name(dbs_path).
+                            readOnMainThread(AccessThreadConstraint.WARNING).
+                            writeOnMainThread(AccessThreadConstraint.WARNING).
+                            trace(ORMA_TRACE).
+                            build();
+                }
+                catch (Exception e4)
+                {
+                    Log.i(TAG, "M:STARTUP:init DB:EE4");
+                    Log.i(TAG, "db:EE4:" + e4.getMessage());
+                    show_wrong_credentials();
+                    finish();
+                    return;
+                }
+                // Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
+            }
+
+            // ----- Clear all messages from DB -----
+            // ----- Clear all messages from DB -----
+            // ----- Clear all messages from DB -----
+            // ** // ** // orma.deleteFromMessage().execute();
+            // ----- Clear all messages from DB -----
+            // ----- Clear all messages from DB -----
+            // ----- Clear all messages from DB -----
+        }
+
 
         try
         {
@@ -540,9 +663,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-
-        setContentView(R.layout.activity_main);
-
         if (PREF__window_security)
         {
             // prevent screenshots and also dont show the window content in recent activity screen
@@ -558,6 +678,8 @@ public class MainActivity extends AppCompatActivity
         //            e.printStackTrace();
         //            Log.i(TAG, "onCreate:setThreadPriority:EE:" + e.getMessage());
         //        }
+
+        Log.i(TAG, "M:STARTUP:getVersionInfo");
         getVersionInfo();
 
         try
@@ -573,9 +695,8 @@ public class MainActivity extends AppCompatActivity
         //        {
         //            canceller = new EchoCanceller();
         //        }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+
         //        try
         //        {
         //            ((Toolbar) getSupportActionBar().getCustomView().getParent()).setContentInsetsAbsolute(0, 0);
@@ -602,6 +723,7 @@ public class MainActivity extends AppCompatActivity
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
+            Log.i(TAG, "M:STARTUP:notification channels");
             String channelName;
             // ---------------------
             channelId_newmessage_sound_and_vibrate = "trifa_new_message_sound_and_vibrate";
@@ -653,7 +775,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         // prefs ----------
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
         PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
@@ -745,6 +866,7 @@ public class MainActivity extends AppCompatActivity
 
         if (PREF__orbot_enabled__temp)
         {
+            Log.i(TAG, "M:STARTUP:wait for orbot");
             boolean orbot_installed = OrbotHelper.isOrbotInstalled(this);
 
             if (orbot_installed)
@@ -987,17 +1109,7 @@ public class MainActivity extends AppCompatActivity
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 
         // prefs ----------
-        PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
 
-        if (PREF__DB_secrect_key.isEmpty())
-        {
-            // ok, use hash of user entered password
-            PREF__DB_secrect_key = PREF__DB_secrect_key__user_hash;
-        }
-
-        mt = (TextView) this.findViewById(R.id.main_maintext);
-        mt.setText("...");
-        mt.setVisibility(View.VISIBLE);
         // TODO: remake this into something nicer ----------
         top_imageview = (ImageView) this.findViewById(R.id.main_maintopimage);
         top_imageview.setVisibility(View.GONE);
@@ -1079,11 +1191,13 @@ public class MainActivity extends AppCompatActivity
 
         // --------- status spinner ---------
         // get permission ----------
+        Log.i(TAG, "M:STARTUP:permissions");
         MainActivityPermissionsDispatcher.dummyForPermissions001WithPermissionCheck(this);
         // get permission ----------
         // -------- drawer ------------
         // -------- drawer ------------
         // -------- drawer ------------
+        Log.i(TAG, "M:STARTUP:drawer");
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(
                 R.string.MainActivity_profile).withIcon(GoogleMaterial.Icon.gmd_face);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(
@@ -1291,15 +1405,6 @@ public class MainActivity extends AppCompatActivity
         Callstate.my_audio_enabled = 1;
         Callstate.my_video_enabled = 1;
 
-        if (native_lib_loaded)
-        {
-            mt.setText("successfully loaded native library");
-        }
-        else
-        {
-            mt.setText("loadLibrary jni-c-toxcore failed!");
-        }
-
         String native_api = getNativeLibAPI();
         mt.setText(mt.getText() + "\n" + native_api);
         mt.setText(mt.getText() + "\n" + "c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." +
@@ -1308,75 +1413,10 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "loaded:c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
         Log.i(TAG, "loaded:jni-c-toxcore:v" + jnictoxcore_version());
 
-        if ((!TOX_SERVICE_STARTED) || (orma == null))
-        {
-            try
-            {
-                String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-                // Log.i(TAG, "db:path=" + dbs_path);
-                File database_dir = new File(new File(dbs_path).getParent());
-                database_dir.mkdirs();
-                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-
-                if (DB_ENCRYPT)
-                {
-                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-                }
-
-                orma = builder.name(dbs_path).
-                        readOnMainThread(AccessThreadConstraint.NONE).
-                        writeOnMainThread(AccessThreadConstraint.NONE).
-                        trace(ORMA_TRACE).
-                        build();
-                // Log.i(TAG, "db:open=OK:path=" + dbs_path);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "db:EE1:" + e.getMessage());
-                String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-
-                if (DELETE_SQL_AND_VFS_ON_ERROR)
-                {
-                    try
-                    {
-                        // Log.i(TAG, "db:deleting database:" + dbs_path);
-                        new File(dbs_path).delete();
-                    }
-                    catch (Exception e3)
-                    {
-                        e3.printStackTrace();
-                        Log.i(TAG, "db:EE3:" + e3.getMessage());
-                    }
-                }
-
-                // Log.i(TAG, "db:path(2)=" + dbs_path);
-                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-
-                if (DB_ENCRYPT)
-                {
-                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-                }
-
-                orma = builder.name(dbs_path).
-                        readOnMainThread(AccessThreadConstraint.WARNING).
-                        writeOnMainThread(AccessThreadConstraint.WARNING).
-                        trace(ORMA_TRACE).
-                        build();
-                // Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
-            }
-
-            // ----- Clear all messages from DB -----
-            // ----- Clear all messages from DB -----
-            // ----- Clear all messages from DB -----
-            // ** // ** // orma.deleteFromMessage().execute();
-            // ----- Clear all messages from DB -----
-            // ----- Clear all messages from DB -----
-            // ----- Clear all messages from DB -----
-        }
-
         if ((!TOX_SERVICE_STARTED) || (vfs == null))
         {
+            Log.i(TAG, "M:STARTUP:init VFS");
+
             if (VFS_ENCRYPT)
             {
                 try
@@ -1470,6 +1510,7 @@ public class MainActivity extends AppCompatActivity
         // cleanup temp dirs --------
         if (!TOX_SERVICE_STARTED)
         {
+            Log.i(TAG, "M:STARTUP:cleanup_temp_dirs (background)");
             HelperGeneric.cleanup_temp_dirs();
         }
 
@@ -1495,6 +1536,7 @@ public class MainActivity extends AppCompatActivity
 
         if (!TOX_SERVICE_STARTED)
         {
+            Log.i(TAG, "M:STARTUP:start ToxService");
             Log.i(TAG, "set_all_conferences_inactive:005");
             HelperConference.set_all_conferences_inactive();
             startService(i);
@@ -1502,6 +1544,7 @@ public class MainActivity extends AppCompatActivity
 
         if (!TOX_SERVICE_STARTED)
         {
+            Log.i(TAG, "M:STARTUP:start ToxThread");
             tox_thread_start();
         }
 
@@ -1524,6 +1567,8 @@ public class MainActivity extends AppCompatActivity
         registerReceiver(receiver4, receiverFilter4);
         // --
         MainActivity.set_av_call_status(Callstate.state);
+
+        Log.i(TAG, "M:STARTUP:-- DONE --");
     }
 
     public void vfs_listFilesAndFilesSubDirectories(String directoryName, int depth, String parent)
@@ -5994,6 +6039,12 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, AddFriendActivity.class);
         // intent.putExtra("key", value);
         startActivityForResult(intent, AddFriendActivity_ID);
+    }
+
+    public void show_wrong_credentials()
+    {
+        Intent intent = new Intent(this, WrongCredentials.class);
+        startActivity(intent);
     }
 
     @Override

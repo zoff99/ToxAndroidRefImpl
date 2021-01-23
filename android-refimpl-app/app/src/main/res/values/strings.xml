@@ -260,7 +260,7 @@
         <item>3</item>
     </string-array>
 
-    <string-array name="multi_select_list_preference_default_value"/>
+    <string-array name="multi_select_list_preference_default_value" />
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
 
@@ -434,6 +434,8 @@
     <string name="layout___export">Export</string>
     <string name="layout___migdb_text">Migrating Database files</string>
     <string name="layout___migdb_do_not_close">DO NOT close this screen</string>
+    <string name="title_activity_wrong_credentials">Wrong Credentials</string>
+    <string name="wrong_credentials_error">Wrong Credentials</string>
     <!-- Layout texts -->
     <!-- Layout texts -->
     <!-- Layout texts -->

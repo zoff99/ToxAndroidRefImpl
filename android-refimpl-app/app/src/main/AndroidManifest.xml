@@ -216,6 +216,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".WrongCredentials"
+            android:label="@string/title_activity_wrong_credentials" >
+        </activity>
+
         <receiver
             android:name=".ConnectionManager"
             android:label="NetworkConnection">
