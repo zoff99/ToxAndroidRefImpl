@@ -54,6 +54,7 @@ public class CheckPasswordActivity extends AppCompatActivity
         setContentView(R.layout.activity_check_password);
 
         mPasswordView1 = (EditText) findViewById(R.id.password_1_c);
+        mPasswordView1.requestFocus();
         mPasswordView1.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
             @Override
