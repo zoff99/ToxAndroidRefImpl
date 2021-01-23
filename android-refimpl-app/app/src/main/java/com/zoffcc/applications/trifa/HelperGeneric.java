@@ -222,6 +222,8 @@ public class HelperGeneric
                     e.printStackTrace();
                 }
 
+                Log.i(TAG, "M:STARTUP:cleanup_temp_dirs PART 1 starting ...");
+
                 try
                 {
                     if (MainActivity.VFS_ENCRYPT)
@@ -242,6 +244,8 @@ public class HelperGeneric
                     e.printStackTrace();
                 }
 
+                Log.i(TAG, "M:STARTUP:cleanup_temp_dirs PART 2 starting ...");
+
                 try
                 {
                     vfs_deleteFilesAndFilesSubDirectories_real(MainActivity.SD_CARD_TMP_DIR + "/");
@@ -250,6 +254,8 @@ public class HelperGeneric
                 {
                     e.getMessage();
                 }
+
+                Log.i(TAG, "M:STARTUP:cleanup_temp_dirs ---READY---");
 
                 Log.i(TAG, "cleanup_temp_dirs:---READY---");
             }
