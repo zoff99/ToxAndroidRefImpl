@@ -29,9 +29,9 @@
     <string name="settings_toolbar_title">Ayarlar</string>
     <string name="pref_header_general">Genel</string>
     <string name="pref_title_auto_accept_image">görüntüleri otomatik kabul et</string>
-    <string name="pref_description_auto_accept_image">3 MBayt\'a kadar olan Görüntüleri ve Fotoğrafları otomatik olarak kabul et</string>
+    <string name="pref_description_auto_accept_image">6 megabayta kadar olan görüntüleri ve fotoğrafları otomatik olarak kabul et</string>
     <string name="pref_title_auto_accept_video">videoları otomatik kabul et</string>
-    <string name="pref_description_auto_accept_video">boyutu 10 MBayt\'a kadar olan videoları otomatik olarak kabul et</string>
+    <string name="pref_description_auto_accept_video">boyutu 20 megabayta kadar olan videoları otomatik olarak kabul et</string>
     <string name="pref_title_video_uv_reversed">Videoda ters UV</string>
     <string name="pref_description_video_uv_reversed">Kamera videosundaki UV düzlemlerinin sırasını ters çevir</string>
     <string name="pref_title_software_echo_cancel">Yankı giderme</string>
@@ -353,4 +353,9 @@
     <string name="layout___migdb_do_not_close">Bu ekranı KAPATMAYIN</string>
     <string name="layout___migdb_text">Veri tabanı dosyalarını taşıma</string>
     <string name="messages_search_default_text">ara ...</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Yeni bildirim belirteci alındı. Bu belirteç kullanılsın mı\?</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Belirteç</string>
+    <string name="MainActivity_yes_button">evet</string>
+    <string name="pref_description_auto_accept_all_upto">boyutu 200 megabayta kadar olan tüm dosyaları otomatik olarak kabul et</string>
+    <string name="pref_title_auto_accept_all_upto">tüm dosyaları otomatik olarak kabul et</string>
 </resources>
