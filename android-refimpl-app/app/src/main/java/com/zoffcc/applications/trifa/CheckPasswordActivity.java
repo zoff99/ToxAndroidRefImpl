@@ -94,7 +94,7 @@ public class CheckPasswordActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            Log.i(TAG,"EE:002");
+            Log.i(TAG, "EE:002");
         }
         Log.i(TAG, "006");
     }
@@ -126,7 +126,7 @@ public class CheckPasswordActivity extends AppCompatActivity
             }
             catch (Exception e)
             {
-                Log.i(TAG,"EE:001");
+                Log.i(TAG, "EE:001");
             }
         }
 
@@ -137,11 +137,13 @@ public class CheckPasswordActivity extends AppCompatActivity
         finish();
     }
 
+    /*
     @Override
     public void onBackPressed()
     {
         // super.onBackPressed();
         // do nothing!!
     }
+     */
 }
 
