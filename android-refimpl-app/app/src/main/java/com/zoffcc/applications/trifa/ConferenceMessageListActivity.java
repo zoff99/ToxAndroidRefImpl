@@ -82,6 +82,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
@@ -95,7 +97,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     String conf_id = "-1";
     String conf_id_prev = "-1";
     //
-    com.vanniktech.emoji.EmojiEditText ml_new_message = null;
+    static com.vanniktech.emoji.EmojiEditText ml_new_conf_message = null;
     EmojiPopup emojiPopup = null;
     ImageView insert_emoji = null;
     TextView ml_maintext = null;
@@ -222,7 +224,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
 
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
-        ml_new_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
+        ml_new_conf_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
 
         messageSearchView = (SearchView) findViewById(R.id.conf_search_view_messages);
         messageSearchView.setQueryHint(getString(R.string.messages_search_default_text));
@@ -240,7 +242,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         }
 
         // give focus to text input
-        ml_new_message.requestFocus();
+        ml_new_conf_message.requestFocus();
         try
         {
             // hide softkeyboard initially
@@ -370,11 +372,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         if (PREF__use_incognito_keyboard)
         {
-            ml_new_message.setImeOptions(EditorInfo.IME_ACTION_SEND | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
+            ml_new_conf_message.setImeOptions(
+                    EditorInfo.IME_ACTION_SEND | EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
         }
         else
         {
-            ml_new_message.setImeOptions(EditorInfo.IME_ACTION_SEND);
+            ml_new_conf_message.setImeOptions(EditorInfo.IME_ACTION_SEND);
         }
 
         set_peer_count_header();
@@ -570,7 +573,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             {
                 Log.d(TAG, "Closed soft keyboard");
             }
-        }).build(ml_new_message);
+        }).build(ml_new_conf_message);
     }
 
     String get_current_conf_id()
@@ -626,6 +629,43 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         return super.dispatchKeyEvent(event);
     }
 
+    public static void add_quote_conf_message_text(final String quote_text)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if ((ml_new_conf_message.getText().toString() == null) ||
+                        (ml_new_conf_message.getText().toString().length() == 0))
+                    {
+                        ml_new_conf_message.append(TEXT_QUOTE_STRING_1 + quote_text + TEXT_QUOTE_STRING_2 + "\n");
+                    }
+                    else
+                    {
+                        String old_text = ml_new_conf_message.getText().toString();
+                        ml_new_conf_message.setText("");
+                        // need to do it this way, or else the text input cursor will not be in the correct place
+                        ml_new_conf_message.append(
+                                old_text + "\n" + TEXT_QUOTE_STRING_1 + quote_text + TEXT_QUOTE_STRING_2 + "\n");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "add_quote_message_text:EE01:" + e.getMessage());
+                }
+            }
+        };
+
+        if (conferences_handler_s != null)
+        {
+            conferences_handler_s.post(myRunnable);
+        }
+    }
+
     synchronized public void send_message_onclick(View view)
     {
         // Log.i(TAG,"send_message_onclick:---start");
@@ -636,8 +676,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             if (is_conference_active(conf_id))
             {
                 // send typed message to friend
-                msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(),
-                                                                                      ml_new_message.getText().toString().length()));
+                msg = ml_new_conf_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(),
+                                                                                           ml_new_conf_message.getText().toString().length()));
 
                 try
                 {
@@ -669,7 +709,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                         {
                             // message was sent OK
                             insert_into_conference_message_db(m, true);
-                            ml_new_message.setText("");
+                            ml_new_conf_message.setText("");
                         }
                     }
                 }
@@ -1202,6 +1242,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == SelectFriendSingleActivity_ID)
         {
             if (resultCode == RESULT_OK)

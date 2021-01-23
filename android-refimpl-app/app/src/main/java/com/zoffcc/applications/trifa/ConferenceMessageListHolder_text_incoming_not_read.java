@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.daimajia.swipe.SwipeLayout;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
@@ -45,6 +46,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.ConferenceMessageListActivity.add_quote_conf_message_text;
 import static com.zoffcc.applications.trifa.ConferenceMessageListFragment.conf_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
@@ -58,6 +60,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MessageListActivity.add_quote_message_text;
 import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
@@ -85,6 +88,9 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     boolean is_selected = false;
     boolean is_system_message = false;
     ImageView img_corner;
+    int swipe_state = 0;
+    int swipe_state_done = 0;
+    SwipeLayout swipeLayout = null;
 
     public ConferenceMessageListHolder_text_incoming_not_read(View itemView, Context c)
     {
@@ -103,11 +109,80 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         peer_name_text = (TextView) itemView.findViewById(R.id.peer_name_text);
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
         img_corner = (ImageView) itemView.findViewById(R.id.img_corner);
+
+        swipe_state = 0;
+        swipe_state_done = 0;
+
+        swipeLayout = (SwipeLayout) itemView.findViewById(R.id.msg_swipe_container);
+        swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
     }
 
     public void bindMessageList(ConferenceMessage m)
     {
         message_ = m;
+
+        swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener()
+        {
+            @Override
+            public void onClose(SwipeLayout layout)
+            {
+                // when the SurfaceView totally cover the BottomView.
+                // Log.i(TAG, "onClose: state=");
+            }
+
+            @Override
+            public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset)
+            {
+                // you are swiping.
+                // Log.i(TAG, "onUpdate: " + leftOffset + " " + topOffset);
+                if (leftOffset > 60)
+                {
+                    swipeLayout.close(true);
+                    // Log.i(TAG, "onUpdate: --> close");
+                    if (swipe_state == 0)
+                    {
+                        swipe_state = 1;
+                    }
+                }
+                else if (leftOffset == 0)
+                {
+                    if (swipe_state == 1)
+                    {
+                        swipe_state = 0;
+                        Log.i(TAG, "onUpdate: --> QUOTE");
+                        add_quote_conf_message_text(message_.text);
+                    }
+                }
+            }
+
+            @Override
+            public void onStartOpen(SwipeLayout layout)
+            {
+                // Log.i(TAG, "onStartOpen");
+            }
+
+            @Override
+            public void onOpen(SwipeLayout layout)
+            {
+                // when the BottomView totally show.
+                // Log.i(TAG, "onOpen");
+                swipeLayout.close(true);
+            }
+
+            @Override
+            public void onStartClose(SwipeLayout layout)
+            {
+                // Log.i(TAG, "onStartClose");
+            }
+
+            @Override
+            public void onHandRelease(SwipeLayout layout, float xvel, float yvel)
+            {
+                // when user's hand released.
+                // Log.i(TAG, "onHandRelease");
+                swipeLayout.close(true);
+            }
+        });
 
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
 
