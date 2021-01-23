@@ -104,6 +104,8 @@ import static com.zoffcc.applications.trifa.MessageListFragment.show_only_files;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
@@ -985,14 +987,15 @@ public class MessageListActivity extends AppCompatActivity
                     if ((ml_new_message.getText().toString() == null) ||
                         (ml_new_message.getText().toString().length() == 0))
                     {
-                        ml_new_message.append(quote_text + "\n");
+                        ml_new_message.append(TEXT_QUOTE_STRING_1 + quote_text + TEXT_QUOTE_STRING_2 + "\n");
                     }
                     else
                     {
                         String old_text = ml_new_message.getText().toString();
                         ml_new_message.setText("");
                         // need to do it this way, or else the text input cursor will not be in the correct place
-                        ml_new_message.append(old_text + "\n" + quote_text + "\n");
+                        ml_new_message.append(
+                                old_text + "\n" + TEXT_QUOTE_STRING_1 + quote_text + TEXT_QUOTE_STRING_2 + "\n");
                     }
                 }
                 catch (Exception e)

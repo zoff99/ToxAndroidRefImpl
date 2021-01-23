@@ -60,6 +60,9 @@ public class TRIFAGlobals
     public static final int CONFERENCE_ID_LENGTH = 32;
     public static final int DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS = 4 * 1000; // 4 sec.
 
+    public static final String TEXT_QUOTE_STRING_1 = "----\n";
+    public static final String TEXT_QUOTE_STRING_2 = "\n----";
+
     // ----------
     // https://toxme.io/u/echobot
     //  echobot@toxme.io
