@@ -30,9 +30,9 @@
     <!-- Strings related to Settings -->
     <string name="pref_header_general">通用</string>
     <string name="pref_title_auto_accept_image">自动接收图片</string>
-    <string name="pref_description_auto_accept_image">自动接收不超过 3 MByte 的图片和照片</string>
+    <string name="pref_description_auto_accept_image">自动接收不超过 6 MByte 的图片和照片</string>
     <string name="pref_title_auto_accept_video">自动接收视频</string>
-    <string name="pref_description_auto_accept_video">自动接收不超过 10 MByte 视频</string>
+    <string name="pref_description_auto_accept_video">自动接收不超过 20 MByte 视频</string>
     <string name="pref_title_video_uv_reversed">在视频中反转 UV</string>
     <string name="pref_description_video_uv_reversed">反转摄像机视频中 UV 平面的顺序</string>
     <string name="pref_title_software_echo_cancel">回声消除</string>
@@ -334,4 +334,11 @@
     <string name="layout___migdb_do_not_close">不要关闭这个屏幕</string>
     <string name="layout___migdb_text">正在迁移数据库文件</string>
     <string name="messages_search_default_text">搜索 …</string>
+    <string name="wrong_credentials_error">错误的凭据</string>
+    <string name="title_activity_wrong_credentials">错误的凭据</string>
+    <string name="MainActivity_new_noti_token_dialog_text">收到了新的通知令牌。使用这枚令牌吗？</string>
+    <string name="MainActivity_new_noti_token_dialog_title">令牌</string>
+    <string name="MainActivity_yes_button">是</string>
+    <string name="pref_description_auto_accept_all_upto">自动接受所有最大 200 MByte 的文件</string>
+    <string name="pref_title_auto_accept_all_upto">自动接受所有文件</string>
 </resources>
