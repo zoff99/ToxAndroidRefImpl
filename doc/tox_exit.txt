@@ -1,0 +1,64 @@
+
+tox exit
+========
+
+UI Thread:
+
+    GroupAudioService.stop_me();
+
+    if (is_tox_started)
+    {
+        tox_service_fg.stop_tox_fg(true);
+        tox_service_fg.stop_me(true);
+    }
+    else
+    {
+        // just exit
+        tox_service_fg.stop_me(true);
+    }
+
+
+# ------------------------
+
+TrifaToxService:
+
+stop_me()
+{
+    stopForeground(true);
+
+    tox_notification_cancel(this);
+
+    while (is_tox_started)
+    {
+        ... sleep ...
+    }
+
+    vfs__detach();
+    vfs__unmount();
+
+    tox_notification_cancel(static_context);
+
+    stopSelf(); # stop foreground service
+
+    tox_notification_cancel(static_context);
+
+    MainActivity.exit(); # EXIT app
+}
+
+stop_tox_fg()
+{
+    stop_tox_fg_done = false;
+
+    Runnable myRunnable = new Runnable() # on UI Thread
+    {
+        ToxServiceThread.interrupt();
+        ToxServiceThread.join();
+        is_tox_started = false;
+        stop_tox_fg_done = true;
+    }
+}
+
+
+
+
+

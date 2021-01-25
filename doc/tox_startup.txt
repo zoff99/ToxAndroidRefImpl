@@ -1,0 +1,92 @@
+
+tox startup
+===========
+
+MainActivity:
+
+onCreate()
+{
+    bootstrapping = false;
+
+    PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
+    if (PREF__DB_secrect_key.isEmpty())
+    {
+        PREF__DB_secrect_key = PREF__DB_secrect_key__user_hash;
+    }
+
+
+    if ((!TOX_SERVICE_STARTED) || (orma == null))
+    {
+        orma = ...
+    }
+
+    if ((!TOX_SERVICE_STARTED) || (vfs == null))
+    {
+        vfs =  ...
+    }
+
+    Intent i = new Intent(this, TrifaToxService.class);
+    if (!TOX_SERVICE_STARTED)
+    {
+        startService(i); # start foreground service
+    }
+
+    if (!TOX_SERVICE_STARTED)
+    {
+        tox_thread_start();
+    }
+}
+
+
+tox_thread_start()
+{
+    Thread t = new Thread()
+    {
+        while (tox_service_fg == null)
+        {
+            ... sleep ...
+        }
+
+        if (!is_tox_started)
+        {
+            init(...) # NATIVE func
+            tox_service_fg.tox_thread_start_fg();
+        }
+    }
+}
+
+# ------------------------
+
+TrifaToxService:
+
+tox_thread_start_fg()
+{
+    ToxServiceThread = new Thread()
+    {
+        boolean old_is_tox_started = is_tox_started;
+        is_tox_started = true;
+
+        if (!old_is_tox_started)
+        {
+            MainActivity.init_tox_callbacks(); # NATIVE func
+        }
+
+        if (!old_is_tox_started)
+        {
+            bootstrap_me();
+        }
+
+        # --------------- main tox loop ---------------
+        while (!stop_me)
+        {
+            MainActivity.tox_iterate();
+        }
+        # --------------- main tox loop ---------------
+
+        MainActivity.tox_kill();
+    }
+}
+
+
+
+
