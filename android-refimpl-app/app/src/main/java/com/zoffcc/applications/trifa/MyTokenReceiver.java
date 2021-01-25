@@ -20,12 +20,19 @@
 package com.zoffcc.applications.trifa;
 
 import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY_NEED_ACK;
@@ -35,6 +42,8 @@ public class MyTokenReceiver extends BroadcastReceiver
 {
     private static final String TAG = "trifa.MyTokenRcvr";
     private static PowerManager.WakeLock token_wakeup_lock = null;
+
+    static int CHANGE_TOKEN_NOTIFICATION_ID = 886679;
 
     @Override
     public void onReceive(Context context, Intent intent2)
@@ -83,15 +92,61 @@ public class MyTokenReceiver extends BroadcastReceiver
                         // https://developer.android.com/guide/components/activities/background-starts
                         // thanks Google
                         Log.i(TAG, "TrifaToxService NOT running");
-                        Intent open_trifa_intent = new Intent(context.getApplicationContext(),
-                                                              StartMainActivityWrapper.class);
-                        open_trifa_intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(open_trifa_intent);
-                        Log.i(TAG, "activity started");
+
+
+                        if (Build.VERSION.SDK_INT < 29)
+                        {
+
+                            Intent open_trifa_intent = new Intent(context, StartMainActivityWrapper.class);
+                            open_trifa_intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(open_trifa_intent);
+                            Log.i(TAG, "activity started");
+                        }
+                        else
+                        {
+                            Log.i(TAG, "API:" + Build.VERSION.SDK_INT);
+                            try
+                            {
+                                NotificationManager nm3 = (NotificationManager) context.getSystemService(
+                                        Context.NOTIFICATION_SERVICE);
+
+                                Intent fullScreenIntent = new Intent(context, StartMainActivityWrapper.class);
+                                PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(context, 0,
+                                                                                                  fullScreenIntent,
+                                                                                                  PendingIntent.FLAG_UPDATE_CURRENT);
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                                {
+                                    NotificationChannel channel = new NotificationChannel(
+                                            "trifa_extern_token_receiver_id", "new Token",
+                                            NotificationManager.IMPORTANCE_HIGH);
+                                    nm3.createNotificationChannel(channel);
+                                }
+
+                                NotificationCompat.Builder notificationBuilder = new NotificationCompat.
+                                        Builder(context, "trifa_extern_token_receiver_id").
+                                        setSmallIcon(R.mipmap.ic_launcher).
+                                        setContentTitle("TRIfA").
+                                        setContentText("new Token").
+                                        setPriority(NotificationCompat.PRIORITY_HIGH).
+                                        setCategory(NotificationCompat.CATEGORY_CALL).
+                                        setAutoCancel(true).
+                                        setFullScreenIntent(fullScreenPendingIntent, true);
+
+                                Notification incomingMsgNotification = notificationBuilder.build();
+                                nm3.notify(CHANGE_TOKEN_NOTIFICATION_ID, incomingMsgNotification);
+                                Log.i(TAG, "notify");
+                            }
+                            catch (Exception e2)
+                            {
+                                e2.printStackTrace();
+                                Log.i(TAG, "show_noti:EE02:" + e2.getMessage());
+                            }
+                        }
 
                         try
                         {
-                            Thread.sleep(5 * 1000); // wait for 20 seconds
+                            Thread.sleep(20 * 1000); // wait for 20 seconds
                         }
                         catch (Exception e)
                         {

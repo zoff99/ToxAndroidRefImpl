@@ -1551,6 +1551,7 @@ public class HelperGeneric
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "get_network_connections:EE01:" + e.getMessage());
             return "ERROR_getting_network_connections";
         }
     }
