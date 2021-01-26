@@ -28,6 +28,7 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -93,6 +94,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_reset_nodelist;
     Button button_test_notification;
     Button button_test_ringtone;
+    Button button_iobrowser_start;
     Button button_export_savedata;
     Button button_import_savedata;
 
@@ -131,6 +133,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_reset_nodelist = (Button) findViewById(R.id.button_reset_nodelist);
         button_test_notification = (Button) findViewById(R.id.button_test_notification);
         button_test_ringtone = (Button) findViewById(R.id.button_test_ringtone);
+        button_iobrowser_start = (Button) findViewById(R.id.button_iobrowser_start);
         button_export_savedata = (Button) findViewById(R.id.button_export_savedata);
         button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
@@ -138,6 +141,23 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        button_iobrowser_start.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    Intent intent = new Intent(getBaseContext(), IOBrowser.class);
+                    startActivity(intent);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         button_set_app_language.setOnClickListener(new View.OnClickListener()
         {
@@ -929,6 +949,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == SelectLanguageActivity_ID)
         {
             if (resultCode == RESULT_OK)
@@ -968,7 +990,10 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             //}
                             else if (result_lang.compareTo("es") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             //else if (result_lang.compareTo("fa") == 0)
                             //{
@@ -977,35 +1002,59 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             //}
                             else if (result_lang.compareTo("fr") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             else if (result_lang.compareTo("hi") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             else if (result_lang.compareTo("hu") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             else if (result_lang.compareTo("it") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             else if (result_lang.compareTo("kn") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             else if (result_lang.compareTo("tr") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             else if (result_lang.compareTo("sv") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             else if (result_lang.compareTo("ru") == 0)
                             {
-                                Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                                {
+                                    Lingver.getInstance().setLocale(this, Locale.forLanguageTag(result_lang));
+                                }
                             }
                             // ------------------
                             // ------------------

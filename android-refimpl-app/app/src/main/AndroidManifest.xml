@@ -222,6 +222,10 @@
             android:label="@string/title_activity_wrong_credentials" >
         </activity>
 
+        <activity
+            android:name=".IOBrowser" >
+        </activity>
+
         <receiver
             android:name=".ConnectionManager"
             android:label="NetworkConnection">
