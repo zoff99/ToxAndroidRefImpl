@@ -1441,7 +1441,8 @@ public class MainActivity extends AppCompatActivity
                     {
                         Log.i(TAG, "vfs:EE1:" + ee.getMessage());
                         ee.printStackTrace();
-                        Log.i(TAG, "VFS:mount:[2]:start");
+                        Log.i(TAG, "VFS:mount:[2]:start:" + Thread.currentThread().getId() + ":" +
+                                   Thread.currentThread().getName());
                         vfs.mount(dbFile, PREF__DB_secrect_key);
                         Log.i(TAG, "VFS:mount:[2]:end");
                     }
@@ -1484,7 +1485,8 @@ public class MainActivity extends AppCompatActivity
                         // Log.i(TAG, "vfs:path=" + dbFile);
                         vfs = VirtualFileSystem.get();
                         vfs.createNewContainer(dbFile, PREF__DB_secrect_key);
-                        Log.i(TAG, "VFS:mount:[3]:start");
+                        Log.i(TAG, "VFS:mount:[3]:start:" + Thread.currentThread().getId() + ":" +
+                                   Thread.currentThread().getName());
                         vfs.mount(PREF__DB_secrect_key);
                         Log.i(TAG, "VFS:mount:[3]:end");
                         // Log.i(TAG, "vfs:open(2)=OK:path=" + dbFile);
