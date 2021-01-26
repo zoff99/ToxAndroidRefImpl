@@ -233,11 +233,13 @@ public class TrifaToxService extends Service
                                 if (vfs.isMounted())
                                 {
                                     Log.i(TAG, "stop_me:006d");
-                                    Log.i(TAG, "VFS:detach:start:vfs.isMounted()=" + vfs.isMounted());
-                                    vfs__detach();
+                                    Log.i(TAG, "VFS:detach:start:vfs.isMounted()=" + vfs.isMounted() + " " +
+                                               Thread.currentThread().getId() + ":" + Thread.currentThread().getName());
+                                    // vfs__detach();
                                     Log.i(TAG, "stop_me:006e");
                                     Thread.sleep(1);
-                                    Log.i(TAG, "VFS:unmount:start:vfs.isMounted()=" + vfs.isMounted());
+                                    Log.i(TAG, "VFS:unmount:start:vfs.isMounted()=" + vfs.isMounted() + " " +
+                                               Thread.currentThread().getId() + ":" + Thread.currentThread().getName());
                                     vfs__unmount();
                                     Log.i(TAG, "stop_me:006f");
                                 }
