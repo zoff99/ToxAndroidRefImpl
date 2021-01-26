@@ -360,4 +360,5 @@
     <string name="pref_title_auto_accept_all_upto">tüm dosyaları otomatik olarak kabul et</string>
     <string name="wrong_credentials_error">Yanlış Kimlik Bilgileri</string>
     <string name="title_activity_wrong_credentials">Yanlış Kimlik Bilgileri</string>
+    <string name="layout___iobrowser_start">şifrelenmiş depolamaya göz at</string>
 </resources>
