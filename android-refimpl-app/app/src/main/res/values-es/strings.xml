@@ -26,7 +26,7 @@
     <string name="settings_toolbar_title">Configuraciones</string>
     <string name="pref_header_general">General</string>
     <string name="pref_title_auto_accept_image">imagen de aceptación automática</string>
-    <string name="pref_description_auto_accept_image">aceptar automáticamente imágenes y fotos de hasta 3 MB de tamaño</string>
+    <string name="pref_description_auto_accept_image">aceptar automáticamente imágenes y fotos de hasta 6 MB de tamaño</string>
     <string name="pref_title_video_uv_reversed">invertir UV en video</string>
     <string name="pref_description_video_uv_reversed">Invierta el orden de los planos UV en el video de la cámara</string>
     <string name="pref_title_software_echo_cancel">Cancelación del eco</string>
@@ -300,9 +300,18 @@
     <string name="pref_title_global_font_size">Tamaño de la fuente</string>
     <string name="pref_description_video_cam_resolution">Qué resolución usar para las videollamadas</string>
     <string name="pref_title_video_cam_resolution">Resolución de la cámara</string>
-    <string name="pref_description_auto_accept_video">aceptar automáticamente videos de hasta 10 MB de tamaño</string>
+    <string name="pref_description_auto_accept_video">aceptar automáticamente videos de hasta 20 MB de tamaño</string>
     <string name="pref_title_auto_accept_video">aceptar videos automáticamente</string>
     <string name="conference_audio_activity_player_name">Reproductor de audioconferencia</string>
     <string name="layout___migdb_do_not_close">NO CIERRE esta pantalla</string>
     <string name="layout___migdb_text">Migrando los archivos de la base de datos</string>
+    <string name="wrong_credentials_error">Credenciales incorrectas</string>
+    <string name="title_activity_wrong_credentials">Credenciales incorrectas</string>
+    <string name="layout___iobrowser_start">navegar por el almacenamiento encriptado</string>
+    <string name="messages_search_default_text">buscar...</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Nuevo token de notificación recibido. ¿Usar este token\?</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Token</string>
+    <string name="MainActivity_yes_button">sí</string>
+    <string name="pref_description_auto_accept_all_upto">aceptar automáticamente todos los archivos de hasta 200 MB de tamaño</string>
+    <string name="pref_title_auto_accept_all_upto">aceptar automáticamente todos los archivos</string>
 </resources>
