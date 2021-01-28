@@ -341,4 +341,5 @@
     <string name="MainActivity_yes_button">是</string>
     <string name="pref_description_auto_accept_all_upto">自动接受所有最大 200 MByte 的文件</string>
     <string name="pref_title_auto_accept_all_upto">自动接受所有文件</string>
+    <string name="layout___iobrowser_start">浏览加密的存储</string>
 </resources>

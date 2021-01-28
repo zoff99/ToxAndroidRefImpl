@@ -90,8 +90,8 @@
     <string name="pref_title_vibrate">Vibrar</string>
     <string name="pref_ringtone_silent">Silencioso</string>
     <string name="pref_title_ringtone">Toque de chamada</string>
-    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 3 MB de tamanho</string>
-    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 10 MB de tamanho</string>
+    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 6 MB de tamanho</string>
+    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 20 MB de tamanho</string>
     <string name="pref_title_auto_accept_video">aceitar vídeos automaticamente</string>
     <string name="pref_title_auto_accept_image">aceitar imagens automaticamente</string>
     <string name="pref_header_general">Geral</string>
@@ -207,4 +207,12 @@
     <string name="layout___migdb_do_not_close">NÃO FECHE esta tela</string>
     <string name="layout___migdb_text">Migrando arquivos do banco de dados</string>
     <string name="messages_search_default_text">procurar ...</string>
+    <string name="wrong_credentials_error">Credenciais Erradas</string>
+    <string name="title_activity_wrong_credentials">Credenciais Erradas</string>
+    <string name="layout___iobrowser_start">navegar no armazenamento criptografado</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Novo token de notificação recebido. Usar este token\?</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Token</string>
+    <string name="MainActivity_yes_button">sim</string>
+    <string name="pref_description_auto_accept_all_upto">aceitar automaticamente todos os arquivos de até 200 MB de tamanho</string>
+    <string name="pref_title_auto_accept_all_upto">aceitar automaticamente todos os arquivos</string>
 </resources>
