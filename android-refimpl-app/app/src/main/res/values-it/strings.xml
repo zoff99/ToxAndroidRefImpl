@@ -26,7 +26,7 @@
     <string name="settings_toolbar_title">impostazioni</string>
     <string name="pref_header_general">Generale</string>
     <string name="pref_title_auto_accept_image">accetta automaticamente l\'immagine</string>
-    <string name="pref_description_auto_accept_image">accetta automaticamente immagini e foto di dimensioni fino a 3 MByte</string>
+    <string name="pref_description_auto_accept_image">accetta automaticamente immagini e foto di dimensioni fino a 6 MByte</string>
     <string name="pref_title_video_uv_reversed">UV inverso in video</string>
     <string name="pref_description_video_uv_reversed">Invertire l\'ordine dei piani UV nel video della videocamera</string>
     <string name="pref_title_software_echo_cancel">Eliminazione dell\'eco</string>
@@ -288,7 +288,7 @@
     <string name="pref_title_global_font_size">Dimensione del carattere</string>
     <string name="pref_description_video_cam_resolution">Quale risoluzione utilizzare per le videochiamate</string>
     <string name="pref_title_video_cam_resolution">Risoluzione della telecamera</string>
-    <string name="pref_description_auto_accept_video">auto accettare video fino a 10 MByte di dimensione</string>
+    <string name="pref_description_auto_accept_video">auto accettare video fino a 20 MByte di dimensione</string>
     <string name="pref_title_auto_accept_video">accettare automaticamente i video</string>
     <string name="conference_audio_activity_player_name">Lettore di audioconferenza</string>
     <string name="pref_description_X_audio_play_buffer_custom">!! Sperimentale!!
@@ -305,4 +305,13 @@
 \nIl cambiamento ha bisogno di RESTART!</string>
     <string name="layout___migdb_do_not_close">NON CHIUDERE questa schermata</string>
     <string name="layout___migdb_text">Spostare database</string>
+    <string name="wrong_credentials_error">Credenziali sbagliate</string>
+    <string name="title_activity_wrong_credentials">Credenziali sbagliate</string>
+    <string name="layout___iobrowser_start">sfoglia l\'archivio crittografato</string>
+    <string name="messages_search_default_text">ricercare ...</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Nuovo token di notifica ricevuto. Usare questo Token\?</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Token</string>
+    <string name="MainActivity_yes_button">si</string>
+    <string name="pref_description_auto_accept_all_upto">accettare automaticamente tutti i file fino a 200 MByte di dimensioni</string>
+    <string name="pref_title_auto_accept_all_upto">accettare automaticamente tutti i file</string>
 </resources>
