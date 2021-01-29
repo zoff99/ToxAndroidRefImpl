@@ -88,6 +88,9 @@ public class MyExternReceiver extends BroadcastReceiver
 
                         if (Build.VERSION.SDK_INT < 29)
                         {
+                            // TODO: this is not working anymore starting with Android 10
+                            // https://developer.android.com/guide/components/activities/background-starts
+                            // thanks Google
 
                             Intent open_trifa_intent = new Intent(context, StartMainActivityWrapper.class);
                             open_trifa_intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
