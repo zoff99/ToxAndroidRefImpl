@@ -134,6 +134,9 @@
     <string name="pref_title_h264_encoder_use_intra_refresh">H264 intra refresh</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">H264 encoder should use intra refresh frames</string>
 
+    <string name="pref_title_start_on_boot">start on boot</string>
+    <string name="pref_description_start_on_boot">start the application after boot.\nGoogle does not allow this anymore starting with Android 10</string>
+
     <string name="pref_title_use_incognito_keyboard">incognito Keyboard</string>
     <string name="pref_description_use_incognito_keyboard">turn off to tell keyboard not to learn from your entered words</string>
 

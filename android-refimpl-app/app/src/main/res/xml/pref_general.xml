@@ -1,6 +1,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
+        android:defaultValue="false"
+        android:key="start_on_boot"
+        android:summary="@string/pref_description_start_on_boot"
+        android:title="@string/pref_title_start_on_boot" />
+
+    <SwitchPreference
         android:defaultValue="true"
         android:key="use_incognito_keyboard"
         android:summary="@string/pref_description_use_incognito_keyboard"
