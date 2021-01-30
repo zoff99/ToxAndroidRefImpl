@@ -261,8 +261,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         setContentView(R.layout.activity_calling);
 
         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        PREF__video_play_delay_ms = settings_cs1.getInt(GLOBAL_PLAY_DELAY_SETTING_NAME,
-                                                        GLOBAL_INIT_PLAY_DELAY);
+        PREF__video_play_delay_ms = settings_cs1.getInt(GLOBAL_PLAY_DELAY_SETTING_NAME, GLOBAL_INIT_PLAY_DELAY);
         Log.i(TAG, "pref:get:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
         PREF__audio_play_volume_percent = settings_cs1.getInt("audio_play_volume_percent", 100);
         Log.i(TAG, "pref:get:PREF__audio_play_volume_percent=" + PREF__audio_play_volume_percent);
@@ -410,8 +409,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" +
-                                   e.getMessage());
+                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
                     }
                 }
                 else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
@@ -424,8 +422,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" +
-                                   e.getMessage());
+                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
                     }
                 }
                 return false;
@@ -454,8 +451,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                 getApplicationContext());
                         settings_cs2.edit().putInt("audio_play_volume_percent",
                                                    PREF__audio_play_volume_percent).apply();
-                        Log.i(TAG, "pref:set:PREF__audio_play_volume_percent=" +
-                                   PREF__audio_play_volume_percent);
+                        Log.i(TAG, "pref:set:PREF__audio_play_volume_percent=" + PREF__audio_play_volume_percent);
                     }
                     catch (Exception ee)
                     {
@@ -498,8 +494,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" +
-                                   e.getMessage());
+                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
                     }
                 }
                 else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
@@ -512,8 +507,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" +
-                                   e.getMessage());
+                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
                     }
                 }
                 return false;
@@ -880,8 +874,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                 }
                                 catch (Exception e)
                                 {
-                                    Log.i(TAG,
-                                          "setOnDiscreteSliderChangeListener:001:EE:" + e.getMessage());
+                                    Log.i(TAG, "setOnDiscreteSliderChangeListener:001:EE:" + e.getMessage());
                                 }
                             }
                         };
@@ -1117,8 +1110,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     }
 
                     camera_toggle_button_pressed = true;
-                    Log.i(TAG,
-                          "camera_toggle_button_pressed[press start]=" + camera_toggle_button_pressed);
+                    Log.i(TAG, "camera_toggle_button_pressed[press start]=" + camera_toggle_button_pressed);
                     final Thread toggle_thread = new Thread()
                     {
                         @Override
@@ -1134,8 +1126,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             }
                             toggle_camera();
                             camera_toggle_button_pressed = false;
-                            Log.i(TAG, "camera_toggle_button_pressed[press end]=" +
-                                       camera_toggle_button_pressed);
+                            Log.i(TAG, "camera_toggle_button_pressed[press end]=" + camera_toggle_button_pressed);
                         }
                     };
                     toggle_thread.start();
@@ -1578,8 +1569,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         try
         {
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-            MainActivity.PREF__camera_get_preview_format = settings.getString("camera_get_preview_format",
-                                                                              "YV12");
+            MainActivity.PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
         }
         catch (Exception e)
         {
@@ -1826,6 +1816,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
         catch (Exception e)
         {
+            Log.i(TAG, "reinit_camera:EE01:" + e.getMessage());
         }
     }
 
@@ -2052,10 +2043,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         Log.i(TAG, "cameraHasOpened:**************** CAMERA OPEN ****************");
         Callstate.camera_opened = true;
-        SurfaceHolder holder = cameraSurfacePreview.getSurfaceHolder();
-        Log.i(TAG, "cameraHasOpened:holder=" + holder);
-        Log.i(TAG, "cameraHasOpened:CameraWrapper.getInstance()=" + CameraWrapper.getInstance());
-        CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
+        try
+        {
+            SurfaceHolder holder = cameraSurfacePreview.getSurfaceHolder();
+            Log.i(TAG, "cameraHasOpened:holder=" + holder);
+            Log.i(TAG, "cameraHasOpened:CameraWrapper.getInstance()=" + CameraWrapper.getInstance());
+            CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "cameraHasOpened:EE01:" + e.getMessage());
+        }
     }
 
     public void turnOnScreen()
@@ -3057,11 +3055,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
              */
 
             mBufferInfo = new MediaCodec.BufferInfo();
-            Log.d(TAG, "prepareEncoder:before:w,h:" + video_encoder_width + "," +
-                       video_encoder_height);
+            Log.d(TAG, "prepareEncoder:before:w,h:" + video_encoder_width + "," + video_encoder_height);
             video_encoder_format = MediaFormat.createVideoFormat(MIME_TYPE, video_encoder_width, video_encoder_height);
-            Log.d(TAG, "prepareEncoder:after:w,h:" + video_encoder_width + "," +
-                       video_encoder_height);
+            Log.d(TAG, "prepareEncoder:after:w,h:" + video_encoder_width + "," + video_encoder_height);
 
             try
             {
@@ -3132,8 +3128,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         Log.i(TAG, "prepareEncoder:1a:using format [" + i + "] " + format);
                         break;
                     default:
-                        Log.i(TAG, "prepareEncoder:1a:Unsupported color format [" + i + "] " +
-                                   format);
+                        Log.i(TAG, "prepareEncoder:1a:Unsupported color format [" + i + "] " + format);
                         break;
                 }
             }
@@ -3148,8 +3143,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         Log.i(TAG, "prepareEncoder:1b:using format [" + i + "] " + format);
                         break;
                     default:
-                        Log.i(TAG, "prepareEncoder:1b:Unsupported color format [" + i + "] " +
-                                   format);
+                        Log.i(TAG, "prepareEncoder:1b:Unsupported color format [" + i + "] " + format);
                         break;
                 }
             }
@@ -3168,8 +3162,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         Log.i(TAG, "prepareEncoder:2:using format [" + i + "] " + format);
                         break;
                     default:
-                        Log.i(TAG, "prepareEncoder:2:Unsupported color format [" + i + "] " +
-                                   format);
+                        Log.i(TAG, "prepareEncoder:2:Unsupported color format [" + i + "] " + format);
                         break;
                 }
             }
@@ -3233,8 +3226,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             else if (encoderStatus < 0)
             {
-                Log.w(TAG, "drainEncoder:unexpected result from encoder.dequeueOutputBuffer: " +
-                           encoderStatus);
+                Log.w(TAG, "drainEncoder:unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
                 // let's ignore it
             }
             else
@@ -3242,8 +3234,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
                 if (encodedData == null)
                 {
-                    throw new RuntimeException("drainEncoder:encoderOutputBuffer " + encoderStatus +
-                                               " was null");
+                    throw new RuntimeException("drainEncoder:encoderOutputBuffer " + encoderStatus + " was null");
                 }
 
                 if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)

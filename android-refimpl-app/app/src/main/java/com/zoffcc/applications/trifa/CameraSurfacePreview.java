@@ -295,7 +295,14 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
     public void surfaceDestroyed(SurfaceHolder holder)
     {
         Log.i(TAG, "surfaceDestroyed...");
-        CameraWrapper.getInstance().doStopCamera();
+        try
+        {
+            CameraWrapper.getInstance().doStopCamera();
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "surfaceDestroyed:EE01:" + e.getMessage());
+        }
     }
 
     public SurfaceHolder getSurfaceHolder()
