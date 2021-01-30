@@ -48,7 +48,7 @@ import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 
 public class Aboutpage extends AppCompatActivity implements Logging.AsyncResponse
 {
-    private static final String TAG = "trifa.Aboutpage"; //$NON-NLS-1$
+    private static final String TAG = "trifa.Aboutpage";
     ProgressDialog progressDialog2 = null;
 
     @Override
@@ -83,7 +83,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                     try
                     {
                         progressDialog2 = ProgressDialog.show(Aboutpage.this, "", getString(
-                                R.string.Aboutpage_4)); //$NON-NLS-1$ //$NON-NLS-2$
+                                R.string.Aboutpage_4));
 
                         progressDialog2.setCanceledOnTouchOutside(false);
                         progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
@@ -137,130 +137,130 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             //  --------------------------------
             //  --------- used libs ------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_8)); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_8));
             el2.setIconDrawable(R.drawable.about_icon_github);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_9)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_10))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_9));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_10)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_11)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_12))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_11));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_12)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_13)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_14))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_13));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_14)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_15)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_16))); //$NON-NLS-1$
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_17)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_18))); //$NON-NLS-1$
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_19)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_20))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_15));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_16)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_21)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_22))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_17));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_18)));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle(getString(R.string.Aboutpage_19));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_20)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_23)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_24))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_21));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_22)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_25)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_26))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_23));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_24)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_27)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_28))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_25));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_26)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_29)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_30))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_27));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_28)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_31)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_32))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_29));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_30)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_33)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_34))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_31));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_32)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_35)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_36))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_33));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_34)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_37)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_38))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_35));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_36)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_39)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_40))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_37));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_38)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_41)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_42))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_39));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_40)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_43)); //$NON-NLS-1$
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_44))); //$NON-NLS-1$
+            el2.setTitle(getString(R.string.Aboutpage_41));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_42)));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle(getString(R.string.Aboutpage_43));
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_44)));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
@@ -271,27 +271,27 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "onCreate:EE1:" + e.getMessage()); //$NON-NLS-1$
+            Log.i(TAG, "onCreate:EE1:" + e.getMessage());
         }
 
         try
         {
             // find the large top icon in aboutpage layout
             ImageView icon_big = (ImageView) findViewById(R.id.image);
-            Log.i(TAG, "onCreate:icon_big=" + icon_big); //$NON-NLS-1$
+            Log.i(TAG, "onCreate:icon_big=" + icon_big);
 
             final Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.web_hi_res_512);
             Log.i(TAG, "onCreate:bm1.getWidth()=" + bm1.getWidth() + " bm1.getHeight()=" +
-                       bm1.getHeight()); //$NON-NLS-1$ //$NON-NLS-2$
+                       bm1.getHeight());
             final Bitmap bm1_scaled = Bitmap.createScaledBitmap(bm1, (int) dp2px(200), (int) dp2px(200), true);
-            Log.i(TAG, "onCreate:dp2px(200)=" + dp2px(200)); //$NON-NLS-1$
+            Log.i(TAG, "onCreate:dp2px(200)=" + dp2px(200));
 
             icon_big.setImageBitmap(bm1_scaled);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "onCreate:EE2:" + e.getMessage()); //$NON-NLS-1$
+            Log.i(TAG, "onCreate:EE2:" + e.getMessage());
         }
     }
 
@@ -301,18 +301,18 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
     {
         String output = output_part1 + System.getProperty("line.separator") + System.getProperty("line.separator") +
                         "LastStackTrace:" + System.getProperty("line.separator") +
-                        MainApplication.last_stack_trace_as_string; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        MainApplication.last_stack_trace_as_string = ""; // reset last stacktrace //$NON-NLS-1$
+                        MainApplication.last_stack_trace_as_string;
+        MainApplication.last_stack_trace_as_string = ""; // reset last stacktrace
 
         // String DATA_DEBUG_DIR = new File(getExternalFilesDir(null).getAbsolutePath() + "/crashes").toString();
         String DATA_DEBUG_DIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
-                                         "/trifa/crashes").toString(); //$NON-NLS-1$
+                                         "/trifa/crashes").toString();
 
-        String date = new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.GERMAN).format(new Date()); //$NON-NLS-1$
-        String full_file_name = DATA_DEBUG_DIR + "/crash_" + date + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$
-        String full_file_name_suppl = DATA_DEBUG_DIR + "/crash_single.txt"; //$NON-NLS-1$
+        String date = new SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.GERMAN).format(new Date());
+        String full_file_name = DATA_DEBUG_DIR + "/crash_" + date + ".txt";
+        String full_file_name_suppl = DATA_DEBUG_DIR + "/crash_single.txt";
         String feedback_text = "If there is no file attached, please attach:\n" + full_file_name +
-                               "\nto this email."; //$NON-NLS-1$ //$NON-NLS-2$
+                               "\nto this email.";
 
         Logging.writeToFile(output, Aboutpage.this, full_file_name);
 
@@ -334,6 +334,6 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
         main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc", getString(R.string.Aboutpage_0) + " (a:" +
                                                                             android.os.Build.VERSION.SDK + ")",
                                                 feedback_text, full_file_name,
-                                                full_file_name_suppl); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                                full_file_name_suppl);
     }
 }

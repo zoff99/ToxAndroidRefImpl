@@ -36,7 +36,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
 
 public class AddFriendActivity extends AppCompatActivity
 {
-    private static final String TAG = "trifa.AddFrdActivity"; //$NON-NLS-1$
+    private static final String TAG = "trifa.AddFrdActivity";
     EditText toxid_text = null;
     Button button_add = null;
     TextInputLayout friend_toxid_inputlayout = null;
@@ -54,7 +54,7 @@ public class AddFriendActivity extends AppCompatActivity
         button_add = (Button) findViewById(R.id.friend_addbutton);
         friend_toxid_inputlayout = (TextInputLayout) findViewById(R.id.friend_toxid_inputlayout);
 
-        toxid_text.setText(""); //$NON-NLS-1$
+        toxid_text.setText("");
         // friend_toxid_inputlayout.setError("No ToxID");
         friend_toxid_inputlayout.setError(null);
 
@@ -68,7 +68,7 @@ public class AddFriendActivity extends AppCompatActivity
                     button_add.setEnabled(true);
                     friend_toxid_inputlayout.setErrorEnabled(false);
                 }
-                else if (editable.length() == ((TOX_ADDRESS_SIZE * 2) + "tox:".length())) //$NON-NLS-1$
+                else if (editable.length() == ((TOX_ADDRESS_SIZE * 2) + "tox:".length()))
                 {
                     // TODO: acutally see if editable starts with "tox:", but it can be in any case (ToX: or toX: or TOX: ....)
                     button_add.setEnabled(true);
@@ -79,11 +79,11 @@ public class AddFriendActivity extends AppCompatActivity
                     button_add.setEnabled(false);
                     if (editable.length() > 0)
                     {
-                        friend_toxid_inputlayout.setError(getString(R.string.AddFriendActivity_3)); //$NON-NLS-1$
+                        friend_toxid_inputlayout.setError(getString(R.string.AddFriendActivity_3));
                     }
                     else
                     {
-                        friend_toxid_inputlayout.setError(getString(R.string.AddFriendActivity_4)); //$NON-NLS-1$
+                        friend_toxid_inputlayout.setError(getString(R.string.AddFriendActivity_4));
                     }
                 }
             }
@@ -104,8 +104,8 @@ public class AddFriendActivity extends AppCompatActivity
     {
         try
         {
-            Intent intent = new Intent("com.google.zxing.client.android.SCAN"); //$NON-NLS-1$
-            intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes //$NON-NLS-1$ //$NON-NLS-2$
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("SCAN_MODE", "QR_CODE_MODE"); // "PRODUCT_MODE for bar codes
 
             startActivityForResult(intent, 0);
         }
@@ -113,7 +113,7 @@ public class AddFriendActivity extends AppCompatActivity
         {
             try
             {
-                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android"); //$NON-NLS-1$
+                Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
                 Intent marketIntent = new Intent(Intent.ACTION_VIEW, marketUri);
                 startActivity(marketIntent);
             }
@@ -138,7 +138,7 @@ public class AddFriendActivity extends AppCompatActivity
 
         if (toxid_ok == true)
         {
-            intent.putExtra("toxid", toxid_text.getText().toString()); //$NON-NLS-1$
+            intent.putExtra("toxid", toxid_text.getText().toString());
             setResult(RESULT_OK, intent);
         }
         else
@@ -161,8 +161,8 @@ public class AddFriendActivity extends AppCompatActivity
         {
             if (resultCode == RESULT_OK)
             {
-                String contents = data.getStringExtra("SCAN_RESULT"); //$NON-NLS-1$
-                String format = data.getStringExtra("SCAN_RESULT_FORMAT"); //$NON-NLS-1$
+                String contents = data.getStringExtra("SCAN_RESULT");
+                String format = data.getStringExtra("SCAN_RESULT_FORMAT");
                 toxid_text.setText(contents);
             }
         }

@@ -243,7 +243,7 @@ public class GroupAudioService extends Service
                         else
                         {
                             // headset plugged in
-                            Log.i(TAG, "onReceive:headset:plugged in"); //$NON-NLS-1$
+                            Log.i(TAG, "onReceive:headset:plugged in");
                             manager.setSpeakerphoneOn(false);
                             manager.setWiredHeadsetOn(true);
                             Callstate.audio_device = 1;
@@ -253,13 +253,13 @@ public class GroupAudioService extends Service
                     }
                     else
                     {
-                        Log.i(TAG, "onReceive:headset:setImageDrawable:null1"); //$NON-NLS-1$
+                        Log.i(TAG, "onReceive:headset:setImageDrawable:null1");
                     }
                 }
                 catch (Exception ee)
                 {
                     ee.printStackTrace();
-                    Log.i(TAG, "onReceive:headset:setImageDrawable:null2"); //$NON-NLS-1$
+                    Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
                 }
 
                 // HINT: stop audio recording, we do not need it in this mode -------------
