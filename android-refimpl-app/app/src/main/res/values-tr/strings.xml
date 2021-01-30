@@ -361,4 +361,7 @@
     <string name="wrong_credentials_error">Yanlış Kimlik Bilgileri</string>
     <string name="title_activity_wrong_credentials">Yanlış Kimlik Bilgileri</string>
     <string name="layout___iobrowser_start">şifrelenmiş depolamaya göz at</string>
+    <string name="pref_description_start_on_boot">önyüklemeden sonra uygulamayı başlat.
+\nGoogle, Android 10\'dan itibaren artık buna izin vermiyor</string>
+    <string name="pref_title_start_on_boot">önyüklemede başlat</string>
 </resources>
