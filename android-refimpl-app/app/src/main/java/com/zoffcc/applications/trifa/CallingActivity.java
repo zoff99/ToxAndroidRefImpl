@@ -1963,56 +1963,63 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 active_camera_type = FRONT_CAMERA_USED;
                 Log.i(TAG, "active_camera_type(01)=" + active_camera_type); //$NON-NLS-1$
                 CameraWrapper.camera_preview_size2 = null;
-                CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
-
-                // wait for 1 seconds to actually get a camera preview. if not, restart camera
-                int WAIT_SECONDS = 2;
-                long startup_ts = System.currentTimeMillis();
-                for (int j = 0; j < 100 * WAIT_SECONDS; j++)
+                try
                 {
-                    // Log.i(TAG, "onStart:01:ts=" + camera_preview_call_back_ts_first_frame + " " +
-                    //            camera_preview_call_back_start_ts);
+                    CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
 
-                    if (camera_toggle_button_pressed == true)
+                    // wait for 1 seconds to actually get a camera preview. if not, restart camera
+                    int WAIT_SECONDS = 2;
+                    long startup_ts = System.currentTimeMillis();
+                    for (int j = 0; j < 100 * WAIT_SECONDS; j++)
                     {
-                        break;
-                    }
+                        // Log.i(TAG, "onStart:01:ts=" + camera_preview_call_back_ts_first_frame + " " +
+                        //            camera_preview_call_back_start_ts);
 
-                    if (camera_preview_call_back_ts_first_frame > startup_ts)
-                    {
-                        Log.i(TAG, "onStart:01:ts:got a frame"); //$NON-NLS-1$
-                        // ok we got a video frame from the camera
-                        break;
+                        if (camera_toggle_button_pressed == true)
+                        {
+                            break;
+                        }
+
+                        if (camera_preview_call_back_ts_first_frame > startup_ts)
+                        {
+                            Log.i(TAG, "onStart:01:ts:got a frame"); //$NON-NLS-1$
+                            // ok we got a video frame from the camera
+                            break;
+                        }
+
+                        try
+                        {
+                            Thread.sleep(10);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
 
                     try
                     {
-                        Thread.sleep(10);
+                        if (camera_toggle_button_pressed != true)
+                        {
+                            Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restarting ..."); //$NON-NLS-1$
+                            reinit_camera(c_this);
+                        }
+                        else
+                        {
+                            Log.i(TAG, "onStart:01:ts:camera toggle button pressed"); //$NON-NLS-1$
+                        }
                     }
                     catch (Exception e)
                     {
+                        Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restart:EE:" + e.getMessage()); //$NON-NLS-1$
                         e.printStackTrace();
                     }
-                }
 
-                try
-                {
-                    if (camera_toggle_button_pressed != true)
-                    {
-                        Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restarting ..."); //$NON-NLS-1$
-                        reinit_camera(c_this);
-                    }
-                    else
-                    {
-                        Log.i(TAG, "onStart:01:ts:camera toggle button pressed"); //$NON-NLS-1$
-                    }
                 }
-                catch (Exception e)
+                catch (Exception e33)
                 {
-                    Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restart:EE:" + e.getMessage()); //$NON-NLS-1$
-                    e.printStackTrace();
+                    Log.i(TAG, "onStart:EE33:" + e33.getMessage());
                 }
-
             }
         };
         openThread.start();
