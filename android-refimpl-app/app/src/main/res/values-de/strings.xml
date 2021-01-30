@@ -28,9 +28,9 @@
     <string name="settings_toolbar_title">Einstellungen</string>
     <string name="pref_header_general">Allgemeines</string>
     <string name="pref_title_auto_accept_image">Bilder automatisch akzeptieren</string>
-    <string name="pref_description_auto_accept_image">Bilder und Fotos mit einer Größe von bis zu 3 MByte automatisch akzeptieren</string>
+    <string name="pref_description_auto_accept_image">Bilder und Fotos mit einer Größe von bis zu 6 MByte automatisch akzeptieren</string>
     <string name="pref_title_auto_accept_video">Videos automatisch akzeptieren</string>
-    <string name="pref_description_auto_accept_video">Videos automatisch mit einer Größe von bis zu 10 MByte akzeptieren</string>
+    <string name="pref_description_auto_accept_video">Videos automatisch mit einer Größe von bis zu 20 MByte akzeptieren</string>
     <string name="pref_title_video_uv_reversed">UV in Video umkehren</string>
     <string name="pref_description_video_uv_reversed">Kehren Sie die Reihenfolge der UV-Ebenen im Kameravideo um</string>
     <string name="pref_title_software_echo_cancel">Echounterdrückung</string>
@@ -297,4 +297,13 @@
     <string name="pref_description_video_cam_resolution">Auflösung für Videoanrufe</string>
     <string name="layout___migdb_do_not_close">Diesen Bildschirm NICHT schließen</string>
     <string name="layout___migdb_text">Migrieren von Datenbankdateien</string>
+    <string name="wrong_credentials_error">Falsche Anmeldeinformationen</string>
+    <string name="title_activity_wrong_credentials">Falsche Anmeldeinformationen</string>
+    <string name="layout___iobrowser_start">verschlüsselten Speicher durchsuchen</string>
+    <string name="messages_search_default_text">suche...</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Neues Benachrichtigungstoken empfangen. Verwenden Sie dieses Token\?</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Token</string>
+    <string name="MainActivity_yes_button">ja</string>
+    <string name="pref_description_auto_accept_all_upto">akzeptiert automatisch alle Dateien bis zu einer Größe von 200 MByte</string>
+    <string name="pref_title_auto_accept_all_upto">Auto akzeptieren alle Dateien</string>
 </resources>

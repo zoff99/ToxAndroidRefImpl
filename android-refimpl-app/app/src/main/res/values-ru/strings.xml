@@ -320,4 +320,9 @@
     <string name="layout___migdb_do_not_close">НЕ закрывайте этот экран</string>
     <string name="layout___migdb_text">Перенос файлов базы данных</string>
     <string name="messages_search_default_text">поиск ...</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Получен новый токен уведомления. Использовать этот токен\?</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Токен</string>
+    <string name="MainActivity_yes_button">да</string>
+    <string name="pref_description_auto_accept_all_upto">автоматически принимать все файлы размером до 200 МБ</string>
+    <string name="pref_title_auto_accept_all_upto">автоматически принимать все файлы</string>
 </resources>

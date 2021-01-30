@@ -26,7 +26,7 @@
     <string name="settings_toolbar_title">الإعدادات</string>
     <string name="pref_header_general">جنرال لواء</string>
     <string name="pref_title_auto_accept_image">قبول تلقائي للصورة</string>
-    <string name="pref_description_auto_accept_image">قبول تلقائي للصور والصور بحجم يصل إلى 3 ميجا بايت</string>
+    <string name="pref_description_auto_accept_image">قبول تلقائي للصور والصور التي يصل حجمها إلى 6 ميغابايت</string>
     <string name="pref_title_video_uv_reversed">عكس الأشعة فوق البنفسجية في الفيديو</string>
     <string name="pref_description_video_uv_reversed">اعكس ترتيب الطائرات فوق البنفسجية في فيديو الكاميرا</string>
     <string name="pref_title_software_echo_cancel">إلغاء الصدى</string>
@@ -285,7 +285,7 @@
     <string name="pref_title_global_font_size">حجم الخط</string>
     <string name="pref_description_video_cam_resolution">أبعاد الفيديو المستعملة في المكالمات</string>
     <string name="pref_title_video_cam_resolution">أبعاد الكاميرا</string>
-    <string name="pref_description_auto_accept_video">إقبل تلقائيا الفيديوهات التي لا يزيد حجمها عن 10 ميغا</string>
+    <string name="pref_description_auto_accept_video">قبول تلقائي لمقاطع فيديو يصل حجمها إلى 20 ميغابايت</string>
     <string name="pref_title_auto_accept_video">إقبل الفيديوهات تلقائيا</string>
     <string name="pref_title_use_incognito_keyboard">وضع التخفّي للوحة المفاتيح</string>
     <string name="conference_audio_activity_player_name">مشغل المؤتمر الصوتي</string>
@@ -305,4 +305,13 @@
     <string name="pref_title_force_udp_only">فرض وضع UDP</string>
     <string name="pref_description_mic_gain_factor">قم بتعيين ربح أعلى إذا كان الميكروفون الخاص بك يسجل بصوت منخفض</string>
     <string name="pref_title_mic_gain_factor">كسب الميكروفون</string>
+    <string name="wrong_credentials_error">أوراق اعتماد خاطئة</string>
+    <string name="title_activity_wrong_credentials">أوراق اعتماد خاطئة</string>
+    <string name="layout___iobrowser_start">استعراض التخزين المشفر</string>
+    <string name="messages_search_default_text">بحث...</string>
+    <string name="MainActivity_new_noti_token_dialog_text">تم استلام رمز إعلام جديد. استخدم هذا الرمز؟</string>
+    <string name="MainActivity_new_noti_token_dialog_title">رمز</string>
+    <string name="MainActivity_yes_button">نعم</string>
+    <string name="pref_description_auto_accept_all_upto">قبول تلقائي لجميع الملفات التي يصل حجمها إلى 200 ميغا بايت</string>
+    <string name="pref_title_auto_accept_all_upto">قبول تلقائي لجميع الملفات</string>
 </resources>
