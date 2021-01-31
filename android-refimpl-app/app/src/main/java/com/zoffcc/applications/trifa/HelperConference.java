@@ -283,7 +283,7 @@ public class HelperConference
         }
     }
 
-    static ConferenceMessage get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(String conference_identifier, String sender_pubkey, int n)
+    static ConferenceMessage get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(String conference_identifier, String sender_pubkey, int n, boolean direct)
     {
         try
         {
@@ -292,7 +292,7 @@ public class HelperConference
                     and().
                     tox_peerpubkeyEq(sender_pubkey.toUpperCase()).
                     and().
-                    was_syncedEq(false).
+                    was_syncedEq(direct).
                     and().
                     rcvd_timestampGt(System.currentTimeMillis() - (n * 1000)).
                     orderByRcvd_timestampDesc().
