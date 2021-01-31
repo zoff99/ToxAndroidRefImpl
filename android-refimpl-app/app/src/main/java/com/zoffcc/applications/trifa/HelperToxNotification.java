@@ -35,6 +35,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.nmn3;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_SERVICE_NOTIFICATION_TEXT_COLOR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 
 public class HelperToxNotification
@@ -58,6 +59,14 @@ public class HelperToxNotification
         notification_view = new RemoteViews(c.getPackageName(), R.layout.custom_notification);
         Log.i(TAG, "contentView=" + notification_view);
         notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+        try
+        {
+            notification_view.setTextColor(R.id.title, Color.parseColor(TOX_SERVICE_NOTIFICATION_TEXT_COLOR));
+        }
+        catch (Exception e_text_color)
+        {
+            Log.i(TAG, "e_text_color:EE01:" + e_text_color.getMessage());
+        }
         notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
         notification_view.setTextViewText(R.id.text, "");
 
