@@ -4258,6 +4258,8 @@ public class MainActivity extends AppCompatActivity
                         String real_sender_text = wrapped_msg_text_as_string.substring(64);
                         long real_text_length = (text_length - 64);
 
+                        long sync_msg_received_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
+
                         // add text as conference message
                         long sender_peer_num = HelperConference.get_peernum_from_peer_pubkey(real_conference_id,
                                                                                              real_sender_peer_pubkey);
@@ -4266,7 +4268,8 @@ public class MainActivity extends AppCompatActivity
                         // now check if this is "potentially" a double message, we can not be sure a 100%
                         // since there is no uniqe key for each message
                         ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
-                                real_conference_id, real_sender_peer_pubkey, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false);
+                                real_conference_id, real_sender_peer_pubkey, sync_msg_received_timestamp,
+                                MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false);
 
                         if (cm != null)
                         {
@@ -4283,7 +4286,7 @@ public class MainActivity extends AppCompatActivity
                         HelperGeneric.conference_message_add_from_sync(
                                 HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
                                 real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
-                                (msg_wrapped_sec * 1000) + msg_wrapped_ms);
+                                sync_msg_received_timestamp);
                         //TODO: bestätigung senden, dass wir die nachricht bekommen haben.
                         // TOX_FILE_KIND_MESSAGEV2_ANSWER
                         // send_friend_msg_receipt_v2_wrapper
@@ -5358,7 +5361,7 @@ public class MainActivity extends AppCompatActivity
 
         // now check if this is "potentially" a double message, we can not be sure a 100% since there is no uniqe key for each message
         ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
-                conf_id, m.tox_peerpubkey, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, true);
+                conf_id, m.tox_peerpubkey, m.sent_timestamp, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, true);
         if (cm != null)
         {
             if (cm.text.equals(message))

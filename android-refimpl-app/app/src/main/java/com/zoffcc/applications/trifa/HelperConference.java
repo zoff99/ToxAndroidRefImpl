@@ -283,7 +283,11 @@ public class HelperConference
         }
     }
 
-    static ConferenceMessage get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(String conference_identifier, String sender_pubkey, int n, boolean was_synced)
+    static ConferenceMessage get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
+            String conference_identifier,
+            String sender_pubkey,
+            long sent_timestamp,
+            int n, boolean was_synced)
     {
         try
         {
@@ -294,8 +298,8 @@ public class HelperConference
                     and().
                     was_syncedEq(was_synced).
                     and().
-                    rcvd_timestampGt(System.currentTimeMillis() - (n * 1000)).
-                    orderByRcvd_timestampDesc().
+                    sent_timestampGt(sent_timestamp - (n * 1000)).
+                    orderBySent_timestampDesc().
                     limit(1).
                     toList().
                     get(0);
