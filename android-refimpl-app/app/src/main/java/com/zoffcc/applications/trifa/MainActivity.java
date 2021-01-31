@@ -161,6 +161,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
@@ -4265,14 +4266,13 @@ public class MainActivity extends AppCompatActivity
                         // now check if this is "potentially" a double message, we can not be sure a 100%
                         // since there is no uniqe key for each message
                         ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
-                                real_conference_id, real_sender_peer_pubkey, 80, false);
+                                real_conference_id, real_sender_peer_pubkey, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false);
 
                         if (cm != null)
                         {
                             if (cm.text.equals(real_sender_text))
                             {
-                                Log.i(TAG,
-                                      "tox_callback_friend_sync_message_v2_cb_method:potentially double message");
+                                Log.i(TAG, "friend_sync_message_v2_cb:potentially double message");
                                 // ok it's a "potentially" double message
                                 // just ignore it, but still send "receipt" to proxy so it won't send this message again
                                 send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer);
@@ -5357,15 +5357,14 @@ public class MainActivity extends AppCompatActivity
         m.was_synced = false;
 
         // now check if this is "potentially" a double message, we can not be sure a 100% since there is no uniqe key for each message
-        ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(conf_id, m.tox_peerpubkey, 80, false);
+        ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
+                conf_id, m.tox_peerpubkey, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, true);
         if (cm != null)
         {
             if (cm.text.equals(message))
             {
-                Log.i(TAG,
-                    "tox_callback_friend_sync_message_v2_cb_method:potentially double message");
+                Log.i(TAG, "conference_message_cb:potentially double message");
                 // ok it's a "potentially" double message
-                // just ignore it, but still send "receipt" to proxy so it won't send this message again
                 return;
             }
         }
