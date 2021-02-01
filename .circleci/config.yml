@@ -18,7 +18,7 @@ jobs:
     steps:
       - run: pwd; ls -al; id -a
       - run: apt update &&
-          apt install -y zip grep sudo rubygems git ssh
+          apt install -y zip grep sudo rubygems git ssh ruby-dev
       - checkout
       # - run: sudo $(which gem) install github_changelog_generator
       - run: sudo $(which gem) install specific_install && sudo $(which gem) https://github.com/github-changelog-generator/github-changelog-generator
