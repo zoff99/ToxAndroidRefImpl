@@ -6,8 +6,26 @@ workflows:
   build_linux:
     jobs:
       - build
+      - b2
 
 jobs:
+  b2:
+    docker:
+      - image: ubuntu:bionic
+
+    steps:
+      - run: pwd; ls -al; id -a
+      - run: apt update &&
+          apt install -y zip grep sudo rubygems git ssh ruby-dev gcc make wget
+      - checkout
+      - run: wget https://github.com/git-chglog/git-chglog/releases/download/v0.10.0/git-chglog_0.10.0_linux_amd64.tar.gz ;
+          git clone https://github.com/zoff99/ToxAndroidRefImpl ;
+          cd ToxAndroidRefImpl ;
+          tar -xvf ../git-chglog_0.10.0_linux_amd64.tar.gz ;
+          ./git-chglog --version ;
+          mkdir .chglog/
+
+
   build:
     #working_directory: ~/work
     #machine:
