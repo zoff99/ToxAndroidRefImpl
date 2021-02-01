@@ -21,7 +21,8 @@ jobs:
           apt install -y zip grep sudo rubygems git ssh ruby-dev gcc make
       - checkout
       # - run: sudo $(which gem) install github_changelog_generator
-      - run: sudo $(which gem) install specific_install && sudo $(which gem) https://github.com/github-changelog-generator/github-changelog-generator
+      - run: sudo $(which gem) install specific_install
+      - run: sudo $(which gem) specific_install https://github.com/github-changelog-generator/github-changelog-generator
 
       - run: sudo $(which ruby) $(which github_changelog_generator) --help ; exit 0
       - run: sudo $(which ruby) $(which github_changelog_generator)
