@@ -342,4 +342,7 @@
     <string name="pref_description_auto_accept_all_upto">自动接受所有最大 200 MByte 的文件</string>
     <string name="pref_title_auto_accept_all_upto">自动接受所有文件</string>
     <string name="layout___iobrowser_start">浏览加密的存储</string>
+    <string name="pref_description_start_on_boot">开机后启动本应用。
+\n从安卓 10 起，谷歌不再允许这一特性</string>
+    <string name="pref_title_start_on_boot">开机时启动</string>
 </resources>
