@@ -40,7 +40,11 @@ jobs:
       - checkout
       # - run: sudo $(which gem) install github_changelog_generator
       - run: sudo $(which gem) install specific_install
-      - run: sudo $(which gem) specific_install https://github.com/github-changelog-generator/github-changelog-generator
+      # - run: sudo $(which gem) specific_install https://github.com/github-changelog-generator/github-changelog-generator
+      - run: git clone https://github.com/ameir/github-changelog-generator.git -b v1.15.2-fixes;
+         cd github-changelog-generator/ ;
+         sudo $(which gem) build github_changelog_generator.gemspec ;
+         sudo $(which gem) install -N github_changelog_generator-1.15.2.gem
 
       - run: sudo $(which ruby) $(which github_changelog_generator) --help ; exit 0
       - run: sudo $(which ruby) $(which github_changelog_generator)
