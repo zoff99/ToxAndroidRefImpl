@@ -49,6 +49,7 @@ added master:71BC3623887FEFC1F76811F8C3291806873E1B66159D955DB129BAACFE33BE2D
 * now install the Tox Notify Companion App: [apk_file](https://github.com/zoff99/tox_push_msg_app/releases/download/1.0.0/play.pushmsg_10000.apk)
 
 * sync FCM Token to TRIfA:
+
 <img height="300" src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/add_fcm.gif"></img><br>
 
 * ToxProxy for Linux will show it has received the Token:
