@@ -345,11 +345,10 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
         echo "not uploading artefact to bintray!! -> not maven branch"
     fi
 
-    cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; mv build.gradle build.gradle2 ; mv gpr.gradle build.gradle
-    cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:tasks
-    cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:publishToMavenLocal
-    cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:publishGprPublicationToMavenLocal
-
+    # cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; mv build.gradle build.gradle2 ; mv gpr.gradle build.gradle
+    # cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:tasks
+    # cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:publishToMavenLocal
+    # cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:publishGprPublicationToMavenLocal
 
     find ~/.m2/repository -type f -exec ls -al {} \;
 # --------- bintray artefact -------------
