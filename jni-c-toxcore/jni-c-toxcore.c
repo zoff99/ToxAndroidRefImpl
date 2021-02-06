@@ -3471,6 +3471,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1lossless_1packet(JNIEnv *env, jobject thiz,
         jlong friend_number, jbyteArray data, jint data_length)
 {
+    if(tox_global == NULL)
+    {
+        return (jlong)-9991;
+    }
+
     jbyte *data2 = (*env)->GetByteArrayElements(env, data, 0);
     TOX_ERR_FRIEND_CUSTOM_PACKET error;
     uint32_t res = tox_friend_send_lossless_packet(tox_global, (uint32_t)friend_number, (const uint8_t *)data2,
