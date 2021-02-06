@@ -37,7 +37,7 @@ ToxID:827707DBFF41BEA803C9CF7D81C1CFC2007FA774E6DE24FF1B661259CB8891668EF63E91C0
 #############################################################
 #############################################################
 ```
-* open TRIfA on your phone and add this ToxID as Friend:
+* open TRIfA on your phone and add this ToxID as Friend and set it as Relay:
 
 <img height="300" src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/add_toxproxy.gif"></img><br>
 
