@@ -20,10 +20,48 @@ https://hosted.weblate.org/engage/trifa-a-tox-client-for-android/
 
 Offline Messages \*NEW\* \*NEW\*
 =
-To get offline messages for your TRIfA App, install ToxProxy on your raspberryPi and leave it running at home.<br>
-See the installation instructions [here](https://github.com/zoff99/ToxBlinkenwall_raspi_lite_image/blob/toxproxy_01/README.md)
+To get offline messages for your TRIfA App, install ToxProxy on a Linux Box at home and leave it running 0:00-24:00.<br>
+### Installation instructions:
 
-<img height="300" src="https://raw.githubusercontent.com/zoff99/ToxProxy/zoff99/tweaks_001/pix/toxproxy_001_medium.jpg"></img><br>
+* install ToxProxy for Linux: [appimage_binary](https://github.com/zoff99/ToxProxy/releases/download/0.99.3/ToxProxy_x86_64_0.99.3.AppImage)
+* run ToxProxy for Linux:
+```
+dummy@dummy:/home/dummy$ ./ToxProxy_x86_64_0.99.3.AppImage 
+ToxProxy version: 0.99.3
+Connection Status changed to:Online via UDP
+#############################################################
+#############################################################
+
+ToxID:827707DBFF41BEA803C9CF7D81C1CFC2007FA774E6DE24FF1B661259CB8891668EF63E91C06E
+
+#############################################################
+#############################################################
+```
+* open TRIfA on your phone and add this ToxID as Friend:
+
+<img height="300" src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/add_toxproxy.gif"></img><br>
+
+* ToxProxy for Linux will show that your phone is set as master:
+```
+added master:71BC3623887FEFC1F76811F8C3291806873E1B66159D955DB129BAACFE33BE2D
+```
+
+* now install the Tox Notify Companion App: [apk_file](https://github.com/zoff99/tox_push_msg_app/releases/download/1.0.0/play.pushmsg_10000.apk)
+
+* sync FCM Token to TRIfA:
+<img height="300" src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/add_fcm.gif"></img><br>
+
+* ToxProxy for Linux will show it has received the Token:
+```
+received token:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+saved token:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+```
+
+* now in TRIfA goto ```settings``` and activate ```Battery Savings Mode```
+* and set ```Offline Time in Batterysavings mode``` ```to 120 minutes```
+
+<br><br>
+<br><br>
 
 Get in touch
 =
