@@ -1,0 +1,22 @@
+plugins {
+    id("maven-publish")
+    id("java")
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/zoff99/pkgs_ToxAndroidRefImpl")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("zoff99")
+                password = project.findProperty("gpr.key") ?: System.getenv("xxxxxxxxxxxxxxxx")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
