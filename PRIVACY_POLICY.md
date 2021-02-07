@@ -16,9 +16,9 @@
 
 * All data sent over the network is encrypted, only the intended recipient can read it.
 
-* If you lose you device or your stored data there is no way to restore it.
+* If you lose your device or your stored data there is no way to restore it.
 
-* If a direct connection can not be established, then TCP relays are used to send data
+* If a direct connection can not be established, then TCP relays are used to send data.
 
 * TCP relays can not read or decrypt any data.
 
