@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/android-refimpl-app/app/src/main/res/drawable/web_hi_res_512.png" width="400">
+
 # Tox Reference Implementation for Android [TRIfA]
 
 ~~This is not a Reference Client, it's c-toxcore for Android.~~<br>
