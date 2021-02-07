@@ -26,8 +26,8 @@ To get offline messages for your TRIfA App, install ToxProxy on a Linux Box at h
 * install ToxProxy for Linux: [appimage_binary](https://github.com/zoff99/ToxProxy/releases/latest/download/ToxProxy_x86_64.AppImage)
 * run ToxProxy for Linux (**it will only write data to the current directory and below**):
 ```
-dummy@dummy:/home/dummy$ ./ToxProxy_x86_64_0.99.4.AppImage 
-ToxProxy version: 0.99.4
+dummy@dummy:/home/dummy$ ./ToxProxy_x86_64.AppImage
+ToxProxy version: 0.99.xx
 Connection Status changed to:Online via UDP
 #############################################################
 #############################################################
