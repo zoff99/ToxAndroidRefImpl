@@ -294,7 +294,8 @@ dependencies {
     //
     //
     //
-    implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.61@aar'
+    // implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.61@aar'
+    implementation 'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.61'
     //
     //
     //
