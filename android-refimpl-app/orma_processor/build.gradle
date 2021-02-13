@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-annotations:6.0.2')
+    compileOnly "androidx.annotation:annotation:1.1.0"
+    implementation 'com.squareup:javapoet:1.11.1'
+}
