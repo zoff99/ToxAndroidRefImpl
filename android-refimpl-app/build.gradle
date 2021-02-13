@@ -4,7 +4,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        // jcenter()
+        jcenter()
     }
     dependencies {
         classpath "com.gradle:build-scan-plugin:1.13.4"
@@ -28,7 +28,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        // jcenter()
+        jcenter()
         maven {
             url "https://jitpack.io"
         }

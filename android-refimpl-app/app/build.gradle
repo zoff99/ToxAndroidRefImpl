@@ -227,9 +227,11 @@ android {
 
 
 dependencies {
+    // implementation project(':orma_processor')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':native-audio-jni', configuration: 'default')
     // implementation project(path: ':loggingstdout', configuration: 'default')
+    annotationProcessor project(':orma_processor')
     //
     //
     implementation('com.mikepenz:materialdrawer:6.0.9@aar') {
@@ -340,7 +342,9 @@ dependencies {
     implementation 'com.daimajia.numberprogressbar:library:1.4@aar'
     implementation 'com.github.lawloretienne:discreteslider:0.0.9'
     implementation "com.github.YarikSOffice:lingver:1.3.0"
-    annotationProcessor 'com.github.zoff99:pkgs_maskaradeOrma-processor:6.0.2'
+    // annotationProcessor 'com.github.maskarade.android.orma:orma-processor:6.0.2'
+    // annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
+    // annotationProcessor 'com.github.zoff99:pkgs_maskaradeOrma-processor:6.0.2'
     annotationProcessor 'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0'
     // ---------------------
     // ---------------------
