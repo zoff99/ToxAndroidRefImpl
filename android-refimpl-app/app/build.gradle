@@ -20,6 +20,7 @@
 buildscript {
     repositories {
         google()
+        mavenCentral()
         maven {
             url "https://jitpack.io"
         }
@@ -255,23 +256,36 @@ dependencies {
     implementation ('net.zetetic:android-database-sqlcipher:4.4.2@aar') {
         transitive = true
     }
-    implementation ('info.guardianproject.iocipher:IOCipher:0.4.2.1') {
+    implementation ('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
         transitive = true
     }
     //
     implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
-    implementation('com.github.maskarade.android.orma:orma:6.0.2') {
+
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-annotations:6.0.2') {
+    }
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-core:6.0.2') {
         transitive = true
         exclude group: 'io.reactivex'
         exclude group: 'com.android.support'
     }
-    implementation('com.github.maskarade.android.orma:orma-encryption:6.0.2') {
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-migration:6.0.2') {
+        transitive = true
+        exclude group: 'io.reactivex'
+        exclude group: 'com.android.support'
+    }
+    implementation('com.github.zoff99:pkgs_maskaradeOrma:6.0.2') {
+        transitive = true
+        exclude group: 'io.reactivex'
+        exclude group: 'com.android.support'
+    }
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-encryption:6.0.2') {
         transitive = true
         exclude group: 'io.reactivex'
         exclude group: 'com.android.support'
     }
     //
-    implementation('com.github.hotchemi:permissionsdispatcher:3.2.0') {
+    implementation('com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0') {
         exclude group: 'com.android.support'
     }
     //
@@ -279,7 +293,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    implementation('com.l4digital.fastscroll:fastscroll:1.1.2') {
+    implementation('com.github.zoff99:pkgs_l4digitalFastscroll:1.1.2') {
         exclude group: 'com.android.support'
     }
     //
@@ -314,20 +328,20 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     androidTestImplementation 'androidx.multidex:multidex:2.0.1'
     androidTestImplementation 'androidx.multidex:multidex-instrumentation:2.0.0'
-    implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
-    implementation 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
+    implementation 'com.github.zoff99:pkgs_guardianprojectNetcipher:2.0.0-beta1'
+    implementation 'com.github.zoff99:pkgs_guardianprojectNetcipher-okhttp:2.0.0-alpha1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.github.medyo:android-about-page:1.2.4'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'me.zhanghai.android.patternlock:library:2.1.2'
-    implementation 'com.github.armcha:AutoLinkTextView:0.3.0'
+    implementation 'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0'
     implementation 'com.github.chrisbanes:PhotoView:2.1.3'
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.daimajia.numberprogressbar:library:1.4@aar'
     implementation 'com.github.lawloretienne:discreteslider:0.0.9'
     implementation "com.github.YarikSOffice:lingver:1.3.0"
-    annotationProcessor 'com.github.maskarade.android.orma:orma-processor:6.0.2'
-    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
+    annotationProcessor 'com.github.zoff99:pkgs_maskaradeOrma-processor:6.0.2'
+    annotationProcessor 'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0'
     // ---------------------
     // ---------------------
     // Testing-only dependencies
