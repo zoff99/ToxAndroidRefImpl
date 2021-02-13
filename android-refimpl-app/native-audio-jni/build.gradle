@@ -1,3 +1,23 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://jitpack.io"
+        }
+        jcenter()
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+    maven {
+        url "https://jitpack.io"
+    }
+    jcenter()
+}
+
 apply plugin: 'com.android.library'
 
 android {
@@ -60,3 +80,6 @@ android {
     }
 }
 
+//dependencies {
+//    implementation 'com.android.tools.lint:lint-gradle:30.0.0-alpha06'
+//}
