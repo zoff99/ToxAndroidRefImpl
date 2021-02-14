@@ -1789,10 +1789,6 @@ void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, 
 
 void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message)
 {
-#ifdef JAVA_LINUX
-    return;
-#endif
-
     if(message == NULL)
     {
         return;
@@ -2516,7 +2512,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "cls_local=%p", cls_local);
     dbg(9, "MainActivity=%p", MainActivity);
     dbg(9, "Logging test ---***---");
-    android_tox_log_cb(TOX_LOG_LEVEL_ERROR, "xxx.c", 1234, "function_name", "logging test");
 
 #ifndef SYS_gettid
     // no gettid() available
@@ -2596,6 +2591,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
                                 "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
+
+    android_tox_log_cb(1, "xxx.c", 1234, "function_name", "logging test");
+
     start_filter_audio(recording_samling_rate);
     set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
     // -------- resumable FTs: not working fully yet, so turn it off --------
