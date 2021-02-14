@@ -22,8 +22,8 @@ _LIBSODIUM_VERSION_="1.0.18"
 _X264_VERSION_="1771b556ee45207f8711744ccbd5d42a3949b14c"
 ## ----------------------
 
-export ASAN_CLANG_FLAGS=" -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls "
-
+# export ASAN_CLANG_FLAGS=" -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls "
+export ASAN_CLANG_FLAGS=" "
 
 ## set this to make c-toxcore log more verbose -------------
 export DEBUG_TOXCORE_LOGGING=" -DMIN_LOGGER_LEVEL=1 "
