@@ -1804,6 +1804,8 @@ void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, co
         return;
     }
 
+    dbg(9, "MainActivity=%p", MainActivity);
+
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
@@ -2505,6 +2507,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "cls_local=%p", cls_local);
     dbg(9, "MainActivity=%p", MainActivity);
     dbg(9, "Logging test ---***---");
+    android_tox_log_cb(TOX_LOG_LEVEL_ERROR, "xxx.c", 1234, "function_name", "logging test");
 
 #ifndef SYS_gettid
     // no gettid() available
