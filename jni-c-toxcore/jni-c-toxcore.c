@@ -2676,6 +2676,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 #ifdef TOX_HAVE_TOXAV_CALLBACKS_002
     android_toxav_callback_call_comm_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_call_comm_cb_method", "(JJJ)V");
+    dbg(9, "android_toxav_callback_call_comm_cb_method:%p", (void *)android_toxav_callback_call_comm_cb_method);
     toxav_callback_call_comm(tox_av_global, toxav_call_comm_cb_, &mytox_CC);
 #endif
     dbg(9, "linking AV callbacks ... READY");
