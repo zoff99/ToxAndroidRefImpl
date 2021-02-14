@@ -149,7 +149,6 @@ typedef struct
 
 static const char *savedata_filename = "savedata.tox";
 static const char *savedata_tmp_filename = "savedata.tox.tmp";
-static int tox_loop_running = 1;
 static int toxav_video_thread_stop = 0;
 static int toxav_audio_thread_stop = 0;
 static int toxav_iterate_thread_stop = 0;
