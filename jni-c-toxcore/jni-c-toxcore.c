@@ -2613,6 +2613,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     // dbg(9, "1004");
     // tox_self_set_status_message(tox_global, (uint8_t *)status_message, strlen(status_message), NULL);
     // dbg(9, "1005");
+    dbg(9, "MainActivity=%p", MainActivity);
     // ----------- create Tox AV instance --------
     TOXAV_ERR_NEW rc;
     dbg(2, "new Tox AV");
