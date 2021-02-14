@@ -65,8 +65,6 @@
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
 #include <jni.h>
-#include "coffeecatch.h"
-#include "coffeejni.h"
 #ifdef USE_ECHO_CANCELLATION
 #include "filter_audio/filter_audio.h"
 #endif
