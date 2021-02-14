@@ -1789,6 +1789,10 @@ void file_recv_chunk_cb(Tox *tox, uint32_t friend_number, uint32_t file_number, 
 
 void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, const char *func, const char *message)
 {
+#ifdef JAVA_LINUX
+    return;
+#endif
+
     if(message == NULL)
     {
         return;
