@@ -147,12 +147,12 @@ typedef struct
 } CallControl;
 
 
-const char *savedata_filename = "savedata.tox";
-const char *savedata_tmp_filename = "savedata.tox.tmp";
-int tox_loop_running = 1;
-int toxav_video_thread_stop = 0;
-int toxav_audio_thread_stop = 0;
-int toxav_iterate_thread_stop = 0;
+static const char *savedata_filename = "savedata.tox";
+static const char *savedata_tmp_filename = "savedata.tox.tmp";
+static int tox_loop_running = 1;
+static int toxav_video_thread_stop = 0;
+static int toxav_audio_thread_stop = 0;
+static int toxav_iterate_thread_stop = 0;
 
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
@@ -726,10 +726,10 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
     size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
     // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
-    char *savedata_enc = malloc(size_enc);
+    uint8_t *savedata_enc = malloc(size_enc);
     // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
     TOX_ERR_ENCRYPTION error;
-    tox_pass_encrypt(savedata, size, passphrase, passphrase_len, savedata_enc, &error);
+    tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
     // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
     bool res = false;
 
@@ -738,12 +738,12 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     }
     else
     {
-        res = tox_is_data_encrypted(savedata_enc);
+        res = tox_is_data_encrypted((const uint8_t *)savedata_enc);
     }
 
     // dbg(9, "update_savedata_file:tox_is_data_encrypted=%d", (int)res);
     FILE *f = fopen(full_path_filename_tmp, "wb");
-    fwrite(savedata_enc, size_enc, 1, f);
+    fwrite((const void *)savedata_enc, size_enc, 1, f);
     fclose(f);
     rename(full_path_filename_tmp, full_path_filename);
     free(full_path_filename);
@@ -3681,7 +3681,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv *env
     char name[length + 1];
     CLEAR(name);
     // dbg(9, "name len=%d", (int)length);
-    tox_self_get_name(tox_global, name);
+    tox_self_get_name(tox_global, (uint8_t *)name);
     // dbg(9, "name=%s", (char *)name);
     // return (*env)->NewStringUTF(env, (uint8_t *)name);
     jstring js1 = c_safe_string_from_java((char *)name, length);
@@ -3708,7 +3708,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(
     size_t length = tox_self_get_status_message_size(tox_global);
     char message[length + 1];
     CLEAR(message);
-    tox_self_get_status_message(tox_global, message);
+    tox_self_get_status_message(tox_global, (uint8_t *)message);
     jstring js1 = c_safe_string_from_java((char *)message, length);
     return js1;
 }
@@ -5134,7 +5134,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name
     {
         char name[length + 1];
         CLEAR(name);
-        bool res = tox_conference_peer_get_name(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, name, &error);
+        bool res = tox_conference_peer_get_name(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, (uint8_t *)name, &error);
 
         if(res == false)
         {
@@ -5246,7 +5246,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIE
     {
         char title[length + 1];
         CLEAR(title);
-        bool res = tox_conference_get_title(tox_global, (uint32_t)conference_number, title, &error);
+        bool res = tox_conference_get_title(tox_global, (uint32_t)conference_number, (uint8_t *)title, &error);
 
         if(res == false)
         {
@@ -6237,7 +6237,13 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
 
         for (j = 0; j < upsample_factor; j++)
         {
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbad-function-cast"
+            // we are converting the returned "float" to "int16_t"
             *new_pcm_buffer_pos = (int16_t)interpolate_linear(*pcm, *pcm_next, j/upsample_factor);
+#pragma GCC diagnostic pop
+
             new_pcm_buffer_pos++;
         }
 
