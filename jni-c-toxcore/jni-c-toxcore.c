@@ -1806,12 +1806,8 @@ void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, co
         return;
     }
 
-    dbg(9, "MainActivity:1=%p", MainActivity);
-
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
-
-    dbg(9, "jnienv2:1=%p", jnienv2);
 
     // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
     jstring js1 = c_safe_string_from_java((const char *)file, strlen(file));
@@ -1819,8 +1815,6 @@ void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, co
     jstring js2 = c_safe_string_from_java((const char *)func, strlen(func));
     // jstring js3 = (*jnienv2)->NewStringUTF(jnienv2, message);
     jstring js3 = c_safe_string_from_java((const char *)message, strlen(message));
-
-    dbg(9, "MainActivity:2=%p", MainActivity);
 
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, android_tox_log_cb_method, (int)level, js1,
                                      (jlong)(unsigned long long)line, js2, js3);
@@ -2509,9 +2503,14 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     // ------------------- *********** -------------------
     // ------------------- *********** -------------------
     // ------------------- *********** -------------------
+
     jclass cls_local = (*env)->GetObjectClass(env, thiz);
+#ifndef JAVA_LINUX
     MainActivity = (*env)->NewGlobalRef(env, cls_local);
-    // logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
+#else
+    android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &MainActivity);
+#endif
+
     dbg(9, "cls_local=%p", cls_local);
     dbg(9, "MainActivity=%p", MainActivity);
     dbg(9, "Logging test ---***---");
