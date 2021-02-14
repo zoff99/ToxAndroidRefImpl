@@ -22,6 +22,7 @@ _LIBSODIUM_VERSION_="1.0.18"
 _X264_VERSION_="1771b556ee45207f8711744ccbd5d42a3949b14c"
 ## ----------------------
 
+export ASAN_CLANG_FLAGS=" -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls "
 
 
 ## set this to make c-toxcore log more verbose -------------
@@ -1164,6 +1165,7 @@ set -x
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
+    $ASAN_CLANG_FLAGS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
