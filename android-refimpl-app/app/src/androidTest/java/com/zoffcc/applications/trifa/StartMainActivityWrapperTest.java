@@ -131,9 +131,10 @@ public class StartMainActivityWrapperTest
             Log.i(TAG, "checking for AlertDialog:View does not show, that is ok");
         }
 
-        Log.i(TAG, "sleeping for 40 seconds");
-        // sleep 10 seconds
-        SystemClock.sleep(40000);
+        final int seconds_sleep = 240;
+        Log.i(TAG, "sleeping for " + seconds_sleep + " seconds");
+        // sleep x seconds
+        SystemClock.sleep(seconds_sleep * 1000);
         Log.i(TAG, "sleeping ended");
     }
 
