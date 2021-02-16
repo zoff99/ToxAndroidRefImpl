@@ -26,6 +26,12 @@ jobs:
         name: trifa
         path: /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk
 
+  gradle-wrapper-validation:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: gradle/wrapper-validation-action@v1
+ 
   android-test:
     runs-on: macos-latest
     steps:
