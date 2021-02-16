@@ -17,6 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
+#define _GNU_SOURCE
 
 #include <ctype.h>
 #include <stdio.h>
@@ -65,8 +66,6 @@
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
 #include <jni.h>
-#include "coffeecatch.h"
-#include "coffeejni.h"
 #ifdef USE_ECHO_CANCELLATION
 #include "filter_audio/filter_audio.h"
 #endif
@@ -77,8 +76,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 60
-static const char global_version_string[] = "0.99.60";
+#define VERSION_PATCH 61
+static const char global_version_string[] = "0.99.61";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -148,12 +147,11 @@ typedef struct
 } CallControl;
 
 
-const char *savedata_filename = "savedata.tox";
-const char *savedata_tmp_filename = "savedata.tox.tmp";
-int tox_loop_running = 1;
-int toxav_video_thread_stop = 0;
-int toxav_audio_thread_stop = 0;
-int toxav_iterate_thread_stop = 0;
+static const char *savedata_filename = "savedata.tox";
+static const char *savedata_tmp_filename = "savedata.tox.tmp";
+static int toxav_video_thread_stop = 0;
+static int toxav_audio_thread_stop = 0;
+static int toxav_iterate_thread_stop = 0;
 
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
@@ -727,10 +725,10 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
     size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
     // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
-    char *savedata_enc = malloc(size_enc);
+    uint8_t *savedata_enc = malloc(size_enc);
     // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
     TOX_ERR_ENCRYPTION error;
-    tox_pass_encrypt(savedata, size, passphrase, passphrase_len, savedata_enc, &error);
+    tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
     // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
     bool res = false;
 
@@ -739,12 +737,12 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     }
     else
     {
-        res = tox_is_data_encrypted(savedata_enc);
+        res = tox_is_data_encrypted((const uint8_t *)savedata_enc);
     }
 
     // dbg(9, "update_savedata_file:tox_is_data_encrypted=%d", (int)res);
     FILE *f = fopen(full_path_filename_tmp, "wb");
-    fwrite(savedata_enc, size_enc, 1, f);
+    fwrite((const void *)savedata_enc, size_enc, 1, f);
     fclose(f);
     rename(full_path_filename_tmp, full_path_filename);
     free(full_path_filename);
@@ -1806,12 +1804,14 @@ void android_tox_log_cb(TOX_LOG_LEVEL level, const char *file, uint32_t line, co
 
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
+
     // jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, file);
     jstring js1 = c_safe_string_from_java((const char *)file, strlen(file));
     // jstring js2 = (*jnienv2)->NewStringUTF(jnienv2, func);
     jstring js2 = c_safe_string_from_java((const char *)func, strlen(func));
     // jstring js3 = (*jnienv2)->NewStringUTF(jnienv2, message);
     jstring js3 = c_safe_string_from_java((const char *)message, strlen(message));
+
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity, android_tox_log_cb_method, (int)level, js1,
                                      (jlong)(unsigned long long)line, js2, js3);
     (*jnienv2)->DeleteLocalRef(jnienv2, js1);
@@ -2499,13 +2499,24 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     // ------------------- *********** -------------------
     // ------------------- *********** -------------------
     // ------------------- *********** -------------------
+
     jclass cls_local = (*env)->GetObjectClass(env, thiz);
+#ifndef JAVA_LINUX
     MainActivity = (*env)->NewGlobalRef(env, cls_local);
-    // logger_method = (*env)->GetStaticMethodID(env, MainActivity, "logger", "(ILjava/lang/String;)V");
+#else
+    android_find_class_global("com/zoffcc/applications/trifa/MainActivity", &MainActivity);
+#endif
+
     dbg(9, "cls_local=%p", cls_local);
     dbg(9, "MainActivity=%p", MainActivity);
     dbg(9, "Logging test ---***---");
+
+#ifndef SYS_gettid
+    // no gettid() available
+    int thread_id = 0;
+#else
     int thread_id = gettid();
+#endif
     dbg(9, "THREAD ID=%d", thread_id);
     s = (*env)->GetStringUTFChars(env, datadir, NULL);
     app_data_dir = strdup(s);
@@ -2578,6 +2589,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
                                 "(ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)V");
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
+
+    android_tox_log_cb(1, "xxx.c", 1234, "function_name", "logging test");
+
     start_filter_audio(recording_samling_rate);
     set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
     // -------- resumable FTs: not working fully yet, so turn it off --------
@@ -2607,6 +2621,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     // dbg(9, "1004");
     // tox_self_set_status_message(tox_global, (uint8_t *)status_message, strlen(status_message), NULL);
     // dbg(9, "1005");
+    dbg(9, "MainActivity=%p", MainActivity);
     // ----------- create Tox AV instance --------
     TOXAV_ERR_NEW rc;
     dbg(2, "new Tox AV");
@@ -2658,6 +2673,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 #ifdef TOX_HAVE_TOXAV_CALLBACKS_002
     android_toxav_callback_call_comm_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_toxav_callback_call_comm_cb_method", "(JJJ)V");
+    dbg(9, "android_toxav_callback_call_comm_cb_method:%p", (void *)android_toxav_callback_call_comm_cb_method);
     toxav_callback_call_comm(tox_av_global, toxav_call_comm_cb_, &mytox_CC);
 #endif
     dbg(9, "linking AV callbacks ... READY");
@@ -2709,8 +2725,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, 
         jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j,
         jint enable_ipv6, jint force_udp_mode)
 {
-    COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled,
-                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j, enable_ipv6, force_udp_mode));
+    Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled,
+                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j, enable_ipv6, force_udp_mode);
 }
 
 
@@ -2741,8 +2757,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__rea
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv *env, jobject thiz, jstring passphrase_j)
 {
-    COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz,
-                   passphrase_j));
+    Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz,
+                   passphrase_j);
 }
 
 void Java_com_zoffcc_applications_trifa_MainActivity_export_1savedata_1file_1unsecure(JNIEnv *env, jobject thiz,
@@ -2845,8 +2861,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single(JNIEnv *
         jstring key_hex, long port)
 {
     jint retcode = 0;
-    COFFEE_TRY_JNI(env, retcode = Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single__real(env, thiz,
-                                  ip, key_hex, port));
+    retcode = Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single__real(env, thiz,
+                                  ip, key_hex, port);
     return retcode;
 }
 
@@ -2903,8 +2919,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single(JNIEnv *env, j
         jobject key_hex, long port)
 {
     jint retcode = 0;
-    COFFEE_TRY_JNI(env, retcode = Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single__real(env, thiz, ip,
-                                  key_hex, port));
+    retcode = Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single__real(env, thiz, ip,
+                                  key_hex, port);
     return retcode;
 }
 // -----------------
@@ -2957,7 +2973,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(JNIEnv *env
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_bootstrap(JNIEnv *env, jobject thiz)
 {
-    COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(env, thiz));
+    Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(env, thiz);
 }
 
 
@@ -2970,7 +2986,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks__real(
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks(JNIEnv *env, jobject thiz)
 {
-    COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks__real(env, thiz));
+    Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks__real(env, thiz);
 }
 
 
@@ -2992,7 +3008,7 @@ jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1videocall_1au
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv *env, jobject thiz)
 {
-    COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(env, thiz));
+    Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(env, thiz);
 }
 
 JNIEXPORT jlong JNICALL
@@ -3143,7 +3159,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv *env, jobject thiz)
 {
-    COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(env, thiz));
+    Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(env, thiz);
 }
 
 JNIEXPORT void JNICALL Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv *env, jobject thiz) __attribute__((noreturn));
@@ -3664,7 +3680,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv *env
     char name[length + 1];
     CLEAR(name);
     // dbg(9, "name len=%d", (int)length);
-    tox_self_get_name(tox_global, name);
+    tox_self_get_name(tox_global, (uint8_t *)name);
     // dbg(9, "name=%s", (char *)name);
     // return (*env)->NewStringUTF(env, (uint8_t *)name);
     jstring js1 = c_safe_string_from_java((char *)name, length);
@@ -3691,7 +3707,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(
     size_t length = tox_self_get_status_message_size(tox_global);
     char message[length + 1];
     CLEAR(message);
-    tox_self_get_status_message(tox_global, message);
+    tox_self_get_status_message(tox_global, (uint8_t *)message);
     jstring js1 = c_safe_string_from_java((char *)message, length);
     return js1;
 }
@@ -5117,7 +5133,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name
     {
         char name[length + 1];
         CLEAR(name);
-        bool res = tox_conference_peer_get_name(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, name, &error);
+        bool res = tox_conference_peer_get_name(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, (uint8_t *)name, &error);
 
         if(res == false)
         {
@@ -5229,7 +5245,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIE
     {
         char title[length + 1];
         CLEAR(title);
-        bool res = tox_conference_get_title(tox_global, (uint32_t)conference_number, title, &error);
+        bool res = tox_conference_get_title(tox_global, (uint32_t)conference_number, (uint8_t *)title, &error);
 
         if(res == false)
         {
@@ -6220,7 +6236,13 @@ int16_t *upsample_to_48khz(int16_t *pcm, size_t sample_count, uint8_t channels, 
 
         for (j = 0; j < upsample_factor; j++)
         {
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbad-function-cast"
+            // we are converting the returned "float" to "int16_t"
             *new_pcm_buffer_pos = (int16_t)interpolate_linear(*pcm, *pcm_next, j/upsample_factor);
+#pragma GCC diagnostic pop
+
             new_pcm_buffer_pos++;
         }
 
@@ -6481,7 +6503,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(JNIEnv *
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC(JNIEnv *env, jobject thiz)
 {
-    COFFEE_TRY_JNI(env, Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(env, thiz));
+    Java_com_zoffcc_applications_trifa_MainActivity_AppCrashC__XX_real(env, thiz);
 }
 // ----------- produce a Crash to test Crash Detector -----------
 // ----------- produce a Crash to test Crash Detector -----------
