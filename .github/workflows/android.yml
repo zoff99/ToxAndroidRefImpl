@@ -58,6 +58,7 @@ jobs:
           screencapture -T 45 -x -t png /Users/runner/screen05.png &
           screencapture -T 46 -x -t png /Users/runner/screen06.png &
           screencapture -T 50 -x -t png /Users/runner/screen07.png &
+          screencapture -T 240 -x -t png /Users/runner/screen08.png &
           cd android-refimpl-app ; ./gradlew connectedAndroidTest
 
     - name: upload screenshots
