@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
+## [1.0.93](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.93) (2021-02-06)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.92...HEAD)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.92...1.0.93)
 
 **Fixed bugs:**
 
@@ -191,8 +191,6 @@
 
 **Fixed bugs:**
 
-- - [\#184](https://github.com/zoff99/ToxAndroidRefImpl/issues/184)
-- - [\#183](https://github.com/zoff99/ToxAndroidRefImpl/issues/183)
 - Latest grapheneos build cant send images [\#181](https://github.com/zoff99/ToxAndroidRefImpl/issues/181)
 
 **Merged pull requests:**
@@ -200,6 +198,7 @@
 - Translations update from Weblate [\#187](https://github.com/zoff99/ToxAndroidRefImpl/pull/187) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#186](https://github.com/zoff99/ToxAndroidRefImpl/pull/186) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#185](https://github.com/zoff99/ToxAndroidRefImpl/pull/185) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#182](https://github.com/zoff99/ToxAndroidRefImpl/pull/182) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#180](https://github.com/zoff99/ToxAndroidRefImpl/pull/180) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#179](https://github.com/zoff99/ToxAndroidRefImpl/pull/179) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#178](https://github.com/zoff99/ToxAndroidRefImpl/pull/178) ([weblate](https://github.com/weblate))
@@ -218,7 +217,6 @@
 
 **Merged pull requests:**
 
-- Translations update from Weblate [\#182](https://github.com/zoff99/ToxAndroidRefImpl/pull/182) ([weblate](https://github.com/weblate))
 - Improve profile activity [\#175](https://github.com/zoff99/ToxAndroidRefImpl/pull/175) ([naxuroqa](https://github.com/naxuroqa))
 - Fix typo [\#172](https://github.com/zoff99/ToxAndroidRefImpl/pull/172) ([licaon-kter](https://github.com/licaon-kter))
 
@@ -301,11 +299,14 @@
 **Merged pull requests:**
 
 - migrate to androidx [\#147](https://github.com/zoff99/ToxAndroidRefImpl/pull/147) ([zoff99](https://github.com/zoff99))
-- Add Kannada translation [\#146](https://github.com/zoff99/ToxAndroidRefImpl/pull/146) ([ehmry](https://github.com/ehmry))
 
 ## [1.0.51](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.51) (2020-06-02)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.50...1.0.51)
+
+**Merged pull requests:**
+
+- Add Kannada translation [\#146](https://github.com/zoff99/ToxAndroidRefImpl/pull/146) ([ehmry](https://github.com/ehmry))
 
 ## [1.0.50](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.50) (2020-05-31)
 
