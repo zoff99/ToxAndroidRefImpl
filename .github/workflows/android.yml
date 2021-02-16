@@ -40,7 +40,7 @@ jobs:
       run:  brew install cliclick
 
     - name: macos-version1
-      run: sw_vers - productVersion
+      run: sw_vers -productVersion
 
     - name: macos-version2
       run: system_profiler SPSoftwareDataType
