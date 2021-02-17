@@ -4255,8 +4255,27 @@ public class MainActivity extends AppCompatActivity
                     if (conference_num > -1)
                     {
                         String real_sender_peer_pubkey = wrapped_msg_text_as_string.substring(0, 64);
-                        String real_sender_text = wrapped_msg_text_as_string.substring(64);
-                        long real_text_length = (text_length - 64);
+                        long real_text_length = (text_length - 64 - 9);
+                        String real_sender_text_ = wrapped_msg_text_as_string.substring(64);
+
+                        String real_sender_text = "";
+                        String real_send_message_id = "";
+
+                        Log.i(TAG,
+                              "xxxxxxxxxxxxx2:" + real_sender_text_.length() + " " + real_sender_text_.substring(8, 9) +
+                              " " + real_sender_text_.substring(9) + " " + real_sender_text_.substring(0, 8));
+
+                        if ((real_sender_text_.length() > 8) && (real_sender_text_.startsWith(":", 8)))
+                        {
+                            real_sender_text = real_sender_text_.substring(9);
+                            real_send_message_id = real_sender_text_.substring(0, 8).toLowerCase();
+                        }
+                        else
+                        {
+                            real_sender_text = real_sender_text_;
+                            real_send_message_id = "";
+                        }
+
 
                         long sync_msg_received_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
 
@@ -4269,7 +4288,7 @@ public class MainActivity extends AppCompatActivity
                         // since there is no uniqe key for each message
                         ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
                                 real_conference_id, real_sender_peer_pubkey, sync_msg_received_timestamp,
-                                MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false);
+                                real_send_message_id, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false);
 
                         if (cm != null)
                         {
@@ -5281,7 +5300,7 @@ public class MainActivity extends AppCompatActivity
         HelperGeneric.update_savedata_file_wrapper();
     }
 
-    static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message, long length)
+    static void android_tox_callback_conference_message_cb_method(long conference_number, long peer_number, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
     {
         if (tox_conference_get_type(conference_number) == TOX_CONFERENCE_TYPE_AV.value)
         {
@@ -5296,6 +5315,23 @@ public class MainActivity extends AppCompatActivity
         {
             // HINT: do not add our own messages, they are already in the DB!
             return;
+        }
+
+        String message_ = "";
+        String message_id_ = "";
+
+        Log.i(TAG, "xxxxxxxxxxxxx1:" + message_orig.length() + " " + message_orig.substring(8, 9) + " " +
+                   message_orig.substring(9) + " " + message_orig.substring(0, 8));
+
+        if ((message_orig.length() > 8) && (message_orig.startsWith(":", 8)))
+        {
+            message_ = message_orig.substring(9);
+            message_id_ = message_orig.substring(0, 8).toLowerCase();
+        }
+        else
+        {
+            message_ = message_orig;
+            message_id_ = "";
         }
 
         boolean do_notification = true;
@@ -5356,15 +5392,16 @@ public class MainActivity extends AppCompatActivity
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.sent_timestamp = System.currentTimeMillis();
-        m.text = message;
+        m.text = message_;
+        m.message_id_tox = message_id_;
         m.was_synced = false;
 
         // now check if this is "potentially" a double message, we can not be sure a 100% since there is no uniqe key for each message
         ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
-                conf_id, m.tox_peerpubkey, m.sent_timestamp, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, true);
+                conf_id, m.tox_peerpubkey, m.sent_timestamp, m.message_id_tox, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, true);
         if (cm != null)
         {
-            if (cm.text.equals(message))
+            if (cm.text.equals(message_))
             {
                 Log.i(TAG, "conference_message_cb:potentially double message");
                 // ok it's a "potentially" double message
