@@ -283,15 +283,15 @@ public class HelperConference
         }
     }
 
-    static ConferenceMessage get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
-            String conference_identifier,
-            String sender_pubkey,
-            long sent_timestamp,
-            String message_id_tox,
-            int n, boolean was_synced)
+    static ConferenceMessage get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(String conference_identifier, String sender_pubkey, long sent_timestamp, String message_id_tox, int n, boolean was_synced)
     {
         try
         {
+            if ((message_id_tox == null) || (message_id_tox.length() < 8))
+            {
+                return null;
+            }
+
             final int SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL = 60 * 60 * 2; // 2 hours
 
             ConferenceMessage cm = orma.selectFromConferenceMessage().
