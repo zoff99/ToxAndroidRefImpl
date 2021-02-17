@@ -60,8 +60,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.MessageListActivity.add_quote_message_text;
-import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
@@ -517,7 +515,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             // TODO: do we need to reset here? -> yes
             img_avatar.setVisibility(View.VISIBLE);
             img_corner.setVisibility(View.VISIBLE);
-            imageView.setVisibility(View.INVISIBLE);
+            imageView.setVisibility(View.VISIBLE);
             textView_container.setMinimumHeight((int) dp2px(50));
             textView_container.setPadding(0, textView_container.getPaddingTop(), 0,
                                           textView_container.getPaddingBottom()); // left, top, right, bottom
@@ -533,6 +531,18 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 // Log.i(TAG, "have_avatar_for_pubkey:005+" + have_avatar_for_pubkey);
                 img_avatar.setImageDrawable(smiley_face);
             }
+
+            if (m.was_synced)
+            {
+                // synced from ToxProxy
+                imageView.setImageResource(R.drawable.circle_orange);
+            }
+            else
+            {
+                // received directly
+                imageView.setImageResource(R.drawable.circle_green);
+            }
+
         }
 
     }
