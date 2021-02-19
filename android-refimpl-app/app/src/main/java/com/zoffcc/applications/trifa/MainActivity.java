@@ -4261,9 +4261,9 @@ public class MainActivity extends AppCompatActivity
                         String real_sender_text = "";
                         String real_send_message_id = "";
 
-                        Log.i(TAG,
-                              "xxxxxxxxxxxxx2:" + real_sender_text_.length() + " " + real_sender_text_.substring(8, 9) +
-                              " " + real_sender_text_.substring(9) + " " + real_sender_text_.substring(0, 8));
+                        // Log.i(TAG,
+                        //      "xxxxxxxxxxxxx2:" + real_sender_text_.length() + " " + real_sender_text_.substring(8, 9) +
+                        //      " " + real_sender_text_.substring(9) + " " + real_sender_text_.substring(0, 8));
 
                         if ((real_sender_text_.length() > 8) && (real_sender_text_.startsWith(":", 8)))
                         {
@@ -5320,8 +5320,8 @@ public class MainActivity extends AppCompatActivity
         String message_ = "";
         String message_id_ = "";
 
-        Log.i(TAG, "xxxxxxxxxxxxx1:" + message_orig.length() + " " + message_orig.substring(8, 9) + " " +
-                   message_orig.substring(9) + " " + message_orig.substring(0, 8));
+        // Log.i(TAG, "xxxxxxxxxxxxx1:" + message_orig.length() + " " + message_orig.substring(8, 9) + " " +
+        //           message_orig.substring(9) + " " + message_orig.substring(0, 8));
 
         if ((message_orig.length() > 8) && (message_orig.startsWith(":", 8)))
         {
