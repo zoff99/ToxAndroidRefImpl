@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -41,6 +42,7 @@ public class StartMainActivityWrapperTest
     //
     private static final String MOCK_PASSWORD = "öWOIA>C9iq2v<q0230i2q4$&%$/S3p95ig0_92";
     private Activity currentActivity = null;
+    private static final String MOCK_TEST_MSG = "Hello, test äößß";
     //
 
     @Rule
@@ -63,8 +65,8 @@ public class StartMainActivityWrapperTest
 
         if (cur_act.equals("CheckPasswordActivity"))
         {
-            onView(withId(R.id.password_1)).perform(replaceText(MOCK_PASSWORD));
-            onView(withId(R.id.set_button)).perform(click());
+            onView(withId(R.id.password_1_c)).perform(replaceText(MOCK_PASSWORD));
+            onView(withId(R.id.set_button_2)).perform(click());
         }
         else if (cur_act.equals("SetPasswordActivity"))
         {
@@ -78,30 +80,6 @@ public class StartMainActivityWrapperTest
             onView(withId(R.id.bugButton)).perform(replaceText(MOCK_PASSWORD));
             // cause ERROR -----
         }
-
-        /*
-        long loops = 0;
-        boolean wait_for_main_act = true;
-        while (wait_for_main_act)
-        {
-            loops++;
-            cur_act = getActivityInstance().getLocalClassName();
-
-            if (cur_act.equals(""))
-            {
-                wait_for_main_act = false;
-            }
-
-            if (loops > 60)
-            {
-                // after 6 seconds cause ERROR.
-                onView(withId(R.id.bugButton)).perform(replaceText(MOCK_PASSWORD));
-                // after 6 seconds cause ERROR.
-            }
-
-            SystemClock.sleep(200);
-        }
-        */
 
         Log.i(TAG, "checking for AlertDialog");
 
@@ -130,6 +108,22 @@ public class StartMainActivityWrapperTest
             //view not displayed logic
             Log.i(TAG, "checking for AlertDialog:View does not show, that is ok");
         }
+
+        onView(withId(R.id.f_avatar_icon)).perform(click());
+
+        onView(withId(R.id.ml_new_message)).perform(click());
+        onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG));
+        onView(withId(R.id.ml_button_01)).perform(click());
+
+        Espresso.closeSoftKeyboard();
+
+        for (int i = 0; i < 3; i++)
+        {
+            onView(withId(R.id.ml_new_message)).perform(replaceText("test:" + i));
+            onView(withId(R.id.ml_button_01)).perform(click());
+        }
+
+        Espresso.closeSoftKeyboard();
 
         final int seconds_sleep = 240;
         Log.i(TAG, "sleeping for " + seconds_sleep + " seconds");
