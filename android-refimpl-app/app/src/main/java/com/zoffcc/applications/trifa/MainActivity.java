@@ -2603,18 +2603,25 @@ public class MainActivity extends AppCompatActivity
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------
-
     public static native long tox_conference_join(long friend_number, ByteBuffer cookie_buffer, long cookie_length);
 
-    public static native String tox_conference_peer_get_public_key(long conference_number, long peer_number);
-
     public static native long tox_conference_peer_count(long conference_number);
-
-    public static native long tox_conference_offline_peer_count(long conference_number);
 
     public static native long tox_conference_peer_get_name_size(long conference_number, long peer_number);
 
     public static native String tox_conference_peer_get_name(long conference_number, long peer_number);
+
+    public static native String tox_conference_peer_get_public_key(long conference_number, long peer_number);
+
+    public static native long tox_conference_offline_peer_count(long conference_number);
+
+    public static native long tox_conference_offline_peer_get_name_size(long conference_number, long offline_peer_number);
+
+    public static native String tox_conference_offline_peer_get_name(long conference_number, long offline_peer_number);
+
+    public static native String tox_conference_offline_peer_get_public_key(long conference_number, long offline_peer_number);
+
+    public static native long tox_conference_offline_peer_get_last_active(long conference_number, long offline_peer_number);
 
     public static native int tox_conference_peer_number_is_ours(long conference_number, long peer_number);
 
@@ -5603,7 +5610,7 @@ public class MainActivity extends AppCompatActivity
                             //      "namelist_change_cb:INFO:" + " 002 " + conference_number + ":" + peer_number + ":" +
                             //      peer_pubkey_temp2);
                             conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number,
-                                                                            peer_name_temp2);
+                                                                            peer_name_temp2,false);
                             //Log.i(TAG, "namelist_change_cb:INFO:" + " 003");
                         }
                     }
@@ -5836,7 +5843,7 @@ public class MainActivity extends AppCompatActivity
                                 Log.i(TAG,
                                       "namelist_change_cb:INFO:" + " 002.1 " + conference_number + ":" + peer_number +
                                       ":" + peer_pubkey_temp2);
-                                conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number, null);
+                                conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number, null,false);
                                 // TODO: because here the name is always "Tox User" !!
                             }
                         }
@@ -5865,7 +5872,7 @@ public class MainActivity extends AppCompatActivity
                                       "namelist_change_cb:INFO:" + " 002 " + conference_number + ":" + peer_number +
                                       ":" + peer_pubkey_temp2);
                                 conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number,
-                                                                                peer_name_temp2);
+                                                                                peer_name_temp2,false);
                                 Log.i(TAG, "namelist_change_cb:INFO:" + " 003");
                             }
                         }

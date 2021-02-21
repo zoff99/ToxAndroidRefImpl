@@ -44,7 +44,6 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.holder.BadgeStyle;
-import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
@@ -76,6 +75,8 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_get_public_key;
@@ -455,6 +456,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
             final long conference_num = tox_conference_by_confid__wrapper(conf_id);
             long num_peers = tox_conference_peer_count(conference_num);
+            long offline_num_peers = tox_conference_offline_peer_count(conference_num);
 
             // Log.d(TAG, "set_peer_names_and_avatars:003:peer count=" + num_peers);
 
@@ -463,16 +465,45 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 long i = 0;
                 for (i = 0; i < num_peers; i++)
                 {
-                    String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_num, i);
-                    String peer_name_temp = tox_conference_peer_get_name(conference_num, i);
-                    if (peer_name_temp.equals(""))
+                    try
                     {
-                        peer_name_temp = null;
+                        String peer_pubkey_temp = tox_conference_peer_get_public_key(conference_num, i);
+                        String peer_name_temp = tox_conference_peer_get_name(conference_num, i);
+                        if (peer_name_temp.equals(""))
+                        {
+                            peer_name_temp = null;
+                        }
+                        // Log.d(TAG, "set_peer_names_and_avatars:004:add:" + peer_name_temp);
+                        add_group_user(peer_pubkey_temp, i, peer_name_temp, false);
                     }
-                    // Log.d(TAG, "set_peer_names_and_avatars:004:add:" + peer_name_temp);
-                    add_group_user(peer_pubkey_temp, i, peer_name_temp);
+                    catch (Exception e)
+                    {
+                    }
                 }
             }
+
+            if (offline_num_peers > 0)
+            {
+                long i = 0;
+                for (i = 0; i < offline_num_peers; i++)
+                {
+                    try
+                    {
+                        String peer_pubkey_temp = tox_conference_offline_peer_get_public_key(conference_num, i);
+                        String peer_name_temp = tox_conference_offline_peer_get_name(conference_num, i);
+                        if (peer_name_temp.equals(""))
+                        {
+                            peer_name_temp = null;
+                        }
+                        // Log.d(TAG, "set_peer_names_and_avatars:005:add:" + peer_name_temp);
+                        add_group_user(peer_pubkey_temp, i, peer_name_temp, true);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            }
+
         }
     }
 
@@ -985,9 +1016,9 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         }
     }
 
-    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name)
+    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name, boolean offline)
     {
-        // Log.i(TAG, "add_group_user:peernum=" + peernum);
+        // Log.i(TAG, "add_group_user:peernum=" + peernum + " name=" + name + " offline=" + offline);
 
         try
         {
@@ -1016,7 +1047,10 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 }
                 final String name3 = name2;
 
-                lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);
+                if (!offline)
+                {
+                    lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);
+                }
 
                 Thread t = new Thread()
                 {
@@ -1074,13 +1108,19 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
                                         try
                                         {
+                                            int badge_color = R.color.md_green_700;
+                                            if (offline)
+                                            {
+                                                badge_color = R.color.md_red_700;
+                                            }
+
                                             new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
                                                                                           peer_pubkey).
                                                     withIdentifier(peernum).
                                                     withName(name3).
                                                     withBadge("" + peernum).withBadgeStyle(
                                                     new BadgeStyle().withTextColor(Color.WHITE).withColorRes(
-                                                            R.color.md_red_700)).
+                                                            badge_color)).
                                                     withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
                                                     {
                                                         @Override
@@ -1090,6 +1130,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                                                                        ConferencePeerInfoActivity.class);
                                                             intent.putExtra("peer_pubkey", peer_pubkey);
                                                             intent.putExtra("conf_id", conf_id);
+                                                            intent.putExtra("offline", offline);
                                                             view.getContext().startActivity(intent);
                                                             return true;
                                                         }
@@ -1111,6 +1152,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                                                                        ConferencePeerInfoActivity.class);
                                                             intent.putExtra("peer_pubkey", peer_pubkey);
                                                             intent.putExtra("conf_id", conf_id);
+                                                            intent.putExtra("offline", offline);
                                                             view.getContext().startActivity(intent);
                                                             return true;
                                                         }
@@ -1146,83 +1188,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             }
             else
             {
-                // -- UPDATE --
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // Log.i(TAG, "add_group_user:UPDATE:peernum=" + peernum);
-                String name2 = "";
-                if (name != null)
-                {
-                    name2 = name;
-                }
-                else
-                {
-                    name2 = peer_pubkey.substring(peer_pubkey.length() - 5, peer_pubkey.length());
-                }
-
-                try
-                {
-                    name2 = resolve_name_for_pubkey(peer_pubkey, name2);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-                final String name3 = name2;
-
-                lookup_peer_listnum_pubkey.put(peer_pubkey, peernum);
-
-                Thread t = new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            Runnable myRunnable = new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    try
-                                    {
-                                        StringHolder sh = new StringHolder(name3);
-                                        // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
-                                        conference_message_drawer.updateName(peernum, sh);
-                                    }
-                                    catch (Exception e2)
-                                    {
-                                        e2.printStackTrace();
-                                        Log.i(TAG, "add_group_user:EE2:" + e2.getMessage());
-                                    }
-                                }
-                            };
-
-                            if (conferences_handler_s != null)
-                            {
-                                conferences_handler_s.post(myRunnable);
-                            }
-
-                        }
-                        catch (Exception e3)
-                        {
-                            e3.printStackTrace();
-                            Log.i(TAG, "add_group_user:EE3:" + e3.getMessage());
-                        }
-                    }
-                };
-                t.start();
-                t.join();
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
-                // **** THIS is never used anymore ****
+                Log.i(TAG, "add_group_user:EE999:!!please report this!!");
             }
         }
         catch (Exception e)
