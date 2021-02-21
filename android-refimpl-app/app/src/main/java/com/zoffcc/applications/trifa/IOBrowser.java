@@ -53,6 +53,7 @@ public class IOBrowser extends ListActivity
     private TextView fileInfo;
     private String[] items;
     private String root = "/";
+    private String cur_path = root;
     private boolean at_root_dir = true;
 
     @Override
@@ -61,6 +62,8 @@ public class IOBrowser extends ListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_iobrowser);
         fileInfo = (TextView) findViewById(R.id.iobrowser_info);
+
+        cur_path = root;
     }
 
     @Override
@@ -76,11 +79,13 @@ public class IOBrowser extends ListActivity
             e.printStackTrace();
         }
         at_root_dir = true;
-        getFileList(root);
+        getFileList(cur_path);
     }
 
     public void getFileList(String dirPath)
     {
+
+        cur_path = dirPath;
 
         item = new ArrayList<String>();
         path = new ArrayList<String>();
