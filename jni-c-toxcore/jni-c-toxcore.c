@@ -5167,6 +5167,148 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1number_1i
 }
 
 
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1get_1name_1size(JNIEnv *env, jobject thiz,
+        jlong conference_number, jlong offline_peer_number)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    TOX_ERR_CONFERENCE_PEER_QUERY error;
+    size_t res = tox_conference_offline_peer_get_name_size(tox_global, (uint32_t)conference_number, (uint32_t)offline_peer_number, &error);
+
+    if(error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+    {
+        if(error == TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND)
+        {
+            dbg(0, "tox_conference_offline_peer_get_name_size:TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND");
+            return (jlong)-1;
+        }
+        else if(error == TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND)
+        {
+            dbg(0, "tox_conference_offline_peer_get_name_size:TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND");
+            return (jlong)-2;
+        }
+        else if(error == TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION)
+        {
+            dbg(0, "tox_conference_offline_peer_get_name_size:TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION");
+            return (jlong)-3;
+        }
+        else
+        {
+            return (jlong)-99;
+        }
+    }
+
+    return (jlong)(unsigned long long)res;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1get_1name(JNIEnv *env, jobject thiz,
+        jlong conference_number, jlong offline_peer_number)
+{
+    TOX_ERR_CONFERENCE_PEER_QUERY error;
+    size_t length = tox_conference_offline_peer_get_name_size(tox_global, (uint32_t)conference_number, (uint32_t)offline_peer_number,
+                    &error);
+
+    if(error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+    {
+        return NULL;
+    }
+    else
+    {
+        char name[length + 1];
+        CLEAR(name);
+        bool res = tox_conference_offline_peer_get_name(tox_global, (uint32_t)conference_number, (uint32_t)offline_peer_number, (uint8_t *)name, &error);
+
+        if(res == false)
+        {
+            return (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+        }
+        else
+        {
+            jstring js1 = c_safe_string_from_java((char *)name, length);
+            return js1;
+        }
+    }
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1get_1public_1key(JNIEnv *env, jobject thiz,
+        jlong conference_number, jlong offline_peer_number)
+{
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    jstring result;
+    uint8_t public_key[TOX_PUBLIC_KEY_SIZE];
+    TOX_ERR_CONFERENCE_PEER_QUERY error;
+    bool res = tox_conference_offline_peer_get_public_key(tox_global, (uint32_t)conference_number, (uint32_t)offline_peer_number,
+               public_key, &error);
+
+    if(res == false)
+    {
+        result = (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+    }
+    else
+    {
+        char tox_pk_hex[TOX_PUBLIC_KEY_SIZE*2 + 1];
+        CLEAR(tox_pk_hex);
+        toxpk_bin_to_hex(public_key, tox_pk_hex);
+        tox_pk_hex[TOX_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+        result = (*env)->NewStringUTF(env, tox_pk_hex); // C style string to Java String
+    }
+
+    return result;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1get_1last_1active(JNIEnv *env, jobject thiz,
+        jlong conference_number, jlong offline_peer_number)
+{
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    TOX_ERR_CONFERENCE_PEER_QUERY error;
+    uint64_t res = tox_conference_offline_peer_get_last_active(tox_global, (uint32_t)conference_number, (uint32_t)offline_peer_number, &error);
+
+    if(error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
+    {
+        if(error == TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND)
+        {
+            dbg(0, "tox_conference_offline_peer_get_last_active:TOX_ERR_CONFERENCE_PEER_QUERY_CONFERENCE_NOT_FOUND");
+            return (jlong)-1;
+        }
+        else if(error == TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND)
+        {
+            dbg(0, "tox_conference_offline_peer_get_last_active:TOX_ERR_CONFERENCE_PEER_QUERY_PEER_NOT_FOUND");
+            return (jlong)-2;
+        }
+        else if(error == TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION)
+        {
+            dbg(0, "tox_conference_offline_peer_get_last_active:TOX_ERR_CONFERENCE_PEER_QUERY_NO_CONNECTION");
+            return (jlong)-3;
+        }
+        else
+        {
+            return (jlong)-99;
+        }
+    }
+
+    if (res == UINT64_MAX)
+    {
+        return (jlong)-98;
+    }
+
+    return (jlong)(unsigned long long)res;
+}
+
 /**
  * Return the length of the conference title. Return value is unspecified on failure.
  *
