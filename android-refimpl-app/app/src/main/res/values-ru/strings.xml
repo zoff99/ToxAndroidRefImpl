@@ -26,7 +26,7 @@
     <string name="settings_toolbar_title">Настройки</string>
     <string name="pref_header_general">Общие</string>
     <string name="pref_title_auto_accept_image">автоматически принимать изображения</string>
-    <string name="pref_description_auto_accept_image">автоматически принимать изображения и фотографии размером до 3 МБ</string>
+    <string name="pref_description_auto_accept_image">автоматически принимать изображения и фотографии размером до 6 МБ</string>
     <string name="pref_title_video_uv_reversed">поменять UV в видео</string>
     <string name="pref_description_video_uv_reversed">Обратный порядок плоскостей UV в видео камеры</string>
     <string name="pref_title_software_echo_cancel">Эхоподавление</string>
@@ -314,7 +314,7 @@
     <string name="pref_title_global_font_size">Размер шрифта</string>
     <string name="pref_description_video_cam_resolution">Какое разрешение использовать для видеозвонков</string>
     <string name="pref_title_video_cam_resolution">Разрешение камеры</string>
-    <string name="pref_description_auto_accept_video">автоматически принимать видео размером до 10 МБ</string>
+    <string name="pref_description_auto_accept_video">автоматически принимать видео размером до 20 МБ</string>
     <string name="pref_title_auto_accept_video">автоматически принимать видео</string>
     <string name="conference_audio_activity_player_name">Проигрыватель аудиоконференций</string>
     <string name="layout___migdb_do_not_close">НЕ закрывайте этот экран</string>
@@ -325,4 +325,10 @@
     <string name="MainActivity_yes_button">да</string>
     <string name="pref_description_auto_accept_all_upto">автоматически принимать все файлы размером до 200 МБ</string>
     <string name="pref_title_auto_accept_all_upto">автоматически принимать все файлы</string>
+    <string name="title_activity_wrong_credentials">Неверные учетные данные</string>
+    <string name="wrong_credentials_error">Неверные учетные данные</string>
+    <string name="layout___iobrowser_start">просматривать зашифрованное хранилище</string>
+    <string name="pref_description_start_on_boot">запуск приложения после загрузки.
+\nGoogle больше не допускает этого, начиная с Android 10</string>
+    <string name="pref_title_start_on_boot">запускать при загрузке</string>
 </resources>
