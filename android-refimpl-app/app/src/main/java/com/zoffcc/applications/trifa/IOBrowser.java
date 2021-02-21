@@ -37,6 +37,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import info.guardianproject.iocipher.File;
@@ -92,6 +93,7 @@ public class IOBrowser extends ListActivity
 
         info.guardianproject.iocipher.File file = new info.guardianproject.iocipher.File(dirPath);
         info.guardianproject.iocipher.File[] files = file.listFiles();
+        Arrays.sort(files);
 
         if (!dirPath.equals(root))
         {
@@ -108,10 +110,8 @@ public class IOBrowser extends ListActivity
             at_root_dir = true;
         }
 
-        for (int i = 0; i < files.length; i++)
+        for (File fileItem : files)
         {
-
-            File fileItem = files[i];
             path.add(fileItem.getPath());
 
             String item_name = fileItem.getName();
@@ -120,7 +120,7 @@ public class IOBrowser extends ListActivity
             if (fileItem.isDirectory())
             {
                 // input name directory to array list
-                Log.i(TAG, "dir:" + item_name);
+                // Log.i(TAG, "dir:" + item_name);
 
                 if (item_name.length() == (TOX_PUBLIC_KEY_SIZE * 2))
                 {
@@ -189,37 +189,39 @@ public class IOBrowser extends ListActivity
         }
         else
         {
-            Log.i(TAG, "open URL: " + Uri.parse(IOCipherContentProvider.FILES_URI + file.getName()));
-            final Uri uri = Uri.parse(IOCipherContentProvider.FILES_URI + file.getName());
-            new AlertDialog.Builder(this).setIcon(R.mipmap.ic_launcher).setTitle(
-                    "[" + file.getName() + "]").setNeutralButton("View", new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    try
+            // Log.i(TAG, "open URL: " + Uri.parse(IOCipherContentProvider.FILES_URI + cur_path + "/" + file.getName()));
+            final Uri uri = Uri.parse(IOCipherContentProvider.FILES_URI + cur_path + "/" + file.getName());
+            new AlertDialog.Builder(this).setIcon(R.mipmap.ic_launcher).setTitle(file.getName()).setNeutralButton(
+                    "View", new DialogInterface.OnClickListener()
                     {
-                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                    }
-                    catch (ActivityNotFoundException e)
-                    {
-                        Log.e(TAG, "No relevant Activity found", e);
-                    }
-                }
-            }).setPositiveButton("Share...", new DialogInterface.OnClickListener()
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            try
+                            {
+                                Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
+                                startActivity(sendIntent);
+                            }
+                            catch (ActivityNotFoundException e)
+                            {
+                                Log.e(TAG, "No relevant Activity found", e);
+                            }
+                        }
+                    }).setPositiveButton("Share...", new DialogInterface.OnClickListener()
             {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
                     Intent intent = new Intent(Intent.ACTION_SEND, uri);
-                    String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
+                    // intent.putExtra(Intent.EXTRA_STREAM, uri);
+                    String fileExtension = MimeTypeMap.getFileExtensionFromUrl(file.getName());
                     String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
                     if (mimeType == null)
                     {
                         mimeType = "application/octet-stream";
                     }
-                    Log.i(TAG, "mime type: " + mimeType);
+                    // Log.i(TAG, "mime type: " + mimeType);
                     intent.setType(mimeType);
                     try
                     {
@@ -240,7 +242,6 @@ public class IOBrowser extends ListActivity
         public IconicList()
         {
             super(IOBrowser.this, R.layout.iobrowser_row, items);
-
             // TODO Auto-generated constructor stub
         }
 

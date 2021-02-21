@@ -41,7 +41,7 @@ import info.guardianproject.iocipher.FileInputStream;
 public class IOCipherContentProvider extends ContentProvider
 {
     public static final String TAG = "IOCipherContentProvider";
-    public static final Uri FILES_URI = Uri.parse("content://info.guardianproject.iocipherexample/");
+    public static final Uri FILES_URI = Uri.parse("content://com.zoffcc.applications.trifa/");
     private MimeTypeMap mimeTypeMap;
 
     @Override
@@ -68,7 +68,7 @@ public class IOCipherContentProvider extends ContentProvider
         {
             pipe = ParcelFileDescriptor.createPipe();
             String path = uri.getPath();
-            Log.i(TAG, "streaming " + path);
+            // Log.i(TAG, "streaming " + path);
             // BufferedInputStream could help, AutoCloseOutputStream conflicts
             in = new FileInputStream(new File(path));
             new PipeFeederThread(in, new AutoCloseOutputStream(pipe[1])).start();
@@ -120,7 +120,7 @@ public class IOCipherContentProvider extends ContentProvider
         @Override
         public void run()
         {
-            byte[] buf = new byte[8192];
+            byte[] buf = new byte[8192]; // TODO: is 8k here OK? in the example it's 1k
             int len;
 
             try

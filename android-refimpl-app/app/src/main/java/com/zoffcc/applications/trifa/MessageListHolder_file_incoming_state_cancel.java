@@ -19,11 +19,14 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import androidx.recyclerview.widget.RecyclerView;
+import android.net.Uri;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -44,9 +47,12 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import androidx.recyclerview.widget.RecyclerView;
+import info.guardianproject.iocipher.File;
+
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
@@ -142,14 +148,17 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 {
                     if (my_position < 1)
                     {
-                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date_string.setText(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                         message_text_date.setVisibility(View.VISIBLE);
                     }
                     else
                     {
-                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
                         {
-                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date_string.setText(
+                                    MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                             message_text_date.setVisibility(View.VISIBLE);
                         }
                     }
@@ -171,7 +180,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
         final Message message = m;
 
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION);
 
         button_ok.setVisibility(View.GONE);
         button_cancel.setVisibility(View.GONE);
@@ -249,12 +259,14 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     });
 
 
-                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(message2.filename_fullpath);
+                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
+                            message2.filename_fullpath);
                     try
                     {
                         // Log.i(TAG, "glide:img:001");
 
-                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(
+                                new RoundedCorners((int) dp2px(20)));
                         // apply(glide_options).
 
                         GlideApp.
@@ -282,13 +294,69 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                         color(Color.parseColor("#AA000000")).sizeDp(50);
 
                 ft_preview_image.setImageDrawable(d3);
+
+
+                if (VFS_ENCRYPT)
+                {
+                    ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                    {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event)
+                        {
+                            if (event.getAction() == MotionEvent.ACTION_UP)
+                            {
+                                try
+                                {
+                                    final Uri uri = Uri.parse(
+                                            IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
+
+                                   // Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
+                                   //            message2.filename_fullpath);
+
+                                    File file = new File(message2.filename_fullpath);
+                                    String filename_without_path = file.getName();
+
+                                    new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
+                                            setTitle(filename_without_path).
+                                            setNeutralButton("View", new DialogInterface.OnClickListener()
+                                            {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which)
+                                                {
+                                                    try
+                                                    {
+                                                        Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
+                                                        v.getContext().startActivity(sendIntent);
+                                                    }
+                                                    catch (ActivityNotFoundException e)
+                                                    {
+                                                        Log.e(TAG, "No relevant Activity found", e);
+                                                    }
+                                                }
+                                            }).show();
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
+                                }
+                            }
+                            else
+                            {
+                            }
+                            return true;
+                        }
+                    });
+                }
+
             }
 
             ft_preview_container.setVisibility(View.VISIBLE);
             ft_preview_image.setVisibility(View.VISIBLE);
         }
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
+                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -361,7 +429,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         @Override
         public boolean onLongClick(final View v)
         {
-            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected, message_);
+            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected,
+                                                                                           message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

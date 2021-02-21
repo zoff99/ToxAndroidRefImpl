@@ -283,6 +283,11 @@
         </receiver>
 
         <provider
+            android:name=".IOCipherContentProvider"
+            android:authorities="com.zoffcc.applications.trifa"
+            android:exported="true"/>
+
+        <provider
             android:name=".GenericFileProvider"
             android:authorities="com.zoffcc.applications.trifa.provider"
             android:exported="false"
