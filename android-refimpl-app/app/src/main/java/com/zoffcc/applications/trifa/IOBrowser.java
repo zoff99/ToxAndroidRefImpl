@@ -41,6 +41,9 @@ import java.util.List;
 
 import info.guardianproject.iocipher.File;
 
+import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+
 public class IOBrowser extends ListActivity
 {
     private static final String TAG = "trifa.IOBrowser";
@@ -50,6 +53,7 @@ public class IOBrowser extends ListActivity
     private TextView fileInfo;
     private String[] items;
     private String root = "/";
+    private boolean at_root_dir = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,6 +75,7 @@ public class IOBrowser extends ListActivity
         {
             e.printStackTrace();
         }
+        at_root_dir = true;
         getFileList(root);
     }
 
@@ -90,6 +95,12 @@ public class IOBrowser extends ListActivity
 
             item.add("..");
             path.add(file.getParent()); // back one level
+
+            at_root_dir = false;
+        }
+        else
+        {
+            at_root_dir = true;
         }
 
         for (int i = 0; i < files.length; i++)
@@ -97,15 +108,44 @@ public class IOBrowser extends ListActivity
 
             File fileItem = files[i];
             path.add(fileItem.getPath());
+
+            String item_name = fileItem.getName();
+            String display_name = item_name;
+
             if (fileItem.isDirectory())
             {
                 // input name directory to array list
-                item.add("[" + fileItem.getName() + "]");
+                Log.i(TAG, "dir:" + item_name);
+
+                if (item_name.length() == (TOX_PUBLIC_KEY_SIZE * 2))
+                {
+                    try
+                    {
+                        display_name = orma.selectFromFriendList().
+                                tox_public_key_stringEq(item_name).
+                                toList().get(0).name;
+
+                        String alias_name = orma.selectFromFriendList().
+                                tox_public_key_stringEq(item_name).
+                                toList().get(0).alias_name;
+
+                        if ((alias_name != null) && (alias_name.length() > 0))
+                        {
+                            display_name = alias_name;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                item.add("[" + display_name + "]");
             }
             else
             {
                 // input name file to array list
-                item.add(fileItem.getName());
+                item.add(item_name);
             }
         }
         fileInfo.setText("Info: " + dirPath + " [ " + files.length + " item ]");
@@ -246,6 +286,19 @@ public class IOBrowser extends ListActivity
             }
 
             return (row);
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (!at_root_dir)
+        {
+            getFileList(path.get(1));
+        }
+        else
+        {
+            super.onBackPressed();
         }
     }
 }
