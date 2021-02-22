@@ -314,4 +314,7 @@
     <string name="MainActivity_yes_button">sí</string>
     <string name="pref_description_auto_accept_all_upto">aceptar automáticamente todos los archivos de hasta 200 MB de tamaño</string>
     <string name="pref_title_auto_accept_all_upto">aceptar automáticamente todos los archivos</string>
+    <string name="pref_description_start_on_boot">inicia la aplicación después del arranque.
+\nGoogle ya no permite esto a partir de Android 10</string>
+    <string name="pref_title_start_on_boot">iniciar en el arranque</string>
 </resources>
