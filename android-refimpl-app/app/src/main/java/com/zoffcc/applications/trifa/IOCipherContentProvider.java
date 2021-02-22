@@ -21,9 +21,7 @@ package com.zoffcc.applications.trifa;
 
 // inspired by https://github.com/commonsguy/cw-omnibus/tree/master/ContentProvider/Pipe
 
-import android.content.ContentProvider;
-import android.content.ContentValues;
-import android.database.Cursor;
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.ParcelFileDescriptor.AutoCloseOutputStream;
@@ -38,10 +36,11 @@ import java.io.OutputStream;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
 
-public class IOCipherContentProvider extends ContentProvider
+public class IOCipherContentProvider extends AbstractFileProvider
 {
     public static final String TAG = "IOCipherContentProvider";
     public static final Uri FILES_URI = Uri.parse("content://com.zoffcc.applications.trifa/");
+    private static final int PIPE_BLOCKSIZE = 8192;
     private MimeTypeMap mimeTypeMap;
 
     @Override
@@ -52,10 +51,17 @@ public class IOCipherContentProvider extends ContentProvider
     }
 
     @Override
-    public String getType(Uri uri)
+    public long getDataLength(Uri uri)
     {
-        String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
-        return mimeTypeMap.getMimeTypeFromExtension(fileExtension);
+        String path = uri.getPath();
+        long filesize = new File(path).length();
+        if ((filesize < 1) || (filesize > (Long.MAX_VALUE - 2)))
+        {
+            filesize = AssetFileDescriptor.UNKNOWN_LENGTH;
+        }
+        // Log.i(TAG, "getDataLength:ret=" + filesize);
+
+        return filesize;
     }
 
     @Override
@@ -68,8 +74,8 @@ public class IOCipherContentProvider extends ContentProvider
         {
             pipe = ParcelFileDescriptor.createPipe();
             String path = uri.getPath();
-            // Log.i(TAG, "streaming " + path);
-            // BufferedInputStream could help, AutoCloseOutputStream conflicts
+            // Log.i(TAG, "streaming " + path + " tid=" + Thread.currentThread().getId());
+
             in = new FileInputStream(new File(path));
             new PipeFeederThread(in, new AutoCloseOutputStream(pipe[1])).start();
         }
@@ -80,30 +86,6 @@ public class IOCipherContentProvider extends ContentProvider
         }
 
         return (pipe[0]);
-    }
-
-    @Override
-    public Cursor query(Uri url, String[] projection, String selection, String[] selectionArgs, String sort)
-    {
-        throw new RuntimeException("Operation not supported");
-    }
-
-    @Override
-    public Uri insert(Uri uri, ContentValues initialValues)
-    {
-        throw new RuntimeException("Operation not supported");
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String where, String[] whereArgs)
-    {
-        throw new RuntimeException("Operation not supported");
-    }
-
-    @Override
-    public int delete(Uri uri, String where, String[] whereArgs)
-    {
-        throw new RuntimeException("Operation not supported");
     }
 
     static class PipeFeederThread extends Thread
@@ -120,13 +102,14 @@ public class IOCipherContentProvider extends ContentProvider
         @Override
         public void run()
         {
-            byte[] buf = new byte[8192]; // TODO: is 8k here OK? in the example it's 1k
+            byte[] buf = new byte[PIPE_BLOCKSIZE];
             int len;
 
             try
             {
                 while ((len = in.read(buf)) > 0)
                 {
+                    // Log.i(TAG, "write_data:" + len + " tid=" + Thread.currentThread().getId());
                     out.write(buf, 0, len);
                 }
 

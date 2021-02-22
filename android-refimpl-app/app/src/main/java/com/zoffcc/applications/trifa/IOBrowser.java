@@ -238,7 +238,6 @@ public class IOBrowser extends ListActivity
 
     class IconicList extends ArrayAdapter
     {
-
         public IconicList()
         {
             super(IOBrowser.this, R.layout.iobrowser_row, items);
