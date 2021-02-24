@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -34,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -52,6 +54,7 @@ import info.guardianproject.iocipher.File;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
@@ -69,8 +72,10 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     ImageButton button_cancel;
     com.daimajia.numberprogressbar.NumberProgressBar ft_progressbar;
     ViewGroup ft_preview_container;
+    ViewGroup ft_export_button_container;
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
+    ImageButton ft_export_button;
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
@@ -101,8 +106,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
         message_text_date_string = (TextView) itemView.findViewById(R.id.message_text_date_string);
         message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
+        ft_export_button_container = (ViewGroup) itemView.findViewById(R.id.ft_export_button_container);
+        ft_export_button = (ImageButton) itemView.findViewById(R.id.ft_export_button);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void bindMessageList(Message m)
     {
         // Log.i(TAG, "bindMessageList");
@@ -196,10 +204,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             ft_preview_image.setImageDrawable(null);
             ft_preview_container.setVisibility(View.GONE);
             ft_preview_image.setVisibility(View.GONE);
+            ft_export_button_container.setVisibility(View.GONE);
+            ft_export_button.setVisibility(View.GONE);
         }
         else
         {
-            // TODO: show preview and "click" to open/delete file
             textView.setAutoLinkText("" + message.text + "\n OK");
 
             boolean is_image = false;
@@ -295,61 +304,88 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
                 ft_preview_image.setImageDrawable(d3);
 
-
-                if (VFS_ENCRYPT)
+                ft_preview_image.setOnTouchListener(new View.OnTouchListener()
                 {
-                    ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event)
                     {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event)
+                        if (event.getAction() == MotionEvent.ACTION_UP)
                         {
-                            if (event.getAction() == MotionEvent.ACTION_UP)
+                            try
                             {
-                                try
-                                {
-                                    final Uri uri = Uri.parse(
-                                            IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
+                                final Uri uri = Uri.parse(
+                                        IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
 
-                                   // Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
-                                   //            message2.filename_fullpath);
+                                // Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
+                                //            message2.filename_fullpath);
 
-                                    File file = new File(message2.filename_fullpath);
-                                    String filename_without_path = file.getName();
+                                File file = new File(message2.filename_fullpath);
+                                String filename_without_path = file.getName();
 
-                                    new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
-                                            setTitle(filename_without_path).
-                                            setNeutralButton("View", new DialogInterface.OnClickListener()
+                                new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
+                                        setTitle(filename_without_path).
+                                        setNeutralButton("View", new DialogInterface.OnClickListener()
+                                        {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which)
                                             {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which)
+                                                try
                                                 {
-                                                    try
-                                                    {
-                                                        Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
-                                                        v.getContext().startActivity(sendIntent);
-                                                    }
-                                                    catch (ActivityNotFoundException e)
-                                                    {
-                                                        Log.e(TAG, "No relevant Activity found", e);
-                                                    }
+                                                    Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
+                                                    v.getContext().startActivity(sendIntent);
                                                 }
-                                            }).show();
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                    Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
-                                }
+                                                catch (ActivityNotFoundException e)
+                                                {
+                                                    Log.e(TAG, "No relevant Activity found", e);
+                                                }
+                                            }
+                                        }).show();
                             }
-                            else
+                            catch (Exception e)
                             {
+                                e.printStackTrace();
+                                Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
                             }
-                            return true;
                         }
-                    });
-                }
+                        else
+                        {
+                        }
+                        return true;
+                    }
+                });
+
 
             }
+
+            ft_export_button_container.setVisibility(View.VISIBLE);
+            ft_export_button.setVisibility(View.VISIBLE);
+
+            ft_export_button.setOnTouchListener(new View.OnTouchListener()
+            {
+                @Override
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    if (event.getAction() == MotionEvent.ACTION_UP)
+                    {
+                        try
+                        {
+                            String export_filename = SD_CARD_FILES_EXPORT_DIR + "/" + message2.tox_friendpubkey + "/";
+                            FileDB file_ = orma.selectFromFileDB().idEq(message2.filedb_id).get(0);
+                            HelperGeneric.export_vfs_file_to_real_file(file_.path_name, file_.file_name,
+                                                                       export_filename, file_.file_name);
+
+                            Toast.makeText(v.getContext(),
+                                           "File exported to:" + "\n" + export_filename + file_.file_name,
+                                           Toast.LENGTH_LONG).show();
+
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                    }
+                    return true;
+                }
+            });
 
             ft_preview_container.setVisibility(View.VISIBLE);
             ft_preview_image.setVisibility(View.VISIBLE);

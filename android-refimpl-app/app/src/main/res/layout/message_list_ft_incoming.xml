@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/message_entry_padding">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/message_entry_padding">
 
     <LinearLayout
         android:id="@+id/layout_message_container"
@@ -28,17 +28,17 @@
                 android:src="@drawable/user_pratikshya"
                 app:civ_border_color="#50000000"
                 app:civ_border_width="2dp"
-                app:civ_fill_color="@color/md_grey_400"/>
+                app:civ_fill_color="@color/md_grey_400" />
 
             <ImageView
                 android:id="@+id/img_corner"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginRight="0dp"
                 android:layout_marginTop="14dp"
+                android:layout_marginRight="0dp"
                 android:layout_weight="1"
                 android:alpha="0.5"
-                android:src="@drawable/arrow_bg2"/>
+                android:src="@drawable/arrow_bg2" />
 
 
             <LinearLayout
@@ -67,7 +67,7 @@
                         android:padding="2dp"
                         android:scaleType="centerInside"
                         android:src="@drawable/circle_red"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
 
                     <com.luseen.autolinklibrary.EmojiTextViewLinks
                         android:id="@+id/m_text"
@@ -78,7 +78,7 @@
                         android:text="..."
                         android:textColorLink="@color/textblock_link_color_for_orange"
                         android:textSize="20sp"
-                        app:emojiSize="@dimen/emoji_size_in_textview"/>
+                        app:emojiSize="@dimen/emoji_size_in_textview" />
 
                 </LinearLayout>
 
@@ -108,24 +108,23 @@
                         app:progress_text_size="12sp"
                         app:progress_text_visibility="visible"
                         app:progress_unreached_bar_height="4dp"
-                        app:progress_unreached_color="#66CCCCCC"
-                        />
+                        app:progress_unreached_color="#66CCCCCC" />
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/ft_preview_container"
                     android:layout_width="fill_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="200dp"
                     android:layout_marginRight="0dp"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="3dp"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1" />
 
                     <ImageButton
                         android:id="@+id/ft_preview_image"
@@ -137,18 +136,43 @@
                         android:background="@android:color/transparent"
                         android:elevation="4dp"
                         android:minHeight="50dp"
-                        android:paddingBottom="8dp"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:paddingTop="8dp"
+                        android:paddingLeft="0dp"
+                        android:paddingTop="4dp"
+                        android:paddingRight="0dp"
+                        android:paddingBottom="4dp"
                         android:scaleType="fitCenter"
-                        android:src="@null"/>
+                        android:src="@null" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="3dp"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1" />
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ft_export_button_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <ImageButton
+                        android:id="@+id/ft_export_button"
+                        android:layout_width="100dp"
+                        android:layout_height="65dp"
+                        android:scaleType="fitCenter"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="25dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:elevation="4dp"
+                        android:padding="2dp"
+                        android:src="@android:drawable/ic_menu_save"
+                        android:visibility="visible" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -164,16 +188,16 @@
                         android:id="@+id/ft_button_ok"
                         android:layout_width="65dp"
                         android:layout_height="match_parent"
-                        android:layout_marginBottom="8dp"
                         android:layout_marginLeft="25dp"
-                        android:layout_marginRight="25dp"
                         android:layout_marginTop="8dp"
+                        android:layout_marginRight="25dp"
+                        android:layout_marginBottom="8dp"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:elevation="4dp"
                         android:padding="2dp"
                         android:src="@android:drawable/ic_menu_add"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
                     <ImageButton
                         android:id="@+id/ft_dummy1"
@@ -181,22 +205,22 @@
                         android:layout_height="match_parent"
                         android:layout_weight="100"
                         android:background="@android:color/transparent"
-                        android:src="@null"/>
+                        android:src="@null" />
 
                     <ImageButton
                         android:id="@+id/ft_button_cancel"
                         android:layout_width="65dp"
                         android:layout_height="match_parent"
-                        android:layout_marginBottom="8dp"
                         android:layout_marginLeft="25dp"
-                        android:layout_marginRight="25dp"
                         android:layout_marginTop="8dp"
+                        android:layout_marginRight="25dp"
+                        android:layout_marginBottom="8dp"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:elevation="4dp"
                         android:padding="2dp"
                         android:src="@android:drawable/ic_menu_close_clear_cancel"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -215,22 +239,22 @@
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="10"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/date_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:layout_marginBottom="@dimen/message_entry_datetime_bottom_padding"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="-2dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="@dimen/message_entry_datetime_bottom_padding"
                 android:gravity="top"
                 android:padding="0dp"
                 android:text="2017-06-20 14:00:12"
                 android:textAlignment="gravity"
                 android:textColor="#EFEFEF"
-                android:textSize="13sp"/>
+                android:textSize="13sp" />
 
         </LinearLayout>
 
@@ -253,25 +277,25 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="100"
-            android:background="@color/md_white_1000"/>
+            android:background="@color/md_white_1000" />
 
         <TextView
             android:id="@+id/message_text_date_string"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
             android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_weight="1"
             android:background="@drawable/rounded_date_bg"
-            android:paddingBottom="2dp"
-            android:paddingEnd="@dimen/padding_small"
-            android:paddingLeft="@dimen/padding_small"
-            android:paddingRight="@dimen/padding_small"
             android:paddingStart="@dimen/padding_small"
+            android:paddingLeft="@dimen/padding_small"
             android:paddingTop="2dp"
+            android:paddingEnd="@dimen/padding_small"
+            android:paddingRight="@dimen/padding_small"
+            android:paddingBottom="2dp"
             android:text="2017-05-14"
             android:textColor="@color/md_white_1000"
-            android:textSize="@dimen/text_small"/>
+            android:textSize="@dimen/text_small" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -280,7 +304,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="100"
-            android:background="@color/md_white_1000"/>
+            android:background="@color/md_white_1000" />
 
     </LinearLayout>
 
