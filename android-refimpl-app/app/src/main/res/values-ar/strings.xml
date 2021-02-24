@@ -314,4 +314,7 @@
     <string name="MainActivity_yes_button">نعم</string>
     <string name="pref_description_auto_accept_all_upto">قبول تلقائي لجميع الملفات التي يصل حجمها إلى 200 ميغا بايت</string>
     <string name="pref_title_auto_accept_all_upto">قبول تلقائي لجميع الملفات</string>
+    <string name="pref_description_start_on_boot">بدء تشغيل التطبيق بعد التمهيد.
+\nجوجل لا يسمح هذا بعد الآن بدءا من الروبوت 10</string>
+    <string name="pref_title_start_on_boot">بدء التشغيل على التمهيد</string>
 </resources>
