@@ -22,15 +22,17 @@ package com.zoffcc.applications.trifa;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
 
@@ -63,12 +65,17 @@ public class AddFriendActivity extends AppCompatActivity
             @Override
             public void afterTextChanged(Editable editable)
             {
-                if (editable.length() == (TOX_ADDRESS_SIZE * 2))
+                String toxid = editable.toString().
+                        replace(" ", "").
+                        replace("\r", "").
+                        replace("\n", "");
+
+                if (toxid.length() == (TOX_ADDRESS_SIZE * 2))
                 {
                     button_add.setEnabled(true);
                     friend_toxid_inputlayout.setErrorEnabled(false);
                 }
-                else if (editable.length() == ((TOX_ADDRESS_SIZE * 2) + "tox:".length()))
+                else if (toxid.length() == ((TOX_ADDRESS_SIZE * 2) + "tox:".length()))
                 {
                     // TODO: acutally see if editable starts with "tox:", but it can be in any case (ToX: or toX: or TOX: ....)
                     button_add.setEnabled(true);
@@ -77,7 +84,7 @@ public class AddFriendActivity extends AppCompatActivity
                 else
                 {
                     button_add.setEnabled(false);
-                    if (editable.length() > 0)
+                    if (toxid.length() > 0)
                     {
                         friend_toxid_inputlayout.setError(getString(R.string.AddFriendActivity_3));
                     }
@@ -138,7 +145,12 @@ public class AddFriendActivity extends AppCompatActivity
 
         if (toxid_ok == true)
         {
-            intent.putExtra("toxid", toxid_text.getText().toString());
+            String tox_id_text_clean = toxid_text.getText().toString().
+                    replace(" ", "").
+                    replace("\r", "").
+                    replace("\n", "");
+
+            intent.putExtra("toxid", tox_id_text_clean);
             setResult(RESULT_OK, intent);
         }
         else
