@@ -1043,7 +1043,7 @@ JNIEnv *AttachJava()
     (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **)&java, &args);
 #else
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &java, &args);
-#fi
+#endif
     return java;
 }
 
@@ -2367,7 +2367,7 @@ void *thread_av(void *data)
     (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **)&env, &args);
 #else
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
-#fi
+#endif
     dbg(9, "2001");
     // ToxAV *av = (ToxAV *) data;
     dbg(9, "2002");
@@ -2398,7 +2398,7 @@ void *thread_video_av(void *data)
     (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **)&env, &args);
 #else
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
-#fi
+#endif
     dbg(9, "2001");
     ToxAV *av = (ToxAV *) data;
     dbg(9, "2002");
@@ -2442,7 +2442,7 @@ void *thread_audio_av(void *data)
     (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **)&env, &args);
 #else
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
-#fi
+#endif
     ToxAV *av = (ToxAV *) data;
     pthread_t id = pthread_self();
     dbg(2, "AV audio Thread #%d: starting", (int) id);
