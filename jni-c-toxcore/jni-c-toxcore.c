@@ -529,7 +529,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     dbg(9, "1008");
 
 #ifdef __MINGW32__
-    snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\%s", app_data_dir, savedata_filename);
+    snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_filename);
 #else
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
 #endif
@@ -726,7 +726,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
 
 #ifdef __MINGW32__
-    snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\%s", app_data_dir, savedata_filename);
+    snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_filename);
 #else
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
 #endif
@@ -734,7 +734,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
 
 #ifdef __MINGW32__
-    snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s\%s", app_data_dir, savedata_tmp_filename);
+    snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_tmp_filename);
 #else
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
 #endif
