@@ -31,7 +31,10 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#ifndef __MINGW32__
 #include <sys/ioctl.h>
+#endif
 #include <unistd.h>
 
 #include <fcntl.h>
@@ -50,9 +53,13 @@
 
 #include <pthread.h>
 
+#ifndef __MINGW32__
 #include <linux/videodev2.h>
+#endif
 #include <vpx/vpx_image.h>
+#ifndef __MINGW32__
 #include <sys/mman.h>
+#endif
 
 #define AV_MEDIACODEC 1
 
@@ -76,8 +83,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 62
-static const char global_version_string[] = "0.99.62";
+#define VERSION_PATCH 63
+static const char global_version_string[] = "0.99.63";
 // ----------- version -----------
 // ----------- version -----------
 
