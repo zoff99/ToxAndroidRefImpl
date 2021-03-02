@@ -760,7 +760,15 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     FILE *f = fopen(full_path_filename_tmp, "wb");
     fwrite((const void *)savedata_enc, size_enc, 1, f);
     fclose(f);
-    rename(full_path_filename_tmp, full_path_filename);
+    dbg(9, "update_savedata_file:rename src=%s dst=%s", full_path_filename_tmp, full_path_filename);
+
+#ifdef __MINGW32__
+    // HINT: rename() will refuse to overwrite existing files with WIN32 mingw
+    unlink(full_path_filename);
+#endif
+
+    int res_rename = rename(full_path_filename_tmp, full_path_filename);
+    dbg(9, "update_savedata_file:rename src=%s dst=%s res=%d", full_path_filename_tmp, full_path_filename, res_rename);
     free(full_path_filename);
     free(full_path_filename_tmp);
 
