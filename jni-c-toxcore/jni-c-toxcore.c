@@ -32,9 +32,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifndef __MINGW32__
-#include <sys/ioctl.h>
-#endif
 #include <unistd.h>
 
 #include <fcntl.h>
@@ -53,13 +50,7 @@
 
 #include <pthread.h>
 
-#ifndef __MINGW32__
-#include <linux/videodev2.h>
-#endif
 #include <vpx/vpx_image.h>
-#ifndef __MINGW32__
-#include <sys/mman.h>
-#endif
 
 #define AV_MEDIACODEC 1
 
@@ -536,7 +527,13 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     dbg(9, "1007");
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
     dbg(9, "1008");
+
+#ifdef __MINGW32__
+    snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\%s", app_data_dir, savedata_filename);
+#else
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
+#endif
+
     dbg(9, "1009");
     FILE *f = fopen(full_path_filename, "rb");
 
@@ -727,9 +724,21 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     // dbg(9, "update_savedata_file:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
+
+#ifdef __MINGW32__
+    snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\%s", app_data_dir, savedata_filename);
+#else
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
+#endif
+
     char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
+
+#ifdef __MINGW32__
+    snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s\%s", app_data_dir, savedata_tmp_filename);
+#else
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
+#endif
+
     size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
     // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
     uint8_t *savedata_enc = malloc(size_enc);
