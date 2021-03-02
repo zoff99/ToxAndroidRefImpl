@@ -764,7 +764,6 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 
 #ifdef __MINGW32__
     // HINT: rename() will refuse to overwrite existing files with WIN32 mingw
-    XXX;
     unlink(full_path_filename);
 #endif
 
