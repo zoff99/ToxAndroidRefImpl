@@ -74,8 +74,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 63
-static const char global_version_string[] = "0.99.63";
+#define VERSION_PATCH 70
+static const char global_version_string[] = "0.99.70";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -764,6 +764,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 
 #ifdef __MINGW32__
     // HINT: rename() will refuse to overwrite existing files with WIN32 mingw
+    XXX;
     unlink(full_path_filename);
 #endif
 
