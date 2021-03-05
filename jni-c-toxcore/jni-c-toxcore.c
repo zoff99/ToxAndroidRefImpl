@@ -74,8 +74,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 70
-static const char global_version_string[] = "0.99.70";
+#define VERSION_PATCH 71
+static const char global_version_string[] = "0.99.71";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -2399,7 +2399,9 @@ void *thread_av(void *data)
     dbg(9, "2003");
     dbg(2, "AV Thread #%d: starting", (int) id);
 
+#ifndef __APPLE__
     pthread_setname_np(pthread_self(), "t_av()");
+#endif
 
     while(toxav_iterate_thread_stop != 1)
     {
@@ -2431,8 +2433,9 @@ void *thread_video_av(void *data)
     dbg(2, "AV video Thread #%d: starting", (int) id);
     // long av_iterate_interval = 1;
 
+#ifndef __APPLE__
     pthread_setname_np(pthread_self(), "t_v_iter()");
-
+#endif
 
     while(toxav_video_thread_stop != 1)
     {
@@ -2472,7 +2475,9 @@ void *thread_audio_av(void *data)
     dbg(2, "AV audio Thread #%d: starting", (int) id);
     // long av_iterate_interval = 1;
 
+#ifndef __APPLE__
     pthread_setname_np(pthread_self(), "t_a_iter()");
+#endif
 
     int delta = 0;
     int want_iterate_ms = 5;
