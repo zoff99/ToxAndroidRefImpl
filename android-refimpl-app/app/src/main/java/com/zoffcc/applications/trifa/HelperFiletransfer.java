@@ -55,55 +55,58 @@ public class HelperFiletransfer
                     get_filetransfer_filename_from_id(message.filetransfer_id).toLowerCase());
             // Log.i(TAG, "check_auto_accept_incoming_filetransfer:mime-type=" + mimeType);
 
-            if (PREF__auto_accept_image)
+            if (mimeType != null)
             {
-                if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                    6 * 1014 * 1024) // if file size is smaller than 6 MByte accept FT
+                if (PREF__auto_accept_image)
                 {
-                    if (mimeType.startsWith("image"))
+                    if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
+                        6 * 1014 * 1024) // if file size is smaller than 6 MByte accept FT
                     {
-                        if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
+                        if (mimeType.startsWith("image"))
                         {
-                            // accept FT
-                            set_filetransfer_accepted_from_id(message.filetransfer_id);
-                            set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
-                            set_message_accepted_from_id(message.id);
-                            set_message_state_from_id(message.id, TOX_FILE_CONTROL_RESUME.value);
-                            tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
-                                             get_filetransfer_filenum_from_id(message.filetransfer_id),
-                                             TOX_FILE_CONTROL_RESUME.value);
+                            if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
+                            {
+                                // accept FT
+                                set_filetransfer_accepted_from_id(message.filetransfer_id);
+                                set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
+                                set_message_accepted_from_id(message.id);
+                                set_message_state_from_id(message.id, TOX_FILE_CONTROL_RESUME.value);
+                                tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
+                                                 get_filetransfer_filenum_from_id(message.filetransfer_id),
+                                                 TOX_FILE_CONTROL_RESUME.value);
 
-                            // update message view
-                            update_single_message_from_messge_id(message.id, true);
-                            // Log.i(TAG, "check_auto_accept_incoming_filetransfer:image:accepted");
-                            return true;
+                                // update message view
+                                update_single_message_from_messge_id(message.id, true);
+                                // Log.i(TAG, "check_auto_accept_incoming_filetransfer:image:accepted");
+                                return true;
+                            }
                         }
                     }
                 }
-            }
 
-            if (PREF__auto_accept_video)
-            {
-                if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                    20 * 1014 * 1024) // if file size is smaller than 20 MByte accept FT
+                if (PREF__auto_accept_video)
                 {
-                    if (mimeType.startsWith("video"))
+                    if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
+                        20 * 1014 * 1024) // if file size is smaller than 20 MByte accept FT
                     {
-                        if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
+                        if (mimeType.startsWith("video"))
                         {
-                            // accept FT
-                            set_filetransfer_accepted_from_id(message.filetransfer_id);
-                            set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
-                            set_message_accepted_from_id(message.id);
-                            set_message_state_from_id(message.id, TOX_FILE_CONTROL_RESUME.value);
-                            tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
-                                             get_filetransfer_filenum_from_id(message.filetransfer_id),
-                                             TOX_FILE_CONTROL_RESUME.value);
+                            if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
+                            {
+                                // accept FT
+                                set_filetransfer_accepted_from_id(message.filetransfer_id);
+                                set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_RESUME.value);
+                                set_message_accepted_from_id(message.id);
+                                set_message_state_from_id(message.id, TOX_FILE_CONTROL_RESUME.value);
+                                tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
+                                                 get_filetransfer_filenum_from_id(message.filetransfer_id),
+                                                 TOX_FILE_CONTROL_RESUME.value);
 
-                            // update message view
-                            update_single_message_from_messge_id(message.id, true);
-                            // Log.i(TAG, "check_auto_accept_incoming_filetransfer:video:accepted");
-                            return true;
+                                // update message view
+                                update_single_message_from_messge_id(message.id, true);
+                                // Log.i(TAG, "check_auto_accept_incoming_filetransfer:video:accepted");
+                                return true;
+                            }
                         }
                     }
                 }
