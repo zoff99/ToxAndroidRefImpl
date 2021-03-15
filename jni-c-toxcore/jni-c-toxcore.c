@@ -2210,6 +2210,57 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1filteraudio_1active(JNIEnv 
 
 
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_crgb2yuv(JNIEnv *env, jobject thiz, jobject rgba_buf,
+        jobject yuv_buf, jint w_yuv, jint h_yuv, jint w_rgba, jint h_rgba)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+
+    uint8_t *video_buffer_rgba = (uint8_t *)(*jnienv2)->GetDirectBufferAddress(jnienv2, rgba_buf);
+    // jlong capacity_rgba = (*jnienv2)->GetDirectBufferCapacity(jnienv2, rgba_buf);
+    // long video_buffer_rgba_size = (long)capacity_rgba;
+
+    uint8_t *video_buffer_yuv = (uint8_t *)(*jnienv2)->GetDirectBufferAddress(jnienv2, yuv_buf);
+    // jlong capacity_yuv = (*jnienv2)->GetDirectBufferCapacity(jnienv2, yuv_buf);
+    // long video_buffer_yuv_size = (long)capacity_yuv;
+
+    int rgba_pos = 0;
+
+    for (int j = 0; j < h_rgba; j++)
+    {
+        for (int i = 0; i < w_rgba; i++)
+        {
+            int color = (uint32_t)(video_buffer_rgba[rgba_pos]);
+
+            // int alpha = color >> 24 & 0xff;
+            int R = color >> 16 & 0xff;
+            int G = color >> 8 & 0xff;
+            int B = color & 0xff;
+
+            //~ int y = (int) ((0.257 * red) + (0.504 * green) + (0.098 * blue) + 16);
+            //~ int v = (int) ((0.439 * red) - (0.368 * green) - (0.071 * blue) + 128);
+            //~ int u = (int) (-(0.148 * red) - (0.291 * green) + (0.439 * blue) + 128);
+
+            int Y = (int) (R * .299000 + G * .587000 + B * 0.114000);
+            int U = (int) (R * -.168736 + G * -.331264 + B * 0.500000 + 128);
+            int V = (int) (R * .500000 + G * -.418688 + B * -0.081312 + 128);
+
+            int arraySize = h_yuv * w_yuv;
+            int yLoc = j * w_yuv + i;
+            int uLoc = (j / 2) * (w_yuv / 2) + i / 2 + arraySize;
+            int vLoc = (j / 2) * (w_yuv / 2) + i / 2 + arraySize + arraySize / 4;
+
+            video_buffer_yuv[yLoc] = (uint8_t) Y;
+            video_buffer_yuv[uLoc] = (uint8_t) U;
+            video_buffer_yuv[vLoc] = (uint8_t) V;
+
+            rgba_pos++;
+        }
+    }
+}
+
+
 /*
  * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
  * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
