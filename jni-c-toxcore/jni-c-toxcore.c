@@ -2024,14 +2024,10 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
 void toxav_audio_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, const int16_t *pcm, size_t sample_count,
                                    uint8_t channels, uint32_t sampling_rate, void *user_data, uint64_t pts)
 {
-    dbg(9, "toxav_audio_receive_frame_cb_:001");
     pthread_mutex_lock(&group_audio___mutex);
-    dbg(9, "toxav_audio_receive_frame_cb_:002");
     if (!global_group_audio_peerbuffers_buffer)
     {
-    dbg(9, "toxav_audio_receive_frame_cb_:003");
         videocall_audio_alloc_peer_buffer();
-    dbg(9, "toxav_audio_receive_frame_cb_:004");
     }
 
     // TODO: check that incoming audio is actually coming from the correct friend!
@@ -2042,25 +2038,18 @@ void toxav_audio_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, const 
     global_videocall_audio_sample_rate = sampling_rate;
     global_videocall_audio_channels = channels;
 
-    dbg(9, "toxav_audio_receive_frame_cb_:005");
     pthread_mutex_unlock(&group_audio___mutex);
-    dbg(9, "toxav_audio_receive_frame_cb_:006");
 
     pthread_mutex_lock(&group_audio___mutex);
-    dbg(9, "toxav_audio_receive_frame_cb_:007");
     
     // dbg(9, "toxav_audio_receive_frame_cb_:sample_count=%d sampling_rate=%d channels=%d",
     //    sample_count,
     //    sampling_rate,
     //    channels);
 
-    dbg(9, "toxav_audio_receive_frame_cb_:008");
     global_call_audio_last_pts = pts;
-    dbg(9, "toxav_audio_receive_frame_cb_:009");
     videocall_audio_add_buffer(pcm, (sample_count * channels));
-    dbg(9, "toxav_audio_receive_frame_cb_:010");
     pthread_mutex_unlock(&group_audio___mutex);
-    dbg(9, "toxav_audio_receive_frame_cb_:099");
 }
 
 void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height,
