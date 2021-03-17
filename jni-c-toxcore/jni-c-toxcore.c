@@ -58,6 +58,17 @@
 #include <libavcodec/jni.h>
 #endif
 
+
+#ifdef __APPLE__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
+#ifndef OS_WIN32
+#include <sys/time.h>
+#endif
+
+
 // HINT: it may not be working properly
 // #define USE_ECHO_CANCELLATION 1
 
@@ -457,9 +468,48 @@ time_t get_unix_time(void)
 static uint64_t current_time_monotonic_default()
 {
     uint64_t time = 0;
+#ifdef OS_WIN32
+    /* Must hold mono_time->last_clock_lock here */
+
+    /* GetTickCount provides only a 32 bit counter, but we can't use
+     * GetTickCount64 for backwards compatibility, so we handle wraparound
+     * ourselves.
+     */
+    uint32_t ticks = GetTickCount();
+
+    /* the higher 32 bits count the number of wrap arounds */
+    uint64_t old_ovf = mono_time->time & ~((uint64_t)UINT32_MAX);
+
+    /* Check if time has decreased because of 32 bit wrap from GetTickCount() */
+    if (ticks < mono_time->last_clock_mono) {
+        /* account for overflow */
+        old_ovf += UINT32_MAX + UINT64_C(1);
+    }
+
+    if (mono_time->last_clock_update) {
+        mono_time->last_clock_mono = ticks;
+        mono_time->last_clock_update = false;
+    }
+
+    /* splice the low and high bits back together */
+    time = old_ovf + ticks;
+#else
     struct timespec clock_mono;
+#if defined(__APPLE__)
+    clock_serv_t muhclock;
+    mach_timespec_t machtime;
+
+    host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &muhclock);
+    clock_get_time(muhclock, &machtime);
+    mach_port_deallocate(mach_task_self(), muhclock);
+
+    clock_mono.tv_sec = machtime.tv_sec;
+    clock_mono.tv_nsec = machtime.tv_nsec;
+#else
     clock_gettime(CLOCK_MONOTONIC, &clock_mono);
+#endif
     time = 1000ULL * clock_mono.tv_sec + (clock_mono.tv_nsec / 1000000ULL);
+#endif
     return time;
 }
 
