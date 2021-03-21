@@ -31,7 +31,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/ioctl.h>
+
 #include <unistd.h>
 
 #include <fcntl.h>
@@ -50,15 +50,24 @@
 
 #include <pthread.h>
 
-#include <linux/videodev2.h>
 #include <vpx/vpx_image.h>
-#include <sys/mman.h>
 
 #define AV_MEDIACODEC 1
 
 #ifdef AV_MEDIACODEC
 #include <libavcodec/jni.h>
 #endif
+
+
+#ifdef __APPLE__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
+#ifndef OS_WIN32
+#include <sys/time.h>
+#endif
+
 
 // HINT: it may not be working properly
 // #define USE_ECHO_CANCELLATION 1
@@ -76,8 +85,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 62
-static const char global_version_string[] = "0.99.62";
+#define VERSION_PATCH 71
+static const char global_version_string[] = "0.99.71";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -459,9 +468,48 @@ time_t get_unix_time(void)
 static uint64_t current_time_monotonic_default()
 {
     uint64_t time = 0;
+#ifdef OS_WIN32
+    /* Must hold mono_time->last_clock_lock here */
+
+    /* GetTickCount provides only a 32 bit counter, but we can't use
+     * GetTickCount64 for backwards compatibility, so we handle wraparound
+     * ourselves.
+     */
+    uint32_t ticks = GetTickCount();
+
+    /* the higher 32 bits count the number of wrap arounds */
+    uint64_t old_ovf = mono_time->time & ~((uint64_t)UINT32_MAX);
+
+    /* Check if time has decreased because of 32 bit wrap from GetTickCount() */
+    if (ticks < mono_time->last_clock_mono) {
+        /* account for overflow */
+        old_ovf += UINT32_MAX + UINT64_C(1);
+    }
+
+    if (mono_time->last_clock_update) {
+        mono_time->last_clock_mono = ticks;
+        mono_time->last_clock_update = false;
+    }
+
+    /* splice the low and high bits back together */
+    time = old_ovf + ticks;
+#else
     struct timespec clock_mono;
+#if defined(__APPLE__)
+    clock_serv_t muhclock;
+    mach_timespec_t machtime;
+
+    host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &muhclock);
+    clock_get_time(muhclock, &machtime);
+    mach_port_deallocate(mach_task_self(), muhclock);
+
+    clock_mono.tv_sec = machtime.tv_sec;
+    clock_mono.tv_nsec = machtime.tv_nsec;
+#else
     clock_gettime(CLOCK_MONOTONIC, &clock_mono);
+#endif
     time = 1000ULL * clock_mono.tv_sec + (clock_mono.tv_nsec / 1000000ULL);
+#endif
     return time;
 }
 
@@ -529,7 +577,13 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     dbg(9, "1007");
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
     dbg(9, "1008");
+
+#ifdef __MINGW32__
+    snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_filename);
+#else
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
+#endif
+
     dbg(9, "1009");
     FILE *f = fopen(full_path_filename, "rb");
 
@@ -720,9 +774,21 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     // dbg(9, "update_savedata_file:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
     char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
+
+#ifdef __MINGW32__
+    snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_filename);
+#else
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
+#endif
+
     char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
+
+#ifdef __MINGW32__
+    snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_tmp_filename);
+#else
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
+#endif
+
     size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
     // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
     uint8_t *savedata_enc = malloc(size_enc);
@@ -744,7 +810,15 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     FILE *f = fopen(full_path_filename_tmp, "wb");
     fwrite((const void *)savedata_enc, size_enc, 1, f);
     fclose(f);
-    rename(full_path_filename_tmp, full_path_filename);
+    dbg(9, "update_savedata_file:rename src=%s dst=%s", full_path_filename_tmp, full_path_filename);
+
+#ifdef __MINGW32__
+    // HINT: rename() will refuse to overwrite existing files with WIN32 mingw
+    unlink(full_path_filename);
+#endif
+
+    int res_rename = rename(full_path_filename_tmp, full_path_filename);
+    dbg(9, "update_savedata_file:rename src=%s dst=%s res=%d", full_path_filename_tmp, full_path_filename, res_rename);
     free(full_path_filename);
     free(full_path_filename_tmp);
 
@@ -1039,7 +1113,11 @@ JNIEnv *AttachJava()
 {
     JavaVMAttachArgs args = {JNI_VERSION_1_6, 0, 0};
     JNIEnv *java;
+#ifdef JAVA_LINUX
+    (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **)&java, &args);
+#else
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &java, &args);
+#endif
     return java;
 }
 
@@ -2182,6 +2260,57 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1filteraudio_1active(JNIEnv 
 
 
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_crgb2yuv(JNIEnv *env, jobject thiz, jobject rgba_buf,
+        jobject yuv_buf, jint w_yuv, jint h_yuv, jint w_rgba, jint h_rgba)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+
+    uint8_t *video_buffer_rgba = (uint8_t *)(*jnienv2)->GetDirectBufferAddress(jnienv2, rgba_buf);
+    // jlong capacity_rgba = (*jnienv2)->GetDirectBufferCapacity(jnienv2, rgba_buf);
+    // long video_buffer_rgba_size = (long)capacity_rgba;
+
+    uint8_t *video_buffer_yuv = (uint8_t *)(*jnienv2)->GetDirectBufferAddress(jnienv2, yuv_buf);
+    // jlong capacity_yuv = (*jnienv2)->GetDirectBufferCapacity(jnienv2, yuv_buf);
+    // long video_buffer_yuv_size = (long)capacity_yuv;
+
+    int rgba_pos = 0;
+
+    for (int j = 0; j < h_rgba; j++)
+    {
+        for (int i = 0; i < w_rgba; i++)
+        {
+            int color = (uint32_t)(video_buffer_rgba[rgba_pos]);
+
+            // int alpha = color >> 24 & 0xff;
+            int R = color >> 16 & 0xff;
+            int G = color >> 8 & 0xff;
+            int B = color & 0xff;
+
+            //~ int y = (int) ((0.257 * red) + (0.504 * green) + (0.098 * blue) + 16);
+            //~ int v = (int) ((0.439 * red) - (0.368 * green) - (0.071 * blue) + 128);
+            //~ int u = (int) (-(0.148 * red) - (0.291 * green) + (0.439 * blue) + 128);
+
+            int Y = (int) (R * .299000 + G * .587000 + B * 0.114000);
+            int U = (int) (R * -.168736 + G * -.331264 + B * 0.500000 + 128);
+            int V = (int) (R * .500000 + G * -.418688 + B * -0.081312 + 128);
+
+            int arraySize = h_yuv * w_yuv;
+            int yLoc = j * w_yuv + i;
+            int uLoc = (j / 2) * (w_yuv / 2) + i / 2 + arraySize;
+            int vLoc = (j / 2) * (w_yuv / 2) + i / 2 + arraySize + arraySize / 4;
+
+            video_buffer_yuv[yLoc] = (uint8_t) Y;
+            video_buffer_yuv[uLoc] = (uint8_t) U;
+            video_buffer_yuv[vLoc] = (uint8_t) V;
+
+            rgba_pos++;
+        }
+    }
+}
+
+
 /*
  * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
  * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
@@ -2359,7 +2488,11 @@ void *thread_av(void *data)
 {
     JavaVMAttachArgs args = {JNI_VERSION_1_6, 0, 0};
     JNIEnv *env;
+#ifdef JAVA_LINUX
+    (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **)&env, &args);
+#else
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
+#endif
     dbg(9, "2001");
     // ToxAV *av = (ToxAV *) data;
     dbg(9, "2002");
@@ -2367,7 +2500,9 @@ void *thread_av(void *data)
     dbg(9, "2003");
     dbg(2, "AV Thread #%d: starting", (int) id);
 
+#ifndef __APPLE__
     pthread_setname_np(pthread_self(), "t_av()");
+#endif
 
     while(toxav_iterate_thread_stop != 1)
     {
@@ -2386,7 +2521,11 @@ void *thread_video_av(void *data)
 {
     JavaVMAttachArgs args = {JNI_VERSION_1_6, 0, 0};
     JNIEnv *env;
+#ifdef JAVA_LINUX
+    (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **)&env, &args);
+#else
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
+#endif
     dbg(9, "2001");
     ToxAV *av = (ToxAV *) data;
     dbg(9, "2002");
@@ -2395,8 +2534,9 @@ void *thread_video_av(void *data)
     dbg(2, "AV video Thread #%d: starting", (int) id);
     // long av_iterate_interval = 1;
 
+#ifndef __APPLE__
     pthread_setname_np(pthread_self(), "t_v_iter()");
-
+#endif
 
     while(toxav_video_thread_stop != 1)
     {
@@ -2425,13 +2565,20 @@ void *thread_audio_av(void *data)
 {
     JavaVMAttachArgs args = {JNI_VERSION_1_6, 0, 0};
     JNIEnv *env;
+
+#ifdef JAVA_LINUX
+    (*cachedJVM)->AttachCurrentThread(cachedJVM, (void **)&env, &args);
+#else
     (*cachedJVM)->AttachCurrentThread(cachedJVM, &env, &args);
+#endif
     ToxAV *av = (ToxAV *) data;
     pthread_t id = pthread_self();
     dbg(2, "AV audio Thread #%d: starting", (int) id);
     // long av_iterate_interval = 1;
 
+#ifndef __APPLE__
     pthread_setname_np(pthread_self(), "t_a_iter()");
+#endif
 
     int delta = 0;
     int want_iterate_ms = 5;
@@ -5738,6 +5885,45 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv
     }
 
     // dbg(9, "toxav_video_send_frame:res=%d,error=%d", (int)res, (int)error);
+    return (jint)error;
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1age(JNIEnv *env, jobject thiz,
+        jlong friend_number, jint frame_width_px, jint frame_height_px, jint age_ms)
+{
+    TOXAV_ERR_SEND_FRAME error;
+    video_buffer_2_y_size = (int)(frame_width_px * frame_height_px);
+    video_buffer_2_u_size = (int)(video_buffer_2_y_size / 4);
+    video_buffer_2_v_size = (int)(video_buffer_2_y_size / 4);
+    video_buffer_2_u = (uint8_t *)(video_buffer_2 + video_buffer_2_y_size);
+    video_buffer_2_v = (uint8_t *)(video_buffer_2 + video_buffer_2_y_size + video_buffer_2_u_size);
+    // dbg(9, "toxav_video_send_frame_age:fn=%d,video_buffer_2=%p,w=%d,h=%d", (int)friend_number, video_buffer_2, (int)frame_width_px, (int)frame_height_px);
+    bool res = toxav_video_send_frame_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                      (uint16_t)frame_height_px,
+                                      (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error, (uint32_t)age_ms);
+
+    if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+    {
+        // yieldcpu(1); // sleep 1 ms
+
+        res = toxav_video_send_frame_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                     (uint16_t)frame_height_px,
+                                     (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error, (uint32_t)age_ms);
+
+        if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
+        {
+            yieldcpu(1); // sleep 1 ms
+
+            res = toxav_video_send_frame_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
+                                         (uint16_t)frame_height_px,
+                                         (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error, (uint32_t)age_ms);
+
+        }
+    }
+
+    // dbg(9, "toxav_video_send_frame_age:res=%d,error=%d", (int)res, (int)error);
     return (jint)error;
 }
 
