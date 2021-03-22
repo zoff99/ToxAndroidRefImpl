@@ -11,4 +11,27 @@
     <string name="conference_message_list_activity_name">Текстова конференція</string>
     <string name="message_list_activity_name">Розмова</string>
     <string name="add_friend_activity_name">Додати друга</string>
+    <string name="pref_title_higher_audio_quality">Якість звуку</string>
+    <string name="pref_description_mic_gain_factor">Якщо ваш співрозмовник погано вас чує, збільшить цей параметр</string>
+    <string name="pref_title_mic_gain_factor">Підсилення мікрофону</string>
+    <string name="pref_description_global_font_size">Розмір текстової інформації зображеної у додатку</string>
+    <string name="pref_title_global_font_size">Розмір шрифту</string>
+    <string name="pref_title_video_cam_resolution">Роздільна здатність камери</string>
+    <string name="pref_description_higher_video_quality">Вікористовуйте кращу якість Відеозв\'язку.
+\nЗміна потребує перезавантаження застосунку!</string>
+    <string name="pref_title_higher_video_quality">Якість зображення</string>
+    <string name="pref_title_auto_accept_all_upto">автоматично приймати усі файли</string>
+    <string name="pref_description_auto_accept_video">автоматично приймати Відео файли розміром до 20 мегабайтів</string>
+    <string name="pref_title_auto_accept_video">автоматично приймати відео</string>
+    <string name="pref_title_auto_accept_image">автоматично приймати зображення</string>
+    <string name="pref_header_general">Головні</string>
+    <string name="settings_toolbar_title">Налаштування</string>
+    <string name="title_activity_maintenance">Обслуговування</string>
+    <string name="title_activity_share">відкрити з TRIfA</string>
+    <string name="title_activity_check_password">Ввести пароль</string>
+    <string name="title_activity_set_password">Встановити пароль</string>
+    <string name="title_activity_aboutpage">Про</string>
+    <string name="title_activity_conferencepeerinfo">Інформація піра</string>
+    <string name="title_activity_friendinfo">Детально про друга</string>
+    <string name="title_activity_crash">Зламався</string>
 </resources>
