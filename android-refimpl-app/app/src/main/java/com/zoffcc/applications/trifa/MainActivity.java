@@ -83,7 +83,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
-import com.vanniktech.emoji.ios.IosEmojiProvider;
+import com.vanniktech.emoji.google.GoogleEmojiProvider;
 import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
@@ -507,7 +507,8 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         Log.i(TAG, "M:STARTUP:EmojiManager install");
-        EmojiManager.install(new IosEmojiProvider());
+        // EmojiManager.install(new IosEmojiProvider());
+        EmojiManager.install(new GoogleEmojiProvider());
         // EmojiManager.install(new EmojiOneProvider());
 
 
@@ -5610,7 +5611,7 @@ public class MainActivity extends AppCompatActivity
                             //      "namelist_change_cb:INFO:" + " 002 " + conference_number + ":" + peer_number + ":" +
                             //      peer_pubkey_temp2);
                             conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number,
-                                                                            peer_name_temp2,false);
+                                                                            peer_name_temp2, false);
                             //Log.i(TAG, "namelist_change_cb:INFO:" + " 003");
                         }
                     }
@@ -5843,7 +5844,8 @@ public class MainActivity extends AppCompatActivity
                                 Log.i(TAG,
                                       "namelist_change_cb:INFO:" + " 002.1 " + conference_number + ":" + peer_number +
                                       ":" + peer_pubkey_temp2);
-                                conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number, null,false);
+                                conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number, null,
+                                                                                false);
                                 // TODO: because here the name is always "Tox User" !!
                             }
                         }
@@ -5872,7 +5874,7 @@ public class MainActivity extends AppCompatActivity
                                       "namelist_change_cb:INFO:" + " 002 " + conference_number + ":" + peer_number +
                                       ":" + peer_pubkey_temp2);
                                 conference_message_list_activity.add_group_user(peer_pubkey_temp2, peer_number,
-                                                                                peer_name_temp2,false);
+                                                                                peer_name_temp2, false);
                                 Log.i(TAG, "namelist_change_cb:INFO:" + " 003");
                             }
                         }
