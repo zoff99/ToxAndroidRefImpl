@@ -5918,7 +5918,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1age(J
 
             res = toxav_video_send_frame_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                          (uint16_t)frame_height_px,
-                                         (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error, (uint32_t)age_ms);
+                                         (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error, (uint32_t)age_ms + 1);
 
         }
     }
@@ -5943,7 +5943,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264_
         res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                           (uint16_t)frame_height_px,
                                           (uint8_t *)video_buffer_2,
-                                          (uint32_t)data_len, &error, (uint32_t)(age_ms + 1));
+                                          (uint32_t)data_len, &error, (uint32_t)(age_ms));
 
         if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
         {
@@ -5951,7 +5951,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264_
             res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                               (uint16_t)frame_height_px,
                                               (uint8_t *)video_buffer_2,
-                                              (uint32_t)data_len, &error, (uint32_t)(age_ms + 2));
+                                              (uint32_t)data_len, &error, (uint32_t)(age_ms + 1));
         }
     }
 
