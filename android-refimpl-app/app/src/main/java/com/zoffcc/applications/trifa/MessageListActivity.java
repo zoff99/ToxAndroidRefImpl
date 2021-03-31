@@ -131,7 +131,7 @@ public class MessageListActivity extends AppCompatActivity
     static final int MEDIAPICK_ID_001 = 8002;
     //
     static com.vanniktech.emoji.EmojiEditText ml_new_message = null;
-    EmojiPopup emojiPopup = null;
+    com.vanniktech.emoji.EmojiPopup emojiPopup = null;
     ImageView insert_emoji = null;
     TextView ml_maintext = null;
     ViewGroup rootView = null;
