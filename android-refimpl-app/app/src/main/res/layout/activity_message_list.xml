@@ -165,7 +165,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="7dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/emoji_google_category_people"
+            app:srcCompat="@drawable/i_emoji_google_category_people"
             tools:ignore="ContentDescription" />
 
         <com.vanniktech.emoji.EmojiEditText
