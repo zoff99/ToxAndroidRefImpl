@@ -3459,7 +3459,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1messa
 
 /** -----XX-----SPLIT-02-----XX----- */
 
-
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message_1v2(JNIEnv *env,
         jobject thiz, jlong friend_number, jint type, jlong ts_sec,
@@ -3499,7 +3498,39 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
     capacity = (*env)->GetDirectBufferCapacity(env, raw_msg_len_back);
     uint32_t raw_msg_len_back_c;
     const char *message_str = NULL;
+    // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
+
+
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)message);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)message, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
+                  (int)type, (uint32_t) ts_sec,
+                  (const uint8_t *)pBytes, (size_t)plength,
+                  (uint8_t *)raw_message_back_buffer_c, &raw_msg_len_back_c, (uint8_t *)msgid_back_buffer_c,
+                  &error);
+    (*env)->ReleaseStringUTFChars(env, message, message_str);
+    // HINT: give number back as 2 bytes in ByteBuffer
+    //       a bit hacky, but it works
+    raw_msg_len_back_c_2[0] = (uint8_t)(raw_msg_len_back_c % 256); // low byte
+    raw_msg_len_back_c_2[1] = (uint8_t)(raw_msg_len_back_c / 256); // high byte
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+#else
+
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
                   (int)type, (uint32_t) ts_sec,
@@ -3511,6 +3542,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
     //       a bit hacky, but it works
     raw_msg_len_back_c_2[0] = (uint8_t)(raw_msg_len_back_c % 256); // low byte
     raw_msg_len_back_c_2[1] = (uint8_t)(raw_msg_len_back_c / 256); // high byte
+
+#endif
 
     if(res == -1)
     {
@@ -3578,12 +3611,36 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEnv *env, jobject thiz,
         jlong friend_number, jint type, jobject message)
 {
+
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)message);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)message, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)pBytes,
+                                           (size_t)plength, &error);
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+#else
+
     const char *message_str = NULL;
+    // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)message_str,
                                            (size_t)strlen(message_str), &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
+
+#endif
 
     if(error != 0)
     {
@@ -3747,12 +3804,37 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env
         return (jint)-1;
     }
 
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)name);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)name, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_SET_INFO error;
+    bool res = tox_self_set_name(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+    return (jint)res;
+
+#else
+
     const char *s = NULL;
+    // TODO: UTF-8
     s = (*env)->GetStringUTFChars(env, name, NULL);
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_name(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
     (*env)->ReleaseStringUTFChars(env, name, s);
     return (jint)res;
+
+#endif
 }
 
 JNIEXPORT jint JNICALL
@@ -3764,12 +3846,38 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(
         return (jint)-1;
     }
 
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)status_message);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)status_message, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_SET_INFO error;
+    bool res = tox_self_set_status_message(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+    return (jint)res;
+
+#else
+
     const char *s = NULL;
+    // TODO: UTF-8
     s = (*env)->GetStringUTFChars(env, status_message, NULL);
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_status_message(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
     (*env)->ReleaseStringUTFChars(env, status_message, s);
     return (jint)res;
+
+#endif
+
 }
 
 JNIEXPORT void JNICALL
@@ -5033,12 +5141,36 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1send_1message(JNIEnv *env, jobject thiz,
         jlong conference_number, jint type, jobject message)
 {
+
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)message);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)message, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_CONFERENCE_SEND_MESSAGE error;
+    bool res = tox_conference_send_message(tox_global, (uint32_t)conference_number, (int)type, (uint8_t *)pBytes,
+                                           (size_t)plength, &error);
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+#else
+
     const char *message_str = NULL;
+    // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
     TOX_ERR_CONFERENCE_SEND_MESSAGE error;
     bool res = tox_conference_send_message(tox_global, (uint32_t)conference_number, (int)type, (uint8_t *)message_str,
                                            (size_t)strlen(message_str), &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
+
+#endif
 
     if(res == false)
     {
