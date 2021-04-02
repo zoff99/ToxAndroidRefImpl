@@ -3512,7 +3512,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
     (*env)->DeleteLocalRef(env, charsetName);
 
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
-    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
@@ -3622,7 +3622,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEn
     (*env)->DeleteLocalRef(env, charsetName);
 
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
-    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)pBytes,
@@ -3814,7 +3814,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env
     (*env)->DeleteLocalRef(env, charsetName);
 
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
-    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_name(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
@@ -3856,7 +3856,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(
     (*env)->DeleteLocalRef(env, charsetName);
 
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
-    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_status_message(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
@@ -5152,7 +5152,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1send_1message(J
     (*env)->DeleteLocalRef(env, charsetName);
 
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
-    const jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
     TOX_ERR_CONFERENCE_SEND_MESSAGE error;
     bool res = tox_conference_send_message(tox_global, (uint32_t)conference_number, (int)type, (uint8_t *)pBytes,
