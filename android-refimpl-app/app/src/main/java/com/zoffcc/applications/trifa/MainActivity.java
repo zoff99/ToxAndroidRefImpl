@@ -4542,6 +4542,7 @@ public class MainActivity extends AppCompatActivity
         {
             Filetransfer ft = orma.selectFromFiletransfer().
                     directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
+                    stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     file_numberEq(file_number).
                     orderByIdDesc().
@@ -4914,7 +4915,7 @@ public class MainActivity extends AppCompatActivity
             f = orma.selectFromFiletransfer().
                     directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
                     file_numberEq(file_number).
-                    and().
+                    stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().
                     get(0);
