@@ -555,16 +555,6 @@ public class HelperFiletransfer
         }
     }
 
-    static void update_filetransfer_db_fos_open(final Filetransfer f)
-    {
-        orma.updateFiletransfer().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                and().
-                file_numberEq(f.file_number).
-                fos_open(f.fos_open).
-                execute();
-    }
-
     static void update_filetransfer_db_current_position(final Filetransfer f)
     {
         orma.updateFiletransfer().

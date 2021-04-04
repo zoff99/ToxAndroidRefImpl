@@ -185,8 +185,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_VP8;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos_normal;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
@@ -4817,6 +4815,7 @@ public class MainActivity extends AppCompatActivity
             f.ft_accepted = false;
             f.ft_outgoing_started = false; // dummy for incoming FTs, but still set it here
             f.current_position = 0;
+            f.message_id = -1;
             long ft_id = HelperFiletransfer.insert_into_filetransfer_db(f);
             f.id = ft_id;
             // add FT message to UI
@@ -4922,6 +4921,11 @@ public class MainActivity extends AppCompatActivity
 
             // Log.i(TAG, "file_recv_chunk:filesize==" + f.filesize);
 
+            if (f == null)
+            {
+                return;
+            }
+
             if (position == 0)
             {
                 // Log.i(TAG, "file_recv_chunk:START-O-F:filesize==" + f.filesize);
@@ -4949,6 +4953,7 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
+            return;
         }
 
         if (length == 0)
@@ -4959,48 +4964,6 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "file_recv_chunk:file fully received");
 
-                if (VFS_ENCRYPT)
-                {
-                    info.guardianproject.iocipher.FileOutputStream fos = null;
-                    fos = cache_ft_fos.get(
-                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
-
-                    if (f.fos_open)
-                    {
-                        try
-                        {
-                            fos.close();
-                        }
-                        catch (Exception e3)
-                        {
-                            Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
-                        }
-                    }
-
-                    f.fos_open = false;
-                }
-                else
-                {
-                    java.io.FileOutputStream fos = null;
-                    fos = cache_ft_fos_normal.get(
-                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
-
-                    if (f.fos_open)
-                    {
-                        try
-                        {
-                            fos.close();
-                        }
-                        catch (Exception e3)
-                        {
-                            Log.i(TAG, "file_recv_chunk:EE3:" + e3.getMessage());
-                        }
-                    }
-
-                    f.fos_open = false;
-                }
-
-                HelperFiletransfer.update_filetransfer_db_fos_open(f);
                 HelperGeneric.move_tmp_file_to_real_file(f.path_name, f.file_name,
                                                          VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string +
                                                          "/", f.file_name);
@@ -5081,77 +5044,18 @@ public class MainActivity extends AppCompatActivity
             {
                 if (VFS_ENCRYPT)
                 {
-                    info.guardianproject.iocipher.FileOutputStream fos = null;
-
-                    if (!f.fos_open)
+                    try
                     {
-                        fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                        // Log.i(TAG, "file_recv_chunk:new fos[1]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                        cache_ft_fos.put(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                fos);
-                        f.fos_open = true;
-                        HelperFiletransfer.update_filetransfer_db_fos_open(f);
+                        info.guardianproject.iocipher.RandomAccessFile fos = new info.guardianproject.iocipher.RandomAccessFile(
+                                f.path_name + "/" + f.file_name, "rw");
+
+                        fos.seek(position);
+                        fos.write(data);
+                        fos.close();
                     }
-                    else
+                    catch (Exception e)
                     {
-                        fos = cache_ft_fos.get(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
-
-                        if (fos == null)
-                        {
-                            fos = new info.guardianproject.iocipher.FileOutputStream(f.path_name + "/" + f.file_name);
-                            // Log.i(TAG,
-                            //       "file_recv_chunk:new fos[2]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                            cache_ft_fos.put(
-                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                    fos);
-                            f.fos_open = true;
-                            HelperFiletransfer.update_filetransfer_db_fos_open(f);
-                        }
-
-                        // Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
                     }
-
-                    // Log.i(TAG, "file_recv_chunk:fos:" + fos);
-                    fos.write(data);
-                }
-                else
-                {
-                    java.io.FileOutputStream fos = null;
-
-                    if (!f.fos_open)
-                    {
-                        fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                        // Log.i(TAG, "file_recv_chunk:new fos[3]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                        cache_ft_fos_normal.put(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                fos);
-                        f.fos_open = true;
-                        HelperFiletransfer.update_filetransfer_db_fos_open(f);
-                    }
-                    else
-                    {
-                        fos = cache_ft_fos_normal.get(
-                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number);
-
-                        if (fos == null)
-                        {
-                            fos = new java.io.FileOutputStream(f.path_name + "/" + f.file_name);
-                            // Log.i(TAG,
-                            //      "file_recv_chunk:new fos[4]=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                            cache_ft_fos_normal.put(
-                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number) + ":" + file_number,
-                                    fos);
-                            f.fos_open = true;
-                            HelperFiletransfer.update_filetransfer_db_fos_open(f);
-                        }
-
-                        // Log.i(TAG, "file_recv_chunk:fos=" + fos + " file=" + f.path_name + "/" + f.file_name);
-                    }
-
-                    // Log.i(TAG, "file_recv_chunk:fos:" + fos);
-                    fos.write(data);
                 }
 
                 if (f.filesize < UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES)

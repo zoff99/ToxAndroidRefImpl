@@ -158,8 +158,8 @@ public class TRIFAGlobals
     static final int USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS = 10;
 
     // ---- lookup cache ----
-    static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
-    static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
+    // static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
+    // static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
     // ---- lookup cache ----
 
     static List<BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<>();
