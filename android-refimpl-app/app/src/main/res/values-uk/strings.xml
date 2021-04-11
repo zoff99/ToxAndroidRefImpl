@@ -34,4 +34,59 @@
     <string name="title_activity_conferencepeerinfo">Інформація піра</string>
     <string name="title_activity_friendinfo">Детально про друга</string>
     <string name="title_activity_crash">Зламався</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! Експериментально !!
+\nНе синхронізуйте відео або аудіо. Використовуйте це налаштування, якщо у вас є проблеми з відеодзвінками, як крайній засіб.</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">не синхронізувати Звук і Зображення</string>
+    <string name="pref_description_X_misc_button_enabled">!! Експериментально !!
+\nдодайте кнопку на екрані дзвінка, щоб надіслати фіксоване повідомлення</string>
+    <string name="pref_title_X_misc_button_enabled">Кнопка «Інше»</string>
+    <string name="pref_description_X_battery_saving_mode">!! Експериментально !!
+\nце заощадить трохи більше батареї, але надсилання та отримання повідомлення триватиме довше.
+\nМожливо, є й інші погані наслідки!</string>
+    <string name="pref_title_X_battery_saving_mode">Режим економії заряду акумулятора</string>
+    <string name="pref_description_X_use_native_audio_play">!! Експериментально !!
+\nВикористовуйте рідне аудіо для відтворення звуку</string>
+    <string name="pref_title_X_use_native_audio_play">Власна аудіосистема</string>
+    <string name="pref_description_X_zoom_incoming_video">дозволити зменшити масштаб вікна відеодзвінка. Це працює не повністю!</string>
+    <string name="pref_title_X_zoom_incoming_video">Масштаб вікна відео виклику</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Якщо у вас виникають проблеми з вимкненням екрана в аудіовиклику, вимкніть це</string>
+    <string name="pref_title_allow_screen_off_in_audio_call">Вимкнути екран</string>
+    <string name="pref_description_U_keep_nospam">зберегти значення NoSpam. Це не безпечно, активуйте лише якщо ви знаєте, що робите!</string>
+    <string name="pref_title_U_keep_nospam">Зберегти NoSpam</string>
+    <string name="pref_description_local_discovery_enabled">використовувати початкові вузли із локальної мережі</string>
+    <string name="pref_title_local_discovery_enabled">Пошук у локальній мережі</string>
+    <string name="pref_description_video_uv_reversed">Зворотний порядок площин UV у відео камери</string>
+    <string name="pref_title_video_uv_reversed">зворотне UV у відео</string>
+    <string name="pref_description_conference_show_system_messages">показувати системні повідомлення на конференціях</string>
+    <string name="pref_title_conference_show_system_messages">Системні повідомлення</string>
+    <string name="pref_description_set_fps">спробуйте встановити частоту кадрів 15 кадрів в секунду, це може зірватися на деяких телефонах</string>
+    <string name="pref_title_set_fps">встановити fps</string>
+    <string name="pref_description_use_incognito_keyboard">вимкніть, щоб сказати клавіатурі не вчитися з введених слів</string>
+    <string name="pref_title_use_incognito_keyboard">клавіатура інкогніто</string>
+    <string name="pref_description_start_on_boot">запустити програму після завантаження пристрою.
+\nGoogle більше не дозволяє це, починаючи з Android 10</string>
+    <string name="pref_title_start_on_boot">запуск під час завантаження пристрою</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">Кодер H264 повинен використовувати кадри внутрішнього оновлення</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 внутрішнє оновлення</string>
+    <string name="pref_description_fps_half">Частота кадрів відео 1/2: так 12 кадрів в секунду замість 25 кадрів в секунду</string>
+    <string name="pref_title_fps_half">зменшити кількість кадрів у секунду</string>
+    <string name="pref_description_orbot_enabled">Для використання опції встановіть додаток Orbot.
+\nПотрібен пепезапуск додатку!</string>
+    <string name="pref_title_orbot_enabled">увімкнути Tor-проксі</string>
+    <string name="pref_description_force_udp_only">примусово використоввувати UDP, деякі контакти можуть бути недоступні із таким налаштуванням
+\nЗміна потребує перезавантаження додатку!</string>
+    <string name="pref_description_camera_get_preview_format">Здається, формат попереднього перегляду камери на деяких телефонах неправильний</string>
+    <string name="pref_title_force_udp_only">примусовий режим UDP</string>
+    <string name="pref_description_udp_enabled">для більшості мобільних пристроїв UDP збільшить обсяг Інтернет-трафіку.
+\nЗміна параметру потребує перезавантаження додатку!
+\nНалаштування за замовчуванням вимкнено</string>
+    <string name="pref_title_udp_enabled">увімкнути UDP</string>
+    <string name="pref_description_higher_audio_quality">Використовуйте кращу якість звуку.
+\nДля зміни потрібно перезавантажити додаток!</string>
+    <string name="pref_title_camera_get_preview_format">Формат попереднього перегляду камери</string>
+    <string name="pref_description_video_cam_resolution">Яку роздільну здатність використовувати для відеодзвінка</string>
+    <string name="pref_description_software_echo_cancel">Використовувати програмне ехоподавлення</string>
+    <string name="pref_title_software_echo_cancel">Ехоподавлення</string>
+    <string name="pref_description_auto_accept_all_upto">автоматично приймати всі файли розміром до 200 MByte</string>
+    <string name="pref_description_auto_accept_image">автоматично приймати зображення та фотографії розміром до 6 МБайт</string>
 </resources>
