@@ -89,4 +89,33 @@
     <string name="pref_title_software_echo_cancel">Ехоподавлення</string>
     <string name="pref_description_auto_accept_all_upto">автоматично приймати всі файли розміром до 200 MByte</string>
     <string name="pref_description_auto_accept_image">автоматично приймати зображення та фотографії розміром до 6 МБайт</string>
+    <string name="MainActivity_add_to_batt_opt">Будь ласка, додайте TRIfA до списку винятків для оптимізації батареї!</string>
+    <string name="layout___set_password_or_skip">Встановіть пароль або пропустіть.
+\n
+\nЯкщо ви вирішите пропустити, то
+\nпароль буде автоматично сформовано.
+\nНемає можливості відновлення!</string>
+    <string name="add_friend_activity_help">Вставте Tox ID друга у текстове поле вище або торкніться кнопки QR-код, щоб відсканувати код друга камерою.</string>
+    <string name="pref_title_sound">Звук</string>
+    <string name="pref_title_vibrate">Вібрувати</string>
+    <string name="pref_ringtone_silent">Безшумно</string>
+    <string name="pref_title_ringtone">Рингтон</string>
+    <string name="pref_title_new_message_notifications">Сповіщення про нові повідомлення</string>
+    <string name="pref_header_notifications">Сповіщення</string>
+    <string name="pref_title_system_sync_settings">Налаштування системної синхронізації</string>
+    <string name="pref_description_X_battery_saving_timeout">Налаштування за замовчуванням - 15 хвилин</string>
+    <string name="pref_title_X_battery_saving_timeout">Автономний час у режимі економії заряду акумулятора</string>
+    <string name="pref_description_X_audio_recording_frame_size">Налаштування за замовчуванням - 40 мс</string>
+    <string name="pref_title_X_audio_recording_frame_size">Розмір аудіофрейму</string>
+    <string name="pref_description_min_audio_samplingrate_out">Налаштування за замовчуванням - 48000 Гц</string>
+    <string name="pref_title_min_audio_samplingrate_out">Частота дискретизації звуку</string>
+    <string name="pref_title_sync_frequency">Частота синхронізації</string>
+    <string name="pref_header_data_sync">Дані та синхронізація</string>
+    <string name="pref_title_add_friends_to_messages">Додавання друзів до повідомлень</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Експериментально !!
+\nБуфер відтворення звуку в байтах, встановлений на 0, щоб вимкнути власні настройки</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Буфер відтворення аудіо</string>
+    <string name="pref_description_X_eac_delay_ms">!! Експериментально !!
+\nЗатримка AEC в мс</string>
+    <string name="pref_title_X_eac_delay_ms">Затримка AEC</string>
 </resources>
