@@ -2019,6 +2019,11 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
     global_call_audio_last_pts = 0;
     videocall_audio_add_buffer(pcm, (sample_count * channels));
     pthread_mutex_unlock(&group_audio___mutex);
+#ifdef JAVA_LINUX
+    int want_ms = (int)((sample_count * 1000) / sampling_rate);
+    // dbg(9, "toxav_audio_receive_frame_cb_:want_ms=%d", want_ms);
+    process_incoming_videocall_audio_on_iterate(1, want_ms, channels, sampling_rate, 0);
+#endif
 }
 
 void toxav_audio_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, const int16_t *pcm, size_t sample_count,
@@ -2050,6 +2055,11 @@ void toxav_audio_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, const 
     global_call_audio_last_pts = pts;
     videocall_audio_add_buffer(pcm, (sample_count * channels));
     pthread_mutex_unlock(&group_audio___mutex);
+#ifdef JAVA_LINUX
+    int want_ms = (int)((sample_count * 1000) / sampling_rate);
+    // dbg(9, "toxav_audio_receive_frame_cb_:want_ms=%d", want_ms);
+    process_incoming_videocall_audio_on_iterate(1, want_ms, channels, sampling_rate, 0);
+#endif
 }
 
 void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height,
@@ -6726,33 +6736,22 @@ void Pipe_reset(size_t *_rptr, size_t *_wptr)
 
 size_t Pipe_read(char* data, size_t bytes, void * check_buf, void *_buf, size_t *_rptr, size_t *_wptr)
 {
-
-    // dbg(9, "Pipe_read:001");
-
     if (!data)
     {
-        // dbg(9, "Pipe_read:002");
         return 0;
     }
 
     if (!check_buf)
     {
-        // dbg(9, "Pipe_read:003");
         return 0;
     }
 
-    // dbg(9, "Pipe_read:004");
     bytes = min(bytes, Pipe_getUsed(_rptr, _wptr));
-    // dbg(9, "Pipe_read:005");
     const size_t bytes_read1 = min(bytes, (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2) - (*_rptr));
     // dbg(9, "Pipe_read:006:data=%p check_buf=%p _buf=%p _rptr=%p, _rptr=%d bytes_read1=%d bytes=%d", data, check_buf, _buf, _rptr, (int)(*_rptr), bytes_read1, bytes);
     memcpy(data, (char *)_buf + (*_rptr), bytes_read1);
-    // dbg(9, "Pipe_read:007");
     memcpy(data + bytes_read1, _buf, bytes - bytes_read1);
-    // dbg(9, "Pipe_read:008");
     Pipe_updateIndex(_rptr, bytes);
-    // dbg(9, "Pipe_read:009");
-
 
     return bytes;
 }
