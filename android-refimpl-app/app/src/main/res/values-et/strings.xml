@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="conference_audio_activity_player_name">Helikonverentside mängija</string>
+    <string name="conference_audio_activity_name">Helikonverents</string>
+    <string name="conference_message_list_activity_name">Tekstikonverents</string>
+    <string name="message_list_activity_name">Kõne</string>
+    <string name="add_friend_activity_name">Lisa sõber</string>
+</resources>
