@@ -2020,9 +2020,15 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
     videocall_audio_add_buffer(pcm, (sample_count * channels));
     pthread_mutex_unlock(&group_audio___mutex);
 #ifdef JAVA_LINUX
-    int want_ms = (int)((sample_count * 1000) / sampling_rate);
-    // dbg(9, "toxav_audio_receive_frame_cb_:want_ms=%d", want_ms);
-    process_incoming_videocall_audio_on_iterate(1, want_ms, channels, sampling_rate, 0);
+    if (sampling_rate > 0)
+    {
+        int want_ms = (int)((sample_count * 1000) / sampling_rate);
+        if ((want_ms > 1) && (want_ms <= 120))
+        {
+            // dbg(9, "toxav_audio_receive_frame_cb_:want_ms=%d", want_ms);
+            process_incoming_videocall_audio_on_iterate(1, want_ms, channels, sampling_rate, 0);
+        }
+    }
 #endif
 }
 
@@ -2056,9 +2062,15 @@ void toxav_audio_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, const 
     videocall_audio_add_buffer(pcm, (sample_count * channels));
     pthread_mutex_unlock(&group_audio___mutex);
 #ifdef JAVA_LINUX
-    int want_ms = (int)((sample_count * 1000) / sampling_rate);
-    // dbg(9, "toxav_audio_receive_frame_cb_:want_ms=%d", want_ms);
-    process_incoming_videocall_audio_on_iterate(1, want_ms, channels, sampling_rate, 0);
+    if (sampling_rate > 0)
+    {
+        int want_ms = (int)((sample_count * 1000) / sampling_rate);
+        if ((want_ms > 1) && (want_ms <= 120))
+        {
+            // dbg(9, "toxav_audio_receive_frame_cb_:want_ms=%d", want_ms);
+            process_incoming_videocall_audio_on_iterate(1, want_ms, channels, sampling_rate, 0);
+        }
+    }
 #endif
 }
 
