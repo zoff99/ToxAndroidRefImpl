@@ -4530,10 +4530,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_chunk_request_cb_method(long friend_number, long file_number, long position, long length)
     {
-        if (PREF__X_battery_saving_mode)
-        {
-            Log.i(TAG, "global_last_activity_for_battery_savings_ts:009:*PING*");
-        }
+        //if (PREF__X_battery_saving_mode)
+        //{
+        //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:009:*PING*");
+        //}
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
         // Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
@@ -4669,18 +4669,31 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    final String fname = new File(ft.path_name + "/" + ft.file_name).getAbsolutePath();
-                    // Log.i(TAG, "file_chunk_request:fname=" + fname);
-                    long file_chunk_length = length;
-                    byte[] bytes_chunck = HelperGeneric.read_chunk_from_SD_file(fname, position, file_chunk_length);
-                    // byte[] bytes_chunck = new byte[(int) file_chunk_length];
-                    // avatar_bytes.position((int) position);
-                    // avatar_bytes.get(bytes_chunck, 0, (int) file_chunk_length);
-                    ByteBuffer file_chunk = ByteBuffer.allocateDirect((int) file_chunk_length);
-                    file_chunk.put(bytes_chunck);
-                    int res = tox_file_send_chunk(friend_number, file_number, position, file_chunk, file_chunk_length);
-                    // Log.i(TAG, "file_chunk_request:res(1)=" + res);
-                    // TODO: handle error codes from tox_file_send_chunk() here ----
+                    if (ft.storage_frame_work)
+                    {
+                        long file_chunk_length = length;
+                        byte[] bytes_chunck = HelperGeneric.read_chunk_from_SD_file(ft.path_name, position, file_chunk_length, false);
+                        ByteBuffer file_chunk = ByteBuffer.allocateDirect((int) file_chunk_length);
+                        file_chunk.put(bytes_chunck);
+                        int res = tox_file_send_chunk(friend_number, file_number, position, file_chunk,
+                                                      file_chunk_length);
+                    }
+                    else
+                    {
+                        final String fname = new File(ft.path_name + "/" + ft.file_name).getAbsolutePath();
+                        // Log.i(TAG, "file_chunk_request:fname=" + fname);
+                        long file_chunk_length = length;
+                        byte[] bytes_chunck = HelperGeneric.read_chunk_from_SD_file(fname, position, file_chunk_length,true);
+                        // byte[] bytes_chunck = new byte[(int) file_chunk_length];
+                        // avatar_bytes.position((int) position);
+                        // avatar_bytes.get(bytes_chunck, 0, (int) file_chunk_length);
+                        ByteBuffer file_chunk = ByteBuffer.allocateDirect((int) file_chunk_length);
+                        file_chunk.put(bytes_chunck);
+                        int res = tox_file_send_chunk(friend_number, file_number, position, file_chunk,
+                                                      file_chunk_length);
+                        // Log.i(TAG, "file_chunk_request:res(1)=" + res);
+                        // TODO: handle error codes from tox_file_send_chunk() here ----
+                    }
 
                     if (ft.filesize < UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES)
                     {

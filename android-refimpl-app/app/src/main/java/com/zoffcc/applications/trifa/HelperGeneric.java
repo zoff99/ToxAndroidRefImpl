@@ -30,6 +30,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -44,6 +45,7 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -77,6 +79,7 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
@@ -130,7 +133,7 @@ public class HelperGeneric
             {
                 try
                 {
-                    clearCache(MainActivity.context_s);
+                    clearCache(context_s);
                 }
                 catch (Exception e)
                 {
@@ -1651,44 +1654,67 @@ public class HelperGeneric
         }
     }
 
-    static byte[] read_chunk_from_SD_file(String file_name_with_path, long position, long file_chunk_length)
+    static byte[] read_chunk_from_SD_file(String file_name_with_path, long position, long file_chunk_length, boolean real_file_path)
     {
         byte[] out = new byte[(int) file_chunk_length];
 
-        try
+        if (real_file_path)
         {
-            RandomAccessFile raf = new RandomAccessFile(file_name_with_path, "r");
-            FileChannel inChannel = raf.getChannel();
-            MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, position, file_chunk_length);
-
-            // Log.i(TAG, "read_chunk_from_SD_file:" + buffer.limit() + " <-> " + file_chunk_length);
-
-            for (int i = 0; i < buffer.limit(); i++)
-            {
-                out[i] = buffer.get();
-            }
-
             try
             {
-                inChannel.close();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+                RandomAccessFile raf = new RandomAccessFile(file_name_with_path, "r");
+                FileChannel inChannel = raf.getChannel();
+                MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, position, file_chunk_length);
 
-            try
-            {
-                raf.close();
+                // Log.i(TAG, "read_chunk_from_SD_file:" + buffer.limit() + " <-> " + file_chunk_length);
+
+                for (int i = 0; i < buffer.limit(); i++)
+                {
+                    out[i] = buffer.get();
+                }
+
+                try
+                {
+                    inChannel.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    raf.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
         }
-        catch (Exception e)
+        else
         {
-            e.printStackTrace();
+            try
+            {
+                InputStream inputStream = context_s.getContentResolver().openInputStream(
+                        Uri.parse(file_name_with_path));
+                long actually_skipped = inputStream.skip(position);
+                if (actually_skipped != position)
+                {
+                    Log.i(TAG, "can NOT read check at position:" + position + " got pos=" + actually_skipped);
+                }
+
+                inputStream.read(out, 0, (int) file_chunk_length);
+                inputStream.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
 
         return out;

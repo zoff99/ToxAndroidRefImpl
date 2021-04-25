@@ -1130,8 +1130,8 @@ public class MessageListActivity extends AppCompatActivity
                         DocumentFile documentFile = DocumentFile.fromSingleUri(this, data.getData());
 
                         fileName = documentFile.getName();
-                        Log.i(TAG, "file_attach_for_send:documentFile:fileName=" + fileName);
-                        Log.i(TAG, "file_attach_for_send:documentFile:fileLength=" + documentFile.length());
+                        // Log.i(TAG, "file_attach_for_send:documentFile:fileName=" + fileName);
+                        // Log.i(TAG, "file_attach_for_send:documentFile:fileLength=" + documentFile.length());
 
                         ContentResolver cr = getApplicationContext().getContentResolver();
                         Cursor metaCursor = cr.query(data.getData(), null, null, null, null);
@@ -1142,16 +1142,16 @@ public class MessageListActivity extends AppCompatActivity
                                 if (metaCursor.moveToFirst())
                                 {
                                     String file_path = metaCursor.getString(0);
-                                    Log.i(TAG, "file_attach_for_send:metaCursor_path:fp=" + file_path);
-                                    Log.i(TAG, "file_attach_for_send:metaCursor_path:column names=" +
-                                               metaCursor.getColumnNames().length);
+                                    //Log.i(TAG, "file_attach_for_send:metaCursor_path:fp=" + file_path);
+                                    //Log.i(TAG, "file_attach_for_send:metaCursor_path:column names=" +
+                                    //           metaCursor.getColumnNames().length);
                                     int j;
                                     for (j = 0; j < metaCursor.getColumnNames().length; j++)
                                     {
-                                        Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
-                                                   metaCursor.getColumnName(j));
-                                        Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
-                                                   metaCursor.getString(j));
+                                        //Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
+                                        //           metaCursor.getColumnName(j));
+                                        //Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
+                                        //           metaCursor.getString(j));
                                     }
                                 }
                             }
@@ -1181,7 +1181,7 @@ public class MessageListActivity extends AppCompatActivity
                     //                    cursor.close();
 
                     String picturePath = getPath(this, selectedImage);
-                    Log.i(TAG, "file_attach_for_send:data=" + data.getData() + ":" + picturePath);
+                    // Log.i(TAG, "file_attach_for_send:data=" + data.getData() + ":" + picturePath);
 
                     //                    Uri uri = null;
                     //                    if (data != null)
@@ -1196,7 +1196,7 @@ public class MessageListActivity extends AppCompatActivity
 
                     final String src_path = new File(new File(picturePath).getAbsolutePath()).getParent();
                     final String src_filename = new File(picturePath).getName();
-                    Log.i(TAG, "file_attach_for_send:select_file:22:p=" + src_path + " f=" + src_filename);
+                    // Log.i(TAG, "file_attach_for_send:select_file:22:p=" + src_path + " f=" + src_filename);
 
                     final String fileName_ = fileName;
 
@@ -1226,8 +1226,6 @@ public class MessageListActivity extends AppCompatActivity
 
     void add_outgoing_file(String filepath, String filename, Uri uri, boolean real_file_path)
     {
-        Log.i(TAG, "add_outgoing_file:regular file");
-
         if (real_file_path)
         {
             long file_size = -1;
@@ -1248,7 +1246,7 @@ public class MessageListActivity extends AppCompatActivity
                 return;
             }
 
-            Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
+            // Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
 
             if (friendnum == -1)
             {
@@ -1297,7 +1295,7 @@ public class MessageListActivity extends AppCompatActivity
             f.ft_outgoing_started = false;
             f.current_position = 0;
 
-            Log.i(TAG, "add_outgoing_file:tox_public_key_string=" + f.tox_public_key_string);
+            // Log.i(TAG, "add_outgoing_file:tox_public_key_string=" + f.tox_public_key_string);
 
             long ft_id = insert_into_filetransfer_db(f);
             f.id = ft_id;
@@ -1367,8 +1365,7 @@ public class MessageListActivity extends AppCompatActivity
         }
         else
         {
-            Log.i(TAG, "add_outgoing_file:filepath=" + filepath + " uri=" + uri.toString() + " uri2=" + uri);
-
+            // Log.i(TAG, "add_outgoing_file:filepath=" + filepath + " uri=" + uri.toString() + " uri2=" + uri);
 
             long file_size = -1;
             try
@@ -1376,8 +1373,8 @@ public class MessageListActivity extends AppCompatActivity
 
                 DocumentFile documentFile = DocumentFile.fromSingleUri(this, uri);
                 String fileName = documentFile.getName();
-                Log.i(TAG, "add_outgoing_file:documentFile:fileName=" + fileName);
-                Log.i(TAG, "add_outgoing_file:documentFile:fileLength=" + documentFile.length());
+                // Log.i(TAG, "add_outgoing_file:documentFile:fileName=" + fileName);
+                // Log.i(TAG, "add_outgoing_file:documentFile:fileLength=" + documentFile.length());
 
                 file_size = documentFile.length();
             }
@@ -1394,7 +1391,7 @@ public class MessageListActivity extends AppCompatActivity
                 return;
             }
 
-            Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
+            // Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
 
             if (friendnum == -1)
             {
@@ -1444,7 +1441,7 @@ public class MessageListActivity extends AppCompatActivity
             f.current_position = 0;
             f.storage_frame_work = true;
 
-            Log.i(TAG, "add_outgoing_file:tox_public_key_string=" + f.tox_public_key_string);
+            // Log.i(TAG, "add_outgoing_file:tox_public_key_string=" + f.tox_public_key_string);
 
             long ft_id = insert_into_filetransfer_db(f);
             f.id = ft_id;
