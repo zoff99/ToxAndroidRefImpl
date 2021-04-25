@@ -19,6 +19,8 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.net.Uri;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -160,6 +162,7 @@ public class TRIFAGlobals
     // ---- lookup cache ----
     // static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
     // static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
+    static Map<String, PositionInputStream> cache_ft_fis_saf = new HashMap<String, PositionInputStream>();
     // ---- lookup cache ----
 
     static List<BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<>();

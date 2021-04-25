@@ -93,6 +93,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H264;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fis_saf;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
@@ -1700,16 +1701,55 @@ public class HelperGeneric
         {
             try
             {
-                InputStream inputStream = context_s.getContentResolver().openInputStream(
-                        Uri.parse(file_name_with_path));
-                long actually_skipped = inputStream.skip(position);
-                if (actually_skipped != position)
+                PositionInputStream fis = cache_ft_fis_saf.get(file_name_with_path);
+                if (fis == null)
                 {
-                    Log.i(TAG, "can NOT read check at position:" + position + " got pos=" + actually_skipped);
+                    InputStream fis_regular = context_s.getContentResolver().openInputStream(
+                            Uri.parse(file_name_with_path));
+                    fis = new PositionInputStream(fis_regular);
+                    if (fis != null)
+                    {
+                        cache_ft_fis_saf.remove(file_name_with_path);
+                        cache_ft_fis_saf.put(file_name_with_path, fis);
+                    }
+
+                    long actually_skipped = fis.skip(position);
+                    if (actually_skipped != position)
+                    {
+                        Log.i(TAG, "can NOT read check at position:" + position + " got pos=" + actually_skipped);
+                    }
+                }
+                else
+                {
+                    if (fis.getPosition() < position)
+                    {
+                        fis.skip(position - fis.getPosition());
+                    }
+                    else
+                    {
+                        if (fis.getPosition() > position)
+                        {
+                            fis.close();
+                            cache_ft_fis_saf.remove(file_name_with_path);
+                            InputStream fis_regular = context_s.getContentResolver().openInputStream(
+                                    Uri.parse(file_name_with_path));
+                            fis = new PositionInputStream(fis_regular);
+                            if (fis != null)
+                            {
+                                cache_ft_fis_saf.put(file_name_with_path, fis);
+                            }
+
+                            long actually_skipped = fis.skip(position);
+                            if (actually_skipped != position)
+                            {
+                                Log.i(TAG,
+                                      "can NOT read check at position:" + position + " got pos=" + actually_skipped);
+                            }
+                        }
+                    }
                 }
 
-                inputStream.read(out, 0, (int) file_chunk_length);
-                inputStream.close();
+                fis.read(out, 0, (int) file_chunk_length);
             }
             catch (Exception e)
             {

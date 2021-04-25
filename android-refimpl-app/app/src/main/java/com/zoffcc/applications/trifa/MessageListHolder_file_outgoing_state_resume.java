@@ -48,6 +48,7 @@ import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_state_from_id;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
@@ -280,6 +281,8 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
                                          TOX_FILE_CONTROL_CANCEL.value);
                         set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
                         set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+
+                        remove_ft_from_cache(message);
 
                         button_ok.setVisibility(View.GONE);
                         button_cancel.setVisibility(View.GONE);

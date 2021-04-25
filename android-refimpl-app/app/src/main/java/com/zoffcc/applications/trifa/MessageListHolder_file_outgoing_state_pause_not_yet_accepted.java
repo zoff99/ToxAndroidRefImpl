@@ -48,6 +48,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 
+import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
@@ -253,6 +254,8 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
                         Log.i(TAG, "button_cancel:OnTouch:res=" + res);
                         set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
                         set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+
+                        remove_ft_from_cache(message);
 
                         button_ok.setVisibility(View.GONE);
                         button_cancel.setVisibility(View.GONE);

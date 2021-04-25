@@ -49,6 +49,7 @@ import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_start_sending_from_id;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_state_from_id;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.update_filetransfer_db_full;
@@ -365,6 +366,8 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                         Log.i(TAG, "button_cancel:OnTouch:res=" + res);
                         set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
                         set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+
+                        remove_ft_from_cache(message);
 
                         button_ok.setVisibility(View.GONE);
                         button_cancel.setVisibility(View.GONE);

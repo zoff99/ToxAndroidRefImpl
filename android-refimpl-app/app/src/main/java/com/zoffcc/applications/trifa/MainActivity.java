@@ -139,6 +139,7 @@ import static com.zoffcc.applications.trifa.HelperConference.get_last_conference
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -4601,6 +4602,8 @@ public class MainActivity extends AppCompatActivity
             {
                 if (length == 0)
                 {
+                    remove_ft_from_cache(ft);
+
                     Log.i(TAG, "file_chunk_request:file fully sent");
                     // transfer finished -----------
                     long filedb_id = -1;
@@ -4672,7 +4675,8 @@ public class MainActivity extends AppCompatActivity
                     if (ft.storage_frame_work)
                     {
                         long file_chunk_length = length;
-                        byte[] bytes_chunck = HelperGeneric.read_chunk_from_SD_file(ft.path_name, position, file_chunk_length, false);
+                        byte[] bytes_chunck = HelperGeneric.read_chunk_from_SD_file(ft.path_name, position,
+                                                                                    file_chunk_length, false);
                         ByteBuffer file_chunk = ByteBuffer.allocateDirect((int) file_chunk_length);
                         file_chunk.put(bytes_chunck);
                         int res = tox_file_send_chunk(friend_number, file_number, position, file_chunk,
@@ -4683,7 +4687,8 @@ public class MainActivity extends AppCompatActivity
                         final String fname = new File(ft.path_name + "/" + ft.file_name).getAbsolutePath();
                         // Log.i(TAG, "file_chunk_request:fname=" + fname);
                         long file_chunk_length = length;
-                        byte[] bytes_chunck = HelperGeneric.read_chunk_from_SD_file(fname, position, file_chunk_length,true);
+                        byte[] bytes_chunck = HelperGeneric.read_chunk_from_SD_file(fname, position, file_chunk_length,
+                                                                                    true);
                         // byte[] bytes_chunck = new byte[(int) file_chunk_length];
                         // avatar_bytes.position((int) position);
                         // avatar_bytes.get(bytes_chunck, 0, (int) file_chunk_length);

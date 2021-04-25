@@ -37,6 +37,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIF
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fis_saf;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
@@ -512,6 +513,7 @@ public class HelperFiletransfer
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
                     // set state for FT in message
                     HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    remove_ft_from_cache(f);
                     // remove link to any message
                     set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
                     // delete FT in DB
@@ -638,5 +640,57 @@ public class HelperFiletransfer
         //    }
         //};
         //t.start();
+    }
+
+    static void remove_ft_from_cache(Filetransfer f)
+    {
+        try
+        {
+            if (f.storage_frame_work)
+            {
+                // Log.i(TAG, "remove_ft_from_cache:" + f.path_name);
+                try
+                {
+                    PositionInputStream fis = cache_ft_fis_saf.get(f.path_name);
+                    if (fis != null)
+                    {
+                        fis.close();
+                    }
+                }
+                catch (Exception e2)
+                {
+                }
+                cache_ft_fis_saf.remove(f.path_name);
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    static void remove_ft_from_cache(Message m)
+    {
+        try
+        {
+            if (m.storage_frame_work)
+            {
+                // Log.i(TAG, "remove_ft_from_cache:" + m.filename_fullpath);
+                try
+                {
+                    PositionInputStream fis = cache_ft_fis_saf.get(m.filename_fullpath);
+                    if (fis != null)
+                    {
+                        fis.close();
+                    }
+                }
+                catch (Exception e2)
+                {
+                }
+                cache_ft_fis_saf.remove(m.filename_fullpath);
+            }
+        }
+        catch (Exception e)
+        {
+        }
     }
 }
