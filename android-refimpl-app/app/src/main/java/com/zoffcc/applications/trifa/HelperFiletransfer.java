@@ -671,7 +671,7 @@ public class HelperFiletransfer
     {
         try
         {
-            info.guardianproject.iocipher.RandomAccessFile fos = cache_ft_fos.get(f.path_name + "/" + f.file_name);
+            BufferedOutputStreamCustom fos = cache_ft_fos.get(f.path_name + "/" + f.file_name);
             if (fos != null)
             {
                 fos.close();
@@ -680,7 +680,7 @@ public class HelperFiletransfer
         catch (Exception e2)
         {
         }
-        Log.i(TAG, "remove_vfs_ft_from_cache:f:" + f.path_name + "/" + f.file_name);
+        // Log.i(TAG, "remove_vfs_ft_from_cache:f:" + f.path_name + "/" + f.file_name);
         cache_ft_fos.remove(f.path_name + "/" + f.file_name);
     }
 
@@ -690,8 +690,8 @@ public class HelperFiletransfer
         {
             String path_name = get_filetransfer_filename_from_id(m.filetransfer_id);
             String file_name = get_filetransfer_path_name_from_id(m.filetransfer_id);
-            info.guardianproject.iocipher.RandomAccessFile fos = cache_ft_fos.get(path_name + "/" + file_name);
-            Log.i(TAG, "remove_vfs_ft_from_cache:m:" + path_name + "/" + file_name);
+            BufferedOutputStreamCustom fos = cache_ft_fos.get(path_name + "/" + file_name);
+            // Log.i(TAG, "remove_vfs_ft_from_cache:m:" + path_name + "/" + file_name);
             if (fos != null)
             {
                 try

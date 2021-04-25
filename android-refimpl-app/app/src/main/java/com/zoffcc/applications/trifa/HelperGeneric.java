@@ -1771,10 +1771,11 @@ public class HelperGeneric
     {
         try
         {
-            info.guardianproject.iocipher.RandomAccessFile fos = cache_ft_fos.get(file_name_with_path);
+            BufferedOutputStreamCustom fos = cache_ft_fos.get(file_name_with_path);
             if (fos == null)
             {
-                fos = new info.guardianproject.iocipher.RandomAccessFile(file_name_with_path, "rw");
+                // Log.i(TAG, "write_chunk_to_VFS_file:cache:fail");
+                fos = new BufferedOutputStreamCustom(file_name_with_path);
                 try
                 {
                     cache_ft_fos.remove(file_name_with_path);
@@ -1784,7 +1785,12 @@ public class HelperGeneric
                 }
                 cache_ft_fos.put(file_name_with_path, fos);
             }
+            else
+            {
+                // Log.i(TAG,"write_chunk_to_VFS_file:cache:HIT");
+            }
 
+            // Log.i(TAG, "write_chunk_to_VFS_file:write:pos=" + position + " len=" + file_chunk_length);
             fos.seek(position);
             fos.write(data);
         }
