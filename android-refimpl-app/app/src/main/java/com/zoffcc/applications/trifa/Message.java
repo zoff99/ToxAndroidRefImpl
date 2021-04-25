@@ -19,11 +19,11 @@
 
 package com.zoffcc.applications.trifa;
 
-import androidx.annotation.Nullable;
-
 import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
+
+import androidx.annotation.Nullable;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
@@ -111,6 +111,9 @@ public class Message
     @Column(indexed = true, defaultExpr = "2")
     int resend_count; // 2 -> do not resend msg anymore, 0 or 1 -> resend count
 
+    @Column(indexed = true, defaultExpr = "false")
+    boolean storage_frame_work = false;
+
     static Message deep_copy(Message in)
     {
         Message out = new Message();
@@ -138,6 +141,7 @@ public class Message
         out.msg_version = in.msg_version;
         out.raw_msgv2_bytes = in.raw_msgv2_bytes;
         out.resend_count = in.resend_count;
+        out.storage_frame_work = in.storage_frame_work;
 
         return out;
     }
@@ -151,6 +155,7 @@ public class Message
                ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
                ", send_retries=" + send_retries + ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath +
                ", is_new=" + is_new + ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version +
-               ", resend_count=" + resend_count + ", raw_msgv2_bytes=" + "xxxxxx";
+               ", resend_count=" + resend_count + ", raw_msgv2_bytes=" + "xxxxxx" + ", storage_frame_work=" +
+               storage_frame_work;
     }
 }

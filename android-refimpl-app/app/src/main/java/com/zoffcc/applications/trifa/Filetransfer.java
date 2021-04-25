@@ -72,6 +72,9 @@ public class Filetransfer
     @Column(indexed = true, defaultExpr = "-1")
     long message_id; // f_key -> Message.id
 
+    @Column(indexed = true, defaultExpr = "false")
+    boolean storage_frame_work = false;
+
     static Filetransfer deep_copy(Filetransfer in)
     {
         Filetransfer out = new Filetransfer();
@@ -88,12 +91,16 @@ public class Filetransfer
         out.filesize = in.filesize;
         out.current_position = in.current_position;
         out.message_id = in.message_id;
+        out.storage_frame_work = in.storage_frame_work;
         return out;
     }
 
     @Override
     public String toString()
     {
-        return "id=" + id + ", kind=" + kind + ", state=" + state + ", direction=" + direction + ", path_name=" + path_name + ", file_name=" + file_name + ", filesize=" + filesize + ", current_position=" + current_position + ", message_id=" + message_id + ", tox_public_key_string=" + tox_public_key_string;
+        return "id=" + id + ", kind=" + kind + ", state=" + state + ", direction=" + direction + ", path_name=" +
+               path_name + ", file_name=" + file_name + ", filesize=" + filesize + ", current_position=" +
+               current_position + ", message_id=" + message_id + ", tox_public_key_string=" + tox_public_key_string +
+               ", storage_frame_work=" + storage_frame_work;
     }
 }
