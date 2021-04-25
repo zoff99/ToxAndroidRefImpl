@@ -38,6 +38,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fis_saf;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
@@ -387,6 +388,26 @@ public class HelperFiletransfer
         }
     }
 
+    public static String get_filetransfer_path_name_from_id(long filetransfer_id)
+    {
+        try
+        {
+            if (orma.selectFromFiletransfer().idEq(filetransfer_id).count() == 1)
+            {
+                return orma.selectFromFiletransfer().idEq(filetransfer_id).get(0).path_name;
+            }
+            else
+            {
+                return "";
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public static void set_filetransfer_for_message_from_friendnum_and_filenum(long friend_number, long file_number, long ft_id)
     {
         try
@@ -472,6 +493,7 @@ public class HelperFiletransfer
                     delete_filetransfer_tmpfile(friend_number, file_number);
                     // set state for FT in message
                     HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    remove_vfs_ft_from_cache(f);
                     // remove link to any message
                     set_filetransfer_for_message_from_friendnum_and_filenum(friend_number, file_number, -1);
                     // delete FT in DB
@@ -498,6 +520,7 @@ public class HelperFiletransfer
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
                     set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_CANCEL.value);
                     HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    remove_vfs_ft_from_cache(f);
                     // delete tmp file
                     delete_filetransfer_tmpfile(friend_number, file_number);
                     // delete FT in DB
@@ -542,6 +565,8 @@ public class HelperFiletransfer
                     {
                         HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
                     }
+
+                    remove_ft_from_cache(f);
 
                     // delete tmp file
                     delete_filetransfer_tmpfile(friend_number, file_number);
@@ -640,6 +665,48 @@ public class HelperFiletransfer
         //    }
         //};
         //t.start();
+    }
+
+    static void remove_vfs_ft_from_cache(Filetransfer f)
+    {
+        try
+        {
+            info.guardianproject.iocipher.RandomAccessFile fos = cache_ft_fos.get(f.path_name + "/" + f.file_name);
+            if (fos != null)
+            {
+                fos.close();
+            }
+        }
+        catch (Exception e2)
+        {
+        }
+        Log.i(TAG, "remove_vfs_ft_from_cache:f:" + f.path_name + "/" + f.file_name);
+        cache_ft_fos.remove(f.path_name + "/" + f.file_name);
+    }
+
+    static void remove_vfs_ft_from_cache(Message m)
+    {
+        try
+        {
+            String path_name = get_filetransfer_filename_from_id(m.filetransfer_id);
+            String file_name = get_filetransfer_path_name_from_id(m.filetransfer_id);
+            info.guardianproject.iocipher.RandomAccessFile fos = cache_ft_fos.get(path_name + "/" + file_name);
+            Log.i(TAG, "remove_vfs_ft_from_cache:m:" + path_name + "/" + file_name);
+            if (fos != null)
+            {
+                try
+                {
+                    fos.close();
+                }
+                catch (Exception e2)
+                {
+                }
+            }
+            cache_ft_fos.remove(path_name + "/" + file_name);
+        }
+        catch (Exception e2)
+        {
+        }
     }
 
     static void remove_ft_from_cache(Filetransfer f)

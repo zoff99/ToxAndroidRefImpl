@@ -94,6 +94,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H264;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fis_saf;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
@@ -1709,7 +1710,13 @@ public class HelperGeneric
                     fis = new PositionInputStream(fis_regular);
                     if (fis != null)
                     {
-                        cache_ft_fis_saf.remove(file_name_with_path);
+                        try
+                        {
+                            cache_ft_fis_saf.remove(file_name_with_path);
+                        }
+                        catch (Exception e)
+                        {
+                        }
                         cache_ft_fis_saf.put(file_name_with_path, fis);
                     }
 
@@ -1760,33 +1767,26 @@ public class HelperGeneric
         return out;
     }
 
-    static void write_chunk_to_VFS_file(String file_name_with_path, long position, long file_chunk_length, ByteBuffer data)
+    static void write_chunk_to_VFS_file(String file_name_with_path, final long position, long file_chunk_length, final byte[] data)
     {
         try
         {
-            info.guardianproject.iocipher.RandomAccessFile raf = new info.guardianproject.iocipher.RandomAccessFile(
-                    file_name_with_path, "rw");
-            info.guardianproject.iocipher.IOCipherFileChannel inChannel = raf.getChannel();
-            // inChannel.lseek(position, OsConstants.SEEK_SET);
-            inChannel.write(data, position);
+            info.guardianproject.iocipher.RandomAccessFile fos = cache_ft_fos.get(file_name_with_path);
+            if (fos == null)
+            {
+                fos = new info.guardianproject.iocipher.RandomAccessFile(file_name_with_path, "rw");
+                try
+                {
+                    cache_ft_fos.remove(file_name_with_path);
+                }
+                catch (Exception e)
+                {
+                }
+                cache_ft_fos.put(file_name_with_path, fos);
+            }
 
-            try
-            {
-                inChannel.close();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            try
-            {
-                raf.close();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            fos.seek(position);
+            fos.write(data);
         }
         catch (Exception e)
         {

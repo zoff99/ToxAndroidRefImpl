@@ -19,8 +19,6 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.net.Uri;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -160,7 +158,7 @@ public class TRIFAGlobals
     static final int USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS = 10;
 
     // ---- lookup cache ----
-    // static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
+    static Map<String, info.guardianproject.iocipher.RandomAccessFile> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.RandomAccessFile>();
     // static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
     static Map<String, PositionInputStream> cache_ft_fis_saf = new HashMap<String, PositionInputStream>();
     // ---- lookup cache ----

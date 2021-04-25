@@ -38,6 +38,7 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
@@ -173,6 +174,8 @@ public class MessageListHolder_file_incoming_state_pause_has_accepted extends Re
                         tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey), get_filetransfer_filenum_from_id(message.filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
                         set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
                         set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+
+                        remove_vfs_ft_from_cache(message);
 
                         button_ok.setVisibility(View.GONE);
                         button_cancel.setVisibility(View.GONE);

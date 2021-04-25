@@ -140,12 +140,14 @@ import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_c
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -4922,10 +4924,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
     {
-        if (PREF__X_battery_saving_mode)
-        {
-            Log.i(TAG, "global_last_activity_for_battery_savings_ts:011:*PING*");
-        }
+        //if (PREF__X_battery_saving_mode)
+        //{
+        //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:011:*PING*");
+        //}
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
         // Log.i(TAG, "file_recv_chunk:--START--");
@@ -5052,6 +5054,8 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
+                remove_vfs_ft_from_cache(f);
+
                 // remove FT from DB
                 HelperFiletransfer.delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
             }
@@ -5069,12 +5073,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     try
                     {
-                        info.guardianproject.iocipher.RandomAccessFile fos = new info.guardianproject.iocipher.RandomAccessFile(
-                                f.path_name + "/" + f.file_name, "rw");
-
-                        fos.seek(position);
-                        fos.write(data);
-                        fos.close();
+                        write_chunk_to_VFS_file(f.path_name + "/" + f.file_name, position, length, data);
                     }
                     catch (Exception e)
                     {
