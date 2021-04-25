@@ -23,7 +23,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+
+import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.net.Uri;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -211,7 +215,18 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
         boolean is_image = false;
         try
         {
-            String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+            String mimeType = null;
+            if (message.storage_frame_work)
+            {
+                Uri uri = Uri.parse(message.filename_fullpath);
+                DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
+                String fileName = documentFile.getName();
+                mimeType = URLConnection.guessContentTypeFromName(fileName.toLowerCase());
+            }
+            else
+            {
+                mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+            }
             if (mimeType.startsWith("image"))
             {
                 is_image = true;
@@ -274,9 +289,23 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
                     {
                         try
                         {
-                            Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
-                            intent.putExtra("image_filename", message2.filename_fullpath);
-                            v.getContext().startActivity(intent);
+                            if (message.storage_frame_work)
+                            {
+                                Uri uri = Uri.parse(message.filename_fullpath);
+                                DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
+                                String fileName = documentFile.getName();
+
+                                Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                intent.putExtra("image_filename", uri.toString());
+                                intent.putExtra("storage_frame_work", "1");
+                                v.getContext().startActivity(intent);
+                            }
+                            else
+                            {
+                                Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                intent.putExtra("image_filename", message2.filename_fullpath);
+                                v.getContext().startActivity(intent);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -292,25 +321,47 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
             });
 
 
-            java.io.File f2 = new java.io.File(message2.filename_fullpath);
-            try
+            if (message.storage_frame_work)
             {
-                final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+                try
+                {
+                    final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
 
-                GlideApp.
-                        with(context).
-                        load(f2).
-                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                        skipMemoryCache(false).
-                        priority(Priority.LOW).
-                        placeholder(R.drawable.round_loading_animation).
-                        into(ft_preview_image);
+                    GlideApp.
+                            with(context).
+                            load(Uri.parse(message.filename_fullpath)).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(false).
+                            priority(Priority.LOW).
+                            placeholder(R.drawable.round_loading_animation).
+                            into(ft_preview_image);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
-            catch (Exception e)
+            else
             {
-                e.printStackTrace();
-            }
+                java.io.File f2 = new java.io.File(message2.filename_fullpath);
+                try
+                {
+                    final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
 
+                    GlideApp.
+                            with(context).
+                            load(f2).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(false).
+                            priority(Priority.LOW).
+                            placeholder(R.drawable.round_loading_animation).
+                            into(ft_preview_image);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
         else
         {

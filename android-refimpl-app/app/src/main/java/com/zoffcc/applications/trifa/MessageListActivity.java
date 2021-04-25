@@ -935,6 +935,8 @@ public class MessageListActivity extends AppCompatActivity
             // intent.setType("image/*");
             intent.setType("*/*");
 
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             {
                 intent.putExtra(Intent.EXTRA_MIME_TYPES, "*/*");
@@ -1123,7 +1125,10 @@ public class MessageListActivity extends AppCompatActivity
 
                     try
                     {
+                        getContentResolver().takePersistableUriPermission(data.getData(),
+                                                                          Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         DocumentFile documentFile = DocumentFile.fromSingleUri(this, data.getData());
+
                         fileName = documentFile.getName();
                         Log.i(TAG, "file_attach_for_send:documentFile:fileName=" + fileName);
                         Log.i(TAG, "file_attach_for_send:documentFile:fileLength=" + documentFile.length());
@@ -1362,6 +1367,9 @@ public class MessageListActivity extends AppCompatActivity
         }
         else
         {
+            Log.i(TAG, "add_outgoing_file:filepath=" + filepath + " uri=" + uri.toString() + " uri2=" + uri);
+
+
             long file_size = -1;
             try
             {

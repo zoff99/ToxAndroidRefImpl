@@ -26,8 +26,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -50,11 +48,15 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 
+import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
@@ -149,14 +151,17 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                 {
                     if (my_position < 1)
                     {
-                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date_string.setText(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                         message_text_date.setVisibility(View.VISIBLE);
                     }
                     else
                     {
-                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
+                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
                         {
-                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date_string.setText(
+                                    MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                             message_text_date.setVisibility(View.VISIBLE);
                         }
                     }
@@ -181,7 +186,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         if (message.filedb_id == -1) // tranfser was canceled somewhere
         {
 
-            textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG, AutoLinkMode.MODE_MENTION);
+            textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                     AutoLinkMode.MODE_MENTION);
             textView.setAutoLinkText("" + message.text + "\n *canceled*");
 
             ft_preview_image.setImageDrawable(null);
@@ -200,7 +206,19 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
             boolean is_image = false;
             try
             {
-                String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+                String mimeType = null;
+                if (message.storage_frame_work)
+                {
+                    Uri uri = Uri.parse(message.filename_fullpath);
+                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
+                    String fileName = documentFile.getName();
+                    mimeType = URLConnection.guessContentTypeFromName(fileName.toLowerCase());
+                }
+                else
+                {
+                    mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+                }
+
                 if (mimeType.startsWith("image"))
                 {
                     is_image = true;
@@ -224,9 +242,23 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                         {
                             try
                             {
-                                Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
-                                intent.putExtra("image_filename", message.filename_fullpath);
-                                v.getContext().startActivity(intent);
+                                if (message.storage_frame_work)
+                                {
+                                    Uri uri = Uri.parse(message.filename_fullpath);
+                                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
+                                    String fileName = documentFile.getName();
+
+                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                    intent.putExtra("image_filename", uri.toString());
+                                    intent.putExtra("storage_frame_work", "1");
+                                    v.getContext().startActivity(intent);
+                                }
+                                else
+                                {
+                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                    intent.putExtra("image_filename", message.filename_fullpath);
+                                    v.getContext().startActivity(intent);
+                                }
                             }
                             catch (Exception e)
                             {
@@ -241,26 +273,49 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                     }
                 });
 
-
-                java.io.File f2 = new java.io.File(message.filename_fullpath);
-                try
+                if (message.storage_frame_work)
                 {
-                    final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(new RoundedCorners((int) dp2px(20)));
+                    try
+                    {
+                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(
+                                new RoundedCorners((int) dp2px(20)));
 
-                    GlideApp.
-                            with(context).
-                            load(f2).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            skipMemoryCache(false).
-                            priority(Priority.LOW).
-                            placeholder(R.drawable.round_loading_animation).
-                            into(ft_preview_image);
+                        GlideApp.
+                                with(context).
+                                load(Uri.parse(message.filename_fullpath)).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(false).
+                                priority(Priority.LOW).
+                                placeholder(R.drawable.round_loading_animation).
+                                into(ft_preview_image);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
-                catch (Exception e)
+                else
                 {
-                    e.printStackTrace();
-                }
+                    java.io.File f2 = new java.io.File(message.filename_fullpath);
+                    try
+                    {
+                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(
+                                new RoundedCorners((int) dp2px(20)));
 
+                        GlideApp.
+                                with(context).
+                                load(f2).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(false).
+                                priority(Priority.LOW).
+                                placeholder(R.drawable.round_loading_animation).
+                                into(ft_preview_image);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
             }
             else
             {
@@ -271,6 +326,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
 
                 ft_preview_image.setImageDrawable(d3);
 
+                // open non-image files -----------------
                 ft_preview_image.setOnTouchListener(new View.OnTouchListener()
                 {
                     @Override
@@ -278,37 +334,69 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                     {
                         if (event.getAction() == MotionEvent.ACTION_UP)
                         {
-                            try
+                            if (message.storage_frame_work)
                             {
-                                MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                                Intent newIntent = new Intent(Intent.ACTION_VIEW);
-                                String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(message.filename_fullpath));
-
-                                Uri file_uri = null;
-                                if (Build.VERSION.SDK_INT > 23)
-                                {
-                                    file_uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new java.io.File(message.filename_fullpath));
-                                    newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                }
-                                else
-                                {
-                                    file_uri = Uri.fromFile(new java.io.File(message.filename_fullpath));
-                                }
-
-                                newIntent.setDataAndType(file_uri, mimeType);
-                                newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 try
                                 {
-                                    context.startActivity(newIntent);
+                                    Uri file_uri = Uri.parse(message.filename_fullpath);
+                                    Intent newIntent = new Intent(Intent.ACTION_VIEW, file_uri);
+                                    if (Build.VERSION.SDK_INT > 23)
+                                    {
+                                        newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    }
+
+                                    try
+                                    {
+                                        context.startActivity(newIntent);
+                                    }
+                                    catch (ActivityNotFoundException e)
+                                    {
+                                        Toast.makeText(context, "Can not handle this file", Toast.LENGTH_LONG).show();
+                                    }
                                 }
-                                catch (ActivityNotFoundException e)
+                                catch (Exception e)
                                 {
-                                    Toast.makeText(context, "Can not handle this file", Toast.LENGTH_LONG).show();
+                                    e.printStackTrace();
                                 }
                             }
-                            catch (Exception e)
+                            else
                             {
-                                e.printStackTrace();
+                                try
+                                {
+                                    MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                                    Intent newIntent = new Intent(Intent.ACTION_VIEW);
+                                    String mimeType = myMime.getMimeTypeFromExtension(
+                                            getFileExtensionFromUrl(message.filename_fullpath));
+
+                                    Uri file_uri = null;
+                                    if (Build.VERSION.SDK_INT > 23)
+                                    {
+                                        file_uri = FileProvider.getUriForFile(context,
+                                                                              BuildConfig.APPLICATION_ID + ".provider",
+                                                                              new java.io.File(
+                                                                                      message.filename_fullpath));
+                                        newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    }
+                                    else
+                                    {
+                                        file_uri = Uri.fromFile(new java.io.File(message.filename_fullpath));
+                                    }
+
+                                    newIntent.setDataAndType(file_uri, mimeType);
+                                    newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    try
+                                    {
+                                        context.startActivity(newIntent);
+                                    }
+                                    catch (ActivityNotFoundException e)
+                                    {
+                                        Toast.makeText(context, "Can not handle this file", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                         return true;
@@ -323,7 +411,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         }
 
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
+                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
 
         try
@@ -379,7 +468,6 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
     }
 
 
-
     private View.OnClickListener onclick_listener = new View.OnClickListener()
     {
         @Override
@@ -394,7 +482,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         @Override
         public boolean onLongClick(final View v)
         {
-            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected, message_);
+            MessageListActivity.long_click_message_return res = onLongClick_message_helper(context, v, is_selected,
+                                                                                           message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

@@ -4631,10 +4631,14 @@ public class MainActivity extends AppCompatActivity
                     // Log.i(TAG, "file_chunk_request:file_READY:001:f.id=" + ft.id);
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft.id, friend_number);
                     // Log.i(TAG, "file_chunk_request:file_READY:001a:msg_id=" + msg_id);
+                    String full_path_builder = ft.path_name + "/" + ft.file_name;
+                    if (ft.storage_frame_work)
+                    {
+                        full_path_builder = ft.path_name;
+                    }
                     HelperMessage.update_message_in_db_filename_fullpath_friendnum_and_filenum(friend_number,
                                                                                                file_number,
-                                                                                               ft.path_name + "/" +
-                                                                                               ft.file_name);
+                                                                                               full_path_builder);
                     HelperMessage.set_message_state_from_friendnum_and_filenum(friend_number, file_number,
                                                                                TOX_FILE_CONTROL_CANCEL.value);
                     HelperMessage.set_message_filedb_from_friendnum_and_filenum(friend_number, file_number, filedb_id);
