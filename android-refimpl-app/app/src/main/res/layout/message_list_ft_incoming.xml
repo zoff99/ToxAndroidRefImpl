@@ -172,7 +172,7 @@
                         android:elevation="4dp"
                         android:padding="2dp"
                         android:src="@android:drawable/ic_menu_save"
-                        android:visibility="visible" />
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <LinearLayout
