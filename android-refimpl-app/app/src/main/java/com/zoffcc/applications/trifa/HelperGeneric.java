@@ -932,7 +932,7 @@ public class HelperGeneric
                 {
                     is = new info.guardianproject.iocipher.FileInputStream(f_real);
                     os = new java.io.FileOutputStream(f2);
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[8192];
                     int length;
 
                     while ((length = is.read(buffer)) > 0)
@@ -970,11 +970,16 @@ public class HelperGeneric
                 info.guardianproject.iocipher.FileInputStream is = null;
                 java.io.FileOutputStream os = null;
 
+                if (!f_real.exists())
+                {
+                    return;
+                }
+
                 try
                 {
                     is = new info.guardianproject.iocipher.FileInputStream(f_real);
                     os = new java.io.FileOutputStream(f2);
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[8192];
                     int length;
 
                     while ((length = is.read(buffer)) > 0)
