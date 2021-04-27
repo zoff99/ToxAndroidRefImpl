@@ -357,7 +357,10 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                         }
                     });
                 }
-
+                else
+                {
+                    ft_preview_image.setOnTouchListener(null);
+                }
             }
 
             ft_export_button_container.setVisibility(View.VISIBLE);
@@ -372,15 +375,41 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     {
                         try
                         {
-                            String export_filename = SD_CARD_FILES_EXPORT_DIR + "/" + message2.tox_friendpubkey + "/";
-                            FileDB file_ = orma.selectFromFileDB().idEq(message2.filedb_id).get(0);
-                            HelperGeneric.export_vfs_file_to_real_file(file_.path_name, file_.file_name,
-                                                                       export_filename, file_.file_name);
+                            new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
+                                    setTitle("Export File to unencrypted Storage?").
+                                    setCancelable(true).
+                                    setNeutralButton("Export", new DialogInterface.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which)
+                                        {
+                                            try
+                                            {
+                                                String export_filename =
+                                                        SD_CARD_FILES_EXPORT_DIR + "/" + message2.tox_friendpubkey +
+                                                        "/";
+                                                FileDB file_ = orma.selectFromFileDB().idEq(message2.filedb_id).get(0);
+                                                HelperGeneric.export_vfs_file_to_real_file(file_.path_name,
+                                                                                           file_.file_name,
+                                                                                           export_filename,
+                                                                                           file_.file_name);
 
-                            Toast.makeText(v.getContext(),
-                                           "File exported to:" + "\n" + export_filename + file_.file_name,
-                                           Toast.LENGTH_LONG).show();
-
+                                                Toast.makeText(v.getContext(),
+                                                               "File exported to:" + "\n" + export_filename +
+                                                               file_.file_name, Toast.LENGTH_LONG).show();
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+                                        }
+                                    }).
+                                    setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                                    {
+                                        public void onClick(DialogInterface dialog, int id)
+                                        {
+                                        }
+                                    }).
+                                    show();
                         }
                         catch (Exception e)
                         {
