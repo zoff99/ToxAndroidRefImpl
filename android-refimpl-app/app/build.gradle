@@ -181,8 +181,8 @@ android {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 10097
-        versionName "1.0.97"
+        versionCode 10098
+        versionName "1.0.98"
 
         renderscriptTargetApi 26
         renderscriptSupportModeEnabled true
