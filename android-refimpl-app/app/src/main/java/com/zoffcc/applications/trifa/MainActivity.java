@@ -411,6 +411,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__auto_accept_all_upto = false;
     static int PREF__video_cam_resolution = 0;
     static int PREF__global_font_size = 2;
+    static boolean PREF__allow_open_encrypted_file_via_intent = false;
 
     static String versionName = "";
     static int versionCode = -1;

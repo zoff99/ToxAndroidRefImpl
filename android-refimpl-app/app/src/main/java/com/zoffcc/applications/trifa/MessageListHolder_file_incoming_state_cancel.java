@@ -54,6 +54,7 @@ import info.guardianproject.iocipher.File;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
@@ -304,56 +305,58 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
                 ft_preview_image.setImageDrawable(d3);
 
-                ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                if (PREF__allow_open_encrypted_file_via_intent)
                 {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event)
+                    ft_preview_image.setOnTouchListener(new View.OnTouchListener()
                     {
-                        if (event.getAction() == MotionEvent.ACTION_UP)
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event)
                         {
-                            try
+                            if (event.getAction() == MotionEvent.ACTION_UP)
                             {
-                                final Uri uri = Uri.parse(
-                                        IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
+                                try
+                                {
+                                    final Uri uri = Uri.parse(
+                                            IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
 
-                                // Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
-                                //            message2.filename_fullpath);
+                                    // Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
+                                    //            message2.filename_fullpath);
 
-                                File file = new File(message2.filename_fullpath);
-                                String filename_without_path = file.getName();
+                                    File file = new File(message2.filename_fullpath);
+                                    String filename_without_path = file.getName();
 
-                                new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
-                                        setTitle(filename_without_path).
-                                        setNeutralButton("View", new DialogInterface.OnClickListener()
-                                        {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which)
+                                    new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
+                                            setTitle(filename_without_path).
+                                            setNeutralButton("View", new DialogInterface.OnClickListener()
                                             {
-                                                try
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which)
                                                 {
-                                                    Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
-                                                    v.getContext().startActivity(sendIntent);
+                                                    try
+                                                    {
+                                                        Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
+                                                        v.getContext().startActivity(sendIntent);
+                                                    }
+                                                    catch (ActivityNotFoundException e)
+                                                    {
+                                                        Log.e(TAG, "No relevant Activity found", e);
+                                                    }
                                                 }
-                                                catch (ActivityNotFoundException e)
-                                                {
-                                                    Log.e(TAG, "No relevant Activity found", e);
-                                                }
-                                            }
-                                        }).show();
+                                            }).show();
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
+                                }
                             }
-                            catch (Exception e)
+                            else
                             {
-                                e.printStackTrace();
-                                Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
                             }
+                            return true;
                         }
-                        else
-                        {
-                        }
-                        return true;
-                    }
-                });
-
+                    });
+                }
 
             }
 
