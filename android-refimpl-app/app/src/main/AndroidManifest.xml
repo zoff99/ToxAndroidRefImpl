@@ -285,17 +285,10 @@
         <provider
             android:name=".IOCipherContentProvider"
             android:authorities="com.zoffcc.applications.trifa"
-            android:exported="true"/>
-
-        <provider
-            android:name=".GenericFileProvider"
-            android:authorities="com.zoffcc.applications.trifa.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+            android:grantUriPermissions="true"
+            android:exported="false">
         </provider>
+
     </application>
 
 </manifest>
