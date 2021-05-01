@@ -377,6 +377,7 @@ public class HelperFriend
             catch (Exception e)
             {
                 e.printStackTrace();
+                Log.i(TAG, "set_friend_avatar:EE01:" + e.getMessage());
             }
 
             // Log.i(TAG, "set_friend_avatar:update:pubkey=" + friend_pubkey.substring(0,4) + " path=" + avatar_path_name + " file=" +
@@ -405,7 +406,7 @@ public class HelperFriend
         }
         catch (Exception e)
         {
-            Log.i(TAG, "set_friend_avatar:EE:" + e.getMessage());
+            Log.i(TAG, "set_friend_avatar:EE02:" + e.getMessage());
             e.printStackTrace();
         }
     }
