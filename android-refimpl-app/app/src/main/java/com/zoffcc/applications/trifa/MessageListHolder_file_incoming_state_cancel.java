@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,7 +36,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -385,18 +385,37 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                         {
                                             try
                                             {
-                                                String export_filename =
+                                                final String export_filename =
                                                         SD_CARD_FILES_EXPORT_DIR + "/" + message2.tox_friendpubkey +
                                                         "/";
-                                                FileDB file_ = orma.selectFromFileDB().idEq(message2.filedb_id).get(0);
-                                                HelperGeneric.export_vfs_file_to_real_file(file_.path_name,
-                                                                                           file_.file_name,
-                                                                                           export_filename,
-                                                                                           file_.file_name);
+                                                final FileDB file_ = orma.selectFromFileDB().idEq(
+                                                        message2.filedb_id).get(0);
+                                                ProgressDialog progressDialog2 = null;
 
-                                                Toast.makeText(v.getContext(),
-                                                               "File exported to:" + "\n" + export_filename +
-                                                               file_.file_name, Toast.LENGTH_LONG).show();
+                                                try
+                                                {
+                                                    progressDialog2 = ProgressDialog.show(v.getContext(), "",
+                                                                                          "exporting File ...");
+                                                    progressDialog2.setCanceledOnTouchOutside(false);
+                                                    progressDialog2.setOnCancelListener(
+                                                            new DialogInterface.OnCancelListener()
+                                                            {
+                                                                @Override
+                                                                public void onCancel(DialogInterface dialog)
+                                                                {
+                                                                }
+                                                            });
+                                                }
+                                                catch (Exception e3)
+                                                {
+                                                    e3.printStackTrace();
+                                                    Log.i(TAG, "save_selected_messages:EE1:" + e3.getMessage());
+                                                }
+
+                                                new MainActivity.save_selected_message_custom_asynchtask(v.getContext(),
+                                                                                                         progressDialog2,
+                                                                                                         file_,
+                                                                                                         export_filename).execute();
                                             }
                                             catch (Exception e)
                                             {
