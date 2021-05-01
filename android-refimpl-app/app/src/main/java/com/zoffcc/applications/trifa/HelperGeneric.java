@@ -1772,7 +1772,42 @@ public class HelperGeneric
         return out;
     }
 
-    static void write_chunk_to_VFS_file(String file_name_with_path, final long position, long file_chunk_length, final byte[] data)
+    static void write_chunk_to_VFS_file(String file_name_with_path, long position, long file_chunk_length, final byte[] data)
+    {
+        try
+        {
+            final ByteBuffer data_bb = ByteBuffer.wrap(data);
+            info.guardianproject.iocipher.RandomAccessFile raf = new info.guardianproject.iocipher.RandomAccessFile(
+                    file_name_with_path, "rw");
+            info.guardianproject.iocipher.IOCipherFileChannel inChannel = raf.getChannel();
+            // inChannel.lseek(position, OsConstants.SEEK_SET);
+            inChannel.write(data_bb, position);
+
+            try
+            {
+                inChannel.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                raf.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void Xwrite_chunk_to_VFS_file(String file_name_with_path, final long position, long file_chunk_length, final byte[] data)
     {
         try
         {

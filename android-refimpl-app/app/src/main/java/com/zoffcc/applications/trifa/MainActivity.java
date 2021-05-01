@@ -4804,7 +4804,7 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-            Log.i(TAG, "file_recv:incoming avatar");
+            Log.i(TAG, "file_recv:incoming avatar:size=" + file_size);
             String file_name_avatar = FRIEND_AVATAR_FILENAME;
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
@@ -5021,6 +5021,8 @@ public class MainActivity extends AppCompatActivity
                     HelperFriend.set_friend_avatar(HelperFriend.tox_friend_get_public_key__wrapper(friend_number),
                                                    VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/",
                                                    f.file_name);
+                    // Log.i(TAG, "file_recv_chunk:kind=avatar:set_friend_avatar:" + VFS_PREFIX + VFS_FILE_DIR + "/" +
+                    //           f.tox_public_key_string + "/" + f.file_name);
                 }
                 else
                 {
