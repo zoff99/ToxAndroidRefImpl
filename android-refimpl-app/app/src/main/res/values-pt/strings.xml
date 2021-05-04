@@ -179,9 +179,9 @@
     <string name="pref_title_software_echo_cancel">Cancelamento de Eco</string>
     <string name="pref_description_video_uv_reversed">Inverea a ordem dos planos UV no vídeo da câmara</string>
     <string name="pref_title_video_uv_reversed">UV invertido em vídeo</string>
-    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 10 MB de tamanho</string>
+    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 20 MB de tamanho</string>
     <string name="pref_title_auto_accept_video">aceitar vídeos automaticamente</string>
-    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 3 MB de tamanho</string>
+    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 6 MB de tamanho</string>
     <string name="pref_title_auto_accept_image">aceitar imagens automaticamente</string>
     <string name="pref_header_general">Geral</string>
     <string name="settings_toolbar_title">Configurações</string>
@@ -206,4 +206,16 @@
     <string name="add_friend_activity_name">Adicionar Amigo</string>
     <string name="layout___migdb_do_not_close">NÃO FECHE esta tela</string>
     <string name="layout___migdb_text">Migrando ficheiros do banco de dados</string>
+    <string name="wrong_credentials_error">Credenciais erradas</string>
+    <string name="title_activity_wrong_credentials">Credenciais erradas</string>
+    <string name="layout___iobrowser_start">navegar no armazenamento criptografado</string>
+    <string name="messages_search_default_text">procurar ...</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Novo token de notificação recebido. Usar este token\?</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Token</string>
+    <string name="MainActivity_yes_button">sim</string>
+    <string name="pref_description_start_on_boot">inicia a aplicação após a inicialização.
+\nA Google já não permite isso a partir do Android 10</string>
+    <string name="pref_title_start_on_boot">executar na inicialização</string>
+    <string name="pref_description_auto_accept_all_upto">aceitar automaticamente todos os ficheiros de até 200 MB de tamanho</string>
+    <string name="pref_title_auto_accept_all_upto">aceitar automaticamente todos os ficheiros</string>
 </resources>
