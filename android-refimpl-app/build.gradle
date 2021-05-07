@@ -29,10 +29,5 @@ allprojects {
         maven {
             url "https://jitpack.io"
         }
-        jcenter {
-            content {
-                includeModule("org.jetbrains.trove4j", "trove4j")
-            }
-        }
     }
 }
