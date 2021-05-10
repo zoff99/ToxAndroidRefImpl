@@ -80,6 +80,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.insert_into_filet
 import static com.zoffcc.applications.trifa.HelperFiletransfer.update_filetransfer_db_full;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
@@ -1092,6 +1093,164 @@ public class MessageListActivity extends AppCompatActivity
         // Log.i(TAG,"send_message_onclick:---end");
     }
 
+    static void add_attachment(Context c, Intent data, long friendnum_local, boolean activity_friend_num)
+    {
+        try
+        {
+            String fileName = null;
+
+            try
+            {
+                Log.i(TAG, "xxxxxxxxxx1:" + data);
+                Log.i(TAG, "xxxxxxxxxx2:" + data.getData());
+                try
+                {
+                    c.getContentResolver().takePersistableUriPermission(data.getData(),
+                                                                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                catch (Exception e_persist)
+                {
+                    Log.i(TAG, "No persistable permission grants found:");
+                }
+                DocumentFile documentFile = DocumentFile.fromSingleUri(c, data.getData());
+
+                fileName = documentFile.getName();
+                Log.i(TAG, "file_attach_for_send:documentFile:fileName=" + fileName);
+                Log.i(TAG, "file_attach_for_send:documentFile:fileLength=" + documentFile.length());
+
+                ContentResolver cr = c.getApplicationContext().getContentResolver();
+                Cursor metaCursor = cr.query(data.getData(), null, null, null, null);
+                if (metaCursor != null)
+                {
+                    try
+                    {
+                        if (metaCursor.moveToFirst())
+                        {
+                            String file_path = metaCursor.getString(0);
+                            Log.i(TAG, "file_attach_for_send:metaCursor_path:fp=" + file_path);
+                            Log.i(TAG, "file_attach_for_send:metaCursor_path:column names=" +
+                                       metaCursor.getColumnNames().length);
+                            int j;
+                            for (j = 0; j < metaCursor.getColumnNames().length; j++)
+                            {
+                                Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
+                                           metaCursor.getColumnName(j));
+                                Log.i(TAG,
+                                      "file_attach_for_send:metaCursor_path:column name=" + metaCursor.getString(j));
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        metaCursor.close();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            // -- get real path of file --
+            Uri selectedImage = data.getData();
+            Log.i(TAG, "data_uri=" + selectedImage.toString());
+            //                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            //
+            //                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            //                    Log.i(TAG, "data_uri:" + cursor);
+            //                    cursor.moveToFirst();
+            //
+            //                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            //                    Log.i(TAG, "data_uri:" + columnIndex);
+            //                    String picturePath = cursor.getString(columnIndex);
+            //                    cursor.close();
+
+            String picturePath = getPath(c, selectedImage);
+            Log.i(TAG, "file_attach_for_send:data=" + data.getData() + ":" + picturePath);
+
+            //                    Uri uri = null;
+            //                    if (data != null)
+            //                    {
+            //                        uri = data.getData();
+            //                        Log.i(TAG, "data_uri=" + uri.toString());
+            //                    }
+            //                    String picturePath = "/xxx.png";
+
+            // -- get real path of file --
+
+
+            final String src_path = new File(new File(picturePath).getAbsolutePath()).getParent();
+            final String src_filename = new File(picturePath).getName();
+            Log.i(TAG, "file_attach_for_send:select_file:22:p=" + src_path + " f=" + src_filename);
+
+            final String fileName_ = fileName;
+
+            final Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    if (fileName_ != null)
+                    {
+                        if (activity_friend_num)
+                        {
+                            if (friendnum_local == -1)
+                            {
+                                // ok, we need to wait for onResume to finish and give us the friendnum
+                                Log.i(TAG,
+                                      "add_outgoing_file:ok, we need to wait for onResume to finish and give us the friendnum");
+                                long loop = 0;
+                                while (loop < 20) // wait 4 sec., then give up
+                                {
+                                    loop++;
+                                    try
+                                    {
+                                        Thread.sleep(200);
+                                    }
+                                    catch (InterruptedException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+
+                                    if (MainActivity.message_list_activity != null)
+                                    {
+                                        if (MainActivity.message_list_activity.get_current_friendnum() > -1)
+                                        {
+                                            // got friendnum
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (MainActivity.message_list_activity.get_current_friendnum() == -1)
+                            {
+                                // sorry, still no friendnum
+                                Log.i(TAG, "add_outgoing_file:sorry, still no friendnum");
+                                return;
+                            }
+
+                            add_outgoing_file(c, MainActivity.message_list_activity.get_current_friendnum(),
+                                              data.getData().toString(), fileName_, data.getData(), false);
+
+                        }
+                        else
+                        {
+                            add_outgoing_file(c, friendnum_local, data.getData().toString(), fileName_, data.getData(),
+                                              false);
+                        }
+                    }
+                }
+            };
+            t.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "select_file:22:EE1:" + e.getMessage());
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -1105,112 +1264,14 @@ public class MessageListActivity extends AppCompatActivity
             }
             else
             {
-                try
-                {
-                    String fileName = null;
-
-                    try
-                    {
-                        getContentResolver().takePersistableUriPermission(data.getData(),
-                                                                          Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        DocumentFile documentFile = DocumentFile.fromSingleUri(this, data.getData());
-
-                        fileName = documentFile.getName();
-                        // Log.i(TAG, "file_attach_for_send:documentFile:fileName=" + fileName);
-                        // Log.i(TAG, "file_attach_for_send:documentFile:fileLength=" + documentFile.length());
-
-                        ContentResolver cr = getApplicationContext().getContentResolver();
-                        Cursor metaCursor = cr.query(data.getData(), null, null, null, null);
-                        if (metaCursor != null)
-                        {
-                            try
-                            {
-                                if (metaCursor.moveToFirst())
-                                {
-                                    String file_path = metaCursor.getString(0);
-                                    //Log.i(TAG, "file_attach_for_send:metaCursor_path:fp=" + file_path);
-                                    //Log.i(TAG, "file_attach_for_send:metaCursor_path:column names=" +
-                                    //           metaCursor.getColumnNames().length);
-                                    int j;
-                                    for (j = 0; j < metaCursor.getColumnNames().length; j++)
-                                    {
-                                        //Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
-                                        //           metaCursor.getColumnName(j));
-                                        //Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
-                                        //           metaCursor.getString(j));
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                metaCursor.close();
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    // -- get real path of file --
-                    Uri selectedImage = data.getData();
-                    //                    Log.i(TAG, "data_uri=" + selectedImage.toString());
-                    //                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                    //
-                    //                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-                    //                    Log.i(TAG, "data_uri:" + cursor);
-                    //                    cursor.moveToFirst();
-                    //
-                    //                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    //                    Log.i(TAG, "data_uri:" + columnIndex);
-                    //                    String picturePath = cursor.getString(columnIndex);
-                    //                    cursor.close();
-
-                    String picturePath = getPath(this, selectedImage);
-                    // Log.i(TAG, "file_attach_for_send:data=" + data.getData() + ":" + picturePath);
-
-                    //                    Uri uri = null;
-                    //                    if (data != null)
-                    //                    {
-                    //                        uri = data.getData();
-                    //                        Log.i(TAG, "data_uri=" + uri.toString());
-                    //                    }
-                    //                    String picturePath = "/xxx.png";
-
-                    // -- get real path of file --
-
-
-                    final String src_path = new File(new File(picturePath).getAbsolutePath()).getParent();
-                    final String src_filename = new File(picturePath).getName();
-                    // Log.i(TAG, "file_attach_for_send:select_file:22:p=" + src_path + " f=" + src_filename);
-
-                    final String fileName_ = fileName;
-
-                    final Thread t = new Thread()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            if (fileName_ != null)
-                            {
-                                add_outgoing_file(data.getData().toString(), fileName_, data.getData(), false);
-                            }
-                        }
-                    };
-                    t.start();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "select_file:22:EE1:" + e.getMessage());
-                }
+                add_attachment(this, data, friendnum, true);
             }
             // InputStream inputStream = context.getContentResolver().openInputStream(data.getData());
             //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
         }
     }
 
-    void add_outgoing_file(String filepath, String filename, Uri uri, boolean real_file_path)
+    static void add_outgoing_file(Context c, long friendnum, String filepath, String filename, Uri uri, boolean real_file_path)
     {
         if (real_file_path)
         {
@@ -1233,39 +1294,6 @@ public class MessageListActivity extends AppCompatActivity
             }
 
             // Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
-
-            if (friendnum == -1)
-            {
-                // ok, we need to wait for onResume to finish and give us the friendnum
-                Log.i(TAG, "add_outgoing_file:ok, we need to wait for onResume to finish and give us the friendnum");
-                long loop = 0;
-                while (loop < 20) // wait 4 sec., then give up
-                {
-                    loop++;
-                    try
-                    {
-                        Thread.sleep(200);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    if (friendnum > -1)
-                    {
-                        // got friendnum
-                        break;
-                    }
-                }
-            }
-
-            if (friendnum == -1)
-            {
-                // sorry, still no friendnum
-                Log.i(TAG, "add_outgoing_file:sorry, still no friendnum");
-                return;
-            }
-
             Log.i(TAG, "add_outgoing_file:friendnum(2)=" + friendnum);
 
             Filetransfer f = new Filetransfer();
@@ -1358,7 +1386,7 @@ public class MessageListActivity extends AppCompatActivity
             try
             {
 
-                DocumentFile documentFile = DocumentFile.fromSingleUri(this, uri);
+                DocumentFile documentFile = DocumentFile.fromSingleUri(c, uri);
                 String fileName = documentFile.getName();
                 // Log.i(TAG, "add_outgoing_file:documentFile:fileName=" + fileName);
                 // Log.i(TAG, "add_outgoing_file:documentFile:fileLength=" + documentFile.length());
@@ -1379,38 +1407,6 @@ public class MessageListActivity extends AppCompatActivity
             }
 
             // Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
-
-            if (friendnum == -1)
-            {
-                // ok, we need to wait for onResume to finish and give us the friendnum
-                Log.i(TAG, "add_outgoing_file:ok, we need to wait for onResume to finish and give us the friendnum");
-                long loop = 0;
-                while (loop < 20) // wait 4 sec., then give up
-                {
-                    loop++;
-                    try
-                    {
-                        Thread.sleep(200);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    if (friendnum > -1)
-                    {
-                        // got friendnum
-                        break;
-                    }
-                }
-            }
-
-            if (friendnum == -1)
-            {
-                // sorry, still no friendnum
-                Log.i(TAG, "add_outgoing_file:sorry, still no friendnum");
-                return;
-            }
 
             Log.i(TAG, "add_outgoing_file:friendnum(2)=" + friendnum);
 
@@ -2034,5 +2030,12 @@ public class MessageListActivity extends AppCompatActivity
 
         ret.ret_value = true;
         return ret;
+    }
+
+    static void show_messagelist_for_friend(Context c, String friend_pubkey)
+    {
+        Intent intent = new Intent(c, MessageListActivity.class);
+        intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(friend_pubkey));
+        c.startActivity(intent);
     }
 }

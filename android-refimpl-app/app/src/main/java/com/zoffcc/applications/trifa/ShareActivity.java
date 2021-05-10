@@ -24,16 +24,27 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
+import static com.zoffcc.applications.trifa.MessageListActivity.add_attachment;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 
 public class ShareActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.ShareActivity";
 
     TextView t1;
+    Intent intent;
+    String action;
+    String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -50,17 +61,46 @@ public class ShareActivity extends AppCompatActivity
 
         Log.i(TAG, "onCreate");
 
-        Intent intent = getIntent();
+        intent = getIntent();
         Log.i(TAG, "onCreate:intent=" + intent);
+        action = intent.getAction();
+        type = intent.getType();
 
         try
         {
-            if (Intent.ACTION_SEARCH.equals(intent.getAction()))
+            if (Intent.ACTION_SEARCH.equals(action))
             {
                 String query = intent.getStringExtra(SearchManager.QUERY);
                 Log.i(TAG, "onCreate:query=" + query);
             }
-            if (Intent.ACTION_VIEW.equals(intent.getAction()))
+            else if (Intent.ACTION_SEND.equals(action) && type != null)
+            {
+                if ("text/plain".equals(type))
+                {
+                    Log.i(TAG, "select friend to share to ...");
+                    Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
+                    intent_friend_selection.putExtra("offline", 1);
+                    startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
+                }
+                else if (type.startsWith("image/"))
+                {
+                    Log.i(TAG, "select friend to share to ...");
+                    Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
+                    intent_friend_selection.putExtra("offline", 1);
+                    startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
+                }
+            }
+            else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null)
+            {
+                if (type.startsWith("image/"))
+                {
+                    Log.i(TAG, "select friend to share to ...");
+                    Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
+                    intent_friend_selection.putExtra("offline", 1);
+                    startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
+                }
+            }
+            else if (Intent.ACTION_VIEW.equals(action))
             {
                 ClipData cdata = intent.getClipData();
                 Log.i(TAG, "onCreate:cdata=" + cdata);
@@ -103,8 +143,14 @@ public class ShareActivity extends AppCompatActivity
                 Log.i(TAG, "onCreate:data=" + data);
                 String dataString = intent.getDataString();
                 Log.i(TAG, "onCreate:dataString=" + dataString);
-                String shareWith = dataString.substring(dataString.lastIndexOf('/') + 1);
-                Log.i(TAG, "onCreate:shareWith=" + shareWith);
+                try
+                {
+                    String shareWith = dataString.substring(dataString.lastIndexOf('/') + 1);
+                    Log.i(TAG, "onCreate:shareWith=" + shareWith);
+                }
+                catch (Exception e2)
+                {
+                }
             }
         }
         catch (Exception e)
@@ -119,5 +165,75 @@ public class ShareActivity extends AppCompatActivity
     {
         super.onNewIntent(intent);
         Log.i(TAG, "onNewIntent:intent=" + intent);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SelectFriendSingleActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                try
+                {
+                    String result_friend_pubkey = data.getData().toString();
+                    if (result_friend_pubkey != null)
+                    {
+                        if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)
+                        {
+                            Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey + " intent=" +
+                                       intent);
+
+                            if (Intent.ACTION_SEND.equals(action) && type != null)
+                            {
+                                if ("text/plain".equals(type))
+                                {
+                                    handleSendText(intent, result_friend_pubkey);
+                                }
+                                else if (type.startsWith("image/"))
+                                {
+                                    handleSendImage(intent, result_friend_pubkey);
+                                }
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        }
+    }
+
+    void handleSendText(Intent intent, String friend_pubkey)
+    {
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null)
+        {
+        }
+    }
+
+    void handleSendImage(Intent intent, String friend_pubkey)
+    {
+        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null)
+        {
+            Intent intent_fixup = new Intent();
+            intent_fixup.setData(imageUri);
+            // Intent { dat=content://com.android.providers.media.documents/document/image:12345 flg=0x43 }
+            add_attachment(this, intent_fixup, tox_friend_by_public_key__wrapper(friend_pubkey), false);
+            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey);
+            // close this share activity
+            this.finish();
+        }
+    }
+
+    void handleSendMultipleImages(Intent intent, String friend_pubkey)
+    {
+        ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+        if (imageUris != null)
+        {
+        }
     }
 }

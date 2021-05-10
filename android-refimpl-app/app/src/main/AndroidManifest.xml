@@ -196,7 +196,6 @@
             android:excludeFromRecents="true"
             android:label="@string/title_activity_share"
             android:launchMode="singleTask"
-            android:noHistory="true"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>

@@ -46,13 +46,29 @@ public class FriendSelectSingleActivity extends ListActivity
 
         Log.i(TAG, "onCreate:001");
 
+        Bundle extras = getIntent().getExtras();
+        int also_offline_friends = 0;
+        if (extras != null)
+        {
+            also_offline_friends = extras.getInt("offline", 0);
+        }
+
         List<FriendList> fl = null;
         try
         {
-            fl = orma.selectFromFriendList().
-                TOX_CONNECTION_realNotEq(0).
-                orderByAlias_nameAsc().
-                toList();
+            if (also_offline_friends == 1)
+            {
+                fl = orma.selectFromFriendList().
+                        orderByAlias_nameAsc().
+                        toList();
+            }
+            else
+            {
+                fl = orma.selectFromFriendList().
+                        TOX_CONNECTION_realNotEq(0).
+                        orderByAlias_nameAsc().
+                        toList();
+            }
 
             if (fl == null)
             {
@@ -166,7 +182,7 @@ public class FriendSelectSingleActivity extends ListActivity
             Log.i(TAG, "onCreate:007");
 
             this.setListAdapter(
-                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, friend_pubkey_and_names));
+                    new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, friend_pubkey_and_names));
             ListView lv = getListView();
 
             Log.i(TAG, "onCreate:008");
