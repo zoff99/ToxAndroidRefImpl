@@ -117,6 +117,7 @@ public class ShareActivity extends AppCompatActivity
     @Override
     protected void onNewIntent(Intent intent)
     {
+        super.onNewIntent(intent);
         Log.i(TAG, "onNewIntent:intent=" + intent);
     }
 }
