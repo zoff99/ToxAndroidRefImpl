@@ -86,6 +86,21 @@ public class HelperFriend
         }
     }
 
+    static int is_friend_online_real(long friendnum)
+    {
+        try
+        {
+            return (orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0).TOX_CONNECTION_real);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     synchronized static void set_all_friends_offline()
     {
         Thread t = new Thread()

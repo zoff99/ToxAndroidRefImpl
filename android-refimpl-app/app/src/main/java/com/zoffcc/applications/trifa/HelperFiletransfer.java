@@ -23,16 +23,19 @@ import android.database.Cursor;
 import android.util.Log;
 
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
 import java.util.Random;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_message_accepted_from_id;
+import static com.zoffcc.applications.trifa.HelperMessage.set_message_start_sending_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_all_upto;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_video;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
+import static com.zoffcc.applications.trifa.MainActivity.tox_file_send;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
@@ -42,6 +45,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -758,6 +762,55 @@ public class HelperFiletransfer
         }
         catch (Exception e)
         {
+        }
+    }
+
+    static void start_outgoing_ft(Message m)
+    {
+        try
+        {
+            // accept FT
+            set_message_start_sending_from_id(m.id);
+            set_filetransfer_start_sending_from_id(m.filetransfer_id);
+
+            // update message view
+            update_single_message_from_messge_id(m.id, true);
+
+            Filetransfer ft = orma.selectFromFiletransfer().
+                    idEq(m.filetransfer_id).
+                    orderByIdDesc().get(0);
+
+            Log.i(TAG, "MM2MM:8:ft.filesize=" + ft.filesize + " ftid=" + ft.id + " ft.mid=" + ft.message_id + " mid=" +
+                       m.id);
+
+            // ------ DEBUG ------
+            Log.i(TAG, "MM2MM:8a:ft full=" + ft);
+            // ------ DEBUG ------
+
+            ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
+            byte[] sha256_buf = TrifaSetPatternActivity.sha256(
+                    TrifaSetPatternActivity.StringToBytes2("" + ft.path_name + ":" + ft.file_name + ":" + ft.filesize));
+
+            Log.i(TAG, "TOX_FILE_ID_LENGTH=" + TOX_FILE_ID_LENGTH + " sha_byte=" + sha256_buf.length);
+
+            file_id_buffer.put(sha256_buf);
+
+            // actually start sending the file to friend
+            long file_number = tox_file_send(tox_friend_by_public_key__wrapper(m.tox_friendpubkey),
+                                             ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA.value, ft.filesize,
+                                             file_id_buffer, ft.file_name, ft.file_name.length());
+            // TODO: handle errors from tox_file_send() here -------
+
+            Log.i(TAG, "MM2MM:9:new filenum=" + file_number);
+
+            // update the tox file number in DB -----------
+            ft.file_number = file_number;
+            update_filetransfer_db_full(ft);
+            // update the tox file number in DB -----------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

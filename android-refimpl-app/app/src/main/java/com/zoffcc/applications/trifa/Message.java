@@ -114,6 +114,9 @@ public class Message
     @Column(indexed = true, defaultExpr = "false")
     boolean storage_frame_work = false;
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    boolean ft_outgoing_queued = false;
+
     static Message deep_copy(Message in)
     {
         Message out = new Message();
@@ -142,6 +145,7 @@ public class Message
         out.raw_msgv2_bytes = in.raw_msgv2_bytes;
         out.resend_count = in.resend_count;
         out.storage_frame_work = in.storage_frame_work;
+        out.ft_outgoing_queued = in.ft_outgoing_queued;
 
         return out;
     }
@@ -156,6 +160,6 @@ public class Message
                ", send_retries=" + send_retries + ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath +
                ", is_new=" + is_new + ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version +
                ", resend_count=" + resend_count + ", raw_msgv2_bytes=" + "xxxxxx" + ", storage_frame_work=" +
-               storage_frame_work;
+               storage_frame_work + ", ft_outgoing_queued=" + ft_outgoing_queued;
     }
 }

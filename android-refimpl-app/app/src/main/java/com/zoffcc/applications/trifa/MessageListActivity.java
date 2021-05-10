@@ -914,50 +914,36 @@ public class MessageListActivity extends AppCompatActivity
         Log.i(TAG, "send_attatchment:---start");
 
         String msg = "";
-        if (is_friend_online(friendnum) != 0)
+        // add attachement ------------
+        // add attachement ------------
+
+        stop_self_typing_indicator_s();
+        // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+        // browser.
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+        // Filter to only show results that can be "opened", such as a
+        // file (as opposed to a list of contacts or timezones)
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        // Filter to show only images, using the image MIME data type.
+        // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+        // To search for all documents available via installed storage providers,
+        // it would be "*/*".
+        // intent.setType("image/*");
+        intent.setType("*/*");
+
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
         {
-            // add attachement ------------
-            // add attachement ------------
-
-            stop_self_typing_indicator_s();
-            // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
-            // browser.
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-
-            // Filter to only show results that can be "opened", such as a
-            // file (as opposed to a list of contacts or timezones)
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-            // Filter to show only images, using the image MIME data type.
-            // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
-            // To search for all documents available via installed storage providers,
-            // it would be "*/*".
-            // intent.setType("image/*");
-            intent.setType("*/*");
-
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            {
-                intent.putExtra(Intent.EXTRA_MIME_TYPES, "*/*");
-            }
-
-            startActivityForResult(intent, MEDIAPICK_ID_001);
-
-            // add attachement ------------
-            // add attachement ------------
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, "*/*");
         }
-        else
-        {
-            try
-            {
-                Toast.makeText(this, "Friend not online", Toast.LENGTH_SHORT).show();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
+
+        startActivityForResult(intent, MEDIAPICK_ID_001);
+
+        // add attachement ------------
+        // add attachement ------------
     }
 
     @Override
@@ -1322,6 +1308,7 @@ public class MessageListActivity extends AppCompatActivity
             m.state = TOX_FILE_CONTROL_PAUSE.value;
             m.ft_accepted = false;
             m.ft_outgoing_started = false;
+            m.ft_outgoing_queued = false;
             m.filename_fullpath = new java.io.File(filepath + "/" + filename).getAbsolutePath();
             m.sent_timestamp = System.currentTimeMillis();
             m.text = filename + "\n" + file_size + " bytes";
@@ -1467,6 +1454,7 @@ public class MessageListActivity extends AppCompatActivity
             m.state = TOX_FILE_CONTROL_PAUSE.value;
             m.ft_accepted = false;
             m.ft_outgoing_started = false;
+            m.ft_outgoing_queued = false;
             m.filename_fullpath = filepath;
             m.sent_timestamp = System.currentTimeMillis();
             m.text = filename + "\n" + file_size + " bytes";

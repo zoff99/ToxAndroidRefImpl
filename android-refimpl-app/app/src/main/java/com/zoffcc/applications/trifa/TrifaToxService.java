@@ -49,9 +49,10 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_no
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
 import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conference;
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
@@ -66,7 +67,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
-import static com.zoffcc.applications.trifa.HelperGeneric.vfs__detach;
 import static com.zoffcc.applications.trifa.HelperGeneric.vfs__unmount;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
@@ -118,6 +118,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.DEBUG_BATTERY_OPTIMIZAT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_NODES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS;
@@ -151,6 +152,7 @@ public class TrifaToxService extends Service
     static Thread trifa_service_thread = null;
     static long last_resend_pending_messages_ms = -1;
     static long last_resend_pending_messages2_ms = -1;
+    static long last_start_uqueued_fts_ms = -1;
     static boolean need_wakeup_now = false;
     static int tox_thread_starting_up = 0;
 
@@ -1571,6 +1573,48 @@ public class TrifaToxService extends Service
                     // --- send pending 1-on-1 text messages here --------------
                     // --- send pending 1-on-1 text messages here --------------
 
+
+                    // --- start queued outgoing FTs here --------------
+                    // --- start queued outgoing FTs here --------------
+                    // --- start queued outgoing FTs here --------------
+                    if (global_self_connection_status != TOX_CONNECTION_NONE.value)
+                    {
+                        if ((last_start_uqueued_fts_ms + (10 * 1000)) < System.currentTimeMillis())
+                        {
+                            last_start_uqueued_fts_ms = System.currentTimeMillis();
+
+                            try
+                            {
+                                List<Message> m_v1 = orma.selectFromMessage().
+                                        directionEq(1).
+                                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                                        ft_outgoing_queuedEq(true).
+                                        orderBySent_timestampAsc().
+                                        toList();
+
+                                if ((m_v1 != null) && (m_v1.size() > 0))
+                                {
+                                    Iterator<Message> ii = m_v1.iterator();
+                                    while (ii.hasNext())
+                                    {
+                                        Message m_resend_ft = ii.next();
+
+                                        if (is_friend_online_real(
+                                                tox_friend_by_public_key__wrapper(m_resend_ft.tox_friendpubkey)) != 0)
+                                        {
+                                            start_outgoing_ft(m_resend_ft);
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+                    }
+                    // --- start queued outgoing FTs here --------------
+                    // --- start queued outgoing FTs here --------------
+                    // --- start queued outgoing FTs here --------------
 
                     //**// if (s_time + 4000 < System.currentTimeMillis())
                     //**// {

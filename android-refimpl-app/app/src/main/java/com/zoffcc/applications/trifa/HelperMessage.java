@@ -520,6 +520,19 @@ public class HelperMessage
         }
     }
 
+    public static void set_message_queueing_from_id(long message_id, boolean ft_outgoing_queued)
+    {
+        try
+        {
+            orma.updateMessage().idEq(message_id).ft_outgoing_queued(ft_outgoing_queued).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "set_message_start_queueing_from_id:EE:" + e.getMessage());
+        }
+    }
+
     public static void set_message_filedb_from_friendnum_and_filenum(long friend_number, long file_number, long filedb_id)
     {
         try
