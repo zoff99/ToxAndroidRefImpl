@@ -11,4 +11,41 @@
     <string name="conference_message_list_activity_name">Konferencja tekstowa</string>
     <string name="message_list_activity_name">Czat</string>
     <string name="add_friend_activity_name">Dodaj kontakt</string>
+    <string name="pref_title_force_udp_only">wymusz tryb UDP</string>
+    <string name="pref_description_udp_enabled">dla większości urządzeń UDP powoduje znacznie więcej ruchu internetowego.
+\nZmiana wymaga PONOWNEGO URUCHOMIENIA!
+\nDomyślne ustawienie to WYŁĄCZONE</string>
+    <string name="pref_title_udp_enabled">włącz UDP</string>
+    <string name="pref_description_higher_audio_quality">Użyj lepiej jakości dzwięku.
+\nZmiana wymaga PONOWNEGO URUCHOMIENIA!</string>
+    <string name="pref_title_higher_audio_quality">Jakość dzwięku</string>
+    <string name="pref_description_mic_gain_factor">Ustaw większe wzmocnienie, jeśli mikrofon nagrywa z małą głośnością.</string>
+    <string name="pref_title_mic_gain_factor">Wzmocnienie mikrofonu</string>
+    <string name="pref_description_camera_get_preview_format">Format podglądu kamery zdaje się być w niepasującym formacie dla niektórych telefonów komórkowych</string>
+    <string name="pref_title_camera_get_preview_format">Format podglądu kamery</string>
+    <string name="pref_description_global_font_size">Wybierz rozmiar czcionki</string>
+    <string name="pref_title_global_font_size">Rozmiar czcionki</string>
+    <string name="pref_description_video_cam_resolution">Jakiej rozdzielczosci użyć do połączeń wideo</string>
+    <string name="pref_title_video_cam_resolution">Rozdzielczość kamery</string>
+    <string name="pref_description_higher_video_quality">Użyj lepszej jakości wideo.
+\nZmiana wymaga PONOWNEGO URUCHOMIENIA!</string>
+    <string name="pref_title_higher_video_quality">Jakość wideo</string>
+    <string name="pref_description_software_echo_cancel">Użyj oprogramowanie do usuwania echa</string>
+    <string name="pref_title_software_echo_cancel">Usuwanie echa</string>
+    <string name="pref_description_auto_accept_all_upto">Automatycznie akceptuj pliki do 200MB</string>
+    <string name="pref_title_auto_accept_all_upto">Automatycznie akceptuj wszelkie pliki</string>
+    <string name="pref_description_auto_accept_video">Automatycznie pokaż filmy do 20MB</string>
+    <string name="pref_description_auto_accept_image">"Automatycznie  pokaż obrazki powyżej 6MB"</string>
+    <string name="pref_title_auto_accept_image">Automatycznie pokaż obrazki</string>
+    <string name="pref_title_auto_accept_video">Automatycznie pokaż filmy</string>
+    <string name="pref_header_general">Generalnie</string>
+    <string name="settings_toolbar_title">Ustawienia</string>
+    <string name="title_activity_set_password">Ustal hasło</string>
+    <string name="title_activity_aboutpage">O…</string>
+    <string name="title_activity_friendinfo">Info znajomego</string>
+    <string name="title_activity_conferencepeerinfo">Info o kontakcie</string>
+    <string name="conference_audio_activity_player_name">Odtwarzacz konferencji audio</string>
+    <string name="title_activity_maintenance">Konserwacja</string>
+    <string name="title_activity_share">Otwórz z TRIfA</string>
+    <string name="title_activity_check_password">Wprowadź hasło</string>
 </resources>
