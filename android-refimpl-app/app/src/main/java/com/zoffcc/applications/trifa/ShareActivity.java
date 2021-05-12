@@ -194,8 +194,30 @@ public class ShareActivity extends AppCompatActivity
                                 {
                                     handleSendImage(intent, result_friend_pubkey);
                                 }
+                                else if (type.startsWith("audio/"))
+                                {
+                                    handleSendImage(intent, result_friend_pubkey);
+                                }
+                                else if (type.startsWith("video/"))
+                                {
+                                    handleSendImage(intent, result_friend_pubkey);
+                                }
                             }
-
+                            else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null)
+                            {
+                                if (type.startsWith("image/"))
+                                {
+                                    handleSendMultipleImages(intent, result_friend_pubkey);
+                                }
+                                else if (type.startsWith("audio/"))
+                                {
+                                    handleSendMultipleImages(intent, result_friend_pubkey);
+                                }
+                                else if (type.startsWith("video/"))
+                                {
+                                    handleSendMultipleImages(intent, result_friend_pubkey);
+                                }
+                            }
                         }
                     }
                 }
@@ -216,7 +238,7 @@ public class ShareActivity extends AppCompatActivity
 
     void handleSendImage(Intent intent, String friend_pubkey)
     {
-        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null)
         {
             Intent intent_fixup = new Intent();
@@ -234,6 +256,15 @@ public class ShareActivity extends AppCompatActivity
         ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
         if (imageUris != null)
         {
+            for (Uri imageUri : imageUris)
+            {
+                Intent intent_fixup = new Intent();
+                intent_fixup.setData(imageUri);
+                add_attachment(this, intent_fixup, tox_friend_by_public_key__wrapper(friend_pubkey), false);
+            }
+            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey);
+            // close this share activity
+            this.finish();
         }
     }
 }
