@@ -1151,37 +1151,15 @@ public class MessageListActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            // -- get real path of file --
-            Uri selectedImage = data.getData();
-            Log.i(TAG, "data_uri=" + selectedImage.toString());
-            //                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            //
-            //                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            //                    Log.i(TAG, "data_uri:" + cursor);
-            //                    cursor.moveToFirst();
-            //
-            //                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            //                    Log.i(TAG, "data_uri:" + columnIndex);
-            //                    String picturePath = cursor.getString(columnIndex);
-            //                    cursor.close();
-
-            String picturePath = getPath(c, selectedImage);
-            Log.i(TAG, "file_attach_for_send:data=" + data.getData() + ":" + picturePath);
-
-            //                    Uri uri = null;
-            //                    if (data != null)
-            //                    {
-            //                        uri = data.getData();
-            //                        Log.i(TAG, "data_uri=" + uri.toString());
-            //                    }
-            //                    String picturePath = "/xxx.png";
-
-            // -- get real path of file --
-
-
-            final String src_path = new File(new File(picturePath).getAbsolutePath()).getParent();
-            final String src_filename = new File(picturePath).getName();
-            Log.i(TAG, "file_attach_for_send:select_file:22:p=" + src_path + " f=" + src_filename);
+/*            {
+                Uri selectedImage = data.getData();
+                Log.i(TAG, "data_uri=" + selectedImage.toString());
+                String picturePath = getPath(c, selectedImage);
+                Log.i(TAG, "file_attach_for_send:data=" + data.getData() + ":" + picturePath);
+                final String src_path = new File(new File(picturePath).getAbsolutePath()).getParent();
+                final String src_filename = new File(picturePath).getName();
+                Log.i(TAG, "file_attach_for_send:select_file:22:p=" + src_path + " f=" + src_filename);
+            }*/
 
             final String fileName_ = fileName;
 
