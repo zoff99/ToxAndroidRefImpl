@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.database.Cursor;
 import android.util.Log;
+import android.view.View;
 
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
@@ -787,14 +788,14 @@ public class HelperFiletransfer
                        m.id);
 
             // ------ DEBUG ------
-            Log.i(TAG, "MM2MM:8a:ft full=" + ft);
+            // Log.i(TAG, "MM2MM:8a:ft full=" + ft);
             // ------ DEBUG ------
 
             ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
             byte[] sha256_buf = TrifaSetPatternActivity.sha256(
                     TrifaSetPatternActivity.StringToBytes2("" + ft.path_name + ":" + ft.file_name + ":" + ft.filesize));
 
-            Log.i(TAG, "TOX_FILE_ID_LENGTH=" + TOX_FILE_ID_LENGTH + " sha_byte=" + sha256_buf.length);
+            // Log.i(TAG, "TOX_FILE_ID_LENGTH=" + TOX_FILE_ID_LENGTH + " sha_byte=" + sha256_buf.length);
 
             file_id_buffer.put(sha256_buf);
 
@@ -804,12 +805,27 @@ public class HelperFiletransfer
                                              file_id_buffer, ft.file_name, ft.file_name.length());
             // TODO: handle errors from tox_file_send() here -------
 
-            Log.i(TAG, "MM2MM:9:new filenum=" + file_number);
+            if (file_number < 0)
+            {
+                Log.i(TAG, "tox_file_send:EE:" + file_number);
 
-            // update the tox file number in DB -----------
-            ft.file_number = file_number;
-            update_filetransfer_db_full(ft);
-            // update the tox file number in DB -----------
+                // cancel FT
+                set_filetransfer_state_from_id(m.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
+                set_message_state_from_id(m.id, TOX_FILE_CONTROL_CANCEL.value);
+                remove_ft_from_cache(m);
+                // update message view
+                update_single_message_from_messge_id(m.id, true);
+            }
+            else
+            {
+
+                Log.i(TAG, "MM2MM:9:new filenum=" + file_number);
+
+                // update the tox file number in DB -----------
+                ft.file_number = file_number;
+                update_filetransfer_db_full(ft);
+                // update the tox file number in DB -----------
+            }
         }
         catch (Exception e)
         {

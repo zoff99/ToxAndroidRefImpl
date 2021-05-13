@@ -148,6 +148,7 @@ public class MessageListActivity extends AppCompatActivity
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
+    static boolean oncreate_finished = false;
     CustomSpinner spinner_filter_msgs = null;
     SearchView messageSearchView = null;
 
@@ -157,6 +158,7 @@ public class MessageListActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        oncreate_finished = false;
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
@@ -576,6 +578,7 @@ public class MessageListActivity extends AppCompatActivity
         t.start();
 
         Log.i(TAG, "onCreate:099");
+        oncreate_finished = true;
     }
 
     @Override
@@ -1092,7 +1095,7 @@ public class MessageListActivity extends AppCompatActivity
         // Log.i(TAG,"send_message_onclick:---end");
     }
 
-    static void add_attachment(Context c, Intent data, long friendnum_local, boolean activity_friend_num)
+    static void add_attachment(Context c, Intent data, Intent orig_intent, long friendnum_local, boolean activity_friend_num)
     {
         Log.i(TAG, "add_attachment:001");
 
@@ -1102,22 +1105,22 @@ public class MessageListActivity extends AppCompatActivity
 
             try
             {
-                Log.i(TAG, "xxxxxxxxxx1:" + data);
-                Log.i(TAG, "xxxxxxxxxx2:" + data.getData());
+                // Log.i(TAG, "xxxxxxxxxx1:" + data);
+                // Log.i(TAG, "xxxxxxxxxx2:" + data.getData());
                 try
                 {
-                    c.getContentResolver().takePersistableUriPermission(data.getData(),
+                    c.getContentResolver().takePersistableUriPermission(orig_intent.getData(),
                                                                         Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
                 catch (Exception e_persist)
                 {
-                    Log.i(TAG, "No persistable permission grants found:");
+                    Log.i(TAG, "No persistable permission grants found");
                 }
                 DocumentFile documentFile = DocumentFile.fromSingleUri(c, data.getData());
 
                 fileName = documentFile.getName();
-                Log.i(TAG, "file_attach_for_send:documentFile:fileName=" + fileName);
-                Log.i(TAG, "file_attach_for_send:documentFile:fileLength=" + documentFile.length());
+                // Log.i(TAG, "file_attach_for_send:documentFile:fileName=" + fileName);
+                // Log.i(TAG, "file_attach_for_send:documentFile:fileLength=" + documentFile.length());
 
                 ContentResolver cr = c.getApplicationContext().getContentResolver();
                 Cursor metaCursor = cr.query(data.getData(), null, null, null, null);
@@ -1128,16 +1131,16 @@ public class MessageListActivity extends AppCompatActivity
                         if (metaCursor.moveToFirst())
                         {
                             String file_path = metaCursor.getString(0);
-                            Log.i(TAG, "file_attach_for_send:metaCursor_path:fp=" + file_path);
-                            Log.i(TAG, "file_attach_for_send:metaCursor_path:column names=" +
-                                       metaCursor.getColumnNames().length);
+                            // Log.i(TAG, "file_attach_for_send:metaCursor_path:fp=" + file_path);
+                            // Log.i(TAG, "file_attach_for_send:metaCursor_path:column names=" +
+                            //            metaCursor.getColumnNames().length);
                             int j;
                             for (j = 0; j < metaCursor.getColumnNames().length; j++)
                             {
-                                Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
-                                           metaCursor.getColumnName(j));
-                                Log.i(TAG,
-                                      "file_attach_for_send:metaCursor_path:column name=" + metaCursor.getString(j));
+                                // Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
+                                //            metaCursor.getColumnName(j));
+                                // Log.i(TAG,
+                                //       "file_attach_for_send:metaCursor_path:column name=" + metaCursor.getString(j));
                             }
                         }
                     }
@@ -1154,14 +1157,14 @@ public class MessageListActivity extends AppCompatActivity
 
             final String fileName_ = fileName;
 
-            final Thread t = new Thread()
+            if (fileName_ != null)
             {
-                @Override
-                public void run()
+                if (activity_friend_num)
                 {
-                    if (fileName_ != null)
+                    final Thread t = new Thread()
                     {
-                        if (activity_friend_num)
+                        @Override
+                        public void run()
                         {
                             if (friendnum_local == -1)
                             {
@@ -1169,12 +1172,12 @@ public class MessageListActivity extends AppCompatActivity
                                 Log.i(TAG,
                                       "add_outgoing_file:ok, we need to wait for onResume to finish and give us the friendnum");
                                 long loop = 0;
-                                while (loop < 20) // wait 4 sec., then give up
+                                while (loop < 100)
                                 {
                                     loop++;
                                     try
                                     {
-                                        Thread.sleep(200);
+                                        Thread.sleep(20);
                                     }
                                     catch (InterruptedException e)
                                     {
@@ -1186,10 +1189,40 @@ public class MessageListActivity extends AppCompatActivity
                                         if (MainActivity.message_list_activity.get_current_friendnum() > -1)
                                         {
                                             // got friendnum
+                                            Log.i(TAG, "add_outgoing_file:got friendnum");
                                             break;
                                         }
                                     }
                                 }
+
+                                loop = 0;
+                                while (loop < 1000)
+                                {
+                                    loop++;
+                                    try
+                                    {
+                                        Thread.sleep(20);
+                                    }
+                                    catch (InterruptedException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+
+                                    if (oncreate_finished)
+                                    {
+                                        Log.i(TAG, "add_outgoing_file:oncreate_finished");
+                                        break;
+                                    }
+                                }
+                            }
+
+                            try
+                            {
+                                Thread.sleep(50);
+                            }
+                            catch (InterruptedException e)
+                            {
+                                e.printStackTrace();
                             }
 
                             if (MainActivity.message_list_activity.get_current_friendnum() == -1)
@@ -1202,17 +1235,16 @@ public class MessageListActivity extends AppCompatActivity
                             add_outgoing_file(c, MainActivity.message_list_activity.get_current_friendnum(),
                                               data.getData().toString(), fileName_, data.getData(), false,
                                               activity_friend_num);
-
                         }
-                        else
-                        {
-                            add_outgoing_file(c, friendnum_local, data.getData().toString(), fileName_, data.getData(),
-                                              false, activity_friend_num);
-                        }
-                    }
+                    };
+                    t.start();
                 }
-            };
-            t.start();
+                else
+                {
+                    add_outgoing_file(c, friendnum_local, data.getData().toString(), fileName_, data.getData(), false,
+                                      activity_friend_num);
+                }
+            }
         }
         catch (Exception e)
         {
@@ -1234,7 +1266,7 @@ public class MessageListActivity extends AppCompatActivity
             }
             else
             {
-                add_attachment(this, data, friendnum, true);
+                add_attachment(this, data, data, -1, true);
             }
             // InputStream inputStream = context.getContentResolver().openInputStream(data.getData());
             //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
@@ -1327,7 +1359,7 @@ public class MessageListActivity extends AppCompatActivity
         // ---------- DEBUG ----------
         Log.i(TAG, "add_outgoing_file:MM2MM:3:" + new_msg_id);
         Message m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
-        Log.i(TAG, "add_outgoing_file:MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
+        // Log.i(TAG, "add_outgoing_file:MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
         // ---------- DEBUG ----------
 
         f.message_id = new_msg_id;
@@ -1341,7 +1373,7 @@ public class MessageListActivity extends AppCompatActivity
 
         // ---------- DEBUG ----------
         m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
-        Log.i(TAG, "add_outgoing_file:MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
+        // Log.i(TAG, "add_outgoing_file:MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
         // ---------- DEBUG ----------
 
         // --- ??? should we do this here?

@@ -62,7 +62,7 @@ public class ShareActivity extends AppCompatActivity
         Log.i(TAG, "onCreate");
 
         intent = getIntent();
-        Log.i(TAG, "onCreate:intent=" + intent);
+        // Log.i(TAG, "onCreate:intent=" + intent);
         action = intent.getAction();
         type = intent.getType();
 
@@ -71,20 +71,20 @@ public class ShareActivity extends AppCompatActivity
             if (Intent.ACTION_SEARCH.equals(action))
             {
                 String query = intent.getStringExtra(SearchManager.QUERY);
-                Log.i(TAG, "onCreate:query=" + query);
+                // Log.i(TAG, "onCreate:query=" + query);
             }
             else if (Intent.ACTION_SEND.equals(action) && type != null)
             {
                 if ("text/plain".equals(type))
                 {
-                    Log.i(TAG, "select friend to share to ...");
+                    // Log.i(TAG, "select friend to share to ...");
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
                     intent_friend_selection.putExtra("offline", 1);
                     startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
                 }
                 else if ((type.startsWith("image/")) || (type.startsWith("video/")) || (type.startsWith("audio/")))
                 {
-                    Log.i(TAG, "select friend to share to ...");
+                    // Log.i(TAG, "select friend to share to ...");
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
                     intent_friend_selection.putExtra("offline", 1);
                     startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
@@ -94,7 +94,7 @@ public class ShareActivity extends AppCompatActivity
             {
                 if ((type.startsWith("image/")) || (type.startsWith("video/")) || (type.startsWith("audio/")))
                 {
-                    Log.i(TAG, "select friend to share to ...");
+                    // Log.i(TAG, "select friend to share to ...");
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
                     intent_friend_selection.putExtra("offline", 1);
                     startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
@@ -103,20 +103,20 @@ public class ShareActivity extends AppCompatActivity
             else if (Intent.ACTION_VIEW.equals(action))
             {
                 ClipData cdata = intent.getClipData();
-                Log.i(TAG, "onCreate:cdata=" + cdata);
+                // Log.i(TAG, "onCreate:cdata=" + cdata);
                 if (cdata != null)
                 {
                     int item_count = cdata.getItemCount();
-                    Log.i(TAG, "onCreate:item_count=" + item_count);
-                    Log.i(TAG, "onCreate:getDescription=" + cdata.getDescription());
+                    // Log.i(TAG, "onCreate:item_count=" + item_count);
+                    // Log.i(TAG, "onCreate:getDescription=" + cdata.getDescription());
                 }
 
                 Uri data = intent.getData();
-                Log.i(TAG, "onCreate:data=" + data);
+                // Log.i(TAG, "onCreate:data=" + data);
                 String dataString = intent.getDataString();
-                Log.i(TAG, "onCreate:dataString=" + dataString);
+                // Log.i(TAG, "onCreate:dataString=" + dataString);
                 String shareWith = dataString.substring(dataString.lastIndexOf('/') + 1);
-                Log.i(TAG, "onCreate:shareWith=" + shareWith);
+                // Log.i(TAG, "onCreate:shareWith=" + shareWith);
 
                 // handle tox:......... URL
                 if ((dataString != null) && (dataString.length() > 5) && (dataString.startsWith("tox:")))
@@ -131,22 +131,22 @@ public class ShareActivity extends AppCompatActivity
             else
             {
                 ClipData cdata = intent.getClipData();
-                Log.i(TAG, "onCreate:cdata=" + cdata);
+                // Log.i(TAG, "onCreate:cdata=" + cdata);
                 if (cdata != null)
                 {
                     int item_count = cdata.getItemCount();
-                    Log.i(TAG, "onCreate:item_count=" + item_count);
-                    Log.i(TAG, "onCreate:getDescription=" + cdata.getDescription());
+                    // Log.i(TAG, "onCreate:item_count=" + item_count);
+                    // Log.i(TAG, "onCreate:getDescription=" + cdata.getDescription());
                 }
 
                 Uri data = intent.getData();
-                Log.i(TAG, "onCreate:data=" + data);
+                // Log.i(TAG, "onCreate:data=" + data);
                 String dataString = intent.getDataString();
-                Log.i(TAG, "onCreate:dataString=" + dataString);
+                // Log.i(TAG, "onCreate:dataString=" + dataString);
                 try
                 {
                     String shareWith = dataString.substring(dataString.lastIndexOf('/') + 1);
-                    Log.i(TAG, "onCreate:shareWith=" + shareWith);
+                    // Log.i(TAG, "onCreate:shareWith=" + shareWith);
                 }
                 catch (Exception e2)
                 {
@@ -164,13 +164,13 @@ public class ShareActivity extends AppCompatActivity
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        Log.i(TAG, "onNewIntent:intent=" + intent);
+        // Log.i(TAG, "onNewIntent:intent=" + intent);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i(TAG, "onActivityResult:intent=" + data);
+        // Log.i(TAG, "onActivityResult:intent=" + data);
         if (requestCode == SelectFriendSingleActivity_ID)
         {
             if (resultCode == RESULT_OK)
@@ -182,8 +182,8 @@ public class ShareActivity extends AppCompatActivity
                     {
                         if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)
                         {
-                            Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey + " intent=" +
-                                       intent);
+                            // Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey + " intent=" +
+                            //            intent);
 
                             if (Intent.ACTION_SEND.equals(action) && type != null)
                             {
@@ -247,7 +247,7 @@ public class ShareActivity extends AppCompatActivity
             Intent intent_fixup = new Intent();
             intent_fixup.setData(imageUri);
             // Intent { dat=content://com.android.providers.media.documents/document/image:12345 flg=0x43 }
-            add_attachment(this, intent_fixup, tox_friend_by_public_key__wrapper(friend_pubkey), false);
+            add_attachment(this, intent_fixup, intent, tox_friend_by_public_key__wrapper(friend_pubkey), false);
             MessageListActivity.show_messagelist_for_friend(this, friend_pubkey);
             // close this share activity
             this.finish();
@@ -263,7 +263,7 @@ public class ShareActivity extends AppCompatActivity
             {
                 Intent intent_fixup = new Intent();
                 intent_fixup.setData(imageUri);
-                add_attachment(this, intent_fixup, tox_friend_by_public_key__wrapper(friend_pubkey), false);
+                add_attachment(this, intent_fixup, intent, tox_friend_by_public_key__wrapper(friend_pubkey), false);
             }
             MessageListActivity.show_messagelist_for_friend(this, friend_pubkey);
             // close this share activity

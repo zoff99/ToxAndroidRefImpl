@@ -593,7 +593,7 @@ public class HelperGeneric
 
                                     if (filenum < 0)
                                     {
-                                        Log.i(TAG, "Send own Avatar: error " + filenum);
+                                        Log.i(TAG, "Send_own_Avatar: error " + filenum);
                                         return;
                                     }
 

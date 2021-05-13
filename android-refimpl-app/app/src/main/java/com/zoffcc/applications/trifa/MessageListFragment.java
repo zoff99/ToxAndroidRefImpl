@@ -92,6 +92,7 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
         }
 
+        Log.i(TAG, "loaded_messages:start");
         try
         {
             if (orma != null)
@@ -149,6 +150,7 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
             // data_values is NULL here!!
         }
+        Log.i(TAG, "loaded_messages:ready");
 
         // --------------
         // --------------
@@ -281,27 +283,11 @@ public class MessageListFragment extends Fragment
 
             // default is: at bottom
             is_at_bottom = true;
-
-            //        try
-            //        {
-            //            if (orma != null)
-            //            {
-            //                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-            //                data_values = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).toList();
-            //                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
-            //                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
-            //            }
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            e.printStackTrace();
-            //            // data_values is NULL here!!
-            //        }
-
         }
 
         is_data_loaded = false;
         MainActivity.message_list_fragment = this;
+        Log.i(TAG, "onResume:099");
     }
 
     @Override

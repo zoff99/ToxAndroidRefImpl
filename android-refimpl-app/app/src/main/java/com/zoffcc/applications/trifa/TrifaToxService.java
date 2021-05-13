@@ -135,6 +135,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroup
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 
 public class TrifaToxService extends Service
 {
@@ -1589,6 +1590,7 @@ public class TrifaToxService extends Service
                                         directionEq(1).
                                         TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                                         ft_outgoing_queuedEq(true).
+                                        stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
                                         orderBySent_timestampAsc().
                                         toList();
 
