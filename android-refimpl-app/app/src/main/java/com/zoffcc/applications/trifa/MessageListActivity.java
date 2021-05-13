@@ -1200,13 +1200,14 @@ public class MessageListActivity extends AppCompatActivity
                             }
 
                             add_outgoing_file(c, MainActivity.message_list_activity.get_current_friendnum(),
-                                              data.getData().toString(), fileName_, data.getData(), false);
+                                              data.getData().toString(), fileName_, data.getData(), false,
+                                              activity_friend_num);
 
                         }
                         else
                         {
                             add_outgoing_file(c, friendnum_local, data.getData().toString(), fileName_, data.getData(),
-                                              false);
+                                              false, activity_friend_num);
                         }
                     }
                 }
@@ -1240,7 +1241,7 @@ public class MessageListActivity extends AppCompatActivity
         }
     }
 
-    static void add_outgoing_file(Context c, long friendnum, String filepath, String filename, Uri uri, boolean real_file_path)
+    static void add_outgoing_file(Context c, long friendnum, String filepath, String filename, Uri uri, boolean real_file_path, boolean update_message_view)
     {
         Log.i(TAG, "add_outgoing_file:001");
 
@@ -1320,7 +1321,7 @@ public class MessageListActivity extends AppCompatActivity
         m.text = filename + "\n" + file_size + " bytes";
         m.storage_frame_work = true;
 
-        long new_msg_id = insert_into_message_db(m, true);
+        long new_msg_id = insert_into_message_db(m, update_message_view);
         m.id = new_msg_id;
 
         // ---------- DEBUG ----------
