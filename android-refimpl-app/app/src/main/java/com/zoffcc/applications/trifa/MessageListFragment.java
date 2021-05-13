@@ -421,6 +421,7 @@ public class MessageListFragment extends Fragment
 
     synchronized void add_message(final Message m)
     {
+        Log.i(TAG, "add_message:001");
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -428,6 +429,7 @@ public class MessageListFragment extends Fragment
             {
                 try
                 {
+                    Log.i(TAG, "add_message:002");
                     adapter.add_item(m);
                     if (is_at_bottom)
                     {

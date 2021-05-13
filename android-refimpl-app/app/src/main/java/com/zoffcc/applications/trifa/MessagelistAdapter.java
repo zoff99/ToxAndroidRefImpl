@@ -331,7 +331,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     public void add_list_clear(List<Message> new_items)
     {
-        // Log.i(TAG, "add_list_clear:" + new_items);
+        Log.i(TAG, "add_list_clear:" + new_items);
 
         try
         {

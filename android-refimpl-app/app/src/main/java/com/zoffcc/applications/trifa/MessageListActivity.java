@@ -62,7 +62,6 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -1095,6 +1094,8 @@ public class MessageListActivity extends AppCompatActivity
 
     static void add_attachment(Context c, Intent data, long friendnum_local, boolean activity_friend_num)
     {
+        Log.i(TAG, "add_attachment:001");
+
         try
         {
             String fileName = null;
@@ -1150,16 +1151,6 @@ public class MessageListActivity extends AppCompatActivity
             {
                 e.printStackTrace();
             }
-
-/*            {
-                Uri selectedImage = data.getData();
-                Log.i(TAG, "data_uri=" + selectedImage.toString());
-                String picturePath = getPath(c, selectedImage);
-                Log.i(TAG, "file_attach_for_send:data=" + data.getData() + ":" + picturePath);
-                final String src_path = new File(new File(picturePath).getAbsolutePath()).getParent();
-                final String src_filename = new File(picturePath).getName();
-                Log.i(TAG, "file_attach_for_send:select_file:22:p=" + src_path + " f=" + src_filename);
-            }*/
 
             final String fileName_ = fileName;
 
@@ -1251,226 +1242,120 @@ public class MessageListActivity extends AppCompatActivity
 
     static void add_outgoing_file(Context c, long friendnum, String filepath, String filename, Uri uri, boolean real_file_path)
     {
-        if (real_file_path)
+        Log.i(TAG, "add_outgoing_file:001");
+
+        // Log.i(TAG, "add_outgoing_file:filepath=" + filepath + " uri=" + uri.toString() + " uri2=" + uri);
+
+        long file_size = -1;
+        try
         {
-            long file_size = -1;
-            try
-            {
-                file_size = new java.io.File(filepath + "/" + filename).length();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                // file length unknown?
-                return;
-            }
 
-            if (file_size < 1)
-            {
-                // file length "zero"?
-                return;
-            }
+            DocumentFile documentFile = DocumentFile.fromSingleUri(c, uri);
+            String fileName = documentFile.getName();
+            // Log.i(TAG, "add_outgoing_file:documentFile:fileName=" + fileName);
+            // Log.i(TAG, "add_outgoing_file:documentFile:fileLength=" + documentFile.length());
 
-            // Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
-            Log.i(TAG, "add_outgoing_file:friendnum(2)=" + friendnum);
-
-            Filetransfer f = new Filetransfer();
-            f.tox_public_key_string = tox_friend_get_public_key__wrapper(friendnum);
-            f.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
-            f.file_number = -1; // add later when we actually have the number
-            f.kind = TOX_FILE_KIND_DATA.value;
-            f.state = TOX_FILE_CONTROL_PAUSE.value;
-            f.path_name = filepath;
-            f.file_name = filename;
-            f.filesize = file_size;
-            f.ft_accepted = false;
-            f.ft_outgoing_started = false;
-            f.current_position = 0;
-
-            // Log.i(TAG, "add_outgoing_file:tox_public_key_string=" + f.tox_public_key_string);
-
-            long ft_id = insert_into_filetransfer_db(f);
-            f.id = ft_id;
-
-            // Message m_tmp = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(3)).orderByMessage_idDesc().get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:2:" + ft_id);
-
-
-            // ---------- DEBUG ----------
-            Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:4a:" + "fid=" + ft_tmp.id + " mid=" + ft_tmp.message_id);
-            // ---------- DEBUG ----------
-
-
-            // add FT message to UI
-            Message m = new Message();
-
-            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
-            m.direction = 1; // msg outgoing
-            m.TOX_MESSAGE_TYPE = 0;
-            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
-            m.filetransfer_id = ft_id;
-            m.filedb_id = -1;
-            m.state = TOX_FILE_CONTROL_PAUSE.value;
-            m.ft_accepted = false;
-            m.ft_outgoing_started = false;
-            m.ft_outgoing_queued = false;
-            m.filename_fullpath = new java.io.File(filepath + "/" + filename).getAbsolutePath();
-            m.sent_timestamp = System.currentTimeMillis();
-            m.text = filename + "\n" + file_size + " bytes";
-
-            long new_msg_id = insert_into_message_db(m, true);
-            m.id = new_msg_id;
-
-            // ---------- DEBUG ----------
-            Log.i(TAG, "add_outgoing_file:MM2MM:3:" + new_msg_id);
-            Message m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
-            // ---------- DEBUG ----------
-
-            f.message_id = new_msg_id;
-            // ** // update_filetransfer_db_messageid_from_id(f, ft_id);
-            update_filetransfer_db_full(f);
-
-            // ---------- DEBUG ----------
-            Filetransfer ft_tmp2 = orma.selectFromFiletransfer().idEq(ft_id).get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:4b:" + "fid=" + ft_tmp2.id + " mid=" + ft_tmp2.message_id);
-            // ---------- DEBUG ----------
-
-            // ---------- DEBUG ----------
-            m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
-            // ---------- DEBUG ----------
-
-            // --- ??? should we do this here?
-            //        try
-            //        {
-            //            // update "new" status on friendlist fragment
-            //            FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-            //            friend_list_fragment.modify_friend(f2, friendnum);
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            e.printStackTrace();
-            //            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
-            //        }
-            // --- ??? should we do this here?
+            file_size = documentFile.length();
         }
-        else
+        catch (Exception e)
         {
-            // Log.i(TAG, "add_outgoing_file:filepath=" + filepath + " uri=" + uri.toString() + " uri2=" + uri);
-
-            long file_size = -1;
-            try
-            {
-
-                DocumentFile documentFile = DocumentFile.fromSingleUri(c, uri);
-                String fileName = documentFile.getName();
-                // Log.i(TAG, "add_outgoing_file:documentFile:fileName=" + fileName);
-                // Log.i(TAG, "add_outgoing_file:documentFile:fileLength=" + documentFile.length());
-
-                file_size = documentFile.length();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                // file length unknown?
-                return;
-            }
-
-            if (file_size < 1)
-            {
-                // file length "zero"?
-                return;
-            }
-
-            // Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
-
-            Log.i(TAG, "add_outgoing_file:friendnum(2)=" + friendnum);
-
-            Filetransfer f = new Filetransfer();
-            f.tox_public_key_string = tox_friend_get_public_key__wrapper(friendnum);
-            f.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
-            f.file_number = -1; // add later when we actually have the number
-            f.kind = TOX_FILE_KIND_DATA.value;
-            f.state = TOX_FILE_CONTROL_PAUSE.value;
-            f.path_name = filepath;
-            f.file_name = filename;
-            f.filesize = file_size;
-            f.ft_accepted = false;
-            f.ft_outgoing_started = false;
-            f.current_position = 0;
-            f.storage_frame_work = true;
-
-            // Log.i(TAG, "add_outgoing_file:tox_public_key_string=" + f.tox_public_key_string);
-
-            long ft_id = insert_into_filetransfer_db(f);
-            f.id = ft_id;
-
-            // Message m_tmp = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(3)).orderByMessage_idDesc().get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:2:" + ft_id);
-
-            // ---------- DEBUG ----------
-            Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:4a:" + "fid=" + ft_tmp.id + " mid=" + ft_tmp.message_id);
-            // ---------- DEBUG ----------
-
-
-            // add FT message to UI
-            Message m = new Message();
-
-            m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
-            m.direction = 1; // msg outgoing
-            m.TOX_MESSAGE_TYPE = 0;
-            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
-            m.filetransfer_id = ft_id;
-            m.filedb_id = -1;
-            m.state = TOX_FILE_CONTROL_PAUSE.value;
-            m.ft_accepted = false;
-            m.ft_outgoing_started = false;
-            m.ft_outgoing_queued = false;
-            m.filename_fullpath = filepath;
-            m.sent_timestamp = System.currentTimeMillis();
-            m.text = filename + "\n" + file_size + " bytes";
-            m.storage_frame_work = true;
-
-            long new_msg_id = insert_into_message_db(m, true);
-            m.id = new_msg_id;
-
-            // ---------- DEBUG ----------
-            Log.i(TAG, "add_outgoing_file:MM2MM:3:" + new_msg_id);
-            Message m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
-            // ---------- DEBUG ----------
-
-            f.message_id = new_msg_id;
-            // ** // update_filetransfer_db_messageid_from_id(f, ft_id);
-            update_filetransfer_db_full(f);
-
-            // ---------- DEBUG ----------
-            Filetransfer ft_tmp2 = orma.selectFromFiletransfer().idEq(ft_id).get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:4b:" + "fid=" + ft_tmp2.id + " mid=" + ft_tmp2.message_id);
-            // ---------- DEBUG ----------
-
-            // ---------- DEBUG ----------
-            m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
-            Log.i(TAG, "add_outgoing_file:MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
-            // ---------- DEBUG ----------
-
-            // --- ??? should we do this here?
-            //        try
-            //        {
-            //            // update "new" status on friendlist fragment
-            //            FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-            //            friend_list_fragment.modify_friend(f2, friendnum);
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            e.printStackTrace();
-            //            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
-            //        }
-            // --- ??? should we do this here?
+            e.printStackTrace();
+            // file length unknown?
+            return;
         }
+
+        if (file_size < 1)
+        {
+            // file length "zero"?
+            return;
+        }
+
+        // Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
+
+        Log.i(TAG, "add_outgoing_file:friendnum(2)=" + friendnum);
+
+        Filetransfer f = new Filetransfer();
+        f.tox_public_key_string = tox_friend_get_public_key__wrapper(friendnum);
+        f.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
+        f.file_number = -1; // add later when we actually have the number
+        f.kind = TOX_FILE_KIND_DATA.value;
+        f.state = TOX_FILE_CONTROL_PAUSE.value;
+        f.path_name = filepath;
+        f.file_name = filename;
+        f.filesize = file_size;
+        f.ft_accepted = false;
+        f.ft_outgoing_started = false;
+        f.current_position = 0;
+        f.storage_frame_work = true;
+
+        // Log.i(TAG, "add_outgoing_file:tox_public_key_string=" + f.tox_public_key_string);
+
+        long ft_id = insert_into_filetransfer_db(f);
+        f.id = ft_id;
+
+        // Message m_tmp = orma.selectFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(3)).orderByMessage_idDesc().get(0);
+        Log.i(TAG, "add_outgoing_file:MM2MM:2:" + ft_id);
+
+        // ---------- DEBUG ----------
+        Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+        Log.i(TAG, "add_outgoing_file:MM2MM:4a:" + "fid=" + ft_tmp.id + " mid=" + ft_tmp.message_id);
+        // ---------- DEBUG ----------
+
+
+        // add FT message to UI
+        Message m = new Message();
+
+        m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
+        m.direction = 1; // msg outgoing
+        m.TOX_MESSAGE_TYPE = 0;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
+        m.filetransfer_id = ft_id;
+        m.filedb_id = -1;
+        m.state = TOX_FILE_CONTROL_PAUSE.value;
+        m.ft_accepted = false;
+        m.ft_outgoing_started = false;
+        m.ft_outgoing_queued = false;
+        m.filename_fullpath = filepath;
+        m.sent_timestamp = System.currentTimeMillis();
+        m.text = filename + "\n" + file_size + " bytes";
+        m.storage_frame_work = true;
+
+        long new_msg_id = insert_into_message_db(m, true);
+        m.id = new_msg_id;
+
+        // ---------- DEBUG ----------
+        Log.i(TAG, "add_outgoing_file:MM2MM:3:" + new_msg_id);
+        Message m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
+        Log.i(TAG, "add_outgoing_file:MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
+        // ---------- DEBUG ----------
+
+        f.message_id = new_msg_id;
+        // ** // update_filetransfer_db_messageid_from_id(f, ft_id);
+        update_filetransfer_db_full(f);
+
+        // ---------- DEBUG ----------
+        Filetransfer ft_tmp2 = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+        Log.i(TAG, "add_outgoing_file:MM2MM:4b:" + "fid=" + ft_tmp2.id + " mid=" + ft_tmp2.message_id);
+        // ---------- DEBUG ----------
+
+        // ---------- DEBUG ----------
+        m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
+        Log.i(TAG, "add_outgoing_file:MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
+        // ---------- DEBUG ----------
+
+        // --- ??? should we do this here?
+        //        try
+        //        {
+        //            // update "new" status on friendlist fragment
+        //            FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+        //            friend_list_fragment.modify_friend(f2, friendnum);
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            e.printStackTrace();
+        //            Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
+        //        }
+        // --- ??? should we do this here?
     }
 
     public void start_audio_call_to_friend(View view)

@@ -26,18 +26,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendSelectSingleActivity extends ListActivity
 {
     private static final String TAG = "trifa.FrndSelSingleActy";
+    List<FriendSelectSingle> friends_list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -59,14 +58,20 @@ public class FriendSelectSingleActivity extends ListActivity
             if (also_offline_friends == 1)
             {
                 fl = orma.selectFromFriendList().
-                        orderByAlias_nameAsc().
+                        is_relayNotEq(true).
+                        orderByTOX_CONNECTION_on_offDesc().
+                        orderByNotification_silentAsc().
+                        orderByLast_online_timestampDesc().
                         toList();
             }
             else
             {
                 fl = orma.selectFromFriendList().
+                        is_relayNotEq(true).
                         TOX_CONNECTION_realNotEq(0).
-                        orderByAlias_nameAsc().
+                        orderByTOX_CONNECTION_on_offDesc().
+                        orderByNotification_silentAsc().
+                        orderByLast_online_timestampDesc().
                         toList();
             }
 
@@ -91,128 +96,39 @@ public class FriendSelectSingleActivity extends ListActivity
 
         try
         {
-            Log.i(TAG, "onCreate:003");
 
-            int i = 0;
-            int j = 0;
-            for (i = 0; i < fl.size(); i++)
+            friends_list = new ArrayList<>();
+            for (FriendList f : fl)
             {
-                if (is_any_relay(fl.get(i).tox_public_key_string))
+                if (f.alias_name == null)
                 {
-                    // do not show any relays
+                    friends_list.add(new FriendSelectSingle(f.name, f.tox_public_key_string));
+                }
+                else if (f.alias_name.length() < 1)
+                {
+                    friends_list.add(new FriendSelectSingle(f.name, f.tox_public_key_string));
                 }
                 else
                 {
-                    j++;
+                    friends_list.add(new FriendSelectSingle(f.alias_name, f.tox_public_key_string));
                 }
             }
-
-            Log.i(TAG, "onCreate:004:j=" + j);
-
-            if (j == 0)
-            {
-                this.finish();
-            }
-
-            Log.i(TAG, "onCreate:005");
-
-            String[] friend_pubkey_and_names = new String[j];
-
-            Log.i(TAG, "onCreate:006:friend_pubkey_and_names.len=" + friend_pubkey_and_names.length);
-
-            i = 0;
-            boolean need_increase = false;
-            for (j = 0; j < fl.size(); j++)
-            {
-                need_increase = false;
-
-                // Log.i(TAG, "onCreate:006a:i=" + i + " n=" + fl.get(j).alias_name);
-                if (is_any_relay(fl.get(j).tox_public_key_string))
-                {
-                    // do not show any relays
-                    // Log.i(TAG, "onCreate:006b:RELAY:n=" + fl.get(j).alias_name);
-                }
-                else
-                {
-                    if (fl.get(j).alias_name == null)
-                    {
-                        friend_pubkey_and_names[i] = fl.get(j).tox_public_key_string + ":\n\n" + fl.get(j).name;
-                        need_increase = true;
-                    }
-                    else if (fl.get(j).alias_name.length() < 1)
-                    {
-                        friend_pubkey_and_names[i] = fl.get(j).tox_public_key_string + ":\n\n" + fl.get(j).name;
-                        need_increase = true;
-                    }
-                    else
-                    {
-                        friend_pubkey_and_names[i] = fl.get(j).tox_public_key_string + ":\n\n" + fl.get(j).alias_name;
-                        need_increase = true;
-                    }
-
-                    // Log.i(TAG, "onCreate:006c:n=" + friend_pubkey_and_names[i]);
-                }
-
-                // Log.i(TAG, "onCreate:006b:res=" + friend_pubkey_and_names[i]);
-
-                try
-                {
-                    if (friend_pubkey_and_names[i] == null)
-                    {
-                        friend_pubkey_and_names[i] = "***";
-                        Log.i(TAG, "onCreate:006d");
-                    }
-                    else if (friend_pubkey_and_names[i].length() == 0)
-                    {
-                        friend_pubkey_and_names[i] = "+++";
-                        Log.i(TAG, "onCreate:006e");
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                if (need_increase)
-                {
-                    i++;
-                }
-            }
-
-            Log.i(TAG, "onCreate:007");
-
-            this.setListAdapter(
-                    new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, friend_pubkey_and_names));
+            FriendSelectSingleAdapter adapter = new FriendSelectSingleAdapter(this,
+                                                                              R.layout.friend_select_single_single_list_item_view_custom,
+                                                                              friends_list);
+            this.setListAdapter(adapter);
             ListView lv = getListView();
-
-            Log.i(TAG, "onCreate:008");
 
             lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
             {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
-
-                    String friend_pubkey_and_name = ((TextView) view).getText().toString();
-                    // Log.i(TAG, "onItemClick:friend_pubkey_and_name=" + friend_pubkey_and_name);
-
                     Intent data = new Intent();
                     String return_friend_pubkey = null;
 
                     try
                     {
-                        int iend = friend_pubkey_and_name.indexOf(":"); // find the first occurrence of ":"
-                        if (iend != -1)
-                        {
-                            return_friend_pubkey = friend_pubkey_and_name.substring(0, iend);
-                        }
-                    }
-                    catch (Exception e2)
-                    {
-                        e2.printStackTrace();
-                    }
-
-                    try
-                    {
+                        return_friend_pubkey = friends_list.get((int) id).pubkey;
                         data.setData(Uri.parse(return_friend_pubkey));
                         setResult(RESULT_OK, data);
                     }

@@ -82,7 +82,7 @@ public class ShareActivity extends AppCompatActivity
                     intent_friend_selection.putExtra("offline", 1);
                     startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
                 }
-                else if (type.startsWith("image/"))
+                else if ((type.startsWith("image/")) || (type.startsWith("video/")) || (type.startsWith("audio/")))
                 {
                     Log.i(TAG, "select friend to share to ...");
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
@@ -92,7 +92,7 @@ public class ShareActivity extends AppCompatActivity
             }
             else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null)
             {
-                if (type.startsWith("image/"))
+                if ((type.startsWith("image/")) || (type.startsWith("video/")) || (type.startsWith("audio/")))
                 {
                     Log.i(TAG, "select friend to share to ...");
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
@@ -170,6 +170,7 @@ public class ShareActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.i(TAG, "onActivityResult:intent=" + data);
         if (requestCode == SelectFriendSingleActivity_ID)
         {
             if (resultCode == RESULT_OK)
@@ -202,6 +203,7 @@ public class ShareActivity extends AppCompatActivity
                                 {
                                     handleSendImage(intent, result_friend_pubkey);
                                 }
+                                return;
                             }
                             else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null)
                             {
@@ -217,6 +219,7 @@ public class ShareActivity extends AppCompatActivity
                                 {
                                     handleSendMultipleImages(intent, result_friend_pubkey);
                                 }
+                                return;
                             }
                         }
                     }

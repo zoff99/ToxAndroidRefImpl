@@ -234,7 +234,7 @@ public class HelperMessage
     {
         try
         {
-            // Log.i(TAG, "add_single_message_from_messge_id:message_id=" + message_id);
+            Log.i(TAG, "add_single_message_from_messge_id:1:message_id=" + message_id);
             Thread t = new Thread()
             {
                 @Override
@@ -242,7 +242,7 @@ public class HelperMessage
                 {
                     if (message_id != -1)
                     {
-                        // Log.i(TAG, "add_single_message_from_messge_id:message_id=" + message_id);
+                        Log.i(TAG, "add_single_message_from_messge_id:2:message_id=" + message_id);
 
                         try
                         {
@@ -579,7 +579,7 @@ public class HelperMessage
         //    @Override
         //    public void run()
         //    {
-        // Log.i(TAG, "insert_into_message_db:m=" + m);
+        Log.i(TAG, "insert_into_message_db:m=" + m);
         long row_id = orma.insertIntoMessage(m);
 
         try
