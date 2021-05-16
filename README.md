@@ -26,7 +26,7 @@ https://hosted.weblate.org/engage/trifa-a-tox-client-for-android/
 Offline Messages \*NEW\* \*NEW\*
 =
 To get offline messages for your TRIfA App, install ToxProxy on a Linux Box at home and leave it running 0:00-24:00.<br>
-### Installation instructions:
+### Installation instructions [using Google FCM for Push Messages]:
 
 * install ToxProxy for Linux: [appimage_binary](https://github.com/zoff99/ToxProxy/releases/latest/download/ToxProxy_x86_64.AppImage)
 * run ToxProxy for Linux (**it will only write data to the current directory and below**):
