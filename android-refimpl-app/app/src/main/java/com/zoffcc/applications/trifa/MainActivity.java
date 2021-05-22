@@ -2302,47 +2302,55 @@ public class MainActivity extends AppCompatActivity
         }
 
         // ACK new Notification token --------------------------
-        if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK) != null)
+        try
         {
-            // ok we have a new token, show the user a dialog to ask if we should use it
-            AlertDialog ad = new AlertDialog.Builder(this).
-                    setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
+            if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK) != null)
+            {
+                // ok we have a new token, show the user a dialog to ask if we should use it
+                AlertDialog ad = new AlertDialog.Builder(this).
+                        setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
                         {
-                            try
+                            public void onClick(DialogInterface dialog, int id)
                             {
-                                del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                                try
+                                {
+                                    del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    Log.i(TAG, "del_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
+                                }
                             }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "del_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
-                            }
-                        }
-                    }).
-                    setPositiveButton(R.string.MainActivity_yes_button, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
+                        }).
+                        setPositiveButton(R.string.MainActivity_yes_button, new DialogInterface.OnClickListener()
                         {
-                            try
+                            public void onClick(DialogInterface dialog, int id)
                             {
-                                String new_token = get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
-                                set_g_opts(NOTIFICATION_TOKEN_DB_KEY, new_token);
-                                del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                                try
+                                {
+                                    String new_token = get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                                    set_g_opts(NOTIFICATION_TOKEN_DB_KEY, new_token);
+                                    del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                    Log.i(TAG, "update_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
+                                }
                             }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "update_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
-                            }
-                        }
-                    }).create();
-            ad.setTitle(getString(R.string.MainActivity_new_noti_token_dialog_title));
-            ad.setMessage(getString(R.string.MainActivity_new_noti_token_dialog_text));
-            ad.setCancelable(false);
-            ad.setCanceledOnTouchOutside(false);
-            ad.show();
+                        }).create();
+                ad.setTitle(getString(R.string.MainActivity_new_noti_token_dialog_title));
+                ad.setMessage(getString(R.string.MainActivity_new_noti_token_dialog_text) + "\n\n" +
+                              get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK));
+                ad.setCancelable(false);
+                ad.setCanceledOnTouchOutside(false);
+                ad.show();
+            }
+        }
+        catch (Exception ee2)
+        {
+            Log.i(TAG, "NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE03:" + ee2.getMessage());
         }
         // ACK new Notification token --------------------------
     }
