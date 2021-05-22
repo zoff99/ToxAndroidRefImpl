@@ -591,25 +591,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else
             {
-                try
-                {
-                    if (progressDialog == null)
-                    {
-                        progressDialog = new ProgressDialog(this.context);
-                        progressDialog.setIndeterminate(true);
-                        progressDialog.setMessage("");
-                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    }
-                    progressDialog.show();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                Intent intent = new Intent(v.getContext(), MessageListActivity.class);
-                intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(this.friendlist.tox_public_key_string));
-                v.getContext().startActivity(intent);
+                show_messagelist_acticvity_for_friend(v.getContext(),this.friendlist.tox_public_key_string);
             }
         }
         catch (Exception e)
@@ -892,5 +874,28 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         menu.show();
 
         return true;
+    }
+
+    static void show_messagelist_acticvity_for_friend(Context c, String friend_pubkey)
+    {
+        try
+        {
+            if (progressDialog == null)
+            {
+                progressDialog = new ProgressDialog(c);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setMessage("");
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            }
+            progressDialog.show();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Intent intent = new Intent(c, MessageListActivity.class);
+        intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(friend_pubkey));
+        c.startActivity(intent);
     }
 }
