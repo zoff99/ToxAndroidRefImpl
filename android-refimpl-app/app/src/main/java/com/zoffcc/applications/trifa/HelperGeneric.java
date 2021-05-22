@@ -1198,8 +1198,7 @@ public class HelperGeneric
             }
             catch (android.database.sqlite.SQLiteConstraintException | net.sqlcipher.database.SQLiteConstraintException e)
             {
-                e.printStackTrace();
-
+                // e.printStackTrace();
                 try
                 {
                     orma.updateTRIFADatabaseGlobalsNew().keyEq(key).value(value).execute();
