@@ -3183,4 +3183,22 @@ public class HelperGeneric
 
         return sql_like_pattern;
     }
+
+    static void print_stack_trace()
+    {
+        try
+        {
+            StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+            for (int i = 3; i < elements.length; i++)
+            {
+                StackTraceElement s = elements[i];
+                Log.i("STACK_TRACE:",
+                      "STACK_TRACE:\tat " + s.getClassName() + "." + s.getMethodName() + "(" + s.getFileName() + ":" +
+                      s.getLineNumber() + ")");
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
 }
