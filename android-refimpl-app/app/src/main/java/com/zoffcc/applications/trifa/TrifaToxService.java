@@ -153,7 +153,7 @@ public class TrifaToxService extends Service
     static Thread trifa_service_thread = null;
     static long last_resend_pending_messages_ms = -1;
     static long last_resend_pending_messages2_ms = -1;
-    static long last_start_uqueued_fts_ms = -1;
+    static long last_start_queued_fts_ms = -1;
     static boolean need_wakeup_now = false;
     static int tox_thread_starting_up = 0;
 
@@ -1580,9 +1580,9 @@ public class TrifaToxService extends Service
                     // --- start queued outgoing FTs here --------------
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
-                        if ((last_start_uqueued_fts_ms + (10 * 1000)) < System.currentTimeMillis())
+                        if ((last_start_queued_fts_ms + (4 * 1000)) < System.currentTimeMillis())
                         {
-                            last_start_uqueued_fts_ms = System.currentTimeMillis();
+                            last_start_queued_fts_ms = System.currentTimeMillis();
 
                             try
                             {
