@@ -4435,13 +4435,10 @@ public class MainActivity extends AppCompatActivity
 
         if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_CANCEL.value)
         {
-            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_CANCEL");
             HelperFiletransfer.cancel_filetransfer(friend_number, file_number);
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_RESUME.value)
         {
-            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_RESUME");
-
             try
             {
                 long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number,
@@ -4502,8 +4499,6 @@ public class MainActivity extends AppCompatActivity
         }
         else if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_PAUSE.value)
         {
-            Log.i(TAG, "file_recv_control:TOX_FILE_CONTROL_PAUSE");
-
             try
             {
                 long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number,
@@ -4772,8 +4767,11 @@ public class MainActivity extends AppCompatActivity
 
         if (a_TOX_FILE_KIND == TOX_FILE_KIND_AVATAR.value)
         {
+            Log.i(TAG, "file_recv:TOX_FILE_KIND_AVATAR");
+
             if (file_size > AVATAR_INCOMING_MAX_BYTE_SIZE)
             {
+                Log.i(TAG, "file_recv:avatar_too_large");
                 try
                 {
                     tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
@@ -4786,6 +4784,8 @@ public class MainActivity extends AppCompatActivity
             }
             else if (file_size == 0)
             {
+                Log.i(TAG, "file_recv:avatar_size_zero");
+
                 // friend wants to unset avatar
                 HelperFriend.del_friend_avatar(HelperFriend.tox_friend_get_public_key__wrapper(friend_number),
                                                VFS_PREFIX + VFS_FILE_DIR + "/" +
@@ -4803,8 +4803,6 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-
-            Log.i(TAG, "file_recv:incoming avatar:size=" + file_size);
             String file_name_avatar = FRIEND_AVATAR_FILENAME;
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
@@ -4828,7 +4826,6 @@ public class MainActivity extends AppCompatActivity
                                                                                  HelperFriend.tox_friend_get_public_key__wrapper(
                                                                                          friend_number));
 
-            Log.i(TAG, "file_recv:incoming regular file");
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
@@ -4947,8 +4944,6 @@ public class MainActivity extends AppCompatActivity
                     orderByIdDesc().
                     get(0);
 
-            // Log.i(TAG, "file_recv_chunk:filesize==" + f.filesize);
-
             if (f == null)
             {
                 return;
@@ -4986,8 +4981,6 @@ public class MainActivity extends AppCompatActivity
 
         if (length == 0)
         {
-            Log.i(TAG, "file_recv_chunk:END-O-F:filesize==" + f.filesize);
-
             try
             {
                 Log.i(TAG, "file_recv_chunk:file fully received");
@@ -5067,7 +5060,6 @@ public class MainActivity extends AppCompatActivity
             catch (Exception e2)
             {
                 e2.printStackTrace();
-                Log.i(TAG, "file_recv_chunk:EE2:" + e2.getMessage());
             }
         }
         else // normal chunck recevied ---------- (NOT start, and NOT end)
@@ -5140,8 +5132,6 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "file_recv_chunk:EE1:" + e.getMessage());
             }
         }
-
-        // Log.i(TAG, "file_recv_chunk:--END--");
     }
 
     // void test(int i)
@@ -6512,9 +6502,7 @@ public class MainActivity extends AppCompatActivity
             {
                 progressDialog2.dismiss();
                 Context c = weakContext.get();
-                Toast.makeText(c,
-                               "File exported to:" + "\n" + fname +
-                               f.file_name, Toast.LENGTH_LONG).show();
+                Toast.makeText(c, "File exported to:" + "\n" + fname + f.file_name, Toast.LENGTH_LONG).show();
             }
             catch (Exception e4)
             {
