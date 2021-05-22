@@ -33,8 +33,8 @@ import com.bumptech.glide.signature.ObjectKey;
 
 import java.io.File;
 
-import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.HelperGeneric.copy_vfs_file_to_real_file;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 
 public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.File, java.io.InputStream>
 {
@@ -190,7 +190,7 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
             }
             catch (Exception e)
             {
-                System.out.println("fileloader2:EE:"); // + e.getMessage());
+                Log.i(TAG, "fileloader2:EE:"); // + e.getMessage());
                 // e.printStackTrace();
             }
             // System.out.println("fileloader2:loadData:004:onDataReady=" + out);
