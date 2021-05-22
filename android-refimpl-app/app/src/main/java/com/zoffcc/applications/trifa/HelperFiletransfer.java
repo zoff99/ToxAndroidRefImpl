@@ -21,7 +21,6 @@ package com.zoffcc.applications.trifa;
 
 import android.database.Cursor;
 import android.util.Log;
-import android.view.View;
 
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
