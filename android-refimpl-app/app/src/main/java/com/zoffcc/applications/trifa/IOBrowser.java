@@ -38,6 +38,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import info.guardianproject.iocipher.File;
@@ -51,11 +53,37 @@ public class IOBrowser extends ListActivity
 
     private List<String> item = null;
     private List<String> path = null;
+    private List<dir_item> dir_items = null;
     private TextView fileInfo;
-    private String[] items;
     private String root = "/";
     private String cur_path = root;
     private boolean at_root_dir = true;
+
+    public class dir_item
+    {
+        private String i_name;
+        private String i_path;
+
+        void set_name(String name)
+        {
+            i_name = name;
+        }
+
+        void set_path(String path)
+        {
+            i_path = path;
+        }
+
+        String get_name()
+        {
+            return i_name;
+        }
+
+        String get_path()
+        {
+            return i_path;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -87,9 +115,7 @@ public class IOBrowser extends ListActivity
     {
 
         cur_path = dirPath;
-
-        item = new ArrayList<String>();
-        path = new ArrayList<String>();
+        dir_items = new ArrayList<>();
 
         info.guardianproject.iocipher.File file = new info.guardianproject.iocipher.File(dirPath);
         info.guardianproject.iocipher.File[] files = file.listFiles();
@@ -97,12 +123,6 @@ public class IOBrowser extends ListActivity
 
         if (!dirPath.equals(root))
         {
-            item.add(root);
-            path.add(root);// to get back to main list
-
-            item.add("..");
-            path.add(file.getParent()); // back one level
-
             at_root_dir = false;
         }
         else
@@ -112,7 +132,9 @@ public class IOBrowser extends ListActivity
 
         for (File fileItem : files)
         {
-            path.add(fileItem.getPath());
+            dir_item i2 = new dir_item();
+            i2 = new dir_item();
+            i2.set_path(fileItem.getPath());
 
             String item_name = fileItem.getName();
             String display_name = item_name;
@@ -141,23 +163,55 @@ public class IOBrowser extends ListActivity
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                     }
                 }
 
-                item.add("[" + display_name + "]");
+                i2.set_name("[" + display_name + "]");
             }
             else
             {
                 // input name file to array list
-                item.add(item_name);
+                i2.set_name(item_name);
             }
+            dir_items.add(i2);
         }
         fileInfo.setText("Info: " + dirPath + " [ " + files.length + " item ]");
-        // declare array with specific number of items
-        items = new String[item.size()];
-        // send data arraylist(item) to array(items)
-        item.toArray(items);
+
+        Collections.sort(dir_items, new Comparator<dir_item>()
+        {
+            @Override
+            public int compare(dir_item p1, dir_item p2)
+            {
+                String name1 = p1.get_name();
+                String name2 = p2.get_name();
+                return name1.compareToIgnoreCase(name2);
+            }
+        });
+
+        if (!dirPath.equals(root))
+        {
+            dir_item i = new dir_item();
+            i.set_name("..");
+            i.set_path(file.getParent());
+            dir_items.add(0, i);
+
+            i = new dir_item();
+            i.set_name(root);
+            i.set_path(root);
+            dir_items.add(0, i);
+        }
+
+        item = new ArrayList<>();
+        path = new ArrayList<>();
+
+        for (dir_item d : dir_items)
+        {
+            // Log.i(TAG, "##:" + d.get_name());
+            item.add(d.get_name());
+            path.add(d.get_path());
+        }
+
         setListAdapter(new IconicList());
     }
 
@@ -240,7 +294,7 @@ public class IOBrowser extends ListActivity
     {
         public IconicList()
         {
-            super(IOBrowser.this, R.layout.iobrowser_row, items);
+            super(IOBrowser.this, R.layout.iobrowser_row, item);
             // TODO Auto-generated constructor stub
         }
 
@@ -252,7 +306,7 @@ public class IOBrowser extends ListActivity
             TextView label = (TextView) row.findViewById(R.id.io_browser_label);
             ImageView icon = (ImageView) row.findViewById(R.id.io_browser_icon);
             TextView filesize = (TextView) row.findViewById(R.id.io_browser_filesize);
-            label.setText(items[position]);
+            label.setText(item.get(position));
 
             try
             {
@@ -287,7 +341,7 @@ public class IOBrowser extends ListActivity
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
 
             return (row);
