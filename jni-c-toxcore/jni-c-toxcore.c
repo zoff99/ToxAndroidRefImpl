@@ -4134,6 +4134,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1get_1file_1id(JNIEnv 
 }
 
 JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1sending_1active(JNIEnv *env, jobject thiz, jlong friend_number)
+{
+    if(tox_global == NULL)
+    {
+        return -1;
+    }
+
+    return (jlong)tox_file_sending_active(tox_global, (uint32_t)friend_number);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1receiving_1active(JNIEnv *env, jobject thiz, jlong friend_number)
+{
+    if(tox_global == NULL)
+    {
+        return -1;
+    }
+
+    return (jlong)tox_file_receiving_active(tox_global, (uint32_t)friend_number);
+}
+
+JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong kind, jlong file_size, jobject file_id_buffer, jstring file_name, jlong filename_length)
 {
