@@ -2577,6 +2577,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_file_get_file_id(long friend_number, long file_number, ByteBuffer file_id_buffer);
 
+    // public static native long tox_file_sending_active(long friend_number);
+
+    // public static native long tox_file_receiving_active(long friend_number);
+
     public static native long tox_file_send(long friend_number, long kind, long file_size, ByteBuffer file_id_buffer, String file_name, long filename_length);
 
     public static native int tox_file_send_chunk(long friend_number, long file_number, long position, ByteBuffer data_buffer, long data_length);
