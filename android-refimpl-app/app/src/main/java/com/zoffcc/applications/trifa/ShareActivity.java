@@ -57,7 +57,7 @@ public class ShareActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         t1 = (TextView) findViewById(R.id.text1);
-        t1.setText("Share Content ...");
+        t1.setText("Share Content ...\nNot yet implemented via share.");
 
         Log.i(TAG, "onCreate");
 
@@ -65,6 +65,12 @@ public class ShareActivity extends AppCompatActivity
         // Log.i(TAG, "onCreate:intent=" + intent);
         action = intent.getAction();
         type = intent.getType();
+
+        // HINT: disable sharing content via "share" for now. it does not yet work properly!
+        if (2 == 1 + 1)
+        {
+            return;
+        }
 
         try
         {
