@@ -293,7 +293,7 @@
             android:name=".IOCipherContentProvider"
             android:authorities="com.zoffcc.applications.trifa"
             android:grantUriPermissions="true"
-            android:exported="true">
+            android:exported="false">
         </provider>
 
     </application>
