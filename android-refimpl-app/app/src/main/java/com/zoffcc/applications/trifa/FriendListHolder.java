@@ -238,6 +238,13 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         statusText.setText(fl.status_message);
 
+        /*
+        statusText.setText("ft:s:" + tox_friend_by_public_key__wrapper(fl.tox_public_key_string) + " " +
+                           tox_file_sending_active(tox_friend_by_public_key__wrapper(fl.tox_public_key_string)) + "/" +
+                           tox_file_receiving_active(tox_friend_by_public_key__wrapper(fl.tox_public_key_string)) +
+                           " " + fl.status_message);
+         */
+
         avatar.setImageDrawable(d_lock);
 
         try
@@ -591,7 +598,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else
             {
-                show_messagelist_acticvity_for_friend(v.getContext(),this.friendlist.tox_public_key_string);
+                show_messagelist_acticvity_for_friend(v.getContext(), this.friendlist.tox_public_key_string);
             }
         }
         catch (Exception e)
