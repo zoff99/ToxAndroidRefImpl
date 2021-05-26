@@ -16,4 +16,4 @@ Tox is free software. That's free as in freedom, as well as in price. This means
 <b>More Information:</b><br>
 * <a href="https://tox.zoff.cc">about Tox</a><br>
 * <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
-* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Join Tox IRC Channel</a><br>
+* <a href="https://kiwiirc.com/nextclient/irc.libera.chat/toktok">Join Tox IRC Channel</a><br>
