@@ -117,6 +117,9 @@ public class Message
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     boolean ft_outgoing_queued = false;
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    boolean msg_at_relay = false;
+
     static Message deep_copy(Message in)
     {
         Message out = new Message();
@@ -146,6 +149,7 @@ public class Message
         out.resend_count = in.resend_count;
         out.storage_frame_work = in.storage_frame_work;
         out.ft_outgoing_queued = in.ft_outgoing_queued;
+        out.msg_at_relay = in.msg_at_relay;
 
         return out;
     }
@@ -160,6 +164,6 @@ public class Message
                ", send_retries=" + send_retries + ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath +
                ", is_new=" + is_new + ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version +
                ", resend_count=" + resend_count + ", raw_msgv2_bytes=" + "xxxxxx" + ", storage_frame_work=" +
-               storage_frame_work + ", ft_outgoing_queued=" + ft_outgoing_queued;
+               storage_frame_work + ", ft_outgoing_queued=" + ft_outgoing_queued + ", msg_at_relay=" + msg_at_relay;
     }
 }

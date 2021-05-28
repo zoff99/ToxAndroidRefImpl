@@ -192,8 +192,16 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
 
         if (!m.read)
         {
-            // not yet read
-            imageView.setImageResource(R.drawable.circle_red);
+            if (m.msg_at_relay)
+            {
+                // not yet read, but already at friends relay
+                imageView.setImageResource(R.drawable.circle_orange);
+            }
+            else
+            {
+                // not yet read
+                imageView.setImageResource(R.drawable.circle_red);
+            }
         }
         else
         {

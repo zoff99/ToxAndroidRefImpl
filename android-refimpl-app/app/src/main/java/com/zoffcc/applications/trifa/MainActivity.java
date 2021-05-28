@@ -141,14 +141,18 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
+import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
+import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
@@ -3909,7 +3913,7 @@ public class MainActivity extends AppCompatActivity
                     // ******** friend just came online ********
                     if (HelperRelay.have_own_relay())
                     {
-                        if (!HelperRelay.is_any_relay(f.tox_public_key_string))
+                        if (!is_any_relay(f.tox_public_key_string))
                         {
                             HelperRelay.send_relay_pubkey_to_friend(HelperRelay.get_own_relay_pubkey(),
                                                                     f.tox_public_key_string);
@@ -3948,7 +3952,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
 
-            if (HelperRelay.is_any_relay(f.tox_public_key_string))
+            if (is_any_relay(f.tox_public_key_string))
             {
                 if (!HelperRelay.is_own_relay(f.tox_public_key_string))
                 {
@@ -4030,6 +4034,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_read_receipt_message_v2_cb_method(final long friend_number, long ts_sec, byte[] msg_id)
     {
+        Log.i(TAG, "friend_read_receipt_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number));
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:003:*PING*");
@@ -4040,10 +4045,68 @@ public class MainActivity extends AppCompatActivity
         final String message_id_hash_as_hex_string = HelperGeneric.bytesToHex(msg_id_buffer.array(),
                                                                               msg_id_buffer.arrayOffset(),
                                                                               msg_id_buffer.limit());
-        // Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
+        Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
 
         try
         {
+            final int m_try = orma.selectFromMessage().
+                    msg_id_hashEq(message_id_hash_as_hex_string).
+                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    directionEq(1).
+                    readEq(false).
+                    toList().size();
+
+            if (m_try < 1)
+            {
+                // HINT: it must a an ACK send from a friends toxproxy to singal the receipt of the message on behalf of the friend
+
+                if (is_any_relay(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
+                {
+                    FriendList friend_of_relay = HelperRelay.get_friend_for_relay(
+                            HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
+
+                    if (friend_of_relay != null)
+                    {
+
+                        Message m = orma.selectFromMessage().
+                                msg_id_hashEq(message_id_hash_as_hex_string).
+                                tox_friendpubkeyEq(friend_of_relay.tox_public_key_string).
+                                directionEq(1).
+                                readEq(false).
+                                toList().get(0);
+
+                        if (m != null)
+                        {
+                            Log.i(TAG, "receipt_message_v2_cb:msgid_via_relay found");
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        set_message_msg_at_relay_from_id(m.id, true);
+                                        m.msg_at_relay = true;
+                                        HelperMessage.update_single_message(m, true);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+
+                            if (main_handler_s != null)
+                            {
+                                main_handler_s.post(myRunnable);
+                            }
+                        }
+                    }
+                }
+
+                return;
+            }
+
             final Message m = orma.selectFromMessage().
                     msg_id_hashEq(message_id_hash_as_hex_string).
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
@@ -4061,8 +4124,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         try
                         {
-                            if (!HelperRelay.is_any_relay(
-                                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
+                            if (!is_any_relay(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
                             {
                                 // only update if the "read receipt" comes from a friend, but not it's relay!
                                 m.raw_msgv2_bytes = "";
@@ -4168,6 +4230,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
     {
+        Log.i(TAG, "friend_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length);
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:005:*PING*");
@@ -4178,7 +4241,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_lossless_packet_cb_method(long friend_number, byte[] data, long length)
     {
-        // Log.i(TAG, "friend_lossless_packet_cb:fn=" + friend_number + " len=" + length + " data=" + bytes_to_hex(data));
+        Log.i(TAG, "friend_lossless_packet_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length +
+                   " data=" + bytes_to_hex(data));
 
         if (length > 0)
         {
@@ -4187,7 +4251,7 @@ public class MainActivity extends AppCompatActivity
                 if (length == (TOX_PUBLIC_KEY_SIZE + 1))
                 {
                     // Log.i(TAG, "friend_lossless_packet_cb:recevied CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND");
-                    String relay_pubkey = HelperGeneric.bytes_to_hex(data).substring(2);
+                    String relay_pubkey = bytes_to_hex(data).substring(2);
                     // Log.i(TAG, "friend_lossless_packet_cb:recevied pubkey:" + relay_pubkey);
                     HelperFriend.add_friend_to_system(relay_pubkey.toUpperCase(), true,
                                                       HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
@@ -4198,6 +4262,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length, byte[] raw_data, long raw_data_length)
     {
+        Log.i(TAG, "friend_sync_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number));
+
         if (!HelperRelay.is_own_relay(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
         {
             // sync message only accepted from my own relay
@@ -5190,7 +5256,7 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_conference_invite_cb_method(final long friend_number, final int a_TOX_CONFERENCE_TYPE, final byte[] cookie_buffer, final long cookie_length)
     {
         Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" +
-                   cookie_length + " cookie=" + HelperGeneric.bytes_to_hex(cookie_buffer));
+                   cookie_length + " cookie=" + bytes_to_hex(cookie_buffer));
         //try
         //{
         //Thread t = new Thread()
@@ -5220,7 +5286,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);
         // strip first 3 bytes of cookie to get the conference_id.
         // this is aweful and hardcoded
-        String conference_identifier = HelperGeneric.bytes_to_hex(
+        String conference_identifier = bytes_to_hex(
                 Arrays.copyOfRange(cookie_buffer, 3, (int) (3 + CONFERENCE_ID_LENGTH)));
         Log.i(TAG, "conference_invite_cb:conferenc ID=" + conference_identifier);
 

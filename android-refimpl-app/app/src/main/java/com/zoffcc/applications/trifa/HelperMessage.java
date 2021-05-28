@@ -572,6 +572,19 @@ public class HelperMessage
         }
     }
 
+    public static void set_message_msg_at_relay_from_id(long message_id, boolean msg_at_relay)
+    {
+        try
+        {
+            orma.updateMessage().idEq(message_id).msg_at_relay(msg_at_relay).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "set_message_msg_at_relay_from_id:EE:" + e.getMessage());
+        }
+    }
+
     static long insert_into_message_db(final Message m, final boolean update_message_view_flag)
     {
         // Thread t = new Thread()
