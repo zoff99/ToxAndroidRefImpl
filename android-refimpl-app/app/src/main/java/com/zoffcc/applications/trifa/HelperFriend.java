@@ -871,7 +871,7 @@ public class HelperFriend
         return ret;
     }
 
-    static void send_friend_msg_receipt_v2_wrapper(final long friend_number, final int msg_type, final ByteBuffer msg_id_buffer)
+    static void send_friend_msg_receipt_v2_wrapper(final long friend_number, final int msg_type, final ByteBuffer msg_id_buffer, long t_sec_receipt)
     {
         // (msg_type == 1) msgV2 direct message
         // (msg_type == 2) msgV2 relay message
@@ -880,7 +880,6 @@ public class HelperFriend
         if (msg_type == 1)
         {
             // send message receipt v2
-            long t_sec_receipt = (System.currentTimeMillis() / 1000);
             MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
 
             try
@@ -903,7 +902,6 @@ public class HelperFriend
         else if (msg_type == 2)
         {
             // send message receipt v2
-            final long t_sec_receipt = (System.currentTimeMillis() / 1000);
             final Thread t = new Thread()
             {
                 @Override
@@ -980,13 +978,11 @@ public class HelperFriend
         else if (msg_type == 3)
         {
             // send message receipt v2
-            long t_sec_receipt = (System.currentTimeMillis() / 1000);
             MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
         }
         else if (msg_type == 4)
         {
             // send message receipt v2 for unknown message
-            long t_sec_receipt = (System.currentTimeMillis() / 1000);
             MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
         }
     }

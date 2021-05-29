@@ -2281,12 +2281,15 @@ public class HelperGeneric
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
                     msg_id_as_hex_string).count();
 
+            long pin_timestamp = System.currentTimeMillis();
+
             if (already_have_message > 0)
             {
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
                 // TODO: use received timstamp, not "now" here!
-                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
+                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer,
+                                                                (pin_timestamp / 1000));
                 return;
             }
 
@@ -2316,7 +2319,7 @@ public class HelperGeneric
             m.ft_outgoing_queued = false;
             m.sent_timestamp = (ts_sec * 1000); // sent time as unix timestamp -> convert to milliseconds
             m.sent_timestamp_ms = ts_ms; // "ms" part of timestamp (could be just an increasing number)
-            m.rcvd_timestamp = System.currentTimeMillis();
+            m.rcvd_timestamp = pin_timestamp;
             m.rcvd_timestamp_ms = 0;
             m.text = friend_message_text_utf8;
             m.msg_version = 1;
@@ -2339,7 +2342,8 @@ public class HelperGeneric
                 HelperMessage.insert_into_message_db(m, false);
             }
 
-            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
+            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer,
+                                                            (pin_timestamp / 1000));
 
             try
             {
@@ -2401,13 +2405,17 @@ public class HelperGeneric
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
                     msg_id_as_hex_string).count();
 
+            long pin_timestamp = System.currentTimeMillis();
+
             if (already_have_message > 0)
             {
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
-                Log.i(TAG, "receive_incoming_message:ACK1:" + get_friend_name_from_num(friend_number_real_sender) + " " +
-                           msg_id_as_hex_string);
-                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
+                Log.i(TAG,
+                      "receive_incoming_message:ACK1:" + get_friend_name_from_num(friend_number_real_sender) + " " +
+                      msg_id_as_hex_string);
+                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer,
+                                                                (pin_timestamp / 1000));
                 return;
             }
 
@@ -2437,7 +2445,7 @@ public class HelperGeneric
             m.ft_outgoing_queued = false;
             m.sent_timestamp = (ts_sec * 1000); // sent time as unix timestamp -> convert to milliseconds
             m.sent_timestamp_ms = ts_ms; // "ms" part of timestamp (could be just an increasing number)
-            m.rcvd_timestamp = System.currentTimeMillis();
+            m.rcvd_timestamp = pin_timestamp;
             m.rcvd_timestamp_ms = 0;
             m.text = friend_message_text_utf8;
             m.msg_version = 1;
@@ -2464,7 +2472,8 @@ public class HelperGeneric
             // send message receipt v2 to the relay
             Log.i(TAG, "receive_incoming_message:ACK2:" + get_friend_name_from_num(friend_number_real_sender) + " " +
                        msg_id_as_hex_string);
-            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
+            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer,
+                                                            (pin_timestamp / 1000));
 
             try
             {
