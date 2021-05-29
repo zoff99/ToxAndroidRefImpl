@@ -24,9 +24,11 @@ import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -3212,6 +3214,76 @@ public class HelperGeneric
         }
         catch (Exception e)
         {
+        }
+    }
+
+    static void draw_main_top_icon__real(ImageView view, Context c, int blur_color, boolean is_fg)
+    {
+        try
+        {
+            view.setBackgroundColor(Color.TRANSPARENT);
+
+            Drawable d = c.getResources().getDrawable(R.drawable.web_hi_res_512);
+            Drawable currentState = d.getCurrent();
+            if (currentState instanceof BitmapDrawable)
+            {
+                Bitmap bm1 = ((BitmapDrawable) currentState).getBitmap();
+                Bitmap bm = bm1.copy(bm1.getConfig(), true);
+
+                Bitmap alpha = bm.extractAlpha();
+                BlurMaskFilter blurMaskFilter = new BlurMaskFilter(35, BlurMaskFilter.Blur.OUTER);
+
+                Paint paint = new Paint();
+                paint.setMaskFilter(blurMaskFilter);
+                paint.setColor(blur_color);
+
+                Canvas canvas = new Canvas(bm);
+                canvas.drawBitmap(alpha, 0, 0, paint);
+
+                view.setImageBitmap(bm);
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    static void draw_main_top_icon(ImageView view, Context c, int blur_color, boolean is_fg)
+    {
+        try
+        {
+            if (!is_fg)
+            {
+                Runnable myRunnable = () -> {
+                    try
+                    {
+                        draw_main_top_icon__real(view, c, blur_color, is_fg);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                };
+
+                try
+                {
+                    if (MainActivity.main_handler_s != null)
+                    {
+                        MainActivity.main_handler_s.post(myRunnable);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                draw_main_top_icon__real(view, c, blur_color, is_fg);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

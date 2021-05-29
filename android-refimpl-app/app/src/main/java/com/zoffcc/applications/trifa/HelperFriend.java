@@ -735,7 +735,6 @@ public class HelperFriend
     }
 
     static String get_friend_name_from_pubkey(String friend_pubkey)
-    // get_friend_alias_name_wrapper_pubkey(String friend_pubkey)
     {
         String ret = "Unknown";
         String friend_alias_name = "";

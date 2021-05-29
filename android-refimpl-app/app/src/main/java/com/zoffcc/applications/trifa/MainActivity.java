@@ -147,11 +147,14 @@ import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
+import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection_status_real;
+import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -270,7 +273,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
 
     static TextView mt = null;
-    ImageView top_imageview = null;
+    static ImageView top_imageview = null;
     static boolean native_lib_loaded = false;
     static boolean native_audio_lib_loaded = false;
     static String app_files_directory = "";
@@ -1135,8 +1138,7 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            top_imageview.setBackgroundColor(Color.TRANSPARENT);
-            top_imageview.setImageResource(R.drawable.web_hi_res_512);
+            draw_main_top_icon(top_imageview, this, Color.GRAY, true);
         }
 
         fadeInAndShowImage(top_imageview, 5000);
@@ -2063,8 +2065,33 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            top_imageview.setBackgroundColor(Color.TRANSPARENT);
-            top_imageview.setImageResource(R.drawable.web_hi_res_512);
+            try
+            {
+                if (have_own_relay())
+                {
+                    int relay_connection_status_real = get_own_relay_connection_status_real();
+
+                    if (relay_connection_status_real == 2)
+                    {
+                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#04b431"), true);
+                    }
+                    else if (relay_connection_status_real == 1)
+                    {
+                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#ffce00"), true);
+                    }
+                    else
+                    {
+                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#ff0000"), true);
+                    }
+                }
+                else
+                {
+                    draw_main_top_icon(top_imageview, this, Color.GRAY, true);
+                }
+            }
+            catch (Exception e)
+            {
+            }
         }
 
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
@@ -3911,7 +3938,7 @@ public class MainActivity extends AppCompatActivity
                 if (f.TOX_CONNECTION == TOX_CONNECTION_NONE.value)
                 {
                     // ******** friend just came online ********
-                    if (HelperRelay.have_own_relay())
+                    if (have_own_relay())
                     {
                         if (!is_any_relay(f.tox_public_key_string))
                         {
@@ -3961,6 +3988,21 @@ public class MainActivity extends AppCompatActivity
                     if (f_real != null)
                     {
                         HelperGeneric.update_friend_connection_status_helper(a_TOX_CONNECTION, f_real, true);
+                    }
+                }
+                else // is own relay
+                {
+                    if (a_TOX_CONNECTION == 2)
+                    {
+                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#04b431"), false);
+                    }
+                    else if (a_TOX_CONNECTION == 1)
+                    {
+                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#ffce00"), false);
+                    }
+                    else
+                    {
+                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#ff0000"), false);
                     }
                 }
             }
@@ -5248,7 +5290,7 @@ public class MainActivity extends AppCompatActivity
         // invite also my ToxProxy -------------
         if (tox_conference_get_type(conference_number) == TOX_CONFERENCE_TYPE_TEXT.value)
         {
-            if (HelperRelay.have_own_relay())
+            if (have_own_relay())
             {
                 tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
                                       conference_number);
@@ -5298,7 +5340,7 @@ public class MainActivity extends AppCompatActivity
         // invite also my ToxProxy -------------
         if (a_TOX_CONFERENCE_TYPE == TOX_CONFERENCE_TYPE_TEXT.value)
         {
-            if (HelperRelay.have_own_relay())
+            if (have_own_relay())
             {
                 tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
                                       conference_num);

@@ -23,6 +23,8 @@ import android.util.Log;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -68,8 +70,7 @@ public class HelperRelay
         {
             if (!is_any_relay(friend_pubkey))
             {
-                FriendList fl = HelperFriend.main_get_friend(
-                        HelperFriend.tox_friend_by_public_key__wrapper(friend_pubkey));
+                FriendList fl = HelperFriend.main_get_friend(tox_friend_by_public_key__wrapper(friend_pubkey));
 
                 if (fl != null)
                 {
@@ -165,7 +166,7 @@ public class HelperRelay
                 for (i = 0; i < fl.size(); i++)
                 {
                     FriendList n = fl.get(i);
-                    friend_num = HelperFriend.tox_friend_by_public_key__wrapper(n.tox_public_key_string);
+                    friend_num = tox_friend_by_public_key__wrapper(n.tox_public_key_string);
                     byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
                     data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
                     MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
@@ -185,7 +186,7 @@ public class HelperRelay
             if (fl.size() > 0)
             {
                 int i = 0;
-                long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string);
+                long friend_num = tox_friend_by_public_key__wrapper(relay_public_key_string);
 
                 for (i = 0; i < fl.size(); i++)
                 {
@@ -215,8 +216,7 @@ public class HelperRelay
                     {
                         ConferenceDB conf = c.get(i);
                         int res = MainActivity.tox_conference_invite(
-                                HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string),
-                                conf.tox_conference_number);
+                                tox_friend_by_public_key__wrapper(relay_public_key_string), conf.tox_conference_number);
 
                         // Log.i(TAG,
                         //       "invite_to_all_conferences_own_relay:confnum=" + conf.tox_conference_number + " res=" +
@@ -251,7 +251,7 @@ public class HelperRelay
     static void send_friend_pubkey_to_relay(String relay_public_key_string, String friend_pubkey)
     {
         int i = 0;
-        long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string);
+        long friend_num = tox_friend_by_public_key__wrapper(relay_public_key_string);
         byte[] data = HelperGeneric.hex_to_bytes("FF" + friend_pubkey);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
         // Log.d(TAG, "send_friend_pubkey_to_relay:data=" + data);
@@ -262,7 +262,7 @@ public class HelperRelay
     static void send_relay_pubkey_to_friend(String relay_public_key_string, String friend_pubkey)
     {
         int i = 0;
-        long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(friend_pubkey);
+        long friend_num = tox_friend_by_public_key__wrapper(friend_pubkey);
         byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
         // Log.d(TAG, "send_relay_pubkey_to_friend:data=" + data);
@@ -331,6 +331,21 @@ public class HelperRelay
         try
         {
             ret = orma.selectFromRelayListDB().own_relayEq(true).get(0).tox_public_key_string;
+        }
+        catch (Exception e)
+        {
+        }
+
+        return ret;
+    }
+
+    static int get_own_relay_connection_status_real()
+    {
+        int ret = 0;
+
+        try
+        {
+            return is_friend_online_real(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()));
         }
         catch (Exception e)
         {
