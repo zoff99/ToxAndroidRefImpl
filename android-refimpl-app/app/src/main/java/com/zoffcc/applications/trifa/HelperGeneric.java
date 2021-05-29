@@ -72,6 +72,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x
 import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames_current;
 import static com.zoffcc.applications.trifa.Callstate.java_video_encoder_first_frame_in;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
@@ -2404,6 +2405,8 @@ public class HelperGeneric
             {
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
+                Log.i(TAG, "receive_incoming_message:ACK1:" + get_friend_name_from_num(friend_number_real_sender) + " " +
+                           msg_id_as_hex_string);
                 HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
                 return;
             }
@@ -2459,6 +2462,8 @@ public class HelperGeneric
             }
 
             // send message receipt v2 to the relay
+            Log.i(TAG, "receive_incoming_message:ACK2:" + get_friend_name_from_num(friend_number_real_sender) + " " +
+                       msg_id_as_hex_string);
             HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
 
             try

@@ -27,7 +27,6 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 
-import static com.zoffcc.applications.trifa.TRIFAGlobals.DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
@@ -910,15 +909,6 @@ public class HelperFriend
                 @Override
                 public void run()
                 {
-                    // delay sending of msg receipt for x milliseconds
-                    try
-                    {
-                        Thread.sleep(DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
 
                     // send msg receipt on main thread
                     final Runnable myRunnable = new Runnable()
@@ -931,13 +921,17 @@ public class HelperFriend
                                 String msg_id_as_hex_string = HelperGeneric.bytesToHex(msg_id_buffer.array(),
                                                                                        msg_id_buffer.arrayOffset(),
                                                                                        msg_id_buffer.limit());
-                                // Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
-                                //            msg_id_as_hex_string);
+                                Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
+                                           msg_id_as_hex_string);
 
                                 try
                                 {
-                                    MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt,
-                                                                                     msg_id_buffer);
+                                    int res = MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number,
+                                                                                               t_sec_receipt,
+                                                                                               msg_id_buffer);
+
+                                    Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:ACK:1:res=" + res + " f=" +
+                                               get_friend_name_from_num(friend_number));
 
                                     try
                                     {
@@ -947,9 +941,15 @@ public class HelperFriend
                                         if (relay_for_friend != null)
                                         {
                                             // if friend has a relay, send the "msg receipt" also to the relay. just to be sure.
-                                            MainActivity.tox_util_friend_send_msg_receipt_v2(
+                                            int res_relay = MainActivity.tox_util_friend_send_msg_receipt_v2(
                                                     tox_friend_by_public_key__wrapper(relay_for_friend), t_sec_receipt,
                                                     msg_id_buffer);
+
+                                            Log.i(TAG,
+                                                  "send_friend_msg_receipt_v2_wrapper:ACK:2:res_relay=" + res_relay +
+                                                  " f=" + get_friend_name_from_num(
+                                                          tox_friend_by_public_key__wrapper(relay_for_friend)));
+
                                         }
                                     }
                                     catch (Exception e)
