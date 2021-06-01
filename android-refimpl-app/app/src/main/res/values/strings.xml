@@ -140,6 +140,12 @@
     <string name="pref_title_use_incognito_keyboard">incognito Keyboard</string>
     <string name="pref_description_use_incognito_keyboard">turn off to tell keyboard not to learn from your entered words</string>
 
+    <string name="pref_title_compact_friendlist">Compact Friendlist</string>
+    <string name="pref_description_compact_friendlist">Make the Friendlist more compact, if you have a large list of Friends</string>
+
+    <string name="pref_title_compact_chatlist">Compact Chatlist</string>
+    <string name="pref_description_compact_chatlist">Display Chatmessage more compact saving space</string>
+
     <string name="pref_title_set_fps">set fps</string>
     <string name="pref_description_set_fps">try to set 15fps video framerate, this may crash on some phones</string>
 

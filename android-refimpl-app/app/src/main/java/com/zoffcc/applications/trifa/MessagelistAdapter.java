@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
@@ -71,7 +72,16 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         switch (viewType)
         {
             case Message_model.TEXT_INCOMING_NOT_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact, parent,
+                                                                            false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
+                                                                            false);
+                }
                 return new MessageListHolder_text_incoming_not_read(view, this.context);
             case Message_model.TEXT_INCOMING_HAVE_READ:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
@@ -79,10 +89,28 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 return new MessageListHolder_error(view, this.context);
 
             case Message_model.TEXT_OUTGOING_NOT_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_compact, parent,
+                                                                            false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent,
+                                                                            false);
+                }
                 return new MessageListHolder_text_outgoing_not_read(view, this.context);
             case Message_model.TEXT_OUTGOING_HAVE_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read,
+                                                                            parent, false);
+                }
                 return new MessageListHolder_text_outgoing_read(view, this.context);
 
             case Message_model.FILE_INCOMING_STATE_CANCEL:

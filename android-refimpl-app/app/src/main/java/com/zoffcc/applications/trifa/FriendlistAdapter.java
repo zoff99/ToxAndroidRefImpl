@@ -20,7 +20,6 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +29,10 @@ import com.l4digital.fastscroll.FastScroller;
 
 import java.util.Iterator;
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
+
+import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_friendlist;
 
 public class FriendlistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
@@ -55,11 +58,28 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         switch (viewType)
         {
             case CombinedFriendsAndConferences_model.ITEM_IS_FRIEND:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_entry, parent, false);
+                if (PREF__compact_friendlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_entry_compact, parent,
+                                                                            false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_entry, parent, false);
+                }
                 return new FriendListHolder(view, this.context);
 
             case CombinedFriendsAndConferences_model.ITEM_IS_CONFERENCE:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_conf_entry, parent, false);
+                if (PREF__compact_friendlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_conf_entry_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_conf_entry, parent,
+                                                                            false);
+                }
                 return new ConferenceListHolder(view, this.context);
         }
 
