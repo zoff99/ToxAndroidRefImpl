@@ -114,7 +114,16 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 return new MessageListHolder_text_outgoing_read(view, this.context);
 
             case Message_model.FILE_INCOMING_STATE_CANCEL:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming_compact, parent,
+                                                                            false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent,
+                                                                            false);
+                }
                 return new MessageListHolder_file_incoming_state_cancel(view, this.context);
             case Message_model.FILE_INCOMING_STATE_PAUSE_HAS_ACCEPTED:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
@@ -127,7 +136,16 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 return new MessageListHolder_file_incoming_state_resume(view, this.context);
 
             case Message_model.FILE_OUTGOING_STATE_CANCEL:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing_compact, parent,
+                                                                            false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent,
+                                                                            false);
+                }
                 return new MessageListHolder_file_outgoing_state_cancel(view, this.context);
             case Message_model.FILE_OUTGOING_STATE_PAUSE_HAS_ACCEPTED:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
