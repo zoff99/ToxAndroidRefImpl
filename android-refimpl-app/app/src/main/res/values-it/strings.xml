@@ -317,4 +317,8 @@
     <string name="pref_description_start_on_boot">avvia l\'applicazione dopo il boot.
 \nGoogle non lo permette più a partire da Android 10</string>
     <string name="pref_title_start_on_boot">avviare al boot</string>
+    <string name="pref_description_compact_chatlist">Visualizza il messaggio di chat più compatto risparmiando spazio</string>
+    <string name="pref_title_compact_chatlist">Lista chat compatta</string>
+    <string name="pref_description_compact_friendlist">Rendere la lista degli amici più compatta, se hai una grande lista di amici</string>
+    <string name="pref_title_compact_friendlist">Lista amici compatta</string>
 </resources>
