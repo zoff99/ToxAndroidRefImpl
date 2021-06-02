@@ -332,4 +332,8 @@
     <string name="pref_description_start_on_boot">exécute l’application après le démarrage.
 \nGoogle ne permet plus cela à partir d’Android 10</string>
     <string name="pref_title_start_on_boot">exécuter au démarrage</string>
+    <string name="pref_description_compact_chatlist">Affichage de la messagerie instantanée plus compact et moins encombrant</string>
+    <string name="pref_title_compact_chatlist">Liste de discussion compacte</string>
+    <string name="pref_description_compact_friendlist">Rends la liste d\'amis plus compacte, si vous avez une grande liste d\'amis</string>
+    <string name="pref_title_compact_friendlist">Liste d\'amis compacte</string>
 </resources>
