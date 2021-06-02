@@ -364,4 +364,8 @@
     <string name="pref_description_start_on_boot">önyüklemeden sonra uygulamayı başlat.
 \nGoogle, Android 10\'dan itibaren artık buna izin vermiyor</string>
     <string name="pref_title_start_on_boot">önyüklemede başlat</string>
+    <string name="pref_description_compact_chatlist">Alandan kazanmak için sohbet listesini daha sıkı bir şekilde görüntüleyin</string>
+    <string name="pref_title_compact_chatlist">Sohbet Listesini Sıkıştır</string>
+    <string name="pref_description_compact_friendlist">Geniş bir arkadaş listeniz varsa, onu daha sıkı hale getirin</string>
+    <string name="pref_title_compact_friendlist">Arkadaş Listesini Sıkıştır</string>
 </resources>
