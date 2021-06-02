@@ -148,6 +148,7 @@ public class MessageListActivity extends AppCompatActivity
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
+    static MenuItem amode_info_menu_item = null;
     static boolean oncreate_finished = false;
     CustomSpinner spinner_filter_msgs = null;
     SearchView messageSearchView = null;
@@ -165,6 +166,7 @@ public class MessageListActivity extends AppCompatActivity
 
         amode = null;
         amode_save_menu_item = null;
+        amode_info_menu_item = null;
         selected_messages.clear();
         selected_messages_text_only.clear();
         selected_messages_incoming_file.clear();
@@ -1802,6 +1804,15 @@ public class MessageListActivity extends AppCompatActivity
                     amode_save_menu_item.setVisible(false);
                 }
 
+                if ((selected_messages.size() == 1) && (selected_messages_text_only.size() == 1))
+                {
+                    amode_info_menu_item.setVisible(true);
+                }
+                else
+                {
+                    amode_info_menu_item.setVisible(false);
+                }
+
                 if (selected_messages.isEmpty())
                 {
                     // last item was de-selected
@@ -1843,6 +1854,15 @@ public class MessageListActivity extends AppCompatActivity
                         amode_save_menu_item.setVisible(false);
                     }
 
+                    if ((selected_messages.size() == 1) && (selected_messages_text_only.size() == 1))
+                    {
+                        amode_info_menu_item.setVisible(true);
+                    }
+                    else
+                    {
+                        amode_info_menu_item.setVisible(false);
+                    }
+
                     if (amode != null)
                     {
                         amode.setTitle("" + selected_messages.size() + " selected");
@@ -1881,6 +1901,7 @@ public class MessageListActivity extends AppCompatActivity
                     {
                         amode = message_list_activity.startSupportActionMode(new ToolbarActionMode(context));
                         amode_save_menu_item = amode.getMenu().findItem(R.id.action_save);
+                        amode_info_menu_item = amode.getMenu().findItem(R.id.action_info);
                         v.setBackgroundColor(Color.GRAY);
                         ret.is_selected = true;
                         selected_messages.add(message_.id);
@@ -1903,6 +1924,15 @@ public class MessageListActivity extends AppCompatActivity
                         else
                         {
                             amode_save_menu_item.setVisible(false);
+                        }
+
+                        if ((selected_messages.size() == 1) && (selected_messages_text_only.size() == 1))
+                        {
+                            amode_info_menu_item.setVisible(true);
+                        }
+                        else
+                        {
+                            amode_info_menu_item.setVisible(false);
                         }
 
                         if (amode != null)

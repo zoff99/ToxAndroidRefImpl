@@ -17,4 +17,10 @@
         android:icon="@drawable/ic_delete_white_24dp"
         android:title="@string/layout___delete"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_info"
+        android:icon="@drawable/ic_info_white_24dp"
+        android:title="@string/layout___info"
+        android:visible="false"
+        app:showAsAction="ifRoom"/>
 </menu>

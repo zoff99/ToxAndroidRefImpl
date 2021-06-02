@@ -32,6 +32,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
+
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperMessage
@@ -680,6 +682,99 @@ public class HelperMessage
 
                 MainActivity.clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text.toString()));
                 Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
+                MainActivity.selected_messages.clear();
+                MainActivity.selected_messages_incoming_file.clear();
+                MainActivity.selected_messages_text_only.clear();
+
+                try
+                {
+                    // need to redraw all items again here, to remove the selections
+                    MainActivity.message_list_fragment.adapter.redraw_all_items();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
+    }
+
+    static void show_select_message_info(Context c)
+    {
+        try
+        {
+            if (!MainActivity.selected_messages_text_only.isEmpty())
+            {
+                // sort ascending (lowest ID on top)
+                Collections.sort(MainActivity.selected_messages_text_only, new Comparator<Long>()
+                {
+                    public int compare(Long o1, Long o2)
+                    {
+                        return o1.compareTo(o2);
+                    }
+                });
+                StringBuilder copy_text = new StringBuilder();
+                boolean first = true;
+                Iterator i = MainActivity.selected_messages_text_only.iterator();
+
+                if (i.hasNext())
+                {
+                    try
+                    {
+                        final Message m = orma.selectFromMessage().idEq((Long) i.next()).get(0);
+
+                        // @formatter:off
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(c);
+                        builder.
+                                setMessage(
+                                        "id:"+m.id+"\n"+
+                                        "message_id:"+m.message_id+"\n"+
+                                        "direction:"+m.direction+"\n"+
+                                        "state:"+m.state+"\n"+
+                                        "read:"+m.read+"\n"+
+                                        "msg_version:"+m.msg_version+"\n"+
+                                        "msg_at_relay:"+m.msg_at_relay+"\n"+
+                                        "resend_count:"+m.resend_count+"\n"+
+                                        "send_retries:"+m.send_retries+"\n"+
+                                        "is_new:"+m.is_new+"\n"+
+                                        "msg_id_hash:"+m.msg_id_hash+"\n"+
+                                        "sent_timestamp:"+m.sent_timestamp+"\n"+
+                                        "sent_timestamp_ms:"+m.sent_timestamp_ms+"\n"+
+                                        "rcvd_timestamp:"+m.rcvd_timestamp+"\n"+
+                                        "rcvd_timestamp_ms:"+m.rcvd_timestamp_ms+"\n"+
+                                        "TOX_MESSAGE_TYPE:"+m.TOX_MESSAGE_TYPE+"\n"
+                                           ).
+                                setTitle("Message Info").
+                                setCancelable(false).
+                                setPositiveButton("OK", new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        dialog.dismiss();
+                                    }
+                                }).
+                                setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                        final AlertDialog alert = builder.create();
+                        alert.show();
+                        // @formatter:on
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
                 MainActivity.selected_messages.clear();
                 MainActivity.selected_messages_incoming_file.clear();
                 MainActivity.selected_messages_text_only.clear();

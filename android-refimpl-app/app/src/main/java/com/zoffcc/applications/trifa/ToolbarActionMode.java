@@ -19,25 +19,27 @@
 
 package com.zoffcc.applications.trifa;
 
-
 import android.content.Context;
 import android.os.Build;
-import androidx.core.view.MenuItemCompat;
-import androidx.appcompat.view.ActionMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import androidx.appcompat.view.ActionMode;
+import androidx.core.view.MenuItemCompat;
 
 import static com.zoffcc.applications.trifa.HelperConference.copy_selected_conference_messages;
 import static com.zoffcc.applications.trifa.HelperConference.delete_selected_conference_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.copy_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.delete_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.save_selected_messages;
+import static com.zoffcc.applications.trifa.HelperMessage.show_select_message_info;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode;
+import static com.zoffcc.applications.trifa.MessageListActivity.amode_info_menu_item;
 import static com.zoffcc.applications.trifa.MessageListActivity.amode_save_menu_item;
 
 public class ToolbarActionMode implements ActionMode.Callback
@@ -66,7 +68,7 @@ public class ToolbarActionMode implements ActionMode.Callback
     {
         // Log.i(TAG, "onPrepareActionMode");
 
-        //Sometimes the meu will not be visible so for that we need to set their visibility manually in this method
+        //Sometimes the menu will not be visible so for that we need to set their visibility manually in this method
         //So here show action menu according to SDK Levels
         if (Build.VERSION.SDK_INT < 11)
         {
@@ -127,6 +129,12 @@ public class ToolbarActionMode implements ActionMode.Callback
                 save_selected_messages(context);
                 mode.finish(); // Finish action mode
                 break;
+
+            case R.id.action_info:
+                action_active = true;
+                show_select_message_info(context);
+                mode.finish(); // Finish action mode
+                break;
         }
         return false;
     }
@@ -175,6 +183,7 @@ public class ToolbarActionMode implements ActionMode.Callback
             {
                 amode = null;
                 amode_save_menu_item = null;
+                amode_info_menu_item = null;
             }
         }
         catch (Exception e)
