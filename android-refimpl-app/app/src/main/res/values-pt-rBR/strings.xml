@@ -218,4 +218,8 @@
     <string name="pref_description_start_on_boot">inicia o aplicativo após a inicialização.
 \nA Google não permite mais isso começando com o Android 10</string>
     <string name="pref_title_start_on_boot">executar na inicialização</string>
+    <string name="pref_description_compact_chatlist">Exibir mensagem de bate-papo mais compacta, economizando espaço</string>
+    <string name="pref_title_compact_chatlist">Lista de bate-papo compacta</string>
+    <string name="pref_description_compact_friendlist">Torne a Lista de Amigos mais compacta, se você tiver uma grande lista de Amigos</string>
+    <string name="pref_title_compact_friendlist">Lista de amigos compacta</string>
 </resources>

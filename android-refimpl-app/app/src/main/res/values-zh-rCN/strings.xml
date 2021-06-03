@@ -345,4 +345,8 @@
     <string name="pref_description_start_on_boot">开机后启动本应用。
 \n从安卓 10 起，谷歌不再允许这一特性</string>
     <string name="pref_title_start_on_boot">开机时启动</string>
+    <string name="pref_description_compact_chatlist">以更紧凑的方式显示聊天信息以节省空间</string>
+    <string name="pref_title_compact_chatlist">紧凑式聊天列表</string>
+    <string name="pref_description_compact_friendlist">如果你有一个很长的好友列表，那么让好友列表更紧凑</string>
+    <string name="pref_title_compact_friendlist">紧凑式好友列表</string>
 </resources>
